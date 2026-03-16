@@ -1,0 +1,89 @@
+import { type ComponentType, StrictMode } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { createQueryClient } from '../api/query-client';
+import { AuthProvider } from '../auth/mp-token';
+import { ConfigProvider, parseDataAttributes, type WidgetConfig } from './config';
+
+export interface MountWidgetOptions {
+    /** ID of the target DOM element (e.g., 'perimeter-sermons') */
+    elementId: string;
+    /** Root React component to render */
+    component: ComponentType<Record<string, never>>;
+    /** Compiled CSS string to inject into the shadow root */
+    styles: string;
+    /** Default config values (overridden by data-* attributes) */
+    defaults?: WidgetConfig;
+    /** Whether this widget requires authentication */
+    requiresAuth?: boolean;
+}
+
+export interface MountResult {
+    destroy: () => void;
+}
+
+export function mountWidget(options: MountWidgetOptions): MountResult | null {
+    const {
+        elementId,
+        component: Component,
+        styles,
+        defaults = {},
+        requiresAuth = false,
+    } = options;
+
+    const element = document.getElementById(elementId);
+    if (!element) {
+        console.warn(
+            `[perimeter-widgets] Target element #${elementId} not found`,
+        );
+        return null;
+    }
+
+    // Reuse existing shadow root or create new one (handles HMR/re-mount)
+    const shadowRoot = element.shadowRoot || element.attachShadow({ mode: 'open' });
+
+    // Clear previous content (placeholder HTML or previous widget mount)
+    shadowRoot.innerHTML = '';
+
+    // Inject styles
+    const styleEl = document.createElement('style');
+    styleEl.textContent = styles;
+    shadowRoot.appendChild(styleEl);
+
+    // Create mount point inside shadow root
+    const mountPoint = document.createElement('div');
+    mountPoint.id = 'widget-root';
+    shadowRoot.appendChild(mountPoint);
+
+    // Parse config from data attributes
+    const dataConfig = parseDataAttributes(element);
+    const config = { ...defaults, ...dataConfig };
+
+    // Create isolated QueryClient
+    const queryClient = createQueryClient();
+
+    // Mount React
+    let root: Root | null = createRoot(mountPoint);
+
+    root.render(
+        <StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider requiresAuth={requiresAuth}>
+                    <ConfigProvider config={config}>
+                        <Component />
+                    </ConfigProvider>
+                </AuthProvider>
+            </QueryClientProvider>
+        </StrictMode>,
+    );
+
+    return {
+        destroy: () => {
+            if (root) {
+                root.unmount();
+                root = null;
+                queryClient.clear();
+            }
+        },
+    };
+}
