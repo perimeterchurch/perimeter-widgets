@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* Base reset for shadow DOM context */
+:host {
+    all: initial;
+    display: block;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: #1c1917;
+    line-height: 1.5;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}

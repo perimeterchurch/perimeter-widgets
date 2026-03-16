@@ -1,0 +1,31 @@
+@theme {
+    /* Primary */
+    --color-primary: #5B5BD6;
+    --color-primary-hover: #4E4EC2;
+    --color-primary-active: #4343B0;
+    --color-primary-foreground: #FFFFFF;
+
+    /* Success */
+    --color-success: #46A758;
+    --color-success-hover: #3D9A4E;
+    --color-success-foreground: #FFFFFF;
+
+    /* Warning */
+    --color-warning: #F5A623;
+    --color-warning-hover: #E09915;
+    --color-warning-foreground: #FFFFFF;
+
+    /* Error */
+    --color-error: #E54666;
+    --color-error-hover: #D63A59;
+    --color-error-foreground: #FFFFFF;
+
+    /* Font */
+    --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /* Border radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+}
