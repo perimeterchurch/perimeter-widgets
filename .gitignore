@@ -1,0 +1,8 @@
+node_modules/
+.turbo/
+*.tsbuildinfo
+.env
+.env.local
+.DS_Store
+# dist/ is NOT ignored — committed for jsDelivr CDN serving
+.superpowers/

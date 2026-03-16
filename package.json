@@ -1,0 +1,30 @@
+{
+    "name": "perimeter-widgets",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "turbo dev --filter=storyboard",
+        "build": "turbo build",
+        "test": "turbo test",
+        "lint": "turbo lint",
+        "typecheck": "turbo typecheck",
+        "format": "prettier --write .",
+        "storybook": "turbo storybook",
+        "quality": "turbo typecheck lint test && prettier --check ."
+    },
+    "devDependencies": {
+        "turbo": "^2",
+        "prettier": "^3",
+        "eslint": "^9",
+        "typescript": "^5.7",
+        "@eslint/js": "^9",
+        "typescript-eslint": "^8",
+        "eslint-plugin-react": "^7",
+        "eslint-plugin-react-hooks": "^5",
+        "eslint-config-prettier": "^10"
+    },
+    "packageManager": "pnpm@10.6.2",
+    "engines": {
+        "node": ">=20"
+    }
+}
