@@ -1,0 +1,23 @@
+{
+  "name": "@perimeter-widgets/vite-preset",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "vite": "^6",
+    "@vitejs/plugin-react": "^4",
+    "@tailwindcss/vite": "^4",
+    "vitest": "^3",
+    "@testing-library/react": "^16",
+    "@testing-library/jest-dom": "^6",
+    "jsdom": "^26"
+  },
+  "devDependencies": {
+    "@types/node": "^22"
+  }
+}
