@@ -19,15 +19,54 @@ interface ApiResponse<T> {
     };
 }
 
-const DEFAULT_BASE_URL = 'https://api.perimeter.org';
+const PRODUCTION_BASE_URL = 'https://api.perimeter.org';
+const DEV_BASE_URL = 'http://localhost:5500';
+
+/**
+ * Resolves the API base URL. Priority:
+ * 1. Explicit `baseUrl` option (e.g., from data-api-url attribute)
+ * 2. VITE_API_URL environment variable
+ * 3. localhost:5500 in development, api.perimeter.org in production
+ */
+function resolveBaseUrl(baseUrl?: string): string {
+    if (baseUrl) return baseUrl;
+
+    try {
+        // Vite injects import.meta.env at build time
+        const envUrl = (import.meta as { env?: { VITE_API_URL?: string } })
+            .env?.VITE_API_URL;
+        if (envUrl) return envUrl;
+
+        const isDev = (import.meta as { env?: { DEV?: boolean } }).env?.DEV;
+        if (isDev) return DEV_BASE_URL;
+    } catch {
+        // import.meta.env may not be available in all contexts
+    }
+
+    return PRODUCTION_BASE_URL;
+}
+
+function normalizeHeaders(
+    headers?: HeadersInit,
+): Record<string, string> {
+    if (!headers) return {};
+    if (headers instanceof Headers) {
+        return Object.fromEntries(headers.entries());
+    }
+    if (Array.isArray(headers)) {
+        return Object.fromEntries(headers);
+    }
+    return headers as Record<string, string>;
+}
 
 export function createApiClient(options: ApiClientOptions = {}): ApiClient {
-    const { baseUrl = DEFAULT_BASE_URL, requiresAuth = false } = options;
+    const { baseUrl, requiresAuth = false } = options;
+    const resolvedBaseUrl = resolveBaseUrl(baseUrl);
 
     async function request<T>(path: string, init?: RequestInit): Promise<T> {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            ...(init?.headers as Record<string, string>),
+            ...normalizeHeaders(init?.headers),
         };
 
         // Attach auth token if available and required
@@ -38,29 +77,33 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
             }
         }
 
-        const response = await fetch(`${baseUrl}${path}`, {
+        const response = await fetch(`${resolvedBaseUrl}${path}`, {
             ...init,
             headers,
         });
 
-        if (response.status === 401) {
-            // Token expired or invalid — surface to caller
-            throw new ApiError('Session expired', 401, 'TOKEN_EXPIRED');
-        }
-
         if (!response.ok) {
             const errorBody = await response.json().catch(() => null);
-            throw new ApiError(
-                errorBody?.message || `Request failed: ${response.status}`,
-                response.status,
-                errorBody?.code,
-            );
+            const message =
+                response.status === 401
+                    ? (errorBody?.message ?? 'Session expired')
+                    : (errorBody?.message ??
+                      `Request failed: ${response.status}`);
+            const code =
+                response.status === 401
+                    ? (errorBody?.code ?? 'TOKEN_EXPIRED')
+                    : errorBody?.code;
+            throw new ApiError(message, response.status, code);
         }
 
         const json: ApiResponse<T> = await response.json();
 
         if (!json.success) {
-            throw new ApiError('API returned unsuccessful response', 500);
+            throw new ApiError(
+                'API returned unsuccessful response',
+                200,
+                'UNSUCCESSFUL',
+            );
         }
 
         return json.data;

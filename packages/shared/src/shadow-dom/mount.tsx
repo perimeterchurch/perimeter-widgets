@@ -12,8 +12,8 @@ import {
 export interface MountWidgetOptions {
     /** ID of the target DOM element (e.g., 'perimeter-sermons') */
     elementId: string;
-    /** Root React component to render */
-    component: ComponentType<Record<string, never>>;
+    /** Root React component to render (must accept no props) */
+    component: ComponentType;
     /** Compiled CSS string to inject into the shadow root */
     styles: string;
     /** Default config values (overridden by data-* attributes) */

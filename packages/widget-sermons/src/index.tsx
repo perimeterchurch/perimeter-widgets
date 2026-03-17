@@ -8,6 +8,5 @@ mountWidget({
     styles,
     defaults: {
         perPage: 12,
-        apiUrl: 'https://api.perimeter.org',
     },
 });
