@@ -5,4 +5,6 @@ node_modules/
 .env.local
 .DS_Store
 # dist/ is NOT ignored — committed for jsDelivr CDN serving
+# But storyboard dist is a dev build, not for CDN
+packages/storyboard/dist/
 .superpowers/

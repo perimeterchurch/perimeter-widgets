@@ -1,40 +1,40 @@
 {
-  "name": "@perimeter-widgets/widget-sermons",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "main": "src/index.tsx",
-  "exports": {
-    ".": "./src/index.tsx",
-    "./app": "./src/App.tsx",
-    "./styles": "./src/styles.css",
-    "./types": "./src/types.ts"
-  },
-  "scripts": {
-    "build": "vite build",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
-    "dev": "vite"
-  },
-  "dependencies": {
-    "@perimeter-widgets/shared": "workspace:*",
-    "@tanstack/react-query": "^5",
-    "react": "^19",
-    "react-dom": "^19",
-    "zod": "^3"
-  },
-  "devDependencies": {
-    "@perimeter-widgets/vite-preset": "workspace:*",
-    "@testing-library/jest-dom": "^6",
-    "@testing-library/react": "^16",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^4",
-    "jsdom": "^26",
-    "tailwindcss": "^4",
-    "typescript": "^5.7",
-    "vite": "^6",
-    "vitest": "^3"
-  }
+    "name": "@perimeter-widgets/widget-sermons",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "src/index.tsx",
+    "exports": {
+        ".": "./src/index.tsx",
+        "./app": "./src/App.tsx",
+        "./styles": "./src/styles.css",
+        "./types": "./src/types.ts"
+    },
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint src/",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "@perimeter-widgets/shared": "workspace:*",
+        "@tanstack/react-query": "^5",
+        "react": "^19",
+        "react-dom": "^19",
+        "zod": "^3"
+    },
+    "devDependencies": {
+        "@perimeter-widgets/vite-preset": "workspace:*",
+        "@testing-library/jest-dom": "^6",
+        "@testing-library/react": "^16",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@vitejs/plugin-react": "^4",
+        "jsdom": "^26",
+        "tailwindcss": "^4",
+        "typescript": "^5.7",
+        "vite": "^6",
+        "vitest": "^3"
+    }
 }

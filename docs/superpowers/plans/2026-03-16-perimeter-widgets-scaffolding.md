@@ -19,6 +19,7 @@
 ### Task 1: Root Configuration Files
 
 **Files:**
+
 - Create: `package.json`
 - Create: `pnpm-workspace.yaml`
 - Create: `turbo.json`
@@ -34,28 +35,28 @@
 
 ```json
 {
-  "name": "perimeter-widgets",
-  "private": true,
-  "scripts": {
-    "dev": "turbo dev --filter=storyboard",
-    "build": "turbo build",
-    "test": "turbo test",
-    "lint": "turbo lint",
-    "typecheck": "turbo typecheck",
-    "format": "prettier --write .",
-    "storybook": "turbo storybook",
-    "quality": "turbo typecheck lint test && prettier --check ."
-  },
-  "devDependencies": {
-    "turbo": "^2",
-    "prettier": "^3",
-    "eslint": "^9",
-    "typescript": "^5.7"
-  },
-  "packageManager": "pnpm@10.6.2",
-  "engines": {
-    "node": ">=20"
-  }
+    "name": "perimeter-widgets",
+    "private": true,
+    "scripts": {
+        "dev": "turbo dev --filter=storyboard",
+        "build": "turbo build",
+        "test": "turbo test",
+        "lint": "turbo lint",
+        "typecheck": "turbo typecheck",
+        "format": "prettier --write .",
+        "storybook": "turbo storybook",
+        "quality": "turbo typecheck lint test && prettier --check ."
+    },
+    "devDependencies": {
+        "turbo": "^2",
+        "prettier": "^3",
+        "eslint": "^9",
+        "typescript": "^5.7"
+    },
+    "packageManager": "pnpm@10.6.2",
+    "engines": {
+        "node": ">=20"
+    }
 }
 ```
 
@@ -63,33 +64,33 @@
 
 ```yaml
 packages:
-  - "packages/*"
+    - 'packages/*'
 ```
 
 - [ ] **Step 3: Create `turbo.json`**
 
 ```jsonc
 {
-  "$schema": "https://turbo.build/schema.json",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+    "$schema": "https://turbo.build/schema.json",
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"],
+        },
+        "test": {
+            "dependsOn": ["^build"],
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true,
+        },
+        "storybook": {
+            "cache": false,
+            "persistent": true,
+        },
+        "lint": {},
+        "typecheck": {},
     },
-    "test": {
-      "dependsOn": ["^build"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "storybook": {
-      "cache": false,
-      "persistent": true
-    },
-    "lint": {},
-    "typecheck": {}
-  }
 }
 ```
 
@@ -97,26 +98,26 @@ packages:
 
 ```json
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
-  },
-  "exclude": ["node_modules", "dist"]
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "jsx": "react-jsx",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
+    },
+    "exclude": ["node_modules", "dist"]
 }
 ```
 
@@ -137,11 +138,11 @@ node_modules/
 
 ```json
 {
-  "semi": true,
-  "singleQuote": true,
-  "tabWidth": 4,
-  "trailingComma": "all",
-  "printWidth": 80
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 4,
+    "trailingComma": "all",
+    "printWidth": 80
 }
 ```
 
@@ -209,28 +210,28 @@ Turborepo monorepo of self-contained React widgets for embedding on perimeter.or
 
 ## Commands
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start widget storyboard (full widget previews) |
-| `pnpm build` | Build all widgets to `dist/` |
-| `pnpm build --filter=widget-sermons` | Build a single widget |
-| `pnpm test` | Run all widget tests via Turborepo |
-| `pnpm test --filter=widget-sermons` | Run tests for a single widget |
-| `pnpm storybook` | Start Storybook for shared components |
-| `pnpm lint` | Run ESLint across all packages |
-| `pnpm typecheck` | TypeScript type checking |
-| `pnpm quality` | Run all checks (typecheck + lint + format + test) |
+| Command                              | Description                                       |
+| ------------------------------------ | ------------------------------------------------- |
+| `pnpm dev`                           | Start widget storyboard (full widget previews)    |
+| `pnpm build`                         | Build all widgets to `dist/`                      |
+| `pnpm build --filter=widget-sermons` | Build a single widget                             |
+| `pnpm test`                          | Run all widget tests via Turborepo                |
+| `pnpm test --filter=widget-sermons`  | Run tests for a single widget                     |
+| `pnpm storybook`                     | Start Storybook for shared components             |
+| `pnpm lint`                          | Run ESLint across all packages                    |
+| `pnpm typecheck`                     | TypeScript type checking                          |
+| `pnpm quality`                       | Run all checks (typecheck + lint + format + test) |
 
 ## Architecture
 
 ### Monorepo Packages
 
-| Package | Name | Purpose |
-| --- | --- | --- |
-| `packages/shared/` | `@perimeter-widgets/shared` | API client, auth, shadow DOM mount, shared components, Tailwind preset |
-| `packages/vite-preset/` | `@perimeter-widgets/vite-preset` | Shared Vite config factory for widgets |
-| `packages/storyboard/` | `@perimeter-widgets/storyboard` | Dev preview app for full widget testing with MSW mocking |
-| `packages/widget-*/` | `@perimeter-widgets/widget-*` | Individual widget packages |
+| Package                 | Name                             | Purpose                                                                |
+| ----------------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| `packages/shared/`      | `@perimeter-widgets/shared`      | API client, auth, shadow DOM mount, shared components, Tailwind preset |
+| `packages/vite-preset/` | `@perimeter-widgets/vite-preset` | Shared Vite config factory for widgets                                 |
+| `packages/storyboard/`  | `@perimeter-widgets/storyboard`  | Dev preview app for full widget testing with MSW mocking               |
+| `packages/widget-*/`    | `@perimeter-widgets/widget-*`    | Individual widget packages                                             |
 
 ### Widget Build Pipeline
 
@@ -239,6 +240,7 @@ Each widget is a Vite library mode build that produces a single IIFE JS file in 
 ### Shadow DOM Mounting
 
 Widgets mount via `mountWidget()` from `@perimeter-widgets/shared`:
+
 1. Finds target `<div>` by element ID
 2. Reads `data-*` attributes as config
 3. Creates shadow root with injected styles
@@ -299,6 +301,7 @@ git commit -m "chore: scaffold monorepo root with turbo, pnpm workspaces, and co
 ### Task 2: Vite Preset Package
 
 **Files:**
+
 - Create: `packages/vite-preset/package.json`
 - Create: `packages/vite-preset/tsconfig.json`
 - Create: `packages/vite-preset/src/index.ts`
@@ -307,24 +310,24 @@ git commit -m "chore: scaffold monorepo root with turbo, pnpm workspaces, and co
 
 ```json
 {
-  "name": "@perimeter-widgets/vite-preset",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
-  "scripts": {
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "vite": "^6",
-    "@vitejs/plugin-react": "^4",
-    "@tailwindcss/vite": "^4",
-    "vitest": "^3",
-    "@testing-library/react": "^16",
-    "@testing-library/jest-dom": "^6",
-    "jsdom": "^26"
-  }
+    "name": "@perimeter-widgets/vite-preset",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "vite": "^6",
+        "@vitejs/plugin-react": "^4",
+        "@tailwindcss/vite": "^4",
+        "vitest": "^3",
+        "@testing-library/react": "^16",
+        "@testing-library/jest-dom": "^6",
+        "jsdom": "^26"
+    }
 }
 ```
 
@@ -332,12 +335,12 @@ git commit -m "chore: scaffold monorepo root with turbo, pnpm workspaces, and co
 
 ```json
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
-  },
-  "include": ["src"]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src"
+    },
+    "include": ["src"]
 }
 ```
 
@@ -424,6 +427,7 @@ git commit -m "feat: add vite-preset package with createWidgetConfig and createW
 ### Task 3: Shared Package — Foundation
 
 **Files:**
+
 - Create: `packages/shared/package.json`
 - Create: `packages/shared/tsconfig.json`
 - Create: `packages/shared/src/index.ts`
@@ -435,35 +439,35 @@ git commit -m "feat: add vite-preset package with createWidgetConfig and createW
 
 ```json
 {
-  "name": "@perimeter-widgets/shared",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./styles": "./src/styles/base.css",
-    "./styles/tokens": "./src/styles/tokens.css"
-  },
-  "scripts": {
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
-  "dependencies": {
-    "react": "^19",
-    "react-dom": "^19",
-    "@tanstack/react-query": "^5",
-    "zod": "^3"
-  },
-  "devDependencies": {
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "tailwindcss": "^4",
-    "typescript": "^5.7"
-  }
+    "name": "@perimeter-widgets/shared",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "exports": {
+        ".": "./src/index.ts",
+        "./styles": "./src/styles/base.css",
+        "./styles/tokens": "./src/styles/tokens.css"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint src/",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
+    },
+    "dependencies": {
+        "react": "^19",
+        "react-dom": "^19",
+        "@tanstack/react-query": "^5",
+        "zod": "^3"
+    },
+    "devDependencies": {
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "tailwindcss": "^4",
+        "typescript": "^5.7"
+    }
 }
 ```
 
@@ -471,12 +475,12 @@ git commit -m "feat: add vite-preset package with createWidgetConfig and createW
 
 ```json
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
-  },
-  "include": ["src"]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src"
+    },
+    "include": ["src"]
 }
 ```
 
@@ -487,25 +491,25 @@ Tailwind v4 uses CSS-first configuration via `@theme` directives. This file defi
 ```css
 @theme {
     /* Primary */
-    --color-primary: #5B5BD6;
-    --color-primary-hover: #4E4EC2;
-    --color-primary-active: #4343B0;
-    --color-primary-foreground: #FFFFFF;
+    --color-primary: #5b5bd6;
+    --color-primary-hover: #4e4ec2;
+    --color-primary-active: #4343b0;
+    --color-primary-foreground: #ffffff;
 
     /* Success */
-    --color-success: #46A758;
-    --color-success-hover: #3D9A4E;
-    --color-success-foreground: #FFFFFF;
+    --color-success: #46a758;
+    --color-success-hover: #3d9a4e;
+    --color-success-foreground: #ffffff;
 
     /* Warning */
-    --color-warning: #F5A623;
-    --color-warning-hover: #E09915;
-    --color-warning-foreground: #FFFFFF;
+    --color-warning: #f5a623;
+    --color-warning-hover: #e09915;
+    --color-warning-foreground: #ffffff;
 
     /* Error */
-    --color-error: #E54666;
-    --color-error-hover: #D63A59;
-    --color-error-foreground: #FFFFFF;
+    --color-error: #e54666;
+    --color-error-hover: #d63a59;
+    --color-error-foreground: #ffffff;
 
     /* Font */
     --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -530,7 +534,12 @@ Remove the `tailwind.preset.ts` file from the plan — the JS preset approach is
 :host {
     all: initial;
     display: block;
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        'Segoe UI',
+        Roboto,
+        sans-serif;
     color: #1c1917;
     line-height: 1.5;
 }
@@ -591,6 +600,7 @@ git commit -m "feat: add shared package foundation with tailwind tokens and base
 ### Task 4: Shadow DOM Mount Utility
 
 **Files:**
+
 - Create: `packages/shared/src/shadow-dom/mount.tsx`
 - Create: `packages/shared/src/shadow-dom/config.tsx`
 
@@ -657,7 +667,11 @@ import { createRoot, type Root } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createQueryClient } from '../api/query-client';
 import { AuthProvider } from '../auth/mp-token';
-import { ConfigProvider, parseDataAttributes, type WidgetConfig } from './config';
+import {
+    ConfigProvider,
+    parseDataAttributes,
+    type WidgetConfig,
+} from './config';
 
 export interface MountWidgetOptions {
     /** ID of the target DOM element (e.g., 'perimeter-sermons') */
@@ -694,7 +708,8 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
     }
 
     // Reuse existing shadow root or create new one (handles HMR/re-mount)
-    const shadowRoot = element.shadowRoot || element.attachShadow({ mode: 'open' });
+    const shadowRoot =
+        element.shadowRoot || element.attachShadow({ mode: 'open' });
 
     // Clear previous content (placeholder HTML or previous widget mount)
     shadowRoot.innerHTML = '';
@@ -755,6 +770,7 @@ git commit -m "feat: add shadow DOM mount utility and config context"
 ### Task 5: API Client
 
 **Files:**
+
 - Create: `packages/shared/src/api/client.ts`
 - Create: `packages/shared/src/api/query-client.ts`
 
@@ -805,10 +821,7 @@ const DEFAULT_BASE_URL = 'https://api.perimeter.org';
 export function createApiClient(options: ApiClientOptions = {}): ApiClient {
     const { baseUrl = DEFAULT_BASE_URL, requiresAuth = false } = options;
 
-    async function request<T>(
-        path: string,
-        init?: RequestInit,
-    ): Promise<T> {
+    async function request<T>(path: string, init?: RequestInit): Promise<T> {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             ...(init?.headers as Record<string, string>),
@@ -887,6 +900,7 @@ git commit -m "feat: add API client with response envelope unwrapping and query 
 ### Task 6: Auth Utility
 
 **Files:**
+
 - Create: `packages/shared/src/auth/mp-token.tsx`
 
 - [ ] **Step 1: Create `packages/shared/src/auth/mp-token.tsx`**
@@ -999,6 +1013,7 @@ git commit -m "feat: add MP token auth utility and AuthProvider context"
 ### Task 7: Shared Package — Tests
 
 **Files:**
+
 - Create: `packages/shared/src/shadow-dom/__tests__/config.test.ts`
 - Create: `packages/shared/src/shadow-dom/__tests__/mount.test.tsx`
 - Create: `packages/shared/src/api/__tests__/client.test.ts`
@@ -1160,7 +1175,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { mountWidget } from '../mount';
 
 function TestComponent() {
-    return <div data-testid="test-widget">Hello Widget</div>;
+    return <div data-testid='test-widget'>Hello Widget</div>;
 }
 
 describe('mountWidget', () => {
@@ -1348,6 +1363,7 @@ git commit -m "test: add tests for config parser, MP token auth, and API client"
 ### Task 8: Sermons Widget Skeleton
 
 **Files:**
+
 - Create: `packages/widget-sermons/package.json`
 - Create: `packages/widget-sermons/tsconfig.json`
 - Create: `packages/widget-sermons/vite.config.ts`
@@ -1361,38 +1377,38 @@ git commit -m "test: add tests for config parser, MP token auth, and API client"
 
 ```json
 {
-  "name": "@perimeter-widgets/widget-sermons",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "main": "src/index.tsx",
-  "exports": {
-    ".": "./src/index.tsx",
-    "./app": "./src/App.tsx",
-    "./styles": "./src/styles.css",
-    "./types": "./src/types.ts"
-  },
-  "scripts": {
-    "build": "vite build",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
-    "dev": "vite"
-  },
-  "dependencies": {
-    "react": "^19",
-    "react-dom": "^19",
-    "@tanstack/react-query": "^5",
-    "@perimeter-widgets/shared": "workspace:*",
-    "zod": "^3"
-  },
-  "devDependencies": {
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@perimeter-widgets/vite-preset": "workspace:*",
-    "tailwindcss": "^4",
-    "typescript": "^5.7"
-  }
+    "name": "@perimeter-widgets/widget-sermons",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "src/index.tsx",
+    "exports": {
+        ".": "./src/index.tsx",
+        "./app": "./src/App.tsx",
+        "./styles": "./src/styles.css",
+        "./types": "./src/types.ts"
+    },
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint src/",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "react": "^19",
+        "react-dom": "^19",
+        "@tanstack/react-query": "^5",
+        "@perimeter-widgets/shared": "workspace:*",
+        "zod": "^3"
+    },
+    "devDependencies": {
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@perimeter-widgets/vite-preset": "workspace:*",
+        "tailwindcss": "^4",
+        "typescript": "^5.7"
+    }
 }
 ```
 
@@ -1400,12 +1416,12 @@ git commit -m "test: add tests for config parser, MP token auth, and API client"
 
 ```json
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
-  },
-  "include": ["src"]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src"
+    },
+    "include": ["src"]
 }
 ```
 
@@ -1486,14 +1502,12 @@ export function SermonsApp() {
     const config = useConfig<SermonsConfig>();
 
     return (
-        <div className="p-4">
-            <h2 className="text-2xl font-bold text-stone-900 mb-4">
-                Sermons
-            </h2>
-            <p className="text-stone-600">
+        <div className='p-4'>
+            <h2 className='text-2xl font-bold text-stone-900 mb-4'>Sermons</h2>
+            <p className='text-stone-600'>
                 Sermons widget is loading. Campus: {config.campus ?? 'all'}
             </p>
-            <p className="text-sm text-stone-400 mt-2">
+            <p className='text-sm text-stone-400 mt-2'>
                 This is a placeholder — sermon components will be built once the
                 API endpoints are ready.
             </p>
@@ -1543,6 +1557,7 @@ git commit -m "feat: add sermons widget skeleton with shadow DOM mount and IIFE 
 ### Task 9: Sermons Widget Test
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/__tests__/App.test.tsx`
 
 - [ ] **Step 1: Write App test**
@@ -1551,7 +1566,11 @@ git commit -m "feat: add sermons widget skeleton with shadow DOM mount and IIFE 
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { createQueryClient, AuthProvider, ConfigProvider } from '@perimeter-widgets/shared';
+import {
+    createQueryClient,
+    AuthProvider,
+    ConfigProvider,
+} from '@perimeter-widgets/shared';
 import { SermonsApp } from '../App';
 
 function renderWithProviders(config: Record<string, unknown> = {}) {
@@ -1559,7 +1578,9 @@ function renderWithProviders(config: Record<string, unknown> = {}) {
     return render(
         <QueryClientProvider client={queryClient}>
             <AuthProvider requiresAuth={false}>
-                <ConfigProvider config={{ campus: 'buckhead', perPage: 12, ...config }}>
+                <ConfigProvider
+                    config={{ campus: 'buckhead', perPage: 12, ...config }}
+                >
                     <SermonsApp />
                 </ConfigProvider>
             </AuthProvider>
@@ -1599,6 +1620,7 @@ git commit -m "test: add sermons widget App component tests"
 ### Task 10: Shared Component — Button (First Storybook Component)
 
 **Files:**
+
 - Create: `packages/shared/src/components/Button.tsx`
 - Create: `packages/shared/src/components/Button.stories.tsx`
 - Create: `packages/shared/src/components/index.ts`
@@ -1656,9 +1678,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 `.trim()}
                 {...props}
             >
-                {isLoading ? (
-                    <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : null}
+                {isLoading ?
+                    <span className='mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
+                :   null}
                 {children}
             </button>
         );
@@ -1732,9 +1754,9 @@ export const Disabled: Story = {
 export const Sizes: Story = {
     render: () => (
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Button size="sm">Small</Button>
-            <Button size="md">Medium</Button>
-            <Button size="lg">Large</Button>
+            <Button size='sm'>Small</Button>
+            <Button size='md'>Medium</Button>
+            <Button size='lg'>Large</Button>
         </div>
     ),
 };
@@ -1752,6 +1774,7 @@ git commit -m "feat: add Button component with Storybook stories"
 ### Task 11: Storybook Configuration
 
 **Files:**
+
 - Create: `packages/shared/.storybook/main.ts`
 - Create: `packages/shared/.storybook/preview.ts`
 
@@ -1822,6 +1845,7 @@ git commit -m "feat: add Storybook configuration for shared components"
 ### Task 12: Storyboard (Widget Preview App)
 
 **Files:**
+
 - Create: `packages/storyboard/package.json`
 - Create: `packages/storyboard/tsconfig.json`
 - Create: `packages/storyboard/vite.config.ts`
@@ -1837,31 +1861,31 @@ git commit -m "feat: add Storybook configuration for shared components"
 
 ```json
 {
-  "name": "@perimeter-widgets/storyboard",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "react": "^19",
-    "react-dom": "^19",
-    "@perimeter-widgets/shared": "workspace:*",
-    "@perimeter-widgets/widget-sermons": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^4",
-    "@tailwindcss/vite": "^4",
-    "vite": "^6",
-    "tailwindcss": "^4",
-    "msw": "^2",
-    "typescript": "^5.7"
-  }
+    "name": "@perimeter-widgets/storyboard",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "react": "^19",
+        "react-dom": "^19",
+        "@perimeter-widgets/shared": "workspace:*",
+        "@perimeter-widgets/widget-sermons": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@vitejs/plugin-react": "^4",
+        "@tailwindcss/vite": "^4",
+        "vite": "^6",
+        "tailwindcss": "^4",
+        "msw": "^2",
+        "typescript": "^5.7"
+    }
 }
 ```
 
@@ -1869,14 +1893,14 @@ git commit -m "feat: add Storybook configuration for shared components"
 
 ```json
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
-  },
-  "include": ["src"]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "noUnusedLocals": false,
+        "noUnusedParameters": false
+    },
+    "include": ["src"]
 }
 ```
 
@@ -1900,15 +1924,15 @@ export default defineConfig({
 ```html
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perimeter Widgets — Storyboard</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Perimeter Widgets — Storyboard</title>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
 </html>
 ```
 
@@ -1918,7 +1942,12 @@ export default defineConfig({
 @import 'tailwindcss';
 
 body {
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        'Segoe UI',
+        Roboto,
+        sans-serif;
     margin: 0;
     background: #fafaf9;
     color: #1c1917;
@@ -2048,27 +2077,27 @@ export const handlers = [
 ```tsx
 export function SermonsPreview() {
     return (
-        <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-stone-800">
+        <div className='space-y-4'>
+            <h3 className='text-lg font-semibold text-stone-800'>
                 Sermons Widget
             </h3>
-            <p className="text-sm text-stone-500">
+            <p className='text-sm text-stone-500'>
                 This preview mounts the sermons widget inside a shadow DOM
                 container, exactly as it would appear on perimeter.org.
             </p>
 
             {/* The actual widget mount target — simulates the WordPress embed */}
-            <div className="border border-stone-200 rounded-lg overflow-hidden">
+            <div className='border border-stone-200 rounded-lg overflow-hidden'>
                 <div
-                    id="perimeter-sermons"
-                    data-campus="buckhead"
-                    data-per-page="12"
+                    id='perimeter-sermons'
+                    data-campus='buckhead'
+                    data-per-page='12'
                 />
             </div>
 
-            <p className="text-xs text-stone-400">
-                Element: <code>#perimeter-sermons</code> |
-                Config: campus=buckhead, perPage=12
+            <p className='text-xs text-stone-400'>
+                Element: <code>#perimeter-sermons</code> | Config:
+                campus=buckhead, perPage=12
             </p>
         </div>
     );
@@ -2090,32 +2119,32 @@ export function App() {
     const ActiveWidget = widgets.find((w) => w.id === active)?.component;
 
     return (
-        <div className="min-h-screen">
+        <div className='min-h-screen'>
             {/* Header */}
-            <header className="bg-white border-b border-stone-200 px-6 py-4">
-                <h1 className="text-xl font-bold text-stone-900">
+            <header className='bg-white border-b border-stone-200 px-6 py-4'>
+                <h1 className='text-xl font-bold text-stone-900'>
                     Perimeter Widgets — Storyboard
                 </h1>
-                <p className="text-sm text-stone-500 mt-1">
+                <p className='text-sm text-stone-500 mt-1'>
                     Preview widgets as they appear on perimeter.org
                 </p>
             </header>
 
-            <div className="flex">
+            <div className='flex'>
                 {/* Sidebar */}
-                <nav className="w-56 border-r border-stone-200 bg-white p-4 min-h-[calc(100vh-73px)]">
-                    <h2 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
+                <nav className='w-56 border-r border-stone-200 bg-white p-4 min-h-[calc(100vh-73px)]'>
+                    <h2 className='text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3'>
                         Widgets
                     </h2>
-                    <ul className="space-y-1">
+                    <ul className='space-y-1'>
                         {widgets.map((w) => (
                             <li key={w.id}>
                                 <button
                                     onClick={() => setActive(w.id)}
                                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                                        active === w.id
-                                            ? 'bg-primary text-white'
-                                            : 'text-stone-700 hover:bg-stone-100'
+                                        active === w.id ?
+                                            'bg-primary text-white'
+                                        :   'text-stone-700 hover:bg-stone-100'
                                     }`}
                                 >
                                     {w.name}
@@ -2126,8 +2155,10 @@ export function App() {
                 </nav>
 
                 {/* Preview area */}
-                <main className="flex-1 p-8">
-                    {ActiveWidget ? <ActiveWidget /> : null}
+                <main className='flex-1 p-8'>
+                    {ActiveWidget ?
+                        <ActiveWidget />
+                    :   null}
                 </main>
             </div>
         </div>
@@ -2201,24 +2232,24 @@ export function SermonsPreview() {
     }, []);
 
     return (
-        <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-stone-800">
+        <div className='space-y-4'>
+            <h3 className='text-lg font-semibold text-stone-800'>
                 Sermons Widget
             </h3>
-            <p className="text-sm text-stone-500">
+            <p className='text-sm text-stone-500'>
                 This preview mounts the sermons widget inside a shadow DOM
                 container, exactly as it would appear on perimeter.org.
             </p>
-            <div className="border border-stone-200 rounded-lg overflow-hidden">
+            <div className='border border-stone-200 rounded-lg overflow-hidden'>
                 <div
-                    id="perimeter-sermons"
-                    data-campus="buckhead"
-                    data-per-page="12"
+                    id='perimeter-sermons'
+                    data-campus='buckhead'
+                    data-per-page='12'
                 />
             </div>
-            <p className="text-xs text-stone-400">
-                Element: <code>#perimeter-sermons</code> |
-                Config: campus=buckhead, perPage=12
+            <p className='text-xs text-stone-400'>
+                Element: <code>#perimeter-sermons</code> | Config:
+                campus=buckhead, perPage=12
             </p>
         </div>
     );
@@ -2250,6 +2281,7 @@ git commit -m "feat: add storyboard widget preview app with MSW mocking"
 ### Task 13: Build Manifest Generator
 
 **Files:**
+
 - Create: `scripts/generate-manifest.ts`
 - Modify: Root `package.json` — add `postbuild` script
 
@@ -2335,6 +2367,7 @@ Expected: `dist/manifest.json` is created with the sermons widget entry
 
 Run: `cat dist/manifest.json`
 Expected:
+
 ```json
 {
   "widgets": {
@@ -2359,6 +2392,7 @@ git commit -m "feat: add build manifest generator for CDN cache purging"
 ### Task 14: GitHub Action — Build & Purge
 
 **Files:**
+
 - Create: `.github/workflows/build-and-purge.yml`
 
 - [ ] **Step 1: Create `.github/workflows/build-and-purge.yml`**
@@ -2367,63 +2401,63 @@ git commit -m "feat: add build manifest generator for CDN cache purging"
 name: Build and Purge CDN
 
 on:
-  push:
-    branches: [main]
+    push:
+        branches: [main]
 
 jobs:
-  build-and-purge:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    build-and-purge:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+            - uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Build all widgets
-        run: pnpm build
+            - name: Build all widgets
+              run: pnpm build
 
-      - name: Check for dist changes
-        id: check-dist
-        run: |
-          if git diff --quiet dist/; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
+            - name: Check for dist changes
+              id: check-dist
+              run: |
+                  if git diff --quiet dist/; then
+                    echo "changed=false" >> $GITHUB_OUTPUT
+                  else
+                    echo "changed=true" >> $GITHUB_OUTPUT
+                  fi
 
-      - name: Commit dist changes
-        if: steps.check-dist.outputs.changed == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add dist/
-          git commit -m "chore: update built widget files"
-          git push
+            - name: Commit dist changes
+              if: steps.check-dist.outputs.changed == 'true'
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add dist/
+                  git commit -m "chore: update built widget files"
+                  git push
 
-      - name: Purge jsDelivr cache
-        if: steps.check-dist.outputs.changed == 'true'
-        run: |
-          # Read manifest and purge each widget file
-          node -e "
-            const { readFileSync } = require('fs');
-            const manifest = JSON.parse(readFileSync('./dist/manifest.json', 'utf8'));
-            const widgets = Object.values(manifest.widgets);
-            (async () => {
-              for (const w of widgets) {
-                const url = 'https://purge.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/' + w.file;
-                console.log('Purging: ' + url);
-                const r = await fetch(url);
-                console.log('  Status: ' + r.status);
-              }
-            })();
-          "
+            - name: Purge jsDelivr cache
+              if: steps.check-dist.outputs.changed == 'true'
+              run: |
+                  # Read manifest and purge each widget file
+                  node -e "
+                    const { readFileSync } = require('fs');
+                    const manifest = JSON.parse(readFileSync('./dist/manifest.json', 'utf8'));
+                    const widgets = Object.values(manifest.widgets);
+                    (async () => {
+                      for (const w of widgets) {
+                        const url = 'https://purge.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/' + w.file;
+                        console.log('Purging: ' + url);
+                        const r = await fetch(url);
+                        console.log('  Status: ' + r.status);
+                      }
+                    })();
+                  "
 ```
 
 - [ ] **Step 2: Commit**
@@ -2454,18 +2488,23 @@ Create a temporary test file (do NOT commit):
 ```html
 <!DOCTYPE html>
 <html>
-<head><title>Widget Test</title></head>
-<body>
-  <h1>WordPress Simulation</h1>
-  <div id="perimeter-sermons" data-campus="buckhead" data-per-page="12">
-    <div style="min-height:200px;background:#f5f5f4;border-radius:8px"></div>
-  </div>
-  <script src="dist/sermons/sermons.js"></script>
-</body>
+    <head>
+        <title>Widget Test</title>
+    </head>
+    <body>
+        <h1>WordPress Simulation</h1>
+        <div id="perimeter-sermons" data-campus="buckhead" data-per-page="12">
+            <div
+                style="min-height:200px;background:#f5f5f4;border-radius:8px"
+            ></div>
+        </div>
+        <script src="dist/sermons/sermons.js"></script>
+    </body>
 </html>
 ```
 
 Open in browser and verify:
+
 - Shadow DOM is created on the target element
 - Placeholder content is replaced by the React widget
 - Widget shows "Sermons" heading and campus config

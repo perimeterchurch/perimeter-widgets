@@ -44,9 +44,9 @@ export const Disabled: Story = {
 export const Sizes: Story = {
     render: () => (
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Button size="sm">Small</Button>
-            <Button size="md">Medium</Button>
-            <Button size="lg">Large</Button>
+            <Button size='sm'>Small</Button>
+            <Button size='md'>Medium</Button>
+            <Button size='lg'>Large</Button>
         </div>
     ),
 };

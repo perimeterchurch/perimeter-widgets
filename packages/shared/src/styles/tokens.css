@@ -1,24 +1,24 @@
 @theme {
     /* Primary */
-    --color-primary: #5B5BD6;
-    --color-primary-hover: #4E4EC2;
-    --color-primary-active: #4343B0;
-    --color-primary-foreground: #FFFFFF;
+    --color-primary: #5b5bd6;
+    --color-primary-hover: #4e4ec2;
+    --color-primary-active: #4343b0;
+    --color-primary-foreground: #ffffff;
 
     /* Success */
-    --color-success: #46A758;
-    --color-success-hover: #3D9A4E;
-    --color-success-foreground: #FFFFFF;
+    --color-success: #46a758;
+    --color-success-hover: #3d9a4e;
+    --color-success-foreground: #ffffff;
 
     /* Warning */
-    --color-warning: #F5A623;
-    --color-warning-hover: #E09915;
-    --color-warning-foreground: #FFFFFF;
+    --color-warning: #f5a623;
+    --color-warning-hover: #e09915;
+    --color-warning-foreground: #ffffff;
 
     /* Error */
-    --color-error: #E54666;
-    --color-error-hover: #D63A59;
-    --color-error-foreground: #FFFFFF;
+    --color-error: #e54666;
+    --color-error-hover: #d63a59;
+    --color-error-foreground: #ffffff;
 
     /* Font */
     --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;

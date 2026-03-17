@@ -8,28 +8,28 @@ Turborepo monorepo of self-contained React widgets for embedding on perimeter.or
 
 ## Commands
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start widget storyboard (full widget previews) |
-| `pnpm build` | Build all widgets to `dist/` |
-| `pnpm build --filter=widget-sermons` | Build a single widget |
-| `pnpm test` | Run all widget tests via Turborepo |
-| `pnpm test --filter=widget-sermons` | Run tests for a single widget |
-| `pnpm storybook` | Start Storybook for shared components |
-| `pnpm lint` | Run ESLint across all packages |
-| `pnpm typecheck` | TypeScript type checking |
-| `pnpm quality` | Run all checks (typecheck + lint + format + test) |
+| Command                              | Description                                       |
+| ------------------------------------ | ------------------------------------------------- |
+| `pnpm dev`                           | Start widget storyboard (full widget previews)    |
+| `pnpm build`                         | Build all widgets to `dist/`                      |
+| `pnpm build --filter=widget-sermons` | Build a single widget                             |
+| `pnpm test`                          | Run all widget tests via Turborepo                |
+| `pnpm test --filter=widget-sermons`  | Run tests for a single widget                     |
+| `pnpm storybook`                     | Start Storybook for shared components             |
+| `pnpm lint`                          | Run ESLint across all packages                    |
+| `pnpm typecheck`                     | TypeScript type checking                          |
+| `pnpm quality`                       | Run all checks (typecheck + lint + format + test) |
 
 ## Architecture
 
 ### Monorepo Packages
 
-| Package | Name | Purpose |
-| --- | --- | --- |
-| `packages/shared/` | `@perimeter-widgets/shared` | API client, auth, shadow DOM mount, shared components, Tailwind preset |
-| `packages/vite-preset/` | `@perimeter-widgets/vite-preset` | Shared Vite config factory for widgets |
-| `packages/storyboard/` | `@perimeter-widgets/storyboard` | Dev preview app for full widget testing with MSW mocking |
-| `packages/widget-*/` | `@perimeter-widgets/widget-*` | Individual widget packages |
+| Package                 | Name                             | Purpose                                                                |
+| ----------------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| `packages/shared/`      | `@perimeter-widgets/shared`      | API client, auth, shadow DOM mount, shared components, Tailwind preset |
+| `packages/vite-preset/` | `@perimeter-widgets/vite-preset` | Shared Vite config factory for widgets                                 |
+| `packages/storyboard/`  | `@perimeter-widgets/storyboard`  | Dev preview app for full widget testing with MSW mocking               |
+| `packages/widget-*/`    | `@perimeter-widgets/widget-*`    | Individual widget packages                                             |
 
 ### Widget Build Pipeline
 
@@ -38,6 +38,7 @@ Each widget is a Vite library mode build that produces a single IIFE JS file in 
 ### Shadow DOM Mounting
 
 Widgets mount via `mountWidget()` from `@perimeter-widgets/shared`:
+
 1. Finds target `<div>` by element ID
 2. Reads `data-*` attributes as config
 3. Creates shadow root with injected styles

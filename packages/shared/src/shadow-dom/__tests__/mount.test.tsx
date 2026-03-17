@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mountWidget, type MountResult } from '../mount';
 
 function TestComponent() {
-    return <div data-testid="test-widget">Hello Widget</div>;
+    return <div data-testid='test-widget'>Hello Widget</div>;
 }
 
 describe('mountWidget', () => {

@@ -10,23 +10,20 @@ describe('getMPToken', () => {
             delete store[key];
         }
 
-        vi.stubGlobal(
-            'localStorage',
-            {
-                getItem: (key: string) => store[key] ?? null,
-                setItem: (key: string, value: string) => {
-                    store[key] = value;
-                },
-                removeItem: (key: string) => {
-                    delete store[key];
-                },
-                clear: () => {
-                    for (const key of Object.keys(store)) {
-                        delete store[key];
-                    }
-                },
+        vi.stubGlobal('localStorage', {
+            getItem: (key: string) => store[key] ?? null,
+            setItem: (key: string, value: string) => {
+                store[key] = value;
             },
-        );
+            removeItem: (key: string) => {
+                delete store[key];
+            },
+            clear: () => {
+                for (const key of Object.keys(store)) {
+                    delete store[key];
+                }
+            },
+        });
     });
 
     it('returns authenticated: false when no token', () => {
@@ -50,15 +47,20 @@ describe('getMPToken', () => {
     });
 
     it('returns authenticated: false for expired token', () => {
-        store['mpp-widgets_AuthToken'] = 'a-valid-access-token-that-is-long-enough';
-        store['mpp-widgets_ExpiresAfter'] = new Date(Date.now() - 60000).toISOString();
+        store['mpp-widgets_AuthToken'] =
+            'a-valid-access-token-that-is-long-enough';
+        store['mpp-widgets_ExpiresAfter'] = new Date(
+            Date.now() - 60000,
+        ).toISOString();
         expect(getMPToken()).toEqual({ authenticated: false });
     });
 
     it('returns authenticated: true for non-expired token', () => {
         const token = 'a-valid-access-token-that-is-long-enough';
         store['mpp-widgets_AuthToken'] = token;
-        store['mpp-widgets_ExpiresAfter'] = new Date(Date.now() + 3600000).toISOString();
+        store['mpp-widgets_ExpiresAfter'] = new Date(
+            Date.now() + 3600000,
+        ).toISOString();
         expect(getMPToken()).toEqual({ authenticated: true, token });
     });
 });

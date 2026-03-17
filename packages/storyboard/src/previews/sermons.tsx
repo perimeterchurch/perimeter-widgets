@@ -29,24 +29,24 @@ export function SermonsPreview() {
     }, []);
 
     return (
-        <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-stone-800">
+        <div className='space-y-4'>
+            <h3 className='text-lg font-semibold text-stone-800'>
                 Sermons Widget
             </h3>
-            <p className="text-sm text-stone-500">
+            <p className='text-sm text-stone-500'>
                 This preview mounts the sermons widget inside a shadow DOM
                 container, exactly as it would appear on perimeter.org.
             </p>
-            <div className="border border-stone-200 rounded-lg overflow-hidden">
+            <div className='border border-stone-200 rounded-lg overflow-hidden'>
                 <div
-                    id="perimeter-sermons"
-                    data-campus="buckhead"
-                    data-per-page="12"
+                    id='perimeter-sermons'
+                    data-campus='buckhead'
+                    data-per-page='12'
                 />
             </div>
-            <p className="text-xs text-stone-400">
-                Element: <code>#perimeter-sermons</code> |
-                Config: campus=buckhead, perPage=12
+            <p className='text-xs text-stone-400'>
+                Element: <code>#perimeter-sermons</code> | Config:
+                campus=buckhead, perPage=12
             </p>
         </div>
     );

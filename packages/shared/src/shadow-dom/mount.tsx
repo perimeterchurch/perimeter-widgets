@@ -3,7 +3,11 @@ import { createRoot, type Root } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createQueryClient } from '../api/query-client';
 import { AuthProvider } from '../auth/mp-token';
-import { ConfigProvider, parseDataAttributes, type WidgetConfig } from './config';
+import {
+    ConfigProvider,
+    parseDataAttributes,
+    type WidgetConfig,
+} from './config';
 
 export interface MountWidgetOptions {
     /** ID of the target DOM element (e.g., 'perimeter-sermons') */
@@ -40,7 +44,8 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
     }
 
     // Reuse existing shadow root or create new one (handles HMR/re-mount)
-    const shadowRoot = element.shadowRoot || element.attachShadow({ mode: 'open' });
+    const shadowRoot =
+        element.shadowRoot || element.attachShadow({ mode: 'open' });
 
     // Clear previous content (placeholder HTML or previous widget mount)
     shadowRoot.innerHTML = '';

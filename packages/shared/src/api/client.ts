@@ -24,10 +24,7 @@ const DEFAULT_BASE_URL = 'https://api.perimeter.org';
 export function createApiClient(options: ApiClientOptions = {}): ApiClient {
     const { baseUrl = DEFAULT_BASE_URL, requiresAuth = false } = options;
 
-    async function request<T>(
-        path: string,
-        init?: RequestInit,
-    ): Promise<T> {
+    async function request<T>(path: string, init?: RequestInit): Promise<T> {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             ...(init?.headers as Record<string, string>),
