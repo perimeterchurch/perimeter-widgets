@@ -26,5 +26,10 @@
     "packageManager": "pnpm@10.6.2",
     "engines": {
         "node": ">=20"
+    },
+    "msw": {
+        "workerDirectory": [
+            "packages/storyboard/public"
+        ]
     }
 }

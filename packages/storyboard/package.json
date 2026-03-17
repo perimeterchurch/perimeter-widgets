@@ -1,0 +1,27 @@
+{
+  "name": "@perimeter-widgets/storyboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19",
+    "react-dom": "^19",
+    "@perimeter-widgets/shared": "workspace:*",
+    "@perimeter-widgets/widget-sermons": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "@tailwindcss/vite": "^4",
+    "vite": "^6",
+    "tailwindcss": "^4",
+    "msw": "^2",
+    "typescript": "^5.7"
+  }
+}
