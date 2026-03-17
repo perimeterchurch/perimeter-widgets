@@ -11,6 +11,7 @@
     "./styles/tokens": "./src/styles/tokens.css"
   },
   "scripts": {
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
     "storybook": "storybook dev -p 6006",
@@ -23,9 +24,15 @@
     "zod": "^3"
   },
   "devDependencies": {
+    "@perimeter-widgets/vite-preset": "workspace:*",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "jsdom": "^26",
     "tailwindcss": "^4",
-    "typescript": "^5.7"
+    "typescript": "^5.7",
+    "vitest": "^3"
   }
 }
