@@ -25,12 +25,16 @@
   },
   "devDependencies": {
     "@perimeter-widgets/vite-preset": "workspace:*",
+    "@storybook/addon-essentials": "^8",
+    "@storybook/react": "^8",
+    "@storybook/react-vite": "^8",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4",
     "jsdom": "^26",
+    "storybook": "^8",
     "tailwindcss": "^4",
     "typescript": "^5.7",
     "vitest": "^3"
