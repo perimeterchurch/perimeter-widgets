@@ -1,26 +1,7 @@
-// Types are duplicated here for mock data — the canonical types live in the widget package.
-// When the widget types stabilize, consider moving shared domain types to @perimeter-widgets/shared.
-
-interface Sermon {
-    id: number;
-    title: string;
-    speaker: string;
-    date: string;
-    seriesId?: number;
-    seriesName?: string;
-    description?: string;
-    videoUrl?: string;
-    audioUrl?: string;
-    thumbnailUrl?: string;
-}
-
-interface SermonSeries {
-    id: number;
-    name: string;
-    description?: string;
-    imageUrl?: string;
-    sermonCount: number;
-}
+import type {
+    Sermon,
+    SermonSeries,
+} from '@perimeter-widgets/widget-sermons/types';
 
 export const mockSeries: SermonSeries[] = [
     {

@@ -35,6 +35,7 @@ export function parseDataAttributes(element: HTMLElement): WidgetConfig {
     const config: WidgetConfig = {};
 
     for (const [key, value] of Object.entries(element.dataset)) {
+        if (value === undefined) continue;
         if (value === 'true') {
             config[key] = true;
         } else if (value === 'false') {
@@ -42,7 +43,7 @@ export function parseDataAttributes(element: HTMLElement): WidgetConfig {
         } else if (value !== '' && !isNaN(Number(value))) {
             config[key] = Number(value);
         } else {
-            config[key] = value ?? '';
+            config[key] = value;
         }
     }
 

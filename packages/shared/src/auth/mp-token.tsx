@@ -4,6 +4,7 @@ import {
     useState,
     useEffect,
     useCallback,
+    useMemo,
     type ReactNode,
 } from 'react';
 
@@ -68,7 +69,10 @@ export function AuthProvider({
         if (!requiresAuth) return;
 
         const handleStorage = (e: StorageEvent) => {
-            if (e.key === TOKEN_KEY || e.key === EXPIRY_KEY) {
+            if (
+                (e.key === TOKEN_KEY || e.key === EXPIRY_KEY) &&
+                e.newValue !== e.oldValue
+            ) {
                 refresh();
             }
         };
@@ -77,8 +81,13 @@ export function AuthProvider({
         return () => window.removeEventListener('storage', handleStorage);
     }, [requiresAuth, refresh]);
 
+    const contextValue = useMemo(
+        () => ({ ...authState, refresh }),
+        [authState, refresh],
+    );
+
     return (
-        <AuthContext.Provider value={{ ...authState, refresh }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

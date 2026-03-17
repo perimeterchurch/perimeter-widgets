@@ -44,17 +44,14 @@ jobs:
             - name: Purge jsDelivr cache
               if: steps.check-dist.outputs.changed == 'true'
               run: |
-                  # Read manifest and purge each widget file
-                  node -e "
-                    const { readFileSync } = require('fs');
-                    const manifest = JSON.parse(readFileSync('./dist/manifest.json', 'utf8'));
-                    const widgets = Object.values(manifest.widgets);
-                    (async () => {
-                      for (const w of widgets) {
-                        const url = 'https://purge.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/' + w.file;
-                        console.log('Purging: ' + url);
-                        const r = await fetch(url);
-                        console.log('  Status: ' + r.status);
-                      }
-                    })();
-                  "
+                  node --input-type=module << 'EOF'
+                  import { readFileSync } from 'fs';
+                  const manifest = JSON.parse(readFileSync('./dist/manifest.json', 'utf8'));
+                  const widgets = Object.values(manifest.widgets);
+                  await Promise.all(widgets.map(async (w) => {
+                    const url = 'https://purge.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/' + w.file;
+                    console.log('Purging: ' + url);
+                    const r = await fetch(url);
+                    console.log('  Status: ' + r.status);
+                  }));
+                  EOF

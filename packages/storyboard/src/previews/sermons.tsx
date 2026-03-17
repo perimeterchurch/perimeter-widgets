@@ -5,24 +5,31 @@ export function SermonsPreview() {
     const mountRef = useRef<MountResult | null>(null);
 
     useEffect(() => {
-        // Dynamically import and mount the widget after target element renders
-        import('@perimeter-widgets/widget-sermons/app').then(
-            ({ SermonsApp }) => {
-                import('@perimeter-widgets/widget-sermons/styles?inline').then(
-                    (styles) => {
-                        mountRef.current = mountWidget({
-                            elementId: 'perimeter-sermons',
-                            component: SermonsApp,
-                            styles: styles.default,
-                            defaults: { perPage: 12 },
-                        });
-                    },
-                );
-            },
-        );
+        let cancelled = false;
+
+        Promise.all([
+            import('@perimeter-widgets/widget-sermons/app'),
+            import('@perimeter-widgets/widget-sermons/styles?inline'),
+        ])
+            .then(([{ SermonsApp }, styles]) => {
+                if (cancelled) return;
+                mountRef.current = mountWidget({
+                    elementId: 'perimeter-sermons',
+                    component: SermonsApp,
+                    styles: styles.default,
+                    defaults: { perPage: 12 },
+                });
+            })
+            .catch((err) => {
+                if (!cancelled)
+                    console.error(
+                        '[SermonsPreview] Failed to load widget:',
+                        err,
+                    );
+            });
 
         return () => {
-            // Cleanup on unmount (handles StrictMode double-mount in dev)
+            cancelled = true;
             mountRef.current?.destroy();
             mountRef.current = null;
         };

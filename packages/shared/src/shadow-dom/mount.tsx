@@ -26,6 +26,9 @@ export interface MountResult {
     destroy: () => void;
 }
 
+// Track React roots per element for graceful cleanup on re-mount
+const activeRoots = new WeakMap<Element, Root>();
+
 export function mountWidget(options: MountWidgetOptions): MountResult | null {
     const {
         elementId,
@@ -43,7 +46,14 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
         return null;
     }
 
-    // Reuse existing shadow root or create new one (handles HMR/re-mount)
+    // Unmount any existing React root before re-mounting (handles HMR/re-mount)
+    const existingRoot = activeRoots.get(element);
+    if (existingRoot) {
+        existingRoot.unmount();
+        activeRoots.delete(element);
+    }
+
+    // Reuse existing shadow root or create new one
     const shadowRoot =
         element.shadowRoot || element.attachShadow({ mode: 'open' });
 
@@ -69,6 +79,7 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
 
     // Mount React
     let root: Root | null = createRoot(mountPoint);
+    activeRoots.set(element, root);
 
     root.render(
         <StrictMode>
@@ -85,6 +96,7 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
     return {
         destroy: () => {
             if (root) {
+                activeRoots.delete(element);
                 root.unmount();
                 root = null;
                 queryClient.clear();
