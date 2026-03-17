@@ -15,6 +15,8 @@ export function createWidgetConfig(options: WidgetConfigOptions): UserConfig {
 
     return {
         plugins: [react(), tailwindcss()],
+        // Load .env files from monorepo root
+        envDir: resolve(process.cwd(), '../..'),
         build: {
             lib: {
                 entry: resolve(process.cwd(), entry),

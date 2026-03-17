@@ -5,5 +5,5 @@
         "rootDir": "src",
         "types": ["vitest/globals", "@testing-library/jest-dom/vitest"]
     },
-    "include": ["src"]
+    "include": ["src", "../../env.d.ts"]
 }

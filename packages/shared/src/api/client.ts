@@ -31,16 +31,9 @@ const DEV_BASE_URL = 'http://localhost:5500';
 function resolveBaseUrl(baseUrl?: string): string {
     if (baseUrl) return baseUrl;
 
-    try {
-        // Vite injects import.meta.env at build time
-        const envUrl = (import.meta as { env?: { VITE_API_URL?: string } })
-            .env?.VITE_API_URL;
-        if (envUrl) return envUrl;
-
-        const isDev = (import.meta as { env?: { DEV?: boolean } }).env?.DEV;
-        if (isDev) return DEV_BASE_URL;
-    } catch {
-        // import.meta.env may not be available in all contexts
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+        if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+        if (import.meta.env.DEV) return DEV_BASE_URL;
     }
 
     return PRODUCTION_BASE_URL;

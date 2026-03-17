@@ -4,8 +4,7 @@
         "outDir": "dist",
         "rootDir": "src",
         "noUnusedLocals": false,
-        "noUnusedParameters": false,
-        "types": ["vite/client"]
+        "noUnusedParameters": false
     },
-    "include": ["src"]
+    "include": ["src", "../../env.d.ts"]
 }
