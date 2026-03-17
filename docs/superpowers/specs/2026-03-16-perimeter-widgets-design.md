@@ -12,21 +12,21 @@ First widget: **Sermons** — search/browse sermon series and individual sermons
 
 ## Tech Stack
 
-| Concern | Choice |
-| --- | --- |
-| Monorepo | pnpm workspaces + Turborepo |
-| Framework | React 19 + TypeScript |
-| Styling | Tailwind v4 (shared preset) |
-| Build | Vite (library mode, IIFE output) |
-| Data fetching | React Query v5 |
-| API server | perimeter-api (`api.perimeter.org`) |
-| Testing | Vitest + React Testing Library |
-| Shared component docs | Storybook (Vite builder) |
-| Widget previews | Custom storyboard app (MSW mocking) |
-| Style isolation | Shadow DOM |
-| Auth | MP OAuth token from `localStorage` |
-| CDN | jsDelivr (`@latest` + cache purge) |
-| CI | GitHub Actions (build, purge) |
+| Concern               | Choice                              |
+| --------------------- | ----------------------------------- |
+| Monorepo              | pnpm workspaces + Turborepo         |
+| Framework             | React 19 + TypeScript               |
+| Styling               | Tailwind v4 (shared preset)         |
+| Build                 | Vite (library mode, IIFE output)    |
+| Data fetching         | React Query v5                      |
+| API server            | perimeter-api (`api.perimeter.org`) |
+| Testing               | Vitest + React Testing Library      |
+| Shared component docs | Storybook (Vite builder)            |
+| Widget previews       | Custom storyboard app (MSW mocking) |
+| Style isolation       | Shadow DOM                          |
+| Auth                  | MP OAuth token from `localStorage`  |
+| CDN                   | jsDelivr (`@latest` + cache purge)  |
+| CI                    | GitHub Actions (build, purge)       |
 
 ## Monorepo Structure
 
@@ -107,13 +107,14 @@ perimeter-widgets/
 
 ```typescript
 mountWidget({
-  elementId: 'perimeter-sermons',
-  component: SermonsApp,
-  styles: widgetStyles,       // compiled Tailwind CSS string
+    elementId: 'perimeter-sermons',
+    component: SermonsApp,
+    styles: widgetStyles, // compiled Tailwind CSS string
 });
 ```
 
 **Lifecycle:**
+
 1. Finds `<div id="perimeter-sermons">` in the DOM
 2. Reads all `data-*` attributes as widget config props
 3. Creates a `shadowRoot` (mode `'open'`) on that element
@@ -132,9 +133,9 @@ import { SermonsApp } from './App';
 import styles from './styles.css?inline';
 
 mountWidget({
-  elementId: 'perimeter-sermons',
-  component: SermonsApp,
-  styles,
+    elementId: 'perimeter-sermons',
+    component: SermonsApp,
+    styles,
 });
 ```
 
@@ -167,7 +168,9 @@ No config objects, no init calls. Set once, never change.
 
 ```html
 <div id="perimeter-sermons" data-campus="buckhead">
-  <div style="min-height:200px;background:#f5f5f4;border-radius:8px;animate:pulse"></div>
+    <div
+        style="min-height:200px;background:#f5f5f4;border-radius:8px;animate:pulse"
+    ></div>
 </div>
 ```
 
@@ -177,7 +180,7 @@ No config objects, no init calls. Set once, never change.
 
 ```typescript
 const client = createApiClient({
-  baseUrl: 'https://api.perimeter.org',  // overridable via data-api-url
+    baseUrl: 'https://api.perimeter.org', // overridable via data-api-url
 });
 
 const sermons = await client.get<Sermon[]>('/api/sermons');
@@ -209,10 +212,11 @@ Widgets define hierarchical query keys following the same pattern as perimeter-a
 
 ```typescript
 export const sermonKeys = {
-  all: ['sermons'] as const,
-  list: (filters?: SermonFilters) => [...sermonKeys.all, 'list', filters] as const,
-  detail: (id: string) => [...sermonKeys.all, 'detail', id] as const,
-  series: () => [...sermonKeys.all, 'series'] as const,
+    all: ['sermons'] as const,
+    list: (filters?: SermonFilters) =>
+        [...sermonKeys.all, 'list', filters] as const,
+    detail: (id: string) => [...sermonKeys.all, 'detail', id] as const,
+    series: () => [...sermonKeys.all, 'series'] as const,
 };
 ```
 
@@ -225,13 +229,15 @@ Reads from `localStorage` keys set by WordPress's MP OAuth integration:
 
 ```typescript
 function getMPToken(): MPAuthState {
-  const token = localStorage.getItem('mpp-widgets_AuthToken');
-  const expiresAfter = localStorage.getItem('mpp-widgets_ExpiresAfter');
+    const token = localStorage.getItem('mpp-widgets_AuthToken');
+    const expiresAfter = localStorage.getItem('mpp-widgets_ExpiresAfter');
 
-  if (!token || token === 'null' || token.length < 10) return { authenticated: false };
-  if (expiresAfter && new Date(expiresAfter) < new Date()) return { authenticated: false };
+    if (!token || token === 'null' || token.length < 10)
+        return { authenticated: false };
+    if (expiresAfter && new Date(expiresAfter) < new Date())
+        return { authenticated: false };
 
-  return { authenticated: true, token };
+    return { authenticated: true, token };
 }
 ```
 
@@ -257,13 +263,13 @@ Widget loads → getMPToken() → token exists & valid?
 `@perimeter-widgets/vite-preset` exports:
 
 - **`createWidgetConfig({ name, entry })`** — Vite library mode config
-  - IIFE output format (single script tag compatible)
-  - Output to `../../dist/<name>/<name>.js`
-  - CSS inlined via `?inline` imports
-  - React bundled into each widget (WordPress doesn't provide React)
-  - Tailwind v4 with shared preset
-  - Minification + tree-shaking in production
-  - Global name: `PerimeterWidget_<Name>` (avoids collisions)
+    - IIFE output format (single script tag compatible)
+    - Output to `../../dist/<name>/<name>.js`
+    - CSS inlined via `?inline` imports
+    - React bundled into each widget (WordPress doesn't provide React)
+    - Tailwind v4 with shared preset
+    - Minification + tree-shaking in production
+    - Global name: `PerimeterWidget_<Name>` (avoids collisions)
 - **`createWidgetTestConfig()`** — Vitest config with jsdom, React Testing Library
 
 ### Per-Widget Config
@@ -273,8 +279,8 @@ Widget loads → getMPToken() → token exists & valid?
 import { createWidgetConfig } from '@perimeter-widgets/vite-preset';
 
 export default createWidgetConfig({
-  name: 'sermons',
-  entry: 'src/index.tsx',
+    name: 'sermons',
+    entry: 'src/index.tsx',
 });
 ```
 
@@ -295,13 +301,13 @@ The `manifest.json` is generated during the Turbo build pipeline. Schema:
 
 ```json
 {
-  "widgets": {
-    "sermons": {
-      "file": "dist/sermons/sermons.js",
-      "sizeBytes": 145000,
-      "buildTimestamp": "2026-03-16T12:00:00Z"
+    "widgets": {
+        "sermons": {
+            "file": "dist/sermons/sermons.js",
+            "sizeBytes": 145000,
+            "buildTimestamp": "2026-03-16T12:00:00Z"
+        }
     }
-  }
 }
 ```
 
@@ -310,6 +316,7 @@ The GitHub Action reads this to determine which files to purge from jsDelivr.
 ### Rollback Procedure
 
 Since WordPress embeds use `@latest`, a broken build affects production immediately. To roll back:
+
 1. `git revert <broken-commit>` (reverts the dist changes)
 2. Push to `main`
 3. GitHub Action purges jsDelivr cache for affected files
@@ -319,31 +326,32 @@ Since WordPress embeds use `@latest`, a broken build affects production immediat
 
 ```jsonc
 {
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**"],
+        },
+        "test": {
+            "dependsOn": ["^build"],
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true,
+        },
+        "storybook": {
+            "cache": false,
+            "persistent": true,
+        },
+        "lint": {},
+        "typecheck": {},
     },
-    "test": {
-      "dependsOn": ["^build"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "storybook": {
-      "cache": false,
-      "persistent": true
-    },
-    "lint": {},
-    "typecheck": {}
-  }
 }
 ```
 
 ### GitHub Action: Build & Purge
 
 On push to `main`:
+
 1. Install deps, run `turbo build`
 2. Commit `dist/` changes (if any)
 3. Read `manifest.json` for changed widget files
@@ -384,15 +392,15 @@ Vitest config is a one-liner using `createWidgetTestConfig()`. Turborepo caches 
 
 ### Dev Commands
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start widget storyboard (full widget previews) |
-| `pnpm storybook` | Start Storybook for shared components |
-| `pnpm test` | Run all widget tests via Turborepo |
-| `pnpm test --filter=widget-sermons` | Run tests for a single widget |
-| `pnpm build` | Build all widgets to `dist/` |
-| `pnpm build --filter=widget-sermons` | Build a single widget |
-| `pnpm quality` | Run all checks (typecheck + lint + format + test) |
+| Command                              | Description                                       |
+| ------------------------------------ | ------------------------------------------------- |
+| `pnpm dev`                           | Start widget storyboard (full widget previews)    |
+| `pnpm storybook`                     | Start Storybook for shared components             |
+| `pnpm test`                          | Run all widget tests via Turborepo                |
+| `pnpm test --filter=widget-sermons`  | Run tests for a single widget                     |
+| `pnpm build`                         | Build all widgets to `dist/`                      |
+| `pnpm build --filter=widget-sermons` | Build a single widget                             |
+| `pnpm quality`                       | Run all checks (typecheck + lint + format + test) |
 
 ## Perimeter-API Integration
 
