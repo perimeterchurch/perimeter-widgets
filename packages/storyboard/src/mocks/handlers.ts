@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { mockSermons, mockSeries } from './data/sermons';
+import { mockSermons, mockSeries } from '@/mocks/data/sermons';
 
 // Match both dev (localhost) and production API URLs
 const API_ORIGINS = [

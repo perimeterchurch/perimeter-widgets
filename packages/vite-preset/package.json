@@ -9,15 +9,16 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "vite": "^6",
-        "@vitejs/plugin-react": "^4",
         "@tailwindcss/vite": "^4",
-        "vitest": "^3",
-        "@testing-library/react": "^16",
         "@testing-library/jest-dom": "^6",
-        "jsdom": "^26"
+        "@testing-library/react": "^16",
+        "@vitejs/plugin-react": "^4",
+        "jsdom": "^26",
+        "vite": "^6",
+        "vitest": "^3"
     },
     "devDependencies": {
-        "@types/node": "^22"
+        "@types/node": "^22",
+        "vite-tsconfig-paths": "^6.1.1"
     }
 }

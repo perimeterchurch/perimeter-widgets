@@ -4,7 +4,10 @@
         "outDir": "dist",
         "rootDir": "src",
         "noUnusedLocals": false,
-        "noUnusedParameters": false
+        "noUnusedParameters": false,
+        "paths": {
+            "@/*": ["./src/*"]
+        }
     },
     "include": ["src", "../../env.d.ts"]
 }

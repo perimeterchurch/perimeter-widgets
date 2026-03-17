@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SermonsPreview } from './previews/sermons';
+import { SermonsPreview } from '@/previews/sermons';
 
 const widgets = [
     { id: 'sermons', name: 'Sermons', component: SermonsPreview },

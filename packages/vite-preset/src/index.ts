@@ -1,6 +1,7 @@
 import type { UserConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 import { resolve } from 'path';
 import type { UserConfig as VitestUserConfig } from 'vitest/config';
 
@@ -14,7 +15,7 @@ export function createWidgetConfig(options: WidgetConfigOptions): UserConfig {
     const globalName = `PerimeterWidget_${name.charAt(0).toUpperCase() + name.slice(1)}`;
 
     return {
-        plugins: [react(), tailwindcss()],
+        plugins: [react(), tailwindcss(), tsconfigPaths()],
         // Load .env files from monorepo root
         envDir: resolve(process.cwd(), '../..'),
         build: {
@@ -43,7 +44,7 @@ export function createWidgetConfig(options: WidgetConfigOptions): UserConfig {
 
 export function createWidgetTestConfig(): VitestUserConfig {
     return {
-        plugins: [react()],
+        plugins: [react(), tsconfigPaths()],
         test: {
             environment: 'jsdom',
             globals: true,

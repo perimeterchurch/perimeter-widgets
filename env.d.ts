@@ -1,23 +1,23 @@
 /// <reference types="vite/client" />
 
 /**
- * Shared environment variable types for all packages.
+ * Environment variable types for all packages.
  * Vite injects these at build time from .env files at the monorepo root.
  *
- * Available variables:
- *   VITE_API_URL    - Override API base URL (default: localhost:5500 in dev, api.perimeter.org in prod)
- *   VITE_API_MODE   - "mock" (default) uses MSW mocks in storyboard, "local" hits real API
+ * Naming convention: VITE_PW_<CATEGORY>_<NAME>
+ *   PW = Perimeter Widgets
+ *   Categories: API, AUTH, FEATURE, DEBUG
  */
 interface ImportMetaEnv {
-    /** Override API base URL for all widgets */
-    readonly VITE_API_URL?: string;
-    /** Storyboard only: "mock" (default) or "local" to skip MSW */
-    readonly VITE_API_MODE?: 'mock' | 'local';
-    /** Vite built-in: true in dev server */
+    // --- API ---
+    /** Override API base URL (default: localhost:5500 in dev, api.perimeter.org in prod) */
+    readonly VITE_PW_API_BASE_URL?: string;
+    /** Storyboard only: "mock" (default) or "local" to skip MSW and hit real API */
+    readonly VITE_PW_API_MODE?: 'mock' | 'local';
+
+    // --- Vite built-ins ---
     readonly DEV: boolean;
-    /** Vite built-in: true in production build */
     readonly PROD: boolean;
-    /** Vite built-in: "development" or "production" */
     readonly MODE: string;
 }
 
@@ -31,7 +31,7 @@ declare module '*.css?inline' {
     export default css;
 }
 
-// Package subpath CSS inline imports (e.g., @perimeter-widgets/widget-sermons/styles?inline)
+// Package subpath CSS inline imports
 declare module '@perimeter-widgets/*/styles?inline' {
     const css: string;
     export default css;
