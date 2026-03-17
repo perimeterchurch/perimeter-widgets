@@ -32,8 +32,8 @@ function resolveBaseUrl(baseUrl?: string): string {
     if (baseUrl) return baseUrl;
 
     if (typeof import.meta !== 'undefined' && import.meta.env) {
-        if (import.meta.env.VITE_PW_API_BASE_URL)
-            return import.meta.env.VITE_PW_API_BASE_URL;
+        if (import.meta.env.VITE_API_URL)
+            return import.meta.env.VITE_API_URL;
         if (import.meta.env.DEV) return DEV_BASE_URL;
     }
 
