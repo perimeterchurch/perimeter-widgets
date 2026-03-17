@@ -63,6 +63,26 @@ Built files in `dist/` are committed to the repo. Served via jsDelivr `@latest`.
 - **Use `--body-file` for PR bodies** (avoids ANSI escape code injection)
 - **Read docs before code** — check `docs/superpowers/specs/` for design specs before modifying architecture
 
+## Context Loading
+
+**Always read the relevant doc BEFORE searching the codebase or writing code.**
+
+| Working on... | Load first |
+| --- | --- |
+| Monorepo structure or build pipeline | `docs/architecture/overview.md` |
+| Shared package (API, auth, mount, components) | `docs/architecture/shared-package.md` |
+| Vite build config or test config | `docs/architecture/vite-preset.md` |
+| CDN, jsDelivr, or deployment | `docs/architecture/cdn-deployment.md` |
+| Sermons widget | `docs/widgets/sermons.md` |
+| Developer setup or environment | `docs/guides/developer-setup.md` |
+| Git workflow or conventions | `docs/guides/developer-rules.md` |
+| Creating a new widget | `docs/guides/adding-a-widget.md` |
+| Auth, MP tokens, or security | `docs/guides/authentication.md` |
+| Writing or fixing tests | `docs/guides/testing.md` |
+| WordPress embed patterns | `docs/reference/embed-guide.md` |
+| Design tokens or colors | `docs/reference/design-tokens.md` |
+| Unknown area | `docs/README.md` (full index) |
+
 ## Adding a New Widget
 
 1. Create `packages/widget-<name>/` with entry point, components, hooks, tests
