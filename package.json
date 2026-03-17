@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "turbo dev --filter=storyboard",
         "build": "turbo build",
+        "postbuild": "tsx scripts/generate-manifest.ts",
         "test": "turbo test",
         "lint": "turbo lint",
         "typecheck": "turbo typecheck",
@@ -21,7 +22,8 @@
         "typescript-eslint": "^8",
         "eslint-plugin-react": "^7",
         "eslint-plugin-react-hooks": "^5",
-        "eslint-config-prettier": "^10"
+        "eslint-config-prettier": "^10",
+        "tsx": "^4"
     },
     "packageManager": "pnpm@10.6.2",
     "engines": {
