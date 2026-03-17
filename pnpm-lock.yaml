@@ -110,6 +110,46 @@ importers:
         specifier: ^22
         version: 22.19.15
 
+  packages/widget-sermons:
+    dependencies:
+      '@perimeter-widgets/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@tanstack/react-query':
+        specifier: ^5
+        version: 5.90.21(react@19.2.4)
+      react:
+        specifier: ^19
+        version: 19.2.4
+      react-dom:
+        specifier: ^19
+        version: 19.2.4(react@19.2.4)
+      zod:
+        specifier: ^3
+        version: 3.25.76
+    devDependencies:
+      '@perimeter-widgets/vite-preset':
+        specifier: workspace:*
+        version: link:../vite-preset
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.3(@types/react@19.2.14)
+      tailwindcss:
+        specifier: ^4
+        version: 4.2.1
+      typescript:
+        specifier: ^5.7
+        version: 5.9.3
+      vite:
+        specifier: ^6
+        version: 6.4.1(@types/node@22.19.15)(jiti@2.6.1)(lightningcss@1.31.1)
+      vitest:
+        specifier: ^3
+        version: 3.2.4(@types/node@22.19.15)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.31.1)
+
 packages:
 
   '@adobe/css-tools@4.4.4':

@@ -1,0 +1,36 @@
+{
+  "name": "@perimeter-widgets/widget-sermons",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./app": "./src/App.tsx",
+    "./styles": "./src/styles.css",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "react": "^19",
+    "react-dom": "^19",
+    "@tanstack/react-query": "^5",
+    "@perimeter-widgets/shared": "workspace:*",
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@perimeter-widgets/vite-preset": "workspace:*",
+    "vite": "^6",
+    "vitest": "^3",
+    "tailwindcss": "^4",
+    "typescript": "^5.7"
+  }
+}
