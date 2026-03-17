@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "turbo dev --filter=storyboard",
+        "dev": "turbo dev --filter=@perimeter-widgets/storyboard",
         "build": "turbo build",
         "postbuild": "tsx scripts/generate-manifest.ts",
         "test": "turbo test",
