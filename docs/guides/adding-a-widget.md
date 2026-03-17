@@ -151,9 +151,35 @@ mountWidget({
 });
 ```
 
-### 11. Add storyboard preview
+### 11. Add to storyboard widget registry
 
-Create `packages/storyboard/src/previews/<name>.tsx` and add it to `packages/storyboard/src/App.tsx`.
+Add an entry to `packages/storyboard/src/registry.ts`:
+
+```typescript
+{
+    id: '<name>',
+    name: '<Display Name>',
+    description: 'Short description of the widget',
+    elementId: 'perimeter-<name>',
+    status: 'skeleton', // 'ready' | 'skeleton' | 'planned'
+    imports: {
+        app: '@perimeter-widgets/widget-<name>/app',
+        styles: '@perimeter-widgets/widget-<name>/styles?inline',
+    },
+    configFields: [
+        // Define editable data-* attributes here
+        {
+            key: 'fieldName',
+            label: 'Field Label',
+            type: 'text', // 'text' | 'number' | 'boolean' | 'select'
+            defaultValue: '',
+            description: 'Help text for this field',
+        },
+    ],
+}
+```
+
+The storyboard will automatically pick it up with live config editing and embed code generation.
 
 ### 12. Build and verify
 

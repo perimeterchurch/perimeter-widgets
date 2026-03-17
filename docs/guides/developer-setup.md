@@ -57,20 +57,50 @@ pnpm storybook
 The storyboard (`packages/storyboard/`) is a custom Vite dev app for previewing full widgets in their shadow DOM containers.
 
 - Runs on `http://localhost:5180`
-- Sidebar navigation for switching between widgets
+- Widget registry with status indicators (ready/skeleton/planned)
+- Live config editor — change data attributes and see the widget re-mount instantly
+- Auto-generated embed code snippets for WordPress
 - MSW (Mock Service Worker) intercepts API calls — no real API needed
 - Widgets render inside shadow DOM exactly as they would on WordPress
-- Supports data-attribute config overrides
+
+### Using a real local API
+
+By default the storyboard uses MSW mocks. To test against a real perimeter-api running locally:
+
+```bash
+VITE_API_MODE=local pnpm dev
+```
+
+Or add to `.env.local`:
+
+```
+VITE_API_MODE=local
+VITE_API_URL=http://localhost:5500
+```
 
 ---
 
 ## Storybook
 
-Storybook (`packages/shared/.storybook/`) is for developing and documenting shared UI components in isolation.
+Storybook v10 (`packages/shared/.storybook/`) is for developing and documenting shared UI components in isolation.
 
 - Runs on `http://localhost:6006`
 - Stories co-located with components (`Button.stories.tsx` next to `Button.tsx`)
 - Tailwind design tokens loaded in preview
+- Controls, viewport, and other essentials built into Storybook v10 core
+
+---
+
+## Environment Variables
+
+Copy the example file: `cp .env.example .env.local`
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `VITE_API_URL` | auto (localhost:5500 dev, api.perimeter.org prod) | API base URL |
+| `VITE_API_MODE` | `mock` | `mock` or `local` — storyboard only |
+
+Convention: `VITE_<DOMAIN>_<NAME>`. See `env.d.ts` for type definitions.
 
 ---
 
