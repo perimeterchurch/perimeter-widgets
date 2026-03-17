@@ -16,3 +16,7 @@ export type { WidgetConfig } from './shadow-dom/config';
 
 // React Query
 export { createQueryClient } from './api/query-client';
+
+// Components
+export { Button } from './components';
+export type { ButtonProps } from './components';
