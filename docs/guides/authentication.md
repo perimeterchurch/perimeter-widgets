@@ -14,9 +14,9 @@ Widgets read the Ministry Platform OAuth token from `localStorage`, set by WordP
 
 ## localStorage Keys
 
-| Key | Value | Set by |
-| --- | --- | --- |
-| `mpp-widgets_AuthToken` | OAuth access token string | WordPress MP OAuth plugin |
+| Key                        | Value                        | Set by                    |
+| -------------------------- | ---------------------------- | ------------------------- |
+| `mpp-widgets_AuthToken`    | OAuth access token string    | WordPress MP OAuth plugin |
 | `mpp-widgets_ExpiresAfter` | ISO date string (expiration) | WordPress MP OAuth plugin |
 
 These keys are set by the [MP Custom Widgets](https://github.com/MinistryPlatform-Community/MPCustomWidgets) authentication system (`forceLogin.js`).
@@ -57,7 +57,7 @@ mountWidget({
     elementId: 'perimeter-sermons',
     component: SermonsApp,
     styles,
-    requiresAuth: false,  // default
+    requiresAuth: false, // default
 });
 ```
 

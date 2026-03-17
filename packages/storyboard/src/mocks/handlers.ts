@@ -2,10 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { mockSermons, mockSeries } from '@/mocks/data/sermons';
 
 // Match both dev (localhost) and production API URLs
-const API_ORIGINS = [
-    'http://localhost:5500',
-    'https://api.perimeter.org',
-];
+const API_ORIGINS = ['http://localhost:5500', 'https://api.perimeter.org'];
 
 function apiHandlers(origin: string) {
     return [
@@ -26,9 +23,7 @@ function apiHandlers(origin: string) {
         }),
 
         http.get(`${origin}/api/sermons/:id`, ({ params }) => {
-            const sermon = mockSermons.find(
-                (s) => s.id === Number(params.id),
-            );
+            const sermon = mockSermons.find((s) => s.id === Number(params.id));
             if (!sermon) {
                 return HttpResponse.json(
                     { success: false, message: 'Not found' },

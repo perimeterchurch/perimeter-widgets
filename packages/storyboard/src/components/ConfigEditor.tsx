@@ -14,14 +14,14 @@ export function ConfigEditor({
     onReset,
 }: ConfigEditorProps) {
     return (
-        <div className='border border-stone-200 rounded-lg bg-white'>
-            <div className='flex items-center justify-between px-4 py-3 border-b border-stone-200'>
-                <h4 className='text-sm font-semibold text-stone-800'>
+        <div className='border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-800'>
+            <div className='flex items-center justify-between px-4 py-3 border-b border-stone-200 dark:border-stone-700'>
+                <h4 className='text-sm font-semibold text-stone-800 dark:text-stone-200'>
                     Configuration
                 </h4>
                 <button
                     onClick={onReset}
-                    className='text-xs text-stone-500 hover:text-stone-700 transition-colors'
+                    className='text-xs text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors'
                 >
                     Reset to defaults
                 </button>
@@ -36,10 +36,10 @@ export function ConfigEditor({
                     />
                 ))}
             </div>
-            <div className='px-4 py-3 border-t border-stone-100 bg-stone-50 rounded-b-lg'>
+            <div className='px-4 py-3 border-t border-stone-100 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 rounded-b-lg'>
                 <p className='text-xs text-stone-400'>
                     Data attributes:{' '}
-                    <code className='text-stone-500'>
+                    <code className='text-stone-500 dark:text-stone-300'>
                         {fields
                             .map((f) => {
                                 const val = values[f.key] ?? f.defaultValue;
@@ -59,6 +59,9 @@ export function ConfigEditor({
     );
 }
 
+const inputClasses =
+    'w-full rounded-md border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-700 px-3 py-1.5 text-sm text-stone-900 dark:text-stone-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none';
+
 function FieldInput({
     field,
     value,
@@ -74,17 +77,17 @@ function FieldInput({
         <div>
             <label
                 htmlFor={inputId}
-                className='block text-xs font-medium text-stone-600 mb-1'
+                className='block text-xs font-medium text-stone-600 dark:text-stone-300 mb-1'
             >
                 {field.label}
             </label>
 
-            {field.type === 'select' && field.options ? (
+            {field.type === 'select' && field.options ?
                 <select
                     id={inputId}
                     value={String(value)}
                     onChange={(e) => onChange(e.target.value)}
-                    className='w-full rounded-md border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none'
+                    className={inputClasses}
                 >
                     {field.options.map((opt) => (
                         <option key={opt.value} value={opt.value}>
@@ -92,36 +95,35 @@ function FieldInput({
                         </option>
                     ))}
                 </select>
-            ) : field.type === 'boolean' ? (
+            : field.type === 'boolean' ?
                 <label className='inline-flex items-center gap-2 cursor-pointer'>
                     <input
                         id={inputId}
                         type='checkbox'
                         checked={Boolean(value)}
                         onChange={(e) => onChange(e.target.checked)}
-                        className='rounded border-stone-300 text-indigo-600 focus:ring-indigo-500'
+                        className='rounded border-stone-300 dark:border-stone-600 text-indigo-600 focus:ring-indigo-500'
                     />
-                    <span className='text-sm text-stone-600'>
+                    <span className='text-sm text-stone-600 dark:text-stone-300'>
                         {value ? 'Enabled' : 'Disabled'}
                     </span>
                 </label>
-            ) : field.type === 'number' ? (
+            : field.type === 'number' ?
                 <input
                     id={inputId}
                     type='number'
                     value={Number(value)}
                     onChange={(e) => onChange(Number(e.target.value))}
-                    className='w-full rounded-md border border-stone-300 px-3 py-1.5 text-sm text-stone-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none'
+                    className={inputClasses}
                 />
-            ) : (
-                <input
+            :   <input
                     id={inputId}
                     type='text'
                     value={String(value)}
                     onChange={(e) => onChange(e.target.value)}
-                    className='w-full rounded-md border border-stone-300 px-3 py-1.5 text-sm text-stone-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none'
+                    className={inputClasses}
                 />
-            )}
+            }
 
             {field.description && (
                 <p className='text-xs text-stone-400 mt-1'>

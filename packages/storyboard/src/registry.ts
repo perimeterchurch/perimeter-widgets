@@ -2,6 +2,7 @@
  * Widget registry — defines all widgets available in the storyboard
  * with their configurable fields, defaults, and metadata.
  */
+import type { ComponentType } from 'react';
 
 export interface ConfigField {
     /** Data attribute name in camelCase (e.g., 'perPage' → data-per-page) */
@@ -18,6 +19,11 @@ export interface ConfigField {
     description?: string;
 }
 
+export interface WidgetModule {
+    component: ComponentType;
+    styles: string;
+}
+
 export interface WidgetDefinition {
     /** Unique widget ID */
     id: string;
@@ -29,11 +35,8 @@ export interface WidgetDefinition {
     elementId: string;
     /** Widget status */
     status: 'ready' | 'skeleton' | 'planned';
-    /** Package export paths */
-    imports: {
-        app: string;
-        styles: string;
-    };
+    /** Async loader — must use static import paths for Vite to resolve */
+    load: () => Promise<WidgetModule>;
     /** Configurable data-* attributes */
     configFields: ConfigField[];
 }
@@ -46,9 +49,15 @@ export const widgetRegistry: WidgetDefinition[] = [
             'Search and browse sermons and sermon series with watch/listen view',
         elementId: 'perimeter-sermons',
         status: 'skeleton',
-        imports: {
-            app: '@perimeter-widgets/widget-sermons/app',
-            styles: '@perimeter-widgets/widget-sermons/styles?inline',
+        load: async () => {
+            const [app, styles] = await Promise.all([
+                import('@perimeter-widgets/widget-sermons/app'),
+                import('@perimeter-widgets/widget-sermons/styles?inline'),
+            ]);
+            return {
+                component: app.SermonsApp,
+                styles: styles.default,
+            };
         },
         configFields: [
             {
@@ -60,7 +69,10 @@ export const widgetRegistry: WidgetDefinition[] = [
                     { label: 'All Campuses', value: '' },
                     { label: 'Buckhead', value: 'buckhead' },
                     { label: 'Brookhaven', value: 'brookhaven' },
-                    { label: 'Peachtree Corners', value: 'peachtree-corners' },
+                    {
+                        label: 'Peachtree Corners',
+                        value: 'peachtree-corners',
+                    },
                 ],
                 description: 'Filter sermons by campus location',
             },

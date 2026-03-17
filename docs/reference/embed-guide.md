@@ -27,7 +27,9 @@ Add lightweight placeholder HTML inside the target element to prevent a blank ga
 
 ```html
 <div id="perimeter-sermons" data-campus="buckhead">
-    <div style="min-height:200px;background:#f5f5f4;border-radius:8px;animation:pulse 2s infinite"></div>
+    <div
+        style="min-height:200px;background:#f5f5f4;border-radius:8px;animation:pulse 2s infinite"
+    ></div>
 </div>
 ```
 
@@ -37,8 +39,8 @@ The placeholder is replaced when the widget mounts.
 
 ## Available Widgets
 
-| Widget | Element ID | Script Path |
-| --- | --- | --- |
+| Widget  | Element ID          | Script Path               |
+| ------- | ------------------- | ------------------------- |
 | Sermons | `perimeter-sermons` | `dist/sermons/sermons.js` |
 
 ---
@@ -87,11 +89,11 @@ Widgets render inside a shadow DOM (`mode: 'open'`). This means:
 
 Data attributes on the target element configure the widget:
 
-| Pattern | Conversion | Example |
-| --- | --- | --- |
-| `data-campus="buckhead"` | String: `{ campus: 'buckhead' }` | Filter by campus |
-| `data-per-page="12"` | Number: `{ perPage: 12 }` | Items per page |
-| `data-show-filters="true"` | Boolean: `{ showFilters: true }` | Toggle feature |
+| Pattern                     | Conversion                         | Example            |
+| --------------------------- | ---------------------------------- | ------------------ |
+| `data-campus="buckhead"`    | String: `{ campus: 'buckhead' }`   | Filter by campus   |
+| `data-per-page="12"`        | Number: `{ perPage: 12 }`          | Items per page     |
+| `data-show-filters="true"`  | Boolean: `{ showFilters: true }`   | Toggle feature     |
 | `data-api-url="http://..."` | String: `{ apiUrl: 'http://...' }` | API override (dev) |
 
 Kebab-case attributes are auto-converted to camelCase. Numbers and booleans are auto-parsed.
@@ -100,8 +102,8 @@ Kebab-case attributes are auto-converted to camelCase. Numbers and booleans are 
 
 ## Common Data Attributes (all widgets)
 
-| Attribute | Type | Default | Description |
-| --- | --- | --- | --- |
+| Attribute      | Type   | Default                     | Description                             |
+| -------------- | ------ | --------------------------- | --------------------------------------- |
 | `data-api-url` | string | `https://api.perimeter.org` | Override API base URL (for dev/staging) |
 
 ---
@@ -124,6 +126,7 @@ Kebab-case attributes are auto-converted to camelCase. Numbers and booleans are 
 ### Widget shows stale content
 
 jsDelivr caches `@latest` for up to 7 days. After a new build:
+
 1. The GitHub Action auto-purges the cache
 2. If purge hasn't propagated, append `?v=<timestamp>` to the script URL as a temporary workaround
 

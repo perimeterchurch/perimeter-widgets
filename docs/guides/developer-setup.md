@@ -8,10 +8,10 @@
 
 ## Prerequisites
 
-| Tool | Version | Notes |
-| --- | --- | --- |
-| Node.js | 20+ | Project tested against v25 |
-| pnpm | 10+ | Install: `corepack enable && corepack prepare pnpm@latest` |
+| Tool    | Version | Notes                                                      |
+| ------- | ------- | ---------------------------------------------------------- |
+| Node.js | 20+     | Project tested against v25                                 |
+| pnpm    | 10+     | Install: `corepack enable && corepack prepare pnpm@latest` |
 
 Always use `pnpm` — never `npm` or `npx`.
 
@@ -37,18 +37,18 @@ pnpm storybook
 
 ## Dev Commands
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start widget storyboard on port 5180 |
-| `pnpm storybook` | Start shared component Storybook on port 6006 |
-| `pnpm build` | Build all widgets to `dist/` |
-| `pnpm build --filter=widget-sermons` | Build a single widget |
-| `pnpm test` | Run all tests via Turborepo |
-| `pnpm test --filter=widget-sermons` | Run tests for a single widget |
-| `pnpm lint` | ESLint across all packages |
-| `pnpm typecheck` | TypeScript type checking |
-| `pnpm format` | Auto-format with Prettier |
-| `pnpm quality` | Run all checks (typecheck + lint + format + test) |
+| Command                              | Description                                       |
+| ------------------------------------ | ------------------------------------------------- |
+| `pnpm dev`                           | Start widget storyboard on port 5180              |
+| `pnpm storybook`                     | Start shared component Storybook on port 6006     |
+| `pnpm build`                         | Build all widgets to `dist/`                      |
+| `pnpm build --filter=widget-sermons` | Build a single widget                             |
+| `pnpm test`                          | Run all tests via Turborepo                       |
+| `pnpm test --filter=widget-sermons`  | Run tests for a single widget                     |
+| `pnpm lint`                          | ESLint across all packages                        |
+| `pnpm typecheck`                     | TypeScript type checking                          |
+| `pnpm format`                        | Auto-format with Prettier                         |
+| `pnpm quality`                       | Run all checks (typecheck + lint + format + test) |
 
 ---
 
@@ -95,10 +95,10 @@ Storybook v10 (`packages/shared/.storybook/`) is for developing and documenting 
 
 Copy the example file: `cp .env.example .env.local`
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `VITE_API_URL` | auto (localhost:5500 dev, api.perimeter.org prod) | API base URL |
-| `VITE_API_MODE` | `mock` | `mock` or `local` — storyboard only |
+| Variable        | Default                                           | Description                         |
+| --------------- | ------------------------------------------------- | ----------------------------------- |
+| `VITE_API_URL`  | auto (localhost:5500 dev, api.perimeter.org prod) | API base URL                        |
+| `VITE_API_MODE` | `mock`                                            | `mock` or `local` — storyboard only |
 
 Convention: `VITE_<DOMAIN>_<NAME>`. See `env.d.ts` for type definitions.
 

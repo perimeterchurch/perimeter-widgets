@@ -10,11 +10,11 @@
 
 Always use **pnpm**. Never use npm or npx.
 
-| Do | Don't |
-| --- | --- |
-| `pnpm install` | `npm install` |
-| `pnpm add <pkg>` | `npm install <pkg>` |
-| `pnpm dlx <tool>` | `npx <tool>` |
+| Do                | Don't               |
+| ----------------- | ------------------- |
+| `pnpm install`    | `npm install`       |
+| `pnpm add <pkg>`  | `npm install <pkg>` |
+| `pnpm dlx <tool>` | `npx <tool>`        |
 
 ---
 
@@ -52,12 +52,12 @@ pnpm quality    # typecheck + lint + format + test
 
 Individual checks:
 
-| Command | What it runs |
-| --- | --- |
+| Command          | What it runs                                    |
+| ---------------- | ----------------------------------------------- |
 | `pnpm typecheck` | TypeScript (`tsc --noEmit`) across all packages |
-| `pnpm lint` | ESLint across all packages |
-| `pnpm format` | Prettier (write mode) |
-| `pnpm test` | Vitest across all packages |
+| `pnpm lint`      | ESLint across all packages                      |
+| `pnpm format`    | Prettier (write mode)                           |
+| `pnpm test`      | Vitest across all packages                      |
 
 ---
 

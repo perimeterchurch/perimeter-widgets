@@ -32,17 +32,14 @@ function resolveBaseUrl(baseUrl?: string): string {
     if (baseUrl) return baseUrl;
 
     if (typeof import.meta !== 'undefined' && import.meta.env) {
-        if (import.meta.env.VITE_API_URL)
-            return import.meta.env.VITE_API_URL;
+        if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
         if (import.meta.env.DEV) return DEV_BASE_URL;
     }
 
     return PRODUCTION_BASE_URL;
 }
 
-function normalizeHeaders(
-    headers?: HeadersInit,
-): Record<string, string> {
+function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
     if (!headers) return {};
     if (headers instanceof Headers) {
         return Object.fromEntries(headers.entries());
@@ -79,14 +76,14 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
         if (!response.ok) {
             const errorBody = await response.json().catch(() => null);
             const message =
-                response.status === 401
-                    ? (errorBody?.message ?? 'Session expired')
-                    : (errorBody?.message ??
-                      `Request failed: ${response.status}`);
+                response.status === 401 ?
+                    (errorBody?.message ?? 'Session expired')
+                :   (errorBody?.message
+                    ?? `Request failed: ${response.status}`);
             const code =
-                response.status === 401
-                    ? (errorBody?.code ?? 'TOKEN_EXPIRED')
-                    : errorBody?.code;
+                response.status === 401 ?
+                    (errorBody?.code ?? 'TOKEN_EXPIRED')
+                :   errorBody?.code;
             throw new ApiError(message, response.status, code);
         }
 

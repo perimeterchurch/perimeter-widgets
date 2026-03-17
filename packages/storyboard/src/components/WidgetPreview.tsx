@@ -13,6 +13,7 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
         Record<string, string | number | boolean>
     >(() => getDefaults(widget));
     const [mountKey, setMountKey] = useState(0);
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = useCallback(
         (key: string, value: string | number | boolean) => {
@@ -29,37 +30,28 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
     // Re-mount widget when config changes
     useEffect(() => {
         let cancelled = false;
+        setError(null);
 
-        Promise.all([
-            import(/* @vite-ignore */ widget.imports.app),
-            import(/* @vite-ignore */ widget.imports.styles),
-        ])
-            .then(([appModule, stylesModule]) => {
+        widget
+            .load()
+            .then(({ component, styles }) => {
                 if (cancelled) return;
-
-                // Find the exported component (first exported function/component)
-                const Component =
-                    appModule.default || Object.values(appModule)[0];
-                if (!Component) {
-                    console.error(
-                        `[Storyboard] No component found in ${widget.imports.app}`,
-                    );
-                    return;
-                }
 
                 mountRef.current = mountWidget({
                     elementId: widget.elementId,
-                    component: Component as React.ComponentType,
-                    styles: stylesModule.default || '',
+                    component,
+                    styles,
                     defaults: config,
                 });
             })
             .catch((err) => {
-                if (!cancelled)
+                if (!cancelled) {
                     console.error(
                         `[Storyboard] Failed to load ${widget.name}:`,
                         err,
                     );
+                    setError(err instanceof Error ? err.message : String(err));
+                }
             });
 
         return () => {
@@ -69,52 +61,54 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
         };
     }, [widget, config, mountKey]);
 
-    const statusColors = {
-        ready: 'bg-green-100 text-green-700',
-        skeleton: 'bg-amber-100 text-amber-700',
-        planned: 'bg-stone-100 text-stone-500',
-    };
-
     return (
         <div className='space-y-6'>
             {/* Header */}
             <div>
                 <div className='flex items-center gap-3 mb-1'>
-                    <h3 className='text-lg font-semibold text-stone-900'>
+                    <h3 className='text-lg font-semibold text-stone-900 dark:text-stone-100'>
                         {widget.name}
                     </h3>
-                    <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[widget.status]}`}
-                    >
-                        {widget.status}
-                    </span>
+                    <StatusBadge status={widget.status} />
                 </div>
-                <p className='text-sm text-stone-500'>{widget.description}</p>
+                <p className='text-sm text-stone-500 dark:text-stone-400'>
+                    {widget.description}
+                </p>
             </div>
 
             {/* Widget preview */}
             <div>
                 <div className='flex items-center justify-between mb-2'>
-                    <span className='text-xs font-medium text-stone-500 uppercase tracking-wider'>
+                    <span className='text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider'>
                         Preview
                     </span>
                     <button
                         onClick={() => setMountKey((k) => k + 1)}
-                        className='text-xs text-indigo-600 hover:text-indigo-700 transition-colors'
+                        className='text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
                     >
                         Remount
                     </button>
                 </div>
-                <div className='border border-stone-200 rounded-lg overflow-hidden bg-white min-h-[200px]'>
-                    <div
-                        key={mountKey}
-                        id={widget.elementId}
-                        {...buildDataAttributes(config)}
-                    />
+                <div className='border border-stone-200 dark:border-stone-700 rounded-lg overflow-hidden bg-white dark:bg-stone-900 min-h-[200px]'>
+                    {error ?
+                        <div className='p-6 text-center'>
+                            <p className='text-sm text-red-600 dark:text-red-400 font-medium'>
+                                Failed to load widget
+                            </p>
+                            <p className='text-xs text-stone-500 dark:text-stone-400 mt-1 font-mono'>
+                                {error}
+                            </p>
+                        </div>
+                    :   <div
+                            key={mountKey}
+                            id={widget.elementId}
+                            {...buildDataAttributes(config)}
+                        />
+                    }
                 </div>
                 <p className='text-xs text-stone-400 mt-2'>
                     Element:{' '}
-                    <code className='bg-stone-100 px-1 py-0.5 rounded'>
+                    <code className='bg-stone-100 dark:bg-stone-800 px-1 py-0.5 rounded text-stone-600 dark:text-stone-300'>
                         #{widget.elementId}
                     </code>
                 </p>
@@ -131,17 +125,34 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
             )}
 
             {/* Embed code */}
-            <div className='border border-stone-200 rounded-lg bg-white'>
-                <div className='px-4 py-3 border-b border-stone-200'>
-                    <h4 className='text-sm font-semibold text-stone-800'>
+            <div className='border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-800'>
+                <div className='px-4 py-3 border-b border-stone-200 dark:border-stone-700'>
+                    <h4 className='text-sm font-semibold text-stone-800 dark:text-stone-200'>
                         Embed Code
                     </h4>
                 </div>
-                <pre className='p-4 text-xs text-stone-600 overflow-x-auto'>
+                <pre className='p-4 text-xs text-stone-600 dark:text-stone-300 overflow-x-auto'>
                     {generateEmbedCode(widget, config)}
                 </pre>
             </div>
         </div>
+    );
+}
+
+function StatusBadge({ status }: { status: WidgetDefinition['status'] }) {
+    const colors = {
+        ready: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+        skeleton:
+            'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+        planned:
+            'bg-stone-100 text-stone-500 dark:bg-stone-700 dark:text-stone-400',
+    };
+    return (
+        <span
+            className={`text-xs px-2 py-0.5 rounded-full font-medium ${colors[status]}`}
+        >
+            {status}
+        </span>
     );
 }
 

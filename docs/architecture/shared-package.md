@@ -41,19 +41,20 @@ export type { ButtonProps } from './components';
 
 The core utility that all widgets use to mount into the DOM.
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `elementId` | `string` | required | ID of the target DOM element |
-| `component` | `ComponentType` | required | Root React component |
-| `styles` | `string` | required | Compiled CSS string for shadow root |
-| `defaults` | `WidgetConfig` | `{}` | Default config values |
-| `requiresAuth` | `boolean` | `false` | Whether to read MP token |
+| Option         | Type            | Default  | Description                         |
+| -------------- | --------------- | -------- | ----------------------------------- |
+| `elementId`    | `string`        | required | ID of the target DOM element        |
+| `component`    | `ComponentType` | required | Root React component                |
+| `styles`       | `string`        | required | Compiled CSS string for shadow root |
+| `defaults`     | `WidgetConfig`  | `{}`     | Default config values               |
+| `requiresAuth` | `boolean`       | `false`  | Whether to read MP token            |
 
 Returns `{ destroy: () => void }` or `null` if target element not found.
 
 ### `parseDataAttributes(element): WidgetConfig`
 
 Reads `data-*` attributes from an HTML element. Auto-converts:
+
 - `data-per-page="12"` → `{ perPage: 12 }` (number)
 - `data-show-filters="true"` → `{ showFilters: true }` (boolean)
 - `data-campus="buckhead"` → `{ campus: 'buckhead' }` (string)
@@ -68,14 +69,15 @@ React context for widget config. `useConfig()` throws if used outside a `ConfigP
 
 ### `createApiClient(options): ApiClient`
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `baseUrl` | `string` | `'https://api.perimeter.org'` | API base URL |
-| `requiresAuth` | `boolean` | `false` | Attach MP token to requests |
+| Option         | Type      | Default                       | Description                 |
+| -------------- | --------- | ----------------------------- | --------------------------- |
+| `baseUrl`      | `string`  | `'https://api.perimeter.org'` | API base URL                |
+| `requiresAuth` | `boolean` | `false`                       | Attach MP token to requests |
 
 **Methods:** `get<T>(path)`, `post<T>(path, body?)`
 
 **Behavior:**
+
 - Unwraps perimeter-api's `{ success, data }` response envelope
 - Attaches `Authorization: Bearer <token>` when `requiresAuth` and token available
 - Throws `ApiError` with `status` and `code` on failures
@@ -85,11 +87,11 @@ React context for widget config. `useConfig()` throws if used outside a `ConfigP
 
 Creates an isolated React Query client per widget instance.
 
-| Setting | Value | Reason |
-| --- | --- | --- |
-| `staleTime` | 5 minutes | Matches perimeter-api cache TTLs |
-| `retry` | 1 | Embedded widgets, minimal retries |
-| `refetchOnWindowFocus` | `false` | Widgets are embedded, not full apps |
+| Setting                | Value     | Reason                              |
+| ---------------------- | --------- | ----------------------------------- |
+| `staleTime`            | 5 minutes | Matches perimeter-api cache TTLs    |
+| `retry`                | 1         | Embedded widgets, minimal retries   |
+| `refetchOnWindowFocus` | `false`   | Widgets are embedded, not full apps |
 
 ---
 
@@ -98,6 +100,7 @@ Creates an isolated React Query client per widget instance.
 ### `getMPToken(): MPAuthState`
 
 Reads MP OAuth token from `localStorage`:
+
 - **Key:** `mpp-widgets_AuthToken` — the access token
 - **Key:** `mpp-widgets_ExpiresAfter` — expiration timestamp
 
@@ -116,16 +119,16 @@ React context wrapping widgets with auth state. Only reads token when `requiresA
 ### Button
 
 ```tsx
-<Button variant="primary" size="md" isLoading={false}>
+<Button variant='primary' size='md' isLoading={false}>
     Click me
 </Button>
 ```
 
-| Prop | Values | Default |
-| --- | --- | --- |
-| `variant` | `'primary'`, `'secondary'`, `'ghost'` | `'primary'` |
-| `size` | `'sm'`, `'md'`, `'lg'` | `'md'` |
-| `isLoading` | `boolean` | `false` |
+| Prop        | Values                                | Default     |
+| ----------- | ------------------------------------- | ----------- |
+| `variant`   | `'primary'`, `'secondary'`, `'ghost'` | `'primary'` |
+| `size`      | `'sm'`, `'md'`, `'lg'`                | `'md'`      |
+| `isLoading` | `boolean`                             | `false`     |
 
 View stories: `pnpm storybook` → Primitives/Button
 

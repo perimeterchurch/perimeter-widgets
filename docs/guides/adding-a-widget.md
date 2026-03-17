@@ -130,7 +130,7 @@ import { useConfig } from '@perimeter-widgets/shared';
 
 export function WidgetApp() {
     const config = useConfig();
-    return <div className="p-4">Widget content here</div>;
+    return <div className='p-4'>Widget content here</div>;
 }
 ```
 

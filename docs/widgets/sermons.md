@@ -24,11 +24,11 @@ Public widget for searching and browsing sermons and sermon series on perimeter.
 
 ## Config (data attributes)
 
-| Attribute | Type | Default | Description |
-| --- | --- | --- | --- |
-| `data-campus` | string | _(none)_ | Filter sermons by campus |
-| `data-per-page` | number | `12` | Number of sermons per page |
-| `data-api-url` | string | `https://api.perimeter.org` | API base URL override |
+| Attribute       | Type   | Default                     | Description                |
+| --------------- | ------ | --------------------------- | -------------------------- |
+| `data-campus`   | string | _(none)_                    | Filter sermons by campus   |
+| `data-per-page` | number | `12`                        | Number of sermons per page |
+| `data-api-url`  | string | `https://api.perimeter.org` | API base URL override      |
 
 ---
 
@@ -71,12 +71,12 @@ interface SermonSeries {
 
 All under `(public)` route group in perimeter-api — no authentication required.
 
-| Method | Path | Description |
-| --- | --- | --- |
-| GET | `/api/sermons` | List/search sermons |
-| GET | `/api/sermons/:id` | Sermon detail |
-| GET | `/api/sermons/series` | List sermon series |
-| GET | `/api/sermons/series/:id` | Series detail with sermons |
+| Method | Path                      | Description                |
+| ------ | ------------------------- | -------------------------- |
+| GET    | `/api/sermons`            | List/search sermons        |
+| GET    | `/api/sermons/:id`        | Sermon detail              |
+| GET    | `/api/sermons/series`     | List sermon series         |
+| GET    | `/api/sermons/series/:id` | Series detail with sermons |
 
 Data source: Ministry Platform database tables (to be discovered via `pnpm mp-explore tables --filter "Sermon"`).
 
@@ -84,13 +84,13 @@ Data source: Ministry Platform database tables (to be discovered via `pnpm mp-ex
 
 ## Planned Components
 
-| Component | Purpose |
-| --- | --- |
-| `SermonSearch` | Search/filter bar with text input and filters |
-| `SermonList` | Grid/list of sermon cards with pagination |
-| `SermonCard` | Individual sermon preview with thumbnail, title, speaker, date |
-| `SeriesGrid` | Grid of sermon series with images |
-| `SermonPlayer` | Watch/listen view with video embed and audio player |
+| Component      | Purpose                                                        |
+| -------------- | -------------------------------------------------------------- |
+| `SermonSearch` | Search/filter bar with text input and filters                  |
+| `SermonList`   | Grid/list of sermon cards with pagination                      |
+| `SermonCard`   | Individual sermon preview with thumbnail, title, speaker, date |
+| `SeriesGrid`   | Grid of sermon series with images                              |
+| `SermonPlayer` | Watch/listen view with video embed and audio player            |
 
 ---
 

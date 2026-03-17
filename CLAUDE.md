@@ -55,8 +55,9 @@ Built files in `dist/` are committed to the repo. Served via jsDelivr `@latest`.
 ### Storyboard
 
 The storyboard (`pnpm dev`) provides:
+
 - Widget registry with metadata and status (ready/skeleton/planned)
-- Live config editor for data-* attributes with instant re-mount
+- Live config editor for data-\* attributes with instant re-mount
 - Auto-generated embed code snippets
 - MSW mocking (skip with `VITE_API_MODE=local` to hit real API)
 
@@ -64,10 +65,10 @@ The storyboard (`pnpm dev`) provides:
 
 Defined in `env.d.ts` at monorepo root. Convention: `VITE_<DOMAIN>_<NAME>`.
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `VITE_API_URL` | `localhost:5500` (dev) / `api.perimeter.org` (prod) | API base URL override |
-| `VITE_API_MODE` | `mock` | `mock` (MSW) or `local` (real API) — storyboard only |
+| Variable        | Default                                             | Description                                          |
+| --------------- | --------------------------------------------------- | ---------------------------------------------------- |
+| `VITE_API_URL`  | `localhost:5500` (dev) / `api.perimeter.org` (prod) | API base URL override                                |
+| `VITE_API_MODE` | `mock`                                              | `mock` (MSW) or `local` (real API) — storyboard only |
 
 Setup: `cp .env.example .env.local` or inline: `VITE_API_MODE=local pnpm dev`
 
@@ -92,21 +93,21 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 
 **Always read the relevant doc BEFORE searching the codebase or writing code.**
 
-| Working on... | Load first |
-| --- | --- |
-| Monorepo structure or build pipeline | `docs/architecture/overview.md` |
+| Working on...                                 | Load first                            |
+| --------------------------------------------- | ------------------------------------- |
+| Monorepo structure or build pipeline          | `docs/architecture/overview.md`       |
 | Shared package (API, auth, mount, components) | `docs/architecture/shared-package.md` |
-| Vite build config or test config | `docs/architecture/vite-preset.md` |
-| CDN, jsDelivr, or deployment | `docs/architecture/cdn-deployment.md` |
-| Sermons widget | `docs/widgets/sermons.md` |
-| Developer setup or environment | `docs/guides/developer-setup.md` |
-| Git workflow or conventions | `docs/guides/developer-rules.md` |
-| Creating a new widget | `docs/guides/adding-a-widget.md` |
-| Auth, MP tokens, or security | `docs/guides/authentication.md` |
-| Writing or fixing tests | `docs/guides/testing.md` |
-| WordPress embed patterns | `docs/reference/embed-guide.md` |
-| Design tokens or colors | `docs/reference/design-tokens.md` |
-| Unknown area | `docs/README.md` (full index) |
+| Vite build config or test config              | `docs/architecture/vite-preset.md`    |
+| CDN, jsDelivr, or deployment                  | `docs/architecture/cdn-deployment.md` |
+| Sermons widget                                | `docs/widgets/sermons.md`             |
+| Developer setup or environment                | `docs/guides/developer-setup.md`      |
+| Git workflow or conventions                   | `docs/guides/developer-rules.md`      |
+| Creating a new widget                         | `docs/guides/adding-a-widget.md`      |
+| Auth, MP tokens, or security                  | `docs/guides/authentication.md`       |
+| Writing or fixing tests                       | `docs/guides/testing.md`              |
+| WordPress embed patterns                      | `docs/reference/embed-guide.md`       |
+| Design tokens or colors                       | `docs/reference/design-tokens.md`     |
+| Unknown area                                  | `docs/README.md` (full index)         |
 
 ## Adding a New Widget
 

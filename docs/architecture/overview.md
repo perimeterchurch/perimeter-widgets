@@ -24,12 +24,12 @@ perimeter-widgets/
 
 ## Package Roles
 
-| Package | Type | Purpose |
-| --- | --- | --- |
-| `@perimeter-widgets/shared` | Library | API client, auth, shadow DOM mount, shared components, design tokens |
+| Package                          | Type       | Purpose                                                               |
+| -------------------------------- | ---------- | --------------------------------------------------------------------- |
+| `@perimeter-widgets/shared`      | Library    | API client, auth, shadow DOM mount, shared components, design tokens  |
 | `@perimeter-widgets/vite-preset` | Build tool | Shared Vite config factory — eliminates per-widget config duplication |
-| `@perimeter-widgets/storyboard` | Dev tool | Full widget preview app with MSW mocking (not built for production) |
-| `@perimeter-widgets/widget-*` | Widget | Individual embeddable widgets — each builds to a single IIFE |
+| `@perimeter-widgets/storyboard`  | Dev tool   | Full widget preview app with MSW mocking (not built for production)   |
+| `@perimeter-widgets/widget-*`    | Widget     | Individual embeddable widgets — each builds to a single IIFE          |
 
 ## Widget Build Pipeline
 
@@ -79,7 +79,7 @@ WordPress Page
 Widget config comes from `data-*` attributes on the target element, merged with defaults:
 
 ```html
-<div id="perimeter-sermons" data-campus="buckhead" data-per-page="12">
+<div id="perimeter-sermons" data-campus="buckhead" data-per-page="12"></div>
 ```
 
 Produces: `{ campus: 'buckhead', perPage: 12 }` (kebab-case auto-converted to camelCase, numbers and booleans auto-parsed).
@@ -91,11 +91,11 @@ Each widget defines a Zod schema for its config — invalid attributes produce c
 ```jsonc
 {
     "build": { "dependsOn": ["^build"], "outputs": ["dist/**"] },
-    "test":  { "dependsOn": ["^build"] },
-    "dev":   { "cache": false, "persistent": true },
+    "test": { "dependsOn": ["^build"] },
+    "dev": { "cache": false, "persistent": true },
     "storybook": { "cache": false, "persistent": true },
-    "lint":  {},
-    "typecheck": {}
+    "lint": {},
+    "typecheck": {},
 }
 ```
 

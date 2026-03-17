@@ -26,22 +26,22 @@ export default createWidgetConfig({
 });
 ```
 
-| Option | Type | Description |
-| --- | --- | --- |
-| `name` | `string` | Widget name (used for output file and global variable) |
-| `entry` | `string` | Entry point relative to the widget package root |
+| Option  | Type     | Description                                            |
+| ------- | -------- | ------------------------------------------------------ |
+| `name`  | `string` | Widget name (used for output file and global variable) |
+| `entry` | `string` | Entry point relative to the widget package root        |
 
 ### What it configures
 
-| Setting | Value | Why |
-| --- | --- | --- |
-| Format | IIFE | Single `<script>` tag embedding |
-| Output | `../../dist/<name>/<name>.js` | Root `dist/` folder for CDN |
-| Global name | `PerimeterWidget_<Name>` | Avoids collisions between widgets |
-| Plugins | `@vitejs/plugin-react`, `@tailwindcss/vite` | React JSX + Tailwind v4 CSS processing |
-| Minification | esbuild | Fast, good compression |
-| Dynamic imports | Inlined | Single file output |
-| `process.env.NODE_ENV` | Defined | React production mode in builds |
+| Setting                | Value                                       | Why                                    |
+| ---------------------- | ------------------------------------------- | -------------------------------------- |
+| Format                 | IIFE                                        | Single `<script>` tag embedding        |
+| Output                 | `../../dist/<name>/<name>.js`               | Root `dist/` folder for CDN            |
+| Global name            | `PerimeterWidget_<Name>`                    | Avoids collisions between widgets      |
+| Plugins                | `@vitejs/plugin-react`, `@tailwindcss/vite` | React JSX + Tailwind v4 CSS processing |
+| Minification           | esbuild                                     | Fast, good compression                 |
+| Dynamic imports        | Inlined                                     | Single file output                     |
+| `process.env.NODE_ENV` | Defined                                     | React production mode in builds        |
 
 ---
 
@@ -58,13 +58,13 @@ export default createWidgetTestConfig();
 
 ### What it configures
 
-| Setting | Value | Why |
-| --- | --- | --- |
-| Environment | jsdom | DOM testing |
-| Globals | `true` | `describe`, `it`, `expect` available without import |
-| Setup files | `test-setup.ts` | Loads `@testing-library/jest-dom/vitest` matchers |
-| CSS | `false` | Skip CSS processing in tests |
-| Plugin | `@vitejs/plugin-react` | React JSX transform |
+| Setting     | Value                  | Why                                                 |
+| ----------- | ---------------------- | --------------------------------------------------- |
+| Environment | jsdom                  | DOM testing                                         |
+| Globals     | `true`                 | `describe`, `it`, `expect` available without import |
+| Setup files | `test-setup.ts`        | Loads `@testing-library/jest-dom/vitest` matchers   |
+| CSS         | `false`                | Skip CSS processing in tests                        |
+| Plugin      | `@vitejs/plugin-react` | React JSX transform                                 |
 
 ### `test-setup.ts`
 

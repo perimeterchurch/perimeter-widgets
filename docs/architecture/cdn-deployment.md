@@ -20,11 +20,11 @@ Pattern: `https://cdn.jsdelivr.net/gh/<org>/<repo>@latest/dist/<widget>/<widget>
 
 ### jsDelivr Caching
 
-| Reference | Cache Duration | Use Case |
-| --- | --- | --- |
+| Reference | Cache Duration     | Use Case                      |
+| --------- | ------------------ | ----------------------------- |
 | `@latest` | 7 days (purgeable) | Production — WordPress embeds |
-| `@v1.0.0` | Permanent (1 year) | Pinned version (optional) |
-| `@main` | 12 hours | Development/testing |
+| `@v1.0.0` | Permanent (1 year) | Pinned version (optional)     |
+| `@main`   | 12 hours           | Development/testing           |
 
 WordPress embeds use `@latest` and never need to change their script tags. Cache is purged on every build via GitHub Action.
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { widgetRegistry } from '@/registry';
 import { WidgetPreview } from '@/components/WidgetPreview';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const statusIcons = {
     ready: '●',
@@ -19,18 +20,21 @@ export function App() {
     const activeWidget = widgetRegistry.find((w) => w.id === activeId);
 
     return (
-        <div className='min-h-screen'>
+        <div className='min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors'>
             {/* Header */}
-            <header className='bg-white border-b border-stone-200 px-6 py-4'>
-                <div className='flex items-center gap-3'>
-                    <h1 className='text-xl font-bold text-stone-900'>
-                        Perimeter Widgets
-                    </h1>
-                    <span className='text-xs bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full font-medium'>
-                        Storyboard
-                    </span>
+            <header className='bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
+                <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-3'>
+                        <h1 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
+                            Perimeter Widgets
+                        </h1>
+                        <span className='text-xs bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 px-2 py-0.5 rounded-full font-medium'>
+                            Storyboard
+                        </span>
+                    </div>
+                    <ThemeToggle />
                 </div>
-                <p className='text-sm text-stone-500 mt-1'>
+                <p className='text-sm text-stone-500 dark:text-stone-400 mt-1'>
                     Preview and configure widgets as they appear on
                     perimeter.org
                 </p>
@@ -38,7 +42,7 @@ export function App() {
 
             <div className='flex'>
                 {/* Sidebar */}
-                <nav className='w-64 border-r border-stone-200 bg-white min-h-[calc(100vh-73px)]'>
+                <nav className='w-64 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 min-h-[calc(100vh-73px)]'>
                     <div className='p-4'>
                         <h2 className='text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3'>
                             Widgets
@@ -50,9 +54,9 @@ export function App() {
                                         onClick={() => setActiveId(w.id)}
                                         className={[
                                             'w-full text-left px-3 py-2.5 rounded-lg transition-colors',
-                                            activeId === w.id
-                                                ? 'bg-indigo-50 border border-indigo-200'
-                                                : 'hover:bg-stone-50',
+                                            activeId === w.id ?
+                                                'bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800'
+                                            :   'hover:bg-stone-50 dark:hover:bg-stone-800',
                                         ].join(' ')}
                                     >
                                         <div className='flex items-center gap-2'>
@@ -64,9 +68,9 @@ export function App() {
                                             </span>
                                             <span
                                                 className={`text-sm font-medium ${
-                                                    activeId === w.id
-                                                        ? 'text-indigo-900'
-                                                        : 'text-stone-800'
+                                                    activeId === w.id ?
+                                                        'text-indigo-900 dark:text-indigo-200'
+                                                    :   'text-stone-800 dark:text-stone-200'
                                                 }`}
                                             >
                                                 {w.name}
@@ -82,7 +86,7 @@ export function App() {
                     </div>
 
                     {/* Legend */}
-                    <div className='px-4 py-3 border-t border-stone-100 mt-auto'>
+                    <div className='px-4 py-3 border-t border-stone-100 dark:border-stone-800 mt-auto'>
                         <h3 className='text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2'>
                             Status
                         </h3>
@@ -95,14 +99,12 @@ export function App() {
                             ).map(([status, icon]) => (
                                 <li
                                     key={status}
-                                    className='flex items-center gap-2 text-xs text-stone-500'
+                                    className='flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400'
                                 >
                                     <span className={statusColors[status]}>
                                         {icon}
                                     </span>
-                                    <span className='capitalize'>
-                                        {status}
-                                    </span>
+                                    <span className='capitalize'>{status}</span>
                                 </li>
                             ))}
                         </ul>

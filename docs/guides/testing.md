@@ -58,7 +58,11 @@ Wrap components in the same provider stack that `mountWidget()` uses:
 ```tsx
 import { render, screen } from '@testing-library/react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { createQueryClient, AuthProvider, ConfigProvider } from '@perimeter-widgets/shared';
+import {
+    createQueryClient,
+    AuthProvider,
+    ConfigProvider,
+} from '@perimeter-widgets/shared';
 
 function renderWithProviders(
     ui: React.ReactElement,
@@ -68,9 +72,7 @@ function renderWithProviders(
     return render(
         <QueryClientProvider client={queryClient}>
             <AuthProvider requiresAuth={false}>
-                <ConfigProvider config={config}>
-                    {ui}
-                </ConfigProvider>
+                <ConfigProvider config={config}>{ui}</ConfigProvider>
             </AuthProvider>
         </QueryClientProvider>,
     );
@@ -89,10 +91,11 @@ Mock `fetch` globally:
 global.fetch = vi.fn().mockResolvedValue({
     ok: true,
     status: 200,
-    json: () => Promise.resolve({
-        success: true,
-        data: [{ id: 1, title: 'Test' }],
-    }),
+    json: () =>
+        Promise.resolve({
+            success: true,
+            data: [{ id: 1, title: 'Test' }],
+        }),
 });
 
 const client = createApiClient({ baseUrl: 'https://api.test.com' });
@@ -109,9 +112,15 @@ beforeEach(() => {
     const store: Record<string, string> = {};
     vi.stubGlobal('localStorage', {
         getItem: (key: string) => store[key] ?? null,
-        setItem: (key: string, value: string) => { store[key] = value; },
-        removeItem: (key: string) => { delete store[key]; },
-        clear: () => { Object.keys(store).forEach(k => delete store[k]); },
+        setItem: (key: string, value: string) => {
+            store[key] = value;
+        },
+        removeItem: (key: string) => {
+            delete store[key];
+        },
+        clear: () => {
+            Object.keys(store).forEach((k) => delete store[k]);
+        },
     });
 });
 ```
@@ -125,6 +134,7 @@ beforeEach(() => {
 ### Shadow DOM
 
 jsdom supports `attachShadow()` but with limitations. Shadow DOM tests focus on:
+
 - Shadow root creation
 - Style injection
 - Mount/unmount lifecycle

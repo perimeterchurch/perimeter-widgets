@@ -70,8 +70,8 @@ export function AuthProvider({
 
         const handleStorage = (e: StorageEvent) => {
             if (
-                (e.key === TOKEN_KEY || e.key === EXPIRY_KEY) &&
-                e.newValue !== e.oldValue
+                (e.key === TOKEN_KEY || e.key === EXPIRY_KEY)
+                && e.newValue !== e.oldValue
             ) {
                 refresh();
             }

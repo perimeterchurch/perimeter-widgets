@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
     font-family:
         system-ui,
@@ -10,4 +12,9 @@ body {
     margin: 0;
     background: #fafaf9;
     color: #1c1917;
+}
+
+.dark body {
+    background: #0c0a09;
+    color: #e7e5e4;
 }
