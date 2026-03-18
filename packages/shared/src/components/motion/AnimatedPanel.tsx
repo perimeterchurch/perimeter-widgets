@@ -43,8 +43,10 @@ export function AnimatedPanel({
 
     useEffect(() => {
         if (!open) return;
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+        // Use window instead of document — keyboard events from shadow DOM
+        // bubble to window but may not reach document in all contexts
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, [open, handleKeyDown]);
 
     return (
@@ -60,7 +62,7 @@ export function AnimatedPanel({
                             transition={transitions.fast}
                             className={
                                 backdropClassName
-                                || 'fixed inset-0 z-40 bg-black/30'
+                                || 'fixed inset-0 z-[var(--z-modal-backdrop,1040)] bg-black/30'
                             }
                             onClick={onClose}
                         />
@@ -78,7 +80,7 @@ export function AnimatedPanel({
                             right: 0,
                             bottom: 0,
                             width,
-                            zIndex: 50,
+                            zIndex: 'var(--z-modal, 1050)' as unknown as number,
                             ...style,
                         }}
                         {...props}

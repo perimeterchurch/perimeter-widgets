@@ -10,7 +10,6 @@ import {
 } from 'react';
 import type { BaseComponentProps, Size } from '../../types/ui';
 import { cn } from '../utils/cn';
-import { iconSizes } from '../utils/variants';
 
 type SpinnerElement = ElementRef<'div'>;
 
@@ -64,8 +63,6 @@ export const LoadingSpinner = forwardRef<SpinnerElement, LoadingSpinnerProps>(
                     fill='none'
                     viewBox='0 0 24 24'
                     aria-hidden='true'
-                    width={iconSizes[size]}
-                    height={iconSizes[size]}
                 >
                     <circle
                         className='opacity-25'
