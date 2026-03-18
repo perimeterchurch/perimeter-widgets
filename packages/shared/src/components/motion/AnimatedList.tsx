@@ -5,7 +5,11 @@ import {
     type Variants,
 } from 'framer-motion';
 import { Children, useMemo, type ReactNode } from 'react';
-import { staggerItemVariants, staggers, transitions } from '../../lib/motion/config';
+import {
+    staggerItemVariants,
+    staggers,
+    transitions,
+} from '../../lib/motion/config';
 
 export interface AnimatedListProps extends Omit<
     HTMLMotionProps<'div'>,

@@ -46,29 +46,31 @@ export const WithDelay: Story = {
     },
 };
 
-export const Replay: Story = {
-    render: () => {
-        const [key, setKey] = useState(0);
-        return (
-            <div>
-                <button
-                    onClick={() => setKey((k) => k + 1)}
-                    style={{ marginBottom: 16 }}
+function ReplayDemo() {
+    const [key, setKey] = useState(0);
+    return (
+        <div>
+            <button
+                onClick={() => setKey((k) => k + 1)}
+                style={{ marginBottom: 16 }}
+            >
+                Replay
+            </button>
+            <ScaleIn key={key}>
+                <div
+                    style={{
+                        padding: 24,
+                        background: '#fff0f0',
+                        borderRadius: 8,
+                    }}
                 >
-                    Replay
-                </button>
-                <ScaleIn key={key}>
-                    <div
-                        style={{
-                            padding: 24,
-                            background: '#fff0f0',
-                            borderRadius: 8,
-                        }}
-                    >
-                        Click Replay to remount
-                    </div>
-                </ScaleIn>
-            </div>
-        );
-    },
+                    Click Replay to remount
+                </div>
+            </ScaleIn>
+        </div>
+    );
+}
+
+export const Replay: Story = {
+    render: () => <ReplayDemo />,
 };

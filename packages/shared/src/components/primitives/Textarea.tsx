@@ -15,8 +15,7 @@ import { sizeClasses } from '../utils/variants';
 type TextareaElement = ElementRef<'textarea'>;
 
 export interface TextareaProps
-    extends ComponentPropsWithoutRef<'textarea'>,
-        BaseComponentProps {
+    extends ComponentPropsWithoutRef<'textarea'>, BaseComponentProps {
     /** Input size */
     size?: Size;
     /** Show error state */
@@ -75,9 +74,9 @@ export const Textarea = forwardRef<TextareaElement, TextareaProps>(
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
 
                     // Border styles
-                    error
-                        ? 'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
-                        : 'border-stone-300 dark:border-stone-600',
+                    error ?
+                        'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
+                    :   'border-stone-300 dark:border-stone-600',
 
                     // Disabled styles
                     'disabled:cursor-not-allowed disabled:opacity-50',

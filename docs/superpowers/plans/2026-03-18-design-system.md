@@ -30,6 +30,7 @@ git checkout -b feat/design-system
 ### Task 1: Install dependencies
 
 **Files:**
+
 - Modify: `packages/shared/package.json`
 
 - [ ] **Step 1: Install clsx, tailwind-merge, and framer-motion**
@@ -60,6 +61,7 @@ git commit -m "chore: add clsx, tailwind-merge, framer-motion to shared package"
 ### Task 2: Expand design tokens
 
 **Files:**
+
 - Modify: `packages/shared/src/styles/tokens.css`
 
 **Reference:** `../../perimeter-api/src/styles/tokens.css` — port all token values from the API's `:root` and `.dark` blocks, adapting to `:host` / `:host([data-theme="dark"])` selectors.
@@ -99,6 +101,7 @@ git commit -m "feat: expand design tokens to full API parity with dark mode"
 ### Task 3: Update base CSS with dark mode variant
 
 **Files:**
+
 - Modify: `packages/shared/src/styles/base.css`
 
 **Reference:** `../../perimeter-api/src/styles/globals.css` — port base layer overrides (button cursor, shimmer keyframe), excluding theme transitions and email-specific styles.
@@ -210,6 +213,7 @@ git commit -m "feat: add dark mode variant and base layer overrides"
 ### Task 4: Add shared UI types
 
 **Files:**
+
 - Create: `packages/shared/src/types/ui.ts`
 
 **Reference:** `../../perimeter-api/src/lib/types/ui.ts` — port verbatim.
@@ -296,6 +300,7 @@ git commit -m "feat: add shared UI type definitions"
 ### Task 5: Add `cn()` utility
 
 **Files:**
+
 - Create: `packages/shared/src/components/utils/cn.ts`
 
 **Reference:** `../../perimeter-api/src/components/ui/utils/cn.ts` — port verbatim.
@@ -346,6 +351,7 @@ git commit -m "feat: add cn() className merging utility"
 ### Task 6: Add centralized variants
 
 **Files:**
+
 - Create: `packages/shared/src/components/utils/variants.ts`
 
 **Reference:** `../../perimeter-api/src/components/ui/utils/variants.ts` — port with adaptation. Semantic color tokens in `variantClasses` and `outlineVariantClasses` use `bg-[var(--color-primary)]` arbitrary value syntax for runtime overrideability.
@@ -353,6 +359,7 @@ git commit -m "feat: add cn() className merging utility"
 - [ ] **Step 1: Create the variants file**
 
 Create `packages/shared/src/components/utils/variants.ts`. Port the API's variants with these adaptations:
+
 - Import `Size` and `Variant` types from `../../types/ui` (relative path from utils dir)
 - Semantic color variant classes use arbitrary value syntax: e.g., `bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:bg-[var(--color-primary-hover)] active:bg-[var(--color-primary-active)]`
 - Secondary and ghost variants use stone Tailwind utilities (static, not overridable) with `dark:` variants
@@ -379,6 +386,7 @@ git commit -m "feat: add centralized variant mappings"
 ### Task 7: Update `mountWidget()` for dark mode
 
 **Files:**
+
 - Modify: `packages/shared/src/shadow-dom/mount.tsx`
 
 - [ ] **Step 1: Add `data-theme` propagation**
@@ -417,6 +425,7 @@ git commit -m "feat: propagate data-theme attribute for dark mode support"
 ### Task 8: Update barrel exports and package.json
 
 **Files:**
+
 - Modify: `packages/shared/src/index.ts`
 - Modify: `packages/shared/src/components/index.ts`
 - Modify: `packages/shared/package.json`
@@ -452,6 +461,7 @@ This will be expanded as each primitive is added. For now, only Button exists.
 Move `packages/shared/src/components/Button.tsx` to `packages/shared/src/components/primitives/Button.tsx`. If `packages/shared/src/components/Button.stories.tsx` exists, move it to `packages/shared/src/components/primitives/Button.stories.tsx` and update its import path. (The stories file will be fully rewritten in Chunk 2, Task 9.)
 
 After moving, verify downstream consumers still resolve correctly:
+
 ```bash
 pnpm typecheck --filter @perimeter-widgets/shared
 pnpm build --filter @perimeter-widgets/widget-sermons 2>&1 | tail -5
@@ -515,6 +525,7 @@ git commit -m "refactor: restructure component exports and add subpath entries"
 ### Task 9: Refactor Button to use design system
 
 **Files:**
+
 - Modify: `packages/shared/src/components/primitives/Button.tsx`
 - Create: `packages/shared/src/components/primitives/Button.stories.tsx` (rewrite from scratch)
 
@@ -523,6 +534,7 @@ git commit -m "refactor: restructure component exports and add subpath entries"
 - [ ] **Step 1: Refactor Button component**
 
 Rewrite `Button.tsx` to:
+
 - Import `cn` from `../utils/cn`
 - Import `Size`, `Variant` from `../../types/ui`
 - Import `variantClasses`, `outlineVariantClasses`, `paddingSizes`, `sizeClasses` from `../utils/variants`
@@ -536,6 +548,7 @@ Rewrite `Button.tsx` to:
 - [ ] **Step 2: Create Button stories**
 
 Create `Button.stories.tsx` (replacing any existing version) with:
+
 - Add new variant stories (Success, Warning, Error, Info)
 - Add Outline story
 - Update Sizes story to show all 5 sizes
@@ -563,6 +576,7 @@ git commit -m "refactor: upgrade Button to full design system with variants and 
 ### Task 10: Add Card component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Card.tsx`
 - Create: `packages/shared/src/components/primitives/Card.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -580,9 +594,15 @@ Stories: Default, WithHeader, WithFooter, FullCard (all subcomponents), Hoverabl
 - [ ] **Step 3: Add to barrel export**
 
 Add to `packages/shared/src/components/primitives/index.ts`:
+
 ```typescript
 export { Card, CardHeader, CardBody, CardFooter } from './Card';
-export type { CardProps, CardHeaderProps, CardBodyProps, CardFooterProps } from './Card';
+export type {
+    CardProps,
+    CardHeaderProps,
+    CardBodyProps,
+    CardFooterProps,
+} from './Card';
 ```
 
 - [ ] **Step 4: Verify types and commit**
@@ -598,6 +618,7 @@ git commit -m "feat: add Card primitive component"
 ### Task 11: Add Input component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Input.tsx`
 - Create: `packages/shared/src/components/primitives/Input.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -625,6 +646,7 @@ git commit -m "feat: add Input primitive component"
 ### Task 12: Add Badge component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Badge.tsx`
 - Create: `packages/shared/src/components/primitives/Badge.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -652,6 +674,7 @@ git commit -m "feat: add Badge primitive component"
 ### Task 13: Add Label component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Label.tsx`
 - Create: `packages/shared/src/components/primitives/Label.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -679,6 +702,7 @@ git commit -m "feat: add Label primitive component"
 ### Task 14: Add Skeleton component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Skeleton.tsx`
 - Create: `packages/shared/src/components/primitives/Skeleton.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -706,6 +730,7 @@ git commit -m "feat: add Skeleton primitive component"
 ### Task 15: Add LoadingSpinner component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/LoadingSpinner.tsx`
 - Create: `packages/shared/src/components/primitives/LoadingSpinner.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -735,6 +760,7 @@ git commit -m "feat: add LoadingSpinner primitive component"
 ### Task 16: Add Select component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Select.tsx`
 - Create: `packages/shared/src/components/primitives/Select.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -762,6 +788,7 @@ git commit -m "feat: add Select primitive component"
 ### Task 17: Add Textarea component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Textarea.tsx`
 - Create: `packages/shared/src/components/primitives/Textarea.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -789,6 +816,7 @@ git commit -m "feat: add Textarea primitive component"
 ### Task 18: Add Checkbox component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Checkbox.tsx`
 - Create: `packages/shared/src/components/primitives/Checkbox.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -816,6 +844,7 @@ git commit -m "feat: add Checkbox primitive component"
 ### Task 19: Add Switch component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Switch.tsx`
 - Create: `packages/shared/src/components/primitives/Switch.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -843,6 +872,7 @@ git commit -m "feat: add Switch primitive component"
 ### Task 20: Add Avatar component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/Avatar.tsx`
 - Create: `packages/shared/src/components/primitives/Avatar.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -870,6 +900,7 @@ git commit -m "feat: add Avatar primitive component"
 ### Task 21: Add FilterChip component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/FilterChip.tsx`
 - Create: `packages/shared/src/components/primitives/FilterChip.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -897,6 +928,7 @@ git commit -m "feat: add FilterChip primitive component"
 ### Task 22: Add EmptyState component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/EmptyState.tsx`
 - Create: `packages/shared/src/components/primitives/EmptyState.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -924,6 +956,7 @@ git commit -m "feat: add EmptyState primitive component"
 ### Task 23: Add IndeterminateProgress component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/IndeterminateProgress.tsx`
 - Create: `packages/shared/src/components/primitives/IndeterminateProgress.stories.tsx`
 - Modify: `packages/shared/src/components/primitives/index.ts`
@@ -953,6 +986,7 @@ git commit -m "feat: add IndeterminateProgress primitive component"
 ### Task 24: Add motion config
 
 **Files:**
+
 - Create: `packages/shared/src/lib/motion/config.ts`
 
 **Reference:** `../../perimeter-api/src/lib/motion/config.ts` — port verbatim.
@@ -960,6 +994,7 @@ git commit -m "feat: add IndeterminateProgress primitive component"
 - [ ] **Step 1: Create motion config**
 
 Copy the API's `config.ts` exactly. It contains:
+
 - Springs: snappy, gentle, bouncy
 - Durations: fast, base, slow, entrance
 - Easings: easeOut, easeInOut
@@ -987,6 +1022,7 @@ git commit -m "feat: add Framer Motion config with presets and variants"
 ### Task 25: Add FadeIn, SlideUp, ScaleIn motion components
 
 **Files:**
+
 - Create: `packages/shared/src/components/motion/FadeIn.tsx`
 - Create: `packages/shared/src/components/motion/SlideUp.tsx`
 - Create: `packages/shared/src/components/motion/ScaleIn.tsx`
@@ -1018,6 +1054,7 @@ git commit -m "feat: add FadeIn, SlideUp, ScaleIn motion components"
 ### Task 26: Add AnimatedList and AnimatedPanel
 
 **Files:**
+
 - Create: `packages/shared/src/components/motion/AnimatedList.tsx`
 - Create: `packages/shared/src/components/motion/AnimatedPanel.tsx`
 - Create: `packages/shared/src/components/motion/AnimatedList.stories.tsx`
@@ -1045,6 +1082,7 @@ git commit -m "feat: add AnimatedList and AnimatedPanel motion components"
 ### Task 27: Add CountUp and SkeletonTransition
 
 **Files:**
+
 - Create: `packages/shared/src/components/motion/CountUp.tsx`
 - Create: `packages/shared/src/components/motion/SkeletonTransition.tsx`
 - Create: `packages/shared/src/components/motion/CountUp.stories.tsx`
@@ -1072,6 +1110,7 @@ git commit -m "feat: add CountUp and SkeletonTransition motion components"
 ### Task 28: Create motion barrel export
 
 **Files:**
+
 - Create: `packages/shared/src/components/motion/index.ts`
 
 - [ ] **Step 1: Create barrel export**
@@ -1109,6 +1148,7 @@ Add to `packages/shared/package.json` exports field:
 ```
 
 Motion is subpath-only by design — it is NOT re-exported from the main `index.ts` to avoid bundling framer-motion into widgets that don't use motion. Consumers import via:
+
 - `import { FadeIn } from '@perimeter-widgets/shared/components/motion'`
 - `import { fadeVariants } from '@perimeter-widgets/shared/motion'`
 
@@ -1133,6 +1173,7 @@ git commit -m "feat: add motion components barrel export and subpath entries"
 ### Task 29: Update Storybook preview with theme decorator
 
 **Files:**
+
 - Modify: `packages/shared/.storybook/preview.ts`
 
 - [ ] **Step 1: Update preview.ts with theme toolbar and decorator**
@@ -1210,6 +1251,7 @@ git commit -m "feat: add theme switching decorator to Storybook"
 ### Task 30: Add design token documentation stories — Colors
 
 **Files:**
+
 - Create: `packages/shared/src/stories/Colors.stories.tsx`
 
 - [ ] **Step 1: Create Colors story**
@@ -1228,6 +1270,7 @@ git commit -m "feat: add Colors design token documentation story"
 ### Task 31: Add design token documentation stories — Typography, Spacing, Shadows, Radius
 
 **Files:**
+
 - Create: `packages/shared/src/stories/Typography.stories.tsx`
 - Create: `packages/shared/src/stories/Spacing.stories.tsx`
 - Create: `packages/shared/src/stories/Shadows.stories.tsx`
@@ -1261,11 +1304,13 @@ git commit -m "feat: add Typography, Spacing, Shadows, BorderRadius documentatio
 ### Task 32: Update design tokens doc
 
 **Files:**
+
 - Modify: `docs/reference/design-tokens.md` (this file already exists per the CLAUDE.md context loading table)
 
 - [ ] **Step 1: Update the design tokens reference doc**
 
 Rewrite `docs/reference/design-tokens.md` to reflect the expanded token system:
+
 - Add all new token categories (surface colors, base scale, spacing, typography, shadows, transitions, z-index)
 - Document the two-layer architecture (`:host` runtime + `@theme` static)
 - Document dark mode via `data-theme="dark"` attribute
@@ -1308,58 +1353,61 @@ git commit -m "fix: resolve quality check issues"
 ## File Summary
 
 ### Created Files
-| File | Purpose |
-|---|---|
-| `packages/shared/src/types/ui.ts` | Shared UI type definitions |
-| `packages/shared/src/components/utils/cn.ts` | className merging utility |
-| `packages/shared/src/components/utils/variants.ts` | Centralized variant mappings |
-| `packages/shared/src/components/primitives/index.ts` | Primitives barrel export |
-| `packages/shared/src/components/primitives/Card.tsx` | Card component |
-| `packages/shared/src/components/primitives/Input.tsx` | Input component |
-| `packages/shared/src/components/primitives/Badge.tsx` | Badge component |
-| `packages/shared/src/components/primitives/Avatar.tsx` | Avatar component |
-| `packages/shared/src/components/primitives/Checkbox.tsx` | Checkbox component |
-| `packages/shared/src/components/primitives/Label.tsx` | Label component |
-| `packages/shared/src/components/primitives/Select.tsx` | Select component |
-| `packages/shared/src/components/primitives/Textarea.tsx` | Textarea component |
-| `packages/shared/src/components/primitives/Switch.tsx` | Switch component |
-| `packages/shared/src/components/primitives/Skeleton.tsx` | Skeleton component |
-| `packages/shared/src/components/primitives/LoadingSpinner.tsx` | LoadingSpinner component |
-| `packages/shared/src/components/primitives/FilterChip.tsx` | FilterChip component |
-| `packages/shared/src/components/primitives/EmptyState.tsx` | EmptyState component |
-| `packages/shared/src/components/primitives/IndeterminateProgress.tsx` | IndeterminateProgress component |
-| `packages/shared/src/lib/motion/config.ts` | Framer Motion presets |
-| `packages/shared/src/components/motion/FadeIn.tsx` | FadeIn animation wrapper |
-| `packages/shared/src/components/motion/SlideUp.tsx` | SlideUp animation wrapper |
-| `packages/shared/src/components/motion/ScaleIn.tsx` | ScaleIn animation wrapper |
-| `packages/shared/src/components/motion/AnimatedList.tsx` | Staggered list animation |
-| `packages/shared/src/components/motion/AnimatedPanel.tsx` | Slide-right panel |
-| `packages/shared/src/components/motion/CountUp.tsx` | Animated number counter |
-| `packages/shared/src/components/motion/SkeletonTransition.tsx` | Skeleton-to-content crossfade |
-| `packages/shared/src/components/motion/index.ts` | Motion barrel export |
-| `packages/shared/src/stories/Colors.stories.tsx` | Color token documentation |
-| `packages/shared/src/stories/Typography.stories.tsx` | Typography token documentation |
-| `packages/shared/src/stories/Spacing.stories.tsx` | Spacing token documentation |
-| `packages/shared/src/stories/Shadows.stories.tsx` | Shadow token documentation |
-| `packages/shared/src/stories/BorderRadius.stories.tsx` | Border radius documentation |
-| All `*.stories.tsx` alongside components | Component stories (15 primitives + 7 motion) |
+
+| File                                                                  | Purpose                                      |
+| --------------------------------------------------------------------- | -------------------------------------------- |
+| `packages/shared/src/types/ui.ts`                                     | Shared UI type definitions                   |
+| `packages/shared/src/components/utils/cn.ts`                          | className merging utility                    |
+| `packages/shared/src/components/utils/variants.ts`                    | Centralized variant mappings                 |
+| `packages/shared/src/components/primitives/index.ts`                  | Primitives barrel export                     |
+| `packages/shared/src/components/primitives/Card.tsx`                  | Card component                               |
+| `packages/shared/src/components/primitives/Input.tsx`                 | Input component                              |
+| `packages/shared/src/components/primitives/Badge.tsx`                 | Badge component                              |
+| `packages/shared/src/components/primitives/Avatar.tsx`                | Avatar component                             |
+| `packages/shared/src/components/primitives/Checkbox.tsx`              | Checkbox component                           |
+| `packages/shared/src/components/primitives/Label.tsx`                 | Label component                              |
+| `packages/shared/src/components/primitives/Select.tsx`                | Select component                             |
+| `packages/shared/src/components/primitives/Textarea.tsx`              | Textarea component                           |
+| `packages/shared/src/components/primitives/Switch.tsx`                | Switch component                             |
+| `packages/shared/src/components/primitives/Skeleton.tsx`              | Skeleton component                           |
+| `packages/shared/src/components/primitives/LoadingSpinner.tsx`        | LoadingSpinner component                     |
+| `packages/shared/src/components/primitives/FilterChip.tsx`            | FilterChip component                         |
+| `packages/shared/src/components/primitives/EmptyState.tsx`            | EmptyState component                         |
+| `packages/shared/src/components/primitives/IndeterminateProgress.tsx` | IndeterminateProgress component              |
+| `packages/shared/src/lib/motion/config.ts`                            | Framer Motion presets                        |
+| `packages/shared/src/components/motion/FadeIn.tsx`                    | FadeIn animation wrapper                     |
+| `packages/shared/src/components/motion/SlideUp.tsx`                   | SlideUp animation wrapper                    |
+| `packages/shared/src/components/motion/ScaleIn.tsx`                   | ScaleIn animation wrapper                    |
+| `packages/shared/src/components/motion/AnimatedList.tsx`              | Staggered list animation                     |
+| `packages/shared/src/components/motion/AnimatedPanel.tsx`             | Slide-right panel                            |
+| `packages/shared/src/components/motion/CountUp.tsx`                   | Animated number counter                      |
+| `packages/shared/src/components/motion/SkeletonTransition.tsx`        | Skeleton-to-content crossfade                |
+| `packages/shared/src/components/motion/index.ts`                      | Motion barrel export                         |
+| `packages/shared/src/stories/Colors.stories.tsx`                      | Color token documentation                    |
+| `packages/shared/src/stories/Typography.stories.tsx`                  | Typography token documentation               |
+| `packages/shared/src/stories/Spacing.stories.tsx`                     | Spacing token documentation                  |
+| `packages/shared/src/stories/Shadows.stories.tsx`                     | Shadow token documentation                   |
+| `packages/shared/src/stories/BorderRadius.stories.tsx`                | Border radius documentation                  |
+| All `*.stories.tsx` alongside components                              | Component stories (15 primitives + 7 motion) |
 
 ### Modified Files
-| File | Change |
-|---|---|
-| `packages/shared/package.json` | Add dependencies + subpath exports |
-| `packages/shared/src/styles/tokens.css` | Expand to full two-layer token system |
-| `packages/shared/src/styles/base.css` | Add dark mode variant + base layer overrides |
-| `packages/shared/src/shadow-dom/mount.tsx` | Add `data-theme` propagation |
-| `packages/shared/src/index.ts` | Update barrel exports |
-| `packages/shared/src/components/index.ts` | Add primitives + utilities exports |
-| `packages/shared/src/components/primitives/Button.tsx` | Refactor to use design system |
-| `packages/shared/src/components/primitives/Button.stories.tsx` | Rewrite stories for all variants |
-| `packages/shared/.storybook/preview.ts` | Add theme decorator |
-| `docs/reference/design-tokens.md` | Update for expanded token system |
+
+| File                                                           | Change                                       |
+| -------------------------------------------------------------- | -------------------------------------------- |
+| `packages/shared/package.json`                                 | Add dependencies + subpath exports           |
+| `packages/shared/src/styles/tokens.css`                        | Expand to full two-layer token system        |
+| `packages/shared/src/styles/base.css`                          | Add dark mode variant + base layer overrides |
+| `packages/shared/src/shadow-dom/mount.tsx`                     | Add `data-theme` propagation                 |
+| `packages/shared/src/index.ts`                                 | Update barrel exports                        |
+| `packages/shared/src/components/index.ts`                      | Add primitives + utilities exports           |
+| `packages/shared/src/components/primitives/Button.tsx`         | Refactor to use design system                |
+| `packages/shared/src/components/primitives/Button.stories.tsx` | Rewrite stories for all variants             |
+| `packages/shared/.storybook/preview.ts`                        | Add theme decorator                          |
+| `docs/reference/design-tokens.md`                              | Update for expanded token system             |
 
 ### Moved Files
-| From | To |
-|---|---|
-| `packages/shared/src/components/Button.tsx` | `packages/shared/src/components/primitives/Button.tsx` |
+
+| From                                                | To                                                             |
+| --------------------------------------------------- | -------------------------------------------------------------- |
+| `packages/shared/src/components/Button.tsx`         | `packages/shared/src/components/primitives/Button.tsx`         |
 | `packages/shared/src/components/Button.stories.tsx` | `packages/shared/src/components/primitives/Button.stories.tsx` |

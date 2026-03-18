@@ -86,9 +86,9 @@ export const Input = forwardRef<InputElement, InputProps>(
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
 
                     // Border styles
-                    hasError
-                        ? 'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
-                        : 'border-stone-300 dark:border-stone-600',
+                    hasError ?
+                        'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
+                    :   'border-stone-300 dark:border-stone-600',
 
                     // Disabled styles
                     'disabled:cursor-not-allowed disabled:opacity-50',

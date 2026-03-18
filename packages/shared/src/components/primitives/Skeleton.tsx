@@ -39,7 +39,15 @@ const variantStyles = {
  */
 export const Skeleton = forwardRef<SkeletonElement, SkeletonProps>(
     (
-        { variant = 'line', width, height, rounded, className, style, ...props },
+        {
+            variant = 'line',
+            width,
+            height,
+            rounded,
+            className,
+            style,
+            ...props
+        },
         ref,
     ) => {
         return (
@@ -53,10 +61,8 @@ export const Skeleton = forwardRef<SkeletonElement, SkeletonProps>(
                     className,
                 )}
                 style={{
-                    width:
-                        typeof width === 'number' ? `${width}px` : width,
-                    height:
-                        typeof height === 'number' ? `${height}px` : height,
+                    width: typeof width === 'number' ? `${width}px` : width,
+                    height: typeof height === 'number' ? `${height}px` : height,
                     ...style,
                 }}
                 {...props}

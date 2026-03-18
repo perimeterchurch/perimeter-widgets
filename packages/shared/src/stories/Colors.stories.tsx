@@ -25,10 +25,22 @@ const colorSwatch = (name: string, cssVar: string, hex: string) =>
         }),
         React.createElement(
             'div',
-            { style: { display: 'flex', flexDirection: 'column' as const, gap: '0.125rem' } },
+            {
+                style: {
+                    display: 'flex',
+                    flexDirection: 'column' as const,
+                    gap: '0.125rem',
+                },
+            },
             React.createElement(
                 'span',
-                { style: { fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-text)' } },
+                {
+                    style: {
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        color: 'var(--color-text)',
+                    },
+                },
                 name,
             ),
             React.createElement(
@@ -44,7 +56,12 @@ const colorSwatch = (name: string, cssVar: string, hex: string) =>
             ),
             React.createElement(
                 'span',
-                { style: { fontSize: '0.75rem', color: 'var(--color-text-muted)' } },
+                {
+                    style: {
+                        fontSize: '0.75rem',
+                        color: 'var(--color-text-muted)',
+                    },
+                },
                 hex,
             ),
         ),
@@ -73,7 +90,8 @@ const section = (title: string, children: React.ReactNode[]) =>
             {
                 style: {
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gridTemplateColumns:
+                        'repeat(auto-fill, minmax(280px, 1fr))',
                     gap: '0.25rem',
                 },
             },
@@ -101,39 +119,75 @@ function ColorsPage() {
             colorSwatch('Primary', '--color-primary', '#5b5bd6'),
             colorSwatch('Primary Hover', '--color-primary-hover', '#4e4eca'),
             colorSwatch('Primary Active', '--color-primary-active', '#4242b8'),
-            colorSwatch('Primary Foreground', '--color-primary-foreground', '#ffffff'),
+            colorSwatch(
+                'Primary Foreground',
+                '--color-primary-foreground',
+                '#ffffff',
+            ),
         ]),
         section('Success', [
             colorSwatch('Success', '--color-success', '#46a758'),
             colorSwatch('Success Hover', '--color-success-hover', '#3d9b4f'),
             colorSwatch('Success Active', '--color-success-active', '#348746'),
-            colorSwatch('Success Foreground', '--color-success-foreground', '#ffffff'),
+            colorSwatch(
+                'Success Foreground',
+                '--color-success-foreground',
+                '#ffffff',
+            ),
         ]),
         section('Warning', [
             colorSwatch('Warning', '--color-warning', '#f5a623'),
             colorSwatch('Warning Hover', '--color-warning-hover', '#e09918'),
             colorSwatch('Warning Active', '--color-warning-active', '#c88a14'),
-            colorSwatch('Warning Foreground', '--color-warning-foreground', '#ffffff'),
+            colorSwatch(
+                'Warning Foreground',
+                '--color-warning-foreground',
+                '#ffffff',
+            ),
         ]),
         section('Error', [
             colorSwatch('Error', '--color-error', '#e54666'),
             colorSwatch('Error Hover', '--color-error-hover', '#d93d5c'),
             colorSwatch('Error Active', '--color-error-active', '#c63652'),
-            colorSwatch('Error Foreground', '--color-error-foreground', '#ffffff'),
+            colorSwatch(
+                'Error Foreground',
+                '--color-error-foreground',
+                '#ffffff',
+            ),
         ]),
         section('Surface Colors', [
             colorSwatch('Background', '--color-background', '#ffffff'),
             colorSwatch('Foreground', '--color-foreground', '#1c1917'),
             colorSwatch('Card', '--color-card', '#ffffff'),
-            colorSwatch('Card Foreground', '--color-card-foreground', '#1c1917'),
+            colorSwatch(
+                'Card Foreground',
+                '--color-card-foreground',
+                '#1c1917',
+            ),
             colorSwatch('Muted', '--color-muted', '#f5f5f4'),
-            colorSwatch('Muted Foreground', '--color-muted-foreground', '#78716c'),
+            colorSwatch(
+                'Muted Foreground',
+                '--color-muted-foreground',
+                '#78716c',
+            ),
             colorSwatch('Accent', '--color-accent', '#f5f5f4'),
-            colorSwatch('Accent Foreground', '--color-accent-foreground', '#1c1917'),
+            colorSwatch(
+                'Accent Foreground',
+                '--color-accent-foreground',
+                '#1c1917',
+            ),
             colorSwatch('Popover', '--color-popover', '#ffffff'),
-            colorSwatch('Popover Foreground', '--color-popover-foreground', '#1c1917'),
+            colorSwatch(
+                'Popover Foreground',
+                '--color-popover-foreground',
+                '#1c1917',
+            ),
             colorSwatch('Destructive', '--color-destructive', '#e54666'),
-            colorSwatch('Destructive Foreground', '--color-destructive-foreground', '#ffffff'),
+            colorSwatch(
+                'Destructive Foreground',
+                '--color-destructive-foreground',
+                '#ffffff',
+            ),
             colorSwatch('Border', '--color-border', '#d6d3d1'),
             colorSwatch('Input', '--color-input', '#d6d3d1'),
             colorSwatch('Ring', '--color-ring', '#5b5bd6'),

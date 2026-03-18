@@ -19,7 +19,13 @@ const meta: Meta<typeof AnimatedList> = {
 export default meta;
 type Story = StoryObj<typeof AnimatedList>;
 
-const items = ['First item', 'Second item', 'Third item', 'Fourth item', 'Fifth item'];
+const items = [
+    'First item',
+    'Second item',
+    'Third item',
+    'Fourth item',
+    'Fifth item',
+];
 
 export const Default: Story = {
     args: {
@@ -58,33 +64,35 @@ export const AsList: Story = {
     },
 };
 
+function ReplayDemo() {
+    const [key, setKey] = useState(0);
+    return (
+        <div>
+            <button
+                onClick={() => setKey((k) => k + 1)}
+                style={{ marginBottom: 16 }}
+            >
+                Replay
+            </button>
+            <AnimatedList key={key}>
+                {items.map((item) => (
+                    <div
+                        key={item}
+                        style={{
+                            padding: '12px 16px',
+                            background: '#f0f4ff',
+                            borderRadius: 6,
+                            marginBottom: 8,
+                        }}
+                    >
+                        {item}
+                    </div>
+                ))}
+            </AnimatedList>
+        </div>
+    );
+}
+
 export const Replay: Story = {
-    render: () => {
-        const [key, setKey] = useState(0);
-        return (
-            <div>
-                <button
-                    onClick={() => setKey((k) => k + 1)}
-                    style={{ marginBottom: 16 }}
-                >
-                    Replay
-                </button>
-                <AnimatedList key={key}>
-                    {items.map((item) => (
-                        <div
-                            key={item}
-                            style={{
-                                padding: '12px 16px',
-                                background: '#f0f4ff',
-                                borderRadius: 6,
-                                marginBottom: 8,
-                            }}
-                        >
-                            {item}
-                        </div>
-                    ))}
-                </AnimatedList>
-            </div>
-        );
-    },
+    render: () => <ReplayDemo />,
 };

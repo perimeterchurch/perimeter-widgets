@@ -31,7 +31,8 @@ function ShadowsPage() {
             {
                 style: {
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gridTemplateColumns:
+                        'repeat(auto-fill, minmax(200px, 1fr))',
                     gap: '2rem',
                 },
             },

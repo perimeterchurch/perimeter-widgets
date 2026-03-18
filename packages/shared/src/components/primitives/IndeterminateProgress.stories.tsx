@@ -15,7 +15,13 @@ const meta: Meta<typeof IndeterminateProgress> = {
                 }}
             >
                 <Story />
-                <div style={{ padding: '24px', textAlign: 'center', color: '#999' }}>
+                <div
+                    style={{
+                        padding: '24px',
+                        textAlign: 'center',
+                        color: '#999',
+                    }}
+                >
                     Content area (parent has position: relative)
                 </div>
             </div>

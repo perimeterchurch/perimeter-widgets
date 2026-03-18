@@ -71,10 +71,10 @@ React context for widget config. `useConfig()` throws if used outside a `ConfigP
 
 ### `createApiClient(options): ApiClient`
 
-| Option         | Type      | Default                       | Description                 |
-| -------------- | --------- | ----------------------------- | --------------------------- |
-| `baseUrl`      | `string`  | auto-resolved (see below)     | API base URL                |
-| `requiresAuth` | `boolean` | `false`                       | Attach MP token to requests |
+| Option         | Type      | Default                   | Description                 |
+| -------------- | --------- | ------------------------- | --------------------------- |
+| `baseUrl`      | `string`  | auto-resolved (see below) | API base URL                |
+| `requiresAuth` | `boolean` | `false`                   | Attach MP token to requests |
 
 **Base URL resolution** (priority order):
 

@@ -23,6 +23,7 @@ Design tokens exist at two levels:
 2. **Tailwind `@theme` block** — uses hardcoded hex values (not `var()` references) because Tailwind v4 requires static values at build time for utility class generation. The `@theme` values match the `:host` light mode defaults.
 
 **How components use tokens:**
+
 - Most styling uses standard Tailwind utility classes (`bg-primary`, `text-stone-900`, `rounded-lg`) — these cover ~95% of cases and are static.
 - For the handful of tokens that must be runtime-overridable (brand colors, key surface colors), components use Tailwind arbitrary value syntax: `bg-[var(--color-primary)]`. This ensures WordPress overrides take effect.
 - The `variants.ts` centralized mappings use the arbitrary value syntax for semantic color tokens so runtime overrides work through the variant system.
@@ -30,6 +31,7 @@ Design tokens exist at two levels:
 **Dark mode** uses `data-theme="dark"` on an inner wrapper div inside the shadow root (not on `:host`), enabling a `@custom-variant` selector that works in both shadow DOM and Storybook.
 
 **Why this approach:**
+
 - CSS custom properties on the shadow host enable runtime overrides from WordPress
 - Tailwind utility generation works with static `@theme` values
 - `data-theme` on inner wrapper avoids `:host()` selector limitations in `@custom-variant`
@@ -59,8 +61,8 @@ Expand from the current minimal token set to match the API's full token system.
     /* ... all tokens */
 }
 
-:host([data-theme="dark"]),
-.storybook-root[data-theme="dark"] {
+:host([data-theme='dark']),
+.storybook-root[data-theme='dark'] {
     --color-background: #0c0a09;
     --color-foreground: #fafaf9;
     /* ... dark overrides */
@@ -84,6 +86,7 @@ All hex values are taken from the **API's `tokens.css`** as the canonical source
 ### Token Categories
 
 **Semantic Colors** (with hover/active/foreground variants):
+
 - Primary: warm indigo (`#5b5bd6`, hover `#4e4eca`, active `#4242b8`, foreground `#ffffff`)
 - Success: warm green (`#46a758`, hover `#3d9b4f`, active `#348746`, foreground `#ffffff`)
 - Warning: warm amber (`#f5a623`, hover `#e09918`, active `#c88a14`, foreground `#ffffff`)
@@ -91,37 +94,38 @@ All hex values are taken from the **API's `tokens.css`** as the canonical source
 
 **Surface Colors (light / dark):**
 
-| Token | Light | Dark |
-|---|---|---|
-| `--color-background` | `#ffffff` | `#0c0a09` |
-| `--color-foreground` | `#1c1917` | `#fafaf9` |
-| `--color-card` | `#ffffff` | `#1c1917` |
-| `--color-card-foreground` | `#1c1917` | `#fafaf9` |
-| `--color-muted` | `#f5f5f4` | `#292524` |
-| `--color-muted-foreground` | `#78716c` | `#a8a29e` |
-| `--color-accent` | `#f5f5f4` | `#292524` |
-| `--color-accent-foreground` | `#1c1917` | `#fafaf9` |
-| `--color-popover` | `#ffffff` | `#1c1917` |
-| `--color-popover-foreground` | `#1c1917` | `#fafaf9` |
-| `--color-destructive` | `#e54666` | `#e54666` |
+| Token                            | Light     | Dark      |
+| -------------------------------- | --------- | --------- |
+| `--color-background`             | `#ffffff` | `#0c0a09` |
+| `--color-foreground`             | `#1c1917` | `#fafaf9` |
+| `--color-card`                   | `#ffffff` | `#1c1917` |
+| `--color-card-foreground`        | `#1c1917` | `#fafaf9` |
+| `--color-muted`                  | `#f5f5f4` | `#292524` |
+| `--color-muted-foreground`       | `#78716c` | `#a8a29e` |
+| `--color-accent`                 | `#f5f5f4` | `#292524` |
+| `--color-accent-foreground`      | `#1c1917` | `#fafaf9` |
+| `--color-popover`                | `#ffffff` | `#1c1917` |
+| `--color-popover-foreground`     | `#1c1917` | `#fafaf9` |
+| `--color-destructive`            | `#e54666` | `#e54666` |
 | `--color-destructive-foreground` | `#ffffff` | `#ffffff` |
-| `--color-border` | `#d6d3d1` | `#44403c` |
-| `--color-input` | `#d6d3d1` | `#44403c` |
-| `--color-ring` | `#5b5bd6` | `#5b5bd6` |
+| `--color-border`                 | `#d6d3d1` | `#44403c` |
+| `--color-input`                  | `#d6d3d1` | `#44403c` |
+| `--color-ring`                   | `#5b5bd6` | `#5b5bd6` |
 
 **Base Scale Tokens** (also ported from API, for direct use):
 
-| Token | Light | Dark |
-|---|---|---|
-| `--color-bg` | `#fafaf9` | `#0c0a09` |
-| `--color-bg-subtle` | `#f5f5f4` | `#1c1917` |
-| `--color-bg-muted` | `#e7e5e4` | `#292524` |
-| `--color-border-subtle` | `#e7e5e4` | `#292524` |
-| `--color-text` | `#1c1917` | `#fafaf9` |
+| Token                    | Light     | Dark      |
+| ------------------------ | --------- | --------- |
+| `--color-bg`             | `#fafaf9` | `#0c0a09` |
+| `--color-bg-subtle`      | `#f5f5f4` | `#1c1917` |
+| `--color-bg-muted`       | `#e7e5e4` | `#292524` |
+| `--color-border-subtle`  | `#e7e5e4` | `#292524` |
+| `--color-text`           | `#1c1917` | `#fafaf9` |
 | `--color-text-secondary` | `#57534e` | `#a8a29e` |
-| `--color-text-muted` | `#a8a29e` | `#78716c` |
+| `--color-text-muted`     | `#a8a29e` | `#78716c` |
 
 **Spacing Scale:**
+
 - `--spacing-xs` (0.5rem / 8px)
 - `--spacing-sm` (0.75rem / 12px)
 - `--spacing-md` (1rem / 16px)
@@ -131,31 +135,41 @@ All hex values are taken from the **API's `tokens.css`** as the canonical source
 - `--spacing-3xl` (4rem / 64px)
 
 **Typography:**
+
 - Font families:
-  - `--font-sans`: `ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'` (matches API)
-  - `--font-mono`: `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace`
+    - `--font-sans`: `ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'` (matches API)
+    - `--font-mono`: `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace`
 - Font sizes: `--font-size-xs` (0.75rem) through `--font-size-4xl` (2.25rem)
 - Font weights: `--font-weight-normal` (400), `--font-weight-medium` (500), `--font-weight-semibold` (600), `--font-weight-bold` (700)
 - Line heights: `--line-height-tight` (1.25), `--line-height-normal` (1.5), `--line-height-relaxed` (1.75)
 
 **Border Radius:**
+
 - `--radius-none` (0), `--radius-sm` (0.375rem), `--radius-md` (0.5rem), `--radius-lg` (0.75rem), `--radius-xl` (1rem), `--radius-2xl` (1.5rem), `--radius-full` (9999px)
 
 **Shadows** (warm stone-tinted, matching API):
+
 - `--shadow-xs` through `--shadow-2xl` with dark mode overrides using stronger opacity
 
 **Transitions:**
+
 - `--transition-fast` (150ms), `--transition-base` (200ms), `--transition-slow` (300ms)
 - All use `cubic-bezier(0.4, 0, 0.2, 1)`
 
 **Z-Index Scale:**
+
 - `--z-dropdown` (1000), `--z-sticky` (1020), `--z-fixed` (1030), `--z-modal-backdrop` (1040), `--z-modal` (1050), `--z-popover` (1060), `--z-tooltip` (1070)
 
 ### Runtime Override Path
 
 WordPress admins set overrides on the embed `<div>` (which is the shadow host):
+
 ```html
-<div id="perimeter-sermons" data-theme="dark" style="--color-primary: #ff0000;">
+<div
+    id="perimeter-sermons"
+    data-theme="dark"
+    style="--color-primary: #ff0000;"
+></div>
 ```
 
 CSS custom properties set on the shadow host element inherit into the shadow tree, overriding the `:host` defaults. Components using `bg-[var(--color-primary)]` syntax will pick up the override. Standard Tailwind utilities (`bg-primary`) use the static `@theme` value and will not respond to runtime overrides — this is intentional, as only brand/semantic colors need runtime customization.
@@ -187,6 +201,7 @@ This works in both shadow DOM (where `mountWidget` sets `data-theme` on `#widget
 ```
 
 **Base layer additions:**
+
 - `button, [role='button']` cursor rules (pointer default, not-allowed when disabled)
 - Shimmer animation keyframe for Skeleton component
 - Focus ring utility classes (`.focus-ring`, `.focus-ring-inset`) using `--color-ring`
@@ -244,35 +259,42 @@ lib/
 Ported verbatim from the API's `src/lib/types/ui.ts`:
 
 ```typescript
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-type Variant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'ghost'
+type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type Variant =
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info'
+    | 'ghost';
 
 interface BaseComponentProps {
-    className?: string
-    children?: ReactNode
-    id?: string
-    'data-testid'?: string
+    className?: string;
+    children?: ReactNode;
+    id?: string;
+    'data-testid'?: string;
 }
 
 interface InteractiveProps extends BaseComponentProps {
-    disabled?: boolean
-    isLoading?: boolean
-    'aria-label'?: string
+    disabled?: boolean;
+    isLoading?: boolean;
+    'aria-label'?: string;
 }
 
 interface VariantProps {
-    variant?: Variant
-    size?: Size
+    variant?: Variant;
+    size?: Size;
 }
 
 interface WidthProps {
-    fullWidth?: boolean
+    fullWidth?: boolean;
 }
 
 // Utility types
-type RequiredProps<T, K extends keyof T> = T & Required<Pick<T, K>>
-type VariantValue<T> = T extends { variant: infer V } ? V : never
-type SizeValue<T> = T extends { size: infer S } ? S : never
+type RequiredProps<T, K extends keyof T> = T & Required<Pick<T, K>>;
+type VariantValue<T> = T extends { variant: infer V } ? V : never;
+type SizeValue<T> = T extends { size: infer S } ? S : never;
 ```
 
 ### Utilities
@@ -280,6 +302,7 @@ type SizeValue<T> = T extends { size: infer S } ? S : never
 **`cn.ts`** — `clsx` + `tailwind-merge` for className merging with Tailwind conflict resolution. Direct port from API.
 
 **`variants.ts`** — centralized mappings consumed by all components. Ported from API's `src/components/ui/utils/variants.ts`:
+
 - `sizeClasses` — text size per Size
 - `paddingSizes` — padding per Size
 - `iconSizes` — icon pixel dimensions per Size
@@ -291,6 +314,7 @@ type SizeValue<T> = T extends { size: infer S } ? S : never
 ### Component Design Patterns
 
 All primitives follow these patterns (matching the API's conventions):
+
 - `forwardRef` for ref forwarding
 - `cn()` for className merging
 - Consume centralized `variants.ts` for size/variant styling
@@ -302,27 +326,28 @@ All primitives follow these patterns (matching the API's conventions):
 
 All 15 primitives are ported from the API's `src/components/ui/primitives/` directory with matching props interfaces. Source files for reference during implementation:
 
-| Component | API Source | Key Props |
-|---|---|---|
-| Button | `primitives/Button.tsx` | `variant`, `size`, `isLoading`, `outline`, `fullWidth` |
-| Card | `primitives/Card.tsx` | `CardHeader`, `CardBody`, `CardFooter` subcomponents; `padding` |
-| Input | `primitives/Input.tsx` | `size`, `error` (string), `leftIcon`, `rightIcon` |
-| Badge | `primitives/Badge.tsx` | `variant`, `size`, `dot` (boolean), `outline` |
-| Avatar | `primitives/Avatar.tsx` | `src`, `alt`, `size`, `fallback` |
-| Checkbox | `primitives/Checkbox.tsx` | `checked`, `onChange`, `label`, `size` |
-| Label | `primitives/Label.tsx` | `htmlFor`, `required`, `size` |
-| Select | `primitives/Select.tsx` | `options`, `value`, `onChange`, `size`, `error` |
-| Textarea | `primitives/Textarea.tsx` | `size`, `error`, `rows` |
-| Switch | `primitives/Switch.tsx` | `checked`, `onChange`, `label`, `size` |
-| Skeleton | `primitives/Skeleton.tsx` | `width`, `height`, `rounded`, `className` |
-| LoadingSpinner | `primitives/LoadingSpinner.tsx` | `size`, `className` |
-| FilterChip | `primitives/FilterChip.tsx` | `label`, `onRemove`, `variant`, `size` |
-| EmptyState | `primitives/EmptyState.tsx` | `icon`, `title`, `description`, `action` |
-| IndeterminateProgress | `primitives/IndeterminateProgress.tsx` | `className` |
+| Component             | API Source                             | Key Props                                                       |
+| --------------------- | -------------------------------------- | --------------------------------------------------------------- |
+| Button                | `primitives/Button.tsx`                | `variant`, `size`, `isLoading`, `outline`, `fullWidth`          |
+| Card                  | `primitives/Card.tsx`                  | `CardHeader`, `CardBody`, `CardFooter` subcomponents; `padding` |
+| Input                 | `primitives/Input.tsx`                 | `size`, `error` (string), `leftIcon`, `rightIcon`               |
+| Badge                 | `primitives/Badge.tsx`                 | `variant`, `size`, `dot` (boolean), `outline`                   |
+| Avatar                | `primitives/Avatar.tsx`                | `src`, `alt`, `size`, `fallback`                                |
+| Checkbox              | `primitives/Checkbox.tsx`              | `checked`, `onChange`, `label`, `size`                          |
+| Label                 | `primitives/Label.tsx`                 | `htmlFor`, `required`, `size`                                   |
+| Select                | `primitives/Select.tsx`                | `options`, `value`, `onChange`, `size`, `error`                 |
+| Textarea              | `primitives/Textarea.tsx`              | `size`, `error`, `rows`                                         |
+| Switch                | `primitives/Switch.tsx`                | `checked`, `onChange`, `label`, `size`                          |
+| Skeleton              | `primitives/Skeleton.tsx`              | `width`, `height`, `rounded`, `className`                       |
+| LoadingSpinner        | `primitives/LoadingSpinner.tsx`        | `size`, `className`                                             |
+| FilterChip            | `primitives/FilterChip.tsx`            | `label`, `onRemove`, `variant`, `size`                          |
+| EmptyState            | `primitives/EmptyState.tsx`            | `icon`, `title`, `description`, `action`                        |
+| IndeterminateProgress | `primitives/IndeterminateProgress.tsx` | `className`                                                     |
 
 ### Existing Button Refactor
 
 The current `Button.tsx` is refactored to:
+
 - Use `cn()` instead of manual array joining
 - Import from centralized `variants.ts` instead of inline maps
 - Expand variant set: add `success`, `warning`, `error`, `info` variants
@@ -332,6 +357,7 @@ The current `Button.tsx` is refactored to:
 ### New Dependencies
 
 Added to `packages/shared/package.json` as regular dependencies:
+
 - `clsx` — conditional className utility
 - `tailwind-merge` — Tailwind class deduplication
 - `framer-motion` — animation library
@@ -360,15 +386,15 @@ Direct port from the API's `src/lib/motion/config.ts` — pure config objects wi
 
 ### Motion Components (`components/motion/`)
 
-| Component | Animation | API Source |
-|---|---|---|
-| `FadeIn` | Opacity entrance | `motion/FadeIn.tsx` |
-| `SlideUp` | Vertical slide + fade | `motion/SlideUp.tsx` |
-| `ScaleIn` | Scale + fade | `motion/ScaleIn.tsx` |
-| `AnimatedList` | Staggered children | `motion/AnimatedList.tsx` |
-| `AnimatedPanel` | Slide-right panel with optional backdrop | `motion/AnimatedPanel.tsx` |
-| `CountUp` | Animated number counter | `motion/CountUp.tsx` |
-| `SkeletonTransition` | Skeleton-to-content crossfade | `motion/SkeletonTransition.tsx` |
+| Component            | Animation                                | API Source                      |
+| -------------------- | ---------------------------------------- | ------------------------------- |
+| `FadeIn`             | Opacity entrance                         | `motion/FadeIn.tsx`             |
+| `SlideUp`            | Vertical slide + fade                    | `motion/SlideUp.tsx`            |
+| `ScaleIn`            | Scale + fade                             | `motion/ScaleIn.tsx`            |
+| `AnimatedList`       | Staggered children                       | `motion/AnimatedList.tsx`       |
+| `AnimatedPanel`      | Slide-right panel with optional backdrop | `motion/AnimatedPanel.tsx`      |
+| `CountUp`            | Animated number counter                  | `motion/CountUp.tsx`            |
+| `SkeletonTransition` | Skeleton-to-content crossfade            | `motion/SkeletonTransition.tsx` |
 
 ### Shadow DOM Compatibility
 
@@ -403,12 +429,14 @@ The Storybook decorator wraps each story in `<div class="storybook-root" data-th
 ### Component Stories
 
 Every primitive gets a stories file in `packages/shared/src/components/primitives/` with:
+
 - All variants displayed
 - All sizes (xs through xl)
 - All states (default, hover, disabled, loading, error)
 - Interactive controls via Storybook args
 
 Every motion component gets a story with:
+
 - Animation demonstration
 - Replay button
 - Configurable props (duration, delay, etc.)
@@ -417,17 +445,18 @@ Every motion component gets a story with:
 
 Dedicated stories under `packages/shared/src/stories/` in a "Design System" Storybook category:
 
-| Story | Content |
-|---|---|
-| **Colors** | All semantic + surface colors as swatches with hex values and CSS variable names, light and dark |
-| **Typography** | Full font size/weight scale with sample text |
-| **Spacing** | Visual representation of spacing scale |
-| **Shadows** | Cards showing each shadow level |
-| **Border Radius** | Visual examples of each radius token |
+| Story             | Content                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| **Colors**        | All semantic + surface colors as swatches with hex values and CSS variable names, light and dark |
+| **Typography**    | Full font size/weight scale with sample text                                                     |
+| **Spacing**       | Visual representation of spacing scale                                                           |
+| **Shadows**       | Cards showing each shadow level                                                                  |
+| **Border Radius** | Visual examples of each radius token                                                             |
 
 ### Theme Switching
 
 Add a Storybook toolbar decorator for dark mode:
+
 - Toolbar item in `preview.ts` with light/dark options
 - Decorator wraps each story in `<div class="storybook-root" data-theme="...">` container
 - All component stories and token pages preview in both modes
@@ -498,6 +527,7 @@ export * from './lib/motion/config';
 ```
 
 Subpath exports added to `package.json`:
+
 - `@perimeter-widgets/shared/styles` — CSS tokens + base (existing)
 - `@perimeter-widgets/shared/styles/tokens` — tokens only (existing)
 - `@perimeter-widgets/shared/components/motion` — motion components only (new)
@@ -521,8 +551,8 @@ These API features are intentionally excluded:
 
 ## Dependencies Added
 
-| Package | Purpose | Type |
-|---|---|---|
-| `clsx` | Conditional className utility | dependency |
-| `tailwind-merge` | Tailwind class deduplication | dependency |
-| `framer-motion` | Animation library | dependency |
+| Package          | Purpose                       | Type       |
+| ---------------- | ----------------------------- | ---------- |
+| `clsx`           | Conditional className utility | dependency |
+| `tailwind-merge` | Tailwind class deduplication  | dependency |
+| `framer-motion`  | Animation library             | dependency |

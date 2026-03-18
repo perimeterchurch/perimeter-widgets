@@ -15,8 +15,7 @@ import { iconSizes } from '../utils/variants';
 type SpinnerElement = ElementRef<'div'>;
 
 export interface LoadingSpinnerProps
-    extends ComponentPropsWithoutRef<'div'>,
-        BaseComponentProps {
+    extends ComponentPropsWithoutRef<'div'>, BaseComponentProps {
     /** Spinner size */
     size?: Size;
     /** Optional label for screen readers */

@@ -63,19 +63,19 @@ Since this is the first Neon table in the project, the `CREATE TABLE` SQL is run
 
 ### Fields
 
-| Field | Source | Description |
-| --- | --- | --- |
-| `widget_id` | Client payload | Widget name (e.g., `'sermons'`) — extracted from `elementId` by stripping the `perimeter-` prefix |
-| `event_type` | Client payload | `'mount'` for now, extensible for future interaction events |
-| `page_url` | Client payload | Full URL where widget is embedded |
-| `page_path` | Client payload | Path portion only (for grouping) |
-| `hostname` | Client payload | `'perimeter.org'`, `'localhost'`, etc. |
-| `referrer` | Client payload | `document.referrer` or null |
-| `user_agent` | Server (request header) | Raw UA string, more reliable than `navigator.userAgent` |
-| `device_type` | Server (parsed from UA) | `'desktop'`, `'mobile'`, `'tablet'` |
-| `screen_width` | Client payload | Viewport width in pixels |
-| `config` | Client payload | Widget data-* attributes as JSONB (capped at first 10 keys to prevent bloat) |
-| `created_at` | Server (DB default) | Timestamp |
+| Field          | Source                  | Description                                                                                       |
+| -------------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `widget_id`    | Client payload          | Widget name (e.g., `'sermons'`) — extracted from `elementId` by stripping the `perimeter-` prefix |
+| `event_type`   | Client payload          | `'mount'` for now, extensible for future interaction events                                       |
+| `page_url`     | Client payload          | Full URL where widget is embedded                                                                 |
+| `page_path`    | Client payload          | Path portion only (for grouping)                                                                  |
+| `hostname`     | Client payload          | `'perimeter.org'`, `'localhost'`, etc.                                                            |
+| `referrer`     | Client payload          | `document.referrer` or null                                                                       |
+| `user_agent`   | Server (request header) | Raw UA string, more reliable than `navigator.userAgent`                                           |
+| `device_type`  | Server (parsed from UA) | `'desktop'`, `'mobile'`, `'tablet'`                                                               |
+| `screen_width` | Client payload          | Viewport width in pixels                                                                          |
+| `config`       | Client payload          | Widget data-\* attributes as JSONB (capped at first 10 keys to prevent bloat)                     |
+| `created_at`   | Server (DB default)     | Timestamp                                                                                         |
 
 ### Privacy
 
@@ -138,7 +138,12 @@ export function trackWidgetMount(
     if (navigator.sendBeacon) {
         navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
     } else {
-        fetch(url, { method: 'POST', body, keepalive: true, headers: { 'Content-Type': 'text/plain' } });
+        fetch(url, {
+            method: 'POST',
+            body,
+            keepalive: true,
+            headers: { 'Content-Type': 'text/plain' },
+        });
     }
 }
 ```
@@ -165,6 +170,7 @@ No widget code changes needed — tracking is handled by the shared mount utilit
 ### Deduplication
 
 A module-level `Set<string>` tracks which **element IDs** have already fired an event. This means:
+
 - Re-mounts of the same element (HMR, config changes) do not fire duplicate events
 - Two instances of the same widget type with different element IDs (e.g., two sermon widgets on one page) each fire their own event correctly
 
@@ -214,7 +220,9 @@ export class NeonProvider extends BaseProvider {
 
         const connectionString = process.env.NEON_DATABASE_URL;
         if (!connectionString) {
-            this.audit.warn('NEON_DATABASE_URL not set — Neon provider disabled');
+            this.audit.warn(
+                'NEON_DATABASE_URL not set — Neon provider disabled',
+            );
             return;
         }
 
@@ -266,6 +274,7 @@ container.registerSingleton(NeonProvider as any, () => {
 ```
 
 Full DI chain registered in the appropriate files:
+
 - **Provider:** `src/lib/di/registrations/providers.ts` — NeonProvider (singleton)
 - **System:** `src/lib/di/registrations/systems.ts` — AnalyticsSystem (singleton, receives NeonProvider)
 - **Service:** `src/lib/di/registrations/services.ts` — AnalyticsService (factory, receives AnalyticsSystem)
@@ -293,7 +302,10 @@ import { z } from 'zod';
 
 /** Validates the POST payload from widget sendBeacon */
 export const WidgetEventCreateSchema = z.object({
-    widgetId: z.string().regex(/^[a-z][a-z0-9-]*$/).max(50),
+    widgetId: z
+        .string()
+        .regex(/^[a-z][a-z0-9-]*$/)
+        .max(50),
     eventType: z.enum(['mount']),
     pageUrl: z.string().url().max(2000),
     pagePath: z.string().max(500),
@@ -309,7 +321,11 @@ export type WidgetEventCreate = z.infer<typeof WidgetEventCreateSchema>;
 export const StatsQuerySchema = z.object({
     from: z.string().datetime().optional(),
     to: z.string().datetime().optional(),
-    widgetId: z.string().regex(/^[a-z][a-z0-9-]*$/).max(50).optional(),
+    widgetId: z
+        .string()
+        .regex(/^[a-z][a-z0-9-]*$/)
+        .max(50)
+        .optional(),
 });
 
 export type StatsQuery = z.infer<typeof StatsQuerySchema>;
@@ -327,16 +343,34 @@ export class AnalyticsSystem extends BaseSystem<NeonProvider, never> {
         super(provider, 'AnalyticsSystem');
     }
 
-    async insertEvent(event: WidgetEventCreate, userAgent: string): Promise<void> {
+    async insertEvent(
+        event: WidgetEventCreate,
+        userAgent: string,
+    ): Promise<void> {
         const deviceType = parseDeviceType(userAgent);
         await this.provider.execute(
             `INSERT INTO widget_events (widget_id, event_type, page_url, page_path, hostname, referrer, user_agent, device_type, screen_width, config)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-            [event.widgetId, event.eventType, event.pageUrl, event.pagePath, event.hostname, event.referrer, userAgent, deviceType, event.screenWidth, event.config ? JSON.stringify(event.config) : null],
+            [
+                event.widgetId,
+                event.eventType,
+                event.pageUrl,
+                event.pagePath,
+                event.hostname,
+                event.referrer,
+                userAgent,
+                deviceType,
+                event.screenWidth,
+                event.config ? JSON.stringify(event.config) : null,
+            ],
         );
     }
 
-    async getStats(from: Date, to: Date, widgetId?: string): Promise<AnalyticsStats> {
+    async getStats(
+        from: Date,
+        to: Date,
+        widgetId?: string,
+    ): Promise<AnalyticsStats> {
         // Parameterized queries prevent SQL injection
         // ... GROUP BY aggregation queries ...
     }
@@ -376,11 +410,11 @@ function parseDeviceType(ua: string): 'mobile' | 'tablet' | 'desktop' {
 
 Query parameters validated with `StatsQuerySchema`:
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| `from` | ISO date | 30 days ago | Start of date range |
-| `to` | ISO date | now | End of date range |
-| `widgetId` | string | all | Filter by widget |
+| Param      | Type     | Default     | Description         |
+| ---------- | -------- | ----------- | ------------------- |
+| `from`     | ISO date | 30 days ago | Start of date range |
+| `to`       | ISO date | now         | End of date range   |
+| `widgetId` | string   | all         | Filter by widget    |
 
 Returns aggregated stats:
 
@@ -401,9 +435,7 @@ Returns aggregated stats:
             { "pagePath": "/sermons", "widgetId": "sermons", "count": 2100 },
             { "pagePath": "/", "widgetId": "sermons", "count": 1200 }
         ],
-        "widgetBreakdown": [
-            { "widgetId": "sermons", "count": 4521 }
-        ],
+        "widgetBreakdown": [{ "widgetId": "sermons", "count": 4521 }],
         "deviceBreakdown": [
             { "deviceType": "desktop", "count": 2800 },
             { "deviceType": "mobile", "count": 1500 },
@@ -432,15 +464,18 @@ Protected by the existing AuthWrapper + role check (same as helpdesk, status pag
 ### Layout
 
 **Top row:** Summary cards
+
 - Total loads (with period comparison)
 - Unique pages
 - Top widget
 
 **Middle row:** Charts
+
 - Loads over time (line chart, grouped by day)
 - Device breakdown (donut chart)
 
 **Bottom row:** Tables
+
 - Top pages (path, widget, load count)
 - Top referrers (source, count)
 - Widget breakdown (widget name, count)
@@ -452,7 +487,8 @@ Uses the same React Query + apiClient pattern as existing dashboard pages:
 ```typescript
 export const analyticsKeys = {
     all: ['analytics'] as const,
-    stats: (params: StatsParams) => [...analyticsKeys.all, 'stats', params] as const,
+    stats: (params: StatsParams) =>
+        [...analyticsKeys.all, 'stats', params] as const,
 };
 ```
 
@@ -463,6 +499,7 @@ Use **Recharts** (~45KB gzipped) for the line chart and donut chart. It's the mo
 ## Scope Boundaries
 
 ### In scope (this spec)
+
 - `trackWidgetMount()` in shared package
 - Export `resolveBaseUrl()` from API client
 - Integration with `mountWidget()`
@@ -475,6 +512,7 @@ Use **Recharts** (~45KB gzipped) for the line chart and donut chart. It's the mo
 - `widget_events` table schema, indexes, and migration SQL
 
 ### Out of scope (future)
+
 - Interaction events (clicks, searches, video plays)
 - Session tracking
 - Real-time streaming (SSE)

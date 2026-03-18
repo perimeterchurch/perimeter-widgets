@@ -17,21 +17,17 @@ type CardBodyElement = ElementRef<'div'>;
 type CardFooterElement = ElementRef<'div'>;
 
 export interface CardProps
-    extends ComponentPropsWithoutRef<'div'>,
-        BaseComponentProps {
+    extends ComponentPropsWithoutRef<'div'>, BaseComponentProps {
     /** Apply hover effect */
     hoverable?: boolean;
 }
 
 export interface CardHeaderProps
-    extends ComponentPropsWithoutRef<'div'>,
-        BaseComponentProps {}
+    extends ComponentPropsWithoutRef<'div'>, BaseComponentProps {}
 export interface CardBodyProps
-    extends ComponentPropsWithoutRef<'div'>,
-        BaseComponentProps {}
+    extends ComponentPropsWithoutRef<'div'>, BaseComponentProps {}
 export interface CardFooterProps
-    extends ComponentPropsWithoutRef<'div'>,
-        BaseComponentProps {}
+    extends ComponentPropsWithoutRef<'div'>, BaseComponentProps {}
 
 /**
  * Card root component
@@ -61,8 +57,8 @@ const CardRoot = forwardRef<CardElement, CardProps>(
                     // Dark mode
                     'dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100',
                     // Hover effect
-                    hoverable &&
-                        'transition-shadow duration-200 hover:shadow-md',
+                    hoverable
+                        && 'transition-shadow duration-200 hover:shadow-md',
                     className,
                 )}
                 {...props}

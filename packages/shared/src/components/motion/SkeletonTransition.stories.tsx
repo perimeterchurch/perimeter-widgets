@@ -68,24 +68,26 @@ export const Loaded: Story = {
     },
 };
 
+function ToggleDemo() {
+    const [isLoading, setIsLoading] = useState(true);
+    return (
+        <div>
+            <button
+                onClick={() => setIsLoading((v) => !v)}
+                style={{ marginBottom: 16 }}
+            >
+                {isLoading ? 'Show Content' : 'Show Skeleton'}
+            </button>
+            <SkeletonTransition
+                isLoading={isLoading}
+                skeleton={<SkeletonPlaceholder />}
+            >
+                <LoadedContent />
+            </SkeletonTransition>
+        </div>
+    );
+}
+
 export const Toggle: Story = {
-    render: () => {
-        const [isLoading, setIsLoading] = useState(true);
-        return (
-            <div>
-                <button
-                    onClick={() => setIsLoading((v) => !v)}
-                    style={{ marginBottom: 16 }}
-                >
-                    {isLoading ? 'Show Content' : 'Show Skeleton'}
-                </button>
-                <SkeletonTransition
-                    isLoading={isLoading}
-                    skeleton={<SkeletonPlaceholder />}
-                >
-                    <LoadedContent />
-                </SkeletonTransition>
-            </div>
-        );
-    },
+    render: () => <ToggleDemo />,
 };

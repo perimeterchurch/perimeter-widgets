@@ -16,7 +16,8 @@ import { cn } from '../utils/cn';
 type AvatarElement = ElementRef<'div'>;
 
 export interface AvatarProps
-    extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>,
+    extends
+        Omit<ComponentPropsWithoutRef<'div'>, 'children'>,
         BaseComponentProps {
     /** Image source URL */
     src?: string;
@@ -69,18 +70,16 @@ export const Avatar = forwardRef<AvatarElement, AvatarProps>(
                 )}
                 {...props}
             >
-                {showImage ? (
+                {showImage ?
                     <img
                         src={src}
                         alt={alt}
                         onError={() => setImageError(true)}
                         className='h-full w-full object-cover'
                     />
-                ) : typeof fallback === 'string' ? (
+                : typeof fallback === 'string' ?
                     <span className='uppercase'>{fallback}</span>
-                ) : (
-                    fallback
-                )}
+                :   fallback}
             </div>
         );
     },

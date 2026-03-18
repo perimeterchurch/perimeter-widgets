@@ -20,7 +20,8 @@ export interface SelectOption {
 }
 
 export interface SelectProps
-    extends Omit<ComponentPropsWithoutRef<'select'>, 'size'>,
+    extends
+        Omit<ComponentPropsWithoutRef<'select'>, 'size'>,
         BaseComponentProps {
     /** Predefined options (alternative to children) */
     options?: SelectOption[];
@@ -91,9 +92,9 @@ export const Select = forwardRef<SelectElement, SelectProps>(
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
 
                     // Border styles
-                    error
-                        ? 'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
-                        : 'border-stone-300 dark:border-stone-600',
+                    error ?
+                        'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
+                    :   'border-stone-300 dark:border-stone-600',
 
                     // Disabled styles
                     'disabled:cursor-not-allowed disabled:opacity-50',
@@ -111,13 +112,13 @@ export const Select = forwardRef<SelectElement, SelectProps>(
                 )}
                 {...props}
             >
-                {options
-                    ? options.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                          </option>
-                      ))
-                    : children}
+                {options ?
+                    options.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </option>
+                    ))
+                :   children}
             </select>
         );
     },

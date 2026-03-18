@@ -14,7 +14,8 @@ import { cn } from '../utils/cn';
 type CheckboxElement = ElementRef<'input'>;
 
 export interface CheckboxProps
-    extends Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'size'>,
+    extends
+        Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'size'>,
         BaseComponentProps {
     /** Show error state */
     error?: boolean;
@@ -63,7 +64,11 @@ export const Checkbox = forwardRef<CheckboxElement, CheckboxProps>(
         },
         ref,
     ) => {
-        const checkboxId = id || (label ? `checkbox-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
+        const checkboxId =
+            id
+            || (label ?
+                `checkbox-${label.replace(/\s+/g, '-').toLowerCase()}`
+            :   undefined);
 
         const checkbox = (
             <input
@@ -81,9 +86,9 @@ export const Checkbox = forwardRef<CheckboxElement, CheckboxProps>(
                     checkboxSizeClasses[size],
 
                     // Colors
-                    error
-                        ? 'border-[var(--color-error)]'
-                        : 'border-stone-300 dark:border-stone-600',
+                    error ?
+                        'border-[var(--color-error)]'
+                    :   'border-stone-300 dark:border-stone-600',
                     'checked:bg-[var(--color-primary)] checked:border-[var(--color-primary)]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
 
@@ -105,7 +110,9 @@ export const Checkbox = forwardRef<CheckboxElement, CheckboxProps>(
 
         if (label) {
             return (
-                <div className={cn('inline-flex items-center gap-2', className)}>
+                <div
+                    className={cn('inline-flex items-center gap-2', className)}
+                >
                     {checkbox}
                     <label
                         htmlFor={checkboxId}

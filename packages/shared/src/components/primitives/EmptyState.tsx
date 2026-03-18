@@ -15,8 +15,7 @@ import { cn } from '../utils/cn';
 type EmptyStateElement = ElementRef<'div'>;
 
 export interface EmptyStateProps
-    extends ComponentPropsWithoutRef<'div'>,
-        BaseComponentProps {
+    extends ComponentPropsWithoutRef<'div'>, BaseComponentProps {
     /** Icon or illustration */
     icon?: ReactNode;
     /** Title text */
@@ -39,7 +38,10 @@ export interface EmptyStateProps
  * />
  */
 export const EmptyState = forwardRef<EmptyStateElement, EmptyStateProps>(
-    ({ icon, title, description, action, className, children, ...props }, ref) => {
+    (
+        { icon, title, description, action, className, children, ...props },
+        ref,
+    ) => {
         return (
             <div
                 ref={ref}

@@ -14,8 +14,7 @@ import { cn } from '../utils/cn';
 type LabelElement = ElementRef<'label'>;
 
 export interface LabelProps
-    extends ComponentPropsWithoutRef<'label'>,
-        BaseComponentProps {
+    extends ComponentPropsWithoutRef<'label'>, BaseComponentProps {
     /** Show required indicator */
     required?: boolean;
     /** Disabled state (visual only) */

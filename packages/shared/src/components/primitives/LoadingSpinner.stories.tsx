@@ -27,7 +27,11 @@ export const AllSizes: Story = {
     render: () => (
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             {allSizes.map((size) => (
-                <LoadingSpinner key={size} size={size} label={`${size} spinner`} />
+                <LoadingSpinner
+                    key={size}
+                    size={size}
+                    label={`${size} spinner`}
+                />
             ))}
         </div>
     ),

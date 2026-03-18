@@ -8,7 +8,11 @@ import {
     type ComponentPropsWithoutRef,
     type ElementRef,
 } from 'react';
-import type { InteractiveProps, VariantProps, WidthProps } from '../../types/ui';
+import type {
+    InteractiveProps,
+    VariantProps,
+    WidthProps,
+} from '../../types/ui';
 import { cn } from '../utils/cn';
 import {
     getVariantClasses,

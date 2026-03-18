@@ -27,8 +27,7 @@ export interface BadgeProps extends ComponentPropsWithoutRef<'span'> {
 }
 
 const variantStyles: Record<Variant, string> = {
-    primary:
-        'bg-[var(--color-primary)]/10 text-[var(--color-primary)]',
+    primary: 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]',
     secondary:
         'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300',
     success:
