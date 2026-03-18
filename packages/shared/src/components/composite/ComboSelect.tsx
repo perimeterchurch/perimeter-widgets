@@ -222,13 +222,14 @@ export function ComboSelect<T extends string | number = string>(
         );
     }
 
+    const singleValue = (props as ComboSelectSingleProps<T>).value;
+    const singleOnChange = (props as ComboSelectSingleProps<T>).onChange;
+
     return (
         <Combobox
-            value={(props as ComboSelectSingleProps<T>).value}
-            onChange={(val) => {
-                (props as ComboSelectSingleProps<T>).onChange(
-                    (val ?? '') as T | '',
-                );
+            value={singleValue as string}
+            onChange={(val: string | null) => {
+                singleOnChange((val ?? '') as T | '');
                 setQuery('');
             }}
             immediate

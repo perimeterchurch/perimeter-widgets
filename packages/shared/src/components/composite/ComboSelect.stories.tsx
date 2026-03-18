@@ -42,7 +42,7 @@ export const MultiSelect: Story = {
         const Wrapper = () => {
             const [value, setValue] = useState<string[]>([]);
             return (
-                <ComboSelect
+                <ComboSelect<string>
                     multiple
                     value={value}
                     onChange={setValue}
