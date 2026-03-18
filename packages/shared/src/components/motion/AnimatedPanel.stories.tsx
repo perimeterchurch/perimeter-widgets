@@ -24,7 +24,7 @@ function DefaultDemo() {
             >
                 Open Panel
             </button>
-            <AnimatedPanel open={open} onClose={() => setOpen(false)}>
+            <AnimatedPanel open={open} onClose={() => setOpen(false)} backdrop>
                 <div className='p-6 bg-white dark:bg-stone-900 h-full shadow-[-2px_0_8px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_8px_rgba(0,0,0,0.3)]'>
                     <h3 style={{ marginTop: 0 }}>Panel Content</h3>
                     <p>Press Escape or click backdrop to close.</p>
