@@ -33,16 +33,16 @@ export default createWidgetConfig({
 
 ### What it configures
 
-| Setting                | Value                                       | Why                                    |
-| ---------------------- | ------------------------------------------- | -------------------------------------- |
-| Format                 | IIFE                                        | Single `<script>` tag embedding        |
-| Output                 | `../../dist/<name>/<name>.js`               | Root `dist/` folder for CDN            |
-| Global name            | `PerimeterWidget_<Name>`                    | Avoids collisions between widgets      |
+| Setting                | Value                                                              | Why                                                 |
+| ---------------------- | ------------------------------------------------------------------ | --------------------------------------------------- |
+| Format                 | IIFE                                                               | Single `<script>` tag embedding                     |
+| Output                 | `../../dist/<name>/<name>.js`                                      | Root `dist/` folder for CDN                         |
+| Global name            | `PerimeterWidget_<Name>`                                           | Avoids collisions between widgets                   |
 | Plugins                | `@vitejs/plugin-react`, `@tailwindcss/vite`, `vite-tsconfig-paths` | React JSX + Tailwind v4 CSS + tsconfig path aliases |
-| `envDir`               | Monorepo root (`../../`)                                            | Load `.env` files from monorepo root   |
-| Minification           | esbuild                                     | Fast, good compression                 |
-| Dynamic imports        | Inlined                                     | Single file output                     |
-| `process.env.NODE_ENV` | Defined                                     | React production mode in builds        |
+| `envDir`               | Monorepo root (`../../`)                                           | Load `.env` files from monorepo root                |
+| Minification           | esbuild                                                            | Fast, good compression                              |
+| Dynamic imports        | Inlined                                                            | Single file output                                  |
+| `process.env.NODE_ENV` | Defined                                                            | React production mode in builds                     |
 
 ---
 
@@ -59,12 +59,12 @@ export default createWidgetTestConfig();
 
 ### What it configures
 
-| Setting     | Value                  | Why                                                 |
-| ----------- | ---------------------- | --------------------------------------------------- |
-| Environment | jsdom                  | DOM testing                                         |
-| Globals     | `true`                 | `describe`, `it`, `expect` available without import |
-| Setup files | `test-setup.ts`        | Loads `@testing-library/jest-dom/vitest` matchers   |
-| CSS         | `false`                | Skip CSS processing in tests                        |
+| Setting     | Value                                         | Why                                                 |
+| ----------- | --------------------------------------------- | --------------------------------------------------- |
+| Environment | jsdom                                         | DOM testing                                         |
+| Globals     | `true`                                        | `describe`, `it`, `expect` available without import |
+| Setup files | `test-setup.ts`                               | Loads `@testing-library/jest-dom/vitest` matchers   |
+| CSS         | `false`                                       | Skip CSS processing in tests                        |
 | Plugins     | `@vitejs/plugin-react`, `vite-tsconfig-paths` | React JSX transform + tsconfig path aliases         |
 
 ### `test-setup.ts`

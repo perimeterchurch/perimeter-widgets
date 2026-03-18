@@ -2,3 +2,4 @@ dist/
 packages/storyboard/dist/
 packages/storyboard/public/mockServiceWorker.js
 pnpm-lock.yaml
+packages/shared/storybook-static

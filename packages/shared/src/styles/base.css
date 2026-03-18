@@ -1,17 +1,23 @@
 @import 'tailwindcss';
 @import './tokens.css';
 
-/* Base reset for shadow DOM context */
+/* Dark mode via data-theme attribute on wrapper div */
+@custom-variant dark (&:where([data-theme="dark"] *, [data-theme="dark"]));
+
+/* Shadow DOM host reset */
 :host {
     all: initial;
     display: block;
-    font-family:
-        system-ui,
-        -apple-system,
-        'Segoe UI',
-        Roboto,
-        sans-serif;
-    color: #1c1917;
+    font-family: var(--font-sans);
+    color: var(--color-foreground);
+    line-height: 1.5;
+}
+
+/* Storybook host equivalent */
+.storybook-root {
+    font-family: var(--font-sans);
+    color: var(--color-foreground);
+    background-color: var(--color-background);
     line-height: 1.5;
 }
 
@@ -19,4 +25,56 @@
 *::before,
 *::after {
     box-sizing: border-box;
+}
+
+@layer base {
+    button,
+    [role='button'] {
+        cursor: pointer;
+    }
+
+    button:disabled,
+    [role='button'][aria-disabled='true'] {
+        cursor: not-allowed;
+    }
+}
+
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+        to right,
+        rgb(245 245 244) 4%,
+        rgb(231 229 228) 25%,
+        rgb(245 245 244) 36%
+    );
+    background-size: 1000px 100%;
+}
+
+[data-theme='dark'] .animate-shimmer {
+    background: linear-gradient(
+        to right,
+        rgb(28 25 23) 4%,
+        rgb(41 37 36) 25%,
+        rgb(28 25 23) 36%
+    );
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
 }

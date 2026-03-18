@@ -1,31 +1,266 @@
+/**
+ * Design Tokens
+ * CSS Custom Properties for the UI component library
+ * Warm stone-based palette with semantic color tokens
+ *
+ * Layer 1: @theme block — static hex values for Tailwind build
+ * Layer 2: :host / .storybook-root — CSS custom properties for runtime overrides
+ * Layer 3: Dark mode overrides
+ * Layer 4: Focus ring utilities
+ */
+
+/* ========================================
+   Layer 1: Tailwind v4 Theme Configuration
+   Static hex values required at build time
+   ======================================== */
 @theme {
-    /* Primary */
+    /* Primary: warm indigo */
     --color-primary: #5b5bd6;
-    --color-primary-hover: #4e4ec2;
-    --color-primary-active: #4343b0;
+    --color-primary-hover: #4e4eca;
+    --color-primary-active: #4242b8;
     --color-primary-foreground: #ffffff;
 
-    /* Success */
+    /* Success: warm green */
     --color-success: #46a758;
-    --color-success-hover: #3d9a4e;
+    --color-success-hover: #3d9b4f;
+    --color-success-active: #348746;
     --color-success-foreground: #ffffff;
 
-    /* Warning */
+    /* Warning: warm amber */
     --color-warning: #f5a623;
-    --color-warning-hover: #e09915;
+    --color-warning-hover: #e09918;
+    --color-warning-active: #c88a14;
     --color-warning-foreground: #ffffff;
 
-    /* Error */
+    /* Error: warm rose */
     --color-error: #e54666;
-    --color-error-hover: #d63a59;
+    --color-error-hover: #d93d5c;
+    --color-error-active: #c63652;
     --color-error-foreground: #ffffff;
 
-    /* Font */
-    --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    /* Info: sky blue */
+    --color-info: #0ea5e9;
+    --color-info-hover: #0284c7;
+    --color-info-active: #0369a1;
+    --color-info-foreground: #ffffff;
+
+    /* Surface colors */
+    --color-background: #ffffff;
+    --color-foreground: #1c1917;
+    --color-card: #ffffff;
+    --color-card-foreground: #1c1917;
+    --color-muted: #f5f5f4;
+    --color-muted-foreground: #78716c;
+    --color-accent: #f5f5f4;
+    --color-accent-foreground: #1c1917;
+    --color-popover: #ffffff;
+    --color-popover-foreground: #1c1917;
+    --color-destructive: #e54666;
+    --color-destructive-foreground: #ffffff;
+    --color-border: #d6d3d1;
+    --color-input: #d6d3d1;
+    --color-ring: #5b5bd6;
+
+    /* Base scale: stone (warm gray) */
+    --color-bg: #fafaf9;
+    --color-bg-subtle: #f5f5f4;
+    --color-bg-muted: #e7e5e4;
+    --color-text: #1c1917;
+    --color-text-secondary: #57534e;
+    --color-text-muted: #a8a29e;
+    --color-border-subtle: #e7e5e4;
+
+    /* Font families */
+    --font-sans:
+        ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-mono:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
+
+    /* Font sizes */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
 
     /* Border radius */
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
+    --radius-none: 0;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+
+    /* Shadows (warm stone tint) */
+    --shadow-xs: 0 1px 2px 0 rgb(28 25 23 / 0.04);
+    --shadow-sm:
+        0 1px 3px 0 rgb(28 25 23 / 0.08), 0 1px 2px -1px rgb(28 25 23 / 0.08);
+    --shadow-md:
+        0 4px 6px -1px rgb(28 25 23 / 0.08), 0 2px 4px -2px rgb(28 25 23 / 0.06);
+    --shadow-lg:
+        0 10px 15px -3px rgb(28 25 23 / 0.08),
+        0 4px 6px -4px rgb(28 25 23 / 0.06);
+    --shadow-xl:
+        0 20px 25px -5px rgb(28 25 23 / 0.08),
+        0 8px 10px -6px rgb(28 25 23 / 0.06);
+    --shadow-2xl: 0 25px 50px -12px rgb(28 25 23 / 0.2);
+}
+
+/* ========================================
+   Layer 2: Runtime Custom Properties
+   CSS variables for runtime overrideability
+   ======================================== */
+:host,
+.storybook-root {
+    /* Semantic colors */
+    --color-primary: #5b5bd6;
+    --color-primary-hover: #4e4eca;
+    --color-primary-active: #4242b8;
+    --color-primary-foreground: #ffffff;
+
+    --color-success: #46a758;
+    --color-success-hover: #3d9b4f;
+    --color-success-active: #348746;
+    --color-success-foreground: #ffffff;
+
+    --color-warning: #f5a623;
+    --color-warning-hover: #e09918;
+    --color-warning-active: #c88a14;
+    --color-warning-foreground: #ffffff;
+
+    --color-error: #e54666;
+    --color-error-hover: #d93d5c;
+    --color-error-active: #c63652;
+    --color-error-foreground: #ffffff;
+
+    --color-info: #0ea5e9;
+    --color-info-hover: #0284c7;
+    --color-info-active: #0369a1;
+    --color-info-foreground: #ffffff;
+
+    /* Surface colors */
+    --color-background: #ffffff;
+    --color-foreground: #1c1917;
+    --color-card: #ffffff;
+    --color-card-foreground: #1c1917;
+    --color-muted: #f5f5f4;
+    --color-muted-foreground: #78716c;
+    --color-accent: #f5f5f4;
+    --color-accent-foreground: #1c1917;
+    --color-popover: #ffffff;
+    --color-popover-foreground: #1c1917;
+    --color-destructive: #e54666;
+    --color-destructive-foreground: #ffffff;
+    --color-border: #d6d3d1;
+    --color-input: #d6d3d1;
+    --color-ring: #5b5bd6;
+
+    /* Base scale */
+    --color-bg: #fafaf9;
+    --color-bg-subtle: #f5f5f4;
+    --color-bg-muted: #e7e5e4;
+    --color-text: #1c1917;
+    --color-text-secondary: #57534e;
+    --color-text-muted: #a8a29e;
+    --color-border-subtle: #e7e5e4;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+
+    /* Font weights */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Line heights */
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Z-Index Scale */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* ========================================
+   Layer 3: Dark Mode Overrides
+   ======================================== */
+:host([data-theme='dark']),
+.storybook-root[data-theme='dark'] {
+    /* Base scale: stone dark */
+    --color-bg: #0c0a09;
+    --color-bg-subtle: #1c1917;
+    --color-bg-muted: #292524;
+    --color-border: #44403c;
+    --color-border-subtle: #292524;
+    --color-text: #fafaf9;
+    --color-text-secondary: #a8a29e;
+    --color-text-muted: #78716c;
+
+    /* Surface colors (dark mode) */
+    --color-background: #0c0a09;
+    --color-foreground: #fafaf9;
+    --color-muted: #292524;
+    --color-muted-foreground: #a8a29e;
+    --color-input: #44403c;
+    --color-ring: #5b5bd6;
+
+    /* Card colors */
+    --color-card: #1c1917;
+    --color-card-foreground: #fafaf9;
+
+    /* Popover colors */
+    --color-popover: #1c1917;
+    --color-popover-foreground: #fafaf9;
+
+    /* Accent colors */
+    --color-accent: #292524;
+    --color-accent-foreground: #fafaf9;
+
+    /* Adjusted shadows for dark mode */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-md:
+        0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg:
+        0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-xl:
+        0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+}
+
+/* ========================================
+   Layer 4: Focus Ring Utilities
+   ======================================== */
+@layer utilities {
+    .focus-ring {
+        @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    }
+
+    .focus-ring-inset {
+        @apply outline-none ring-2 ring-inset ring-ring;
+    }
 }
