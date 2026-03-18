@@ -8,3 +8,6 @@ export type {
     CardBodyProps,
     CardFooterProps,
 } from './Card';
+
+export { Input } from './Input';
+export type { InputProps } from './Input';
