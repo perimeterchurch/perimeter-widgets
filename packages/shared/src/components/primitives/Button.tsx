@@ -15,9 +15,10 @@ import type {
 } from '../../types/ui';
 import { cn } from '../utils/cn';
 import {
-    getVariantClasses,
-    getPaddingClasses,
-    getRadiusClasses,
+    outlineVariantClasses,
+    paddingSizes,
+    radiusSizes,
+    variantClasses,
 } from '../utils/variants';
 
 type ButtonElement = ElementRef<'button'>;
@@ -83,7 +84,9 @@ export const Button = forwardRef<ButtonElement, ButtonProps>(
                     'disabled:pointer-events-none disabled:opacity-50',
 
                     // Variant styles
-                    getVariantClasses(variant, outline),
+                    outline ?
+                        outlineVariantClasses[variant]
+                    :   variantClasses[variant],
 
                     // Shadow for filled variants (not ghost/outline)
                     !outline
@@ -91,8 +94,8 @@ export const Button = forwardRef<ButtonElement, ButtonProps>(
                         && 'shadow-sm hover:shadow-md',
 
                     // Size styles
-                    getPaddingClasses(size),
-                    getRadiusClasses(size),
+                    paddingSizes[size],
+                    radiusSizes[size],
 
                     // Width
                     fullWidth && 'w-full',

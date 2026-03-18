@@ -10,7 +10,12 @@ import {
 } from 'react';
 import type { BaseComponentProps, Size } from '../../types/ui';
 import { cn } from '../utils/cn';
-import { sizeClasses } from '../utils/variants';
+import {
+    getInputBorderClasses,
+    inputBaseClasses,
+    inputSizeClasses,
+    sizeClasses,
+} from '../utils/variants';
 
 type SelectElement = ElementRef<'select'>;
 
@@ -32,14 +37,6 @@ export interface SelectProps
     /** Full width */
     fullWidth?: boolean;
 }
-
-const selectSizeClasses: Record<Size, string> = {
-    xs: 'h-7 px-2 py-1',
-    sm: 'h-8 px-2.5 py-1.5',
-    md: 'h-10 px-3 py-2',
-    lg: 'h-12 px-4 py-2.5',
-    xl: 'h-14 px-5 py-3',
-};
 
 /**
  * Select component with custom styling
@@ -76,28 +73,15 @@ export const Select = forwardRef<SelectElement, SelectProps>(
                     onKeyDown?.(e);
                 }}
                 className={cn(
-                    // Base styles
-                    'flex rounded-lg border bg-white',
-                    'transition-all duration-200',
+                    inputBaseClasses,
                     'cursor-pointer',
 
-                    // Dark mode
-                    'dark:bg-stone-900 dark:text-stone-100',
-
                     // Size
-                    selectSizeClasses[size],
+                    inputSizeClasses[size],
                     sizeClasses[size],
 
-                    // Focus styles
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
-
                     // Border styles
-                    error ?
-                        'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
-                    :   'border-stone-300 dark:border-stone-600',
-
-                    // Disabled styles
-                    'disabled:cursor-not-allowed disabled:opacity-50',
+                    getInputBorderClasses(error),
 
                     // Width
                     fullWidth ? 'w-full' : 'w-auto',

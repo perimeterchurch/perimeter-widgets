@@ -86,22 +86,32 @@ export const outlineVariantClasses = {
 } as const satisfies Record<Variant, string>;
 
 /**
- * Get padding classes for a component
+ * Shared size classes for form inputs (Input, Select, Textarea)
  */
-export function getPaddingClasses(size: Size): string {
-    return paddingSizes[size];
-}
+export const inputSizeClasses = {
+    xs: 'h-7 px-2 py-1',
+    sm: 'h-8 px-2.5 py-1.5',
+    md: 'h-10 px-3 py-2',
+    lg: 'h-12 px-4 py-2.5',
+    xl: 'h-14 px-5 py-3',
+} as const satisfies Record<Size, string>;
 
 /**
- * Get border radius classes for a component
+ * Shared base classes for form inputs (Input, Select, Textarea)
  */
-export function getRadiusClasses(size: Size): string {
-    return radiusSizes[size];
-}
+export const inputBaseClasses = [
+    'flex rounded-lg border bg-white',
+    'transition-all duration-200',
+    'dark:bg-stone-900 dark:text-stone-100',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+].join(' ');
 
 /**
- * Get variant classes for a component
+ * Get error/normal border classes for form inputs
  */
-export function getVariantClasses(variant: Variant, outline = false): string {
-    return outline ? outlineVariantClasses[variant] : variantClasses[variant];
+export function getInputBorderClasses(hasError: boolean): string {
+    return hasError ?
+            'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
+        :   'border-stone-300 dark:border-stone-600';
 }

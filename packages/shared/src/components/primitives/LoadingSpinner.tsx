@@ -57,7 +57,7 @@ export const LoadingSpinner = forwardRef<SpinnerElement, LoadingSpinnerProps>(
             >
                 <svg
                     className={cn(
-                        'animate-spin text-[var(--color-primary)] dark:text-[var(--color-primary)]',
+                        'animate-spin text-[var(--color-primary)]',
                         sizeClasses[size],
                     )}
                     xmlns='http://www.w3.org/2000/svg'

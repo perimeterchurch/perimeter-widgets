@@ -10,7 +10,11 @@ import {
 } from 'react';
 import type { BaseComponentProps, Size } from '../../types/ui';
 import { cn } from '../utils/cn';
-import { sizeClasses } from '../utils/variants';
+import {
+    getInputBorderClasses,
+    inputBaseClasses,
+    sizeClasses,
+} from '../utils/variants';
 
 type TextareaElement = ElementRef<'textarea'>;
 
@@ -58,28 +62,16 @@ export const Textarea = forwardRef<TextareaElement, TextareaProps>(
                     onKeyDown?.(e);
                 }}
                 className={cn(
-                    // Base styles
-                    'flex min-h-[80px] rounded-lg border bg-white px-3 py-2',
-                    'placeholder:text-stone-400',
-                    'transition-all duration-200',
+                    inputBaseClasses,
+                    'min-h-[80px] px-3 py-2',
+                    'placeholder:text-stone-400 dark:placeholder:text-stone-500',
                     'resize-y',
-
-                    // Dark mode
-                    'dark:bg-stone-900 dark:text-stone-100 dark:placeholder:text-stone-500',
 
                     // Text size
                     sizeClasses[size],
 
-                    // Focus styles
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
-
                     // Border styles
-                    error ?
-                        'border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/50'
-                    :   'border-stone-300 dark:border-stone-600',
-
-                    // Disabled styles
-                    'disabled:cursor-not-allowed disabled:opacity-50',
+                    getInputBorderClasses(error),
 
                     // Width
                     fullWidth ? 'w-full' : 'w-auto',
