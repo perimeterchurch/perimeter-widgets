@@ -38,6 +38,12 @@
     --color-error-active: #c63652;
     --color-error-foreground: #ffffff;
 
+    /* Info: sky blue */
+    --color-info: #0ea5e9;
+    --color-info-hover: #0284c7;
+    --color-info-active: #0369a1;
+    --color-info-foreground: #ffffff;
+
     /* Surface colors */
     --color-background: #ffffff;
     --color-foreground: #1c1917;
@@ -132,6 +138,11 @@
     --color-error-hover: #d93d5c;
     --color-error-active: #c63652;
     --color-error-foreground: #ffffff;
+
+    --color-info: #0ea5e9;
+    --color-info-hover: #0284c7;
+    --color-info-active: #0369a1;
+    --color-info-foreground: #ffffff;
 
     /* Surface colors */
     --color-background: #ffffff;

@@ -52,10 +52,8 @@ const CardRoot = forwardRef<CardElement, CardProps>(
                 ref={ref}
                 className={cn(
                     // Base styles
-                    'rounded-xl border border-stone-200 bg-white text-stone-900',
+                    'rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-card-foreground)]',
                     'shadow-sm',
-                    // Dark mode
-                    'dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100',
                     // Transitions
                     'transition-all duration-200',
                     // Hover effect

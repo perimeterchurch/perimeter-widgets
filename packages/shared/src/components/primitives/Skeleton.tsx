@@ -56,7 +56,7 @@ export const Skeleton = forwardRef<SkeletonElement, SkeletonProps>(
                 aria-live='polite'
                 aria-busy='true'
                 className={cn(
-                    'animate-pulse bg-stone-200 dark:bg-stone-700',
+                    'animate-shimmer',
                     rounded ?? variantStyles[variant],
                     className,
                 )}

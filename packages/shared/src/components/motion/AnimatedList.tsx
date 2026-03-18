@@ -49,28 +49,28 @@ export function AnimatedList({
         [staggerDelay],
     );
 
+    const Container =
+        Tag === 'ul' ? motion.ul
+        : Tag === 'ol' ? motion.ol
+        : motion.div;
+    const Item = Tag === 'ul' || Tag === 'ol' ? motion.li : motion.div;
+
     return (
-        <motion.div
-            role={Tag === 'ul' || Tag === 'ol' ? 'list' : undefined}
+        <Container
             variants={containerVariants}
             initial='hidden'
             animate='visible'
             exit='exit'
-            {...props}
+            {...(props as Record<string, unknown>)}
         >
             <AnimatePresence>
                 {Children.map(children, (child, index) => {
                     if (!child) return null;
                     return (
-                        <motion.div
+                        <Item
                             key={
                                 (child as React.ReactElement)?.key
                                 ?? `item-${index}`
-                            }
-                            role={
-                                Tag === 'ul' || Tag === 'ol' ?
-                                    'listitem'
-                                :   undefined
                             }
                             variants={itemVariants}
                             transition={{
@@ -79,10 +79,10 @@ export function AnimatedList({
                             }}
                         >
                             {child}
-                        </motion.div>
+                        </Item>
                     );
                 })}
             </AnimatePresence>
-        </motion.div>
+        </Container>
     );
 }

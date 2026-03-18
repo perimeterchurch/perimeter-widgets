@@ -3,8 +3,6 @@
  * Type definitions for UI components
  */
 
-import { type ReactNode } from 'react';
-
 /**
  * Component size variants
  */
@@ -26,12 +24,6 @@ export type Variant =
  * Base props for all components
  */
 export interface BaseComponentProps {
-    /** Additional CSS classes */
-    className?: string;
-    /** Child elements */
-    children?: ReactNode;
-    /** HTML id attribute */
-    id?: string;
     /** Test identifier */
     'data-testid'?: string;
 }
@@ -65,18 +57,3 @@ export interface WidthProps {
     /** Expand to full width */
     fullWidth?: boolean;
 }
-
-/**
- * Utility type: Make specific props required
- */
-export type RequiredProps<T, K extends keyof T> = T & Required<Pick<T, K>>;
-
-/**
- * Utility type: Extract variant value from a type
- */
-export type VariantValue<T> = T extends { variant: infer V } ? V : never;
-
-/**
- * Utility type: Extract size value from a type
- */
-export type SizeValue<T> = T extends { size: infer S } ? S : never;

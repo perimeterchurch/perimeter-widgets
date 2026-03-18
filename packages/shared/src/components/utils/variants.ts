@@ -64,7 +64,7 @@ export const variantClasses = {
     warning:
         'bg-[var(--color-warning)] text-[var(--color-warning-foreground)] hover:bg-[var(--color-warning-hover)] active:bg-[var(--color-warning-active)]',
     error: 'bg-[var(--color-error)] text-[var(--color-error-foreground)] hover:bg-[var(--color-error-hover)] active:bg-[var(--color-error-active)]',
-    info: 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:bg-[var(--color-primary-hover)] active:bg-[var(--color-primary-active)]',
+    info: 'bg-[var(--color-info)] text-[var(--color-info-foreground)] hover:bg-[var(--color-info-hover)] active:bg-[var(--color-info-active)]',
     ghost: 'bg-transparent text-stone-700 hover:bg-stone-100 active:bg-stone-200 dark:text-stone-300 dark:hover:bg-stone-800 dark:active:bg-stone-700',
 } as const satisfies Record<Variant, string>;
 
@@ -81,7 +81,7 @@ export const outlineVariantClasses = {
     warning:
         'border-2 border-[var(--color-warning)] text-[var(--color-warning)] hover:bg-[var(--color-warning)] hover:text-[var(--color-warning-foreground)]',
     error: 'border-2 border-[var(--color-error)] text-[var(--color-error)] hover:bg-[var(--color-error)] hover:text-[var(--color-error-foreground)]',
-    info: 'border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-foreground)]',
+    info: 'border-2 border-[var(--color-info)] text-[var(--color-info)] hover:bg-[var(--color-info)] hover:text-[var(--color-info-foreground)]',
     ghost: 'border-2 border-stone-200 text-stone-700 hover:bg-stone-100 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800',
 } as const satisfies Record<Variant, string>;
 

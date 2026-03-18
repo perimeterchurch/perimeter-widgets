@@ -35,6 +35,8 @@ export const IndeterminateProgress = forwardRef<
     return (
         <div
             ref={ref}
+            role='progressbar'
+            aria-label='Loading'
             className={cn(
                 'absolute inset-x-0 top-0 z-10 h-0.5 overflow-hidden',
                 className,

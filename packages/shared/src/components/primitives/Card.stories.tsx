@@ -29,7 +29,7 @@ export const WithHeader: Story = {
                 <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
                     Card Title
                 </h3>
-                <p style={{ fontSize: '0.875rem', color: '#78716c' }}>
+                <p className='text-sm text-[var(--color-text-muted)]'>
                     Card description
                 </p>
             </Card.Header>
@@ -60,7 +60,7 @@ export const FullCard: Story = {
                 <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
                     Full Card
                 </h3>
-                <p style={{ fontSize: '0.875rem', color: '#78716c' }}>
+                <p className='text-sm text-[var(--color-text-muted)]'>
                     With all subcomponents
                 </p>
             </Card.Header>
