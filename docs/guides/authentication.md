@@ -2,7 +2,7 @@
 
 > **Scope:** MP OAuth token from WordPress, auth flow, localStorage keys, widget auth patterns
 > **Key files:** `packages/shared/src/auth/mp-token.tsx`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 

@@ -2,7 +2,7 @@
 
 > **Scope:** Vitest setup, widget test patterns, mocking, jsdom quirks
 > **Key files:** `packages/vite-preset/src/test-setup.ts`, `packages/shared/vitest.config.ts`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 

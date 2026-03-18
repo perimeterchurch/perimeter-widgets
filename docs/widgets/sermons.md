@@ -3,7 +3,7 @@
 > **Scope:** Sermon search/browse, series listing, watch/listen view
 > **Key files:** `packages/widget-sermons/src/`
 > **Status:** Skeleton — placeholder UI, awaiting API endpoints
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 

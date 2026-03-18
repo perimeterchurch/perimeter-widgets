@@ -1,7 +1,7 @@
 # Widget Embed Guide
 
 > **Scope:** WordPress embed patterns, data attributes, loading states, multiple widgets
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 

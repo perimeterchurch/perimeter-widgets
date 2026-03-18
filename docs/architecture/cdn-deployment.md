@@ -2,7 +2,7 @@
 
 > **Scope:** jsDelivr serving, cache purging, GitHub Action, rollback
 > **Key files:** `.github/workflows/build-and-purge.yml`, `scripts/generate-manifest.ts`, `dist/manifest.json`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 

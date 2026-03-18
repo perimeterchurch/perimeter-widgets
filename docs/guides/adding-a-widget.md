@@ -2,7 +2,7 @@
 
 > **Scope:** Step-by-step guide for creating a new widget from scratch
 > **Key files:** `packages/widget-sermons/` (reference implementation)
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 
@@ -162,9 +162,15 @@ Add an entry to `packages/storyboard/src/registry.ts`:
     description: 'Short description of the widget',
     elementId: 'perimeter-<name>',
     status: 'skeleton', // 'ready' | 'skeleton' | 'planned'
-    imports: {
-        app: '@perimeter-widgets/widget-<name>/app',
-        styles: '@perimeter-widgets/widget-<name>/styles?inline',
+    load: async () => {
+        const [app, styles] = await Promise.all([
+            import('@perimeter-widgets/widget-<name>/app'),
+            import('@perimeter-widgets/widget-<name>/styles?inline'),
+        ]);
+        return {
+            component: app.WidgetApp,
+            styles: styles.default,
+        };
     },
     configFields: [
         // Define editable data-* attributes here

@@ -2,7 +2,7 @@
 
 > **Scope:** API client, auth utility, shadow DOM mount, shared components, design tokens
 > **Key files:** `packages/shared/src/`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 
@@ -51,6 +51,8 @@ The core utility that all widgets use to mount into the DOM.
 
 Returns `{ destroy: () => void }` or `null` if target element not found.
 
+Active React roots are tracked via a `WeakMap` keyed by shadow root, enabling graceful re-mount (e.g., during HMR) without creating duplicate roots.
+
 ### `parseDataAttributes(element): WidgetConfig`
 
 Reads `data-*` attributes from an HTML element. Auto-converts:
@@ -71,8 +73,14 @@ React context for widget config. `useConfig()` throws if used outside a `ConfigP
 
 | Option         | Type      | Default                       | Description                 |
 | -------------- | --------- | ----------------------------- | --------------------------- |
-| `baseUrl`      | `string`  | `'https://api.perimeter.org'` | API base URL                |
+| `baseUrl`      | `string`  | auto-resolved (see below)     | API base URL                |
 | `requiresAuth` | `boolean` | `false`                       | Attach MP token to requests |
+
+**Base URL resolution** (priority order):
+
+1. Explicit `baseUrl` option (e.g., from `data-api-url` attribute)
+2. `VITE_API_URL` environment variable
+3. `http://localhost:5500` in development, `https://api.perimeter.org` in production
 
 **Methods:** `get<T>(path)`, `post<T>(path, body?)`
 
@@ -82,6 +90,7 @@ React context for widget config. `useConfig()` throws if used outside a `ConfigP
 - Attaches `Authorization: Bearer <token>` when `requiresAuth` and token available
 - Throws `ApiError` with `status` and `code` on failures
 - 401 responses throw `ApiError` with code `TOKEN_EXPIRED`
+- Uses `normalizeHeaders()` to safely merge `HeadersInit` values (supports `Headers`, arrays, and plain objects)
 
 ### `createQueryClient(): QueryClient`
 
@@ -110,7 +119,7 @@ Validation: token must exist, not be `"null"`, be at least 10 characters, and no
 
 ### `AuthProvider` / `useAuth()`
 
-React context wrapping widgets with auth state. Only reads token when `requiresAuth={true}`. Listens for cross-tab `storage` events to pick up token changes.
+React context wrapping widgets with auth state. Only reads token when `requiresAuth={true}`. Listens for cross-tab `storage` events to pick up token changes. The context value is memoized with `useMemo` to prevent unnecessary re-renders.
 
 ---
 

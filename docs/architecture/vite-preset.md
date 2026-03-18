@@ -2,7 +2,7 @@
 
 > **Scope:** Build config factory, test config factory, IIFE output, Tailwind v4 integration
 > **Key files:** `packages/vite-preset/src/index.ts`, `packages/vite-preset/src/test-setup.ts`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 
@@ -38,7 +38,8 @@ export default createWidgetConfig({
 | Format                 | IIFE                                        | Single `<script>` tag embedding        |
 | Output                 | `../../dist/<name>/<name>.js`               | Root `dist/` folder for CDN            |
 | Global name            | `PerimeterWidget_<Name>`                    | Avoids collisions between widgets      |
-| Plugins                | `@vitejs/plugin-react`, `@tailwindcss/vite` | React JSX + Tailwind v4 CSS processing |
+| Plugins                | `@vitejs/plugin-react`, `@tailwindcss/vite`, `vite-tsconfig-paths` | React JSX + Tailwind v4 CSS + tsconfig path aliases |
+| `envDir`               | Monorepo root (`../../`)                                            | Load `.env` files from monorepo root   |
 | Minification           | esbuild                                     | Fast, good compression                 |
 | Dynamic imports        | Inlined                                     | Single file output                     |
 | `process.env.NODE_ENV` | Defined                                     | React production mode in builds        |
@@ -64,7 +65,7 @@ export default createWidgetTestConfig();
 | Globals     | `true`                 | `describe`, `it`, `expect` available without import |
 | Setup files | `test-setup.ts`        | Loads `@testing-library/jest-dom/vitest` matchers   |
 | CSS         | `false`                | Skip CSS processing in tests                        |
-| Plugin      | `@vitejs/plugin-react` | React JSX transform                                 |
+| Plugins     | `@vitejs/plugin-react`, `vite-tsconfig-paths` | React JSX transform + tsconfig path aliases         |
 
 ### `test-setup.ts`
 

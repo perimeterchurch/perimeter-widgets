@@ -2,7 +2,7 @@
 
 > **Scope:** Colors, typography, spacing, border radius — shared across all widgets
 > **Key files:** `packages/shared/src/styles/tokens.css`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 

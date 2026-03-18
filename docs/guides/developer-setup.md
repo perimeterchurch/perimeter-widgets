@@ -2,7 +2,7 @@
 
 > **Scope:** Local environment, pnpm, dev server, storyboard, Storybook
 > **Key files:** `package.json`, `turbo.json`, `pnpm-workspace.yaml`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 
@@ -57,7 +57,8 @@ pnpm storybook
 The storyboard (`packages/storyboard/`) is a custom Vite dev app for previewing full widgets in their shadow DOM containers.
 
 - Runs on `http://localhost:5180`
-- Widget registry with status indicators (ready/skeleton/planned)
+- Widget registry with `load()` functions and status indicators (ready/skeleton/planned)
+- Dark mode toggle for previewing widgets in light and dark contexts
 - Live config editor — change data attributes and see the widget re-mount instantly
 - Auto-generated embed code snippets for WordPress
 - MSW (Mock Service Worker) intercepts API calls — no real API needed

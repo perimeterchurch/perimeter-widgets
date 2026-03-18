@@ -2,7 +2,7 @@
 
 > **Scope:** Monorepo structure, package roles, build pipeline, shadow DOM mounting, widget lifecycle
 > **Key files:** `turbo.json`, `pnpm-workspace.yaml`, `packages/shared/src/shadow-dom/mount.tsx`
-> **Last verified:** 2026-03-17
+> **Last verified:** 2026-03-18
 
 ---
 
@@ -41,6 +41,7 @@ Widget Source → Vite (library mode) → IIFE bundle → dist/<name>/<name>.js
                               React bundled in (WordPress doesn't provide it)
                               CSS inlined via ?inline imports (for shadow DOM)
                               Tailwind v4 processed via @tailwindcss/vite
+                              tsconfig path aliases via vite-tsconfig-paths
 ```
 
 **Output:** `dist/<name>/<name>.js` — a single `<script>` tag loads everything the widget needs.
