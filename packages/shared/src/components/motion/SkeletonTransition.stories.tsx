@@ -14,34 +14,10 @@ export default meta;
 type Story = StoryObj<typeof SkeletonTransition>;
 
 const SkeletonPlaceholder = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div
-            style={{
-                width: '100%',
-                height: 16,
-                background: '#e5e7eb',
-                borderRadius: 4,
-                animation: 'pulse 1.5s ease-in-out infinite',
-            }}
-        />
-        <div
-            style={{
-                width: '80%',
-                height: 16,
-                background: '#e5e7eb',
-                borderRadius: 4,
-                animation: 'pulse 1.5s ease-in-out infinite',
-            }}
-        />
-        <div
-            style={{
-                width: '60%',
-                height: 16,
-                background: '#e5e7eb',
-                borderRadius: 4,
-                animation: 'pulse 1.5s ease-in-out infinite',
-            }}
-        />
+    <div className="flex flex-col gap-2">
+        <div className="w-full h-4 bg-stone-200 dark:bg-stone-700 rounded animate-pulse" />
+        <div className="w-4/5 h-4 bg-stone-200 dark:bg-stone-700 rounded animate-pulse" />
+        <div className="w-3/5 h-4 bg-stone-200 dark:bg-stone-700 rounded animate-pulse" />
     </div>
 );
 
@@ -74,7 +50,7 @@ function ToggleDemo() {
         <div>
             <button
                 onClick={() => setIsLoading((v) => !v)}
-                style={{ marginBottom: 16 }}
+                className="mb-4 px-3 py-1.5 rounded bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-stone-100 hover:bg-stone-300 dark:hover:bg-stone-600"
             >
                 {isLoading ? 'Show Content' : 'Show Skeleton'}
             </button>

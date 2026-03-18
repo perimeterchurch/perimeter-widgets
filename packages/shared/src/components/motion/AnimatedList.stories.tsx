@@ -32,12 +32,7 @@ export const Default: Story = {
         children: items.map((item) => (
             <div
                 key={item}
-                style={{
-                    padding: '12px 16px',
-                    background: '#f0f4ff',
-                    borderRadius: 6,
-                    marginBottom: 8,
-                }}
+                className="px-4 py-3 bg-stone-100 dark:bg-stone-800 rounded-md mb-2"
             >
                 {item}
             </div>
@@ -51,12 +46,7 @@ export const AsList: Story = {
         children: items.map((item) => (
             <div
                 key={item}
-                style={{
-                    padding: '12px 16px',
-                    background: '#f0fff4',
-                    borderRadius: 6,
-                    marginBottom: 8,
-                }}
+                className="px-4 py-3 bg-stone-100 dark:bg-stone-800 rounded-md mb-2"
             >
                 {item}
             </div>
@@ -70,7 +60,7 @@ function ReplayDemo() {
         <div>
             <button
                 onClick={() => setKey((k) => k + 1)}
-                style={{ marginBottom: 16 }}
+                className="mb-4 px-3 py-1.5 rounded bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-stone-100 hover:bg-stone-300 dark:hover:bg-stone-600"
             >
                 Replay
             </button>
@@ -78,12 +68,7 @@ function ReplayDemo() {
                 {items.map((item) => (
                     <div
                         key={item}
-                        style={{
-                            padding: '12px 16px',
-                            background: '#f0f4ff',
-                            borderRadius: 6,
-                            marginBottom: 8,
-                        }}
+                        className="px-4 py-3 bg-stone-100 dark:bg-stone-800 rounded-md mb-2"
                     >
                         {item}
                     </div>
