@@ -8,6 +8,7 @@ import {
     type ComponentPropsWithoutRef,
     type ElementRef,
 } from 'react';
+import { X } from 'lucide-react';
 import type { BaseComponentProps, Variant, Size } from '../../types/ui';
 import { cn } from '../utils/cn';
 
@@ -105,21 +106,10 @@ export const FilterChip = forwardRef<FilterChipElement, FilterChipProps>(
                         )}
                         aria-label={`Remove ${label}`}
                     >
-                        <svg
+                        <X
                             className={removeSizeStyles[size]}
-                            viewBox='0 0 12 12'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
                             aria-hidden='true'
-                        >
-                            <path
-                                d='M9 3L3 9M3 3L9 9'
-                                stroke='currentColor'
-                                strokeWidth='2'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                            />
-                        </svg>
+                        />
                     </button>
                 )}
             </span>
