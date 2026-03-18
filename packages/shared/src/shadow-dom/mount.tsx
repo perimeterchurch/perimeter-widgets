@@ -68,6 +68,16 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
     // Create mount point inside shadow root
     const mountPoint = document.createElement('div');
     mountPoint.id = 'widget-root';
+
+    // Propagate data-theme for dark mode support
+    const theme = element.getAttribute('data-theme');
+    if (theme) {
+        // Host: so :host([data-theme="dark"]) swaps CSS custom property values
+        shadowRoot.host.setAttribute('data-theme', theme);
+        // Inner div: so @custom-variant dark selector activates dark: Tailwind utilities
+        mountPoint.setAttribute('data-theme', theme);
+    }
+
     shadowRoot.appendChild(mountPoint);
 
     // Parse config from data attributes
