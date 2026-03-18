@@ -81,6 +81,8 @@ export const FilterChip = forwardRef<FilterChipElement, FilterChipProps>(
                 ref={ref}
                 className={cn(
                     'inline-flex items-center rounded-full font-medium',
+                    'transition-all duration-200',
+                    'hover:shadow-sm',
                     chipVariantStyles[variant],
                     chipSizeStyles[size],
                     className,
@@ -97,8 +99,8 @@ export const FilterChip = forwardRef<FilterChipElement, FilterChipProps>(
                         }}
                         className={cn(
                             'inline-flex items-center justify-center shrink-0',
-                            'rounded-full opacity-60 hover:opacity-100',
-                            'transition-opacity duration-150',
+                            'rounded-full opacity-60 hover:opacity-100 hover:scale-110',
+                            'transition-all duration-150',
                             'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current',
                         )}
                         aria-label={`Remove ${label}`}

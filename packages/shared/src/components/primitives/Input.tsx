@@ -73,7 +73,7 @@ export const Input = forwardRef<InputElement, InputProps>(
                     // Base styles
                     'flex rounded-lg border bg-white',
                     'placeholder:text-stone-400',
-                    'transition-colors duration-200',
+                    'transition-all duration-200',
 
                     // Dark mode
                     'dark:bg-stone-900 dark:text-stone-100 dark:placeholder:text-stone-500',

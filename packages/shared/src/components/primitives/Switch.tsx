@@ -92,6 +92,7 @@ export const Switch = forwardRef<SwitchElement, SwitchProps>(
                     // Base styles
                     'relative shrink-0 appearance-none rounded-full',
                     'transition-colors duration-200 cursor-pointer',
+                    'active:scale-95',
 
                     // Size
                     sizeConfig.track,

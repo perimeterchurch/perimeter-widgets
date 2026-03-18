@@ -76,13 +76,19 @@ export const Button = forwardRef<ButtonElement, ButtonProps>(
                 className={cn(
                     // Base styles
                     'inline-flex items-center justify-center gap-2',
-                    'font-medium transition-colors duration-200',
+                    'font-medium transition-all duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
                     'min-h-11',
+                    'active:scale-[0.98]',
                     'disabled:pointer-events-none disabled:opacity-50',
 
                     // Variant styles
                     getVariantClasses(variant, outline),
+
+                    // Shadow for filled variants (not ghost/outline)
+                    !outline
+                        && variant !== 'ghost'
+                        && 'shadow-sm hover:shadow-md',
 
                     // Size styles
                     getPaddingClasses(size),

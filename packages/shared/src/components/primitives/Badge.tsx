@@ -94,6 +94,7 @@ export const Badge = forwardRef<BadgeElement, BadgeProps>(
                 ref={ref}
                 className={cn(
                     'inline-flex items-center gap-1.5 rounded-full font-medium',
+                    'transition-colors duration-200',
                     outline ? outlineStyles[variant] : variantStyles[variant],
                     sizeStyles[size],
                     className,

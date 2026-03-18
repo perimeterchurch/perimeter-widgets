@@ -62,6 +62,7 @@ export const Avatar = forwardRef<AvatarElement, AvatarProps>(
                     'bg-stone-200 text-stone-600',
                     'dark:bg-stone-700 dark:text-stone-300',
                     'font-medium select-none shrink-0',
+                    'transition-all duration-200',
 
                     // Size
                     avatarSizeClasses[size],

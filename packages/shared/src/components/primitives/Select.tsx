@@ -78,7 +78,7 @@ export const Select = forwardRef<SelectElement, SelectProps>(
                 className={cn(
                     // Base styles
                     'flex rounded-lg border bg-white',
-                    'transition-colors duration-200',
+                    'transition-all duration-200',
                     'cursor-pointer',
 
                     // Dark mode

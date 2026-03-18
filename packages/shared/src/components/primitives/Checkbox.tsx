@@ -80,7 +80,8 @@ export const Checkbox = forwardRef<CheckboxElement, CheckboxProps>(
                 className={cn(
                     // Base styles
                     'rounded border-2 shrink-0',
-                    'transition-colors duration-200',
+                    'transition-all duration-200',
+                    'active:scale-95',
 
                     // Size
                     checkboxSizeClasses[size],

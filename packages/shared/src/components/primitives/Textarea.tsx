@@ -61,7 +61,7 @@ export const Textarea = forwardRef<TextareaElement, TextareaProps>(
                     // Base styles
                     'flex min-h-[80px] rounded-lg border bg-white px-3 py-2',
                     'placeholder:text-stone-400',
-                    'transition-colors duration-200',
+                    'transition-all duration-200',
                     'resize-y',
 
                     // Dark mode

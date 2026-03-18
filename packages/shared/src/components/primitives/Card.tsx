@@ -56,9 +56,10 @@ const CardRoot = forwardRef<CardElement, CardProps>(
                     'shadow-sm',
                     // Dark mode
                     'dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100',
+                    // Transitions
+                    'transition-all duration-200',
                     // Hover effect
-                    hoverable
-                        && 'transition-shadow duration-200 hover:shadow-md',
+                    hoverable && 'hover:shadow-md hover:-translate-y-0.5',
                     className,
                 )}
                 {...props}
