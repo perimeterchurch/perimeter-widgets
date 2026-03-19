@@ -93,7 +93,9 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
                                 <div
                                     className='text-sm text-stone-600 dark:text-stone-300 prose prose-sm'
                                     dangerouslySetInnerHTML={{
-                                        __html: DOMPurify.sanitize(sermon.description),
+                                        __html: DOMPurify.sanitize(
+                                            sermon.description,
+                                        ),
                                     }}
                                 />
                             </div>

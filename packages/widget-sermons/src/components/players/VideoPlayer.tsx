@@ -40,7 +40,8 @@ export function VideoPlayer({ url }: { url: string }) {
     useEffect(() => {
         const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
         document.addEventListener('fullscreenchange', onFsChange);
-        return () => document.removeEventListener('fullscreenchange', onFsChange);
+        return () =>
+            document.removeEventListener('fullscreenchange', onFsChange);
     }, []);
 
     const toggleFullscreen = useCallback(() => {
