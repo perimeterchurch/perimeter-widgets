@@ -1,15 +1,8 @@
-import { DateTime } from 'luxon';
 import { Badge } from '@perimeter-widgets/shared';
-import type { SermonListItem } from '../../types';
+import type { SermonListViewProps } from '../../types';
+import { formatDate } from '../../lib/format';
 
-export interface SermonListViewProps {
-    sermons: SermonListItem[];
-    onSermonClick: (id: number) => void;
-}
-
-function formatDate(iso: string): string {
-    return DateTime.fromISO(iso).toLocaleString(DateTime.DATE_MED);
-}
+export type { SermonListViewProps };
 
 export function SermonLargeCards({
     sermons,

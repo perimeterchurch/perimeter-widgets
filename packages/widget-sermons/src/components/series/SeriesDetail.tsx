@@ -1,19 +1,15 @@
-import { DateTime } from 'luxon';
 import { ArrowLeft } from 'lucide-react';
 import { Badge, EmptyState, Skeleton } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import type { SermonsConfig } from '../../types';
 import { useSeriesDetail } from '../../hooks/use-series-detail';
+import { formatDate } from '../../lib/format';
 
 interface SeriesDetailProps {
     id: number;
     config: SermonsConfig;
     onBack: () => void;
     onSermonClick: (id: number) => void;
-}
-
-function formatDate(iso: string): string {
-    return DateTime.fromISO(iso).toLocaleString(DateTime.DATE_MED);
 }
 
 export function SeriesDetail({

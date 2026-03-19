@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { DateTime } from 'luxon';
 import { ArrowLeft } from 'lucide-react';
 import { EmptyState, Skeleton } from '@perimeter-widgets/shared';
@@ -92,7 +93,7 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
                                 <div
                                     className='text-sm text-stone-600 dark:text-stone-300 prose prose-sm'
                                     dangerouslySetInnerHTML={{
-                                        __html: sermon.description,
+                                        __html: DOMPurify.sanitize(sermon.description),
                                     }}
                                 />
                             </div>

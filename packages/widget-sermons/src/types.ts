@@ -92,6 +92,15 @@ export type PaginatedSermonsResponse = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Shared Component Props                                             */
+/* ------------------------------------------------------------------ */
+
+export interface SermonListViewProps {
+    sermons: SermonListItem[];
+    onSermonClick: (id: number) => void;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Tab and View Types                                                 */
 /* ------------------------------------------------------------------ */
 

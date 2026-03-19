@@ -1,14 +1,10 @@
-import { DateTime } from 'luxon';
 import { Badge } from '@perimeter-widgets/shared';
 import type { SeriesListItem } from '../../types';
+import { formatDate } from '../../lib/format';
 
 interface SeriesGridProps {
     series: SeriesListItem[];
     onSeriesClick: (id: number) => void;
-}
-
-function formatDate(iso: string): string {
-    return DateTime.fromISO(iso).toLocaleString(DateTime.DATE_MED);
 }
 
 export function SeriesGrid({ series, onSeriesClick }: SeriesGridProps) {

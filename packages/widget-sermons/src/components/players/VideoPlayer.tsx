@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
     Play,
     Pause,
@@ -8,13 +8,7 @@ import {
     Minimize,
 } from 'lucide-react';
 import { useMediaPlayer } from '../../hooks/use-media-player';
-
-function formatTime(seconds: number): string {
-    if (!isFinite(seconds) || seconds < 0) return '0:00';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
+import { formatTime } from '../../lib/format';
 
 const SPEEDS = [0.5, 1, 1.5, 2] as const;
 
@@ -43,14 +37,28 @@ export function VideoPlayer({ url }: { url: string }) {
         hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
     }, []);
 
+    useEffect(() => {
+        const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+        document.addEventListener('fullscreenchange', onFsChange);
+        return () => document.removeEventListener('fullscreenchange', onFsChange);
+    }, []);
+
     const toggleFullscreen = useCallback(() => {
         const el = containerRef.current;
         if (!el) return;
+
         if (document.fullscreenElement) {
             document.exitFullscreen();
             setIsFullscreen(false);
         } else {
-            el.requestFullscreen();
+            // Try container first; fall back to shadow host for shadow DOM compat
+            const target =
+                el.getRootNode() instanceof ShadowRoot ?
+                    (el.getRootNode() as ShadowRoot).host
+                :   el;
+            target.requestFullscreen().catch(() => {
+                // Fullscreen not supported in this context
+            });
             setIsFullscreen(true);
         }
     }, []);

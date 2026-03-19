@@ -1,13 +1,7 @@
 import { useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useMediaPlayer } from '../../hooks/use-media-player';
-
-function formatTime(seconds: number): string {
-    if (!isFinite(seconds) || seconds < 0) return '0:00';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
+import { formatTime } from '../../lib/format';
 
 const SPEEDS = [0.5, 1, 1.5, 2] as const;
 
