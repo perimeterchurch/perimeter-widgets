@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Tabs, LoadingSpinner } from '@perimeter-widgets/shared';
 import { VideoPlayer } from './VideoPlayer';
 import { AudioPlayer } from './AudioPlayer';
@@ -7,6 +8,18 @@ import type { SermonLink } from '../../types';
 const PdfViewer = lazy(() =>
     import('./PdfViewer').then((m) => ({ default: m.PdfViewer })),
 );
+
+const fade = {
+    initial: { opacity: 0 },
+    animate: {
+        opacity: 1,
+        transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] as const },
+    },
+    exit: {
+        opacity: 0,
+        transition: { duration: 0.12, ease: [0.16, 1, 0.3, 1] as const },
+    },
+};
 
 export interface MediaTabsProps {
     links: SermonLink[];
@@ -31,39 +44,51 @@ export function MediaTabs({ links }: MediaTabsProps) {
     if (availableTabs.length === 0) return null;
 
     return (
-        <div className='overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700'>
+        <div className='overflow-hidden rounded-lg border border-[var(--color-border)]'>
             <Tabs
                 tabs={availableTabs}
                 activeTab={activeTab}
                 onChange={setActiveTab}
             />
             <div className='min-h-[300px]'>
-                {activeTab === 'video' && videoLink && (
-                    <div className='aspect-video'>
-                        <VideoPlayer url={videoLink.url} />
-                    </div>
-                )}
-                {activeTab === 'audio' && audioLink && (
-                    <div className='flex h-[300px] items-center justify-center'>
-                        <AudioPlayer url={audioLink.url} />
-                    </div>
-                )}
-                {activeTab === 'document' && docLink && (
-                    <Suspense
-                        fallback={
-                            <div className='flex h-[400px] items-center justify-center'>
-                                <LoadingSpinner
-                                    size='lg'
-                                    label='Loading PDF viewer'
-                                />
-                            </div>
-                        }
-                    >
-                        <div className='h-[600px]'>
-                            <PdfViewer url={docLink.url} />
-                        </div>
-                    </Suspense>
-                )}
+                <AnimatePresence mode='wait'>
+                    {activeTab === 'video' && videoLink && (
+                        <motion.div
+                            key='video'
+                            {...fade}
+                            className='aspect-video'
+                        >
+                            <VideoPlayer url={videoLink.url} />
+                        </motion.div>
+                    )}
+                    {activeTab === 'audio' && audioLink && (
+                        <motion.div
+                            key='audio'
+                            {...fade}
+                            className='flex h-[300px] items-center justify-center'
+                        >
+                            <AudioPlayer url={audioLink.url} />
+                        </motion.div>
+                    )}
+                    {activeTab === 'document' && docLink && (
+                        <motion.div key='document' {...fade}>
+                            <Suspense
+                                fallback={
+                                    <div className='flex h-[400px] items-center justify-center'>
+                                        <LoadingSpinner
+                                            size='lg'
+                                            label='Loading PDF viewer'
+                                        />
+                                    </div>
+                                }
+                            >
+                                <div className='h-[600px]'>
+                                    <PdfViewer url={docLink.url} />
+                                </div>
+                            </Suspense>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );
