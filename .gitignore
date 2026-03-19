@@ -8,3 +8,4 @@ node_modules/
 # But storyboard dist is a dev build, not for CDN
 packages/storyboard/dist/
 .superpowers/
+.worktrees/

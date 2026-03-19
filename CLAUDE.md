@@ -119,6 +119,15 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 6. Commit dist, push to main — GitHub Action purges jsDelivr
 7. Add `<div>` + `<script>` tag on WordPress once — never touch it again
 
+## Worktrees
+
+Use `.worktrees/` (project-local, hidden) for isolated development branches. This directory is gitignored.
+
+```bash
+git worktree add .worktrees/<branch-name> -b <branch-name>
+cd .worktrees/<branch-name> && pnpm install
+```
+
 ## API Integration
 
 Widgets fetch from `api.perimeter.org` (perimeter-api) in production, `localhost:5500` in development. New widget endpoints follow perimeter-api's 5-layer architecture (Route -> Controller -> Service -> System -> Provider). See `../perimeter-api/CLAUDE.md` for API conventions.
