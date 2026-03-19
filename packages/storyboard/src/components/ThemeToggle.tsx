@@ -18,6 +18,12 @@ function getStoredTheme(): Theme {
 function applyTheme(theme: Theme) {
     const resolved = theme === 'system' ? getSystemPreference() : theme;
     document.documentElement.classList.toggle('dark', resolved === 'dark');
+    // Propagate data-theme for shadow DOM widgets (they use @custom-variant dark
+    // which matches [data-theme="dark"], not the .dark class)
+    document.documentElement.setAttribute(
+        'data-theme',
+        resolved === 'dark' ? 'dark' : 'light',
+    );
 }
 
 export function ThemeToggle() {

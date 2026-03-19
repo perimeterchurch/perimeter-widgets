@@ -3,6 +3,11 @@ import { mountWidget, type MountResult } from '@perimeter-widgets/shared';
 import { ConfigEditor } from '@/components/ConfigEditor';
 import type { WidgetDefinition } from '@/registry';
 
+/** Read the current resolved theme from the document element */
+function getResolvedTheme(): string {
+    return document.documentElement.getAttribute('data-theme') ?? 'light';
+}
+
 interface WidgetPreviewProps {
     widget: WidgetDefinition;
 }
@@ -14,6 +19,19 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
     >(() => getDefaults(widget));
     const [mountKey, setMountKey] = useState(0);
     const [error, setError] = useState<string | null>(null);
+    const [theme, setTheme] = useState(getResolvedTheme);
+
+    // Watch for theme changes on document element
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setTheme(getResolvedTheme());
+        });
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+        return () => observer.disconnect();
+    }, []);
 
     const handleChange = useCallback(
         (key: string, value: string | number | boolean) => {
@@ -59,7 +77,7 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
             mountRef.current?.destroy();
             mountRef.current = null;
         };
-    }, [widget, config, mountKey]);
+    }, [widget, config, mountKey, theme]);
 
     return (
         <div className='space-y-6'>
@@ -102,6 +120,7 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
                     :   <div
                             key={mountKey}
                             id={widget.elementId}
+                            data-theme={theme}
                             {...buildDataAttributes(config)}
                         />
                     }
