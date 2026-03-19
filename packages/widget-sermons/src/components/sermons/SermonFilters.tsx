@@ -115,7 +115,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                     size='sm'
                     onClick={() => setShowMore(!showMore)}
                 >
-                    <SlidersHorizontal className='h-4 w-4 mr-1.5' />
+                    <SlidersHorizontal className='h-4 w-4' />
                     More Filters
                 </Button>
             </div>
@@ -177,7 +177,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                                 {seriesOptions.find(
                                     (o) => o.value === props.series,
                                 )?.label ?? 'Series'}{' '}
-                                <X className='ml-1 h-3 w-3' />
+                                <X className='h-3 w-3' />
                             </Badge>
                         </button>
                     )}
@@ -191,7 +191,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                                 {speakerOptions.find(
                                     (o) => o.value === props.speaker,
                                 )?.label ?? 'Speaker'}{' '}
-                                <X className='ml-1 h-3 w-3' />
+                                <X className='h-3 w-3' />
                             </Badge>
                         </button>
                     )}
@@ -204,7 +204,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             <Badge variant='primary' size='sm'>
                                 {bookOptions.find((o) => o.value === props.book)
                                     ?.label ?? 'Book'}{' '}
-                                <X className='ml-1 h-3 w-3' />
+                                <X className='h-3 w-3' />
                             </Badge>
                         </button>
                     )}
@@ -215,7 +215,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             className='inline-flex'
                         >
                             <Badge variant='secondary' size='sm'>
-                                "{props.search}" <X className='ml-1 h-3 w-3' />
+                                "{props.search}" <X className='h-3 w-3' />
                             </Badge>
                         </button>
                     )}
