@@ -14,16 +14,16 @@
         "quality": "turbo typecheck lint test && prettier --check ."
     },
     "devDependencies": {
-        "@eslint/js": "^10",
-        "eslint": "^10",
-        "eslint-config-prettier": "^10",
-        "eslint-plugin-react": "^7",
-        "eslint-plugin-react-hooks": "^7",
-        "prettier": "^3",
-        "tsx": "^4",
-        "turbo": "^2.8.18",
-        "typescript": "^5.9",
-        "typescript-eslint": "^8"
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.0.3",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "prettier": "^3.8.1",
+        "tsx": "^4.21.0",
+        "turbo": "^2.8.20",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.57.1"
     },
     "packageManager": "pnpm@10.32.1",
     "engines": {
