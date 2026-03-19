@@ -11,14 +11,22 @@ export function useMediaPlayer() {
     const togglePlay = useCallback(() => {
         const el = mediaRef.current;
         if (!el) return;
-        if (el.paused) { el.play(); setIsPlaying(true); }
-        else { el.pause(); setIsPlaying(false); }
+        if (el.paused) {
+            el.play();
+            setIsPlaying(true);
+        } else {
+            el.pause();
+            setIsPlaying(false);
+        }
     }, []);
 
     const seek = useCallback((delta: number) => {
         const el = mediaRef.current;
         if (!el) return;
-        el.currentTime = Math.max(0, Math.min(el.currentTime + delta, el.duration || 0));
+        el.currentTime = Math.max(
+            0,
+            Math.min(el.currentTime + delta, el.duration || 0),
+        );
         setCurrentTime(el.currentTime);
     }, []);
 
@@ -62,5 +70,17 @@ export function useMediaPlayer() {
         };
     }, []);
 
-    return { mediaRef, isPlaying, currentTime, duration, volume, playbackRate, togglePlay, seek, seekTo, setVolume, setPlaybackRate };
+    return {
+        mediaRef,
+        isPlaying,
+        currentTime,
+        duration,
+        volume,
+        playbackRate,
+        togglePlay,
+        seek,
+        seekTo,
+        setVolume,
+        setPlaybackRate,
+    };
 }

@@ -18,12 +18,39 @@ export interface UseSermonsParams {
 }
 
 export function useSermons(params: UseSermonsParams) {
-    const { search, series, speaker, book, campus, from, to, sort = 'date', order = 'desc', page = 1, config } = params;
+    const {
+        search,
+        series,
+        speaker,
+        book,
+        campus,
+        from,
+        to,
+        sort = 'date',
+        order = 'desc',
+        page = 1,
+        config,
+    } = params;
     const client = createApiClient({ baseUrl: config.apiUrl });
     const campusId = campus ?? resolveCampusId(config.campus);
 
     return useQuery({
-        queryKey: ['sermons', { search, series, speaker, book, campus: campusId, from, to, sort, order, page, perPage: config.perPage }],
+        queryKey: [
+            'sermons',
+            {
+                search,
+                series,
+                speaker,
+                book,
+                campus: campusId,
+                from,
+                to,
+                sort,
+                order,
+                page,
+                perPage: config.perPage,
+            },
+        ],
         queryFn: async () => {
             const sp = new URLSearchParams();
             if (search) sp.set('search', search);
@@ -37,7 +64,9 @@ export function useSermons(params: UseSermonsParams) {
             sp.set('order', order);
             sp.set('page', String(page));
             sp.set('perPage', String(config.perPage));
-            return client.get<PaginatedSermonsResponse>(`/api/sermons?${sp.toString()}`);
+            return client.get<PaginatedSermonsResponse>(
+                `/api/sermons?${sp.toString()}`,
+            );
         },
     });
 }

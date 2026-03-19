@@ -15,9 +15,15 @@ export const Default: Story = {
         const Wrapper = () => {
             const [page, setPage] = useState(1);
             return (
-                <div className="flex flex-col items-center gap-4">
-                    <Pagination page={page} totalPages={29} onChange={setPage} />
-                    <div className="text-sm text-stone-600">Page {page} of 29</div>
+                <div className='flex flex-col items-center gap-4'>
+                    <Pagination
+                        page={page}
+                        totalPages={29}
+                        onChange={setPage}
+                    />
+                    <div className='text-sm text-stone-600'>
+                        Page {page} of 29
+                    </div>
                 </div>
             );
         };
@@ -30,9 +36,11 @@ export const FewPages: Story = {
         const Wrapper = () => {
             const [page, setPage] = useState(1);
             return (
-                <div className="flex flex-col items-center gap-4">
+                <div className='flex flex-col items-center gap-4'>
                     <Pagination page={page} totalPages={3} onChange={setPage} />
-                    <div className="text-sm text-stone-600">Page {page} of 3</div>
+                    <div className='text-sm text-stone-600'>
+                        Page {page} of 3
+                    </div>
                 </div>
             );
         };

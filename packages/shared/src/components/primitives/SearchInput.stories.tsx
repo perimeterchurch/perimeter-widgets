@@ -16,17 +16,20 @@ export const Default: Story = {
             const [value, setValue] = useState('');
             const [debouncedValue, setDebouncedValue] = useState('');
             return (
-                <div className="flex flex-col gap-4 w-full max-w-sm">
+                <div className='flex flex-col gap-4 w-full max-w-sm'>
                     <SearchInput
                         value={value}
                         onChange={(v) => {
                             setValue(v);
                             setDebouncedValue(v);
                         }}
-                        placeholder="Search sermons..."
+                        placeholder='Search sermons...'
                     />
-                    <div className="text-sm text-stone-500">
-                        Debounced value: <span className="font-medium text-stone-800">{debouncedValue || '(empty)'}</span>
+                    <div className='text-sm text-stone-500'>
+                        Debounced value:{' '}
+                        <span className='font-medium text-stone-800'>
+                            {debouncedValue || '(empty)'}
+                        </span>
                     </div>
                 </div>
             );
@@ -40,8 +43,12 @@ export const WithInitialValue: Story = {
         const Wrapper = () => {
             const [value, setValue] = useState('grace');
             return (
-                <div className="w-full max-w-sm">
-                    <SearchInput value={value} onChange={setValue} placeholder="Search..." />
+                <div className='w-full max-w-sm'>
+                    <SearchInput
+                        value={value}
+                        onChange={setValue}
+                        placeholder='Search...'
+                    />
                 </div>
             );
         };

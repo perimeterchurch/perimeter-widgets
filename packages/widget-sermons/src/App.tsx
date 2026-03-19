@@ -15,18 +15,26 @@ function SermonsWidget() {
 
     if (filters.screen === 'detail' && filters.id) {
         return (
-            <div className="p-4">
-                <SermonDetail id={filters.id} config={config} onBack={() => filters.setScreen('browse')} />
+            <div className='p-4'>
+                <SermonDetail
+                    id={filters.id}
+                    config={config}
+                    onBack={() => filters.setScreen('browse')}
+                />
             </div>
         );
     }
 
     return (
-        <div className="p-4">
+        <div className='p-4'>
             <SermonTabs activeTab={activeTab} onTabChange={filters.setTab} />
-            <div className="mt-4">
-                {activeTab === 'sermons' && <SermonsView config={config} filters={filters} />}
-                {activeTab === 'series' && <SeriesView config={config} filters={filters} />}
+            <div className='mt-4'>
+                {activeTab === 'sermons' && (
+                    <SermonsView config={config} filters={filters} />
+                )}
+                {activeTab === 'series' && (
+                    <SeriesView config={config} filters={filters} />
+                )}
                 {activeTab === 'compilations' && <ComingSoon />}
             </div>
         </div>

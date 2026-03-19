@@ -10,7 +10,11 @@ export interface PaginationProps {
     className?: string;
 }
 
-function getPageNumbers(current: number, total: number, max: number): (number | 'ellipsis')[] {
+function getPageNumbers(
+    current: number,
+    total: number,
+    max: number,
+): (number | 'ellipsis')[] {
     if (total <= max) return Array.from({ length: total }, (_, i) => i + 1);
     const pages: (number | 'ellipsis')[] = [];
     const sideCount = Math.floor((max - 3) / 2);
@@ -30,16 +34,28 @@ const buttonBase = cn(
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50',
 );
 
-export function Pagination({ page, totalPages, onChange, maxButtons = 7, className }: PaginationProps) {
-    const pages = useMemo(() => getPageNumbers(page, totalPages, maxButtons), [page, totalPages, maxButtons]);
+export function Pagination({
+    page,
+    totalPages,
+    onChange,
+    maxButtons = 7,
+    className,
+}: PaginationProps) {
+    const pages = useMemo(
+        () => getPageNumbers(page, totalPages, maxButtons),
+        [page, totalPages, maxButtons],
+    );
     if (totalPages <= 1) return null;
     return (
-        <nav aria-label="Pagination" className={cn('flex items-center justify-center gap-1', className)}>
+        <nav
+            aria-label='Pagination'
+            className={cn('flex items-center justify-center gap-1', className)}
+        >
             <button
-                type="button"
+                type='button'
                 onClick={() => onChange(page - 1)}
                 disabled={page <= 1}
-                aria-label="Previous page"
+                aria-label='Previous page'
                 className={cn(
                     buttonBase,
                     'border border-stone-200 dark:border-stone-700',
@@ -47,36 +63,37 @@ export function Pagination({ page, totalPages, onChange, maxButtons = 7, classNa
                     'hover:bg-stone-100 dark:hover:bg-stone-800',
                 )}
             >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className='h-4 w-4' />
             </button>
             {pages.map((p, i) =>
-                p === 'ellipsis' ? (
-                    <span key={`ellipsis-${i}`} className="px-1 text-sm text-stone-400">
+                p === 'ellipsis' ?
+                    <span
+                        key={`ellipsis-${i}`}
+                        className='px-1 text-sm text-stone-400'
+                    >
                         ...
                     </span>
-                ) : (
-                    <button
+                :   <button
                         key={p}
-                        type="button"
+                        type='button'
                         onClick={() => onChange(p)}
                         aria-label={`Page ${p}`}
                         aria-current={p === page ? 'page' : undefined}
                         className={cn(
                             buttonBase,
-                            p === page
-                                ? 'bg-[var(--color-primary)] text-white'
-                                : 'border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800',
+                            p === page ?
+                                'bg-[var(--color-primary)] text-white'
+                            :   'border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800',
                         )}
                     >
                         {p}
-                    </button>
-                ),
+                    </button>,
             )}
             <button
-                type="button"
+                type='button'
                 onClick={() => onChange(page + 1)}
                 disabled={page >= totalPages}
-                aria-label="Next page"
+                aria-label='Next page'
                 className={cn(
                     buttonBase,
                     'border border-stone-200 dark:border-stone-700',
@@ -84,7 +101,7 @@ export function Pagination({ page, totalPages, onChange, maxButtons = 7, classNa
                     'hover:bg-stone-100 dark:hover:bg-stone-800',
                 )}
             >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className='h-4 w-4' />
             </button>
         </nav>
     );

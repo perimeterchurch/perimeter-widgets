@@ -16,16 +16,16 @@ export const Default: Story = {
             const [from, setFrom] = useState('');
             const [to, setTo] = useState('');
             return (
-                <div className="flex flex-col gap-4">
+                <div className='flex flex-col gap-4'>
                     <DateRangePicker
                         from={from}
                         to={to}
                         onFromChange={setFrom}
                         onToChange={setTo}
                     />
-                    <div className="text-sm text-stone-500">
+                    <div className='text-sm text-stone-500'>
                         Range:{' '}
-                        <span className="font-medium text-stone-800">
+                        <span className='font-medium text-stone-800'>
                             {from || 'any'} — {to || 'any'}
                         </span>
                     </div>
@@ -42,16 +42,16 @@ export const WithPresetValues: Story = {
             const [from, setFrom] = useState('2026-01-01');
             const [to, setTo] = useState('2026-03-31');
             return (
-                <div className="flex flex-col gap-4">
+                <div className='flex flex-col gap-4'>
                     <DateRangePicker
                         from={from}
                         to={to}
                         onFromChange={setFrom}
                         onToChange={setTo}
                     />
-                    <div className="text-sm text-stone-500">
+                    <div className='text-sm text-stone-500'>
                         Range:{' '}
-                        <span className="font-medium text-stone-800">
+                        <span className='font-medium text-stone-800'>
                             {from} — {to}
                         </span>
                     </div>

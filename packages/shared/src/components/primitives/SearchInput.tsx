@@ -52,9 +52,9 @@ export function SearchInput({
 
     return (
         <div className={cn('relative', className)}>
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 dark:text-stone-500" />
+            <Search className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 dark:text-stone-500' />
             <input
-                type="text"
+                type='text'
                 value={localValue}
                 onChange={(e) => handleChange(e.target.value)}
                 onKeyDown={(e) => {
@@ -78,12 +78,12 @@ export function SearchInput({
             />
             {localValue && (
                 <button
-                    type="button"
+                    type='button'
                     onClick={handleClear}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"
-                    aria-label="Clear search"
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
+                    aria-label='Clear search'
                 >
-                    <X className="h-4 w-4" />
+                    <X className='h-4 w-4' />
                 </button>
             )}
         </div>

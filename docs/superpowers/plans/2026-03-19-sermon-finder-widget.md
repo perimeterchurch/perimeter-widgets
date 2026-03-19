@@ -17,6 +17,7 @@
 ### New files to create
 
 **Shared package (`packages/shared/src/`):**
+
 ```
 components/composite/Tabs.tsx              # Reusable tab bar
 components/composite/Tabs.stories.tsx      # Storybook stories
@@ -29,6 +30,7 @@ components/composite/DateRangePicker.stories.tsx
 ```
 
 **Widget sermons (`packages/widget-sermons/src/`):**
+
 ```
 types.ts                                   # UPDATE: replace placeholder types with real API types
 hooks/use-sermons.ts                       # React Query hook: paginated sermon list
@@ -57,6 +59,7 @@ components/compilations/ComingSoon.tsx     # Placeholder
 ```
 
 **Storyboard updates:**
+
 ```
 packages/storyboard/src/registry.ts        # UPDATE: sermons entry
 packages/storyboard/src/mocks/handlers.ts  # UPDATE: add missing endpoint handlers
@@ -64,6 +67,7 @@ packages/storyboard/src/mocks/data/sermons.ts  # UPDATE: real response shapes
 ```
 
 ### Files to modify
+
 ```
 packages/widget-sermons/package.json       # Add nuqs, luxon, react-pdf, @types/luxon
 packages/widget-sermons/src/App.tsx        # Replace placeholder with real widget
@@ -79,6 +83,7 @@ docs/widgets/sermons.md                    # Update to reflect final architectur
 ### Task 1: Install dependencies
 
 **Files:**
+
 - Modify: `packages/widget-sermons/package.json`
 
 - [ ] **Step 1: Install nuqs, luxon, and react-pdf in widget-sermons**
@@ -109,6 +114,7 @@ git commit -m "chore: add nuqs, luxon, react-pdf to widget-sermons"
 ### Task 2: Update types.ts with real API types
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/types.ts`
 
 - [ ] **Step 1: Write the test for config schema validation**
@@ -163,12 +169,8 @@ import { z } from 'zod';
 export const SermonsConfigSchema = z.object({
     campus: z.union([z.number(), z.string()]).optional(),
     perPage: z.number().default(12),
-    defaultTab: z
-        .enum(['sermons', 'series'])
-        .default('sermons'),
-    defaultView: z
-        .enum(['grid', 'list', 'large'])
-        .default('grid'),
+    defaultTab: z.enum(['sermons', 'series']).default('sermons'),
+    defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
     apiUrl: z.string().optional(),
 });
 
@@ -313,6 +315,7 @@ git commit -m "feat: replace placeholder types with real sermon API types"
 ### Task 3: Create Tabs shared component
 
 **Files:**
+
 - Create: `packages/shared/src/components/composite/Tabs.tsx`
 - Create: `packages/shared/src/components/composite/Tabs.stories.tsx`
 - Modify: `packages/shared/src/components/index.ts`
@@ -477,6 +480,7 @@ git commit -m "feat: add Tabs shared component with keyboard navigation and Stor
 ### Task 4: Create Pagination shared component
 
 **Files:**
+
 - Create: `packages/shared/src/components/composite/Pagination.tsx`
 - Create: `packages/shared/src/components/composite/Pagination.stories.tsx`
 - Modify: `packages/shared/src/components/index.ts`
@@ -656,6 +660,7 @@ git commit -m "feat: add Pagination shared component with ellipsis and Storybook
 ### Task 5: Create SearchInput shared component
 
 **Files:**
+
 - Create: `packages/shared/src/components/primitives/SearchInput.tsx`
 - Create: `packages/shared/src/components/primitives/SearchInput.stories.tsx`
 - Modify: `packages/shared/src/components/index.ts`
@@ -822,6 +827,7 @@ git commit -m "feat: add SearchInput shared component with debounce and Storyboo
 ### Task 6: Create DateRangePicker shared component
 
 **Files:**
+
 - Create: `packages/shared/src/components/composite/DateRangePicker.tsx`
 - Create: `packages/shared/src/components/composite/DateRangePicker.stories.tsx`
 - Modify: `packages/shared/src/components/index.ts`
@@ -956,6 +962,7 @@ git commit -m "feat: add DateRangePicker shared component with Storybook story"
 ### Task 7: Create use-sermon-filters hook (nuqs query string state)
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/hooks/use-sermon-filters.ts`
 
 - [ ] **Step 1: Create the hook**
@@ -972,8 +979,12 @@ import {
 import type { SortField, SortOrder, TabId, ScreenMode } from '../types';
 
 const sermonParams = {
-    tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault('sermons'),
-    screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault('browse'),
+    tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(
+        'sermons',
+    ),
+    screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault(
+        'browse',
+    ),
     id: parseAsInteger,
     search: parseAsString.withDefault(''),
     series: parseAsInteger,
@@ -994,7 +1005,12 @@ export function useSermonFilters() {
 
     const setTab = (tab: TabId) => {
         if (tab === 'compilations') return; // disabled
-        setParams({ tab: tab as 'sermons' | 'series', screen: 'browse', id: null, page: 1 });
+        setParams({
+            tab: tab as 'sermons' | 'series',
+            screen: 'browse',
+            id: null,
+            page: 1,
+        });
     };
 
     const setScreen = (screen: ScreenMode, id?: number) => {
@@ -1049,13 +1065,13 @@ export function useSermonFilters() {
     };
 
     const hasActiveFilters =
-        !!params.search ||
-        params.series !== null ||
-        params.speaker !== null ||
-        params.book !== null ||
-        params.campus !== null ||
-        params.from !== null ||
-        params.to !== null;
+        !!params.search
+        || params.series !== null
+        || params.speaker !== null
+        || params.book !== null
+        || params.campus !== null
+        || params.from !== null
+        || params.to !== null;
 
     return {
         ...params,
@@ -1095,6 +1111,7 @@ git commit -m "feat: add use-sermon-filters hook with nuqs query string state"
 ### Task 8: Create API data fetching hooks
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/hooks/use-sermons.ts`
 - Create: `packages/widget-sermons/src/hooks/use-sermon-detail.ts`
 - Create: `packages/widget-sermons/src/hooks/use-series.ts`
@@ -1128,16 +1145,39 @@ export interface UseSermonsParams {
 
 export function useSermons(params: UseSermonsParams) {
     const {
-        search, series, speaker, book, campus,
-        from, to, sort = 'date', order = 'desc',
-        page = 1, config,
+        search,
+        series,
+        speaker,
+        book,
+        campus,
+        from,
+        to,
+        sort = 'date',
+        order = 'desc',
+        page = 1,
+        config,
     } = params;
 
     const client = createApiClient({ baseUrl: config.apiUrl });
     const campusId = campus ?? resolveCampusId(config.campus);
 
     return useQuery({
-        queryKey: ['sermons', { search, series, speaker, book, campus: campusId, from, to, sort, order, page, perPage: config.perPage }],
+        queryKey: [
+            'sermons',
+            {
+                search,
+                series,
+                speaker,
+                book,
+                campus: campusId,
+                from,
+                to,
+                sort,
+                order,
+                page,
+                perPage: config.perPage,
+            },
+        ],
         queryFn: async () => {
             const searchParams = new URLSearchParams();
             if (search) searchParams.set('search', search);
@@ -1268,6 +1308,7 @@ git commit -m "feat: add React Query hooks for all sermon API endpoints"
 ### Task 9: Port useMediaPlayer hook
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/hooks/use-media-player.ts`
 
 - [ ] **Step 1: Port the hook from helpdesk**
@@ -1300,7 +1341,10 @@ export function useMediaPlayer() {
     const seek = useCallback((delta: number) => {
         const el = mediaRef.current;
         if (!el) return;
-        el.currentTime = Math.max(0, Math.min(el.currentTime + delta, el.duration || 0));
+        el.currentTime = Math.max(
+            0,
+            Math.min(el.currentTime + delta, el.duration || 0),
+        );
         setCurrentTime(el.currentTime);
     }, []);
 
@@ -1385,11 +1429,13 @@ git commit -m "feat: port useMediaPlayer hook from helpdesk domain"
 ### Task 10: Port VideoPlayer component
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/players/VideoPlayer.tsx`
 
 - [ ] **Step 1: Create VideoPlayer adapted for shadow DOM**
 
 Create `packages/widget-sermons/src/components/players/VideoPlayer.tsx` — port from helpdesk with these changes:
+
 - Remove `'use client'` directive (not Next.js)
 - Change import path: `useMediaPlayer` from `../../hooks/use-media-player`
 - Replace `@hooks/helpdesk/use-media-player` import
@@ -1502,6 +1548,7 @@ git commit -m "feat: port VideoPlayer from helpdesk domain"
 ### Task 11: Port AudioPlayer component
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/players/AudioPlayer.tsx`
 
 - [ ] **Step 1: Create AudioPlayer**
@@ -1568,6 +1615,7 @@ git commit -m "feat: port AudioPlayer from helpdesk domain"
 ### Task 12: Port PdfViewer and create MediaTabs
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/players/PdfViewer.tsx`
 - Create: `packages/widget-sermons/src/components/players/MediaTabs.tsx`
 
@@ -1575,13 +1623,14 @@ git commit -m "feat: port AudioPlayer from helpdesk domain"
 
 Create `packages/widget-sermons/src/components/players/PdfViewer.tsx` — port from `perimeter-api/src/components/helpdesk/viewers/PdfViewer.tsx` with these import changes:
 
-| Original import | Replacement |
-| --- | --- |
-| `'use client'` | Remove entirely (not Next.js) |
-| `import { Button } from '@components/ui/primitives'` | `import { Button } from '@perimeter-widgets/shared'` |
+| Original import                                              | Replacement                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `'use client'`                                               | Remove entirely (not Next.js)                                |
+| `import { Button } from '@components/ui/primitives'`         | `import { Button } from '@perimeter-widgets/shared'`         |
 | `import { LoadingSpinner } from '@components/ui/primitives'` | `import { LoadingSpinner } from '@perimeter-widgets/shared'` |
 
 Keep all other imports (react-pdf, lucide-react icons) and the CDN worker config unchanged:
+
 ```typescript
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -1686,6 +1735,7 @@ git commit -m "feat: port PdfViewer and create MediaTabs with lazy loading"
 ### Task 13: Create SermonTabs (top-level tab bar)
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/SermonTabs.tsx`
 
 - [ ] **Step 1: Create SermonTabs**
@@ -1733,6 +1783,7 @@ git commit -m "feat: add SermonTabs top-level tab bar component"
 ### Task 14: Create SermonFilters component
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/sermons/SermonFilters.tsx`
 
 - [ ] **Step 1: Create the filter bar**
@@ -1950,6 +2001,7 @@ git commit -m "feat: add SermonFilters with inline and expandable filter bar"
 ### Task 15: Create sermon list view components (card grid, small list, large cards)
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/sermons/SermonCardGrid.tsx`
 - Create: `packages/widget-sermons/src/components/sermons/SermonSmallList.tsx`
 - Create: `packages/widget-sermons/src/components/sermons/SermonLargeCards.tsx`
@@ -1976,27 +2028,41 @@ function formatDate(iso: string): string {
 **SermonCardGrid.tsx** — responsive 3/2/1 column grid:
 
 ```tsx
-export function SermonCardGrid({ sermons, onSermonClick }: SermonListViewProps) {
+export function SermonCardGrid({
+    sermons,
+    onSermonClick,
+}: SermonListViewProps) {
     return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
             {sermons.map((sermon) => (
                 <button
                     key={sermon.id}
-                    type="button"
+                    type='button'
                     onClick={() => onSermonClick(sermon.id)}
-                    className="overflow-hidden rounded-lg border border-stone-200 text-left transition-shadow hover:shadow-md dark:border-stone-700"
+                    className='overflow-hidden rounded-lg border border-stone-200 text-left transition-shadow hover:shadow-md dark:border-stone-700'
                 >
-                    {sermon.bannerUrl ? (
-                        <img src={sermon.bannerUrl} alt="" className="aspect-video w-full object-cover" />
-                    ) : (
-                        <div className="aspect-video w-full bg-gradient-to-br from-primary/80 to-primary" />
-                    )}
-                    <div className="p-3">
-                        <h3 className="font-semibold text-sm text-stone-900 dark:text-stone-100 line-clamp-1">{sermon.title}</h3>
-                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">{sermon.speaker.name}</p>
-                        <div className="flex items-center justify-between mt-2">
-                            <span className="text-xs text-stone-400">{formatDate(sermon.date)}</span>
-                            <Badge size="sm" variant="secondary">{sermon.series.title}</Badge>
+                    {sermon.bannerUrl ?
+                        <img
+                            src={sermon.bannerUrl}
+                            alt=''
+                            className='aspect-video w-full object-cover'
+                        />
+                    :   <div className='aspect-video w-full bg-gradient-to-br from-primary/80 to-primary' />
+                    }
+                    <div className='p-3'>
+                        <h3 className='font-semibold text-sm text-stone-900 dark:text-stone-100 line-clamp-1'>
+                            {sermon.title}
+                        </h3>
+                        <p className='text-xs text-stone-500 dark:text-stone-400 mt-1'>
+                            {sermon.speaker.name}
+                        </p>
+                        <div className='flex items-center justify-between mt-2'>
+                            <span className='text-xs text-stone-400'>
+                                {formatDate(sermon.date)}
+                            </span>
+                            <Badge size='sm' variant='secondary'>
+                                {sermon.series.title}
+                            </Badge>
                         </div>
                     </div>
                 </button>
@@ -2009,26 +2075,38 @@ export function SermonCardGrid({ sermons, onSermonClick }: SermonListViewProps) 
 **SermonSmallList.tsx** — compact horizontal rows:
 
 ```tsx
-export function SermonSmallList({ sermons, onSermonClick }: SermonListViewProps) {
+export function SermonSmallList({
+    sermons,
+    onSermonClick,
+}: SermonListViewProps) {
     return (
-        <div className="flex flex-col gap-1">
+        <div className='flex flex-col gap-1'>
             {sermons.map((sermon) => (
                 <button
                     key={sermon.id}
-                    type="button"
+                    type='button'
                     onClick={() => onSermonClick(sermon.id)}
-                    className="flex items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-stone-50 dark:hover:bg-stone-800"
+                    className='flex items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-stone-50 dark:hover:bg-stone-800'
                 >
-                    {sermon.bannerUrl ? (
-                        <img src={sermon.bannerUrl} alt="" className="h-12 w-12 rounded-md object-cover shrink-0" />
-                    ) : (
-                        <div className="h-12 w-12 rounded-md bg-gradient-to-br from-primary/80 to-primary shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm text-stone-900 dark:text-stone-100 truncate">{sermon.title}</h3>
-                        <p className="text-xs text-stone-500 dark:text-stone-400">{sermon.speaker.name} · {formatDate(sermon.date)}</p>
+                    {sermon.bannerUrl ?
+                        <img
+                            src={sermon.bannerUrl}
+                            alt=''
+                            className='h-12 w-12 rounded-md object-cover shrink-0'
+                        />
+                    :   <div className='h-12 w-12 rounded-md bg-gradient-to-br from-primary/80 to-primary shrink-0' />
+                    }
+                    <div className='flex-1 min-w-0'>
+                        <h3 className='font-semibold text-sm text-stone-900 dark:text-stone-100 truncate'>
+                            {sermon.title}
+                        </h3>
+                        <p className='text-xs text-stone-500 dark:text-stone-400'>
+                            {sermon.speaker.name} · {formatDate(sermon.date)}
+                        </p>
                     </div>
-                    <Badge size="sm" variant="secondary" className="shrink-0">{sermon.series.title}</Badge>
+                    <Badge size='sm' variant='secondary' className='shrink-0'>
+                        {sermon.series.title}
+                    </Badge>
                 </button>
             ))}
         </div>
@@ -2039,28 +2117,42 @@ export function SermonSmallList({ sermons, onSermonClick }: SermonListViewProps)
 **SermonLargeCards.tsx** — single-column horizontal cards with description:
 
 ```tsx
-export function SermonLargeCards({ sermons, onSermonClick }: SermonListViewProps) {
+export function SermonLargeCards({
+    sermons,
+    onSermonClick,
+}: SermonListViewProps) {
     return (
-        <div className="flex flex-col gap-3">
+        <div className='flex flex-col gap-3'>
             {sermons.map((sermon) => (
                 <button
                     key={sermon.id}
-                    type="button"
+                    type='button'
                     onClick={() => onSermonClick(sermon.id)}
-                    className="flex overflow-hidden rounded-lg border border-stone-200 text-left transition-shadow hover:shadow-md dark:border-stone-700"
+                    className='flex overflow-hidden rounded-lg border border-stone-200 text-left transition-shadow hover:shadow-md dark:border-stone-700'
                 >
-                    {sermon.bannerUrl ? (
-                        <img src={sermon.bannerUrl} alt="" className="w-44 shrink-0 object-cover" />
-                    ) : (
-                        <div className="w-44 shrink-0 bg-gradient-to-br from-primary/80 to-primary" />
-                    )}
-                    <div className="flex-1 p-3">
-                        <h3 className="font-semibold text-stone-900 dark:text-stone-100">{sermon.title}</h3>
-                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">{sermon.speaker.name} · {sermon.series.title}</p>
+                    {sermon.bannerUrl ?
+                        <img
+                            src={sermon.bannerUrl}
+                            alt=''
+                            className='w-44 shrink-0 object-cover'
+                        />
+                    :   <div className='w-44 shrink-0 bg-gradient-to-br from-primary/80 to-primary' />
+                    }
+                    <div className='flex-1 p-3'>
+                        <h3 className='font-semibold text-stone-900 dark:text-stone-100'>
+                            {sermon.title}
+                        </h3>
+                        <p className='text-xs text-stone-500 dark:text-stone-400 mt-1'>
+                            {sermon.speaker.name} · {sermon.series.title}
+                        </p>
                         {sermon.shortDescription && (
-                            <p className="text-xs text-stone-600 dark:text-stone-300 mt-2 line-clamp-2">{sermon.shortDescription}</p>
+                            <p className='text-xs text-stone-600 dark:text-stone-300 mt-2 line-clamp-2'>
+                                {sermon.shortDescription}
+                            </p>
                         )}
-                        <span className="text-xs text-stone-400 mt-2 block">{formatDate(sermon.date)}</span>
+                        <span className='text-xs text-stone-400 mt-2 block'>
+                            {formatDate(sermon.date)}
+                        </span>
                     </div>
                 </button>
             ))}
@@ -2087,6 +2179,7 @@ git commit -m "feat: add sermon list view components (card grid, small list, lar
 ### Task 16: Create SermonsView container
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/sermons/SermonsView.tsx`
 
 - [ ] **Step 1: Create container that wires up filters, list views, and pagination**
@@ -2210,6 +2303,7 @@ git commit -m "feat: add SermonsView container with filters, view toggle, and pa
 ### Task 17: Create SermonDetail component
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/sermons/SermonDetail.tsx`
 
 - [ ] **Step 1: Create the detail view**
@@ -2306,6 +2400,7 @@ git commit -m "feat: add SermonDetail with tabbed media player"
 ### Task 18: Create Series view components
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/series/SeriesView.tsx`
 - Create: `packages/widget-sermons/src/components/series/SeriesGrid.tsx`
 - Create: `packages/widget-sermons/src/components/series/SeriesDetail.tsx`
@@ -2334,6 +2429,7 @@ git commit -m "feat: add Series tab components (grid, detail, container)"
 ### Task 19: Create ComingSoon placeholder and wire up App.tsx
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/components/compilations/ComingSoon.tsx`
 - Modify: `packages/widget-sermons/src/App.tsx`
 
@@ -2434,6 +2530,7 @@ git commit -m "feat: wire up App.tsx with tab routing, detail views, and nuqs ad
 ### Task 20: Update storyboard registry and MSW handlers
 
 **Files:**
+
 - Modify: `packages/storyboard/src/registry.ts`
 - Modify: `packages/storyboard/src/mocks/handlers.ts`
 - Modify: `packages/storyboard/src/mocks/data/sermons.ts`
@@ -2456,6 +2553,7 @@ git commit -m "feat: update storyboard registry, MSW handlers, and mock data for
 ### Task 21: Update tests
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/__tests__/App.test.tsx`
 - Create: `packages/widget-sermons/src/__tests__/sermon-filters.test.ts`
 
@@ -2483,6 +2581,7 @@ git commit -m "test: update widget tests for new sermon finder architecture"
 ### Task 22: Update docs and run quality checks
 
 **Files:**
+
 - Modify: `docs/widgets/sermons.md`
 
 - [ ] **Step 1: Update sermons widget doc** — replace placeholder content with real architecture, component list, API types, config attributes, and embed code.

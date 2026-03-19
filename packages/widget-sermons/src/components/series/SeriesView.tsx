@@ -14,16 +14,23 @@ interface SeriesViewProps {
 
 export function SeriesView({ config, filters }: SeriesViewProps) {
     const [search, setSearch] = useState('');
-    const [selectedSeriesId, setSelectedSeriesId] = useState<number | null>(null);
+    const [selectedSeriesId, setSelectedSeriesId] = useState<number | null>(
+        null,
+    );
 
     const { data: seriesList = [], isLoading } = useSeries(config);
 
-    const filtered = search
-        ? seriesList.filter((s) =>
-              (s.displayTitle ?? s.title).toLowerCase().includes(search.toLowerCase()) ||
-              (s.subtitle?.toLowerCase().includes(search.toLowerCase()) ?? false),
-          )
-        : seriesList;
+    const filtered =
+        search ?
+            seriesList.filter(
+                (s) =>
+                    (s.displayTitle ?? s.title)
+                        .toLowerCase()
+                        .includes(search.toLowerCase())
+                    || (s.subtitle?.toLowerCase().includes(search.toLowerCase())
+                        ?? false),
+            )
+        :   seriesList;
 
     if (selectedSeriesId !== null) {
         return (
@@ -37,24 +44,31 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
     }
 
     return (
-        <div className="space-y-4">
+        <div className='space-y-4'>
             <SearchInput
                 value={search}
                 onChange={setSearch}
-                placeholder="Search series..."
-                className="max-w-sm"
+                placeholder='Search series...'
+                className='max-w-sm'
             />
             <SkeletonTransition
                 isLoading={isLoading}
                 skeleton={
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                         {Array.from({ length: 6 }, (_, i) => (
-                            <Skeleton key={i} variant="card" className="h-32 w-full" />
+                            <Skeleton
+                                key={i}
+                                variant='card'
+                                className='h-32 w-full'
+                            />
                         ))}
                     </div>
                 }
             >
-                <SeriesGrid series={filtered} onSeriesClick={setSelectedSeriesId} />
+                <SeriesGrid
+                    series={filtered}
+                    onSeriesClick={setSelectedSeriesId}
+                />
             </SkeletonTransition>
         </div>
     );

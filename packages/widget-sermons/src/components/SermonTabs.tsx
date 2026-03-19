@@ -8,7 +8,11 @@ const TABS = [
         id: 'compilations' as const,
         label: 'Compilations',
         disabled: true,
-        badge: <Badge size="sm" variant="secondary">Soon</Badge>,
+        badge: (
+            <Badge size='sm' variant='secondary'>
+                Soon
+            </Badge>
+        ),
     },
 ];
 
@@ -18,5 +22,11 @@ export interface SermonTabsProps {
 }
 
 export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
-    return <Tabs tabs={TABS} activeTab={activeTab} onChange={(id) => onTabChange(id as TabId)} />;
+    return (
+        <Tabs
+            tabs={TABS}
+            activeTab={activeTab}
+            onChange={(id) => onTabChange(id as TabId)}
+        />
+    );
 }

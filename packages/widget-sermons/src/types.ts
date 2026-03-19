@@ -7,12 +7,8 @@ import { z } from 'zod';
 export const SermonsConfigSchema = z.object({
     campus: z.union([z.number(), z.string()]).optional(),
     perPage: z.number().default(12),
-    defaultTab: z
-        .enum(['sermons', 'series'])
-        .default('sermons'),
-    defaultView: z
-        .enum(['grid', 'list', 'large'])
-        .default('grid'),
+    defaultTab: z.enum(['sermons', 'series']).default('sermons'),
+    defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
     apiUrl: z.string().optional(),
 });
 

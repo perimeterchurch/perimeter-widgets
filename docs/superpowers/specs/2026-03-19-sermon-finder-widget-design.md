@@ -10,18 +10,18 @@ A sermon finder and viewer widget for perimeter.org that allows visitors to sear
 
 ## Decisions
 
-| Decision | Choice | Rationale |
-| --- | --- | --- |
-| Navigation model | Hybrid query string + React state | Query strings for bookmarkable state (tab, view, id, search, filters, page, sort); React state for ephemeral UI (view toggle, filter panel open/closed) |
-| Query string library | nuqs | Type-safe hooks, handles encoding/history/batching, ~3KB, no router dependency |
-| Compilations | Deferred — placeholder tab | `Sermon_Compilations` MP table relationship undiscovered; tab shown as disabled with "Soon" badge |
-| Media players | Ported from helpdesk domain | Custom VideoPlayer, AudioPlayer, PdfViewer + useMediaPlayer() hook — adapted for shadow DOM context |
-| Player layout | Tabbed | Watch / Listen / PDF tabs within sermon detail; only shows tabs for available media types |
-| Sermon list layout | 3-view dropdown toggle | Card grid (default), small list, large feature cards — user selects via dropdown |
-| Filter layout | Exposed + expandable | Search + series + speaker + sort visible inline; book, campus, date range behind "More Filters" button |
-| Pagination | Numbered pages | Classic `< 1 2 3 ... N >` — bookmarkable via `?page=N`, shows total scope |
-| DateTime library | Luxon ^3.x | Matches perimeter-api; used for formatting sermon dates |
-| Top-level navigation | Tabbed: Sermons / Series / Compilations | Each tab is a first-class browsing mode with independent query string state |
+| Decision             | Choice                                  | Rationale                                                                                                                                               |
+| -------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Navigation model     | Hybrid query string + React state       | Query strings for bookmarkable state (tab, view, id, search, filters, page, sort); React state for ephemeral UI (view toggle, filter panel open/closed) |
+| Query string library | nuqs                                    | Type-safe hooks, handles encoding/history/batching, ~3KB, no router dependency                                                                          |
+| Compilations         | Deferred — placeholder tab              | `Sermon_Compilations` MP table relationship undiscovered; tab shown as disabled with "Soon" badge                                                       |
+| Media players        | Ported from helpdesk domain             | Custom VideoPlayer, AudioPlayer, PdfViewer + useMediaPlayer() hook — adapted for shadow DOM context                                                     |
+| Player layout        | Tabbed                                  | Watch / Listen / PDF tabs within sermon detail; only shows tabs for available media types                                                               |
+| Sermon list layout   | 3-view dropdown toggle                  | Card grid (default), small list, large feature cards — user selects via dropdown                                                                        |
+| Filter layout        | Exposed + expandable                    | Search + series + speaker + sort visible inline; book, campus, date range behind "More Filters" button                                                  |
+| Pagination           | Numbered pages                          | Classic `< 1 2 3 ... N >` — bookmarkable via `?page=N`, shows total scope                                                                               |
+| DateTime library     | Luxon ^3.x                              | Matches perimeter-api; used for formatting sermon dates                                                                                                 |
+| Top-level navigation | Tabbed: Sermons / Series / Compilations | Each tab is a first-class browsing mode with independent query string state                                                                             |
 
 ## API Endpoints
 
@@ -29,94 +29,94 @@ All public (no auth required), served from `api.perimeter.org`.
 
 ### Sermon Endpoints
 
-| Endpoint | Method | Description |
-| --- | --- | --- |
-| `/api/sermons` | GET | List sermons with pagination, search, and filters |
-| `/api/sermons/:id` | GET | Sermon detail with media links |
-| `/api/sermons/series` | GET | List all series |
-| `/api/sermons/series/:id` | GET | Series detail with embedded sermons |
-| `/api/sermons/speakers` | GET | List all speakers |
-| `/api/sermons/books` | GET | List Bible books referenced by sermons |
+| Endpoint                  | Method | Description                                       |
+| ------------------------- | ------ | ------------------------------------------------- |
+| `/api/sermons`            | GET    | List sermons with pagination, search, and filters |
+| `/api/sermons/:id`        | GET    | Sermon detail with media links                    |
+| `/api/sermons/series`     | GET    | List all series                                   |
+| `/api/sermons/series/:id` | GET    | Series detail with embedded sermons               |
+| `/api/sermons/speakers`   | GET    | List all speakers                                 |
+| `/api/sermons/books`      | GET    | List Bible books referenced by sermons            |
 
 ### Query Parameters (GET /api/sermons)
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| `search` | string | — | Text search on Title and Short_Description |
-| `seriesId` | integer | — | Filter by series |
-| `speakerId` | integer | — | Filter by speaker |
-| `bookId` | integer | — | Filter by Bible book |
-| `congregationId` | integer | — | Filter by campus |
-| `from` | YYYY-MM-DD | — | Start date (inclusive) |
-| `to` | YYYY-MM-DD | — | End date (inclusive) |
-| `page` | integer | 1 | Page number (min 1) |
-| `perPage` | integer | 12 | Items per page (1-50) |
-| `sort` | string | `date` | Sort field: `date` or `title` |
-| `order` | string | `desc` | Sort direction: `asc` or `desc` |
+| Param            | Type       | Default | Description                                |
+| ---------------- | ---------- | ------- | ------------------------------------------ |
+| `search`         | string     | —       | Text search on Title and Short_Description |
+| `seriesId`       | integer    | —       | Filter by series                           |
+| `speakerId`      | integer    | —       | Filter by speaker                          |
+| `bookId`         | integer    | —       | Filter by Bible book                       |
+| `congregationId` | integer    | —       | Filter by campus                           |
+| `from`           | YYYY-MM-DD | —       | Start date (inclusive)                     |
+| `to`             | YYYY-MM-DD | —       | End date (inclusive)                       |
+| `page`           | integer    | 1       | Page number (min 1)                        |
+| `perPage`        | integer    | 12      | Items per page (1-50)                      |
+| `sort`           | string     | `date`  | Sort field: `date` or `title`              |
+| `order`          | string     | `desc`  | Sort direction: `asc` or `desc`            |
 
 ### Response Types
 
 ```typescript
 // Sermon list item (browse views)
 type SermonListItem = {
-  id: number;
-  title: string;
-  subtitle: string | null;
-  shortDescription: string | null;
-  date: string; // YYYY-MM-DD
-  bannerUrl: string | null;
-  speaker: { id: number; name: string };
-  series: { id: number; title: string };
-  congregation: { id: number };
+    id: number;
+    title: string;
+    subtitle: string | null;
+    shortDescription: string | null;
+    date: string; // YYYY-MM-DD
+    bannerUrl: string | null;
+    speaker: { id: number; name: string };
+    series: { id: number; title: string };
+    congregation: { id: number };
 };
 
 // Sermon detail (detail view)
 type SermonDetail = SermonListItem & {
-  description: string | null; // HTML
-  transcript: string | null;
-  scriptureLinks: string | null;
-  book: { id: number; name: string } | null;
-  speaker: { id: number; name: string; bio: string | null };
-  links: SermonLink[];
+    description: string | null; // HTML
+    transcript: string | null;
+    scriptureLinks: string | null;
+    book: { id: number; name: string } | null;
+    speaker: { id: number; name: string; bio: string | null };
+    links: SermonLink[];
 };
 
 type SermonLink = {
-  id: number;
-  url: string;
-  type: string; // "Watch", "Listen", "PDF", etc.
-  mediaType: 'video' | 'audio' | 'document';
-  duration: string | null; // "38:22"
-  position: number | null;
+    id: number;
+    url: string;
+    type: string; // "Watch", "Listen", "PDF", etc.
+    mediaType: 'video' | 'audio' | 'document';
+    duration: string | null; // "38:22"
+    position: number | null;
 };
 
 // Series
 type SeriesListItem = {
-  id: number;
-  title: string;
-  displayTitle: string | null;
-  subtitle: string | null;
-  description: string | null;
-  latestSermonDate: string | null;
-  sermonCount: number;
-  book: { id: number; name: string } | null;
+    id: number;
+    title: string;
+    displayTitle: string | null;
+    subtitle: string | null;
+    description: string | null;
+    latestSermonDate: string | null;
+    sermonCount: number;
+    book: { id: number; name: string } | null;
 };
 
 type SeriesDetail = SeriesListItem & {
-  sermons: SermonListItem[];
+    sermons: SermonListItem[];
 };
 
 // Pagination envelope (GET /api/sermons only)
 type PaginatedSermonsResponse = {
-  success: true;
-  data: {
-    sermons: SermonListItem[];
-    pagination: {
-      page: number;
-      perPage: number;
-      total: number;
-      totalPages: number;
+    success: true;
+    data: {
+        sermons: SermonListItem[];
+        pagination: {
+            page: number;
+            perPage: number;
+            total: number;
+            totalPages: number;
+        };
     };
-  };
 };
 
 // Other endpoint response shapes
@@ -145,23 +145,25 @@ Three tabs: **Sermons** | **Series** | **Compilations**
 
 #### Views (dropdown toggle)
 
-| View | Layout | Best For |
-| --- | --- | --- |
-| Card Grid | Responsive grid (3-col desktop, 2-col tablet, 1-col mobile) with banner image, title, speaker, date, series badge | Visual browsing |
-| Small List | Compact rows with small thumbnail, title, speaker, date, series badge | Scanning many results |
-| Large Cards | Single-column horizontal cards with banner left, title + speaker + description + date + media badges right | Reading descriptions |
+| View        | Layout                                                                                                            | Best For              |
+| ----------- | ----------------------------------------------------------------------------------------------------------------- | --------------------- |
+| Card Grid   | Responsive grid (3-col desktop, 2-col tablet, 1-col mobile) with banner image, title, speaker, date, series badge | Visual browsing       |
+| Small List  | Compact rows with small thumbnail, title, speaker, date, series badge                                             | Scanning many results |
+| Large Cards | Single-column horizontal cards with banner left, title + speaker + description + date + media badges right        | Reading descriptions  |
 
 View selection is stored in React state (ephemeral, not in URL).
 
 #### Filters
 
 **Inline (always visible):**
+
 - Search input (debounced, 300ms)
 - Series dropdown (ComboSelect with search)
 - Speaker dropdown (ComboSelect with search)
 - Sort dropdown (Date: Newest, Date: Oldest, Title: A-Z, Title: Z-A)
 
 **Expandable ("More Filters" button):**
+
 - Bible Book dropdown
 - Campus/Congregation dropdown
 - Date range picker (from/to date inputs using Luxon)
@@ -171,17 +173,17 @@ View selection is stored in React state (ephemeral, not in URL).
 
 Widget URLs use short param names for clean, readable URLs. The `useSermons` hook maps these to API param names when building requests.
 
-| Filter | URL Param | API Param | Example |
-| --- | --- | --- | --- |
-| Search text | `search` | `search` | `?search=hope` |
-| Series | `series` | `seriesId` | `?series=945` |
-| Speaker | `speaker` | `speakerId` | `?speaker=7` |
-| Sort | `sort` + `order` | `sort` + `order` | `?sort=date&order=desc` |
-| Book | `book` | `bookId` | `?book=22` |
-| Campus | `campus` | `congregationId` | `?campus=1` |
-| Date from | `from` | `from` | `?from=2024-01-01` |
-| Date to | `to` | `to` | `?to=2024-12-31` |
-| Page | `page` | `page` | `?page=3` |
+| Filter      | URL Param        | API Param        | Example                 |
+| ----------- | ---------------- | ---------------- | ----------------------- |
+| Search text | `search`         | `search`         | `?search=hope`          |
+| Series      | `series`         | `seriesId`       | `?series=945`           |
+| Speaker     | `speaker`        | `speakerId`      | `?speaker=7`            |
+| Sort        | `sort` + `order` | `sort` + `order` | `?sort=date&order=desc` |
+| Book        | `book`           | `bookId`         | `?book=22`              |
+| Campus      | `campus`         | `congregationId` | `?campus=1`             |
+| Date from   | `from`           | `from`           | `?from=2024-01-01`      |
+| Date to     | `to`             | `to`             | `?to=2024-12-31`        |
+| Page        | `page`           | `page`           | `?page=3`               |
 
 #### Results
 
@@ -198,10 +200,10 @@ Accessed via `?tab=sermons&screen=detail&id=5302` (or from series detail).
 1. **Back button** — Returns to previous list (sermons or series detail). Scroll position is not preserved across navigation (non-trivial in shadow DOM); the list re-renders from query string state which is sufficient
 2. **Title block** — Sermon title, speaker name, date (formatted with Luxon), series link, scripture references
 3. **Tabbed media player** — Tabs shown only for available media types:
-   - **Watch** — VideoPlayer component (ported from helpdesk, HTML5 `<video>`)
-   - **Listen** — AudioPlayer component (ported from helpdesk, HTML5 `<audio>`)
-   - **PDF** — PdfViewer component (ported from helpdesk, react-pdf)
-   - Default to first available tab (Watch > Listen > PDF)
+    - **Watch** — VideoPlayer component (ported from helpdesk, HTML5 `<video>`)
+    - **Listen** — AudioPlayer component (ported from helpdesk, HTML5 `<audio>`)
+    - **PDF** — PdfViewer component (ported from helpdesk, react-pdf)
+    - Default to first available tab (Watch > Listen > PDF)
 4. **Description** — Full HTML description rendered safely
 5. **Speaker info** — Avatar (initials fallback), name, bio
 
@@ -221,8 +223,8 @@ Accessed via `?tab=series&screen=detail&id=945`.
 1. **Back button** — Returns to series grid
 2. **Series header** — Title, subtitle, description, sermon count, book
 3. **Sermon list** — Numbered list of sermons in the series (ordered by date)
-   - Each row: number, title, date, speaker
-   - Click to navigate to sermon detail (`?tab=sermons&screen=detail&id=X`)
+    - Each row: number, title, date, speaker
+    - Click to navigate to sermon detail (`?tab=sermons&screen=detail&id=X`)
 
 ### Compilations Tab (Deferred)
 
@@ -278,33 +280,33 @@ src/
 
 ### New Shared Components (`packages/shared/src/components/`)
 
-| Component | Location | Description |
-| --- | --- | --- |
-| Tabs | `composite/Tabs.tsx` | Reusable tab bar with active indicator, disabled state, badge support |
-| Pagination | `composite/Pagination.tsx` | Numbered page buttons with ellipsis, prev/next, total pages |
-| SearchInput | `primitives/SearchInput.tsx` | Input with search icon, debounced onChange (300ms), clear button |
-| DateRangePicker | `composite/DateRangePicker.tsx` | From/to date inputs with Luxon formatting |
+| Component       | Location                        | Description                                                           |
+| --------------- | ------------------------------- | --------------------------------------------------------------------- |
+| Tabs            | `composite/Tabs.tsx`            | Reusable tab bar with active indicator, disabled state, badge support |
+| Pagination      | `composite/Pagination.tsx`      | Numbered page buttons with ellipsis, prev/next, total pages           |
+| SearchInput     | `primitives/SearchInput.tsx`    | Input with search icon, debounced onChange (300ms), clear button      |
+| DateRangePicker | `composite/DateRangePicker.tsx` | From/to date inputs with Luxon formatting                             |
 
 All new shared components will have Storybook stories.
 
 ### Ported Components (from perimeter-api helpdesk)
 
-| Component | Source | Adaptations Needed |
-| --- | --- | --- |
-| VideoPlayer | `perimeter-api/src/components/helpdesk/viewers/VideoPlayer.tsx` | Remove Next.js imports, adapt styles for shadow DOM tokens, use widget's lucide-react |
-| AudioPlayer | `perimeter-api/src/components/helpdesk/viewers/AudioPlayer.tsx` | Same adaptations as VideoPlayer |
-| PdfViewer | `perimeter-api/src/components/helpdesk/viewers/PdfViewer.tsx` | Remove `next/dynamic`, use standard lazy import, configure worker for CDN context |
-| useMediaPlayer | `perimeter-api/src/hooks/helpdesk/use-media-player.ts` | No changes expected — pure React hook |
+| Component      | Source                                                          | Adaptations Needed                                                                    |
+| -------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| VideoPlayer    | `perimeter-api/src/components/helpdesk/viewers/VideoPlayer.tsx` | Remove Next.js imports, adapt styles for shadow DOM tokens, use widget's lucide-react |
+| AudioPlayer    | `perimeter-api/src/components/helpdesk/viewers/AudioPlayer.tsx` | Same adaptations as VideoPlayer                                                       |
+| PdfViewer      | `perimeter-api/src/components/helpdesk/viewers/PdfViewer.tsx`   | Remove `next/dynamic`, use standard lazy import, configure worker for CDN context     |
+| useMediaPlayer | `perimeter-api/src/hooks/helpdesk/use-media-player.ts`          | No changes expected — pure React hook                                                 |
 
 ## Dependencies
 
 ### New Dependencies (widget-sermons)
 
-| Package | Version | Purpose |
-| --- | --- | --- |
-| `nuqs` | ^2.x | Type-safe query string state management |
-| `luxon` | ^3.7 | DateTime formatting (matches perimeter-api) |
-| `react-pdf` | ^10.x | PDF rendering in PdfViewer |
+| Package     | Version | Purpose                                     |
+| ----------- | ------- | ------------------------------------------- |
+| `nuqs`      | ^2.x    | Type-safe query string state management     |
+| `luxon`     | ^3.7    | DateTime formatting (matches perimeter-api) |
+| `react-pdf` | ^10.x   | PDF rendering in PdfViewer                  |
 
 ### Existing Dependencies (already in shared/widgets)
 
@@ -358,25 +360,26 @@ All query params managed via `nuqs` hooks in `use-sermon-filters.ts`:
 ```typescript
 // Sermons tab
 const sermonsParams = {
-  tab: parseAsStringLiteral(['sermons', 'series']).withDefault('sermons'),
-  screen: parseAsStringLiteral(['browse', 'detail']).withDefault('browse'),
-  id: parseAsInteger,
-  search: parseAsString.withDefault(''),
-  series: parseAsInteger,
-  speaker: parseAsInteger,
-  book: parseAsInteger,
-  campus: parseAsInteger,
-  from: parseAsString, // YYYY-MM-DD
-  to: parseAsString,   // YYYY-MM-DD
-  sort: parseAsStringLiteral(['date', 'title']).withDefault('date'),
-  order: parseAsStringLiteral(['asc', 'desc']).withDefault('desc'),
-  page: parseAsInteger.withDefault(1),
+    tab: parseAsStringLiteral(['sermons', 'series']).withDefault('sermons'),
+    screen: parseAsStringLiteral(['browse', 'detail']).withDefault('browse'),
+    id: parseAsInteger,
+    search: parseAsString.withDefault(''),
+    series: parseAsInteger,
+    speaker: parseAsInteger,
+    book: parseAsInteger,
+    campus: parseAsInteger,
+    from: parseAsString, // YYYY-MM-DD
+    to: parseAsString, // YYYY-MM-DD
+    sort: parseAsStringLiteral(['date', 'title']).withDefault('date'),
+    order: parseAsStringLiteral(['asc', 'desc']).withDefault('desc'),
+    page: parseAsInteger.withDefault(1),
 };
 // Note: perPage is sourced from widget config (data-per-page attribute), not from URL query params.
 // This keeps the URL clean — perPage is a site-level config, not a user-facing filter.
 ```
 
 **URL examples:**
+
 - Browse sermons: `?tab=sermons&sort=date&order=desc&page=1`
 - Search sermons: `?tab=sermons&search=hope&page=1`
 - Filtered: `?tab=sermons&speaker=7&series=945&from=2024-01-01`
@@ -420,26 +423,26 @@ WordPress Page
 
 ## Loading States
 
-| View | Loading Behavior |
-| --- | --- |
-| Sermon list (any view mode) | Skeleton cards/rows matching the active view layout (use `Skeleton` + `SkeletonTransition` from shared) |
-| Sermon detail | Skeleton placeholders for title block, player area, and description |
-| Series grid | Skeleton cards matching series card layout |
-| Series detail | Skeleton for header + skeleton rows for sermon list |
-| Filter dropdowns (speakers, books, series) | ComboSelect shows loading spinner while options fetch |
-| Page navigation | Sermon list shows skeleton overlay while new page loads (keeps pagination visible) |
+| View                                       | Loading Behavior                                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Sermon list (any view mode)                | Skeleton cards/rows matching the active view layout (use `Skeleton` + `SkeletonTransition` from shared) |
+| Sermon detail                              | Skeleton placeholders for title block, player area, and description                                     |
+| Series grid                                | Skeleton cards matching series card layout                                                              |
+| Series detail                              | Skeleton for header + skeleton rows for sermon list                                                     |
+| Filter dropdowns (speakers, books, series) | ComboSelect shows loading spinner while options fetch                                                   |
+| Page navigation                            | Sermon list shows skeleton overlay while new page loads (keeps pagination visible)                      |
 
 PdfViewer is lazy-loaded (`React.lazy`) — only imported when the PDF tab is selected. This avoids bundling ~500KB of react-pdf for users who never view PDFs.
 
 ## Error Handling
 
-| Scenario | Behavior |
-| --- | --- |
-| API unreachable | EmptyState with retry button |
+| Scenario               | Behavior                                                        |
+| ---------------------- | --------------------------------------------------------------- |
+| API unreachable        | EmptyState with retry button                                    |
 | No results for filters | EmptyState: "No sermons found" with suggestion to clear filters |
-| Sermon not found (404) | EmptyState with back button |
-| Media URL broken | Player shows error state with fallback message |
-| PDF fails to load | PdfViewer error state with download link |
+| Sermon not found (404) | EmptyState with back button                                     |
+| Media URL broken       | Player shows error state with fallback message                  |
+| PDF fails to load      | PdfViewer error state with download link                        |
 
 ## Testing Strategy
 

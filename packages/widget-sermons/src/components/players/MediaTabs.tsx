@@ -24,16 +24,22 @@ export function MediaTabs({ links }: MediaTabsProps) {
     if (audioLink) availableTabs.push({ id: 'audio', label: 'Listen' });
     if (docLink) availableTabs.push({ id: 'document', label: 'PDF' });
 
-    const [activeTab, setActiveTab] = useState<string>(availableTabs[0]?.id ?? 'video');
+    const [activeTab, setActiveTab] = useState<string>(
+        availableTabs[0]?.id ?? 'video',
+    );
 
     if (availableTabs.length === 0) return null;
 
     return (
-        <div className="overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700">
-            <Tabs tabs={availableTabs} activeTab={activeTab} onChange={setActiveTab} />
-            <div className="min-h-[300px]">
+        <div className='overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700'>
+            <Tabs
+                tabs={availableTabs}
+                activeTab={activeTab}
+                onChange={setActiveTab}
+            />
+            <div className='min-h-[300px]'>
                 {activeTab === 'video' && videoLink && (
-                    <div className="aspect-video">
+                    <div className='aspect-video'>
                         <VideoPlayer url={videoLink.url} />
                     </div>
                 )}
@@ -41,8 +47,17 @@ export function MediaTabs({ links }: MediaTabsProps) {
                     <AudioPlayer url={audioLink.url} />
                 )}
                 {activeTab === 'document' && docLink && (
-                    <Suspense fallback={<div className="flex h-[400px] items-center justify-center"><LoadingSpinner size="lg" label="Loading PDF viewer" /></div>}>
-                        <div className="h-[600px]">
+                    <Suspense
+                        fallback={
+                            <div className='flex h-[400px] items-center justify-center'>
+                                <LoadingSpinner
+                                    size='lg'
+                                    label='Loading PDF viewer'
+                                />
+                            </div>
+                        }
+                    >
+                        <div className='h-[600px]'>
                             <PdfViewer url={docLink.url} />
                         </div>
                     </Suspense>

@@ -7,8 +7,12 @@ import {
 import type { SortField, SortOrder, TabId, ScreenMode } from '../types';
 
 const sermonParams = {
-    tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault('sermons'),
-    screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault('browse'),
+    tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(
+        'sermons',
+    ),
+    screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault(
+        'browse',
+    ),
     id: parseAsInteger,
     search: parseAsString.withDefault(''),
     series: parseAsInteger,
@@ -29,7 +33,12 @@ export function useSermonFilters() {
 
     const setTab = (tab: TabId) => {
         if (tab === 'compilations') return;
-        setParams({ tab: tab as 'sermons' | 'series', screen: 'browse', id: null, page: 1 });
+        setParams({
+            tab: tab as 'sermons' | 'series',
+            screen: 'browse',
+            id: null,
+            page: 1,
+        });
     };
 
     const setScreen = (screen: ScreenMode, id?: number) => {
@@ -70,24 +79,41 @@ export function useSermonFilters() {
 
     const clearFilters = () => {
         setParams({
-            search: null, series: null, speaker: null, book: null,
-            campus: null, from: null, to: null, sort: 'date', order: 'desc', page: 1,
+            search: null,
+            series: null,
+            speaker: null,
+            book: null,
+            campus: null,
+            from: null,
+            to: null,
+            sort: 'date',
+            order: 'desc',
+            page: 1,
         });
     };
 
     const hasActiveFilters =
-        !!params.search ||
-        params.series !== null ||
-        params.speaker !== null ||
-        params.book !== null ||
-        params.campus !== null ||
-        params.from !== null ||
-        params.to !== null;
+        !!params.search
+        || params.series !== null
+        || params.speaker !== null
+        || params.book !== null
+        || params.campus !== null
+        || params.from !== null
+        || params.to !== null;
 
     return {
         ...params,
-        setTab, setScreen, setSearch, setSeries, setSpeaker,
-        setBook, setCampus, setDateRange, setSort, setPage,
-        clearFilters, hasActiveFilters,
+        setTab,
+        setScreen,
+        setSearch,
+        setSeries,
+        setSpeaker,
+        setBook,
+        setCampus,
+        setDateRange,
+        setSort,
+        setPage,
+        clearFilters,
+        hasActiveFilters,
     };
 }

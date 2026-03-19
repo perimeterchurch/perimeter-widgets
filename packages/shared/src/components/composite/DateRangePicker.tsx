@@ -28,27 +28,27 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
     return (
         <div className={cn('flex items-center gap-2', className)}>
-            <div className="relative">
-                <Calendar className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
+            <div className='relative'>
+                <Calendar className='pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400' />
                 <input
-                    type="date"
+                    type='date'
                     value={from}
                     onChange={(e) => onFromChange(e.target.value)}
                     max={to || undefined}
                     className={cn(inputClasses, 'pl-8 w-[150px]')}
-                    aria-label="From date"
+                    aria-label='From date'
                 />
             </div>
-            <span className="text-sm text-stone-400">to</span>
-            <div className="relative">
-                <Calendar className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400" />
+            <span className='text-sm text-stone-400'>to</span>
+            <div className='relative'>
+                <Calendar className='pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400' />
                 <input
-                    type="date"
+                    type='date'
                     value={to}
                     onChange={(e) => onToChange(e.target.value)}
                     min={from || undefined}
                     className={cn(inputClasses, 'pl-8 w-[150px]')}
-                    aria-label="To date"
+                    aria-label='To date'
                 />
             </div>
         </div>

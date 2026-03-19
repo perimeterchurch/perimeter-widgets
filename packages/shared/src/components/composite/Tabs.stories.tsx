@@ -21,9 +21,15 @@ export const Default: Story = {
         const Wrapper = () => {
             const [activeTab, setActiveTab] = useState('sermons');
             return (
-                <div className="w-full max-w-md">
-                    <Tabs tabs={sermonTabs} activeTab={activeTab} onChange={setActiveTab} />
-                    <div className="mt-4 text-sm text-stone-600">Active tab: {activeTab}</div>
+                <div className='w-full max-w-md'>
+                    <Tabs
+                        tabs={sermonTabs}
+                        activeTab={activeTab}
+                        onChange={setActiveTab}
+                    />
+                    <div className='mt-4 text-sm text-stone-600'>
+                        Active tab: {activeTab}
+                    </div>
                 </div>
             );
         };
@@ -40,7 +46,7 @@ export const WithBadge: Story = {
                     id: 'sermons',
                     label: 'Sermons',
                     badge: (
-                        <span className="rounded-full bg-stone-200 px-1.5 py-0.5 text-xs font-semibold text-stone-600">
+                        <span className='rounded-full bg-stone-200 px-1.5 py-0.5 text-xs font-semibold text-stone-600'>
                             42
                         </span>
                     ),
@@ -49,7 +55,7 @@ export const WithBadge: Story = {
                     id: 'series',
                     label: 'Series',
                     badge: (
-                        <span className="rounded-full bg-stone-200 px-1.5 py-0.5 text-xs font-semibold text-stone-600">
+                        <span className='rounded-full bg-stone-200 px-1.5 py-0.5 text-xs font-semibold text-stone-600'>
                             8
                         </span>
                     ),
@@ -57,9 +63,15 @@ export const WithBadge: Story = {
                 { id: 'compilations', label: 'Compilations', disabled: true },
             ];
             return (
-                <div className="w-full max-w-md">
-                    <Tabs tabs={tabsWithBadge} activeTab={activeTab} onChange={setActiveTab} />
-                    <div className="mt-4 text-sm text-stone-600">Active tab: {activeTab}</div>
+                <div className='w-full max-w-md'>
+                    <Tabs
+                        tabs={tabsWithBadge}
+                        activeTab={activeTab}
+                        onChange={setActiveTab}
+                    />
+                    <div className='mt-4 text-sm text-stone-600'>
+                        Active tab: {activeTab}
+                    </div>
                 </div>
             );
         };
