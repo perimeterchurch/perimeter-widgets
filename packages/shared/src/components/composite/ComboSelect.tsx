@@ -109,7 +109,7 @@ export function ComboSelect<T extends string | number = string>(
     const innerContent = (
         <div className={cn('relative min-w-0', fullWidth && 'w-full')}>
             {/* Icon overlay (left) */}
-            <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
+            <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3'>
                 {loading ?
                     <Loader2 className='h-3.5 w-3.5 animate-spin text-[var(--color-primary)]' />
                 : placeholderIcon ?
@@ -152,7 +152,7 @@ export function ComboSelect<T extends string | number = string>(
                 anchor={{ to: 'bottom start', gap: 4 }}
                 transition
                 className={cn(
-                    'z-[var(--z-dropdown,1000)] w-[var(--input-width)] origin-top',
+                    'z-[var(--z-dropdown,1000)] !min-w-[var(--input-width)] origin-top',
                     'max-h-60 overflow-y-auto',
                     'rounded-lg bg-[var(--color-popover)] shadow-lg ring-1 ring-[var(--color-border)]',
                     'dark:bg-stone-900 dark:ring-stone-700',
@@ -171,7 +171,7 @@ export function ComboSelect<T extends string | number = string>(
                             key={String(option.value)}
                             value={option.value}
                             className={cn(
-                                'flex cursor-pointer items-center gap-2 px-3 py-2 text-sm',
+                                'flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm',
                                 'transition-colors duration-150',
                                 'text-[var(--color-popover-foreground)] dark:text-stone-200',
                                 'data-[focus]:bg-[var(--color-accent)] data-[focus]:text-[var(--color-accent-foreground)]',

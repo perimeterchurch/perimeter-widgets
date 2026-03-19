@@ -51,8 +51,10 @@ export function SearchInput({
     };
 
     return (
-        <div className={cn('relative', className)}>
-            <Search className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 dark:text-stone-500' />
+        <div className={cn('relative flex items-center', className)}>
+            <div className='pointer-events-none absolute left-3 flex items-center justify-center'>
+                <Search className='h-4 w-4 text-stone-400 dark:text-stone-500' />
+            </div>
             <input
                 type='text'
                 value={localValue}
@@ -80,7 +82,7 @@ export function SearchInput({
                 <button
                     type='button'
                     onClick={handleClear}
-                    className='absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
+                    className='absolute right-3 flex items-center justify-center text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
                     aria-label='Clear search'
                 >
                     <X className='h-4 w-4' />
