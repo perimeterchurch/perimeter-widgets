@@ -29,7 +29,6 @@ export interface SermonFiltersProps {
     series: number | null;
     speaker: number | null;
     book: number | null;
-    campus: number | null;
     from: string;
     to: string;
     sort: SortField;
@@ -45,7 +44,6 @@ export interface SermonFiltersProps {
     onSeriesChange: (value: number | null) => void;
     onSpeakerChange: (value: number | null) => void;
     onBookChange: (value: number | null) => void;
-    onCampusChange: (value: number | null) => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
@@ -74,11 +72,6 @@ const SORT_OPTIONS: IconSelectOption<string>[] = [
     },
 ];
 
-const CAMPUS_OPTIONS = [
-    { value: 1 as number, label: 'Buckhead' },
-    { value: 2 as number, label: 'Brookhaven' },
-    { value: 3 as number, label: 'Peachtree Corners' },
-];
 
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
@@ -156,17 +149,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         allOptionLabel='All Books'
                         loading={props.booksLoading}
                     />
-                    <ComboSelect<number>
-                        value={props.campus ?? ''}
-                        onChange={(v) =>
-                            props.onCampusChange(v === '' ? null : v)
-                        }
-                        options={CAMPUS_OPTIONS}
-                        placeholder='All Campuses'
-                        showAllOption
-                        allOptionLabel='All Campuses'
-                    />
-                    <DateRangePicker
+<DateRangePicker
                         from={props.from}
                         to={props.to}
                         onFromChange={(from) =>
