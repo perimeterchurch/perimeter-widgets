@@ -53,7 +53,7 @@ export function SearchInput({
     return (
         <div className={cn('relative flex items-center', className)}>
             <div className='pointer-events-none absolute left-3 flex items-center justify-center'>
-                <Search className='h-4 w-4 text-stone-400 dark:text-stone-500' />
+                <Search className='h-4 w-4 text-[var(--color-text-muted)]' />
             </div>
             <input
                 type='text'
@@ -68,10 +68,10 @@ export function SearchInput({
                 placeholder={placeholder}
                 className={cn(
                     'h-10 w-full rounded-lg border pl-9 pr-9 text-sm',
-                    'bg-white dark:bg-stone-900',
-                    'border-stone-300 dark:border-stone-600',
-                    'text-stone-900 dark:text-stone-100',
-                    'placeholder:text-stone-400 dark:placeholder:text-stone-500',
+                    'bg-[var(--color-background)]',
+                    'border-[var(--color-input)]',
+                    'text-[var(--color-foreground)]',
+                    'placeholder:text-[var(--color-text-muted)]',
                     'transition-colors duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
                     'focus-visible:border-[var(--color-primary)]',
@@ -82,7 +82,7 @@ export function SearchInput({
                 <button
                     type='button'
                     onClick={handleClear}
-                    className='absolute right-3 flex items-center justify-center text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
+                    className='absolute right-3 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-foreground)]'
                     aria-label='Clear search'
                 >
                     <X className='h-4 w-4' />

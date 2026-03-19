@@ -113,7 +113,7 @@ export function ComboSelect<T extends string | number = string>(
                 {loading ?
                     <Loader2 className='h-3.5 w-3.5 animate-spin text-[var(--color-primary)]' />
                 : placeholderIcon ?
-                    <span className='flex items-center text-[var(--color-text-muted)] dark:text-stone-500'>
+                    <span className='flex items-center text-[var(--color-text-muted)]'>
                         {placeholderIcon}
                     </span>
                 :   null}
@@ -123,11 +123,11 @@ export function ComboSelect<T extends string | number = string>(
             <ComboboxInput
                 className={cn(
                     'h-10 w-full rounded-lg border text-sm',
-                    'bg-[var(--color-background)] dark:bg-stone-900',
+                    'bg-[var(--color-background)]',
                     'transition-colors duration-200',
-                    'border-[var(--color-input)] dark:border-stone-600',
-                    'text-[var(--color-foreground)] dark:text-stone-200',
-                    'placeholder:text-[var(--color-text-muted)] dark:placeholder:text-stone-500',
+                    'border-[var(--color-input)]',
+                    'text-[var(--color-foreground)]',
+                    'placeholder:text-[var(--color-text-muted)]',
                     'focus:outline-none focus:ring-2 focus:ring-[var(--color-ring)]/50 focus:ring-offset-2',
                     'focus:border-[var(--color-ring)]',
                     placeholderIcon || loading ? 'pl-8' : 'pl-3',
@@ -145,7 +145,7 @@ export function ComboSelect<T extends string | number = string>(
 
             {/* Chevron overlay (right) */}
             <ComboboxButton className='absolute inset-y-0 right-0 flex items-center pr-3'>
-                <ChevronDown className='h-3.5 w-3.5 text-[var(--color-text-muted)] dark:text-stone-500' />
+                <ChevronDown className='h-3.5 w-3.5 text-[var(--color-text-muted)]' />
             </ComboboxButton>
 
             <ComboboxOptions
@@ -161,7 +161,7 @@ export function ComboSelect<T extends string | number = string>(
                 )}
             >
                 {filtered.length === 0 ?
-                    <div className='px-3 py-2 text-sm text-[var(--color-text-muted)] dark:text-stone-500'>
+                    <div className='px-3 py-2 text-sm text-[var(--color-text-muted)]'>
                         {emptyText}
                     </div>
                 :   filtered.map((option) => (
@@ -171,9 +171,8 @@ export function ComboSelect<T extends string | number = string>(
                             className={cn(
                                 'flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm',
                                 'transition-colors duration-150',
-                                'text-[var(--color-popover-foreground)] dark:text-stone-200',
+                                'text-[var(--color-popover-foreground)]',
                                 'data-[focus]:bg-[var(--color-accent)] data-[focus]:text-[var(--color-accent-foreground)]',
-                                'dark:data-[focus]:bg-stone-800 dark:data-[focus]:text-stone-100',
                             )}
                         >
                             {({ selected: isSelected }) => (
