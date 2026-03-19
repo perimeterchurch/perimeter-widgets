@@ -36,7 +36,12 @@ function renderWithProviders(config: Record<string, unknown> = {}) {
         <QueryClientProvider client={queryClient}>
             <AuthProvider requiresAuth={false}>
                 <ConfigProvider
-                    config={{ perPage: 12, defaultTab: 'sermons', defaultView: 'grid', ...config }}
+                    config={{
+                        perPage: 12,
+                        defaultTab: 'sermons',
+                        defaultView: 'grid',
+                        ...config,
+                    }}
                 >
                     <SermonsApp />
                 </ConfigProvider>
@@ -46,13 +51,18 @@ function renderWithProviders(config: Record<string, unknown> = {}) {
 }
 
 describe('SermonsApp', () => {
-    it('renders the sermons heading', () => {
+    it('renders the Sermons tab', () => {
         renderWithProviders();
         expect(screen.getByText('Sermons')).toBeInTheDocument();
     });
 
-    it('displays the configured campus', () => {
-        renderWithProviders({ campus: 1 });
-        expect(screen.getByText(/Campus: 1/)).toBeInTheDocument();
+    it('renders the Series tab', () => {
+        renderWithProviders();
+        expect(screen.getByText('Series')).toBeInTheDocument();
+    });
+
+    it('renders the Compilations tab', () => {
+        renderWithProviders();
+        expect(screen.getByText('Compilations')).toBeInTheDocument();
     });
 });
