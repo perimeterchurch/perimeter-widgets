@@ -18,6 +18,7 @@
         "dev": "vite"
     },
     "dependencies": {
+        "@headlessui/react": "^2.2.9",
         "@perimeter-widgets/shared": "workspace:*",
         "@tanstack/react-query": "^5",
         "dompurify": "^3.3.3",

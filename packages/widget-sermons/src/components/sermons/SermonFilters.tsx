@@ -3,11 +3,11 @@ import {
     SearchInput,
     ComboSelect,
     IconSelect,
-    DateRangePicker,
     Badge,
     Button,
 } from '@perimeter-widgets/shared';
 import type { IconSelectOption } from '@perimeter-widgets/shared';
+import { DateRangePicker } from '../ui/DateRangePicker';
 import {
     SlidersHorizontal,
     X,
