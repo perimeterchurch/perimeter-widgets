@@ -36,7 +36,7 @@ function renderWithProviders(config: Record<string, unknown> = {}) {
         <QueryClientProvider client={queryClient}>
             <AuthProvider requiresAuth={false}>
                 <ConfigProvider
-                    config={{ campus: 'buckhead', perPage: 12, ...config }}
+                    config={{ perPage: 12, defaultTab: 'sermons', defaultView: 'grid', ...config }}
                 >
                     <SermonsApp />
                 </ConfigProvider>
@@ -52,7 +52,7 @@ describe('SermonsApp', () => {
     });
 
     it('displays the configured campus', () => {
-        renderWithProviders({ campus: 'buckhead' });
-        expect(screen.getByText(/Campus: buckhead/)).toBeInTheDocument();
+        renderWithProviders({ campus: 1 });
+        expect(screen.getByText(/Campus: 1/)).toBeInTheDocument();
     });
 });
