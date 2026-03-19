@@ -17,12 +17,25 @@ function apiHandlers(origin: string) {
             const perPage = parseInt(url.searchParams.get('perPage') ?? '12');
             const search = url.searchParams.get('search')?.toLowerCase();
 
+            const seriesId = url.searchParams.get('seriesId');
+            const speakerId = url.searchParams.get('speakerId');
+
             let filtered = mockSermons;
             if (search) {
                 filtered = filtered.filter(
                     (s) =>
                         s.title.toLowerCase().includes(search)
                         || s.shortDescription?.toLowerCase().includes(search),
+                );
+            }
+            if (seriesId) {
+                filtered = filtered.filter(
+                    (s) => s.series.id === Number(seriesId),
+                );
+            }
+            if (speakerId) {
+                filtered = filtered.filter(
+                    (s) => s.speaker.id === Number(speakerId),
                 );
             }
 
