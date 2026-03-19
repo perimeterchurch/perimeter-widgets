@@ -20,8 +20,11 @@
     "dependencies": {
         "@perimeter-widgets/shared": "workspace:*",
         "@tanstack/react-query": "^5",
+        "luxon": "^3.7.2",
+        "nuqs": "^2.8.9",
         "react": "^19",
         "react-dom": "^19",
+        "react-pdf": "^10.4.1",
         "zod": "^3"
     },
     "devDependencies": {
