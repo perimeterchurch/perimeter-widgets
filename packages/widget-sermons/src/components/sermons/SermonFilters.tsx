@@ -2,20 +2,11 @@ import { useState } from 'react';
 import {
     SearchInput,
     ComboSelect,
-    IconSelect,
     Badge,
     Button,
 } from '@perimeter-widgets/shared';
-import type { IconSelectOption } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
-import {
-    SlidersHorizontal,
-    X,
-    ArrowDownWideNarrow,
-    ArrowUpNarrowWide,
-    ArrowDownAZ,
-    ArrowUpZA,
-} from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import type {
     Speaker,
     Book,
@@ -49,36 +40,8 @@ export interface SermonFiltersProps {
     onClearFilters: () => void;
 }
 
-const SORT_OPTIONS: IconSelectOption<string>[] = [
-    {
-        value: 'date-desc',
-        label: 'Date: Newest',
-        icon: <ArrowDownWideNarrow className='h-4 w-4' />,
-    },
-    {
-        value: 'date-asc',
-        label: 'Date: Oldest',
-        icon: <ArrowUpNarrowWide className='h-4 w-4' />,
-    },
-    {
-        value: 'title-asc',
-        label: 'Title: A-Z',
-        icon: <ArrowDownAZ className='h-4 w-4' />,
-    },
-    {
-        value: 'title-desc',
-        label: 'Title: Z-A',
-        icon: <ArrowUpZA className='h-4 w-4' />,
-    },
-];
-
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
-    const sortValue = `${props.sort}-${props.order}`;
-    const handleSortChange = (value: string) => {
-        const [sort, order] = value.split('-') as [SortField, SortOrder];
-        props.onSortChange(sort, order);
-    };
 
     const seriesOptions = props.seriesList.map((s) => ({
         value: s.id,
@@ -95,6 +58,7 @@ export function SermonFilters(props: SermonFiltersProps) {
 
     return (
         <div className='space-y-3'>
+            {/* Inline filters: search, series, speaker, books */}
             <div className='flex flex-wrap items-center gap-2'>
                 <SearchInput
                     value={props.search}
@@ -120,10 +84,14 @@ export function SermonFilters(props: SermonFiltersProps) {
                     allOptionLabel='All Speakers'
                     loading={props.speakersLoading}
                 />
-                <IconSelect
-                    value={sortValue}
-                    onChange={handleSortChange}
-                    options={SORT_OPTIONS}
+                <ComboSelect<number>
+                    value={props.book ?? ''}
+                    onChange={(v) => props.onBookChange(v === '' ? null : v)}
+                    options={bookOptions}
+                    placeholder='All Books'
+                    showAllOption
+                    allOptionLabel='All Books'
+                    loading={props.booksLoading}
                 />
                 <Button
                     variant='secondary'
@@ -131,23 +99,13 @@ export function SermonFilters(props: SermonFiltersProps) {
                     onClick={() => setShowMore(!showMore)}
                 >
                     <SlidersHorizontal className='h-4 w-4' />
-                    More Filters
+                    {showMore ? 'Less' : 'Date Range'}
                 </Button>
             </div>
 
+            {/* Expandable: date range only */}
             {showMore && (
-                <div className='flex flex-wrap items-center gap-2 rounded-lg bg-stone-50 p-3 dark:bg-stone-900'>
-                    <ComboSelect<number>
-                        value={props.book ?? ''}
-                        onChange={(v) =>
-                            props.onBookChange(v === '' ? null : v)
-                        }
-                        options={bookOptions}
-                        placeholder='All Books'
-                        showAllOption
-                        allOptionLabel='All Books'
-                        loading={props.booksLoading}
-                    />
+                <div className='flex flex-wrap items-center gap-3 rounded-lg bg-[var(--color-muted)] p-3'>
                     <DateRangePicker
                         from={props.from}
                         to={props.to}
@@ -162,7 +120,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         <button
                             type='button'
                             onClick={props.onClearFilters}
-                            className='text-sm text-red-500 underline hover:text-red-700'
+                            className='text-sm text-[var(--color-error)] underline hover:opacity-80'
                         >
                             Clear All
                         </button>
@@ -170,6 +128,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                 </div>
             )}
 
+            {/* Active filter chips */}
             {props.hasActiveFilters && (
                 <div className='flex flex-wrap gap-1.5'>
                     {props.series && (
@@ -220,7 +179,8 @@ export function SermonFilters(props: SermonFiltersProps) {
                             className='inline-flex'
                         >
                             <Badge variant='secondary' size='sm'>
-                                "{props.search}" <X className='h-3 w-3' />
+                                &ldquo;{props.search}&rdquo;{' '}
+                                <X className='h-3 w-3' />
                             </Badge>
                         </button>
                     )}

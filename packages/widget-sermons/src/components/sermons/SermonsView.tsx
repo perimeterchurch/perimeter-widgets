@@ -2,8 +2,21 @@ import { useState } from 'react';
 import { Pagination, IconSelect, Skeleton } from '@perimeter-widgets/shared';
 import type { IconSelectOption } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
-import { LayoutGrid, List, Rows3 } from 'lucide-react';
-import type { SermonsConfig, ViewMode } from '../../types';
+import {
+    LayoutGrid,
+    List,
+    Rows3,
+    ArrowDownWideNarrow,
+    ArrowUpNarrowWide,
+    ArrowDownAZ,
+    ArrowUpZA,
+} from 'lucide-react';
+import type {
+    SermonsConfig,
+    ViewMode,
+    SortField,
+    SortOrder,
+} from '../../types';
 import { useSermons } from '../../hooks/use-sermons';
 import { useSeries } from '../../hooks/use-series';
 import { useSpeakers } from '../../hooks/use-speakers';
@@ -25,11 +38,38 @@ const VIEW_OPTIONS: IconSelectOption<string>[] = [
         label: 'Card Grid',
         icon: <LayoutGrid className='h-4 w-4' />,
     },
-    { value: 'list', label: 'Small List', icon: <List className='h-4 w-4' /> },
+    {
+        value: 'list',
+        label: 'Small List',
+        icon: <List className='h-4 w-4' />,
+    },
     {
         value: 'large',
         label: 'Large Cards',
         icon: <Rows3 className='h-4 w-4' />,
+    },
+];
+
+const SORT_OPTIONS: IconSelectOption<string>[] = [
+    {
+        value: 'date-desc',
+        label: 'Date: Newest',
+        icon: <ArrowDownWideNarrow className='h-4 w-4' />,
+    },
+    {
+        value: 'date-asc',
+        label: 'Date: Oldest',
+        icon: <ArrowUpNarrowWide className='h-4 w-4' />,
+    },
+    {
+        value: 'title-asc',
+        label: 'Title: A-Z',
+        icon: <ArrowDownAZ className='h-4 w-4' />,
+    },
+    {
+        value: 'title-desc',
+        label: 'Title: Z-A',
+        icon: <ArrowUpZA className='h-4 w-4' />,
     },
 ];
 
@@ -46,6 +86,12 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
 
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
+
+    const sortValue = `${filters.sort}-${filters.order}`;
+    const handleSortChange = (value: string) => {
+        const [sort, order] = value.split('-') as [SortField, SortOrder];
+        filters.setSort(sort, order);
+    };
 
     const ViewComponent =
         viewMode === 'list' ? SermonSmallList
@@ -78,12 +124,17 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 onSortChange={filters.setSort}
                 onClearFilters={filters.clearFilters}
             />
+            {/* Results header: count + sort + view */}
             <div className='flex items-center justify-between'>
-                <span className='text-sm text-stone-500'>
+                <span className='text-sm text-[var(--color-text-muted)]'>
                     {pagination ? `${pagination.total} sermons` : ''}
                 </span>
                 <div className='flex items-center gap-2'>
-                    <span className='text-xs text-stone-400'>View:</span>
+                    <IconSelect
+                        value={sortValue}
+                        onChange={handleSortChange}
+                        options={SORT_OPTIONS}
+                    />
                     <IconSelect
                         value={viewMode}
                         onChange={(v) => setViewMode(v as ViewMode)}
