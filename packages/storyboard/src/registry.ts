@@ -48,7 +48,7 @@ export const widgetRegistry: WidgetDefinition[] = [
         description:
             'Search and browse sermons and sermon series with watch/listen view',
         elementId: 'perimeter-sermons',
-        status: 'skeleton',
+        status: 'ready',
         load: async () => {
             const [app, styles] = await Promise.all([
                 import('@perimeter-widgets/widget-sermons/app'),
@@ -60,6 +60,9 @@ export const widgetRegistry: WidgetDefinition[] = [
             };
         },
         configFields: [
+            // NOTE: Migrated from string slugs to integer congregation IDs.
+            // Existing WordPress embeds using data-campus="buckhead" will still work
+            // via resolveCampusId() backwards-compatible mapping in the widget.
             {
                 key: 'campus',
                 label: 'Campus',
@@ -67,12 +70,9 @@ export const widgetRegistry: WidgetDefinition[] = [
                 defaultValue: '',
                 options: [
                     { label: 'All Campuses', value: '' },
-                    { label: 'Buckhead', value: 'buckhead' },
-                    { label: 'Brookhaven', value: 'brookhaven' },
-                    {
-                        label: 'Peachtree Corners',
-                        value: 'peachtree-corners',
-                    },
+                    { label: 'Buckhead', value: '1' },
+                    { label: 'Brookhaven', value: '2' },
+                    { label: 'Peachtree Corners', value: '3' },
                 ],
                 description: 'Filter sermons by campus location',
             },
@@ -82,6 +82,29 @@ export const widgetRegistry: WidgetDefinition[] = [
                 type: 'number',
                 defaultValue: 12,
                 description: 'Number of sermons to display per page',
+            },
+            {
+                key: 'defaultTab',
+                label: 'Default Tab',
+                type: 'select',
+                defaultValue: 'sermons',
+                options: [
+                    { label: 'Sermons', value: 'sermons' },
+                    { label: 'Series', value: 'series' },
+                ],
+                description: 'Which tab to show by default',
+            },
+            {
+                key: 'defaultView',
+                label: 'Default View',
+                type: 'select',
+                defaultValue: 'grid',
+                options: [
+                    { label: 'Card Grid', value: 'grid' },
+                    { label: 'Small List', value: 'list' },
+                    { label: 'Large Cards', value: 'large' },
+                ],
+                description: 'Default sermon list layout',
             },
         ],
     },
