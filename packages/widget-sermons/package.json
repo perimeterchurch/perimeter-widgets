@@ -20,6 +20,7 @@
     "dependencies": {
         "@perimeter-widgets/shared": "workspace:*",
         "@tanstack/react-query": "^5",
+        "lucide-react": "^0.577.0",
         "luxon": "^3.7.2",
         "nuqs": "^2.8.9",
         "react": "^19",
