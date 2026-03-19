@@ -72,7 +72,6 @@ const SORT_OPTIONS: IconSelectOption<string>[] = [
     },
 ];
 
-
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
     const sortValue = `${props.sort}-${props.order}`;
@@ -149,7 +148,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         allOptionLabel='All Books'
                         loading={props.booksLoading}
                     />
-<DateRangePicker
+                    <DateRangePicker
                         from={props.from}
                         to={props.to}
                         onFromChange={(from) =>

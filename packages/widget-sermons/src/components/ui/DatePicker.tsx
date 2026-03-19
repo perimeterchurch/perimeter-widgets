@@ -114,11 +114,7 @@ export function DatePicker({
                 )}
             </div>
 
-            <Modal
-                open={isOpen}
-                onClose={handleClose}
-                size='sm'
-            >
+            <Modal open={isOpen} onClose={handleClose} size='sm'>
                 <CalendarPanel
                     value={value}
                     selectedDate={selectedDate}
@@ -308,9 +304,9 @@ function CalendarPanel({
                                 <span
                                     className={cn(
                                         'absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full',
-                                        isSelected ?
-                                            'bg-white'
-                                        :   'bg-[var(--color-primary)]',
+                                        isSelected ? 'bg-white' : (
+                                            'bg-[var(--color-primary)]'
+                                        ),
                                     )}
                                 />
                             )}

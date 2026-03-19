@@ -673,10 +673,7 @@ function CalendarGrid({
                                 isEnd
                                     && 'rounded-r-lg bg-[var(--color-primary)]/8',
                                 isStart && isEnd && 'rounded-lg',
-                                !inRange
-                                    && !isStart
-                                    && !isEnd
-                                    && 'rounded-lg',
+                                !inRange && !isStart && !isEnd && 'rounded-lg',
                                 // Text & hover
                                 !isCurrentMonth
                                     && 'text-stone-300 dark:text-stone-600',
@@ -698,9 +695,9 @@ function CalendarGrid({
                                 <span
                                     className={cn(
                                         'absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full',
-                                        isSelected ?
-                                            'bg-white'
-                                        :   'bg-[var(--color-primary)]',
+                                        isSelected ? 'bg-white' : (
+                                            'bg-[var(--color-primary)]'
+                                        ),
                                     )}
                                 />
                             )}

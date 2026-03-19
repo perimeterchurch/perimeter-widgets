@@ -20,9 +20,17 @@ interface SermonsViewProps {
 }
 
 const VIEW_OPTIONS: IconSelectOption<string>[] = [
-    { value: 'grid', label: 'Card Grid', icon: <LayoutGrid className='h-4 w-4' /> },
+    {
+        value: 'grid',
+        label: 'Card Grid',
+        icon: <LayoutGrid className='h-4 w-4' />,
+    },
     { value: 'list', label: 'Small List', icon: <List className='h-4 w-4' /> },
-    { value: 'large', label: 'Large Cards', icon: <Rows3 className='h-4 w-4' /> },
+    {
+        value: 'large',
+        label: 'Large Cards',
+        icon: <Rows3 className='h-4 w-4' />,
+    },
 ];
 
 export function SermonsView({ config, filters }: SermonsViewProps) {

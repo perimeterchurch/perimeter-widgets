@@ -154,7 +154,6 @@ export function ComboSelect<T extends string | number = string>(
                     'absolute left-0 top-full z-[var(--z-dropdown,1000)] mt-1 w-full origin-top',
                     'max-h-60 overflow-y-auto',
                     'rounded-lg bg-[var(--color-popover)] shadow-lg ring-1 ring-[var(--color-border)]',
-                    'dark:bg-stone-900 dark:ring-stone-700',
                     'focus:outline-none',
                     'py-1',
                     'transition duration-200',
