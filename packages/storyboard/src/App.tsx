@@ -112,7 +112,7 @@ export function App() {
                 </nav>
 
                 {/* Preview area */}
-                <main className='flex-1 p-8 max-w-4xl'>
+                <main className='flex-1 p-8'>
                     {activeWidget ?
                         <WidgetPreview
                             key={activeWidget.id}
