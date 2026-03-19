@@ -87,7 +87,7 @@ export function VideoPlayer({ url }: { url: string }) {
                 onClick={togglePlay}
             />
             <div
-                className={`absolute bottom-6 left-1/2 -translate-x-1/2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+                className={`absolute bottom-6 inset-x-0 flex justify-center transition-opacity duration-300 ${showControls ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
             >
                 <div className='flex w-max max-w-[90vw] items-center gap-3 rounded-xl bg-stone-900/60 px-4 py-2.5 backdrop-blur-md'>
                     <button

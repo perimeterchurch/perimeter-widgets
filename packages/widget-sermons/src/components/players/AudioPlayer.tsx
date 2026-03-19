@@ -28,7 +28,7 @@ export function AudioPlayer({ url }: { url: string }) {
     }, [playbackRate, setPlaybackRate]);
 
     return (
-        <div className='flex h-full w-full items-center justify-center p-4'>
+        <div className='flex h-full w-full flex-col items-center justify-center p-4'>
             <div className='flex w-full max-w-[500px] items-center gap-3 rounded-xl bg-stone-100 px-5 py-3 shadow-lg dark:bg-stone-800'>
                 <button
                     type='button'
@@ -88,6 +88,7 @@ export function AudioPlayer({ url }: { url: string }) {
                 ref={mediaRef as React.RefObject<HTMLAudioElement>}
                 src={url}
                 preload='metadata'
+                className='hidden'
             />
         </div>
     );
