@@ -74,10 +74,8 @@ export function IconSelect<T extends string | number = string>({
 
                 <ListboxOptions
                     transition
-                    anchor='bottom start'
                     className={cn(
-                        'z-[var(--z-dropdown,1000)]',
-                        'w-[var(--button-width)] origin-top',
+                        'absolute left-0 top-full z-[var(--z-dropdown,1000)] mt-1 w-full origin-top',
                         'rounded-lg bg-[var(--color-popover)] shadow-lg ring-1 ring-[var(--color-border)]',
                         'dark:bg-stone-900 dark:ring-stone-700',
                         'focus:outline-none',

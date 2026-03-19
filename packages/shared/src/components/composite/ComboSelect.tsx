@@ -149,10 +149,9 @@ export function ComboSelect<T extends string | number = string>(
             </ComboboxButton>
 
             <ComboboxOptions
-                anchor={{ to: 'bottom start', gap: 4 }}
                 transition
                 className={cn(
-                    'z-[var(--z-dropdown,1000)] !min-w-[var(--input-width)] origin-top',
+                    'absolute left-0 top-full z-[var(--z-dropdown,1000)] mt-1 w-full origin-top',
                     'max-h-60 overflow-y-auto',
                     'rounded-lg bg-[var(--color-popover)] shadow-lg ring-1 ring-[var(--color-border)]',
                     'dark:bg-stone-900 dark:ring-stone-700',
