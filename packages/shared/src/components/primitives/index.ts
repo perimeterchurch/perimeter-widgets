@@ -47,3 +47,6 @@ export type { EmptyStateProps } from './EmptyState';
 
 export { IndeterminateProgress } from './IndeterminateProgress';
 export type { IndeterminateProgressProps } from './IndeterminateProgress';
+
+export { SearchInput } from './SearchInput';
+export type { SearchInputProps } from './SearchInput';
