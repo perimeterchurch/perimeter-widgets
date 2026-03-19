@@ -31,7 +31,6 @@ export function useSermons(params: UseSermonsParams) {
         page = 1,
         config,
     } = params;
-    const client = createApiClient({ baseUrl: config.apiUrl });
     const campusId = campus ?? resolveCampusId(config.campus);
 
     return useQuery({
@@ -52,6 +51,7 @@ export function useSermons(params: UseSermonsParams) {
             },
         ],
         queryFn: async () => {
+            const client = createApiClient({ baseUrl: config.apiUrl });
             const sp = new URLSearchParams();
             if (search) sp.set('search', search);
             if (series) sp.set('seriesId', String(series));

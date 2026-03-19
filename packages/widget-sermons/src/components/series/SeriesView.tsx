@@ -4,7 +4,6 @@ import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion'
 import type { SermonsConfig } from '../../types';
 import { useSeries } from '../../hooks/use-series';
 import { SeriesGrid } from './SeriesGrid';
-import { SeriesDetail } from './SeriesDetail';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 
 interface SeriesViewProps {
@@ -14,9 +13,6 @@ interface SeriesViewProps {
 
 export function SeriesView({ config, filters }: SeriesViewProps) {
     const [search, setSearch] = useState('');
-    const [selectedSeriesId, setSelectedSeriesId] = useState<number | null>(
-        null,
-    );
 
     const { data: seriesList = [], isLoading } = useSeries(config);
 
@@ -31,17 +27,6 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                         ?? false),
             )
         :   seriesList;
-
-    if (selectedSeriesId !== null) {
-        return (
-            <SeriesDetail
-                id={selectedSeriesId}
-                config={config}
-                onBack={() => setSelectedSeriesId(null)}
-                onSermonClick={(id) => filters.setScreen('detail', id)}
-            />
-        );
-    }
 
     return (
         <div className='space-y-4'>
@@ -67,7 +52,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
             >
                 <SeriesGrid
                     series={filtered}
-                    onSeriesClick={setSelectedSeriesId}
+                    onSeriesClick={(id) => filters.setScreen('detail', id)}
                 />
             </SkeletonTransition>
         </div>
