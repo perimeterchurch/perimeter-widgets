@@ -1,19 +1,42 @@
 import { useConfig } from '@perimeter-widgets/shared';
-import type { SermonsConfig } from './types';
+import { NuqsAdapter } from 'nuqs/adapters/react';
+import type { SermonsConfig, TabId } from './types';
+import { useSermonFilters } from './hooks/use-sermon-filters';
+import { SermonTabs } from './components/SermonTabs';
+import { SermonsView } from './components/sermons/SermonsView';
+import { SermonDetail } from './components/sermons/SermonDetail';
+import { SeriesView } from './components/series/SeriesView';
+import { ComingSoon } from './components/compilations/ComingSoon';
 
-export function SermonsApp() {
+function SermonsWidget() {
     const config = useConfig<SermonsConfig>();
+    const filters = useSermonFilters();
+    const activeTab = filters.tab as TabId;
+
+    if (filters.screen === 'detail' && filters.id) {
+        return (
+            <div className="p-4">
+                <SermonDetail id={filters.id} config={config} onBack={() => filters.setScreen('browse')} />
+            </div>
+        );
+    }
 
     return (
-        <div className='p-4'>
-            <h2 className='text-2xl font-bold text-stone-900 mb-4'>Sermons</h2>
-            <p className='text-stone-600'>
-                Sermons widget is loading. Campus: {config.campus ?? 'all'}
-            </p>
-            <p className='text-sm text-stone-400 mt-2'>
-                This is a placeholder — sermon components will be built once the
-                API endpoints are ready.
-            </p>
+        <div className="p-4">
+            <SermonTabs activeTab={activeTab} onTabChange={filters.setTab} />
+            <div className="mt-4">
+                {activeTab === 'sermons' && <SermonsView config={config} filters={filters} />}
+                {activeTab === 'series' && <SeriesView config={config} filters={filters} />}
+                {activeTab === 'compilations' && <ComingSoon />}
+            </div>
         </div>
+    );
+}
+
+export function SermonsApp() {
+    return (
+        <NuqsAdapter>
+            <SermonsWidget />
+        </NuqsAdapter>
     );
 }
