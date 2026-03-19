@@ -32,6 +32,7 @@
         "@perimeter-widgets/vite-preset": "workspace:*",
         "@testing-library/jest-dom": "^6",
         "@testing-library/react": "^16",
+        "@types/luxon": "^3.7.1",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "@vitejs/plugin-react": "^4",
