@@ -1,5 +1,6 @@
 import { useConfig } from '@perimeter-widgets/shared';
 import { NuqsAdapter } from 'nuqs/adapters/react';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { SermonsConfig } from './types';
 import { useSermonFilters } from './hooks/use-sermon-filters';
 import { SermonTabs } from './components/SermonTabs';
@@ -8,14 +9,35 @@ import { SermonDetail } from './components/sermons/SermonDetail';
 import { SeriesView } from './components/series/SeriesView';
 import { SeriesDetail } from './components/series/SeriesDetail';
 
+const fadeSlide = {
+    initial: { opacity: 0, y: 8 },
+    animate: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] as const },
+    },
+    exit: {
+        opacity: 0,
+        y: -8,
+        transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] as const },
+    },
+};
+
 function SermonsWidget() {
     const config = useConfig<SermonsConfig>();
     const filters = useSermonFilters();
 
-    if (filters.screen === 'detail' && filters.id) {
-        if (filters.tab === 'series') {
-            return (
-                <div className='p-4'>
+    // Build a unique key for AnimatePresence based on the current "page"
+    const viewKey =
+        filters.screen === 'detail' && filters.id ?
+            `detail-${filters.tab}-${filters.id}`
+        :   `browse-${filters.tab}`;
+
+    // Determine which content to render
+    const renderContent = () => {
+        if (filters.screen === 'detail' && filters.id) {
+            if (filters.tab === 'series') {
+                return (
                     <SeriesDetail
                         id={filters.id}
                         config={config}
@@ -24,31 +46,49 @@ function SermonsWidget() {
                             filters.setScreen('detail', id);
                         }}
                     />
-                </div>
-            );
-        }
-        return (
-            <div className='p-4'>
+                );
+            }
+            return (
                 <SermonDetail
                     id={filters.id}
                     config={config}
                     onBack={() => filters.setScreen('browse')}
                 />
-            </div>
+            );
+        }
+
+        return (
+            <>
+                <SermonTabs
+                    activeTab={filters.tab}
+                    onTabChange={filters.setTab}
+                />
+                <div className='mt-4'>
+                    <AnimatePresence mode='wait'>
+                        <motion.div key={filters.tab} {...fadeSlide}>
+                            {filters.tab === 'sermons' && (
+                                <SermonsView
+                                    config={config}
+                                    filters={filters}
+                                />
+                            )}
+                            {filters.tab === 'series' && (
+                                <SeriesView config={config} filters={filters} />
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            </>
         );
-    }
+    };
 
     return (
         <div className='p-4'>
-            <SermonTabs activeTab={filters.tab} onTabChange={filters.setTab} />
-            <div className='mt-4'>
-                {filters.tab === 'sermons' && (
-                    <SermonsView config={config} filters={filters} />
-                )}
-                {filters.tab === 'series' && (
-                    <SeriesView config={config} filters={filters} />
-                )}
-            </div>
+            <AnimatePresence mode='wait'>
+                <motion.div key={viewKey} {...fadeSlide}>
+                    {renderContent()}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 }

@@ -22,6 +22,7 @@
         "@perimeter-widgets/shared": "workspace:*",
         "@tanstack/react-query": "^5",
         "dompurify": "^3.3.3",
+        "framer-motion": "^12.38.0",
         "lucide-react": "^0.577.0",
         "luxon": "^3.7.2",
         "nuqs": "^2.8.9",

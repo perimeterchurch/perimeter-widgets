@@ -200,6 +200,9 @@ importers:
       dompurify:
         specifier: ^3.3.3
         version: 3.3.3
+      framer-motion:
+        specifier: ^12.38.0
+        version: 12.38.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       lucide-react:
         specifier: ^0.577.0
         version: 0.577.0(react@19.2.4)
