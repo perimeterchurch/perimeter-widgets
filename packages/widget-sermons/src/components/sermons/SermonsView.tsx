@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Pagination, Select, Skeleton } from '@perimeter-widgets/shared';
+import { Pagination, IconSelect, Skeleton } from '@perimeter-widgets/shared';
+import type { IconSelectOption } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
+import { LayoutGrid, List, Rows3 } from 'lucide-react';
 import type { SermonsConfig, ViewMode } from '../../types';
 import { useSermons } from '../../hooks/use-sermons';
 import { useSeries } from '../../hooks/use-series';
@@ -17,10 +19,10 @@ interface SermonsViewProps {
     filters: ReturnType<typeof useSermonFilters>;
 }
 
-const VIEW_OPTIONS = [
-    { value: 'grid', label: 'Card Grid' },
-    { value: 'list', label: 'Small List' },
-    { value: 'large', label: 'Large Cards' },
+const VIEW_OPTIONS: IconSelectOption<string>[] = [
+    { value: 'grid', label: 'Card Grid', icon: <LayoutGrid className='h-4 w-4' /> },
+    { value: 'list', label: 'Small List', icon: <List className='h-4 w-4' /> },
+    { value: 'large', label: 'Large Cards', icon: <Rows3 className='h-4 w-4' /> },
 ];
 
 export function SermonsView({ config, filters }: SermonsViewProps) {
@@ -76,13 +78,10 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 </span>
                 <div className='flex items-center gap-2'>
                     <span className='text-xs text-stone-400'>View:</span>
-                    <Select
+                    <IconSelect
                         value={viewMode}
-                        onChange={(e) =>
-                            setViewMode(e.target.value as ViewMode)
-                        }
+                        onChange={(v) => setViewMode(v as ViewMode)}
                         options={VIEW_OPTIONS}
-                        size='sm'
                     />
                 </div>
             </div>

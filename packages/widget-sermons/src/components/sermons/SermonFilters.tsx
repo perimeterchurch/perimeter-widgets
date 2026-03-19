@@ -2,12 +2,20 @@ import { useState } from 'react';
 import {
     SearchInput,
     ComboSelect,
-    Select,
+    IconSelect,
     DateRangePicker,
     Badge,
     Button,
 } from '@perimeter-widgets/shared';
-import { SlidersHorizontal, X } from 'lucide-react';
+import type { IconSelectOption } from '@perimeter-widgets/shared';
+import {
+    SlidersHorizontal,
+    X,
+    ArrowDownWideNarrow,
+    ArrowUpNarrowWide,
+    ArrowDownAZ,
+    ArrowUpZA,
+} from 'lucide-react';
 import type {
     Speaker,
     Book,
@@ -43,11 +51,27 @@ export interface SermonFiltersProps {
     onClearFilters: () => void;
 }
 
-const SORT_OPTIONS = [
-    { value: 'date-desc', label: 'Date: Newest' },
-    { value: 'date-asc', label: 'Date: Oldest' },
-    { value: 'title-asc', label: 'Title: A-Z' },
-    { value: 'title-desc', label: 'Title: Z-A' },
+const SORT_OPTIONS: IconSelectOption<string>[] = [
+    {
+        value: 'date-desc',
+        label: 'Date: Newest',
+        icon: <ArrowDownWideNarrow className='h-4 w-4' />,
+    },
+    {
+        value: 'date-asc',
+        label: 'Date: Oldest',
+        icon: <ArrowUpNarrowWide className='h-4 w-4' />,
+    },
+    {
+        value: 'title-asc',
+        label: 'Title: A-Z',
+        icon: <ArrowDownAZ className='h-4 w-4' />,
+    },
+    {
+        value: 'title-desc',
+        label: 'Title: Z-A',
+        icon: <ArrowUpZA className='h-4 w-4' />,
+    },
 ];
 
 const CAMPUS_OPTIONS = [
@@ -104,11 +128,10 @@ export function SermonFilters(props: SermonFiltersProps) {
                     allOptionLabel='All Speakers'
                     loading={props.speakersLoading}
                 />
-                <Select
+                <IconSelect
                     value={sortValue}
-                    onChange={(e) => handleSortChange(e.target.value)}
+                    onChange={handleSortChange}
                     options={SORT_OPTIONS}
-                    size='md'
                 />
                 <Button
                     variant='secondary'
