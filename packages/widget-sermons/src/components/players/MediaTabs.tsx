@@ -44,7 +44,9 @@ export function MediaTabs({ links }: MediaTabsProps) {
                     </div>
                 )}
                 {activeTab === 'audio' && audioLink && (
-                    <AudioPlayer url={audioLink.url} />
+                    <div className='flex h-[300px] items-center justify-center'>
+                        <AudioPlayer url={audioLink.url} />
+                    </div>
                 )}
                 {activeTab === 'document' && docLink && (
                     <Suspense
