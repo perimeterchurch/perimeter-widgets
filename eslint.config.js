@@ -23,6 +23,13 @@ export default tseslint.config(
                 'error',
                 { argsIgnorePattern: '^_' },
             ],
+            '@typescript-eslint/no-explicit-any': 'error',
+        },
+    },
+    {
+        files: ['**/*.test.{ts,tsx}', '**/*.stories.{ts,tsx}'],
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
         },
     },
     prettier,

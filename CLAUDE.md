@@ -88,6 +88,8 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 - **Conventional commits:** `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `test:`
 - **Use `--body-file` for PR bodies** (avoids ANSI escape code injection)
 - **Read docs before code** — check `docs/` for architecture and guides before modifying the codebase
+- **Never add eslint-disable comments** — fix the underlying code instead of suppressing warnings. eslint-disable comments hide problems and rot over time
+- **Never use `any` in production code** — `@typescript-eslint/no-explicit-any` is enforced as an error. Use proper types, generics, or `unknown` instead. Test and story files are exempt from this rule
 
 ## Context Loading
 
