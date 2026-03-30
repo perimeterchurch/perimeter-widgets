@@ -1,5 +1,9 @@
-import { createApiClient as createBaseClient } from '@perimeterchurch/api';
+import {
+    createApiClient as createBaseClient,
+    type paths,
+} from '@perimeterchurch/api';
 import type { ApiClientOptions as BaseOptions } from '@perimeterchurch/api';
+import type { Client } from 'openapi-fetch';
 import { getMPToken } from '../auth/mp-token';
 
 export type { paths, components, operations } from '@perimeterchurch/api';
@@ -30,7 +34,9 @@ export interface WidgetApiClientOptions {
     headers?: Record<string, string>;
 }
 
-export function createApiClient(options: WidgetApiClientOptions = {}) {
+export function createApiClient(
+    options: WidgetApiClientOptions = {},
+): Client<paths> {
     const { baseUrl, requiresAuth = false, headers } = options;
     const resolvedBaseUrl = resolveBaseUrl(baseUrl);
 
