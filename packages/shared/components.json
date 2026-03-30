@@ -19,8 +19,8 @@
         "hooks": "src/hooks"
     },
     "registries": {
-        "perimeter": {
-            "url": "https://style.perimeter.org/r"
+        "@perimeter": {
+            "url": "https://style.perimeter.org/r/{name}.json"
         }
     }
 }
