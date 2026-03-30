@@ -81,12 +81,6 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 ## Critical Rules
 
 - **Always use `pnpm`** — never npm or npx
-- **Always create a branch** — never commit directly to `dev` or `main`
-- **Merge target is `dev` only** — never merge directly to `main`
-- **Never push to origin** — pushing is a manual task performed by the developer
-- **Run `pnpm quality` before merging**
-- **Conventional commits:** `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `test:`
-- **Use `--body-file` for PR bodies** (avoids ANSI escape code injection)
 - **Read docs before code** — check `docs/` for architecture and guides before modifying the codebase
 - **Never add eslint-disable comments** — fix the underlying code instead of suppressing warnings. eslint-disable comments hide problems and rot over time
 - **Never use `any` in production code** — `@typescript-eslint/no-explicit-any` is enforced as an error. Use proper types, generics, or `unknown` instead. Test and story files are exempt from this rule
@@ -121,7 +115,57 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 6. Commit dist, push to main — GitHub Action purges jsDelivr
 7. Add `<div>` + `<script>` tag on WordPress once — never touch it again
 
-## Worktrees
+## Git Workflow
+
+### Branch Model
+
+- **`main`** — production releases only. Never commit or push directly
+- **`dev`** — integration branch. All work merges here via pull request. Never commit or push directly
+- **Feature branches** — created off `dev`, merged back via PR
+
+### Branch Naming
+
+Use conventional prefixes: `feat/`, `fix/`, `refactor/`, `chore/`, `docs/`, `test/` with kebab-case descriptions.
+
+### Workflow
+
+```
+1. git checkout dev && git pull
+2. git checkout -b feat/my-feature        # or use a worktree (see below)
+3. ... make changes, commit atomically ...
+4. pnpm quality                            # must pass before PR
+5. git push -u origin feat/my-feature      # push the feature branch only
+6. NO_COLOR=1 gh pr create --base dev      # open PR targeting dev
+7. Developer reviews and merges on GitHub
+```
+
+### Commit Discipline
+
+- **Atomic commits** — each commit represents one logical change that compiles and passes tests
+- **Conventional commit format:** `type: subject` — e.g., `feat: add sermon search endpoint`
+- **Write commit bodies for non-obvious changes** — the subject says what, the body says why
+
+### Pull Requests
+
+- **Always target `dev`** — never open a PR against `main`
+- **Use `NO_COLOR=1` for PR commands** — `NO_COLOR=1 gh pr create --body "..."` prevents ANSI escape codes. If colors still leak through, write the body with the **Write tool** and pass it with `--body-file`
+- **Run `pnpm quality` before opening** — the branch must pass typecheck + lint + format + test
+- **The developer merges** — Claude creates the PR and pushes the branch; the developer reviews and merges on GitHub
+
+### Branch Protection
+
+- **Never commit directly to `dev` or `main`** — always use a feature branch
+- **Never push directly to `dev` or `main`** — all changes reach these branches via pull request
+- **Never merge locally** — do not run `git checkout dev && git merge`. Use GitHub PRs
+- **Never force-push to shared branches** — force-push is only acceptable on your own feature branches
+
+### Rebase Workflow
+
+- **Rebase feature branches onto `dev`** before merging — keeps history linear and makes bisecting trivial
+- **Never rebase shared/published branches** — only rebase branches you own that haven't been merged
+- **After rebasing**, the developer (not Claude) handles the force-push
+
+### Worktrees
 
 Use `.worktrees/` (project-local, hidden) for isolated development branches. This directory is gitignored.
 
@@ -129,6 +173,10 @@ Use `.worktrees/` (project-local, hidden) for isolated development branches. Thi
 git worktree add .worktrees/<branch-name> -b <branch-name>
 cd .worktrees/<branch-name> && pnpm install
 ```
+
+- **Copy config files** to the worktree before running tests (e.g., `cp .env.local <worktree-path>/.env.local`)
+- **Verify all tests pass** in the worktree before merging and on `dev` after merging
+- **Run `pnpm quality`** in the worktree and on `dev` after finishing plans or committing changes
 
 ## API Integration
 
