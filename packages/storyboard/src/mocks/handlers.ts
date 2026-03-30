@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import type { operations } from '@perimeter-widgets/shared';
 import {
     mockSermons,
     mockSermonDetail,
@@ -6,6 +7,19 @@ import {
     mockSpeakers,
     mockBooks,
 } from '@/mocks/data/sermons';
+
+type ListSermonsResponse =
+    operations['listSermons']['responses']['200']['content']['application/json'];
+type GetSermonResponse =
+    operations['getSermon']['responses']['200']['content']['application/json'];
+type ListSeriesResponse =
+    operations['listSeries']['responses']['200']['content']['application/json'];
+type GetSeriesDetailResponse =
+    operations['getSeriesDetail']['responses']['200']['content']['application/json'];
+type ListSpeakersResponse =
+    operations['listSpeakers']['responses']['200']['content']['application/json'];
+type ListBooksResponse =
+    operations['listBooks']['responses']['200']['content']['application/json'];
 
 const API_ORIGINS = ['http://localhost:5500', 'https://api.perimeter.org'];
 
@@ -53,11 +67,14 @@ function apiHandlers(origin: string) {
                         totalPages: Math.ceil(filtered.length / perPage),
                     },
                 },
-            });
+            } satisfies ListSermonsResponse);
         }),
 
         http.get(`${origin}/api/sermons/series`, () => {
-            return HttpResponse.json({ success: true, data: mockSeries });
+            return HttpResponse.json({
+                success: true,
+                data: mockSeries,
+            } satisfies ListSeriesResponse);
         }),
 
         http.get(`${origin}/api/sermons/series/:id`, ({ params }) => {
@@ -73,15 +90,21 @@ function apiHandlers(origin: string) {
             return HttpResponse.json({
                 success: true,
                 data: { ...series, sermons },
-            });
+            } satisfies GetSeriesDetailResponse);
         }),
 
         http.get(`${origin}/api/sermons/speakers`, () => {
-            return HttpResponse.json({ success: true, data: mockSpeakers });
+            return HttpResponse.json({
+                success: true,
+                data: mockSpeakers,
+            } satisfies ListSpeakersResponse);
         }),
 
         http.get(`${origin}/api/sermons/books`, () => {
-            return HttpResponse.json({ success: true, data: mockBooks });
+            return HttpResponse.json({
+                success: true,
+                data: mockBooks,
+            } satisfies ListBooksResponse);
         }),
 
         http.get(`${origin}/api/sermons/:id`, ({ params }) => {
@@ -89,7 +112,7 @@ function apiHandlers(origin: string) {
                 return HttpResponse.json({
                     success: true,
                     data: mockSermonDetail,
-                });
+                } satisfies GetSermonResponse);
             }
             const sermon = mockSermons.find((s) => s.id === Number(params.id));
             if (!sermon)
@@ -105,10 +128,10 @@ function apiHandlers(origin: string) {
                     transcript: null,
                     scriptureLinks: null,
                     book: null,
-                    speaker: mockSpeakers[0],
+                    speaker: mockSpeakers[0]!,
                     links: [],
                 },
-            });
+            } satisfies GetSermonResponse);
         }),
     ];
 }
