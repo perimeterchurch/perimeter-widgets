@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import './tokens.css';
 
 /* Dark mode via data-theme attribute on wrapper div */
 @custom-variant dark (&:where([data-theme="dark"] *, [data-theme="dark"]));
