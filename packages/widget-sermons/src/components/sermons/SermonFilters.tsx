@@ -76,7 +76,9 @@ export function SermonFilters(props: SermonFiltersProps) {
                 <Select
                     value={props.series != null ? String(props.series) : ''}
                     onValueChange={(v) =>
-                        props.onSeriesChange(v == null || v === '' ? null : Number(v))
+                        props.onSeriesChange(
+                            v == null || v === '' ? null : Number(v),
+                        )
                     }
                 >
                     <SelectTrigger>
@@ -97,7 +99,9 @@ export function SermonFilters(props: SermonFiltersProps) {
                 <Select
                     value={props.speaker != null ? String(props.speaker) : ''}
                     onValueChange={(v) =>
-                        props.onSpeakerChange(v == null || v === '' ? null : Number(v))
+                        props.onSpeakerChange(
+                            v == null || v === '' ? null : Number(v),
+                        )
                     }
                 >
                     <SelectTrigger>
@@ -118,7 +122,9 @@ export function SermonFilters(props: SermonFiltersProps) {
                 <Select
                     value={props.book != null ? String(props.book) : ''}
                     onValueChange={(v) =>
-                        props.onBookChange(v == null || v === '' ? null : Number(v))
+                        props.onBookChange(
+                            v == null || v === '' ? null : Number(v),
+                        )
                     }
                 >
                     <SelectTrigger>

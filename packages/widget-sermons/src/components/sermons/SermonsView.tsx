@@ -15,11 +15,7 @@ import {
     Skeleton,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
-import {
-    LayoutGrid,
-    List,
-    Rows3,
-} from 'lucide-react';
+import { LayoutGrid, List, Rows3 } from 'lucide-react';
 import type {
     SermonsConfig,
     ViewMode,
@@ -67,7 +63,10 @@ const SORT_OPTIONS = [
 ];
 
 /** Build a page range for the pagination component */
-function getPageRange(page: number, totalPages: number): (number | 'ellipsis')[] {
+function getPageRange(
+    page: number,
+    totalPages: number,
+): (number | 'ellipsis')[] {
     const pages: (number | 'ellipsis')[] = [];
     if (totalPages <= 7) {
         for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -157,9 +156,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                     </Select>
                     <Select
                         value={viewMode}
-                        onValueChange={(v) =>
-                            v && setViewMode(v as ViewMode)
-                        }
+                        onValueChange={(v) => v && setViewMode(v as ViewMode)}
                     >
                         <SelectTrigger size='sm'>
                             <SelectValue />
@@ -206,9 +203,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                                 }
                                 aria-disabled={pagination.page <= 1}
                                 className={
-                                    pagination.page <= 1
-                                        ? 'pointer-events-none opacity-50'
-                                        : 'cursor-pointer'
+                                    pagination.page <= 1 ?
+                                        'pointer-events-none opacity-50'
+                                    :   'cursor-pointer'
                                 }
                             />
                         </PaginationItem>
@@ -216,12 +213,11 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                             pagination.page,
                             pagination.totalPages,
                         ).map((item, idx) =>
-                            item === 'ellipsis' ? (
+                            item === 'ellipsis' ?
                                 <PaginationItem key={`e-${idx}`}>
                                     <PaginationEllipsis />
                                 </PaginationItem>
-                            ) : (
-                                <PaginationItem key={item}>
+                            :   <PaginationItem key={item}>
                                     <PaginationLink
                                         isActive={item === pagination.page}
                                         onClick={() => filters.setPage(item)}
@@ -229,8 +225,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                                     >
                                         {item}
                                     </PaginationLink>
-                                </PaginationItem>
-                            ),
+                                </PaginationItem>,
                         )}
                         <PaginationItem>
                             <PaginationNext
@@ -246,9 +241,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                                     pagination.page >= pagination.totalPages
                                 }
                                 className={
-                                    pagination.page >= pagination.totalPages
-                                        ? 'pointer-events-none opacity-50'
-                                        : 'cursor-pointer'
+                                    pagination.page >= pagination.totalPages ?
+                                        'pointer-events-none opacity-50'
+                                    :   'cursor-pointer'
                                 }
                             />
                         </PaginationItem>

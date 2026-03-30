@@ -1,6 +1,11 @@
 import { useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Tabs, TabsList, TabsTrigger, Spinner } from '@perimeter-widgets/shared';
+import {
+    Tabs,
+    TabsList,
+    TabsTrigger,
+    Spinner,
+} from '@perimeter-widgets/shared';
 import { VideoPlayer } from './VideoPlayer';
 import { AudioPlayer } from './AudioPlayer';
 import type { SermonLink } from '../../types';
@@ -45,10 +50,7 @@ export function MediaTabs({ links }: MediaTabsProps) {
 
     return (
         <div className='overflow-hidden rounded-lg border border-[var(--color-border)]'>
-            <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-            >
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList>
                     {availableTabs.map((tab) => (
                         <TabsTrigger key={tab.id} value={tab.id}>

@@ -4,7 +4,12 @@ export type { MountWidgetOptions, MountResult } from './shadow-dom/mount';
 
 // API Client
 export { createApiClient } from './api/client';
-export type { WidgetApiClientOptions, paths, components, operations } from './api/client';
+export type {
+    WidgetApiClientOptions,
+    paths,
+    components,
+    operations,
+} from './api/client';
 
 // Auth
 export { getMPToken, AuthProvider, useAuth } from './auth/mp-token';
@@ -19,4 +24,3 @@ export { createQueryClient } from './api/query-client';
 
 // Components
 export * from './components';
-

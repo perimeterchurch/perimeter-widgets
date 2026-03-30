@@ -40,9 +40,7 @@ export function SermonCardGrid({
                         <p className='text-xs text-stone-500 dark:text-stone-400'>
                             {sermon.speaker.name} · {formatDate(sermon.date)}
                         </p>
-                        <Badge variant='secondary'>
-                            {sermon.series.title}
-                        </Badge>
+                        <Badge variant='secondary'>{sermon.series.title}</Badge>
                     </div>
                 </button>
             ))}

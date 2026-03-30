@@ -1,9 +1,4 @@
-import {
-    Badge,
-    Tabs,
-    TabsList,
-    TabsTrigger,
-} from '@perimeter-widgets/shared';
+import { Badge, Tabs, TabsList, TabsTrigger } from '@perimeter-widgets/shared';
 import type { TabId } from '../types';
 
 const TAB_DEFS: { id: TabId; label: string; disabled?: boolean }[] = [
