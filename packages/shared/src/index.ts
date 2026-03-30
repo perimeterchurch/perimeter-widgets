@@ -20,5 +20,3 @@ export { createQueryClient } from './api/query-client';
 // Components
 export * from './components';
 
-// Types
-export type * from './types/ui';

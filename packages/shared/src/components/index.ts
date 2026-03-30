@@ -1,9 +1,32 @@
-// Primitives
-export * from './primitives';
+// Registry components — top-level ui/ (unique, not in perimeter preset)
+export * from './ui/input-group';
 
-// Composite
-export * from './composite';
+// Registry components — perimeter preset
+export * from './ui/perimeter/avatar';
+export * from './ui/perimeter/badge';
+export * from './ui/perimeter/button';
+export * from './ui/perimeter/calendar';
+export * from './ui/perimeter/card';
+export * from './ui/perimeter/checkbox';
+export * from './ui/perimeter/combobox';
+export * from './ui/perimeter/command';
+export * from './ui/perimeter/dialog';
+export * from './ui/perimeter/dropdown-menu';
+export * from './ui/perimeter/empty';
+export * from './ui/perimeter/input';
+export * from './ui/perimeter/label';
+export * from './ui/perimeter/pagination';
+export * from './ui/perimeter/progress';
+export * from './ui/perimeter/radio-group';
+export * from './ui/perimeter/scroll-area';
+export * from './ui/perimeter/select';
+export * from './ui/perimeter/separator';
+export * from './ui/perimeter/skeleton';
+export * from './ui/perimeter/spinner';
+export * from './ui/perimeter/switch';
+export * from './ui/perimeter/tabs';
+export * from './ui/perimeter/textarea';
+export * from './ui/perimeter/tooltip';
 
-// Utilities
-export { cn } from './utils/cn';
-export * from './utils/variants';
+// Utility
+export { cn } from '../lib/utils';
