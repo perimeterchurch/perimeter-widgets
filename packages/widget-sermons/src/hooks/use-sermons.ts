@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
-import type { PaginatedSermonsResponse, SortField, SortOrder } from '../types';
+import type { SortField, SortOrder } from '../types';
 import { resolveCampusId, type SermonsConfig } from '../types';
 
 export interface UseSermonsParams {
@@ -52,21 +52,25 @@ export function useSermons(params: UseSermonsParams) {
         ],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
-            const sp = new URLSearchParams();
-            if (search) sp.set('search', search);
-            if (series) sp.set('seriesId', String(series));
-            if (speaker) sp.set('speakerId', String(speaker));
-            if (book) sp.set('bookId', String(book));
-            if (campusId) sp.set('congregationId', String(campusId));
-            if (from) sp.set('from', from);
-            if (to) sp.set('to', to);
-            sp.set('sort', sort);
-            sp.set('order', order);
-            sp.set('page', String(page));
-            sp.set('perPage', String(config.perPage));
-            return client.get<PaginatedSermonsResponse>(
-                `/api/sermons?${sp.toString()}`,
-            );
+            const { data, error } = await client.GET('/api/sermons', {
+                params: {
+                    query: {
+                        search: search || undefined,
+                        seriesId: series ?? undefined,
+                        speakerId: speaker ?? undefined,
+                        bookId: book ?? undefined,
+                        congregationId: campusId,
+                        from: from ?? undefined,
+                        to: to ?? undefined,
+                        sort,
+                        order,
+                        page,
+                        perPage: config.perPage,
+                    },
+                },
+            });
+            if (error) throw new Error('Failed to fetch sermons');
+            return data.data;
         },
     });
 }

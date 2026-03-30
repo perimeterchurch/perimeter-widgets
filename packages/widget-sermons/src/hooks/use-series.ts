@@ -1,13 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
-import type { SeriesListItem, SermonsConfig } from '../types';
+import type { SermonsConfig } from '../types';
 
 export function useSeries(config: SermonsConfig) {
     return useQuery({
         queryKey: ['series-list'],
-        queryFn: () => {
+        queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
-            return client.get<SeriesListItem[]>('/api/sermons/series');
+            const { data, error } = await client.GET('/api/sermons/series');
+            if (error) throw new Error('Failed to fetch series');
+            return data.data;
         },
     });
 }

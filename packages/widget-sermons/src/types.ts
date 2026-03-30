@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { operations } from '@perimeter-widgets/shared';
 
 /* ------------------------------------------------------------------ */
 /*  Widget Configuration (from data-* attributes)                      */
@@ -15,81 +16,39 @@ export const SermonsConfigSchema = z.object({
 export type SermonsConfig = z.infer<typeof SermonsConfigSchema>;
 
 /* ------------------------------------------------------------------ */
-/*  API Response Types                                                 */
+/*  API Response Types (derived from OpenAPI spec)                     */
 /* ------------------------------------------------------------------ */
 
-export type Speaker = {
-    id: number;
-    name: string;
-    bio: string | null;
-};
+type ListSermonsResponse =
+    operations['listSermons']['responses']['200']['content']['application/json'];
+export type SermonListItem = ListSermonsResponse['data']['sermons'][number];
+export type Pagination = ListSermonsResponse['data']['pagination'];
 
-export type Book = {
-    id: number;
-    name: string;
-};
+type GetSermonResponse =
+    operations['getSermon']['responses']['200']['content']['application/json'];
+export type SermonDetail = GetSermonResponse['data'];
+export type SermonLink = SermonDetail['links'][number];
 
-export type SermonLink = {
-    id: number;
-    url: string;
-    type: string;
-    mediaType: 'video' | 'audio' | 'document';
-    duration: string | null;
-    position: number | null;
-};
+type ListSeriesResponse =
+    operations['listSeries']['responses']['200']['content']['application/json'];
+export type SeriesListItem = ListSeriesResponse['data'][number];
 
-export type SermonListItem = {
-    id: number;
-    title: string;
-    subtitle: string | null;
-    shortDescription: string | null;
-    date: string;
-    bannerUrl: string | null;
-    speaker: { id: number; name: string };
-    series: { id: number; title: string };
-    congregation: { id: number };
-};
+type GetSeriesDetailResponse =
+    operations['getSeriesDetail']['responses']['200']['content']['application/json'];
+export type SeriesDetail = GetSeriesDetailResponse['data'];
 
-export type SermonDetail = SermonListItem & {
-    description: string | null;
-    transcript: string | null;
-    scriptureLinks: string | null;
-    book: Book | null;
-    speaker: Speaker;
-    links: SermonLink[];
-};
+type ListSpeakersResponse =
+    operations['listSpeakers']['responses']['200']['content']['application/json'];
+export type Speaker = ListSpeakersResponse['data'][number];
 
-export type SeriesListItem = {
-    id: number;
-    title: string;
-    displayTitle: string | null;
-    subtitle: string | null;
-    description: string | null;
-    latestSermonDate: string | null;
-    sermonCount: number;
-    book: Book | null;
-};
-
-export type SeriesDetail = SeriesListItem & {
-    sermons: SermonListItem[];
-};
-
-export type Pagination = {
-    page: number;
-    perPage: number;
-    total: number;
-    totalPages: number;
-};
+type ListBooksResponse =
+    operations['listBooks']['responses']['200']['content']['application/json'];
+export type Book = ListBooksResponse['data'][number];
 
 /**
  * Response shape for GET /api/sermons (after envelope unwrap).
- * Note: createApiClient automatically unwraps the { success, data } envelope,
- * so hooks receive this type directly — NOT the raw { success: true, data: { ... } } wrapper.
  */
-export type PaginatedSermonsResponse = {
-    sermons: SermonListItem[];
-    pagination: Pagination;
-};
+export type PaginatedSermonsResponse = ListSermonsResponse['data'];
 
 /* ------------------------------------------------------------------ */
 /*  Shared Component Props                                             */
