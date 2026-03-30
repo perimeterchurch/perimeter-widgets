@@ -3,8 +3,8 @@ export { mountWidget } from './shadow-dom/mount';
 export type { MountWidgetOptions, MountResult } from './shadow-dom/mount';
 
 // API Client
-export { createApiClient, ApiError } from './api/client';
-export type { ApiClient, ApiClientOptions } from './api/client';
+export { createApiClient } from './api/client';
+export type { WidgetApiClientOptions, paths, components, operations } from './api/client';
 
 // Auth
 export { getMPToken, AuthProvider, useAuth } from './auth/mp-token';
