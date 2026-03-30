@@ -47,7 +47,7 @@ export function SeriesGrid({ series, onSeriesClick }: SeriesGridProps) {
                         )}
                     </div>
                     {s.book && (
-                        <Badge variant='secondary' size='sm'>
+                        <Badge variant='secondary'>
                             {s.book.name}
                         </Badge>
                     )}

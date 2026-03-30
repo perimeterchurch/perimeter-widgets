@@ -1,5 +1,12 @@
 import { ArrowLeft } from 'lucide-react';
-import { Badge, EmptyState, Skeleton } from '@perimeter-widgets/shared';
+import {
+    Badge,
+    Empty,
+    EmptyHeader,
+    EmptyTitle,
+    EmptyDescription,
+    Skeleton,
+} from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import type { SermonsConfig } from '../../types';
 import { useSeriesDetail } from '../../hooks/use-series-detail';
@@ -30,10 +37,14 @@ export function SeriesDetail({
                 >
                     <ArrowLeft className='h-4 w-4' /> Back
                 </button>
-                <EmptyState
-                    title='Series not found'
-                    description='This series may have been removed or is unavailable.'
-                />
+                <Empty>
+                    <EmptyHeader>
+                        <EmptyTitle>Series not found</EmptyTitle>
+                        <EmptyDescription>
+                            This series may have been removed or is unavailable.
+                        </EmptyDescription>
+                    </EmptyHeader>
+                </Empty>
             </div>
         );
     }
@@ -78,7 +89,7 @@ export function SeriesDetail({
                                     {series.sermonCount !== 1 ? 's' : ''}
                                 </span>
                                 {series.book && (
-                                    <Badge variant='secondary' size='sm'>
+                                    <Badge variant='secondary'>
                                         {series.book.name}
                                     </Badge>
                                 )}

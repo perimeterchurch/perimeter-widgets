@@ -52,7 +52,7 @@ export function SermonLargeCards({
                             )}
                         </div>
                         <div className='flex items-center gap-2'>
-                            <Badge variant='secondary' size='sm'>
+                            <Badge variant='secondary'>
                                 {sermon.series.title}
                             </Badge>
                             <span className='text-xs text-stone-400'>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { SearchInput, Skeleton } from '@perimeter-widgets/shared';
+import { Input, Skeleton } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
+import { Search } from 'lucide-react';
 import type { SermonsConfig } from '../../types';
 import { useSeries } from '../../hooks/use-series';
 import { SeriesGrid } from './SeriesGrid';
@@ -30,12 +31,15 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
 
     return (
         <div className='space-y-4'>
-            <SearchInput
-                value={search}
-                onChange={setSearch}
-                placeholder='Search series...'
-                className='max-w-sm'
-            />
+            <div className='relative max-w-sm'>
+                <Search className='pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+                <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder='Search series...'
+                    className='pl-9'
+                />
+            </div>
             <SkeletonTransition
                 isLoading={isLoading}
                 skeleton={
@@ -43,8 +47,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                         {Array.from({ length: 6 }, (_, i) => (
                             <Skeleton
                                 key={i}
-                                variant='card'
-                                className='h-32 w-full'
+                                className='h-32 w-full rounded-lg'
                             />
                         ))}
                     </div>

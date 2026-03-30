@@ -1,7 +1,13 @@
 import DOMPurify from 'dompurify';
 import { DateTime } from 'luxon';
 import { ArrowLeft } from 'lucide-react';
-import { EmptyState, Skeleton } from '@perimeter-widgets/shared';
+import {
+    Empty,
+    EmptyHeader,
+    EmptyTitle,
+    EmptyDescription,
+    Skeleton,
+} from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import type { SermonsConfig } from '../../types';
 import { useSermonDetail } from '../../hooks/use-sermon-detail';
@@ -35,10 +41,14 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
                 >
                     <ArrowLeft className='h-4 w-4' /> Back
                 </button>
-                <EmptyState
-                    title='Sermon not found'
-                    description='This sermon may have been removed or is unavailable.'
-                />
+                <Empty>
+                    <EmptyHeader>
+                        <EmptyTitle>Sermon not found</EmptyTitle>
+                        <EmptyDescription>
+                            This sermon may have been removed or is unavailable.
+                        </EmptyDescription>
+                    </EmptyHeader>
+                </Empty>
             </div>
         );
     }
@@ -58,7 +68,7 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
                     <div className='space-y-4'>
                         <Skeleton className='h-8 w-2/3' />
                         <Skeleton className='h-5 w-1/2' />
-                        <Skeleton variant='card' className='h-64 w-full' />
+                        <Skeleton className='h-64 w-full rounded-lg' />
                         <Skeleton className='h-24 w-full' />
                     </div>
                 }

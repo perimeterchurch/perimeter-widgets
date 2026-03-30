@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import {
-    SearchInput,
-    ComboSelect,
+    Input,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
     Badge,
     Button,
 } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X, Search } from 'lucide-react';
 import type {
     Speaker,
     Book,
@@ -60,39 +64,78 @@ export function SermonFilters(props: SermonFiltersProps) {
         <div className='space-y-3'>
             {/* Inline filters: search, series, speaker, books */}
             <div className='flex flex-wrap items-center gap-2'>
-                <SearchInput
-                    value={props.search}
-                    onChange={props.onSearchChange}
-                    placeholder='Search sermons...'
-                    className='min-w-[200px] flex-1'
-                />
-                <ComboSelect<number>
-                    value={props.series ?? ''}
-                    onChange={(v) => props.onSeriesChange(v === '' ? null : v)}
-                    options={seriesOptions}
-                    placeholder='All Series'
-                    showAllOption
-                    allOptionLabel='All Series'
-                    loading={props.seriesLoading}
-                />
-                <ComboSelect<number>
-                    value={props.speaker ?? ''}
-                    onChange={(v) => props.onSpeakerChange(v === '' ? null : v)}
-                    options={speakerOptions}
-                    placeholder='All Speakers'
-                    showAllOption
-                    allOptionLabel='All Speakers'
-                    loading={props.speakersLoading}
-                />
-                <ComboSelect<number>
-                    value={props.book ?? ''}
-                    onChange={(v) => props.onBookChange(v === '' ? null : v)}
-                    options={bookOptions}
-                    placeholder='All Books'
-                    showAllOption
-                    allOptionLabel='All Books'
-                    loading={props.booksLoading}
-                />
+                <div className='relative min-w-[200px] flex-1'>
+                    <Search className='pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+                    <Input
+                        value={props.search}
+                        onChange={(e) => props.onSearchChange(e.target.value)}
+                        placeholder='Search sermons...'
+                        className='pl-9'
+                    />
+                </div>
+                <Select
+                    value={props.series != null ? String(props.series) : ''}
+                    onValueChange={(v) =>
+                        props.onSeriesChange(v == null || v === '' ? null : Number(v))
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder='All Series' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value=''>All Series</SelectItem>
+                        {seriesOptions.map((opt) => (
+                            <SelectItem
+                                key={opt.value}
+                                value={String(opt.value)}
+                            >
+                                {opt.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={props.speaker != null ? String(props.speaker) : ''}
+                    onValueChange={(v) =>
+                        props.onSpeakerChange(v == null || v === '' ? null : Number(v))
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder='All Speakers' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value=''>All Speakers</SelectItem>
+                        {speakerOptions.map((opt) => (
+                            <SelectItem
+                                key={opt.value}
+                                value={String(opt.value)}
+                            >
+                                {opt.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={props.book != null ? String(props.book) : ''}
+                    onValueChange={(v) =>
+                        props.onBookChange(v == null || v === '' ? null : Number(v))
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder='All Books' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value=''>All Books</SelectItem>
+                        {bookOptions.map((opt) => (
+                            <SelectItem
+                                key={opt.value}
+                                value={String(opt.value)}
+                            >
+                                {opt.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <Button
                     variant='secondary'
                     size='sm'
@@ -137,7 +180,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             onClick={() => props.onSeriesChange(null)}
                             className='inline-flex'
                         >
-                            <Badge variant='primary' size='sm'>
+                            <Badge variant='default'>
                                 {seriesOptions.find(
                                     (o) => o.value === props.series,
                                 )?.label ?? 'Series'}{' '}
@@ -151,7 +194,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             onClick={() => props.onSpeakerChange(null)}
                             className='inline-flex'
                         >
-                            <Badge variant='primary' size='sm'>
+                            <Badge variant='default'>
                                 {speakerOptions.find(
                                     (o) => o.value === props.speaker,
                                 )?.label ?? 'Speaker'}{' '}
@@ -165,7 +208,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             onClick={() => props.onBookChange(null)}
                             className='inline-flex'
                         >
-                            <Badge variant='primary' size='sm'>
+                            <Badge variant='default'>
                                 {bookOptions.find((o) => o.value === props.book)
                                     ?.label ?? 'Book'}{' '}
                                 <X className='h-3 w-3' />
@@ -178,7 +221,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             onClick={() => props.onSearchChange('')}
                             className='inline-flex'
                         >
-                            <Badge variant='secondary' size='sm'>
+                            <Badge variant='secondary'>
                                 &ldquo;{props.search}&rdquo;{' '}
                                 <X className='h-3 w-3' />
                             </Badge>

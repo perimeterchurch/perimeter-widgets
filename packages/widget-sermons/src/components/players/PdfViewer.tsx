@@ -12,8 +12,7 @@ import {
     Maximize,
     Columns2,
 } from 'lucide-react';
-import { Button } from '@perimeter-widgets/shared';
-import { LoadingSpinner } from '@perimeter-widgets/shared';
+import { Button, Spinner } from '@perimeter-widgets/shared';
 
 // Use CDN worker to avoid Turbopack bundling issues
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -351,9 +350,9 @@ export function PdfViewer({ url }: { url: string }) {
                             onLoadSuccess={onDocumentLoadSuccess}
                             loading={
                                 <div className='flex h-full w-full items-center justify-center'>
-                                    <LoadingSpinner
-                                        size='lg'
-                                        label='Loading PDF'
+                                    <Spinner
+                                        className='size-8'
+                                        aria-label='Loading PDF'
                                     />
                                 </div>
                             }

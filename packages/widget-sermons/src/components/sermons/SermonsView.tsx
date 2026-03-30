@@ -1,15 +1,24 @@
 import { useState } from 'react';
-import { Pagination, IconSelect, Skeleton } from '@perimeter-widgets/shared';
-import type { IconSelectOption } from '@perimeter-widgets/shared';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationPrevious,
+    PaginationNext,
+    PaginationEllipsis,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
+    Skeleton,
+} from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import {
     LayoutGrid,
     List,
     Rows3,
-    ArrowDownWideNarrow,
-    ArrowUpNarrowWide,
-    ArrowDownAZ,
-    ArrowUpZA,
 } from 'lucide-react';
 import type {
     SermonsConfig,
@@ -32,7 +41,7 @@ interface SermonsViewProps {
     filters: ReturnType<typeof useSermonFilters>;
 }
 
-const VIEW_OPTIONS: IconSelectOption<string>[] = [
+const VIEW_OPTIONS = [
     {
         value: 'grid',
         label: 'Card Grid',
@@ -50,28 +59,29 @@ const VIEW_OPTIONS: IconSelectOption<string>[] = [
     },
 ];
 
-const SORT_OPTIONS: IconSelectOption<string>[] = [
-    {
-        value: 'date-desc',
-        label: 'Date: Newest',
-        icon: <ArrowDownWideNarrow className='h-4 w-4' />,
-    },
-    {
-        value: 'date-asc',
-        label: 'Date: Oldest',
-        icon: <ArrowUpNarrowWide className='h-4 w-4' />,
-    },
-    {
-        value: 'title-asc',
-        label: 'Title: A-Z',
-        icon: <ArrowDownAZ className='h-4 w-4' />,
-    },
-    {
-        value: 'title-desc',
-        label: 'Title: Z-A',
-        icon: <ArrowUpZA className='h-4 w-4' />,
-    },
+const SORT_OPTIONS = [
+    { value: 'date-desc', label: 'Date: Newest' },
+    { value: 'date-asc', label: 'Date: Oldest' },
+    { value: 'title-asc', label: 'Title: A-Z' },
+    { value: 'title-desc', label: 'Title: Z-A' },
 ];
+
+/** Build a page range for the pagination component */
+function getPageRange(page: number, totalPages: number): (number | 'ellipsis')[] {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+        return pages;
+    }
+    pages.push(1);
+    if (page > 3) pages.push('ellipsis');
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (page < totalPages - 2) pages.push('ellipsis');
+    pages.push(totalPages);
+    return pages;
+}
 
 export function SermonsView({ config, filters }: SermonsViewProps) {
     const [viewMode, setViewMode] = useState<ViewMode>(
@@ -130,16 +140,40 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                     {pagination ? `${pagination.total} sermons` : ''}
                 </span>
                 <div className='flex items-center gap-2'>
-                    <IconSelect
+                    <Select
                         value={sortValue}
-                        onChange={handleSortChange}
-                        options={SORT_OPTIONS}
-                    />
-                    <IconSelect
+                        onValueChange={(v) => v && handleSortChange(v)}
+                    >
+                        <SelectTrigger size='sm'>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {SORT_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select
                         value={viewMode}
-                        onChange={(v) => setViewMode(v as ViewMode)}
-                        options={VIEW_OPTIONS}
-                    />
+                        onValueChange={(v) =>
+                            v && setViewMode(v as ViewMode)
+                        }
+                    >
+                        <SelectTrigger size='sm'>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {VIEW_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                    <span className='flex items-center gap-1.5'>
+                                        {opt.icon} {opt.label}
+                                    </span>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
             <SkeletonTransition
@@ -149,8 +183,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                         {Array.from({ length: config.perPage }, (_, i) => (
                             <Skeleton
                                 key={i}
-                                variant='card'
-                                className='h-48 w-full'
+                                className='h-48 w-full rounded-lg'
                             />
                         ))}
                     </div>
@@ -162,11 +195,65 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 />
             </SkeletonTransition>
             {pagination && pagination.totalPages > 1 && (
-                <Pagination
-                    page={pagination.page}
-                    totalPages={pagination.totalPages}
-                    onChange={filters.setPage}
-                />
+                <Pagination>
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious
+                                onClick={() =>
+                                    filters.setPage(
+                                        Math.max(1, pagination.page - 1),
+                                    )
+                                }
+                                aria-disabled={pagination.page <= 1}
+                                className={
+                                    pagination.page <= 1
+                                        ? 'pointer-events-none opacity-50'
+                                        : 'cursor-pointer'
+                                }
+                            />
+                        </PaginationItem>
+                        {getPageRange(
+                            pagination.page,
+                            pagination.totalPages,
+                        ).map((item, idx) =>
+                            item === 'ellipsis' ? (
+                                <PaginationItem key={`e-${idx}`}>
+                                    <PaginationEllipsis />
+                                </PaginationItem>
+                            ) : (
+                                <PaginationItem key={item}>
+                                    <PaginationLink
+                                        isActive={item === pagination.page}
+                                        onClick={() => filters.setPage(item)}
+                                        className='cursor-pointer'
+                                    >
+                                        {item}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ),
+                        )}
+                        <PaginationItem>
+                            <PaginationNext
+                                onClick={() =>
+                                    filters.setPage(
+                                        Math.min(
+                                            pagination.totalPages,
+                                            pagination.page + 1,
+                                        ),
+                                    )
+                                }
+                                aria-disabled={
+                                    pagination.page >= pagination.totalPages
+                                }
+                                className={
+                                    pagination.page >= pagination.totalPages
+                                        ? 'pointer-events-none opacity-50'
+                                        : 'cursor-pointer'
+                                }
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
             )}
         </div>
     );
