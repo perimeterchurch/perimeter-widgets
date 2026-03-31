@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import type { ConfigField } from '@/registry';
 
 interface ConfigEditorProps {
     fields: ConfigField[];
     values: Record<string, string | number | boolean>;
-    onChange: (key: string, value: string | number | boolean) => void;
+    onChange: (values: Record<string, string | number | boolean>) => void;
     onReset: () => void;
 }
 
@@ -13,26 +14,56 @@ export function ConfigEditor({
     onChange,
     onReset,
 }: ConfigEditorProps) {
+    const [draft, setDraft] = useState(values);
+    const isDirty = JSON.stringify(draft) !== JSON.stringify(values);
+
+    const updateField = (key: string, value: string | number | boolean) => {
+        setDraft((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const apply = () => {
+        onChange(draft);
+    };
+
+    const reset = () => {
+        onReset();
+        const defaults: Record<string, string | number | boolean> = {};
+        for (const field of fields) {
+            defaults[field.key] = field.defaultValue;
+        }
+        setDraft(defaults);
+    };
+
     return (
         <div className='border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-800'>
             <div className='flex items-center justify-between px-4 py-3 border-b border-stone-200 dark:border-stone-700'>
                 <h4 className='text-sm font-semibold text-stone-800 dark:text-stone-200'>
                     Configuration
                 </h4>
-                <button
-                    onClick={onReset}
-                    className='text-xs text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors'
-                >
-                    Reset to defaults
-                </button>
+                <div className='flex items-center gap-2'>
+                    {isDirty && (
+                        <button
+                            onClick={apply}
+                            className='text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded transition-colors'
+                        >
+                            Apply
+                        </button>
+                    )}
+                    <button
+                        onClick={reset}
+                        className='text-xs text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors'
+                    >
+                        Reset
+                    </button>
+                </div>
             </div>
             <div className='p-4 grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 {fields.map((field) => (
                     <FieldInput
                         key={field.key}
                         field={field}
-                        value={values[field.key] ?? field.defaultValue}
-                        onChange={(value) => onChange(field.key, value)}
+                        value={draft[field.key] ?? field.defaultValue}
+                        onChange={(value) => updateField(field.key, value)}
                     />
                 ))}
             </div>
@@ -42,7 +73,7 @@ export function ConfigEditor({
                     <code className='text-stone-500 dark:text-stone-300'>
                         {fields
                             .map((f) => {
-                                const val = values[f.key] ?? f.defaultValue;
+                                const val = draft[f.key] ?? f.defaultValue;
                                 if (val === '' || val === false) return null;
                                 const attr = f.key.replace(
                                     /[A-Z]/g,

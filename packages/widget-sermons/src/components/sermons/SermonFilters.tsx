@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
@@ -10,6 +10,7 @@ import {
     SelectItem,
     Badge,
     Button,
+    Checkbox,
 } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SlidersHorizontal, X, Search } from 'lucide-react';
@@ -27,7 +28,7 @@ export interface SermonFiltersProps {
     series: number | null;
     speaker: number | null;
     book: number | null;
-    serviceType: number | null;
+    selectedServiceTypeIds: number[];
     from: string;
     to: string;
     sort: SortField;
@@ -46,7 +47,8 @@ export interface SermonFiltersProps {
     onSeriesChange: (value: number | null) => void;
     onSpeakerChange: (value: number | null) => void;
     onBookChange: (value: number | null) => void;
-    onServiceTypeChange: (value: number | null) => void;
+    onToggleServiceType: (id: number) => void;
+    onClearServiceTypes: () => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
@@ -156,36 +158,11 @@ export function SermonFilters(props: SermonFiltersProps) {
                     </SelectContent>
                 </Select>
                 {props.showServiceTypeFilter && (
-                    <Select
-                        value={
-                            props.serviceType != null
-                                ? String(props.serviceType)
-                                : ''
-                        }
-                        onValueChange={(v) =>
-                            props.onServiceTypeChange(
-                                v == null || v === '' ? null : Number(v),
-                            )
-                        }
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder='All Service Types' />
-                        </SelectTrigger>
-                        <SelectContent
-                            align='start'
-                            alignItemWithTrigger={false}
-                        >
-                            <SelectItem value=''>All Service Types</SelectItem>
-                            {serviceTypeOptions.map((opt) => (
-                                <SelectItem
-                                    key={opt.value}
-                                    value={String(opt.value)}
-                                >
-                                    {opt.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <ServiceTypeMultiSelect
+                        options={serviceTypeOptions}
+                        selected={props.selectedServiceTypeIds}
+                        onToggle={props.onToggleServiceType}
+                    />
                 )}
                 <Button
                     variant='secondary'
@@ -266,20 +243,21 @@ export function SermonFilters(props: SermonFiltersProps) {
                             </Badge>
                         </button>
                     )}
-                    {props.serviceType && (
+                    {props.selectedServiceTypeIds.map((id) => (
                         <button
+                            key={id}
                             type='button'
-                            onClick={() => props.onServiceTypeChange(null)}
+                            onClick={() => props.onToggleServiceType(id)}
                             className='inline-flex'
                         >
                             <Badge variant='default'>
                                 {serviceTypeOptions.find(
-                                    (o) => o.value === props.serviceType,
+                                    (o) => o.value === id,
                                 )?.label ?? 'Service Type'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
-                    )}
+                    ))}
                     {props.search && (
                         <button
                             type='button'
@@ -292,6 +270,69 @@ export function SermonFilters(props: SermonFiltersProps) {
                             </Badge>
                         </button>
                     )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ServiceTypeMultiSelect({
+    options,
+    selected,
+    onToggle,
+}: {
+    options: { value: number; label: string }[];
+    selected: number[];
+    onToggle: (id: number) => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!open) return;
+        const handleClick = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [open]);
+
+    const label =
+        selected.length === 0 ? 'Service Types'
+        : selected.length === 1 ?
+            (options.find((o) => o.value === selected[0])?.label ??
+            'Service Type')
+        :   `${selected.length} Service Types`;
+
+    return (
+        <div ref={ref} className='relative'>
+            <Button
+                variant='outline'
+                size='default'
+                onClick={() => setOpen(!open)}
+                className='text-sm whitespace-nowrap'
+            >
+                {label}
+            </Button>
+            {open && (
+                <div className='absolute top-full left-0 z-50 mt-1 min-w-48 rounded-lg bg-popover p-1 shadow-md ring-1 ring-foreground/10'>
+                    {options.map((opt) => (
+                        <button
+                            key={opt.value}
+                            type='button'
+                            onClick={() => onToggle(opt.value)}
+                            className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground'
+                        >
+                            <Checkbox
+                                checked={selected.includes(opt.value)}
+                                readOnly
+                                className='pointer-events-none'
+                            />
+                            {opt.label}
+                        </button>
+                    ))}
                 </div>
             )}
         </div>

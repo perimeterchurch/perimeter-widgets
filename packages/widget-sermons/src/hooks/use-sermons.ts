@@ -8,7 +8,7 @@ export interface UseSermonsParams {
     series?: number | null;
     speaker?: number | null;
     book?: number | null;
-    serviceType?: number | null;
+    selectedServiceTypeIds?: number[];
     serviceTypeId?: string;
     from?: string | null;
     to?: string | null;
@@ -24,7 +24,7 @@ export function useSermons(params: UseSermonsParams) {
         series,
         speaker,
         book,
-        serviceType,
+        selectedServiceTypeIds = [],
         serviceTypeId,
         from,
         to,
@@ -34,9 +34,11 @@ export function useSermons(params: UseSermonsParams) {
         config,
     } = params;
 
-    // Merge: explicit filter selection takes priority, then config-resolved IDs
+    // Merge: UI filter selection takes priority, then config-resolved IDs
     const resolvedServiceTypeId =
-        serviceType != null ? String(serviceType) : (serviceTypeId ?? undefined);
+        selectedServiceTypeIds.length > 0
+            ? selectedServiceTypeIds.join(',')
+            : (serviceTypeId ?? undefined);
 
     return useQuery({
         queryKey: [

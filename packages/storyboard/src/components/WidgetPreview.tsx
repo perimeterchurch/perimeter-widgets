@@ -34,8 +34,8 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
     }, []);
 
     const handleChange = useCallback(
-        (key: string, value: string | number | boolean) => {
-            setConfig((prev) => ({ ...prev, [key]: value }));
+        (newValues: Record<string, string | number | boolean>) => {
+            setConfig(newValues);
         },
         [],
     );

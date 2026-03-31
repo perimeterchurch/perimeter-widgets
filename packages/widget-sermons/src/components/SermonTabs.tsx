@@ -27,7 +27,10 @@ export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
                     >
                         {tab.label}
                         {tab.id === 'compilations' && (
-                            <Badge variant='secondary' className='ml-1'>
+                            <Badge
+                                variant='secondary'
+                                className='ml-1.5 px-1.5 py-0 text-[10px] leading-4 font-medium rounded-full'
+                            >
                                 Soon
                             </Badge>
                         )}

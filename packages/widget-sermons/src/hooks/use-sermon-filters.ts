@@ -18,13 +18,27 @@ const sermonParams = {
     series: parseAsInteger,
     speaker: parseAsInteger,
     book: parseAsInteger,
-    serviceType: parseAsInteger,
+    serviceTypes: parseAsString,
     from: parseAsString,
     to: parseAsString,
     sort: parseAsStringLiteral(['date', 'title'] as const).withDefault('date'),
     order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault('desc'),
     page: parseAsInteger.withDefault(1),
 };
+
+/** Parse comma-separated IDs string into number array */
+function parseServiceTypeIds(value: string | null): number[] {
+    if (!value) return [];
+    return value
+        .split(',')
+        .map((s) => Number(s.trim()))
+        .filter((n) => !isNaN(n) && n > 0);
+}
+
+/** Serialize number array into comma-separated string */
+function serializeServiceTypeIds(ids: number[]): string | null {
+    return ids.length > 0 ? ids.join(',') : null;
+}
 
 export function useSermonFilters() {
     const [params, setParams] = useQueryStates(sermonParams, {
@@ -61,8 +75,16 @@ export function useSermonFilters() {
         setParams({ book: bookId, page: 1 });
     };
 
-    const setServiceType = (serviceTypeId: number | null) => {
-        setParams({ serviceType: serviceTypeId, page: 1 });
+    const toggleServiceType = (id: number) => {
+        const current = parseServiceTypeIds(params.serviceTypes);
+        const next = current.includes(id)
+            ? current.filter((x) => x !== id)
+            : [...current, id];
+        setParams({ serviceTypes: serializeServiceTypeIds(next), page: 1 });
+    };
+
+    const clearServiceTypes = () => {
+        setParams({ serviceTypes: null, page: 1 });
     };
 
     const setDateRange = (from: string | null, to: string | null) => {
@@ -77,13 +99,15 @@ export function useSermonFilters() {
         setParams({ page });
     };
 
+    const selectedServiceTypeIds = parseServiceTypeIds(params.serviceTypes);
+
     const clearFilters = () => {
         setParams({
             search: null,
             series: null,
             speaker: null,
             book: null,
-            serviceType: null,
+            serviceTypes: null,
             from: null,
             to: null,
             sort: 'date',
@@ -97,19 +121,21 @@ export function useSermonFilters() {
         || params.series !== null
         || params.speaker !== null
         || params.book !== null
-        || params.serviceType !== null
+        || selectedServiceTypeIds.length > 0
         || params.from !== null
         || params.to !== null;
 
     return {
         ...params,
+        selectedServiceTypeIds,
         setTab,
         setScreen,
         setSearch,
         setSeries,
         setSpeaker,
         setBook,
-        setServiceType,
+        toggleServiceType,
+        clearServiceTypes,
         setDateRange,
         setSort,
         setPage,
