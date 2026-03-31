@@ -6,6 +6,7 @@ import {
     mockSeries,
     mockSpeakers,
     mockBooks,
+    mockServiceTypes,
 } from '@/mocks/data/sermons';
 
 type ListSermonsResponse =
@@ -91,6 +92,13 @@ function apiHandlers(origin: string) {
                 success: true,
                 data: { ...series, sermons },
             } satisfies GetSeriesDetailResponse);
+        }),
+
+        http.get(`${origin}/api/sermons/service-types`, () => {
+            return HttpResponse.json({
+                success: true,
+                data: mockServiceTypes,
+            });
         }),
 
         http.get(`${origin}/api/sermons/speakers`, () => {

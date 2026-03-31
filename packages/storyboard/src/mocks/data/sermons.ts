@@ -4,6 +4,7 @@ import type {
     SeriesListItem,
     Speaker,
     Book,
+    ServiceType,
 } from '@perimeter-widgets/widget-sermons/types';
 
 export const mockSpeakers: Speaker[] = [
@@ -13,6 +14,13 @@ export const mockSpeakers: Speaker[] = [
         bio: 'Senior Pastor at Perimeter Church since 2010.',
     },
     { id: 2, name: 'Pastor Jane Doe', bio: 'Teaching Pastor and author.' },
+];
+
+export const mockServiceTypes: ServiceType[] = [
+    { id: 1, name: 'Worship Service' },
+    { id: 2, name: 'Youth' },
+    { id: 3, name: 'Kids' },
+    { id: 4, name: 'Special Event' },
 ];
 
 export const mockBooks: Book[] = [

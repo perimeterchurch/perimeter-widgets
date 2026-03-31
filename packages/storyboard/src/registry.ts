@@ -60,21 +60,13 @@ export const widgetRegistry: WidgetDefinition[] = [
             };
         },
         configFields: [
-            // NOTE: Migrated from string slugs to integer congregation IDs.
-            // Existing WordPress embeds using data-campus="buckhead" will still work
-            // via resolveCampusId() backwards-compatible mapping in the widget.
             {
-                key: 'campus',
-                label: 'Campus',
-                type: 'select',
+                key: 'serviceTypes',
+                label: 'Service Types',
+                type: 'text',
                 defaultValue: '',
-                options: [
-                    { label: 'All Campuses', value: '' },
-                    { label: 'Buckhead', value: '1' },
-                    { label: 'Brookhaven', value: '2' },
-                    { label: 'Peachtree Corners', value: '3' },
-                ],
-                description: 'Filter sermons by campus location',
+                description:
+                    'Comma-separated service type names to filter by (e.g., "Worship Service,Youth"). Leave blank to show a dropdown filter instead.',
             },
             {
                 key: 'perPage',

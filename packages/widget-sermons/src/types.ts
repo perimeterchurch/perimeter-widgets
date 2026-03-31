@@ -6,7 +6,7 @@ import type { operations } from '@perimeter-widgets/shared';
 /* ------------------------------------------------------------------ */
 
 export const SermonsConfigSchema = z.object({
-    campus: z.union([z.number(), z.string()]).optional(),
+    serviceTypes: z.string().optional(),
     perPage: z.number().default(12),
     defaultTab: z.enum(['sermons', 'series']).default('sermons'),
     defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
@@ -70,20 +70,30 @@ export type SortField = 'date' | 'title';
 export type SortOrder = 'asc' | 'desc';
 
 /* ------------------------------------------------------------------ */
-/*  Campus ID Mapping (backwards compat)                               */
+/*  Service Type                                                       */
 /* ------------------------------------------------------------------ */
 
-const CAMPUS_SLUG_MAP: Record<string, number> = {
-    buckhead: 1,
-    brookhaven: 2,
-    'peachtree-corners': 3,
-};
+export interface ServiceType {
+    id: number;
+    name: string;
+}
 
-/** Resolve campus config (string slug or number) to a congregation ID */
-export function resolveCampusId(
-    campus: string | number | undefined,
-): number | undefined {
-    if (campus === undefined || campus === '') return undefined;
-    if (typeof campus === 'number') return campus;
-    return CAMPUS_SLUG_MAP[campus] ?? undefined;
+/**
+ * Resolve comma-separated service type names from config against the
+ * fetched service types list using fuzzy (substring) matching.
+ * Returns a comma-separated string of matched IDs, or undefined if none.
+ */
+export function resolveServiceTypeIds(
+    configNames: string | undefined,
+    serviceTypes: ServiceType[],
+): string | undefined {
+    if (!configNames) return undefined;
+    const names = configNames.split(',').map((n) => n.toLowerCase().trim()).filter(Boolean);
+    if (names.length === 0) return undefined;
+
+    const matchedIds = serviceTypes
+        .filter((st) => names.some((n) => st.name.toLowerCase().includes(n)))
+        .map((st) => st.id);
+
+    return matchedIds.length > 0 ? matchedIds.join(',') : undefined;
 }

@@ -1,14 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
 import type { SortField, SortOrder } from '../types';
-import { resolveCampusId, type SermonsConfig } from '../types';
+import type { SermonsConfig } from '../types';
 
 export interface UseSermonsParams {
     search?: string;
     series?: number | null;
     speaker?: number | null;
     book?: number | null;
-    campus?: number | null;
+    serviceType?: number | null;
+    serviceTypeId?: string;
     from?: string | null;
     to?: string | null;
     sort?: SortField;
@@ -23,7 +24,8 @@ export function useSermons(params: UseSermonsParams) {
         series,
         speaker,
         book,
-        campus,
+        serviceType,
+        serviceTypeId,
         from,
         to,
         sort = 'date',
@@ -31,7 +33,10 @@ export function useSermons(params: UseSermonsParams) {
         page = 1,
         config,
     } = params;
-    const campusId = campus ?? resolveCampusId(config.campus);
+
+    // Merge: explicit filter selection takes priority, then config-resolved IDs
+    const resolvedServiceTypeId =
+        serviceType != null ? String(serviceType) : (serviceTypeId ?? undefined);
 
     return useQuery({
         queryKey: [
@@ -41,7 +46,7 @@ export function useSermons(params: UseSermonsParams) {
                 series,
                 speaker,
                 book,
-                campus: campusId,
+                serviceTypeId: resolvedServiceTypeId,
                 from,
                 to,
                 sort,
@@ -59,14 +64,14 @@ export function useSermons(params: UseSermonsParams) {
                         seriesId: series ?? undefined,
                         speakerId: speaker ?? undefined,
                         bookId: book ?? undefined,
-                        congregationId: campusId,
                         from: from ?? undefined,
                         to: to ?? undefined,
                         sort,
                         order,
                         page,
                         perPage: config.perPage,
-                    },
+                        serviceTypeId: resolvedServiceTypeId,
+                    } as Record<string, unknown>,
                 },
             });
             if (error) throw new Error('Failed to fetch sermons');

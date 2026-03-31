@@ -17,6 +17,7 @@ import type {
     Speaker,
     Book,
     SeriesListItem,
+    ServiceType,
     SortField,
     SortOrder,
 } from '../../types';
@@ -26,6 +27,7 @@ export interface SermonFiltersProps {
     series: number | null;
     speaker: number | null;
     book: number | null;
+    serviceType: number | null;
     from: string;
     to: string;
     sort: SortField;
@@ -34,13 +36,17 @@ export interface SermonFiltersProps {
     seriesList: SeriesListItem[];
     speakers: Speaker[];
     books: Book[];
+    serviceTypes: ServiceType[];
+    showServiceTypeFilter: boolean;
     seriesLoading?: boolean;
     speakersLoading?: boolean;
     booksLoading?: boolean;
+    serviceTypesLoading?: boolean;
     onSearchChange: (value: string) => void;
     onSeriesChange: (value: number | null) => void;
     onSpeakerChange: (value: number | null) => void;
     onBookChange: (value: number | null) => void;
+    onServiceTypeChange: (value: number | null) => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
@@ -60,6 +66,10 @@ export function SermonFilters(props: SermonFiltersProps) {
     const bookOptions = props.books.map((b) => ({
         value: b.id,
         label: b.name,
+    }));
+    const serviceTypeOptions = props.serviceTypes.map((st) => ({
+        value: st.id,
+        label: st.name,
     }));
 
     return (
@@ -145,6 +155,38 @@ export function SermonFilters(props: SermonFiltersProps) {
                         ))}
                     </SelectContent>
                 </Select>
+                {props.showServiceTypeFilter && (
+                    <Select
+                        value={
+                            props.serviceType != null
+                                ? String(props.serviceType)
+                                : ''
+                        }
+                        onValueChange={(v) =>
+                            props.onServiceTypeChange(
+                                v == null || v === '' ? null : Number(v),
+                            )
+                        }
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder='All Service Types' />
+                        </SelectTrigger>
+                        <SelectContent
+                            align='start'
+                            alignItemWithTrigger={false}
+                        >
+                            <SelectItem value=''>All Service Types</SelectItem>
+                            {serviceTypeOptions.map((opt) => (
+                                <SelectItem
+                                    key={opt.value}
+                                    value={String(opt.value)}
+                                >
+                                    {opt.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
                 <Button
                     variant='secondary'
                     size='sm'
@@ -220,6 +262,20 @@ export function SermonFilters(props: SermonFiltersProps) {
                             <Badge variant='default'>
                                 {bookOptions.find((o) => o.value === props.book)
                                     ?.label ?? 'Book'}{' '}
+                                <X className='h-3 w-3' />
+                            </Badge>
+                        </button>
+                    )}
+                    {props.serviceType && (
+                        <button
+                            type='button'
+                            onClick={() => props.onServiceTypeChange(null)}
+                            className='inline-flex'
+                        >
+                            <Badge variant='default'>
+                                {serviceTypeOptions.find(
+                                    (o) => o.value === props.serviceType,
+                                )?.label ?? 'Service Type'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>

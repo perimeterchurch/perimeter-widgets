@@ -18,7 +18,7 @@ const sermonParams = {
     series: parseAsInteger,
     speaker: parseAsInteger,
     book: parseAsInteger,
-    campus: parseAsInteger,
+    serviceType: parseAsInteger,
     from: parseAsString,
     to: parseAsString,
     sort: parseAsStringLiteral(['date', 'title'] as const).withDefault('date'),
@@ -61,8 +61,8 @@ export function useSermonFilters() {
         setParams({ book: bookId, page: 1 });
     };
 
-    const setCampus = (campusId: number | null) => {
-        setParams({ campus: campusId, page: 1 });
+    const setServiceType = (serviceTypeId: number | null) => {
+        setParams({ serviceType: serviceTypeId, page: 1 });
     };
 
     const setDateRange = (from: string | null, to: string | null) => {
@@ -83,7 +83,7 @@ export function useSermonFilters() {
             series: null,
             speaker: null,
             book: null,
-            campus: null,
+            serviceType: null,
             from: null,
             to: null,
             sort: 'date',
@@ -97,7 +97,7 @@ export function useSermonFilters() {
         || params.series !== null
         || params.speaker !== null
         || params.book !== null
-        || params.campus !== null
+        || params.serviceType !== null
         || params.from !== null
         || params.to !== null;
 
@@ -109,7 +109,7 @@ export function useSermonFilters() {
         setSeries,
         setSpeaker,
         setBook,
-        setCampus,
+        setServiceType,
         setDateRange,
         setSort,
         setPage,
