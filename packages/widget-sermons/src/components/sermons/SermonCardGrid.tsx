@@ -1,6 +1,7 @@
 import { Badge } from '@perimeter-widgets/shared';
 import type { SermonListViewProps } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
+import { ImagePlaceholder } from '../ui/ImagePlaceholder';
 
 export type { SermonListViewProps };
 
@@ -34,7 +35,7 @@ export function SermonCardGrid({
                             (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                         }}
                     />
-                    <div className='hidden h-40 w-full bg-gradient-to-br from-primary/80 to-primary' />
+                    <ImagePlaceholder className='hidden h-40 w-full' />
                     <div className='p-3 space-y-1'>
                         <p className='font-semibold text-sm leading-snug text-stone-900 dark:text-stone-100 line-clamp-2'>
                             {sermon.title}

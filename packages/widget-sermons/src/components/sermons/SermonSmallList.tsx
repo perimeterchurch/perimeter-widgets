@@ -1,6 +1,7 @@
 import { Badge } from '@perimeter-widgets/shared';
 import type { SermonListViewProps } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
+import { ImagePlaceholder } from '../ui/ImagePlaceholder';
 
 export type { SermonListViewProps };
 
@@ -35,7 +36,7 @@ export function SermonSmallList({
                             img.nextElementSibling?.classList.remove('hidden');
                         }}
                     />
-                    <div className='hidden h-12 w-12 flex-shrink-0 rounded bg-gradient-to-br from-primary/80 to-primary' />
+                    <ImagePlaceholder className='hidden h-12 w-12 flex-shrink-0 rounded' />
                     <div className='min-w-0 flex-1 space-y-0.5'>
                         <p className='truncate font-medium text-sm text-stone-900 dark:text-stone-100'>
                             {sermon.title}

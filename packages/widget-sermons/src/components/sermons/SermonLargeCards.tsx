@@ -1,6 +1,7 @@
 import { Badge } from '@perimeter-widgets/shared';
 import type { SermonListViewProps } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
+import { ImagePlaceholder } from '../ui/ImagePlaceholder';
 
 export type { SermonListViewProps };
 
@@ -36,8 +37,8 @@ export function SermonLargeCards({
                             img.nextElementSibling?.classList.remove('hidden');
                         }}
                     />
-                    <div
-                        className='hidden w-44 flex-shrink-0 bg-gradient-to-br from-primary/80 to-primary'
+                    <ImagePlaceholder
+                        className='hidden w-44 flex-shrink-0'
                         style={{ minHeight: '120px' }}
                     />
                     <div className='flex flex-1 flex-col justify-between p-4 space-y-2'>
