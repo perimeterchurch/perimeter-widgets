@@ -16,6 +16,12 @@ export default defineConfig({
                 target: 'http://localhost:5500',
                 changeOrigin: true,
             },
+            // Proxy S3 file requests to avoid CORS issues in dev
+            '/s3-proxy': {
+                target: 'https://perimeter-files.s3.amazonaws.com',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/s3-proxy/, ''),
+            },
         },
     },
 });

@@ -13,6 +13,7 @@ import {
     Columns2,
 } from 'lucide-react';
 import { Button, Spinner } from '@perimeter-widgets/shared';
+import { proxyS3Url } from '../../lib/format';
 
 // Use CDN worker to avoid Turbopack bundling issues
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -38,7 +39,8 @@ const THUMBNAIL_WIDTH = 120;
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export function PdfViewer({ url }: { url: string }) {
+export function PdfViewer({ url: rawUrl }: { url: string }) {
+    const url = proxyS3Url(rawUrl);
     const [numPages, setNumPages] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [scale, setScale] = useState<number>(1.0);
