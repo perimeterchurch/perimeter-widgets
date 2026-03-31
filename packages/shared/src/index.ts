@@ -19,6 +19,12 @@ export type { MPAuthState } from './auth/mp-token';
 export { ConfigProvider, useConfig } from './shadow-dom/config';
 export type { WidgetConfig } from './shadow-dom/config';
 
+// Portal Container (shadow DOM)
+export {
+    PortalContainerProvider,
+    usePortalContainer,
+} from './shadow-dom/portal-container';
+
 // React Query
 export { createQueryClient } from './api/query-client';
 

@@ -8,6 +8,7 @@ import {
     parseDataAttributes,
     type WidgetConfig,
 } from './config';
+import { PortalContainerProvider } from './portal-container';
 
 export interface MountWidgetOptions {
     /** ID of the target DOM element (e.g., 'perimeter-sermons') */
@@ -93,13 +94,15 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
 
     root.render(
         <StrictMode>
-            <QueryClientProvider client={queryClient}>
-                <AuthProvider requiresAuth={requiresAuth}>
-                    <ConfigProvider config={config}>
-                        <Component />
-                    </ConfigProvider>
-                </AuthProvider>
-            </QueryClientProvider>
+            <PortalContainerProvider container={mountPoint}>
+                <QueryClientProvider client={queryClient}>
+                    <AuthProvider requiresAuth={requiresAuth}>
+                        <ConfigProvider config={config}>
+                            <Component />
+                        </ConfigProvider>
+                    </AuthProvider>
+                </QueryClientProvider>
+            </PortalContainerProvider>
         </StrictMode>,
     );
 
