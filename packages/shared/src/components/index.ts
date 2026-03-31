@@ -1,5 +1,9 @@
-// Registry components — top-level ui/ (unique, not in perimeter preset)
+// Registry components — top-level ui/
 export * from './ui/input-group';
+export { Input as BaseInput } from './ui/input';
+export { Textarea as BaseTextarea } from './ui/textarea';
+export { Button as BaseButton } from './ui/button';
+export { Dialog as BaseDialog } from './ui/dialog';
 
 // Registry components — perimeter preset
 export * from './ui/perimeter/avatar';

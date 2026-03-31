@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import {
-    Input,
+    InputGroup,
+    InputGroupAddon,
+    InputGroupInput,
     Select,
     SelectTrigger,
     SelectValue,
@@ -64,15 +66,16 @@ export function SermonFilters(props: SermonFiltersProps) {
         <div className='space-y-3'>
             {/* Inline filters: search, series, speaker, books */}
             <div className='flex flex-wrap items-center gap-2'>
-                <div className='relative min-w-[200px] flex-1'>
-                    <Search className='pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-                    <Input
+                <InputGroup className='min-w-[200px] flex-1'>
+                    <InputGroupAddon align='inline-start'>
+                        <Search />
+                    </InputGroupAddon>
+                    <InputGroupInput
                         value={props.search}
                         onChange={(e) => props.onSearchChange(e.target.value)}
                         placeholder='Search sermons...'
-                        className='pl-9'
                     />
-                </div>
+                </InputGroup>
                 <Select
                     value={props.series != null ? String(props.series) : ''}
                     onValueChange={(v) =>
@@ -84,7 +87,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                     <SelectTrigger>
                         <SelectValue placeholder='All Series' />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent align='start' alignItemWithTrigger={false}>
                         <SelectItem value=''>All Series</SelectItem>
                         {seriesOptions.map((opt) => (
                             <SelectItem
@@ -107,7 +110,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                     <SelectTrigger>
                         <SelectValue placeholder='All Speakers' />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent align='start' alignItemWithTrigger={false}>
                         <SelectItem value=''>All Speakers</SelectItem>
                         {speakerOptions.map((opt) => (
                             <SelectItem
@@ -130,7 +133,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                     <SelectTrigger>
                         <SelectValue placeholder='All Books' />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent align='start' alignItemWithTrigger={false}>
                         <SelectItem value=''>All Books</SelectItem>
                         {bookOptions.map((opt) => (
                             <SelectItem

@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { Input, Skeleton } from '@perimeter-widgets/shared';
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupInput,
+    Skeleton,
+} from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import { Search } from 'lucide-react';
 import type { SermonsConfig } from '../../types';
@@ -31,15 +36,16 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
 
     return (
         <div className='space-y-4'>
-            <div className='relative max-w-sm'>
-                <Search className='pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-                <Input
+            <InputGroup className='max-w-sm'>
+                <InputGroupAddon align='inline-start'>
+                    <Search />
+                </InputGroupAddon>
+                <InputGroupInput
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder='Search series...'
-                    className='pl-9'
                 />
-            </div>
+            </InputGroup>
             <SkeletonTransition
                 isLoading={isLoading}
                 skeleton={
