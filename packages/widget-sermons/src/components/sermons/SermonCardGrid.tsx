@@ -1,6 +1,6 @@
 import { Badge } from '@perimeter-widgets/shared';
 import type { SermonListViewProps } from '../../types';
-import { formatDate } from '../../lib/format';
+import { formatDate, sermonImageUrl } from '../../lib/format';
 
 export type { SermonListViewProps };
 
@@ -25,14 +25,16 @@ export function SermonCardGrid({
                     onClick={() => onSermonClick(sermon.id)}
                     className='overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700 text-left transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
                 >
-                    {sermon.bannerUrl ?
-                        <img
-                            src={sermon.bannerUrl}
-                            alt={sermon.title}
-                            className='h-40 w-full object-cover'
-                        />
-                    :   <div className='h-40 w-full bg-gradient-to-br from-primary/80 to-primary' />
-                    }
+                    <img
+                        src={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
+                        alt={sermon.title}
+                        className='h-40 w-full object-cover'
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                        }}
+                    />
+                    <div className='hidden h-40 w-full bg-gradient-to-br from-primary/80 to-primary' />
                     <div className='p-3 space-y-1'>
                         <p className='font-semibold text-sm leading-snug text-stone-900 dark:text-stone-100 line-clamp-2'>
                             {sermon.title}

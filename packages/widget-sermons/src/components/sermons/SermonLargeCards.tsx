@@ -1,6 +1,6 @@
 import { Badge } from '@perimeter-widgets/shared';
 import type { SermonListViewProps } from '../../types';
-import { formatDate } from '../../lib/format';
+import { formatDate, sermonImageUrl } from '../../lib/format';
 
 export type { SermonListViewProps };
 
@@ -25,18 +25,21 @@ export function SermonLargeCards({
                     onClick={() => onSermonClick(sermon.id)}
                     className='flex w-full overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700 text-left transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
                 >
-                    {sermon.bannerUrl ?
-                        <img
-                            src={sermon.bannerUrl}
-                            alt={sermon.title}
-                            className='h-auto w-44 flex-shrink-0 object-cover'
-                            style={{ minHeight: '120px' }}
-                        />
-                    :   <div
-                            className='w-44 flex-shrink-0 bg-gradient-to-br from-primary/80 to-primary'
-                            style={{ minHeight: '120px' }}
-                        />
-                    }
+                    <img
+                        src={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
+                        alt={sermon.title}
+                        className='h-auto w-44 flex-shrink-0 object-cover'
+                        style={{ minHeight: '120px' }}
+                        onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.style.display = 'none';
+                            img.nextElementSibling?.classList.remove('hidden');
+                        }}
+                    />
+                    <div
+                        className='hidden w-44 flex-shrink-0 bg-gradient-to-br from-primary/80 to-primary'
+                        style={{ minHeight: '120px' }}
+                    />
                     <div className='flex flex-1 flex-col justify-between p-4 space-y-2'>
                         <div className='space-y-1'>
                             <p className='font-semibold text-base leading-snug text-stone-900 dark:text-stone-100 line-clamp-2'>
