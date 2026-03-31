@@ -88,8 +88,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const [viewMode, setViewMode] = useState<ViewMode>(
         config.defaultView ?? 'grid',
     );
-    const { data: serviceTypes = [], isLoading: serviceTypesLoading } =
-        useServiceTypes(config);
+    const { data: serviceTypes = [] } = useServiceTypes(config);
     const configServiceTypeIds = resolveServiceTypeIds(
         config.serviceTypes,
         serviceTypes,
@@ -97,15 +96,22 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const showServiceTypeFilter = !config.serviceTypes;
 
     const { data, isLoading } = useSermons({
-        ...filters,
-        config,
+        search: filters.search,
+        selectedSeriesIds: filters.selectedSeriesIds,
+        selectedSpeakerIds: filters.selectedSpeakerIds,
+        selectedBookIds: filters.selectedBookIds,
+        selectedServiceTypeIds: filters.selectedServiceTypeIds,
         serviceTypeId: configServiceTypeIds,
+        from: filters.from,
+        to: filters.to,
+        sort: filters.sort,
+        order: filters.order,
+        page: filters.page,
+        config,
     });
-    const { data: seriesList = [], isLoading: seriesLoading } =
-        useSeries(config);
-    const { data: speakers = [], isLoading: speakersLoading } =
-        useSpeakers(config);
-    const { data: books = [], isLoading: booksLoading } = useBooks(config);
+    const { data: seriesList = [] } = useSeries(config);
+    const { data: speakers = [] } = useSpeakers(config);
+    const { data: books = [] } = useBooks(config);
 
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
@@ -125,9 +131,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         <div className='space-y-4'>
             <SermonFilters
                 search={filters.search}
-                series={filters.series}
-                speaker={filters.speaker}
-                book={filters.book}
+                selectedSeriesIds={filters.selectedSeriesIds}
+                selectedSpeakerIds={filters.selectedSpeakerIds}
+                selectedBookIds={filters.selectedBookIds}
                 selectedServiceTypeIds={filters.selectedServiceTypeIds}
                 from={filters.from ?? ''}
                 to={filters.to ?? ''}
@@ -139,16 +145,11 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 books={books}
                 serviceTypes={serviceTypes}
                 showServiceTypeFilter={showServiceTypeFilter}
-                seriesLoading={seriesLoading}
-                speakersLoading={speakersLoading}
-                booksLoading={booksLoading}
-                serviceTypesLoading={serviceTypesLoading}
                 onSearchChange={filters.setSearch}
-                onSeriesChange={filters.setSeries}
-                onSpeakerChange={filters.setSpeaker}
-                onBookChange={filters.setBook}
+                onToggleSeries={filters.toggleSeries}
+                onToggleSpeaker={filters.toggleSpeaker}
+                onToggleBook={filters.toggleBook}
                 onToggleServiceType={filters.toggleServiceType}
-                onClearServiceTypes={filters.clearServiceTypes}
                 onDateRangeChange={filters.setDateRange}
                 onSortChange={filters.setSort}
                 onClearFilters={filters.clearFilters}

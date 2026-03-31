@@ -15,9 +15,9 @@ const sermonParams = {
     ),
     id: parseAsInteger,
     search: parseAsString.withDefault(''),
-    series: parseAsInteger,
-    speaker: parseAsInteger,
-    book: parseAsInteger,
+    series: parseAsString,
+    speaker: parseAsString,
+    book: parseAsString,
     serviceTypes: parseAsString,
     from: parseAsString,
     to: parseAsString,
@@ -27,7 +27,7 @@ const sermonParams = {
 };
 
 /** Parse comma-separated IDs string into number array */
-function parseServiceTypeIds(value: string | null): number[] {
+function parseIds(value: string | null): number[] {
     if (!value) return [];
     return value
         .split(',')
@@ -36,8 +36,14 @@ function parseServiceTypeIds(value: string | null): number[] {
 }
 
 /** Serialize number array into comma-separated string */
-function serializeServiceTypeIds(ids: number[]): string | null {
+function serializeIds(ids: number[]): string | null {
     return ids.length > 0 ? ids.join(',') : null;
+}
+
+function toggleId(current: number[], id: number): number[] {
+    return current.includes(id)
+        ? current.filter((x) => x !== id)
+        : [...current, id];
 }
 
 export function useSermonFilters() {
@@ -63,24 +69,38 @@ export function useSermonFilters() {
         setParams({ search: search || null, page: 1 });
     };
 
-    const setSeries = (seriesId: number | null) => {
-        setParams({ series: seriesId, page: 1 });
+    // Multi-select toggles for all filter dropdowns
+    const selectedSeriesIds = parseIds(params.series);
+    const selectedSpeakerIds = parseIds(params.speaker);
+    const selectedBookIds = parseIds(params.book);
+    const selectedServiceTypeIds = parseIds(params.serviceTypes);
+
+    const toggleSeries = (id: number) => {
+        setParams({
+            series: serializeIds(toggleId(selectedSeriesIds, id)),
+            page: 1,
+        });
     };
 
-    const setSpeaker = (speakerId: number | null) => {
-        setParams({ speaker: speakerId, page: 1 });
+    const toggleSpeaker = (id: number) => {
+        setParams({
+            speaker: serializeIds(toggleId(selectedSpeakerIds, id)),
+            page: 1,
+        });
     };
 
-    const setBook = (bookId: number | null) => {
-        setParams({ book: bookId, page: 1 });
+    const toggleBook = (id: number) => {
+        setParams({
+            book: serializeIds(toggleId(selectedBookIds, id)),
+            page: 1,
+        });
     };
 
     const toggleServiceType = (id: number) => {
-        const current = parseServiceTypeIds(params.serviceTypes);
-        const next = current.includes(id)
-            ? current.filter((x) => x !== id)
-            : [...current, id];
-        setParams({ serviceTypes: serializeServiceTypeIds(next), page: 1 });
+        setParams({
+            serviceTypes: serializeIds(toggleId(selectedServiceTypeIds, id)),
+            page: 1,
+        });
     };
 
     const clearServiceTypes = () => {
@@ -99,8 +119,6 @@ export function useSermonFilters() {
         setParams({ page });
     };
 
-    const selectedServiceTypeIds = parseServiceTypeIds(params.serviceTypes);
-
     const clearFilters = () => {
         setParams({
             search: null,
@@ -118,22 +136,25 @@ export function useSermonFilters() {
 
     const hasActiveFilters =
         !!params.search
-        || params.series !== null
-        || params.speaker !== null
-        || params.book !== null
+        || selectedSeriesIds.length > 0
+        || selectedSpeakerIds.length > 0
+        || selectedBookIds.length > 0
         || selectedServiceTypeIds.length > 0
         || params.from !== null
         || params.to !== null;
 
     return {
         ...params,
+        selectedSeriesIds,
+        selectedSpeakerIds,
+        selectedBookIds,
         selectedServiceTypeIds,
         setTab,
         setScreen,
         setSearch,
-        setSeries,
-        setSpeaker,
-        setBook,
+        toggleSeries,
+        toggleSpeaker,
+        toggleBook,
         toggleServiceType,
         clearServiceTypes,
         setDateRange,
