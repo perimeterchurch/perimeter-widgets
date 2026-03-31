@@ -6,12 +6,8 @@ import '@/styles.css';
 async function bootstrap() {
     // Start MSW in development (skip if VITE_API_MODE=local to use real local API)
     if (import.meta.env.DEV && import.meta.env.VITE_API_MODE !== 'local') {
-        const { setupWorker } = await import('msw/browser');
-        const { handlers } = await import('@/mocks/handlers');
-        const worker = setupWorker(...handlers);
-        await worker.start({
-            onUnhandledRequest: 'bypass',
-        });
+        const { initMockWorker } = await import('@/mocks/worker');
+        await initMockWorker();
     }
 
     const root = document.getElementById('root');
