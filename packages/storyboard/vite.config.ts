@@ -10,5 +10,12 @@ export default defineConfig({
     envDir: resolve(import.meta.dirname, '../..'),
     server: {
         port: 5180,
+        proxy: {
+            // Proxy /api requests to perimeter-api when using live data
+            '/api': {
+                target: 'http://localhost:5500',
+                changeOrigin: true,
+            },
+        },
     },
 });

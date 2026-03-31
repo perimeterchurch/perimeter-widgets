@@ -9,7 +9,7 @@ import { getMPToken } from '../auth/mp-token';
 export type { paths, components, operations } from '@perimeterchurch/api';
 
 const PRODUCTION_BASE_URL = 'https://api.perimeter.org';
-const DEV_BASE_URL = 'http://localhost:5500';
+const DEV_BASE_URL = '';
 
 /**
  * Resolves the API base URL. Priority:
