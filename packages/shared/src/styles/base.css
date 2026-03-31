@@ -78,7 +78,8 @@
     display: none;
 }
 
-:root {
+:root,
+:host {
     --radius: 0.625rem;
     --background: oklch(0.985 0.002 75);
     --foreground: oklch(0.147 0.012 50);
@@ -120,7 +121,8 @@
     --sidebar-ring: oklch(0.488 0.145 283);
 }
 
-.dark {
+.dark,
+:host([data-mode="dark"]) {
     --radius: 0.625rem;
     --background: oklch(0.147 0.012 50);
     --foreground: oklch(0.985 0.002 75);
