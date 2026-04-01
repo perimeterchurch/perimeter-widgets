@@ -7,8 +7,8 @@ interface ImagePlaceholderProps {
 
 /**
  * Placeholder shown when a sermon or series image fails to load.
- * Renders the Perimeter Church icon mark (circle with three arches)
- * in a muted style that works on both light and dark themes.
+ * Renders the Perimeter Church icon mark (circle with three interwoven
+ * gothic arches) in muted colors for both light and dark themes.
  */
 export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
     return (
@@ -21,39 +21,53 @@ export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
         >
             <svg
                 xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 100 100'
+                viewBox='0 0 200 200'
                 fill='none'
-                className='h-12 w-12'
+                className='h-14 w-14'
             >
                 {/* Outer circle */}
                 <circle
-                    cx='50'
-                    cy='50'
-                    r='44'
+                    cx='100'
+                    cy='100'
+                    r='90'
                     className='stroke-stone-300 dark:stroke-stone-600'
-                    strokeWidth='3'
+                    strokeWidth='8'
                 />
-                {/* Three gothic arches */}
+                {/* Left arch */}
                 <path
-                    d='M30 72 C30 48 38 32 50 22 C62 32 70 48 70 72'
+                    d='M42 170 C42 110 58 75 80 50 C90 62 96 78 98 98'
                     className='stroke-stone-300 dark:stroke-stone-600'
-                    strokeWidth='3'
+                    strokeWidth='8'
                     strokeLinecap='round'
-                    fill='none'
-                />
-                <path
-                    d='M18 72 C18 52 28 36 42 26'
-                    className='stroke-stone-300 dark:stroke-stone-600'
-                    strokeWidth='3'
-                    strokeLinecap='round'
-                    fill='none'
+                    strokeLinejoin='round'
                 />
                 <path
-                    d='M82 72 C82 52 72 36 58 26'
+                    d='M98 98 C100 120 98 145 92 170'
                     className='stroke-stone-300 dark:stroke-stone-600'
-                    strokeWidth='3'
+                    strokeWidth='8'
                     strokeLinecap='round'
-                    fill='none'
+                />
+                {/* Right arch */}
+                <path
+                    d='M158 170 C158 110 142 75 120 50 C110 62 104 78 102 98'
+                    className='stroke-stone-300 dark:stroke-stone-600'
+                    strokeWidth='8'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                />
+                <path
+                    d='M102 98 C100 120 102 145 108 170'
+                    className='stroke-stone-300 dark:stroke-stone-600'
+                    strokeWidth='8'
+                    strokeLinecap='round'
+                />
+                {/* Center arch (on top) */}
+                <path
+                    d='M68 170 C68 120 78 85 100 42 C122 85 132 120 132 170'
+                    className='stroke-stone-300 dark:stroke-stone-600'
+                    strokeWidth='8'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
                 />
             </svg>
         </div>

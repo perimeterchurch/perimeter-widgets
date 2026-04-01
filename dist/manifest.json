@@ -2,8 +2,8 @@
   "widgets": {
     "sermons": {
       "file": "dist/sermons/sermons.js",
-      "sizeBytes": 1809645,
-      "buildTimestamp": "2026-04-01T19:15:29.099Z"
+      "sizeBytes": 1810057,
+      "buildTimestamp": "2026-04-01T19:16:59.275Z"
     }
   }
 }
