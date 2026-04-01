@@ -93,7 +93,7 @@ export function SermonFilters(props: SermonFiltersProps) {
             </InputGroup>
 
             {/* Row 2: Filter dropdowns */}
-            <div className='flex flex-wrap items-center gap-2'>
+            <div className='flex items-center gap-2'>
                 <MultiCombobox
                     options={withAllOption('All Series', seriesOptions)}
                     value={props.series != null ? String(props.series) : null}
@@ -104,6 +104,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                     }
                     placeholder='All Series'
                     disabled={props.seriesLoading}
+                    className='flex-1'
                 />
                 <MultiCombobox
                     options={withAllOption('All Speakers', speakerOptions)}
@@ -115,6 +116,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                     }
                     placeholder='All Speakers'
                     disabled={props.speakersLoading}
+                    className='flex-1'
                 />
                 <MultiCombobox
                     options={withAllOption('All Books', bookOptions)}
@@ -126,6 +128,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                     }
                     placeholder='All Books'
                     disabled={props.booksLoading}
+                    className='flex-1'
                 />
                 {props.showServiceTypeFilter && (
                     <MultiCombobox
@@ -137,6 +140,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         placeholder='Service Types'
                         selectedLabel='Service Types'
                         disabled={props.serviceTypesLoading}
+                        className='flex-1'
                         multiple
                     />
                 )}

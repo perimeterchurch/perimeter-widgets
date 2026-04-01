@@ -281,7 +281,7 @@ function MultiCombobox(props: MultiComboboxProps) {
             {/* Trigger / Input */}
             <div
                 className={cn(
-                    'flex w-fit items-center gap-1 rounded-lg border border-input bg-transparent text-sm transition-colors',
+                    'flex w-full items-center gap-1 rounded-lg border border-input bg-transparent text-sm transition-colors',
                     'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50',
                     'hover:border-ring/50 hover:bg-muted/30',
                     disabled && 'pointer-events-none opacity-50',
