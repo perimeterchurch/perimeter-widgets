@@ -113,7 +113,7 @@ export function MediaCard({
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
-                    className='h-auto w-44 flex-shrink-0'
+                    className='min-h-32 w-44 flex-shrink-0'
                 />
                 <div className='flex flex-1 flex-col justify-between p-4 space-y-2'>
                     <CardHeader className='p-0'>
