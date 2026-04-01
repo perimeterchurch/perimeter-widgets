@@ -14,11 +14,11 @@ import type {
     Speaker,
     Book,
     SeriesListItem,
-    SermonListItem,
     ServiceType,
     SortField,
     SortOrder,
 } from '../../types';
+import type { FilterIdSets } from '../../hooks/use-filter-ids';
 
 export interface SermonFiltersProps {
     search: string;
@@ -31,7 +31,7 @@ export interface SermonFiltersProps {
     sort: SortField;
     order: SortOrder;
     hasActiveFilters: boolean;
-    sermons: SermonListItem[];
+    filterIds?: FilterIdSets;
     seriesList: SeriesListItem[];
     speakers: Speaker[];
     books: Book[];
@@ -63,20 +63,19 @@ function withAllOption(
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
 
-    // Extract IDs present in current sermon results for cross-filtering
-    const sermonSeriesIds = new Set(props.sermons.map((s) => s.series.id));
-    const sermonSpeakerIds = new Set(props.sermons.map((s) => s.speaker.id));
+    // Cross-filter: when other filters are active and we have filter ID data,
+    // narrow options to those that appear in all matching sermons (unpaginated).
+    // Always include the currently selected value so it stays visible.
+    const { filterIds } = props;
 
-    // Cross-filter: when other filters are active, narrow options to those
-    // that appear in the current results. Always include the currently
-    // selected value so it stays visible in the dropdown.
-    const hasOtherFilters =
+    const hasOtherSeriesFilters =
         props.speaker != null || props.book != null || !!props.search;
     const seriesOptions: MultiComboboxOption[] = props.seriesList
         .filter(
             (s) =>
-                !hasOtherFilters
-                || sermonSeriesIds.has(s.id)
+                !hasOtherSeriesFilters
+                || !filterIds
+                || filterIds.seriesIds.has(s.id)
                 || s.id === props.series,
         )
         .map((s) => ({
@@ -90,7 +89,8 @@ export function SermonFilters(props: SermonFiltersProps) {
         .filter(
             (s) =>
                 !hasOtherSpeakerFilters
-                || sermonSpeakerIds.has(s.id)
+                || !filterIds
+                || filterIds.speakerIds.has(s.id)
                 || s.id === props.speaker,
         )
         .map((s) => ({
