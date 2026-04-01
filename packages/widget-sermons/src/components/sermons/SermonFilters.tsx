@@ -73,18 +73,20 @@ export function SermonFilters(props: SermonFiltersProps) {
 
     return (
         <div className='space-y-3'>
-            {/* Inline filters: search, series, speaker, books */}
+            {/* Row 1: Search */}
+            <InputGroup>
+                <InputGroupAddon align='inline-start'>
+                    <Search />
+                </InputGroupAddon>
+                <InputGroupInput
+                    value={props.search}
+                    onChange={(e) => props.onSearchChange(e.target.value)}
+                    placeholder='Search sermons...'
+                />
+            </InputGroup>
+
+            {/* Row 2: Filter dropdowns + date range button */}
             <div className='flex flex-wrap items-center gap-2'>
-                <InputGroup className='min-w-[200px] flex-1'>
-                    <InputGroupAddon align='inline-start'>
-                        <Search />
-                    </InputGroupAddon>
-                    <InputGroupInput
-                        value={props.search}
-                        onChange={(e) => props.onSearchChange(e.target.value)}
-                        placeholder='Search sermons...'
-                    />
-                </InputGroup>
                 <MultiCombobox
                     options={seriesOptions}
                     value={props.series != null ? String(props.series) : null}
