@@ -77,9 +77,10 @@ export function useSermonFilters() {
 
     const toggleServiceType = (id: number) => {
         const current = parseServiceTypeIds(params.serviceTypes);
-        const next = current.includes(id)
-            ? current.filter((x) => x !== id)
-            : [...current, id];
+        const next =
+            current.includes(id) ?
+                current.filter((x) => x !== id)
+            :   [...current, id];
         setParams({ serviceTypes: serializeServiceTypeIds(next), page: 1 });
     };
 

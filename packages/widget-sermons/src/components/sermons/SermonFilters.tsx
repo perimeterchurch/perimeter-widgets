@@ -96,9 +96,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                 />
                 <MultiCombobox
                     options={speakerOptions}
-                    value={
-                        props.speaker != null ? String(props.speaker) : null
-                    }
+                    value={props.speaker != null ? String(props.speaker) : null}
                     onValueChange={(v) =>
                         props.onSpeakerChange(v != null ? Number(v) : null)
                     }

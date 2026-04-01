@@ -165,7 +165,10 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                         <SelectTrigger size='sm'>
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent align='start' alignItemWithTrigger={false}>
+                        <SelectContent
+                            align='start'
+                            alignItemWithTrigger={false}
+                        >
                             {SORT_OPTIONS.map((opt) => (
                                 <SelectItem key={opt.value} value={opt.value}>
                                     {opt.label}
@@ -180,7 +183,10 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                         <SelectTrigger size='sm'>
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent align='start' alignItemWithTrigger={false}>
+                        <SelectContent
+                            align='start'
+                            alignItemWithTrigger={false}
+                        >
                             {VIEW_OPTIONS.map((opt) => (
                                 <SelectItem key={opt.value} value={opt.value}>
                                     <span className='flex items-center gap-1.5'>
