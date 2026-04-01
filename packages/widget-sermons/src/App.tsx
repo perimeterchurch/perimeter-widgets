@@ -57,12 +57,14 @@ function SermonsWidget() {
                     config={config}
                     onBack={() => {
                         if (filters.fromSeriesId) {
-                            // Go back to the series we came from
                             filters.setSeriesDetail(filters.fromSeriesId);
                         } else {
                             filters.setScreen('browse');
                         }
                     }}
+                    onSermonClick={(sermonId) =>
+                        filters.setScreen('detail', sermonId)
+                    }
                 />
             );
         }

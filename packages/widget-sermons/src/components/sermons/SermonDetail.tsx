@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import DOMPurify from 'dompurify';
 import { DateTime } from 'luxon';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Calendar, Type } from 'lucide-react';
 import {
     Button,
     Empty,
@@ -8,29 +9,62 @@ import {
     EmptyTitle,
     EmptyDescription,
     Skeleton,
+    SortSelect,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
-import type { SermonsConfig } from '../../types';
+import type {
+    SermonsConfig,
+    SermonListItem,
+    SortField,
+    SortOrder,
+} from '../../types';
 import { useSermonDetail } from '../../hooks/use-sermon-detail';
+import { useSermons } from '../../hooks/use-sermons';
+import { formatDate, sermonImageUrl } from '../../lib/format';
 import { MediaTabs } from '../players/MediaTabs';
+import { MediaCard } from '../ui/MediaCard';
+import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 
 interface SermonDetailProps {
     id: number;
     config: SermonsConfig;
     onBack: () => void;
+    onSermonClick?: (id: number) => void;
 }
 
-function getInitials(name: string): string {
-    return name
-        .split(' ')
-        .map((w) => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
-}
+const SORT_FIELDS = [
+    {
+        value: 'date',
+        label: 'Date',
+        icon: <Calendar className='h-3.5 w-3.5' />,
+    },
+    {
+        value: 'title',
+        label: 'Title',
+        icon: <Type className='h-3.5 w-3.5' />,
+    },
+];
 
-export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
+export function SermonDetail({
+    id,
+    config,
+    onBack,
+    onSermonClick,
+}: SermonDetailProps) {
     const { data: sermon, isLoading, error } = useSermonDetail(id, config);
+    const [sortField, setSortField] = useState<SortField>('date');
+    const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
+
+    const { data: seriesData } = useSermons({
+        series: sermon?.series.id ?? null,
+        sort: sortField,
+        order: sortDirection,
+        config: { ...config, perPage: 50 },
+    });
+
+    const relatedSermons = (
+        (seriesData?.sermons ?? []) as SermonListItem[]
+    ).filter((s) => s.id !== id);
 
     if (error) {
         return (
@@ -77,7 +111,7 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
                 }
             >
                 {sermon && (
-                    <div className='space-y-4'>
+                    <div className='space-y-6'>
                         <div>
                             <h2 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
                                 {sermon.title}
@@ -113,21 +147,68 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
                                 />
                             </div>
                         )}
-                        <div className='flex items-center gap-3 rounded-lg bg-stone-50 p-4 dark:bg-stone-900'>
-                            <div className='flex h-12 w-12 items-center justify-center rounded-full bg-stone-200 text-sm font-semibold text-stone-600 dark:bg-stone-700 dark:text-stone-300'>
-                                {getInitials(sermon.speaker.name)}
+
+                        {/* More from this series */}
+                        {relatedSermons.length > 0 && (
+                            <div className='space-y-3'>
+                                <div className='flex items-center justify-between'>
+                                    <h3 className='font-semibold text-sm'>
+                                        More from this series
+                                    </h3>
+                                    <SortSelect
+                                        sortField={sortField}
+                                        sortDirection={sortDirection}
+                                        onSortFieldChange={(f) =>
+                                            setSortField(f as SortField)
+                                        }
+                                        onSortDirectionChange={(d) =>
+                                            setSortDirection(d as SortOrder)
+                                        }
+                                        fields={SORT_FIELDS}
+                                    />
+                                </div>
+                                <div className='divide-y divide-border'>
+                                    {relatedSermons.map((s) => (
+                                        <MediaCard
+                                            key={s.id}
+                                            viewMode='list'
+                                            imageUrl={
+                                                s.bannerUrl
+                                                ?? sermonImageUrl(s.id)
+                                            }
+                                            imageAlt={s.title}
+                                            title={s.title}
+                                            description={s.shortDescription}
+                                            topLeft={
+                                                <DateLabel
+                                                    date={formatDate(s.date)}
+                                                />
+                                            }
+                                            topRight={
+                                                <SeriesPill
+                                                    name={s.series.title}
+                                                />
+                                            }
+                                            bottomLeft={
+                                                <SpeakerLabel
+                                                    name={s.speaker.name}
+                                                />
+                                            }
+                                            bottomRight={
+                                                s.book?.name ?
+                                                    <BookLabel
+                                                        name={s.book.name}
+                                                    />
+                                                :   undefined
+                                            }
+                                            onClick={() =>
+                                                onSermonClick?.(s.id)
+                                            }
+                                        />
+                                    ))}
+                                </div>
                             </div>
-                            <div>
-                                <p className='font-semibold text-sm'>
-                                    {sermon.speaker.name}
-                                </p>
-                                {sermon.speaker.bio && (
-                                    <p className='text-xs text-stone-500 mt-0.5 line-clamp-2'>
-                                        {sermon.speaker.bio}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
+                        )}
                     </div>
                 )}
             </SkeletonTransition>
