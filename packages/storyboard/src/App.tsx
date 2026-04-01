@@ -21,9 +21,9 @@ export function App() {
     const activeWidget = widgetRegistry.find((w) => w.id === activeId);
 
     return (
-        <div className='bg-stone-50 dark:bg-stone-950 transition-colors'>
+        <div className='min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors'>
             {/* Header */}
-            <header className='fixed top-0 left-0 w-full z-20 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
+            <header className='bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-3'>
                         <h1 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
@@ -44,8 +44,9 @@ export function App() {
                 </p>
             </header>
 
-            {/* Sidebar — fixed */}
-            <nav className='fixed top-[73px] left-0 bottom-0 w-64 z-10 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-y-auto'>
+            <div className='flex'>
+                {/* Sidebar */}
+                <nav className='w-64 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 min-h-[calc(100vh-73px)]'>
                     <div className='p-4'>
                         <h2 className='text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3'>
                             Widgets
@@ -114,9 +115,8 @@ export function App() {
                     </div>
                 </nav>
 
-            {/* Main — offset by header height and sidebar width */}
-            <main className='pt-[73px] pl-64 min-h-screen'>
-                <div className='p-8'>
+                {/* Preview area */}
+                <main className='flex-1 p-8'>
                     {activeWidget ?
                         <WidgetPreview
                             key={activeWidget.id}
@@ -126,8 +126,8 @@ export function App() {
                             Select a widget from the sidebar
                         </div>
                     }
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 }

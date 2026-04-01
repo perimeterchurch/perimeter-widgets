@@ -7,10 +7,6 @@ import { cn } from '../../../lib/utils';
 import { usePortalContainer } from '../../../shadow-dom/portal-container';
 import { ChevronRightIcon, CheckIcon } from 'lucide-react';
 
-function NoPortal({ children }: { children: React.ReactNode }) {
-    return <>{children}</>;
-}
-
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
     return <MenuPrimitive.Root data-slot='dropdown-menu' {...props} />;
 }
@@ -38,9 +34,8 @@ function DropdownMenuContent({
         'align' | 'alignOffset' | 'side' | 'sideOffset'
     >) {
     const portalContainer = usePortalContainer();
-    const PortalWrapper = portalContainer ? NoPortal : MenuPrimitive.Portal;
     return (
-        <PortalWrapper>
+        <MenuPrimitive.Portal container={portalContainer}>
             <MenuPrimitive.Positioner
                 className='isolate z-50 outline-none'
                 align={align}
@@ -57,7 +52,7 @@ function DropdownMenuContent({
                     {...props}
                 />
             </MenuPrimitive.Positioner>
-        </PortalWrapper>
+        </MenuPrimitive.Portal>
     );
 }
 
