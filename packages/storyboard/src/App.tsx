@@ -23,7 +23,7 @@ export function App() {
     return (
         <div className='min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors'>
             {/* Header */}
-            <header className='sticky top-0 z-10 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
+            <header className='fixed top-0 left-0 right-0 z-20 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-3'>
                         <h1 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
@@ -44,11 +44,9 @@ export function App() {
                 </p>
             </header>
 
-            <div className='flex min-h-0'>
-                {/* Sidebar */}
-                <nav className='w-64 shrink-0 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden'
-                    style={{ height: 'calc(100vh - 73px)', position: 'sticky', top: '73px' }}
-                >
+            <div className='pt-[73px]'>
+                {/* Sidebar — fixed */}
+                <nav className='fixed top-[73px] left-0 bottom-0 w-64 z-10 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-y-auto'>
                     <div className='p-4'>
                         <h2 className='text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3'>
                             Widgets
@@ -117,8 +115,8 @@ export function App() {
                     </div>
                 </nav>
 
-                {/* Preview area */}
-                <main className='flex-1 min-w-0 p-8'>
+                {/* Preview area — offset by sidebar width */}
+                <main className='ml-64 flex-1 min-w-0 p-8'>
                     {activeWidget ?
                         <WidgetPreview
                             key={activeWidget.id}
