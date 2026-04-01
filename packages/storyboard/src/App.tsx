@@ -23,7 +23,7 @@ export function App() {
     return (
         <div className='bg-stone-50 dark:bg-stone-950 transition-colors'>
             {/* Header */}
-            <header className='fixed inset-x-0 top-0 z-20 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
+            <header className='fixed top-0 left-0 w-full z-20 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-3'>
                         <h1 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
