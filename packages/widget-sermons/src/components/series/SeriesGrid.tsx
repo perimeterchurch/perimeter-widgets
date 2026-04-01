@@ -1,4 +1,4 @@
-import { Badge } from '@perimeter-widgets/shared';
+import { Calendar, Hash, BookOpen } from 'lucide-react';
 import type { SeriesListItem } from '../../types';
 import { formatDate, seriesImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
@@ -9,12 +9,31 @@ interface SeriesGridProps {
     onSeriesClick: (id: number) => void;
 }
 
-function SeriesMeta({ series }: { series: SeriesListItem }) {
+const iconClass = 'inline h-3 w-3 shrink-0';
+
+function DateLabel({ date }: { date: string }) {
     return (
-        <span className='text-xs text-muted-foreground'>
-            {series.sermonCount} sermon{series.sermonCount !== 1 ? 's' : ''}
-            {series.latestSermonDate
-                && ` · ${formatDate(series.latestSermonDate)}`}
+        <span className='flex items-center gap-1'>
+            <Calendar className={iconClass} />
+            {date}
+        </span>
+    );
+}
+
+function SermonCountLabel({ count }: { count: number }) {
+    return (
+        <span className='flex items-center gap-1'>
+            <Hash className={iconClass} />
+            {count} sermon{count !== 1 ? 's' : ''}
+        </span>
+    );
+}
+
+function BookLabel({ name }: { name: string }) {
+    return (
+        <span className='flex items-center gap-1'>
+            <BookOpen className={iconClass} />
+            {name}
         </span>
     );
 }
@@ -46,12 +65,15 @@ export function SeriesGrid({
                     imageUrl={seriesImageUrl(s.id)}
                     imageAlt={s.displayTitle ?? s.title}
                     title={s.displayTitle ?? s.title}
-                    subtitle={s.subtitle}
-                    meta={<SeriesMeta series={s} />}
-                    badges={
-                        s.book ?
-                            <Badge variant='secondary'>{s.book.name}</Badge>
+                    description={s.subtitle}
+                    topLeft={
+                        s.latestSermonDate ?
+                            <DateLabel date={formatDate(s.latestSermonDate)} />
                         :   undefined
+                    }
+                    bottomLeft={<SermonCountLabel count={s.sermonCount} />}
+                    bottomRight={
+                        s.book ? <BookLabel name={s.book.name} /> : undefined
                     }
                     onClick={() => onSeriesClick(s.id)}
                 />
