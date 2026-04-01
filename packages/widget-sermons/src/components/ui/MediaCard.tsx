@@ -176,15 +176,18 @@ export function MediaCard({
 
     if (viewMode === 'list') {
         return (
-            <CardButton onClick={onClick} className={LIST_CLASS}>
+            <CardButton
+                onClick={onClick}
+                className={cn('flex w-full flex-row', CARD_BASE)}
+            >
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
                     failed={imgFailed}
                     onFail={() => setImgFailed(true)}
-                    className='aspect-video w-24 flex-shrink-0 self-center rounded'
+                    className='w-32 flex-shrink-0 self-stretch'
                 />
-                <div className='flex min-w-0 flex-1 flex-col gap-1'>
+                <div className='flex min-w-0 flex-1 flex-col gap-1 p-3'>
                     {!hasCornersLayout && (
                         <p className='font-medium text-sm leading-snug line-clamp-2'>
                             {title}
