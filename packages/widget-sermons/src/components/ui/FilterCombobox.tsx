@@ -73,7 +73,7 @@ export function FilterCombobox({
                 />
                 <ComboboxContent anchor={anchorRef}>
                     <ComboboxList>
-                        <ComboboxEmpty>No results</ComboboxEmpty>
+                        <ComboboxEmpty>No matches</ComboboxEmpty>
                         {filtered.map((opt) => (
                             <ComboboxItem
                                 key={opt.value}

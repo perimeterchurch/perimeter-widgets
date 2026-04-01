@@ -17,6 +17,7 @@ import type {
     SortField,
     SortOrder,
 } from '../../types';
+import type { SermonFacets } from '../../hooks/use-sermon-facets';
 
 export interface SermonFiltersProps {
     search: string;
@@ -34,6 +35,7 @@ export interface SermonFiltersProps {
     books: Book[];
     serviceTypes: ServiceType[];
     showServiceTypeFilter: boolean;
+    facets: SermonFacets;
     onSearchChange: (value: string) => void;
     onToggleSeries: (id: number) => void;
     onToggleSpeaker: (id: number) => void;
@@ -47,15 +49,21 @@ export interface SermonFiltersProps {
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
 
-    const seriesOptions: FilterOption[] = props.seriesList.map((s) => ({
+    const { facets } = props;
+    const hasFacets =
+        facets.seriesIds.size > 0
+        || facets.speakerIds.size > 0
+        || facets.bookIds.size > 0;
+
+    const allSeriesOptions: FilterOption[] = props.seriesList.map((s) => ({
         value: s.id,
         label: s.displayTitle ?? s.title,
     }));
-    const speakerOptions: FilterOption[] = props.speakers.map((s) => ({
+    const allSpeakerOptions: FilterOption[] = props.speakers.map((s) => ({
         value: s.id,
         label: s.name,
     }));
-    const bookOptions: FilterOption[] = props.books.map((b) => ({
+    const allBookOptions: FilterOption[] = props.books.map((b) => ({
         value: b.id,
         label: b.name,
     }));
@@ -63,6 +71,36 @@ export function SermonFilters(props: SermonFiltersProps) {
         value: st.id,
         label: st.name,
     }));
+
+    // When facets are loaded, filter options to only show items that
+    // exist in the current result set. Always keep currently-selected
+    // items visible so users can deselect them.
+    const seriesOptions =
+        hasFacets ?
+            allSeriesOptions.filter(
+                (o) =>
+                    facets.seriesIds.has(o.value)
+                    || props.selectedSeriesIds.includes(o.value),
+            )
+        :   allSeriesOptions;
+
+    const speakerOptions =
+        hasFacets ?
+            allSpeakerOptions.filter(
+                (o) =>
+                    facets.speakerIds.has(o.value)
+                    || props.selectedSpeakerIds.includes(o.value),
+            )
+        :   allSpeakerOptions;
+
+    const bookOptions =
+        hasFacets ?
+            allBookOptions.filter(
+                (o) =>
+                    facets.bookIds.has(o.value)
+                    || props.selectedBookIds.includes(o.value),
+            )
+        :   allBookOptions;
 
     return (
         <div className='space-y-3'>

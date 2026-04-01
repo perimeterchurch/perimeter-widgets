@@ -27,6 +27,7 @@ import { useSeries } from '../../hooks/use-series';
 import { useSpeakers } from '../../hooks/use-speakers';
 import { useBooks } from '../../hooks/use-books';
 import { useServiceTypes } from '../../hooks/use-service-types';
+import { useSermonFacets } from '../../hooks/use-sermon-facets';
 import { resolveServiceTypeIds } from '../../types';
 import { SermonFilters } from './SermonFilters';
 import { SermonCardGrid } from './SermonCardGrid';
@@ -112,6 +113,19 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const { data: seriesList = [] } = useSeries(config);
     const { data: speakers = [] } = useSpeakers(config);
     const { data: books = [] } = useBooks(config);
+    const facets = useSermonFacets({
+        search: filters.search,
+        selectedSeriesIds: filters.selectedSeriesIds,
+        selectedSpeakerIds: filters.selectedSpeakerIds,
+        selectedBookIds: filters.selectedBookIds,
+        selectedServiceTypeIds: filters.selectedServiceTypeIds,
+        serviceTypeId: configServiceTypeIds,
+        from: filters.from,
+        to: filters.to,
+        sort: filters.sort,
+        order: filters.order,
+        config,
+    });
 
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
@@ -145,6 +159,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 books={books}
                 serviceTypes={serviceTypes}
                 showServiceTypeFilter={showServiceTypeFilter}
+                facets={facets}
                 onSearchChange={filters.setSearch}
                 onToggleSeries={filters.toggleSeries}
                 onToggleSpeaker={filters.toggleSpeaker}
