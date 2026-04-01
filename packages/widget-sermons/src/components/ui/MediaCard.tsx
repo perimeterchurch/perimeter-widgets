@@ -40,7 +40,7 @@ function FallbackImage({
         <img
             src={src}
             alt={alt}
-            className={cn('object-cover', className)}
+            className={cn('block object-cover', className)}
             onError={onFail}
         />
     );
@@ -103,7 +103,10 @@ export function MediaCard({
 
     if (viewMode === 'large') {
         return (
-            <CardButton onClick={onClick} className={cn('flex', CARD_CLASS)}>
+            <CardButton
+                onClick={onClick}
+                className={cn('flex w-full', CARD_CLASS)}
+            >
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
