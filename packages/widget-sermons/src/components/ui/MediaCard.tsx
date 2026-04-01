@@ -182,11 +182,11 @@ export function MediaCard({
                     alt={imageAlt}
                     failed={imgFailed}
                     onFail={() => setImgFailed(true)}
-                    className='h-12 w-12 flex-shrink-0 rounded'
+                    className='h-16 w-16 flex-shrink-0 rounded'
                 />
-                <div className='min-w-0 flex-1 space-y-0.5'>
+                <div className='flex min-w-0 flex-1 flex-col gap-1'>
                     {!hasCornersLayout && (
-                        <p className='truncate text-sm font-medium text-card-foreground'>
+                        <p className='font-medium text-sm leading-snug line-clamp-2'>
                             {title}
                         </p>
                     )}
