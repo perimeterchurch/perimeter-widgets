@@ -69,6 +69,7 @@ function CardButton({
 
 /** Renders either four-corner layout or fallback to subtitle/meta/badges */
 function InfoSection({
+    title,
     topLeft,
     topRight,
     bottomLeft,
@@ -79,6 +80,7 @@ function InfoSection({
     description,
 }: Pick<
     MediaCardProps,
+    | 'title'
     | 'topLeft'
     | 'topRight'
     | 'bottomLeft'
@@ -103,6 +105,9 @@ function InfoSection({
                         </span>
                     </div>
                 )}
+                <p className='font-medium text-sm leading-snug line-clamp-2'>
+                    {title}
+                </p>
                 {description && (
                     <p className='text-xs text-muted-foreground line-clamp-2'>
                         {description}
@@ -156,6 +161,7 @@ export function MediaCard({
     const [imgFailed, setImgFailed] = useState(false);
 
     const infoProps = {
+        title,
         topLeft,
         topRight,
         bottomLeft,
@@ -165,6 +171,8 @@ export function MediaCard({
         badges,
         description,
     };
+
+    const hasCornersLayout = topLeft || topRight || bottomLeft || bottomRight;
 
     if (viewMode === 'list') {
         return (
@@ -177,9 +185,11 @@ export function MediaCard({
                     className='h-12 w-12 flex-shrink-0 rounded'
                 />
                 <div className='min-w-0 flex-1 space-y-0.5'>
-                    <p className='truncate text-sm font-medium text-card-foreground'>
-                        {title}
-                    </p>
+                    {!hasCornersLayout && (
+                        <p className='truncate text-sm font-medium text-card-foreground'>
+                            {title}
+                        </p>
+                    )}
                     <InfoSection {...infoProps} />
                 </div>
             </CardButton>
@@ -200,9 +210,11 @@ export function MediaCard({
                     className='aspect-[4/3] w-48 flex-shrink-0'
                 />
                 <div className='flex flex-1 flex-col gap-1 p-4'>
-                    <p className='font-medium text-sm leading-snug line-clamp-2'>
-                        {title}
-                    </p>
+                    {!hasCornersLayout && (
+                        <p className='font-medium text-sm leading-snug line-clamp-2'>
+                            {title}
+                        </p>
+                    )}
                     <InfoSection {...infoProps} />
                 </div>
             </CardButton>
@@ -223,9 +235,11 @@ export function MediaCard({
                 className='aspect-video w-full'
             />
             <div className='flex flex-1 flex-col gap-1 p-3'>
-                <p className='font-medium text-sm leading-snug line-clamp-2'>
-                    {title}
-                </p>
+                {!hasCornersLayout && (
+                    <p className='font-medium text-sm leading-snug line-clamp-2'>
+                        {title}
+                    </p>
+                )}
                 <InfoSection {...infoProps} />
             </div>
         </CardButton>
