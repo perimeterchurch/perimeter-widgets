@@ -95,19 +95,19 @@ function InfoSection({
     if (hasCornersLayout) {
         return (
             <div className='flex flex-1 flex-col gap-1.5'>
-                {(topLeft || topRight) && (
-                    <div className='flex items-start justify-between gap-2'>
-                        <span className='text-xs text-muted-foreground shrink-0'>
-                            {topLeft}
-                        </span>
-                        <span className='max-w-[50%] text-xs leading-snug text-muted-foreground text-right'>
-                            {topRight}
-                        </span>
-                    </div>
+                {topLeft && (
+                    <span className='text-xs text-muted-foreground truncate'>
+                        {topLeft}
+                    </span>
                 )}
                 <p className='font-medium text-sm leading-snug line-clamp-2'>
                     {title}
                 </p>
+                {topRight && (
+                    <span className='text-xs text-muted-foreground'>
+                        {topRight}
+                    </span>
+                )}
                 {description && (
                     <p className='text-xs text-muted-foreground line-clamp-2'>
                         {description}
