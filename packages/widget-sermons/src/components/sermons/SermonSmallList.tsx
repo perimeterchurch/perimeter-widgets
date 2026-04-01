@@ -1,11 +1,9 @@
-import { Calendar, Library, User, BookOpen } from 'lucide-react';
 import type { SermonListViewProps } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
+import { DatePill, SeriesPill, SpeakerPill, BookPill } from './SermonInfo';
 
 export type { SermonListViewProps };
-
-const icon = 'inline h-3 w-3 shrink-0';
 
 export function SermonSmallList({
     sermons,
@@ -29,30 +27,12 @@ export function SermonSmallList({
                     imageAlt={sermon.title}
                     title={sermon.title}
                     description={sermon.shortDescription}
-                    topLeft={
-                        <span className='flex items-center gap-1'>
-                            <Calendar className={icon} />
-                            {formatDate(sermon.date)}
-                        </span>
-                    }
-                    topRight={
-                        <span className='flex items-center gap-1'>
-                            <Library className={icon} />
-                            {sermon.series.title}
-                        </span>
-                    }
-                    bottomLeft={
-                        <span className='flex items-center gap-1'>
-                            <User className={icon} />
-                            {sermon.speaker.name}
-                        </span>
-                    }
+                    topLeft={<DatePill date={formatDate(sermon.date)} />}
+                    topRight={<SeriesPill name={sermon.series.title} />}
+                    bottomLeft={<SpeakerPill name={sermon.speaker.name} />}
                     bottomRight={
                         sermon.book?.name ?
-                            <span className='flex items-center gap-1'>
-                                <BookOpen className={icon} />
-                                {sermon.book.name}
-                            </span>
+                            <BookPill name={sermon.book.name} />
                         :   undefined
                     }
                     onClick={() => onSermonClick(sermon.id)}
