@@ -14,6 +14,7 @@ const sermonParams = {
         'browse',
     ),
     id: parseAsInteger,
+    fromSeriesId: parseAsInteger,
     search: parseAsString.withDefault(''),
     series: parseAsInteger,
     speaker: parseAsInteger,
@@ -56,7 +57,27 @@ export function useSermonFilters() {
     };
 
     const setScreen = (screen: ScreenMode, id?: number) => {
-        setParams({ screen, id: id ?? null });
+        setParams({ screen, id: id ?? null, fromSeriesId: null });
+    };
+
+    /** Navigate from a series detail to a sermon detail, remembering the series */
+    const setSermonFromSeries = (sermonId: number, seriesId: number) => {
+        setParams({
+            tab: 'series' as 'sermons' | 'series',
+            screen: 'detail',
+            id: sermonId,
+            fromSeriesId: seriesId,
+        });
+    };
+
+    /** Navigate to a series detail view */
+    const setSeriesDetail = (seriesId: number) => {
+        setParams({
+            tab: 'series' as 'sermons' | 'series',
+            screen: 'detail',
+            id: seriesId,
+            fromSeriesId: null,
+        });
     };
 
     const setSearch = (search: string) => {
@@ -135,6 +156,8 @@ export function useSermonFilters() {
         selectedServiceTypeIds,
         setTab,
         setScreen,
+        setSermonFromSeries,
+        setSeriesDetail,
         setSearch,
         setSeries,
         setSpeaker,

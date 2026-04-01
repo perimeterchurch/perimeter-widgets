@@ -36,23 +36,33 @@ function SermonsWidget() {
     // Determine which content to render
     const renderContent = () => {
         if (filters.screen === 'detail' && filters.id) {
-            if (filters.tab === 'series') {
+            // Viewing a series detail
+            if (filters.tab === 'series' && !filters.fromSeriesId) {
                 return (
                     <SeriesDetail
                         id={filters.id}
                         config={config}
                         onBack={() => filters.setScreen('browse')}
-                        onSermonClick={(id) => {
-                            filters.setScreen('detail', id);
+                        onSermonClick={(sermonId) => {
+                            // Navigate to sermon detail, remembering which series we came from
+                            filters.setSermonFromSeries(sermonId, filters.id!);
                         }}
                     />
                 );
             }
+            // Viewing a sermon detail
             return (
                 <SermonDetail
                     id={filters.id}
                     config={config}
-                    onBack={() => filters.setScreen('browse')}
+                    onBack={() => {
+                        if (filters.fromSeriesId) {
+                            // Go back to the series we came from
+                            filters.setSeriesDetail(filters.fromSeriesId);
+                        } else {
+                            filters.setScreen('browse');
+                        }
+                    }}
                 />
             );
         }
