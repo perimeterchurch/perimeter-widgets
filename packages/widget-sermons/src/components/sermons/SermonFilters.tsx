@@ -143,7 +143,7 @@ export function SermonFilters(props: SermonFiltersProps) {
             </div>
 
             {/* Row 3: Date range + clear all */}
-            <div className='flex flex-wrap items-center gap-3'>
+            <div className='flex items-center gap-3'>
                 <DateRangePicker
                     from={props.from}
                     to={props.to}
@@ -152,12 +152,12 @@ export function SermonFilters(props: SermonFiltersProps) {
                     }
                     onToChange={(to) => props.onDateRangeChange(props.from, to)}
                 />
+                <div className='flex-1' />
                 {props.hasActiveFilters && (
                     <Button
-                        variant='ghost'
+                        variant='outline'
                         size='sm'
                         onClick={props.onClearFilters}
-                        className='text-destructive hover:text-destructive'
                     >
                         <X className='h-3.5 w-3.5' />
                         Clear All

@@ -152,7 +152,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
             </InputGroup>
 
             {/* Row 2: Date range + clear all */}
-            <div className='flex flex-wrap items-center gap-3'>
+            <div className='flex items-center gap-3'>
                 <DateRangePicker
                     from={dateFrom}
                     to={dateTo}
@@ -165,13 +165,9 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                         setPage(1);
                     }}
                 />
+                <div className='flex-1' />
                 {hasActiveFilters && (
-                    <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={clearAll}
-                        className='text-destructive hover:text-destructive'
-                    >
+                    <Button variant='outline' size='sm' onClick={clearAll}>
                         <X className='h-3.5 w-3.5' />
                         Clear All
                     </Button>

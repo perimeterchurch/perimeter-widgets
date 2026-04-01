@@ -120,22 +120,19 @@ export function DateRangePicker({
                     disabled={disabled}
                     onClick={() => setIsOpen(true)}
                     className={cn(
-                        'flex h-10 min-w-0 flex-1 items-center gap-2 rounded-lg border bg-[var(--color-background)] px-3 py-2',
-                        'text-sm',
-                        'transition-colors duration-200',
-                        'border-[var(--color-input)]',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/50 focus-visible:ring-offset-2',
-                        'focus-visible:border-[var(--color-ring)]',
+                        'flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-lg border border-input bg-transparent px-2.5 text-sm',
+                        'transition-colors hover:bg-muted/30',
+                        'focus-visible:outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50',
                         'disabled:cursor-not-allowed disabled:opacity-50',
                         clearable && hasValue && 'rounded-r-none border-r-0',
                     )}
                 >
-                    <Calendar className='h-3.5 w-3.5 shrink-0 text-stone-400' />
+                    <Calendar className='h-3.5 w-3.5 shrink-0 text-muted-foreground' />
                     {displayText ?
                         <span className='flex-1 truncate text-left'>
                             {displayText}
                         </span>
-                    :   <span className='flex-1 truncate text-left text-stone-400'>
+                    :   <span className='flex-1 truncate text-left text-muted-foreground'>
                             {effectivePlaceholder}
                         </span>
                     }
@@ -144,7 +141,7 @@ export function DateRangePicker({
                     <button
                         type='button'
                         onClick={handleClear}
-                        className='flex h-10 items-center rounded-lg rounded-l-none border border-l-0 border-[var(--color-input)] bg-[var(--color-background)] px-2 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:hover:bg-stone-700 dark:hover:text-stone-300'
+                        className='flex h-8 items-center rounded-lg rounded-l-none border border-l-0 border-input bg-transparent px-2 text-muted-foreground transition-colors hover:bg-muted/30'
                         aria-label='Clear date range'
                     >
                         <X className='h-3.5 w-3.5' />
