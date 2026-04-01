@@ -128,6 +128,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 series={filters.series}
                 speaker={filters.speaker}
                 book={filters.book}
+                sermons={sermons}
                 selectedServiceTypeIds={filters.selectedServiceTypeIds}
                 from={filters.from ?? ''}
                 to={filters.to ?? ''}

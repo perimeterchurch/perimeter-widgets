@@ -14,6 +14,7 @@ import type {
     Speaker,
     Book,
     SeriesListItem,
+    SermonListItem,
     ServiceType,
     SortField,
     SortOrder,
@@ -30,6 +31,7 @@ export interface SermonFiltersProps {
     sort: SortField;
     order: SortOrder;
     hasActiveFilters: boolean;
+    sermons: SermonListItem[];
     seriesList: SeriesListItem[];
     speakers: Speaker[];
     books: Book[];
@@ -49,21 +51,58 @@ export interface SermonFiltersProps {
     onClearFilters: () => void;
 }
 
+const ALL = '__all__';
+
+function withAllOption(
+    label: string,
+    options: MultiComboboxOption[],
+): MultiComboboxOption[] {
+    return [{ value: ALL, label }, ...options];
+}
+
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
 
-    const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
-        value: String(s.id),
-        label: s.displayTitle ?? s.title,
-    }));
-    const speakerOptions: MultiComboboxOption[] = props.speakers.map((s) => ({
-        value: String(s.id),
-        label: s.name,
-    }));
+    // Extract IDs present in current sermon results for cross-filtering
+    const sermonSeriesIds = new Set(props.sermons.map((s) => s.series.id));
+    const sermonSpeakerIds = new Set(props.sermons.map((s) => s.speaker.id));
+
+    // Cross-filter: when other filters are active, narrow options to those
+    // that appear in the current results. Always include the currently
+    // selected value so it stays visible in the dropdown.
+    const hasOtherFilters =
+        props.speaker != null || props.book != null || !!props.search;
+    const seriesOptions: MultiComboboxOption[] = props.seriesList
+        .filter(
+            (s) =>
+                !hasOtherFilters
+                || sermonSeriesIds.has(s.id)
+                || s.id === props.series,
+        )
+        .map((s) => ({
+            value: String(s.id),
+            label: s.displayTitle ?? s.title,
+        }));
+
+    const hasOtherSpeakerFilters =
+        props.series != null || props.book != null || !!props.search;
+    const speakerOptions: MultiComboboxOption[] = props.speakers
+        .filter(
+            (s) =>
+                !hasOtherSpeakerFilters
+                || sermonSpeakerIds.has(s.id)
+                || s.id === props.speaker,
+        )
+        .map((s) => ({
+            value: String(s.id),
+            label: s.name,
+        }));
+
     const bookOptions: MultiComboboxOption[] = props.books.map((b) => ({
         value: String(b.id),
         label: b.name,
     }));
+
     const serviceTypeOptions: MultiComboboxOption[] = props.serviceTypes.map(
         (st) => ({
             value: String(st.id),
@@ -88,28 +127,34 @@ export function SermonFilters(props: SermonFiltersProps) {
             {/* Row 2: Filter dropdowns + date range button */}
             <div className='flex flex-wrap items-center gap-2'>
                 <MultiCombobox
-                    options={seriesOptions}
+                    options={withAllOption('All Series', seriesOptions)}
                     value={props.series != null ? String(props.series) : null}
                     onValueChange={(v) =>
-                        props.onSeriesChange(v != null ? Number(v) : null)
+                        props.onSeriesChange(
+                            v != null && v !== ALL ? Number(v) : null,
+                        )
                     }
                     placeholder='All Series'
                     disabled={props.seriesLoading}
                 />
                 <MultiCombobox
-                    options={speakerOptions}
+                    options={withAllOption('All Speakers', speakerOptions)}
                     value={props.speaker != null ? String(props.speaker) : null}
                     onValueChange={(v) =>
-                        props.onSpeakerChange(v != null ? Number(v) : null)
+                        props.onSpeakerChange(
+                            v != null && v !== ALL ? Number(v) : null,
+                        )
                     }
                     placeholder='All Speakers'
                     disabled={props.speakersLoading}
                 />
                 <MultiCombobox
-                    options={bookOptions}
+                    options={withAllOption('All Books', bookOptions)}
                     value={props.book != null ? String(props.book) : null}
                     onValueChange={(v) =>
-                        props.onBookChange(v != null ? Number(v) : null)
+                        props.onBookChange(
+                            v != null && v !== ALL ? Number(v) : null,
+                        )
                     }
                     placeholder='All Books'
                     disabled={props.booksLoading}
