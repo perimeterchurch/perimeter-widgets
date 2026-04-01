@@ -21,9 +21,9 @@ export function App() {
     const activeWidget = widgetRegistry.find((w) => w.id === activeId);
 
     return (
-        <div className='min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors'>
+        <div className='bg-stone-50 dark:bg-stone-950 transition-colors'>
             {/* Header */}
-            <header className='fixed top-0 left-0 right-0 z-20 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
+            <header className='fixed inset-x-0 top-0 z-20 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-3'>
                         <h1 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
@@ -44,9 +44,8 @@ export function App() {
                 </p>
             </header>
 
-            <div className='pt-[73px]'>
-                {/* Sidebar — fixed */}
-                <nav className='fixed top-[73px] left-0 bottom-0 w-64 z-10 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-y-auto'>
+            {/* Sidebar — fixed */}
+            <nav className='fixed top-[73px] left-0 bottom-0 w-64 z-10 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-y-auto'>
                     <div className='p-4'>
                         <h2 className='text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3'>
                             Widgets
@@ -115,8 +114,9 @@ export function App() {
                     </div>
                 </nav>
 
-                {/* Preview area — offset by sidebar width */}
-                <main className='ml-64 flex-1 min-w-0 p-8'>
+            {/* Main — offset by header height and sidebar width */}
+            <main className='pt-[73px] pl-64 min-h-screen'>
+                <div className='p-8'>
                     {activeWidget ?
                         <WidgetPreview
                             key={activeWidget.id}
@@ -126,8 +126,8 @@ export function App() {
                             Select a widget from the sidebar
                         </div>
                     }
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 }
