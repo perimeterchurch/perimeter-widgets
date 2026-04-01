@@ -15,7 +15,15 @@ import {
     Skeleton,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
-import { LayoutGrid, List, Rows3 } from 'lucide-react';
+import {
+    ArrowDownWideNarrow,
+    ArrowUpNarrowWide,
+    ArrowDownAZ,
+    ArrowUpZA,
+    LayoutGrid,
+    List,
+    Rows3,
+} from 'lucide-react';
 import type {
     SermonsConfig,
     ViewMode,
@@ -58,10 +66,26 @@ const VIEW_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
-    { value: 'date-desc', label: 'Date: Newest' },
-    { value: 'date-asc', label: 'Date: Oldest' },
-    { value: 'title-asc', label: 'Title: A-Z' },
-    { value: 'title-desc', label: 'Title: Z-A' },
+    {
+        value: 'date-desc',
+        label: 'Date: Newest',
+        icon: <ArrowDownWideNarrow className='h-4 w-4' />,
+    },
+    {
+        value: 'date-asc',
+        label: 'Date: Oldest',
+        icon: <ArrowUpNarrowWide className='h-4 w-4' />,
+    },
+    {
+        value: 'title-asc',
+        label: 'Title: A-Z',
+        icon: <ArrowDownAZ className='h-4 w-4' />,
+    },
+    {
+        value: 'title-desc',
+        label: 'Title: Z-A',
+        icon: <ArrowUpZA className='h-4 w-4' />,
+    },
 ];
 
 /** Build a page range for the pagination component */
@@ -163,6 +187,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                         onValueChange={(v) => v && handleSortChange(v)}
                     >
                         <SelectTrigger size='sm'>
+                            <span className='text-muted-foreground'>
+                                Sort by:
+                            </span>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent
@@ -171,7 +198,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                         >
                             {SORT_OPTIONS.map((opt) => (
                                 <SelectItem key={opt.value} value={opt.value}>
-                                    {opt.label}
+                                    <span className='flex items-center gap-1.5'>
+                                        {opt.icon} {opt.label}
+                                    </span>
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -181,6 +210,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                         onValueChange={(v) => v && setViewMode(v as ViewMode)}
                     >
                         <SelectTrigger size='sm'>
+                            <span className='text-muted-foreground'>View:</span>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent
