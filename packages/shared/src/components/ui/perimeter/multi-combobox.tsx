@@ -3,6 +3,7 @@ import { useCombobox, useMultipleSelection } from 'downshift';
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react';
 
 import { cn } from '../../../lib/utils';
+import { usePortalContainer } from '../../../shadow-dom/portal-container';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -64,6 +65,34 @@ function MultiCombobox(props: MultiComboboxProps) {
         className,
     } = props;
     const isMultiple = props.multiple === true;
+
+    // Shadow DOM support: downshift attaches event listeners to `window` and
+    // uses `document.getElementById` to find its elements. Inside a shadow DOM
+    // these fail because elements aren't visible from the document. Route
+    // downshift's environment through the shadow root instead.
+    const portalContainer = usePortalContainer();
+    const shadowEnv = React.useMemo(() => {
+        if (!portalContainer) return undefined;
+        const rootNode = portalContainer.getRootNode();
+        if (!(rootNode instanceof ShadowRoot)) return undefined;
+        const shadow = rootNode;
+        return {
+            addEventListener: shadow.addEventListener.bind(shadow),
+            removeEventListener: shadow.removeEventListener.bind(shadow),
+            document: new Proxy(document, {
+                get(target, prop) {
+                    if (prop === 'getElementById')
+                        return shadow.getElementById.bind(shadow);
+                    if (prop === 'activeElement') return shadow.activeElement;
+                    const value = Reflect.get(target, prop);
+                    return typeof value === 'function' ?
+                            value.bind(target)
+                        :   value;
+                },
+            }),
+            Node: window.Node,
+        };
+    }, [portalContainer]);
 
     // Controlled vs uncontrolled state
     const isControlled = props.value !== undefined;
@@ -145,6 +174,7 @@ function MultiCombobox(props: MultiComboboxProps) {
 
     const { getDropdownProps } = useMultipleSelection({
         selectedItems,
+        ...(shadowEnv && { environment: shadowEnv }),
         onStateChange({ selectedItems: newSelectedItems, type }) {
             if (
                 type
@@ -179,6 +209,7 @@ function MultiCombobox(props: MultiComboboxProps) {
     } = useCombobox({
         items: filteredOptions,
         inputValue,
+        ...(shadowEnv && { environment: shadowEnv }),
         itemToString: (item) => item?.label ?? '',
         selectedItem: null, // We manage selection ourselves
         isItemDisabled: (item) => !!item.disabled,
