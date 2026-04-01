@@ -35,4 +35,6 @@ export * from './ui/perimeter/tooltip';
 // Utility
 export { cn } from '../lib/utils';
 
+export * from './ui/perimeter/icon-select';
 export * from './ui/perimeter/multi-combobox';
+export * from './ui/perimeter/sort-select';

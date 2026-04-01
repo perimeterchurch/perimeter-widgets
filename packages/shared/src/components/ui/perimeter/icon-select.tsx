@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
-import { cn } from '@perimeter-widgets/shared';
+import { cn } from '../../../lib/utils';
 
 export interface IconSelectOption {
     value: string;

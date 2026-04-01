@@ -8,6 +8,8 @@ import {
     PaginationNext,
     PaginationEllipsis,
     Skeleton,
+    IconSelect,
+    SortSelect,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import { Calendar, Type, LayoutGrid, Eye, List, Rows3 } from 'lucide-react';
@@ -23,8 +25,6 @@ import { useSpeakers } from '../../hooks/use-speakers';
 import { useBooks } from '../../hooks/use-books';
 import { useServiceTypes } from '../../hooks/use-service-types';
 import { resolveServiceTypeIds } from '../../types';
-import { IconSelect } from '../ui/IconSelect';
-import { SortSelect } from '../ui/SortSelect';
 import { SermonFilters } from './SermonFilters';
 import { SermonCardGrid } from './SermonCardGrid';
 import { SermonSmallList } from './SermonSmallList';
