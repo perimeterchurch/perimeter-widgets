@@ -24,15 +24,18 @@ export function SermonCardGrid({
                     key={sermon.id}
                     type='button'
                     onClick={() => onSermonClick(sermon.id)}
-                    className='overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700 text-left transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
+                    className='overflow-hidden rounded-lg border border-stone-200 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:border-stone-700 dark:hover:border-stone-500'
                 >
                     <img
                         src={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
                         alt={sermon.title}
                         className='h-40 w-full object-cover'
                         onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                            (e.target as HTMLImageElement).style.display =
+                                'none';
+                            (
+                                e.target as HTMLImageElement
+                            ).nextElementSibling?.classList.remove('hidden');
                         }}
                     />
                     <ImagePlaceholder className='hidden h-40 w-full' />

@@ -24,7 +24,7 @@ export function SermonSmallList({
                     key={sermon.id}
                     type='button'
                     onClick={() => onSermonClick(sermon.id)}
-                    className='flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-stone-50 dark:hover:bg-stone-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded'
+                    className='flex w-full items-center gap-3 rounded-md py-3 px-2 text-left transition-all duration-200 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:hover:bg-stone-800/50'
                 >
                     <img
                         src={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}

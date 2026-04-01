@@ -23,7 +23,7 @@ export function SeriesGrid({ series, onSeriesClick }: SeriesGridProps) {
                     key={s.id}
                     type='button'
                     onClick={() => onSeriesClick(s.id)}
-                    className='rounded-lg border border-stone-200 dark:border-stone-700 p-4 text-left space-y-2 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
+                    className='rounded-lg border border-stone-200 p-4 text-left space-y-2 transition-all duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:border-stone-700 dark:hover:border-stone-500'
                 >
                     <div className='space-y-0.5'>
                         <p className='font-semibold text-sm leading-snug text-stone-900 dark:text-stone-100 line-clamp-2'>
