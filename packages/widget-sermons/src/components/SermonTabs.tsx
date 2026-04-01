@@ -1,10 +1,9 @@
-import { Badge, Tabs, TabsList, TabsTrigger } from '@perimeter-widgets/shared';
+import { Tabs, TabsList, TabsTrigger } from '@perimeter-widgets/shared';
 import type { TabId } from '../types';
 
-const TAB_DEFS: { id: TabId; label: string; disabled?: boolean }[] = [
+const TAB_DEFS: { id: TabId; label: string }[] = [
     { id: 'sermons', label: 'Sermons' },
     { id: 'series', label: 'Series' },
-    { id: 'compilations', label: 'Compilations', disabled: true },
 ];
 
 export interface SermonTabsProps {
@@ -20,20 +19,8 @@ export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
         >
             <TabsList>
                 {TAB_DEFS.map((tab) => (
-                    <TabsTrigger
-                        key={tab.id}
-                        value={tab.id}
-                        disabled={tab.disabled}
-                    >
+                    <TabsTrigger key={tab.id} value={tab.id}>
                         {tab.label}
-                        {tab.id === 'compilations' && (
-                            <Badge
-                                variant='secondary'
-                                className='ml-1.5 px-1.5 py-0 text-[10px] leading-4 font-medium rounded-full'
-                            >
-                                Soon
-                            </Badge>
-                        )}
                     </TabsTrigger>
                 ))}
             </TabsList>
