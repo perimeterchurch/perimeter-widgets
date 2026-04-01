@@ -20,7 +20,7 @@ export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
             <img
                 src={LOGO_URL}
                 alt='Perimeter Church'
-                className='h-12 w-12 opacity-20 dark:opacity-15'
+                className='h-1/2 w-1/2 object-contain'
             />
         </div>
     );
