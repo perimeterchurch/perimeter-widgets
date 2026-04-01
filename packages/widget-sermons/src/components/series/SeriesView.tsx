@@ -3,6 +3,7 @@ import {
     InputGroup,
     InputGroupAddon,
     InputGroupInput,
+    Button,
     Pagination,
     PaginationContent,
     PaginationItem,
@@ -17,6 +18,7 @@ import {
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import {
     Search,
+    X,
     Calendar,
     Type,
     Hash,
@@ -27,6 +29,7 @@ import {
 } from 'lucide-react';
 import type { SermonsConfig } from '../../types';
 import { useSeries } from '../../hooks/use-series';
+import { DateRangePicker } from '../ui/DateRangePicker';
 import { SeriesGrid } from './SeriesGrid';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 
@@ -99,6 +102,8 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
     const [sortField, setSortField] = useState<SeriesSortField>('date');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
     const [page, setPage] = useState(1);
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
 
     const { data, isLoading } = useSeries({
         search: search || undefined,
@@ -109,8 +114,25 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
         config,
     });
 
-    const seriesList = data?.series ?? [];
+    // Client-side date filtering on latestSermonDate
+    const allSeries = data?.series ?? [];
+    const seriesList = allSeries.filter((s) => {
+        if (dateFrom && s.latestSermonDate && s.latestSermonDate < dateFrom)
+            return false;
+        if (dateTo && s.latestSermonDate && s.latestSermonDate > dateTo)
+            return false;
+        return true;
+    });
     const pagination = data?.pagination;
+
+    const hasActiveFilters = !!search || !!dateFrom || !!dateTo;
+
+    const clearAll = () => {
+        setSearch('');
+        setDateFrom('');
+        setDateTo('');
+        setPage(1);
+    };
 
     return (
         <div className='space-y-4'>
@@ -128,6 +150,33 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                     placeholder='Search series...'
                 />
             </InputGroup>
+
+            {/* Row 2: Date range + clear all */}
+            <div className='flex flex-wrap items-center gap-3'>
+                <DateRangePicker
+                    from={dateFrom}
+                    to={dateTo}
+                    onFromChange={(v) => {
+                        setDateFrom(v ?? '');
+                        setPage(1);
+                    }}
+                    onToChange={(v) => {
+                        setDateTo(v ?? '');
+                        setPage(1);
+                    }}
+                />
+                {hasActiveFilters && (
+                    <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={clearAll}
+                        className='text-destructive hover:text-destructive'
+                    >
+                        <X className='h-3.5 w-3.5' />
+                        Clear All
+                    </Button>
+                )}
+            </div>
 
             {/* Results header: count + sort + view */}
             <div className='flex items-center justify-between'>

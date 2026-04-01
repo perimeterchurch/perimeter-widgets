@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
@@ -9,7 +8,7 @@ import {
 } from '@perimeter-widgets/shared';
 import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
-import { SlidersHorizontal, X, Search } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import type {
     Speaker,
     Book,
@@ -59,8 +58,6 @@ function withAllOption(
 }
 
 export function SermonFilters(props: SermonFiltersProps) {
-    const [showMore, setShowMore] = useState(false);
-
     const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
         value: String(s.id),
         label: s.displayTitle ?? s.title,
@@ -95,7 +92,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                 />
             </InputGroup>
 
-            {/* Row 2: Filter dropdowns + date range button */}
+            {/* Row 2: Filter dropdowns */}
             <div className='flex flex-wrap items-center gap-2'>
                 <MultiCombobox
                     options={withAllOption('All Series', seriesOptions)}
@@ -143,40 +140,30 @@ export function SermonFilters(props: SermonFiltersProps) {
                         multiple
                     />
                 )}
-                <Button
-                    variant='secondary'
-                    size='sm'
-                    onClick={() => setShowMore(!showMore)}
-                >
-                    <SlidersHorizontal className='h-4 w-4' />
-                    {showMore ? 'Less' : 'Date Range'}
-                </Button>
             </div>
 
-            {/* Expandable: date range only */}
-            {showMore && (
-                <div className='flex flex-wrap items-center gap-3 rounded-lg bg-[var(--color-muted)] p-3'>
-                    <DateRangePicker
-                        from={props.from}
-                        to={props.to}
-                        onFromChange={(from) =>
-                            props.onDateRangeChange(from, props.to)
-                        }
-                        onToChange={(to) =>
-                            props.onDateRangeChange(props.from, to)
-                        }
-                    />
-                    {props.hasActiveFilters && (
-                        <button
-                            type='button'
-                            onClick={props.onClearFilters}
-                            className='text-sm text-[var(--color-error)] underline hover:opacity-80'
-                        >
-                            Clear All
-                        </button>
-                    )}
-                </div>
-            )}
+            {/* Row 3: Date range + clear all */}
+            <div className='flex flex-wrap items-center gap-3'>
+                <DateRangePicker
+                    from={props.from}
+                    to={props.to}
+                    onFromChange={(from) =>
+                        props.onDateRangeChange(from, props.to)
+                    }
+                    onToChange={(to) => props.onDateRangeChange(props.from, to)}
+                />
+                {props.hasActiveFilters && (
+                    <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={props.onClearFilters}
+                        className='text-destructive hover:text-destructive'
+                    >
+                        <X className='h-3.5 w-3.5' />
+                        Clear All
+                    </Button>
+                )}
+            </div>
 
             {/* Active filter chips */}
             {props.hasActiveFilters && (
