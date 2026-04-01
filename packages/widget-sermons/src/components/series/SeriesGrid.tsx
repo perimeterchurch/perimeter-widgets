@@ -1,4 +1,4 @@
-import { Calendar, Hash, BookOpen } from 'lucide-react';
+import { Calendar, Layers, BookOpen } from 'lucide-react';
 import type { SeriesListItem } from '../../types';
 import { formatDate, seriesImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
@@ -23,7 +23,7 @@ function DateLabel({ date }: { date: string }) {
 function SermonCountLabel({ count }: { count: number }) {
     return (
         <span className='flex items-center gap-1'>
-            <Hash className={iconClass} />
+            <Layers className={iconClass} />
             {count} sermon{count !== 1 ? 's' : ''}
         </span>
     );
