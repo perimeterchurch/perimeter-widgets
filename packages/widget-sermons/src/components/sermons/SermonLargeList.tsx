@@ -5,7 +5,7 @@ import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 
 export type { SermonListViewProps };
 
-export function SermonLargeCards({
+export function SermonLargeList({
     sermons,
     onSermonClick,
 }: SermonListViewProps) {

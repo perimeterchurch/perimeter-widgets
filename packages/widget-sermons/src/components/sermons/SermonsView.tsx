@@ -26,9 +26,9 @@ import { useBooks } from '../../hooks/use-books';
 import { useServiceTypes } from '../../hooks/use-service-types';
 import { resolveServiceTypeIds } from '../../types';
 import { SermonFilters } from './SermonFilters';
-import { SermonCardGrid } from './SermonCardGrid';
+import { SermonGrid } from './SermonGrid';
 import { SermonSmallList } from './SermonSmallList';
-import { SermonLargeCards } from './SermonLargeCards';
+import { SermonLargeList } from './SermonLargeList';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 
 interface SermonsViewProps {
@@ -39,7 +39,7 @@ interface SermonsViewProps {
 const VIEW_OPTIONS = [
     {
         value: 'grid',
-        label: 'Card Grid',
+        label: 'Grid',
         icon: <LayoutGrid className='h-3.5 w-3.5' />,
     },
     {
@@ -49,7 +49,7 @@ const VIEW_OPTIONS = [
     },
     {
         value: 'large',
-        label: 'Large Cards',
+        label: 'Large List',
         icon: <Rows3 className='h-3.5 w-3.5' />,
     },
 ];
@@ -125,8 +125,8 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
 
     const ViewComponent =
         viewMode === 'list' ? SermonSmallList
-        : viewMode === 'large' ? SermonLargeCards
-        : SermonCardGrid;
+        : viewMode === 'large' ? SermonLargeList
+        : SermonGrid;
 
     return (
         <div className='space-y-4'>

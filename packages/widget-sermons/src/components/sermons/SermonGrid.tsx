@@ -5,10 +5,7 @@ import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 
 export type { SermonListViewProps };
 
-export function SermonCardGrid({
-    sermons,
-    onSermonClick,
-}: SermonListViewProps) {
+export function SermonGrid({ sermons, onSermonClick }: SermonListViewProps) {
     if (sermons.length === 0) {
         return (
             <div className='py-12 text-center text-muted-foreground'>

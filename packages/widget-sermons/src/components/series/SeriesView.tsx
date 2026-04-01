@@ -59,7 +59,7 @@ const SORT_FIELDS = [
 const VIEW_OPTIONS = [
     {
         value: 'grid',
-        label: 'Card Grid',
+        label: 'Grid',
         icon: <LayoutGrid className='h-3.5 w-3.5' />,
     },
     {
@@ -69,7 +69,7 @@ const VIEW_OPTIONS = [
     },
     {
         value: 'large',
-        label: 'Large Cards',
+        label: 'Large List',
         icon: <Rows3 className='h-3.5 w-3.5' />,
     },
 ];
