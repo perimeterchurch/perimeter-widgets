@@ -42,14 +42,27 @@ function FallbackImage({
                 alt={alt}
                 className={cn('object-cover', className)}
                 onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (
-                        e.target as HTMLImageElement
-                    ).nextElementSibling?.classList.remove('hidden');
+                    const img = e.target as HTMLImageElement;
+                    img.style.display = 'none';
+                    // Show the card-level placeholder overlay
+                    const card = img.closest('[data-slot="media-card"]');
+                    card?.querySelector(
+                        '[data-slot="media-card-fallback"]',
+                    )?.classList.remove('hidden');
                 }}
             />
-            <ImagePlaceholder className={cn('hidden', className)} />
         </>
+    );
+}
+
+function FallbackOverlay() {
+    return (
+        <div
+            data-slot='media-card-fallback'
+            className='hidden absolute inset-0 z-10'
+        >
+            <ImagePlaceholder className='h-full w-full' />
+        </div>
     );
 }
 
@@ -68,12 +81,14 @@ export function MediaCard({
         return (
             <button
                 type='button'
+                data-slot='media-card'
                 onClick={onClick}
                 className={cn(
-                    'flex w-full items-center gap-3',
+                    'relative flex w-full items-center gap-3',
                     LIST_HOVER_CLASS,
                 )}
             >
+                <FallbackOverlay />
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
@@ -99,7 +114,8 @@ export function MediaCard({
         return (
             <Card
                 size='sm'
-                className={cn('flex-row', HOVER_CLASS)}
+                data-slot='media-card'
+                className={cn('relative flex-row', HOVER_CLASS)}
                 onClick={onClick}
                 role='button'
                 tabIndex={0}
@@ -110,6 +126,7 @@ export function MediaCard({
                     }
                 }}
             >
+                <FallbackOverlay />
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
@@ -140,7 +157,8 @@ export function MediaCard({
     return (
         <Card
             size='sm'
-            className={cn('p-0', HOVER_CLASS)}
+            data-slot='media-card'
+            className={cn('relative p-0', HOVER_CLASS)}
             onClick={onClick}
             role='button'
             tabIndex={0}
@@ -151,6 +169,7 @@ export function MediaCard({
                 }
             }}
         >
+            <FallbackOverlay />
             <FallbackImage
                 src={imageUrl}
                 alt={imageAlt}
