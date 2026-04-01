@@ -182,7 +182,7 @@ export function MediaCard({
                     alt={imageAlt}
                     failed={imgFailed}
                     onFail={() => setImgFailed(true)}
-                    className='h-16 w-16 flex-shrink-0 self-center rounded'
+                    className='aspect-video w-24 flex-shrink-0 self-center rounded'
                 />
                 <div className='flex min-w-0 flex-1 flex-col gap-1'>
                     {!hasCornersLayout && (
@@ -207,7 +207,7 @@ export function MediaCard({
                     alt={imageAlt}
                     failed={imgFailed}
                     onFail={() => setImgFailed(true)}
-                    className='aspect-[4/3] w-48 flex-shrink-0'
+                    className='aspect-video w-56 flex-shrink-0'
                 />
                 <div className='flex flex-1 flex-col gap-1 p-4'>
                     {!hasCornersLayout && (
