@@ -5,6 +5,11 @@ interface ImagePlaceholderProps {
     style?: React.CSSProperties;
 }
 
+/**
+ * Placeholder shown when a sermon or series image fails to load.
+ * Renders the Perimeter Church icon mark (circle with three arches)
+ * in a muted style that works on both light and dark themes.
+ */
 export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
     return (
         <div
@@ -16,31 +21,39 @@ export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
         >
             <svg
                 xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 48 48'
+                viewBox='0 0 100 100'
                 fill='none'
-                className='h-10 w-10'
+                className='h-12 w-12'
             >
-                <rect
-                    x='6'
-                    y='10'
-                    width='36'
-                    height='28'
-                    rx='3'
+                {/* Outer circle */}
+                <circle
+                    cx='50'
+                    cy='50'
+                    r='44'
                     className='stroke-stone-300 dark:stroke-stone-600'
-                    strokeWidth='1.5'
+                    strokeWidth='3'
+                />
+                {/* Three gothic arches */}
+                <path
+                    d='M30 72 C30 48 38 32 50 22 C62 32 70 48 70 72'
+                    className='stroke-stone-300 dark:stroke-stone-600'
+                    strokeWidth='3'
+                    strokeLinecap='round'
+                    fill='none'
                 />
                 <path
-                    d='M6 32l10-8 6 5 12-10 8 7'
+                    d='M18 72 C18 52 28 36 42 26'
                     className='stroke-stone-300 dark:stroke-stone-600'
-                    strokeWidth='1.5'
-                    strokeLinejoin='round'
+                    strokeWidth='3'
+                    strokeLinecap='round'
+                    fill='none'
                 />
-                <circle
-                    cx='17'
-                    cy='20'
-                    r='3'
+                <path
+                    d='M82 72 C82 52 72 36 58 26'
                     className='stroke-stone-300 dark:stroke-stone-600'
-                    strokeWidth='1.5'
+                    strokeWidth='3'
+                    strokeLinecap='round'
+                    fill='none'
                 />
             </svg>
         </div>
