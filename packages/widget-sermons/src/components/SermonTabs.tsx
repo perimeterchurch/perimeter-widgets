@@ -1,9 +1,9 @@
 import { Tabs, TabsList, TabsTrigger } from '@perimeter-widgets/shared';
-import { Mic, Library } from 'lucide-react';
+import { BookOpen, Library } from 'lucide-react';
 import type { TabId } from '../types';
 
 const TAB_DEFS: { id: TabId; label: string; icon: React.ReactNode }[] = [
-    { id: 'sermons', label: 'Sermons', icon: <Mic className='h-4 w-4' /> },
+    { id: 'sermons', label: 'Sermons', icon: <BookOpen className='h-4 w-4' /> },
     { id: 'series', label: 'Series', icon: <Library className='h-4 w-4' /> },
 ];
 
