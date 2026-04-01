@@ -10,6 +10,11 @@ interface MediaCardProps {
     meta?: ReactNode;
     badges?: ReactNode;
     description?: string | null;
+    /** Four-corner layout for info below title (overrides subtitle/meta/badges) */
+    topLeft?: ReactNode;
+    topRight?: ReactNode;
+    bottomLeft?: ReactNode;
+    bottomRight?: ReactNode;
     onClick: () => void;
     viewMode: 'grid' | 'list' | 'large';
 }
@@ -62,6 +67,77 @@ function CardButton({
     );
 }
 
+/** Renders either four-corner layout or fallback to subtitle/meta/badges */
+function InfoSection({
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight,
+    subtitle,
+    meta,
+    badges,
+    description,
+}: Pick<
+    MediaCardProps,
+    | 'topLeft'
+    | 'topRight'
+    | 'bottomLeft'
+    | 'bottomRight'
+    | 'subtitle'
+    | 'meta'
+    | 'badges'
+    | 'description'
+>) {
+    const hasCornersLayout = topLeft || topRight || bottomLeft || bottomRight;
+
+    if (hasCornersLayout) {
+        return (
+            <div className='space-y-1.5'>
+                {(topLeft || topRight) && (
+                    <div className='flex items-center justify-between gap-2'>
+                        <span className='text-xs text-muted-foreground truncate'>
+                            {topLeft}
+                        </span>
+                        <span className='text-xs text-muted-foreground truncate text-right'>
+                            {topRight}
+                        </span>
+                    </div>
+                )}
+                {description && (
+                    <p className='text-xs text-muted-foreground line-clamp-2'>
+                        {description}
+                    </p>
+                )}
+                {(bottomLeft || bottomRight) && (
+                    <div className='flex items-center justify-between gap-2'>
+                        <span className='text-xs text-muted-foreground truncate'>
+                            {bottomLeft}
+                        </span>
+                        <span className='text-xs text-muted-foreground truncate text-right'>
+                            {bottomRight}
+                        </span>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {subtitle && (
+                <p className='text-xs text-muted-foreground'>{subtitle}</p>
+            )}
+            {description && (
+                <p className='text-xs text-muted-foreground line-clamp-2'>
+                    {description}
+                </p>
+            )}
+            {meta}
+            {badges}
+        </>
+    );
+}
+
 export function MediaCard({
     imageUrl,
     imageAlt,
@@ -70,10 +146,25 @@ export function MediaCard({
     meta,
     badges,
     description,
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight,
     onClick,
     viewMode,
 }: MediaCardProps) {
     const [imgFailed, setImgFailed] = useState(false);
+
+    const infoProps = {
+        topLeft,
+        topRight,
+        bottomLeft,
+        bottomRight,
+        subtitle,
+        meta,
+        badges,
+        description,
+    };
 
     if (viewMode === 'list') {
         return (
@@ -89,19 +180,8 @@ export function MediaCard({
                     <p className='truncate text-sm font-medium text-card-foreground'>
                         {title}
                     </p>
-                    {subtitle && (
-                        <p className='text-xs text-muted-foreground'>
-                            {subtitle}
-                        </p>
-                    )}
-                    {description && (
-                        <p className='text-xs text-muted-foreground truncate'>
-                            {description}
-                        </p>
-                    )}
-                    {meta}
+                    <InfoSection {...infoProps} />
                 </div>
-                {badges}
             </CardButton>
         );
     }
@@ -124,21 +204,8 @@ export function MediaCard({
                         <p className='font-medium text-sm leading-snug line-clamp-2'>
                             {title}
                         </p>
-                        {subtitle && (
-                            <p className='text-xs text-muted-foreground'>
-                                {subtitle}
-                            </p>
-                        )}
-                        {description && (
-                            <p className='text-xs text-muted-foreground line-clamp-2'>
-                                {description}
-                            </p>
-                        )}
                     </div>
-                    <div className='flex items-center gap-2'>
-                        {badges}
-                        {meta}
-                    </div>
+                    <InfoSection {...infoProps} />
                 </div>
             </CardButton>
         );
@@ -161,16 +228,7 @@ export function MediaCard({
                 <p className='font-medium text-sm leading-snug line-clamp-2'>
                     {title}
                 </p>
-                {subtitle && (
-                    <p className='text-xs text-muted-foreground'>{subtitle}</p>
-                )}
-                {description && (
-                    <p className='text-xs text-muted-foreground line-clamp-2'>
-                        {description}
-                    </p>
-                )}
-                {meta}
-                {badges}
+                <InfoSection {...infoProps} />
             </div>
         </CardButton>
     );

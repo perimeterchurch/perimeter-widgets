@@ -1,4 +1,3 @@
-import { Badge } from '@perimeter-widgets/shared';
 import type { SermonListViewProps } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
@@ -26,11 +25,10 @@ export function SermonSmallList({
                     imageUrl={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
                     imageAlt={sermon.title}
                     title={sermon.title}
-                    subtitle={`${sermon.speaker.name} · ${formatDate(sermon.date)}`}
                     description={sermon.shortDescription}
-                    badges={
-                        <Badge variant='secondary'>{sermon.series.title}</Badge>
-                    }
+                    topLeft={formatDate(sermon.date)}
+                    topRight={sermon.series.title}
+                    bottomLeft={sermon.speaker.name}
                     onClick={() => onSermonClick(sermon.id)}
                 />
             ))}
