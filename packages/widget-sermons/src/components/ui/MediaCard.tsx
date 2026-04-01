@@ -175,22 +175,26 @@ export function MediaCard({
         return (
             <CardButton
                 onClick={onClick}
-                className={cn('flex w-full flex-row', CARD_BASE)}
+                className='flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
             >
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
                     failed={imgFailed}
                     onFail={() => setImgFailed(true)}
-                    className='w-32 flex-shrink-0 self-stretch'
+                    className='h-10 w-10 flex-shrink-0 rounded'
                 />
-                <div className='flex min-w-0 flex-1 flex-col gap-1 p-3'>
-                    {!hasCornersLayout && (
-                        <p className='font-medium text-sm leading-snug line-clamp-2'>
-                            {title}
-                        </p>
-                    )}
-                    <InfoSection {...infoProps} />
+                <div className='min-w-0 flex-1'>
+                    <p className='truncate text-sm font-medium'>{title}</p>
+                    <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+                        {topLeft}
+                        {topRight && <>{topRight}</>}
+                        {bottomLeft}
+                        {bottomRight && <>{bottomRight}</>}
+                        {!hasCornersLayout && subtitle && (
+                            <span className='truncate'>{subtitle}</span>
+                        )}
+                    </div>
                 </div>
             </CardButton>
         );
