@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
     Card,
     CardHeader,
@@ -30,26 +30,25 @@ function FallbackImage({
     src,
     alt,
     className,
+    failed,
+    onFail,
 }: {
     src: string;
     alt: string;
     className?: string;
+    failed: boolean;
+    onFail: () => void;
 }) {
+    if (failed) {
+        return <ImagePlaceholder className={className} />;
+    }
     return (
-        <>
-            <img
-                src={src}
-                alt={alt}
-                className={cn('object-cover', className)}
-                onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (
-                        e.target as HTMLImageElement
-                    ).nextElementSibling?.classList.remove('hidden');
-                }}
-            />
-            <ImagePlaceholder className={cn('hidden', className)} />
-        </>
+        <img
+            src={src}
+            alt={alt}
+            className={cn('object-cover', className)}
+            onError={onFail}
+        />
     );
 }
 
@@ -64,6 +63,8 @@ export function MediaCard({
     onClick,
     viewMode,
 }: MediaCardProps) {
+    const [imgFailed, setImgFailed] = useState(false);
+
     if (viewMode === 'list') {
         return (
             <button
@@ -77,6 +78,8 @@ export function MediaCard({
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
+                    failed={imgFailed}
+                    onFail={() => setImgFailed(true)}
                     className='h-12 w-12 flex-shrink-0 rounded'
                 />
                 <div className='min-w-0 flex-1 space-y-0.5'>
@@ -113,7 +116,9 @@ export function MediaCard({
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
-                    className='min-h-32 w-44 flex-shrink-0'
+                    failed={imgFailed}
+                    onFail={() => setImgFailed(true)}
+                    className='h-full w-44 flex-shrink-0 self-stretch'
                 />
                 <div className='flex flex-1 flex-col justify-between p-4 space-y-2'>
                     <CardHeader className='p-0'>
@@ -154,6 +159,8 @@ export function MediaCard({
             <FallbackImage
                 src={imageUrl}
                 alt={imageAlt}
+                failed={imgFailed}
+                onFail={() => setImgFailed(true)}
                 className='aspect-video w-full'
             />
             <CardHeader className='pb-3'>
