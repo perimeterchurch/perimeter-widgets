@@ -104,8 +104,11 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         config,
         serviceTypeId: configServiceTypeIds,
     });
-    const { data: seriesList = [], isLoading: seriesLoading } =
-        useSeries(config);
+    const { data: seriesData, isLoading: seriesLoading } = useSeries({
+        config,
+        perPage: 50,
+    });
+    const seriesList = seriesData?.series ?? [];
     const { data: speakers = [], isLoading: speakersLoading } =
         useSpeakers(config);
     const { data: books = [], isLoading: booksLoading } = useBooks(config);

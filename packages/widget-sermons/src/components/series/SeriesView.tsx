@@ -1,8 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
     InputGroupInput,
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationPrevious,
+    PaginationNext,
+    PaginationEllipsis,
     Skeleton,
     SortSelect,
     IconSelect,
@@ -18,7 +25,7 @@ import {
     List,
     Rows3,
 } from 'lucide-react';
-import type { SermonsConfig, SeriesListItem } from '../../types';
+import type { SermonsConfig } from '../../types';
 import { useSeries } from '../../hooks/use-series';
 import { SeriesGrid } from './SeriesGrid';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
@@ -67,28 +74,23 @@ const VIEW_OPTIONS = [
     },
 ];
 
-function sortSeries(
-    series: SeriesListItem[],
-    field: SeriesSortField,
-    direction: 'asc' | 'desc',
-): SeriesListItem[] {
-    const sorted = [...series].sort((a, b) => {
-        switch (field) {
-            case 'date': {
-                const dateA = a.latestSermonDate ?? '';
-                const dateB = b.latestSermonDate ?? '';
-                return dateA.localeCompare(dateB);
-            }
-            case 'title': {
-                const titleA = (a.displayTitle ?? a.title).toLowerCase();
-                const titleB = (b.displayTitle ?? b.title).toLowerCase();
-                return titleA.localeCompare(titleB);
-            }
-            case 'count':
-                return a.sermonCount - b.sermonCount;
-        }
-    });
-    return direction === 'desc' ? sorted.reverse() : sorted;
+function getPageRange(
+    page: number,
+    totalPages: number,
+): (number | 'ellipsis')[] {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+        return pages;
+    }
+    pages.push(1);
+    if (page > 3) pages.push('ellipsis');
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (page < totalPages - 2) pages.push('ellipsis');
+    pages.push(totalPages);
+    return pages;
 }
 
 export function SeriesView({ config, filters }: SeriesViewProps) {
@@ -96,25 +98,19 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
     const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
     const [sortField, setSortField] = useState<SeriesSortField>('date');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+    const [page, setPage] = useState(1);
 
-    const { data: seriesList = [], isLoading } = useSeries(config);
+    const { data, isLoading } = useSeries({
+        search: search || undefined,
+        page,
+        perPage: config.perPage,
+        sort: sortField,
+        order: sortDirection,
+        config,
+    });
 
-    const filtered = useMemo(() => {
-        const searched =
-            search ?
-                seriesList.filter(
-                    (s) =>
-                        (s.displayTitle ?? s.title)
-                            .toLowerCase()
-                            .includes(search.toLowerCase())
-                        || (s.subtitle
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase())
-                            ?? false),
-                )
-            :   seriesList;
-        return sortSeries(searched, sortField, sortDirection);
-    }, [seriesList, search, sortField, sortDirection]);
+    const seriesList = data?.series ?? [];
+    const pagination = data?.pagination;
 
     return (
         <div className='space-y-4'>
@@ -125,7 +121,10 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                 </InputGroupAddon>
                 <InputGroupInput
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setPage(1);
+                    }}
                     placeholder='Search series...'
                 />
             </InputGroup>
@@ -133,16 +132,20 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
             {/* Results header: count + sort + view */}
             <div className='flex items-center justify-between'>
                 <span className='text-sm text-[var(--color-text-muted)]'>
-                    {filtered.length} series
+                    {pagination ? `${pagination.total} series` : ''}
                 </span>
                 <div className='flex items-center gap-2'>
                     <SortSelect
                         sortField={sortField}
                         sortDirection={sortDirection}
-                        onSortFieldChange={(f) =>
-                            setSortField(f as SeriesSortField)
-                        }
-                        onSortDirectionChange={setSortDirection}
+                        onSortFieldChange={(f) => {
+                            setSortField(f as SeriesSortField);
+                            setPage(1);
+                        }}
+                        onSortDirectionChange={(d) => {
+                            setSortDirection(d);
+                            setPage(1);
+                        }}
                         fields={SORT_FIELDS}
                     />
                     <IconSelect
@@ -159,21 +162,73 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                 isLoading={isLoading}
                 skeleton={
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-                        {Array.from({ length: 6 }, (_, i) => (
+                        {Array.from({ length: config.perPage }, (_, i) => (
                             <Skeleton
                                 key={i}
-                                className='h-32 w-full rounded-lg'
+                                className='h-48 w-full rounded-lg'
                             />
                         ))}
                     </div>
                 }
             >
                 <SeriesGrid
-                    series={filtered}
+                    series={seriesList}
                     viewMode={viewMode}
                     onSeriesClick={(id) => filters.setScreen('detail', id)}
                 />
             </SkeletonTransition>
+
+            {pagination && pagination.totalPages > 1 && (
+                <Pagination>
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious
+                                onClick={() => setPage(Math.max(1, page - 1))}
+                                aria-disabled={page <= 1}
+                                className={
+                                    page <= 1 ?
+                                        'pointer-events-none opacity-50'
+                                    :   'cursor-pointer'
+                                }
+                            />
+                        </PaginationItem>
+                        {getPageRange(page, pagination.totalPages).map(
+                            (item, idx) =>
+                                item === 'ellipsis' ?
+                                    <PaginationItem key={`e-${idx}`}>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                :   <PaginationItem key={item}>
+                                        <PaginationLink
+                                            isActive={item === page}
+                                            onClick={() => setPage(item)}
+                                            className='cursor-pointer'
+                                        >
+                                            {item}
+                                        </PaginationLink>
+                                    </PaginationItem>,
+                        )}
+                        <PaginationItem>
+                            <PaginationNext
+                                onClick={() =>
+                                    setPage(
+                                        Math.min(
+                                            pagination.totalPages,
+                                            page + 1,
+                                        ),
+                                    )
+                                }
+                                aria-disabled={page >= pagination.totalPages}
+                                className={
+                                    page >= pagination.totalPages ?
+                                        'pointer-events-none opacity-50'
+                                    :   'cursor-pointer'
+                                }
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            )}
         </div>
     );
 }
