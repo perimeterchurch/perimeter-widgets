@@ -16,6 +16,10 @@ import { ChevronDownIcon, XIcon, CheckIcon } from 'lucide-react';
 
 const Combobox = ComboboxPrimitive.Root;
 
+function NoPortal({ children }: { children: React.ReactNode }) {
+    return <>{children}</>;
+}
+
 function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
     return <ComboboxPrimitive.Value data-slot='combobox-value' {...props} />;
 }
@@ -99,8 +103,9 @@ function ComboboxContent({
         'side' | 'align' | 'sideOffset' | 'alignOffset' | 'anchor'
     >) {
     const portalContainer = usePortalContainer();
+    const PortalWrapper = portalContainer ? NoPortal : ComboboxPrimitive.Portal;
     return (
-        <ComboboxPrimitive.Portal container={portalContainer}>
+        <PortalWrapper>
             <ComboboxPrimitive.Positioner
                 side={side}
                 sideOffset={sideOffset}
@@ -119,7 +124,7 @@ function ComboboxContent({
                     {...props}
                 />
             </ComboboxPrimitive.Positioner>
-        </ComboboxPrimitive.Portal>
+        </PortalWrapper>
     );
 }
 

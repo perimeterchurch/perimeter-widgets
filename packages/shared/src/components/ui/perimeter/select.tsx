@@ -9,6 +9,10 @@ import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from 'lucide-react';
 
 const Select = SelectPrimitive.Root;
 
+function NoPortal({ children }: { children: React.ReactNode }) {
+    return <>{children}</>;
+}
+
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
     return (
         <SelectPrimitive.Group
@@ -72,8 +76,9 @@ function SelectContent({
         'align' | 'alignOffset' | 'side' | 'sideOffset' | 'alignItemWithTrigger'
     >) {
     const portalContainer = usePortalContainer();
+    const PortalWrapper = portalContainer ? NoPortal : SelectPrimitive.Portal;
     return (
-        <SelectPrimitive.Portal container={portalContainer}>
+        <PortalWrapper>
             <SelectPrimitive.Positioner
                 side={side}
                 sideOffset={sideOffset}
@@ -96,7 +101,7 @@ function SelectContent({
                     <SelectScrollDownButton />
                 </SelectPrimitive.Popup>
             </SelectPrimitive.Positioner>
-        </SelectPrimitive.Portal>
+        </PortalWrapper>
     );
 }
 

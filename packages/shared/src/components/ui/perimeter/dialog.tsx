@@ -8,6 +8,10 @@ import { usePortalContainer } from '../../../shadow-dom/portal-container';
 import { Button } from '../button';
 import { XIcon } from 'lucide-react';
 
+function NoPortal({ children }: { children: React.ReactNode }) {
+    return <>{children}</>;
+}
+
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
     return <DialogPrimitive.Root data-slot='dialog' {...props} />;
 }
@@ -18,12 +22,11 @@ function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
 
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
     const portalContainer = usePortalContainer();
+    const PortalWrapper = portalContainer ? NoPortal : DialogPrimitive.Portal;
     return (
-        <DialogPrimitive.Portal
-            data-slot='dialog-portal'
-            container={portalContainer}
-            {...props}
-        />
+        <PortalWrapper>
+            {props.children}
+        </PortalWrapper>
     );
 }
 
