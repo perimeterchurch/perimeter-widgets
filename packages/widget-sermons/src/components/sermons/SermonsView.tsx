@@ -23,7 +23,6 @@ import type {
     SortOrder,
 } from '../../types';
 import { useSermons } from '../../hooks/use-sermons';
-import { useFilterIds } from '../../hooks/use-filter-ids';
 import { useSeries } from '../../hooks/use-series';
 import { useSpeakers } from '../../hooks/use-speakers';
 import { useBooks } from '../../hooks/use-books';
@@ -107,7 +106,6 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const { data: speakers = [], isLoading: speakersLoading } =
         useSpeakers(config);
     const { data: books = [], isLoading: booksLoading } = useBooks(config);
-    const { data: filterIds } = useFilterIds({ ...filters, config });
 
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
@@ -130,7 +128,6 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 series={filters.series}
                 speaker={filters.speaker}
                 book={filters.book}
-                filterIds={filterIds}
                 selectedServiceTypeIds={filters.selectedServiceTypeIds}
                 from={filters.from ?? ''}
                 to={filters.to ?? ''}

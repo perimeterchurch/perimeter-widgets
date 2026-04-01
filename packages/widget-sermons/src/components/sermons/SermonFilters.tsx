@@ -18,7 +18,6 @@ import type {
     SortField,
     SortOrder,
 } from '../../types';
-import type { FilterIdSets } from '../../hooks/use-filter-ids';
 
 export interface SermonFiltersProps {
     search: string;
@@ -31,7 +30,6 @@ export interface SermonFiltersProps {
     sort: SortField;
     order: SortOrder;
     hasActiveFilters: boolean;
-    filterIds?: FilterIdSets;
     seriesList: SeriesListItem[];
     speakers: Speaker[];
     books: Book[];
@@ -63,41 +61,14 @@ function withAllOption(
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
 
-    // Cross-filter: when other filters are active and we have filter ID data,
-    // narrow options to those that appear in all matching sermons (unpaginated).
-    // Always include the currently selected value so it stays visible.
-    const { filterIds } = props;
-
-    const hasOtherSeriesFilters =
-        props.speaker != null || props.book != null || !!props.search;
-    const seriesOptions: MultiComboboxOption[] = props.seriesList
-        .filter(
-            (s) =>
-                !hasOtherSeriesFilters
-                || !filterIds
-                || filterIds.seriesIds.has(s.id)
-                || s.id === props.series,
-        )
-        .map((s) => ({
-            value: String(s.id),
-            label: s.displayTitle ?? s.title,
-        }));
-
-    const hasOtherSpeakerFilters =
-        props.series != null || props.book != null || !!props.search;
-    const speakerOptions: MultiComboboxOption[] = props.speakers
-        .filter(
-            (s) =>
-                !hasOtherSpeakerFilters
-                || !filterIds
-                || filterIds.speakerIds.has(s.id)
-                || s.id === props.speaker,
-        )
-        .map((s) => ({
-            value: String(s.id),
-            label: s.name,
-        }));
-
+    const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
+        value: String(s.id),
+        label: s.displayTitle ?? s.title,
+    }));
+    const speakerOptions: MultiComboboxOption[] = props.speakers.map((s) => ({
+        value: String(s.id),
+        label: s.name,
+    }));
     const bookOptions: MultiComboboxOption[] = props.books.map((b) => ({
         value: String(b.id),
         label: b.name,
