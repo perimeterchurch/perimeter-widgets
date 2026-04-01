@@ -1,7 +1,7 @@
 import { Badge } from '@perimeter-widgets/shared';
 import type { SermonListViewProps } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
-import { ImagePlaceholder } from '../ui/ImagePlaceholder';
+import { MediaCard } from '../ui/MediaCard';
 
 export type { SermonListViewProps };
 
@@ -11,42 +11,27 @@ export function SermonSmallList({
 }: SermonListViewProps) {
     if (sermons.length === 0) {
         return (
-            <div className='py-12 text-center text-stone-500 dark:text-stone-400'>
+            <div className='py-12 text-center text-muted-foreground'>
                 No sermons found.
             </div>
         );
     }
 
     return (
-        <div className='divide-y divide-stone-200 dark:divide-stone-700'>
+        <div className='divide-y divide-border'>
             {sermons.map((sermon) => (
-                <button
+                <MediaCard
                     key={sermon.id}
-                    type='button'
-                    onClick={() => onSermonClick(sermon.id)}
-                    className='flex w-full items-center gap-3 rounded-md py-3 px-2 text-left transition-all duration-200 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:hover:bg-stone-800/50'
-                >
-                    <img
-                        src={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
-                        alt={sermon.title}
-                        className='h-12 w-12 flex-shrink-0 rounded object-cover'
-                        onError={(e) => {
-                            const img = e.target as HTMLImageElement;
-                            img.style.display = 'none';
-                            img.nextElementSibling?.classList.remove('hidden');
-                        }}
-                    />
-                    <ImagePlaceholder className='hidden h-12 w-12 flex-shrink-0 rounded' />
-                    <div className='min-w-0 flex-1 space-y-0.5'>
-                        <p className='truncate font-medium text-sm text-stone-900 dark:text-stone-100'>
-                            {sermon.title}
-                        </p>
-                        <p className='text-xs text-stone-500 dark:text-stone-400'>
-                            {sermon.speaker.name} · {formatDate(sermon.date)}
-                        </p>
+                    viewMode='list'
+                    imageUrl={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
+                    imageAlt={sermon.title}
+                    title={sermon.title}
+                    subtitle={`${sermon.speaker.name} · ${formatDate(sermon.date)}`}
+                    badges={
                         <Badge variant='secondary'>{sermon.series.title}</Badge>
-                    </div>
-                </button>
+                    }
+                    onClick={() => onSermonClick(sermon.id)}
+                />
             ))}
         </div>
     );
