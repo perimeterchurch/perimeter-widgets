@@ -182,7 +182,7 @@ export function MediaCard({
                     alt={imageAlt}
                     failed={imgFailed}
                     onFail={() => setImgFailed(true)}
-                    className='h-16 w-16 flex-shrink-0 rounded'
+                    className='h-16 w-16 flex-shrink-0 self-center rounded'
                 />
                 <div className='flex min-w-0 flex-1 flex-col gap-1'>
                     {!hasCornersLayout && (
