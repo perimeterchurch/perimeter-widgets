@@ -1,9 +1,10 @@
 import { Tabs, TabsList, TabsTrigger } from '@perimeter-widgets/shared';
+import { Mic, Library } from 'lucide-react';
 import type { TabId } from '../types';
 
-const TAB_DEFS: { id: TabId; label: string }[] = [
-    { id: 'sermons', label: 'Sermons' },
-    { id: 'series', label: 'Series' },
+const TAB_DEFS: { id: TabId; label: string; icon: React.ReactNode }[] = [
+    { id: 'sermons', label: 'Sermons', icon: <Mic className='h-4 w-4' /> },
+    { id: 'series', label: 'Series', icon: <Library className='h-4 w-4' /> },
 ];
 
 export interface SermonTabsProps {
@@ -17,9 +18,14 @@ export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
             value={activeTab}
             onValueChange={(value) => onTabChange(value as TabId)}
         >
-            <TabsList>
+            <TabsList className='h-10'>
                 {TAB_DEFS.map((tab) => (
-                    <TabsTrigger key={tab.id} value={tab.id}>
+                    <TabsTrigger
+                        key={tab.id}
+                        value={tab.id}
+                        className='gap-1.5 px-4 text-sm'
+                    >
+                        {tab.icon}
                         {tab.label}
                     </TabsTrigger>
                 ))}
