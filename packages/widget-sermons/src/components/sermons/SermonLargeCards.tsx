@@ -1,7 +1,7 @@
 import type { SermonListViewProps } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
-import { DatePill, SeriesPill, SpeakerPill, BookPill } from './SermonInfo';
+import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 
 export type { SermonListViewProps };
 
@@ -27,12 +27,12 @@ export function SermonLargeCards({
                     imageAlt={sermon.title}
                     title={sermon.title}
                     description={sermon.shortDescription}
-                    topLeft={<DatePill date={formatDate(sermon.date)} />}
+                    topLeft={<DateLabel date={formatDate(sermon.date)} />}
                     topRight={<SeriesPill name={sermon.series.title} />}
-                    bottomLeft={<SpeakerPill name={sermon.speaker.name} />}
+                    bottomLeft={<SpeakerLabel name={sermon.speaker.name} />}
                     bottomRight={
                         sermon.book?.name ?
-                            <BookPill name={sermon.book.name} />
+                            <BookLabel name={sermon.book.name} />
                         :   undefined
                     }
                     onClick={() => onSermonClick(sermon.id)}

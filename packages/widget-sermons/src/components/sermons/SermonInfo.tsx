@@ -1,53 +1,39 @@
-import type { ReactNode } from 'react';
 import { Calendar, Library, User, BookOpen } from 'lucide-react';
-import { cn } from '@perimeter-widgets/shared';
 
-const iconClass = 'h-3 w-3 shrink-0';
-const pillClass =
-    'inline-flex items-center gap-1 rounded-full bg-muted/60 px-2 py-0.5 text-xs text-muted-foreground';
+const iconClass = 'inline h-3 w-3 shrink-0';
 
-function Pill({
-    children,
-    className,
-}: {
-    children: ReactNode;
-    className?: string;
-}) {
-    return <span className={cn(pillClass, className)}>{children}</span>;
-}
-
-export function DatePill({ date }: { date: string }) {
+export function DateLabel({ date }: { date: string }) {
     return (
-        <Pill>
+        <span className='flex items-center gap-1'>
             <Calendar className={iconClass} />
             {date}
-        </Pill>
+        </span>
     );
 }
 
 export function SeriesPill({ name }: { name: string }) {
     return (
-        <Pill>
+        <span className='inline-flex items-center gap-1 rounded-full bg-muted/60 px-2 py-0.5 text-xs text-muted-foreground'>
             <Library className={iconClass} />
             {name}
-        </Pill>
+        </span>
     );
 }
 
-export function SpeakerPill({ name }: { name: string }) {
+export function SpeakerLabel({ name }: { name: string }) {
     return (
-        <Pill>
+        <span className='flex items-center gap-1'>
             <User className={iconClass} />
             {name}
-        </Pill>
+        </span>
     );
 }
 
-export function BookPill({ name }: { name: string }) {
+export function BookLabel({ name }: { name: string }) {
     return (
-        <Pill>
+        <span className='flex items-center gap-1'>
             <BookOpen className={iconClass} />
             {name}
-        </Pill>
+        </span>
     );
 }
