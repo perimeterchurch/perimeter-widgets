@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
@@ -58,6 +59,9 @@ function withAllOption(
 }
 
 export function SermonFilters(props: SermonFiltersProps) {
+    // Ref to track pending from value so onToChange doesn't use stale props
+    // (DateRangePicker calls onFromChange then onToChange synchronously)
+    const pendingFrom = useRef(props.from);
     const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
         value: String(s.id),
         label: s.displayTitle ?? s.title,
@@ -151,10 +155,13 @@ export function SermonFilters(props: SermonFiltersProps) {
                 <DateRangePicker
                     from={props.from}
                     to={props.to}
-                    onFromChange={(from) =>
-                        props.onDateRangeChange(from, props.to)
+                    onFromChange={(from) => {
+                        pendingFrom.current = from;
+                        props.onDateRangeChange(from, props.to);
+                    }}
+                    onToChange={(to) =>
+                        props.onDateRangeChange(pendingFrom.current, to)
                     }
-                    onToChange={(to) => props.onDateRangeChange(props.from, to)}
                 />
                 <div className='flex-1' />
                 {props.hasActiveFilters && (
