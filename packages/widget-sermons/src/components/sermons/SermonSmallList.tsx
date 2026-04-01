@@ -27,6 +27,7 @@ export function SermonSmallList({
                     imageAlt={sermon.title}
                     title={sermon.title}
                     subtitle={`${sermon.speaker.name} · ${formatDate(sermon.date)}`}
+                    description={sermon.shortDescription}
                     badges={
                         <Badge variant='secondary'>{sermon.series.title}</Badge>
                     }

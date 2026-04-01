@@ -94,6 +94,11 @@ export function MediaCard({
                             {subtitle}
                         </p>
                     )}
+                    {description && (
+                        <p className='text-xs text-muted-foreground truncate'>
+                            {description}
+                        </p>
+                    )}
                     {meta}
                 </div>
                 {badges}
@@ -158,6 +163,11 @@ export function MediaCard({
                 </p>
                 {subtitle && (
                     <p className='text-xs text-muted-foreground'>{subtitle}</p>
+                )}
+                {description && (
+                    <p className='text-xs text-muted-foreground line-clamp-2'>
+                        {description}
+                    </p>
                 )}
                 {meta}
                 {badges}

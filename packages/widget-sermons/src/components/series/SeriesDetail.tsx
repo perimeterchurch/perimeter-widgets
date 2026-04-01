@@ -97,11 +97,6 @@ export function SeriesDetail({
                                     </Badge>
                                 )}
                             </div>
-                            {series.description && (
-                                <p className='text-sm text-stone-600 dark:text-stone-300 mt-2'>
-                                    {series.description}
-                                </p>
-                            )}
                         </div>
 
                         <div className='divide-y divide-stone-200 dark:divide-stone-700'>
