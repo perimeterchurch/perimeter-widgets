@@ -15,15 +15,7 @@ import {
     Skeleton,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
-import {
-    ArrowDownWideNarrow,
-    ArrowUpNarrowWide,
-    ArrowDownAZ,
-    ArrowUpZA,
-    LayoutGrid,
-    List,
-    Rows3,
-} from 'lucide-react';
+import { Calendar, Type, LayoutGrid, List, Rows3 } from 'lucide-react';
 import type {
     SermonsConfig,
     ViewMode,
@@ -36,6 +28,7 @@ import { useSpeakers } from '../../hooks/use-speakers';
 import { useBooks } from '../../hooks/use-books';
 import { useServiceTypes } from '../../hooks/use-service-types';
 import { resolveServiceTypeIds } from '../../types';
+import { SortSelect } from '../ui/SortSelect';
 import { SermonFilters } from './SermonFilters';
 import { SermonCardGrid } from './SermonCardGrid';
 import { SermonSmallList } from './SermonSmallList';
@@ -65,26 +58,16 @@ const VIEW_OPTIONS = [
     },
 ];
 
-const SORT_OPTIONS = [
+const SORT_FIELDS = [
     {
-        value: 'date-desc',
-        label: 'Date: Newest',
-        icon: <ArrowDownWideNarrow className='h-4 w-4' />,
+        value: 'date',
+        label: 'Date',
+        icon: <Calendar className='h-3.5 w-3.5' />,
     },
     {
-        value: 'date-asc',
-        label: 'Date: Oldest',
-        icon: <ArrowUpNarrowWide className='h-4 w-4' />,
-    },
-    {
-        value: 'title-asc',
-        label: 'Title: A-Z',
-        icon: <ArrowDownAZ className='h-4 w-4' />,
-    },
-    {
-        value: 'title-desc',
-        label: 'Title: Z-A',
-        icon: <ArrowUpZA className='h-4 w-4' />,
+        value: 'title',
+        label: 'Title',
+        icon: <Type className='h-3.5 w-3.5' />,
     },
 ];
 
@@ -134,10 +117,11 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
 
-    const sortValue = `${filters.sort}-${filters.order}`;
-    const handleSortChange = (value: string) => {
-        const [sort, order] = value.split('-') as [SortField, SortOrder];
-        filters.setSort(sort, order);
+    const handleSortFieldChange = (field: string) => {
+        filters.setSort(field as SortField, filters.order);
+    };
+    const handleSortDirectionChange = (direction: 'asc' | 'desc') => {
+        filters.setSort(filters.sort, direction as SortOrder);
     };
 
     const ViewComponent =
@@ -182,29 +166,13 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                     {pagination ? `${pagination.total} sermons` : ''}
                 </span>
                 <div className='flex items-center gap-2'>
-                    <Select
-                        value={sortValue}
-                        onValueChange={(v) => v && handleSortChange(v)}
-                    >
-                        <SelectTrigger size='sm'>
-                            <span className='text-muted-foreground'>
-                                Sort by:
-                            </span>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent
-                            align='start'
-                            alignItemWithTrigger={false}
-                        >
-                            {SORT_OPTIONS.map((opt) => (
-                                <SelectItem key={opt.value} value={opt.value}>
-                                    <span className='flex items-center gap-1.5'>
-                                        {opt.icon} {opt.label}
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <SortSelect
+                        sortField={filters.sort}
+                        sortDirection={filters.order}
+                        onSortFieldChange={handleSortFieldChange}
+                        onSortDirectionChange={handleSortDirectionChange}
+                        fields={SORT_FIELDS}
+                    />
                     <Select
                         value={viewMode}
                         onValueChange={(v) => v && setViewMode(v as ViewMode)}
