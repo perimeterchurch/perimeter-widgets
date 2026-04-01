@@ -1,11 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-    cn,
-} from '@perimeter-widgets/shared';
+import { cn } from '@perimeter-widgets/shared';
 import { ImagePlaceholder } from './ImagePlaceholder';
 
 interface MediaCardProps {
@@ -20,11 +14,11 @@ interface MediaCardProps {
     viewMode: 'grid' | 'list' | 'large';
 }
 
-const HOVER_CLASS =
-    'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:ring-foreground/20 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
+const CARD_CLASS =
+    'overflow-hidden rounded-xl text-left ring-1 ring-foreground/10 bg-card text-card-foreground cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:ring-foreground/20 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
 
-const LIST_HOVER_CLASS =
-    'cursor-pointer rounded-md px-2 py-3 transition-all duration-200 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:hover:bg-stone-800/50';
+const LIST_CLASS =
+    'flex w-full items-center gap-3 cursor-pointer rounded-md px-2 py-3 transition-all duration-200 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:hover:bg-stone-800/50';
 
 function FallbackImage({
     src,
@@ -52,6 +46,22 @@ function FallbackImage({
     );
 }
 
+function CardButton({
+    onClick,
+    className,
+    children,
+}: {
+    onClick: () => void;
+    className: string;
+    children: ReactNode;
+}) {
+    return (
+        <button type='button' onClick={onClick} className={className}>
+            {children}
+        </button>
+    );
+}
+
 export function MediaCard({
     imageUrl,
     imageAlt,
@@ -67,14 +77,7 @@ export function MediaCard({
 
     if (viewMode === 'list') {
         return (
-            <button
-                type='button'
-                onClick={onClick}
-                className={cn(
-                    'flex w-full items-center gap-3',
-                    LIST_HOVER_CLASS,
-                )}
-            >
+            <CardButton onClick={onClick} className={LIST_CLASS}>
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
@@ -94,68 +97,48 @@ export function MediaCard({
                     {meta}
                 </div>
                 {badges}
-            </button>
+            </CardButton>
         );
     }
 
     if (viewMode === 'large') {
         return (
-            <Card
-                size='sm'
-                className={cn('flex-row', HOVER_CLASS)}
-                onClick={onClick}
-                role='button'
-                tabIndex={0}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onClick();
-                    }
-                }}
-            >
+            <CardButton onClick={onClick} className={cn('flex', CARD_CLASS)}>
                 <FallbackImage
                     src={imageUrl}
                     alt={imageAlt}
                     failed={imgFailed}
                     onFail={() => setImgFailed(true)}
-                    className='h-full w-44 flex-shrink-0 self-stretch'
+                    className='aspect-[4/3] w-48 flex-shrink-0'
                 />
                 <div className='flex flex-1 flex-col justify-between p-4 space-y-2'>
-                    <CardHeader className='p-0'>
-                        <CardTitle className='line-clamp-2'>{title}</CardTitle>
-                        {subtitle && (
-                            <CardDescription>{subtitle}</CardDescription>
-                        )}
-                    </CardHeader>
-                    {description && (
-                        <p className='text-sm text-muted-foreground line-clamp-2'>
-                            {description}
+                    <div className='space-y-1'>
+                        <p className='font-medium text-sm leading-snug line-clamp-2'>
+                            {title}
                         </p>
-                    )}
+                        {subtitle && (
+                            <p className='text-xs text-muted-foreground'>
+                                {subtitle}
+                            </p>
+                        )}
+                        {description && (
+                            <p className='text-xs text-muted-foreground line-clamp-2'>
+                                {description}
+                            </p>
+                        )}
+                    </div>
                     <div className='flex items-center gap-2'>
                         {badges}
                         {meta}
                     </div>
                 </div>
-            </Card>
+            </CardButton>
         );
     }
 
     // Grid view (default)
     return (
-        <Card
-            size='sm'
-            className={cn('p-0', HOVER_CLASS)}
-            onClick={onClick}
-            role='button'
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onClick();
-                }
-            }}
-        >
+        <CardButton onClick={onClick} className={CARD_CLASS}>
             <FallbackImage
                 src={imageUrl}
                 alt={imageAlt}
@@ -163,12 +146,16 @@ export function MediaCard({
                 onFail={() => setImgFailed(true)}
                 className='aspect-video w-full'
             />
-            <CardHeader className='pb-3'>
-                <CardTitle className='line-clamp-2'>{title}</CardTitle>
-                {subtitle && <CardDescription>{subtitle}</CardDescription>}
+            <div className='p-3 space-y-1'>
+                <p className='font-medium text-sm leading-snug line-clamp-2'>
+                    {title}
+                </p>
+                {subtitle && (
+                    <p className='text-xs text-muted-foreground'>{subtitle}</p>
+                )}
                 {meta}
                 {badges}
-            </CardHeader>
-        </Card>
+            </div>
+        </CardButton>
     );
 }
