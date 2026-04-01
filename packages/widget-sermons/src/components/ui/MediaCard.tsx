@@ -92,7 +92,7 @@ function InfoSection({
 
     if (hasCornersLayout) {
         return (
-            <div className='space-y-1.5'>
+            <div className='flex flex-1 flex-col gap-1.5'>
                 {(topLeft || topRight) && (
                     <div className='flex items-center justify-between gap-2'>
                         <span className='text-xs text-muted-foreground truncate'>
@@ -109,7 +109,7 @@ function InfoSection({
                     </p>
                 )}
                 {(bottomLeft || bottomRight) && (
-                    <div className='flex items-center justify-between gap-2'>
+                    <div className='mt-auto flex items-center justify-between gap-2'>
                         <span className='text-xs text-muted-foreground truncate'>
                             {bottomLeft}
                         </span>
@@ -199,12 +199,10 @@ export function MediaCard({
                     onFail={() => setImgFailed(true)}
                     className='aspect-[4/3] w-48 flex-shrink-0'
                 />
-                <div className='flex flex-1 flex-col justify-between p-4 space-y-2'>
-                    <div className='space-y-1'>
-                        <p className='font-medium text-sm leading-snug line-clamp-2'>
-                            {title}
-                        </p>
-                    </div>
+                <div className='flex flex-1 flex-col gap-1 p-4'>
+                    <p className='font-medium text-sm leading-snug line-clamp-2'>
+                        {title}
+                    </p>
                     <InfoSection {...infoProps} />
                 </div>
             </CardButton>
@@ -224,7 +222,7 @@ export function MediaCard({
                 onFail={() => setImgFailed(true)}
                 className='aspect-video w-full'
             />
-            <div className='p-3 space-y-1'>
+            <div className='flex flex-1 flex-col gap-1 p-3'>
                 <p className='font-medium text-sm leading-snug line-clamp-2'>
                     {title}
                 </p>
