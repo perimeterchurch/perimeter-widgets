@@ -59,7 +59,7 @@ export function SeriesDetail({
                 onClick={onBack}
                 className='mb-4'
             >
-                <ArrowLeft className='h-4 w-4' /> Back to series
+                <ArrowLeft className='h-4 w-4' /> Back
             </Button>
             <SkeletonTransition
                 isLoading={isLoading}
