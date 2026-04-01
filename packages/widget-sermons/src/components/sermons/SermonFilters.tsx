@@ -1,17 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
     InputGroupInput,
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
     Badge,
     Button,
-    Checkbox,
+    MultiCombobox,
 } from '@perimeter-widgets/shared';
+import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SlidersHorizontal, X, Search } from 'lucide-react';
 import type {
@@ -47,8 +43,7 @@ export interface SermonFiltersProps {
     onSeriesChange: (value: number | null) => void;
     onSpeakerChange: (value: number | null) => void;
     onBookChange: (value: number | null) => void;
-    onToggleServiceType: (id: number) => void;
-    onClearServiceTypes: () => void;
+    onServiceTypesChange: (ids: number[]) => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
@@ -57,22 +52,24 @@ export interface SermonFiltersProps {
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
 
-    const seriesOptions = props.seriesList.map((s) => ({
-        value: s.id,
+    const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
+        value: String(s.id),
         label: s.displayTitle ?? s.title,
     }));
-    const speakerOptions = props.speakers.map((s) => ({
-        value: s.id,
+    const speakerOptions: MultiComboboxOption[] = props.speakers.map((s) => ({
+        value: String(s.id),
         label: s.name,
     }));
-    const bookOptions = props.books.map((b) => ({
-        value: b.id,
+    const bookOptions: MultiComboboxOption[] = props.books.map((b) => ({
+        value: String(b.id),
         label: b.name,
     }));
-    const serviceTypeOptions = props.serviceTypes.map((st) => ({
-        value: st.id,
-        label: st.name,
-    }));
+    const serviceTypeOptions: MultiComboboxOption[] = props.serviceTypes.map(
+        (st) => ({
+            value: String(st.id),
+            label: st.name,
+        }),
+    );
 
     return (
         <div className='space-y-3'>
@@ -88,80 +85,46 @@ export function SermonFilters(props: SermonFiltersProps) {
                         placeholder='Search sermons...'
                     />
                 </InputGroup>
-                <Select
-                    value={props.series != null ? String(props.series) : ''}
+                <MultiCombobox
+                    options={seriesOptions}
+                    value={props.series != null ? String(props.series) : null}
                     onValueChange={(v) =>
-                        props.onSeriesChange(
-                            v == null || v === '' ? null : Number(v),
-                        )
+                        props.onSeriesChange(v != null ? Number(v) : null)
                     }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder='All Series' />
-                    </SelectTrigger>
-                    <SelectContent align='start' alignItemWithTrigger={false}>
-                        <SelectItem value=''>All Series</SelectItem>
-                        {seriesOptions.map((opt) => (
-                            <SelectItem
-                                key={opt.value}
-                                value={String(opt.value)}
-                            >
-                                {opt.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <Select
-                    value={props.speaker != null ? String(props.speaker) : ''}
+                    placeholder='All Series'
+                    disabled={props.seriesLoading}
+                />
+                <MultiCombobox
+                    options={speakerOptions}
+                    value={
+                        props.speaker != null ? String(props.speaker) : null
+                    }
                     onValueChange={(v) =>
-                        props.onSpeakerChange(
-                            v == null || v === '' ? null : Number(v),
-                        )
+                        props.onSpeakerChange(v != null ? Number(v) : null)
                     }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder='All Speakers' />
-                    </SelectTrigger>
-                    <SelectContent align='start' alignItemWithTrigger={false}>
-                        <SelectItem value=''>All Speakers</SelectItem>
-                        {speakerOptions.map((opt) => (
-                            <SelectItem
-                                key={opt.value}
-                                value={String(opt.value)}
-                            >
-                                {opt.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <Select
-                    value={props.book != null ? String(props.book) : ''}
+                    placeholder='All Speakers'
+                    disabled={props.speakersLoading}
+                />
+                <MultiCombobox
+                    options={bookOptions}
+                    value={props.book != null ? String(props.book) : null}
                     onValueChange={(v) =>
-                        props.onBookChange(
-                            v == null || v === '' ? null : Number(v),
-                        )
+                        props.onBookChange(v != null ? Number(v) : null)
                     }
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder='All Books' />
-                    </SelectTrigger>
-                    <SelectContent align='start' alignItemWithTrigger={false}>
-                        <SelectItem value=''>All Books</SelectItem>
-                        {bookOptions.map((opt) => (
-                            <SelectItem
-                                key={opt.value}
-                                value={String(opt.value)}
-                            >
-                                {opt.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    placeholder='All Books'
+                    disabled={props.booksLoading}
+                />
                 {props.showServiceTypeFilter && (
-                    <ServiceTypeMultiSelect
+                    <MultiCombobox
                         options={serviceTypeOptions}
-                        selected={props.selectedServiceTypeIds}
-                        onToggle={props.onToggleServiceType}
+                        value={props.selectedServiceTypeIds.map(String)}
+                        onValueChange={(v) =>
+                            props.onServiceTypesChange(v.map(Number))
+                        }
+                        placeholder='Service Types'
+                        selectedLabel='Service Types'
+                        disabled={props.serviceTypesLoading}
+                        multiple
                     />
                 )}
                 <Button
@@ -210,7 +173,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         >
                             <Badge variant='default'>
                                 {seriesOptions.find(
-                                    (o) => o.value === props.series,
+                                    (o) => o.value === String(props.series),
                                 )?.label ?? 'Series'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
@@ -224,7 +187,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         >
                             <Badge variant='default'>
                                 {speakerOptions.find(
-                                    (o) => o.value === props.speaker,
+                                    (o) => o.value === String(props.speaker),
                                 )?.label ?? 'Speaker'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
@@ -237,8 +200,9 @@ export function SermonFilters(props: SermonFiltersProps) {
                             className='inline-flex'
                         >
                             <Badge variant='default'>
-                                {bookOptions.find((o) => o.value === props.book)
-                                    ?.label ?? 'Book'}{' '}
+                                {bookOptions.find(
+                                    (o) => o.value === String(props.book),
+                                )?.label ?? 'Book'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
@@ -247,12 +211,18 @@ export function SermonFilters(props: SermonFiltersProps) {
                         <button
                             key={id}
                             type='button'
-                            onClick={() => props.onToggleServiceType(id)}
+                            onClick={() =>
+                                props.onServiceTypesChange(
+                                    props.selectedServiceTypeIds.filter(
+                                        (x) => x !== id,
+                                    ),
+                                )
+                            }
                             className='inline-flex'
                         >
                             <Badge variant='default'>
                                 {serviceTypeOptions.find(
-                                    (o) => o.value === id,
+                                    (o) => o.value === String(id),
                                 )?.label ?? 'Service Type'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
@@ -270,69 +240,6 @@ export function SermonFilters(props: SermonFiltersProps) {
                             </Badge>
                         </button>
                     )}
-                </div>
-            )}
-        </div>
-    );
-}
-
-function ServiceTypeMultiSelect({
-    options,
-    selected,
-    onToggle,
-}: {
-    options: { value: number; label: string }[];
-    selected: number[];
-    onToggle: (id: number) => void;
-}) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (!open) return;
-        const handleClick = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) {
-                setOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
-    }, [open]);
-
-    const label =
-        selected.length === 0 ? 'Service Types'
-        : selected.length === 1 ?
-            (options.find((o) => o.value === selected[0])?.label ??
-            'Service Type')
-        :   `${selected.length} Service Types`;
-
-    return (
-        <div ref={ref} className='relative'>
-            <Button
-                variant='outline'
-                size='default'
-                onClick={() => setOpen(!open)}
-                className='text-sm whitespace-nowrap'
-            >
-                {label}
-            </Button>
-            {open && (
-                <div className='absolute top-full left-0 z-50 mt-1 min-w-48 rounded-lg bg-popover p-1 shadow-md ring-1 ring-foreground/10'>
-                    {options.map((opt) => (
-                        <button
-                            key={opt.value}
-                            type='button'
-                            onClick={() => onToggle(opt.value)}
-                            className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground'
-                        >
-                            <Checkbox
-                                checked={selected.includes(opt.value)}
-                                readOnly
-                                className='pointer-events-none'
-                            />
-                            {opt.label}
-                        </button>
-                    ))}
                 </div>
             )}
         </div>

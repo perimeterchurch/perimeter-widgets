@@ -147,8 +147,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 onSeriesChange={filters.setSeries}
                 onSpeakerChange={filters.setSpeaker}
                 onBookChange={filters.setBook}
-                onToggleServiceType={filters.toggleServiceType}
-                onClearServiceTypes={filters.clearServiceTypes}
+                onServiceTypesChange={filters.setServiceTypes}
                 onDateRangeChange={filters.setDateRange}
                 onSortChange={filters.setSort}
                 onClearFilters={filters.clearFilters}

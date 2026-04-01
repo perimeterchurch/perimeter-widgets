@@ -87,6 +87,10 @@ export function useSermonFilters() {
         setParams({ serviceTypes: null, page: 1 });
     };
 
+    const setServiceTypes = (ids: number[]) => {
+        setParams({ serviceTypes: serializeServiceTypeIds(ids), page: 1 });
+    };
+
     const setDateRange = (from: string | null, to: string | null) => {
         setParams({ from: from || null, to: to || null, page: 1 });
     };
@@ -136,6 +140,7 @@ export function useSermonFilters() {
         setBook,
         toggleServiceType,
         clearServiceTypes,
+        setServiceTypes,
         setDateRange,
         setSort,
         setPage,
