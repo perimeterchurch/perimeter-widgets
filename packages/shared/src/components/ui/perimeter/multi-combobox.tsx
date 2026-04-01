@@ -83,7 +83,8 @@ function MultiCombobox(props: MultiComboboxProps) {
                 get(target, prop) {
                     if (prop === 'getElementById')
                         return shadow.getElementById.bind(shadow);
-                    if (prop === 'activeElement') return shadow.activeElement;
+                    if (prop === 'activeElement')
+                        return shadow.activeElement ?? document.activeElement;
                     const value = Reflect.get(target, prop);
                     return typeof value === 'function' ?
                             value.bind(target)

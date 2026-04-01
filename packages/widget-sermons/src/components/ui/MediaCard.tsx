@@ -15,7 +15,7 @@ interface MediaCardProps {
 }
 
 const CARD_CLASS =
-    'overflow-hidden rounded-xl text-left ring-1 ring-foreground/10 bg-card text-card-foreground cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:ring-foreground/20 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
+    'flex flex-col overflow-hidden rounded-xl p-0 text-left ring-1 ring-foreground/10 bg-card text-card-foreground cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:ring-foreground/20 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
 
 const LIST_CLASS =
     'flex w-full items-center gap-3 cursor-pointer rounded-md px-2 py-3 transition-all duration-200 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:hover:bg-stone-800/50';
@@ -105,7 +105,7 @@ export function MediaCard({
         return (
             <CardButton
                 onClick={onClick}
-                className={cn('flex w-full', CARD_CLASS)}
+                className={cn('w-full flex-row', CARD_CLASS)}
             >
                 <FallbackImage
                     src={imageUrl}
