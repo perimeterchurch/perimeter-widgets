@@ -29,14 +29,15 @@ export function SortSelect({
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!open) return;
-        const handleClick = (e: MouseEvent) => {
+        if (!open || !ref.current) return;
+        const root = ref.current.getRootNode() as Document | ShadowRoot;
+        const handleClick = (e: Event) => {
             if (ref.current && !ref.current.contains(e.target as Node)) {
                 setOpen(false);
             }
         };
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
+        root.addEventListener('mousedown', handleClick);
+        return () => root.removeEventListener('mousedown', handleClick);
     }, [open]);
 
     const activeField = fields.find((f) => f.value === sortField);

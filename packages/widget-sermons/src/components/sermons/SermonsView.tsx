@@ -7,15 +7,10 @@ import {
     PaginationPrevious,
     PaginationNext,
     PaginationEllipsis,
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
     Skeleton,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
-import { Calendar, Type, LayoutGrid, List, Rows3 } from 'lucide-react';
+import { Calendar, Type, LayoutGrid, Eye, List, Rows3 } from 'lucide-react';
 import type {
     SermonsConfig,
     ViewMode,
@@ -28,6 +23,7 @@ import { useSpeakers } from '../../hooks/use-speakers';
 import { useBooks } from '../../hooks/use-books';
 import { useServiceTypes } from '../../hooks/use-service-types';
 import { resolveServiceTypeIds } from '../../types';
+import { IconSelect } from '../ui/IconSelect';
 import { SortSelect } from '../ui/SortSelect';
 import { SermonFilters } from './SermonFilters';
 import { SermonCardGrid } from './SermonCardGrid';
@@ -44,17 +40,17 @@ const VIEW_OPTIONS = [
     {
         value: 'grid',
         label: 'Card Grid',
-        icon: <LayoutGrid className='h-4 w-4' />,
+        icon: <LayoutGrid className='h-3.5 w-3.5' />,
     },
     {
         value: 'list',
         label: 'Small List',
-        icon: <List className='h-4 w-4' />,
+        icon: <List className='h-3.5 w-3.5' />,
     },
     {
         value: 'large',
         label: 'Large Cards',
-        icon: <Rows3 className='h-4 w-4' />,
+        icon: <Rows3 className='h-3.5 w-3.5' />,
     },
 ];
 
@@ -173,27 +169,13 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                         onSortDirectionChange={handleSortDirectionChange}
                         fields={SORT_FIELDS}
                     />
-                    <Select
+                    <IconSelect
                         value={viewMode}
-                        onValueChange={(v) => v && setViewMode(v as ViewMode)}
-                    >
-                        <SelectTrigger size='sm'>
-                            <span className='text-muted-foreground'>View:</span>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent
-                            align='start'
-                            alignItemWithTrigger={false}
-                        >
-                            {VIEW_OPTIONS.map((opt) => (
-                                <SelectItem key={opt.value} value={opt.value}>
-                                    <span className='flex items-center gap-1.5'>
-                                        {opt.icon} {opt.label}
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                        onChange={(v) => setViewMode(v as ViewMode)}
+                        options={VIEW_OPTIONS}
+                        label='View:'
+                        icon={<Eye className='h-3.5 w-3.5 shrink-0' />}
+                    />
                 </div>
             </div>
             <SkeletonTransition
