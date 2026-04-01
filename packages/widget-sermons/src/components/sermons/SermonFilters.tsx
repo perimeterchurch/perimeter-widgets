@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import {
     SearchInput,
-    ComboSelect,
     Badge,
     Button,
+    MultiCombobox,
 } from '@perimeter-widgets/shared';
+import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SlidersHorizontal, X } from 'lucide-react';
 import type {
@@ -43,16 +44,16 @@ export interface SermonFiltersProps {
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
 
-    const seriesOptions = props.seriesList.map((s) => ({
-        value: s.id,
+    const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
+        value: String(s.id),
         label: s.displayTitle ?? s.title,
     }));
-    const speakerOptions = props.speakers.map((s) => ({
-        value: s.id,
+    const speakerOptions: MultiComboboxOption[] = props.speakers.map((s) => ({
+        value: String(s.id),
         label: s.name,
     }));
-    const bookOptions = props.books.map((b) => ({
-        value: b.id,
+    const bookOptions: MultiComboboxOption[] = props.books.map((b) => ({
+        value: String(b.id),
         label: b.name,
     }));
 
@@ -66,32 +67,32 @@ export function SermonFilters(props: SermonFiltersProps) {
                     placeholder='Search sermons...'
                     className='min-w-[200px] flex-1'
                 />
-                <ComboSelect<number>
-                    value={props.series ?? ''}
-                    onChange={(v) => props.onSeriesChange(v === '' ? null : v)}
+                <MultiCombobox
                     options={seriesOptions}
+                    value={props.series != null ? String(props.series) : null}
+                    onValueChange={(v) =>
+                        props.onSeriesChange(v != null ? Number(v) : null)
+                    }
                     placeholder='All Series'
-                    showAllOption
-                    allOptionLabel='All Series'
-                    loading={props.seriesLoading}
+                    disabled={props.seriesLoading}
                 />
-                <ComboSelect<number>
-                    value={props.speaker ?? ''}
-                    onChange={(v) => props.onSpeakerChange(v === '' ? null : v)}
+                <MultiCombobox
                     options={speakerOptions}
+                    value={props.speaker != null ? String(props.speaker) : null}
+                    onValueChange={(v) =>
+                        props.onSpeakerChange(v != null ? Number(v) : null)
+                    }
                     placeholder='All Speakers'
-                    showAllOption
-                    allOptionLabel='All Speakers'
-                    loading={props.speakersLoading}
+                    disabled={props.speakersLoading}
                 />
-                <ComboSelect<number>
-                    value={props.book ?? ''}
-                    onChange={(v) => props.onBookChange(v === '' ? null : v)}
+                <MultiCombobox
                     options={bookOptions}
+                    value={props.book != null ? String(props.book) : null}
+                    onValueChange={(v) =>
+                        props.onBookChange(v != null ? Number(v) : null)
+                    }
                     placeholder='All Books'
-                    showAllOption
-                    allOptionLabel='All Books'
-                    loading={props.booksLoading}
+                    disabled={props.booksLoading}
                 />
                 <Button
                     variant='secondary'
@@ -139,7 +140,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         >
                             <Badge variant='primary' size='sm'>
                                 {seriesOptions.find(
-                                    (o) => o.value === props.series,
+                                    (o) => o.value === String(props.series),
                                 )?.label ?? 'Series'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
@@ -153,7 +154,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         >
                             <Badge variant='primary' size='sm'>
                                 {speakerOptions.find(
-                                    (o) => o.value === props.speaker,
+                                    (o) => o.value === String(props.speaker),
                                 )?.label ?? 'Speaker'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
@@ -166,8 +167,9 @@ export function SermonFilters(props: SermonFiltersProps) {
                             className='inline-flex'
                         >
                             <Badge variant='primary' size='sm'>
-                                {bookOptions.find((o) => o.value === props.book)
-                                    ?.label ?? 'Book'}{' '}
+                                {bookOptions.find(
+                                    (o) => o.value === String(props.book),
+                                )?.label ?? 'Book'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>

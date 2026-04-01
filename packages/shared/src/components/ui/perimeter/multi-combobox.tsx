@@ -106,11 +106,11 @@ function MultiCombobox(props: MultiComboboxProps) {
 
     // --- Selection helpers ---
 
-    const selectedValues: string[] = isMultiple
-        ? ((currentValue as string[] | undefined) ?? [])
-        : (currentValue as string | null | undefined) != null
-            ? [currentValue as string]
-            : [];
+    const selectedValues: string[] =
+        isMultiple ? ((currentValue as string[] | undefined) ?? [])
+        : (currentValue as string | null | undefined) != null ?
+            [currentValue as string]
+        :   [];
 
     const isSelected = React.useCallback(
         (value: string) => selectedValues.includes(value),
@@ -121,9 +121,10 @@ function MultiCombobox(props: MultiComboboxProps) {
         (option: MultiComboboxOption) => {
             if (isMultiple) {
                 const current = (currentValue as string[] | undefined) ?? [];
-                const next = current.includes(option.value)
-                    ? current.filter((v) => v !== option.value)
-                    : [...current, option.value];
+                const next =
+                    current.includes(option.value) ?
+                        current.filter((v) => v !== option.value)
+                    :   [...current, option.value];
                 handleValueChange(next);
             } else {
                 const current = currentValue as string | null | undefined;
@@ -146,17 +147,17 @@ function MultiCombobox(props: MultiComboboxProps) {
         selectedItems,
         onStateChange({ selectedItems: newSelectedItems, type }) {
             if (
-                type ===
-                    useMultipleSelection.stateChangeTypes
-                        .SelectedItemKeyDownBackspace ||
-                type ===
-                    useMultipleSelection.stateChangeTypes
-                        .SelectedItemKeyDownDelete ||
-                type ===
-                    useMultipleSelection.stateChangeTypes
-                        .DropdownKeyDownBackspace ||
-                type ===
-                    useMultipleSelection.stateChangeTypes
+                type
+                    === useMultipleSelection.stateChangeTypes
+                        .SelectedItemKeyDownBackspace
+                || type
+                    === useMultipleSelection.stateChangeTypes
+                        .SelectedItemKeyDownDelete
+                || type
+                    === useMultipleSelection.stateChangeTypes
+                        .DropdownKeyDownBackspace
+                || type
+                    === useMultipleSelection.stateChangeTypes
                         .FunctionRemoveSelectedItem
             ) {
                 if (isMultiple && newSelectedItems) {
@@ -228,7 +229,9 @@ function MultiCombobox(props: MultiComboboxProps) {
     }, [handleValueChange, isMultiple]);
 
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const [triggerWidth, setTriggerWidth] = React.useState<number | undefined>();
+    const [triggerWidth, setTriggerWidth] = React.useState<
+        number | undefined
+    >();
 
     // Measure trigger width when dropdown opens
     React.useEffect(() => {
@@ -301,19 +304,17 @@ function MultiCombobox(props: MultiComboboxProps) {
                 )}
                 style={
                     {
-                        '--trigger-width': triggerWidth
-                            ? `${triggerWidth}px`
-                            : 'auto',
+                        '--trigger-width':
+                            triggerWidth ? `${triggerWidth}px` : 'auto',
                     } as React.CSSProperties
                 }
             >
-                {isOpen &&
-                    (filteredOptions.length === 0 ? (
+                {isOpen
+                    && (filteredOptions.length === 0 ?
                         <li className='flex w-full justify-center py-2 text-center text-sm text-muted-foreground'>
                             No matches
                         </li>
-                    ) : (
-                        filteredOptions.map((option, index) => {
+                    :   filteredOptions.map((option, index) => {
                             const selected = isSelected(option.value);
                             return (
                                 <li
@@ -330,8 +331,8 @@ function MultiCombobox(props: MultiComboboxProps) {
                                         'relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none transition-colors duration-150',
                                         'data-highlighted:bg-accent data-highlighted:text-accent-foreground',
                                         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                                        option.disabled &&
-                                            'pointer-events-none opacity-40 line-through',
+                                        option.disabled
+                                            && 'pointer-events-none opacity-40 line-through',
                                     )}
                                 >
                                     {option.label}
@@ -342,8 +343,7 @@ function MultiCombobox(props: MultiComboboxProps) {
                                     )}
                                 </li>
                             );
-                        })
-                    ))}
+                        }))}
             </ul>
         </div>
     );
