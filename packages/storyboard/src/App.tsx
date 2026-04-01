@@ -46,7 +46,7 @@ export function App() {
 
             <div className='flex min-h-0'>
                 {/* Sidebar */}
-                <nav className='w-64 shrink-0 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-y-auto'
+                <nav className='w-64 shrink-0 border-r border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden'
                     style={{ height: 'calc(100vh - 73px)', position: 'sticky', top: '73px' }}
                 >
                     <div className='p-4'>
