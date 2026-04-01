@@ -29,7 +29,7 @@ export function SermonCardGrid({
                     <img
                         src={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
                         alt={sermon.title}
-                        className='h-40 w-full object-cover'
+                        className='aspect-video w-full object-cover'
                         onError={(e) => {
                             (e.target as HTMLImageElement).style.display =
                                 'none';
@@ -38,7 +38,7 @@ export function SermonCardGrid({
                             ).nextElementSibling?.classList.remove('hidden');
                         }}
                     />
-                    <ImagePlaceholder className='hidden h-40 w-full' />
+                    <ImagePlaceholder className='hidden aspect-video w-full' />
                     <div className='p-3 space-y-1'>
                         <p className='font-semibold text-sm leading-snug text-stone-900 dark:text-stone-100 line-clamp-2'>
                             {sermon.title}
