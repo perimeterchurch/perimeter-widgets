@@ -107,6 +107,8 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
 
     const { data, isLoading } = useSeries({
         search: search || undefined,
+        from: dateFrom || undefined,
+        to: dateTo || undefined,
         page,
         perPage: config.perPage,
         sort: sortField,
@@ -114,15 +116,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
         config,
     });
 
-    // Client-side date filtering on latestSermonDate
-    const allSeries = data?.series ?? [];
-    const seriesList = allSeries.filter((s) => {
-        if (dateFrom && s.latestSermonDate && s.latestSermonDate < dateFrom)
-            return false;
-        if (dateTo && s.latestSermonDate && s.latestSermonDate > dateTo)
-            return false;
-        return true;
-    });
+    const seriesList = data?.series ?? [];
     const pagination = data?.pagination;
 
     const hasActiveFilters = !!search || !!dateFrom || !!dateTo;
