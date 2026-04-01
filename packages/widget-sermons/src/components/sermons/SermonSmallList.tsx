@@ -28,7 +28,7 @@ export function SermonSmallList({
                     description={sermon.shortDescription}
                     topLeft={formatDate(sermon.date)}
                     topRight={sermon.series.title}
-                    bottomRight={sermon.speaker.name}
+                    bottomLeft={sermon.speaker.name}
                     onClick={() => onSermonClick(sermon.id)}
                 />
             ))}
