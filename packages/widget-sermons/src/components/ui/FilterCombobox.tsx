@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
     Combobox,
     ComboboxInput,
@@ -45,26 +45,36 @@ export function FilterCombobox({
             (options.find((o) => o.value === selected[0])?.label ?? placeholder)
         :   `${selected.length} selected`;
 
+    const handleValueChange = useCallback(
+        (values: string[]) => {
+            const prevSet = new Set(selected.map(String));
+            const nextSet = new Set(values);
+
+            // Find added item
+            for (const v of nextSet) {
+                if (!prevSet.has(v)) {
+                    onToggle(Number(v));
+                    setQuery('');
+                    return;
+                }
+            }
+            // Find removed item
+            for (const v of prevSet) {
+                if (!nextSet.has(v)) {
+                    onToggle(Number(v));
+                    setQuery('');
+                    return;
+                }
+            }
+        },
+        [selected, onToggle],
+    );
+
     return (
         <div ref={anchorRef}>
             <Combobox
                 value={selected.map(String)}
-                onValueChange={(values: string[]) => {
-                    const prev = new Set(selected.map(String));
-                    const next = new Set(values);
-                    for (const v of next) {
-                        if (!prev.has(v)) {
-                            onToggle(Number(v));
-                            return;
-                        }
-                    }
-                    for (const v of prev) {
-                        if (!next.has(v)) {
-                            onToggle(Number(v));
-                            return;
-                        }
-                    }
-                }}
+                onValueChange={handleValueChange}
                 multiple
             >
                 <ComboboxInput
