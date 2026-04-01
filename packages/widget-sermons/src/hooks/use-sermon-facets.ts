@@ -1,44 +1,46 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
-import type { SermonsConfig, SortField, SortOrder } from '../types';
+import type { SermonsConfig } from '../types';
 
 export interface UseSermonFacetsParams {
     search?: string;
-    selectedSeriesIds?: number[];
-    selectedSpeakerIds?: number[];
-    selectedBookIds?: number[];
-    selectedServiceTypeIds?: number[];
+    selectedSeriesIds: number[];
+    selectedSpeakerIds: number[];
+    selectedBookIds: number[];
+    selectedServiceTypeIds: number[];
     serviceTypeId?: string;
     from?: string | null;
     to?: string | null;
-    sort?: SortField;
-    order?: SortOrder;
     config: SermonsConfig;
+}
+
+interface SermonStub {
+    series: { id: number };
+    speaker: { id: number };
 }
 
 export interface SermonFacets {
     seriesIds: Set<number>;
     speakerIds: Set<number>;
-    bookIds: Set<number>;
 }
 
 /**
- * Fetches a large page of sermons with current filters to extract
- * which series/speaker/book IDs are available in the result set.
- * Used to hide dropdown options that would yield no results.
+ * Fetches all sermons matching the cross-cutting filters (search, date
+ * range, service type) WITHOUT the dropdown-specific filters. Then
+ * derives per-dropdown available IDs by applying the OTHER dropdowns
+ * client-side. This way each dropdown only shows options that would
+ * actually produce results given the other selections.
  */
 export function useSermonFacets(params: UseSermonFacetsParams): SermonFacets {
     const {
         search,
-        selectedSeriesIds = [],
-        selectedSpeakerIds = [],
-        selectedBookIds = [],
-        selectedServiceTypeIds = [],
+        selectedSeriesIds,
+        selectedSpeakerIds,
+        selectedServiceTypeIds,
         serviceTypeId,
         from,
         to,
-        sort = 'date',
-        order = 'desc',
         config,
     } = params;
 
@@ -47,36 +49,20 @@ export function useSermonFacets(params: UseSermonFacetsParams): SermonFacets {
             ? selectedServiceTypeIds.join(',')
             : (serviceTypeId ?? undefined);
 
-    const seriesId =
-        selectedSeriesIds.length > 0 ? selectedSeriesIds[0] : undefined;
-    const speakerId =
-        selectedSpeakerIds.length > 0 ? selectedSpeakerIds[0] : undefined;
-    const bookId =
-        selectedBookIds.length > 0 ? selectedBookIds[0] : undefined;
-
-    const hasFilters =
+    const hasAnyFilter =
         !!search
-        || seriesId !== undefined
-        || speakerId !== undefined
-        || bookId !== undefined
+        || selectedSeriesIds.length > 0
+        || selectedSpeakerIds.length > 0
+        || selectedServiceTypeIds.length > 0
         || resolvedServiceTypeId !== undefined
         || !!from
         || !!to;
 
-    const { data } = useQuery({
+    // Fetch ALL sermons matching cross-cutting filters only (no series/speaker/book filter)
+    const { data: allSermons } = useQuery({
         queryKey: [
-            'sermon-facets',
-            {
-                search,
-                seriesId,
-                speakerId,
-                bookId,
-                serviceTypeId: resolvedServiceTypeId,
-                from,
-                to,
-                sort,
-                order,
-            },
+            'sermon-facets-base',
+            { search, serviceTypeId: resolvedServiceTypeId, from, to },
         ],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
@@ -84,51 +70,42 @@ export function useSermonFacets(params: UseSermonFacetsParams): SermonFacets {
                 params: {
                     query: {
                         search: search || undefined,
-                        seriesId,
-                        speakerId,
-                        bookId,
                         from: from ?? undefined,
                         to: to ?? undefined,
-                        sort,
-                        order,
                         page: 1,
                         perPage: 10000,
                         serviceTypeId: resolvedServiceTypeId,
                     } as Record<string, unknown>,
                 },
             });
-            if (error) return { seriesIds: [], speakerIds: [], bookIds: [] };
-
-            const seriesIdSet = new Set<number>();
-            const speakerIdSet = new Set<number>();
-            const bookIdSet = new Set<number>();
-
-            for (const s of data.data.sermons) {
-                seriesIdSet.add(s.series.id);
-                speakerIdSet.add(s.speaker.id);
-            }
-
-            return {
-                seriesIds: [...seriesIdSet],
-                speakerIds: [...speakerIdSet],
-                bookIds: [...bookIdSet],
-            };
+            if (error) return [];
+            return data.data.sermons as SermonStub[];
         },
-        enabled: hasFilters,
+        enabled: hasAnyFilter,
         staleTime: 2 * 60 * 1000,
     });
 
-    if (!hasFilters || !data) {
-        return {
-            seriesIds: new Set(),
-            speakerIds: new Set(),
-            bookIds: new Set(),
-        };
-    }
+    // For series dropdown: filter by selected speakers (but NOT by selected series)
+    const seriesIds = useMemo(() => {
+        if (!allSermons || !hasAnyFilter) return new Set<number>();
+        let filtered = allSermons;
+        if (selectedSpeakerIds.length > 0) {
+            const speakerSet = new Set(selectedSpeakerIds);
+            filtered = filtered.filter((s) => speakerSet.has(s.speaker.id));
+        }
+        return new Set(filtered.map((s) => s.series.id));
+    }, [allSermons, selectedSpeakerIds, hasAnyFilter]);
 
-    return {
-        seriesIds: new Set(data.seriesIds),
-        speakerIds: new Set(data.speakerIds),
-        bookIds: new Set(data.bookIds),
-    };
+    // For speaker dropdown: filter by selected series (but NOT by selected speakers)
+    const speakerIds = useMemo(() => {
+        if (!allSermons || !hasAnyFilter) return new Set<number>();
+        let filtered = allSermons;
+        if (selectedSeriesIds.length > 0) {
+            const seriesSet = new Set(selectedSeriesIds);
+            filtered = filtered.filter((s) => seriesSet.has(s.series.id));
+        }
+        return new Set(filtered.map((s) => s.speaker.id));
+    }, [allSermons, selectedSeriesIds, hasAnyFilter]);
+
+    return { seriesIds, speakerIds };
 }

@@ -6,6 +6,7 @@ import {
     ComboboxList,
     ComboboxItem,
     ComboboxEmpty,
+    ComboboxSeparator,
 } from '@perimeter-widgets/shared';
 
 export interface FilterOption {
@@ -17,6 +18,7 @@ interface FilterComboboxProps {
     options: FilterOption[];
     selected: number[];
     onToggle: (id: number) => void;
+    onClear: () => void;
     placeholder: string;
 }
 
@@ -24,6 +26,7 @@ export function FilterCombobox({
     options,
     selected,
     onToggle,
+    onClear,
     placeholder,
 }: FilterComboboxProps) {
     const [query, setQuery] = useState('');
@@ -47,7 +50,6 @@ export function FilterCombobox({
             <Combobox
                 value={selected.map(String)}
                 onValueChange={(values: string[]) => {
-                    // Find which value was toggled
                     const prev = new Set(selected.map(String));
                     const next = new Set(values);
                     for (const v of next) {
@@ -73,7 +75,25 @@ export function FilterCombobox({
                 />
                 <ComboboxContent anchor={anchorRef}>
                     <ComboboxList>
-                        <ComboboxEmpty>No matches</ComboboxEmpty>
+                        {selected.length > 0 && (
+                            <>
+                                <button
+                                    type='button'
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        onClear();
+                                    }}
+                                    className='flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
+                                >
+                                    Show all
+                                </button>
+                                <ComboboxSeparator />
+                            </>
+                        )}
+                        <ComboboxEmpty>
+                            No {placeholder.toLowerCase()} match the current
+                            filters
+                        </ComboboxEmpty>
                         {filtered.map((opt) => (
                             <ComboboxItem
                                 key={opt.value}

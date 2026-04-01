@@ -103,6 +103,18 @@ export function useSermonFilters() {
         });
     };
 
+    const clearSeries = () => {
+        setParams({ series: null, page: 1 });
+    };
+
+    const clearSpeaker = () => {
+        setParams({ speaker: null, page: 1 });
+    };
+
+    const clearBook = () => {
+        setParams({ book: null, page: 1 });
+    };
+
     const clearServiceTypes = () => {
         setParams({ serviceTypes: null, page: 1 });
     };
@@ -156,6 +168,9 @@ export function useSermonFilters() {
         toggleSpeaker,
         toggleBook,
         toggleServiceType,
+        clearSeries,
+        clearSpeaker,
+        clearBook,
         clearServiceTypes,
         setDateRange,
         setSort,

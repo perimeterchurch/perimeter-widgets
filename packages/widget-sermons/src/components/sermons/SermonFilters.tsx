@@ -38,9 +38,13 @@ export interface SermonFiltersProps {
     facets: SermonFacets;
     onSearchChange: (value: string) => void;
     onToggleSeries: (id: number) => void;
+    onClearSeries: () => void;
     onToggleSpeaker: (id: number) => void;
+    onClearSpeaker: () => void;
     onToggleBook: (id: number) => void;
+    onClearBook: () => void;
     onToggleServiceType: (id: number) => void;
+    onClearServiceTypes: () => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
@@ -51,9 +55,7 @@ export function SermonFilters(props: SermonFiltersProps) {
 
     const { facets } = props;
     const hasFacets =
-        facets.seriesIds.size > 0
-        || facets.speakerIds.size > 0
-        || facets.bookIds.size > 0;
+        facets.seriesIds.size > 0 || facets.speakerIds.size > 0;
 
     const allSeriesOptions: FilterOption[] = props.seriesList.map((s) => ({
         value: s.id,
@@ -72,9 +74,9 @@ export function SermonFilters(props: SermonFiltersProps) {
         label: st.name,
     }));
 
-    // When facets are loaded, filter options to only show items that
-    // exist in the current result set. Always keep currently-selected
-    // items visible so users can deselect them.
+    // When facets are active, filter options to only show items that
+    // exist in the filtered result set. Currently-selected items
+    // always stay visible so users can deselect them.
     const seriesOptions =
         hasFacets ?
             allSeriesOptions.filter(
@@ -93,14 +95,8 @@ export function SermonFilters(props: SermonFiltersProps) {
             )
         :   allSpeakerOptions;
 
-    const bookOptions =
-        hasFacets ?
-            allBookOptions.filter(
-                (o) =>
-                    facets.bookIds.has(o.value)
-                    || props.selectedBookIds.includes(o.value),
-            )
-        :   allBookOptions;
+    // Books aren't in the sermon list response, so show all
+    const bookOptions = allBookOptions;
 
     return (
         <div className='space-y-3'>
@@ -120,18 +116,21 @@ export function SermonFilters(props: SermonFiltersProps) {
                     options={seriesOptions}
                     selected={props.selectedSeriesIds}
                     onToggle={props.onToggleSeries}
+                    onClear={props.onClearSeries}
                     placeholder='Series'
                 />
                 <FilterCombobox
                     options={speakerOptions}
                     selected={props.selectedSpeakerIds}
                     onToggle={props.onToggleSpeaker}
+                    onClear={props.onClearSpeaker}
                     placeholder='Speakers'
                 />
                 <FilterCombobox
                     options={bookOptions}
                     selected={props.selectedBookIds}
                     onToggle={props.onToggleBook}
+                    onClear={props.onClearBook}
                     placeholder='Books'
                 />
                 {props.showServiceTypeFilter && (
@@ -139,6 +138,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                         options={serviceTypeOptions}
                         selected={props.selectedServiceTypeIds}
                         onToggle={props.onToggleServiceType}
+                        onClear={props.onClearServiceTypes}
                         placeholder='Service Types'
                     />
                 )}

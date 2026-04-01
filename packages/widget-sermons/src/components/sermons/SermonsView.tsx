@@ -122,8 +122,6 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         serviceTypeId: configServiceTypeIds,
         from: filters.from,
         to: filters.to,
-        sort: filters.sort,
-        order: filters.order,
         config,
     });
 
@@ -162,9 +160,13 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 facets={facets}
                 onSearchChange={filters.setSearch}
                 onToggleSeries={filters.toggleSeries}
+                onClearSeries={filters.clearSeries}
                 onToggleSpeaker={filters.toggleSpeaker}
+                onClearSpeaker={filters.clearSpeaker}
                 onToggleBook={filters.toggleBook}
+                onClearBook={filters.clearBook}
                 onToggleServiceType={filters.toggleServiceType}
+                onClearServiceTypes={filters.clearServiceTypes}
                 onDateRangeChange={filters.setDateRange}
                 onSortChange={filters.setSort}
                 onClearFilters={filters.clearFilters}
