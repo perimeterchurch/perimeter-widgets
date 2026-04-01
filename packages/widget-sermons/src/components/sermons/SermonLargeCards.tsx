@@ -28,7 +28,7 @@ export function SermonLargeCards({
                     description={sermon.shortDescription}
                     topLeft={formatDate(sermon.date)}
                     topRight={sermon.series.title}
-                    bottomLeft={sermon.speaker.name}
+                    bottomRight={sermon.speaker.name}
                     onClick={() => onSermonClick(sermon.id)}
                 />
             ))}
