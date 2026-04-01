@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import {
     Badge,
+    Button,
     Empty,
     EmptyHeader,
     EmptyTitle,
@@ -30,13 +31,14 @@ export function SeriesDetail({
     if (error) {
         return (
             <div>
-                <button
-                    type='button'
+                <Button
+                    variant='outline'
+                    size='sm'
                     onClick={onBack}
-                    className='flex items-center gap-1 text-sm text-primary mb-4'
+                    className='mb-4'
                 >
                     <ArrowLeft className='h-4 w-4' /> Back
-                </button>
+                </Button>
                 <Empty>
                     <EmptyHeader>
                         <EmptyTitle>Series not found</EmptyTitle>
@@ -51,13 +53,14 @@ export function SeriesDetail({
 
     return (
         <div>
-            <button
-                type='button'
+            <Button
+                variant='outline'
+                size='sm'
                 onClick={onBack}
-                className='flex items-center gap-1 text-sm text-primary mb-4'
+                className='mb-4'
             >
                 <ArrowLeft className='h-4 w-4' /> Back to series
-            </button>
+            </Button>
             <SkeletonTransition
                 isLoading={isLoading}
                 skeleton={

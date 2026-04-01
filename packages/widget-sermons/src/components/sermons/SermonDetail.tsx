@@ -2,6 +2,7 @@ import DOMPurify from 'dompurify';
 import { DateTime } from 'luxon';
 import { ArrowLeft } from 'lucide-react';
 import {
+    Button,
     Empty,
     EmptyHeader,
     EmptyTitle,
@@ -34,13 +35,14 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
     if (error) {
         return (
             <div>
-                <button
-                    type='button'
+                <Button
+                    variant='outline'
+                    size='sm'
                     onClick={onBack}
-                    className='flex items-center gap-1 text-sm text-primary mb-4'
+                    className='mb-4'
                 >
                     <ArrowLeft className='h-4 w-4' /> Back
-                </button>
+                </Button>
                 <Empty>
                     <EmptyHeader>
                         <EmptyTitle>Sermon not found</EmptyTitle>
@@ -55,13 +57,14 @@ export function SermonDetail({ id, config, onBack }: SermonDetailProps) {
 
     return (
         <div>
-            <button
-                type='button'
+            <Button
+                variant='outline'
+                size='sm'
                 onClick={onBack}
-                className='flex items-center gap-1 text-sm text-primary mb-4'
+                className='mb-4'
             >
                 <ArrowLeft className='h-4 w-4' /> Back to sermons
-            </button>
+            </Button>
             <SkeletonTransition
                 isLoading={isLoading}
                 skeleton={
