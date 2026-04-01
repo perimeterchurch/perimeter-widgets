@@ -5,9 +5,9 @@ import type { SermonsConfig } from '../types';
 
 export interface UseSermonsParams {
     search?: string;
-    selectedSeriesIds?: number[];
-    selectedSpeakerIds?: number[];
-    selectedBookIds?: number[];
+    series?: number | null;
+    speaker?: number | null;
+    book?: number | null;
     selectedServiceTypeIds?: number[];
     serviceTypeId?: string;
     from?: string | null;
@@ -21,9 +21,9 @@ export interface UseSermonsParams {
 export function useSermons(params: UseSermonsParams) {
     const {
         search,
-        selectedSeriesIds = [],
-        selectedSpeakerIds = [],
-        selectedBookIds = [],
+        series,
+        speaker,
+        book,
         selectedServiceTypeIds = [],
         serviceTypeId,
         from,
@@ -40,22 +40,14 @@ export function useSermons(params: UseSermonsParams) {
             ? selectedServiceTypeIds.join(',')
             : (serviceTypeId ?? undefined);
 
-    // For series/speaker/book, use first selected ID (API supports single filter)
-    const seriesId =
-        selectedSeriesIds.length > 0 ? selectedSeriesIds[0] : undefined;
-    const speakerId =
-        selectedSpeakerIds.length > 0 ? selectedSpeakerIds[0] : undefined;
-    const bookId =
-        selectedBookIds.length > 0 ? selectedBookIds[0] : undefined;
-
     return useQuery({
         queryKey: [
             'sermons',
             {
                 search,
-                seriesId,
-                speakerId,
-                bookId,
+                series,
+                speaker,
+                book,
                 serviceTypeId: resolvedServiceTypeId,
                 from,
                 to,
@@ -71,9 +63,9 @@ export function useSermons(params: UseSermonsParams) {
                 params: {
                     query: {
                         search: search || undefined,
-                        seriesId,
-                        speakerId,
-                        bookId,
+                        seriesId: series ?? undefined,
+                        speakerId: speaker ?? undefined,
+                        bookId: book ?? undefined,
                         from: from ?? undefined,
                         to: to ?? undefined,
                         sort,

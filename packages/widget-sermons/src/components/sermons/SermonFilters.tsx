@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
     InputGroupInput,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
     Badge,
     Button,
+    Checkbox,
 } from '@perimeter-widgets/shared';
-import { FilterCombobox, type FilterOption } from '../ui/FilterCombobox';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SlidersHorizontal, X, Search } from 'lucide-react';
 import type {
@@ -17,13 +22,12 @@ import type {
     SortField,
     SortOrder,
 } from '../../types';
-import type { SermonFacets } from '../../hooks/use-sermon-facets';
 
 export interface SermonFiltersProps {
     search: string;
-    selectedSeriesIds: number[];
-    selectedSpeakerIds: number[];
-    selectedBookIds: number[];
+    series: number | null;
+    speaker: number | null;
+    book: number | null;
     selectedServiceTypeIds: number[];
     from: string;
     to: string;
@@ -35,14 +39,14 @@ export interface SermonFiltersProps {
     books: Book[];
     serviceTypes: ServiceType[];
     showServiceTypeFilter: boolean;
-    facets: SermonFacets;
+    seriesLoading?: boolean;
+    speakersLoading?: boolean;
+    booksLoading?: boolean;
+    serviceTypesLoading?: boolean;
     onSearchChange: (value: string) => void;
-    onToggleSeries: (id: number) => void;
-    onClearSeries: () => void;
-    onToggleSpeaker: (id: number) => void;
-    onClearSpeaker: () => void;
-    onToggleBook: (id: number) => void;
-    onClearBook: () => void;
+    onSeriesChange: (value: number | null) => void;
+    onSpeakerChange: (value: number | null) => void;
+    onBookChange: (value: number | null) => void;
     onToggleServiceType: (id: number) => void;
     onClearServiceTypes: () => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
@@ -53,54 +57,26 @@ export interface SermonFiltersProps {
 export function SermonFilters(props: SermonFiltersProps) {
     const [showMore, setShowMore] = useState(false);
 
-    const { facets } = props;
-    const hasFacets =
-        facets.seriesIds.size > 0 || facets.speakerIds.size > 0;
-
-    const allSeriesOptions: FilterOption[] = props.seriesList.map((s) => ({
+    const seriesOptions = props.seriesList.map((s) => ({
         value: s.id,
         label: s.displayTitle ?? s.title,
     }));
-    const allSpeakerOptions: FilterOption[] = props.speakers.map((s) => ({
+    const speakerOptions = props.speakers.map((s) => ({
         value: s.id,
         label: s.name,
     }));
-    const allBookOptions: FilterOption[] = props.books.map((b) => ({
+    const bookOptions = props.books.map((b) => ({
         value: b.id,
         label: b.name,
     }));
-    const serviceTypeOptions: FilterOption[] = props.serviceTypes.map((st) => ({
+    const serviceTypeOptions = props.serviceTypes.map((st) => ({
         value: st.id,
         label: st.name,
     }));
 
-    // When facets are active, filter options to only show items that
-    // exist in the filtered result set. Currently-selected items
-    // always stay visible so users can deselect them.
-    const seriesOptions =
-        hasFacets ?
-            allSeriesOptions.filter(
-                (o) =>
-                    facets.seriesIds.has(o.value)
-                    || props.selectedSeriesIds.includes(o.value),
-            )
-        :   allSeriesOptions;
-
-    const speakerOptions =
-        hasFacets ?
-            allSpeakerOptions.filter(
-                (o) =>
-                    facets.speakerIds.has(o.value)
-                    || props.selectedSpeakerIds.includes(o.value),
-            )
-        :   allSpeakerOptions;
-
-    // Books aren't in the sermon list response, so show all
-    const bookOptions = allBookOptions;
-
     return (
         <div className='space-y-3'>
-            {/* Inline filters */}
+            {/* Inline filters: search, series, speaker, books */}
             <div className='flex flex-wrap items-center gap-2'>
                 <InputGroup className='min-w-[200px] flex-1'>
                     <InputGroupAddon align='inline-start'>
@@ -112,34 +88,80 @@ export function SermonFilters(props: SermonFiltersProps) {
                         placeholder='Search sermons...'
                     />
                 </InputGroup>
-                <FilterCombobox
-                    options={seriesOptions}
-                    selected={props.selectedSeriesIds}
-                    onToggle={props.onToggleSeries}
-                    onClear={props.onClearSeries}
-                    placeholder='Series'
-                />
-                <FilterCombobox
-                    options={speakerOptions}
-                    selected={props.selectedSpeakerIds}
-                    onToggle={props.onToggleSpeaker}
-                    onClear={props.onClearSpeaker}
-                    placeholder='Speakers'
-                />
-                <FilterCombobox
-                    options={bookOptions}
-                    selected={props.selectedBookIds}
-                    onToggle={props.onToggleBook}
-                    onClear={props.onClearBook}
-                    placeholder='Books'
-                />
+                <Select
+                    value={props.series != null ? String(props.series) : ''}
+                    onValueChange={(v) =>
+                        props.onSeriesChange(
+                            v == null || v === '' ? null : Number(v),
+                        )
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder='All Series' />
+                    </SelectTrigger>
+                    <SelectContent align='start' alignItemWithTrigger={false}>
+                        <SelectItem value=''>All Series</SelectItem>
+                        {seriesOptions.map((opt) => (
+                            <SelectItem
+                                key={opt.value}
+                                value={String(opt.value)}
+                            >
+                                {opt.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={props.speaker != null ? String(props.speaker) : ''}
+                    onValueChange={(v) =>
+                        props.onSpeakerChange(
+                            v == null || v === '' ? null : Number(v),
+                        )
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder='All Speakers' />
+                    </SelectTrigger>
+                    <SelectContent align='start' alignItemWithTrigger={false}>
+                        <SelectItem value=''>All Speakers</SelectItem>
+                        {speakerOptions.map((opt) => (
+                            <SelectItem
+                                key={opt.value}
+                                value={String(opt.value)}
+                            >
+                                {opt.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={props.book != null ? String(props.book) : ''}
+                    onValueChange={(v) =>
+                        props.onBookChange(
+                            v == null || v === '' ? null : Number(v),
+                        )
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder='All Books' />
+                    </SelectTrigger>
+                    <SelectContent align='start' alignItemWithTrigger={false}>
+                        <SelectItem value=''>All Books</SelectItem>
+                        {bookOptions.map((opt) => (
+                            <SelectItem
+                                key={opt.value}
+                                value={String(opt.value)}
+                            >
+                                {opt.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 {props.showServiceTypeFilter && (
-                    <FilterCombobox
+                    <ServiceTypeMultiSelect
                         options={serviceTypeOptions}
                         selected={props.selectedServiceTypeIds}
                         onToggle={props.onToggleServiceType}
-                        onClear={props.onClearServiceTypes}
-                        placeholder='Service Types'
                     />
                 )}
                 <Button
@@ -152,7 +174,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                 </Button>
             </div>
 
-            {/* Expandable: date range */}
+            {/* Expandable: date range only */}
             {showMore && (
                 <div className='flex flex-wrap items-center gap-3 rounded-lg bg-[var(--color-muted)] p-3'>
                     <DateRangePicker
@@ -180,58 +202,58 @@ export function SermonFilters(props: SermonFiltersProps) {
             {/* Active filter chips */}
             {props.hasActiveFilters && (
                 <div className='flex flex-wrap gap-1.5'>
-                    {props.selectedSeriesIds.map((id) => (
+                    {props.series && (
                         <button
-                            key={`series-${id}`}
                             type='button'
-                            onClick={() => props.onToggleSeries(id)}
+                            onClick={() => props.onSeriesChange(null)}
                             className='inline-flex'
                         >
                             <Badge variant='default'>
-                                {seriesOptions.find((o) => o.value === id)
-                                    ?.label ?? 'Series'}{' '}
+                                {seriesOptions.find(
+                                    (o) => o.value === props.series,
+                                )?.label ?? 'Series'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
-                    ))}
-                    {props.selectedSpeakerIds.map((id) => (
+                    )}
+                    {props.speaker && (
                         <button
-                            key={`speaker-${id}`}
                             type='button'
-                            onClick={() => props.onToggleSpeaker(id)}
+                            onClick={() => props.onSpeakerChange(null)}
                             className='inline-flex'
                         >
                             <Badge variant='default'>
-                                {speakerOptions.find((o) => o.value === id)
-                                    ?.label ?? 'Speaker'}{' '}
+                                {speakerOptions.find(
+                                    (o) => o.value === props.speaker,
+                                )?.label ?? 'Speaker'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
-                    ))}
-                    {props.selectedBookIds.map((id) => (
+                    )}
+                    {props.book && (
                         <button
-                            key={`book-${id}`}
                             type='button'
-                            onClick={() => props.onToggleBook(id)}
+                            onClick={() => props.onBookChange(null)}
                             className='inline-flex'
                         >
                             <Badge variant='default'>
-                                {bookOptions.find((o) => o.value === id)
+                                {bookOptions.find((o) => o.value === props.book)
                                     ?.label ?? 'Book'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
-                    ))}
+                    )}
                     {props.selectedServiceTypeIds.map((id) => (
                         <button
-                            key={`st-${id}`}
+                            key={id}
                             type='button'
                             onClick={() => props.onToggleServiceType(id)}
                             className='inline-flex'
                         >
                             <Badge variant='default'>
-                                {serviceTypeOptions.find((o) => o.value === id)
-                                    ?.label ?? 'Service Type'}{' '}
+                                {serviceTypeOptions.find(
+                                    (o) => o.value === id,
+                                )?.label ?? 'Service Type'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
@@ -248,6 +270,69 @@ export function SermonFilters(props: SermonFiltersProps) {
                             </Badge>
                         </button>
                     )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ServiceTypeMultiSelect({
+    options,
+    selected,
+    onToggle,
+}: {
+    options: { value: number; label: string }[];
+    selected: number[];
+    onToggle: (id: number) => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!open) return;
+        const handleClick = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [open]);
+
+    const label =
+        selected.length === 0 ? 'Service Types'
+        : selected.length === 1 ?
+            (options.find((o) => o.value === selected[0])?.label ??
+            'Service Type')
+        :   `${selected.length} Service Types`;
+
+    return (
+        <div ref={ref} className='relative'>
+            <Button
+                variant='outline'
+                size='default'
+                onClick={() => setOpen(!open)}
+                className='text-sm whitespace-nowrap'
+            >
+                {label}
+            </Button>
+            {open && (
+                <div className='absolute top-full left-0 z-50 mt-1 min-w-48 rounded-lg bg-popover p-1 shadow-md ring-1 ring-foreground/10'>
+                    {options.map((opt) => (
+                        <button
+                            key={opt.value}
+                            type='button'
+                            onClick={() => onToggle(opt.value)}
+                            className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground'
+                        >
+                            <Checkbox
+                                checked={selected.includes(opt.value)}
+                                readOnly
+                                className='pointer-events-none'
+                            />
+                            {opt.label}
+                        </button>
+                    ))}
                 </div>
             )}
         </div>

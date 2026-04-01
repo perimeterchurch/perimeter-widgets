@@ -27,7 +27,6 @@ import { useSeries } from '../../hooks/use-series';
 import { useSpeakers } from '../../hooks/use-speakers';
 import { useBooks } from '../../hooks/use-books';
 import { useServiceTypes } from '../../hooks/use-service-types';
-import { useSermonFacets } from '../../hooks/use-sermon-facets';
 import { resolveServiceTypeIds } from '../../types';
 import { SermonFilters } from './SermonFilters';
 import { SermonCardGrid } from './SermonCardGrid';
@@ -89,7 +88,8 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const [viewMode, setViewMode] = useState<ViewMode>(
         config.defaultView ?? 'grid',
     );
-    const { data: serviceTypes = [] } = useServiceTypes(config);
+    const { data: serviceTypes = [], isLoading: serviceTypesLoading } =
+        useServiceTypes(config);
     const configServiceTypeIds = resolveServiceTypeIds(
         config.serviceTypes,
         serviceTypes,
@@ -97,33 +97,15 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const showServiceTypeFilter = !config.serviceTypes;
 
     const { data, isLoading } = useSermons({
-        search: filters.search,
-        selectedSeriesIds: filters.selectedSeriesIds,
-        selectedSpeakerIds: filters.selectedSpeakerIds,
-        selectedBookIds: filters.selectedBookIds,
-        selectedServiceTypeIds: filters.selectedServiceTypeIds,
-        serviceTypeId: configServiceTypeIds,
-        from: filters.from,
-        to: filters.to,
-        sort: filters.sort,
-        order: filters.order,
-        page: filters.page,
+        ...filters,
         config,
-    });
-    const { data: seriesList = [] } = useSeries(config);
-    const { data: speakers = [] } = useSpeakers(config);
-    const { data: books = [] } = useBooks(config);
-    const facets = useSermonFacets({
-        search: filters.search,
-        selectedSeriesIds: filters.selectedSeriesIds,
-        selectedSpeakerIds: filters.selectedSpeakerIds,
-        selectedBookIds: filters.selectedBookIds,
-        selectedServiceTypeIds: filters.selectedServiceTypeIds,
         serviceTypeId: configServiceTypeIds,
-        from: filters.from,
-        to: filters.to,
-        config,
     });
+    const { data: seriesList = [], isLoading: seriesLoading } =
+        useSeries(config);
+    const { data: speakers = [], isLoading: speakersLoading } =
+        useSpeakers(config);
+    const { data: books = [], isLoading: booksLoading } = useBooks(config);
 
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
@@ -143,9 +125,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         <div className='space-y-4'>
             <SermonFilters
                 search={filters.search}
-                selectedSeriesIds={filters.selectedSeriesIds}
-                selectedSpeakerIds={filters.selectedSpeakerIds}
-                selectedBookIds={filters.selectedBookIds}
+                series={filters.series}
+                speaker={filters.speaker}
+                book={filters.book}
                 selectedServiceTypeIds={filters.selectedServiceTypeIds}
                 from={filters.from ?? ''}
                 to={filters.to ?? ''}
@@ -157,14 +139,14 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                 books={books}
                 serviceTypes={serviceTypes}
                 showServiceTypeFilter={showServiceTypeFilter}
-                facets={facets}
+                seriesLoading={seriesLoading}
+                speakersLoading={speakersLoading}
+                booksLoading={booksLoading}
+                serviceTypesLoading={serviceTypesLoading}
                 onSearchChange={filters.setSearch}
-                onToggleSeries={filters.toggleSeries}
-                onClearSeries={filters.clearSeries}
-                onToggleSpeaker={filters.toggleSpeaker}
-                onClearSpeaker={filters.clearSpeaker}
-                onToggleBook={filters.toggleBook}
-                onClearBook={filters.clearBook}
+                onSeriesChange={filters.setSeries}
+                onSpeakerChange={filters.setSpeaker}
+                onBookChange={filters.setBook}
                 onToggleServiceType={filters.toggleServiceType}
                 onClearServiceTypes={filters.clearServiceTypes}
                 onDateRangeChange={filters.setDateRange}
