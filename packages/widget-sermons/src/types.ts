@@ -21,7 +21,12 @@ export type SermonsConfig = z.infer<typeof SermonsConfigSchema>;
 
 type ListSermonsResponse =
     operations['listSermons']['responses']['200']['content']['application/json'];
-export type SermonListItem = ListSermonsResponse['data']['sermons'][number];
+type SermonListItemBase = ListSermonsResponse['data']['sermons'][number];
+// The API now includes book in list responses but the published types
+// haven't been updated yet. Extend locally until @perimeterchurch/api is republished.
+export type SermonListItem = SermonListItemBase & {
+    book?: { id: number; name: string } | null;
+};
 export type Pagination = ListSermonsResponse['data']['pagination'];
 
 type GetSermonResponse =
@@ -88,7 +93,10 @@ export function resolveServiceTypeIds(
     serviceTypes: ServiceType[],
 ): string | undefined {
     if (!configNames) return undefined;
-    const names = configNames.split(',').map((n) => n.toLowerCase().trim()).filter(Boolean);
+    const names = configNames
+        .split(',')
+        .map((n) => n.toLowerCase().trim())
+        .filter(Boolean);
     if (names.length === 0) return undefined;
 
     const matchedIds = serviceTypes
