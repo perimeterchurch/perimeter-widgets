@@ -11,7 +11,6 @@ export interface UseSermonsParams {
     selectedBookIds?: number[];
     selectedServiceTypeIds?: number[];
     selectedSeriesTypeIds?: number[];
-    serviceTypeId?: string;
     from?: string | null;
     to?: string | null;
     sort?: SortField;
@@ -28,7 +27,6 @@ export function useSermons(params: UseSermonsParams) {
         selectedBookIds = [],
         selectedServiceTypeIds = [],
         selectedSeriesTypeIds = [],
-        serviceTypeId,
         from,
         to,
         sort = 'date',
@@ -37,11 +35,10 @@ export function useSermons(params: UseSermonsParams) {
         config,
     } = params;
 
-    // Merge: UI filter selection takes priority, then config-resolved IDs
     const resolvedServiceTypeId =
         selectedServiceTypeIds.length > 0 ?
             selectedServiceTypeIds.join(',')
-        :   (serviceTypeId ?? undefined);
+        :   undefined;
 
     const resolvedSeriesTypeId =
         selectedSeriesTypeIds.length > 0 ?

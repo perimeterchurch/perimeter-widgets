@@ -63,14 +63,6 @@ export const widgetRegistry: WidgetDefinition[] = [
         },
         configFields: [
             {
-                key: 'serviceTypes',
-                label: 'Service Types',
-                type: 'text',
-                defaultValue: '',
-                description:
-                    'Comma-separated service type names to filter by (e.g., "Worship Service,Youth"). Leave blank to show a dropdown filter instead.',
-            },
-            {
                 key: 'perPage',
                 label: 'Per Page',
                 type: 'number',
@@ -228,6 +220,13 @@ export const widgetRegistry: WidgetDefinition[] = [
                 type: 'boolean',
                 defaultValue: false,
                 description: 'Hide the search input',
+            },
+            {
+                key: 'hidePagination',
+                label: 'Hide Pagination',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the pagination controls',
             },
         ],
     },

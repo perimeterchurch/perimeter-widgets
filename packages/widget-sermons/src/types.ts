@@ -8,7 +8,6 @@ import type { operations } from '@perimeter-widgets/shared';
 export const SermonsConfigSchema = z
     .object({
         // Existing
-        serviceTypes: z.string().optional(),
         perPage: z.number().default(12),
         defaultTab: z.enum(['sermons', 'series']).default('sermons'),
         defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
@@ -30,6 +29,7 @@ export const SermonsConfigSchema = z
         hideSeriesType: z.coerce.boolean().optional(),
         hideDate: z.coerce.boolean().optional(),
         hideSearch: z.coerce.boolean().optional(),
+        hidePagination: z.coerce.boolean().optional(),
         from: z
             .string()
             .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
@@ -128,26 +128,3 @@ export type ServiceType = ListServiceTypesResponse['data'][number];
 type ListSeriesTypesResponse =
     operations['listSeriesTypes']['responses']['200']['content']['application/json'];
 export type SeriesType = ListSeriesTypesResponse['data'][number];
-
-/**
- * Resolve comma-separated service type names from config against the
- * fetched service types list using fuzzy (substring) matching.
- * Returns a comma-separated string of matched IDs, or undefined if none.
- */
-export function resolveServiceTypeIds(
-    configNames: string | undefined,
-    serviceTypes: ServiceType[],
-): string | undefined {
-    if (!configNames) return undefined;
-    const names = configNames
-        .split(',')
-        .map((n) => n.toLowerCase().trim())
-        .filter(Boolean);
-    if (names.length === 0) return undefined;
-
-    const matchedIds = serviceTypes
-        .filter((st) => names.some((n) => st.name.toLowerCase().includes(n)))
-        .map((st) => st.id);
-
-    return matchedIds.length > 0 ? matchedIds.join(',') : undefined;
-}

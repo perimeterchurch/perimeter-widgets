@@ -25,7 +25,6 @@ import { useSpeakers } from '../../hooks/use-speakers';
 import { useBooks } from '../../hooks/use-books';
 import { useServiceTypes } from '../../hooks/use-service-types';
 import { useSeriesTypes } from '../../hooks/use-series-types';
-import { resolveServiceTypeIds } from '../../types';
 import { SermonFilters } from './SermonFilters';
 import { SermonGrid } from './SermonGrid';
 import { SermonSmallList } from './SermonSmallList';
@@ -77,15 +76,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         useServiceTypes(config);
     const { data: seriesTypes = [], isLoading: seriesTypesLoading } =
         useSeriesTypes(config);
-    const showServiceTypeFilter = !config.serviceTypes && !config.serviceTypeId;
+    const showServiceTypeFilter =
+        !config.serviceTypeId && !config.hideServiceType;
     const showSeriesTypeFilter = !config.seriesTypeId && !config.hideSeriesType;
-
-    const resolvedServiceTypeId =
-        config.serviceTypeId
-        ?? (filters.selectedServiceTypeIds.length > 0 ?
-            filters.selectedServiceTypeIds.join(',')
-        :   (resolveServiceTypeIds(config.serviceTypes, serviceTypes)
-            ?? undefined));
 
     const display = config.display ?? 'full';
     const showFilters = display === 'full';
@@ -116,7 +109,6 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         order: filters.order,
         page: filters.page,
         config,
-        serviceTypeId: resolvedServiceTypeId,
     });
     const { data: seriesData, isLoading: seriesLoading } = useSeries({
         config,
@@ -223,65 +215,72 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                     onSermonClick={(id) => filters.setScreen('detail', id)}
                 />
             </SkeletonTransition>
-            {pagination && pagination.totalPages > 1 && (
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={() =>
-                                    filters.setPage(
-                                        Math.max(1, pagination.page - 1),
-                                    )
-                                }
-                                aria-disabled={pagination.page <= 1}
-                                className={
-                                    pagination.page <= 1 ?
-                                        'pointer-events-none opacity-50'
-                                    :   'cursor-pointer'
-                                }
-                            />
-                        </PaginationItem>
-                        {getPageRange(
-                            pagination.page,
-                            pagination.totalPages,
-                        ).map((item, idx) =>
-                            item === 'ellipsis' ?
-                                <PaginationItem key={`e-${idx}`}>
-                                    <PaginationEllipsis />
-                                </PaginationItem>
-                            :   <PaginationItem key={item}>
-                                    <PaginationLink
-                                        isActive={item === pagination.page}
-                                        onClick={() => filters.setPage(item)}
-                                        className='cursor-pointer'
-                                    >
-                                        {item}
-                                    </PaginationLink>
-                                </PaginationItem>,
-                        )}
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={() =>
-                                    filters.setPage(
-                                        Math.min(
-                                            pagination.totalPages,
-                                            pagination.page + 1,
-                                        ),
-                                    )
-                                }
-                                aria-disabled={
-                                    pagination.page >= pagination.totalPages
-                                }
-                                className={
-                                    pagination.page >= pagination.totalPages ?
-                                        'pointer-events-none opacity-50'
-                                    :   'cursor-pointer'
-                                }
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            )}
+            {!config.hidePagination
+                && pagination
+                && pagination.totalPages > 1 && (
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() =>
+                                        filters.setPage(
+                                            Math.max(1, pagination.page - 1),
+                                        )
+                                    }
+                                    aria-disabled={pagination.page <= 1}
+                                    className={
+                                        pagination.page <= 1 ?
+                                            'pointer-events-none opacity-50'
+                                        :   'cursor-pointer'
+                                    }
+                                />
+                            </PaginationItem>
+                            {getPageRange(
+                                pagination.page,
+                                pagination.totalPages,
+                            ).map((item, idx) =>
+                                item === 'ellipsis' ?
+                                    <PaginationItem key={`e-${idx}`}>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                :   <PaginationItem key={item}>
+                                        <PaginationLink
+                                            isActive={item === pagination.page}
+                                            onClick={() =>
+                                                filters.setPage(item)
+                                            }
+                                            className='cursor-pointer'
+                                        >
+                                            {item}
+                                        </PaginationLink>
+                                    </PaginationItem>,
+                            )}
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() =>
+                                        filters.setPage(
+                                            Math.min(
+                                                pagination.totalPages,
+                                                pagination.page + 1,
+                                            ),
+                                        )
+                                    }
+                                    aria-disabled={
+                                        pagination.page >= pagination.totalPages
+                                    }
+                                    className={
+                                        (
+                                            pagination.page
+                                            >= pagination.totalPages
+                                        ) ?
+                                            'pointer-events-none opacity-50'
+                                        :   'cursor-pointer'
+                                    }
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                )}
         </div>
     );
 }

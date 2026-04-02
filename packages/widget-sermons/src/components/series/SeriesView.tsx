@@ -224,26 +224,30 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                 />
             </SkeletonTransition>
 
-            {pagination && pagination.totalPages > 1 && (
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={() =>
-                                    filters.setPage(
-                                        Math.max(1, filters.page - 1),
-                                    )
-                                }
-                                aria-disabled={filters.page <= 1}
-                                className={
-                                    filters.page <= 1 ?
-                                        'pointer-events-none opacity-50'
-                                    :   'cursor-pointer'
-                                }
-                            />
-                        </PaginationItem>
-                        {getPageRange(filters.page, pagination.totalPages).map(
-                            (item, idx) =>
+            {!config.hidePagination
+                && pagination
+                && pagination.totalPages > 1 && (
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() =>
+                                        filters.setPage(
+                                            Math.max(1, filters.page - 1),
+                                        )
+                                    }
+                                    aria-disabled={filters.page <= 1}
+                                    className={
+                                        filters.page <= 1 ?
+                                            'pointer-events-none opacity-50'
+                                        :   'cursor-pointer'
+                                    }
+                                />
+                            </PaginationItem>
+                            {getPageRange(
+                                filters.page,
+                                pagination.totalPages,
+                            ).map((item, idx) =>
                                 item === 'ellipsis' ?
                                     <PaginationItem key={`e-${idx}`}>
                                         <PaginationEllipsis />
@@ -259,30 +263,30 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                                             {item}
                                         </PaginationLink>
                                     </PaginationItem>,
-                        )}
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={() =>
-                                    filters.setPage(
-                                        Math.min(
-                                            pagination.totalPages,
-                                            filters.page + 1,
-                                        ),
-                                    )
-                                }
-                                aria-disabled={
-                                    filters.page >= pagination.totalPages
-                                }
-                                className={
-                                    filters.page >= pagination.totalPages ?
-                                        'pointer-events-none opacity-50'
-                                    :   'cursor-pointer'
-                                }
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            )}
+                            )}
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() =>
+                                        filters.setPage(
+                                            Math.min(
+                                                pagination.totalPages,
+                                                filters.page + 1,
+                                            ),
+                                        )
+                                    }
+                                    aria-disabled={
+                                        filters.page >= pagination.totalPages
+                                    }
+                                    className={
+                                        filters.page >= pagination.totalPages ?
+                                            'pointer-events-none opacity-50'
+                                        :   'cursor-pointer'
+                                    }
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                )}
         </div>
     );
 }
