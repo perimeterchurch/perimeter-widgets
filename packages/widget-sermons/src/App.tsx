@@ -69,13 +69,17 @@ function SermonsWidget() {
             );
         }
 
+        const showTabs = !config.tab && config.display !== 'headless';
+
         return (
             <>
-                <SermonTabs
-                    activeTab={filters.tab}
-                    onTabChange={filters.setTab}
-                />
-                <div className='mt-4'>
+                {showTabs && (
+                    <SermonTabs
+                        activeTab={filters.tab}
+                        onTabChange={filters.setTab}
+                    />
+                )}
+                <div className={showTabs ? 'mt-4' : ''}>
                     <AnimatePresence mode='wait'>
                         <motion.div key={filters.tab} {...fadeSlide}>
                             {filters.tab === 'sermons' && (
