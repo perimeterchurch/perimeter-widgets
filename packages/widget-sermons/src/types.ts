@@ -21,6 +21,13 @@ export const SermonsConfigSchema = z
         speakerId: z.coerce.string().optional(),
         bookId: z.coerce.string().optional(),
         serviceTypeId: z.coerce.string().optional(),
+        // Hide individual filter dropdowns
+        hideSeries: z.coerce.boolean().optional(),
+        hideSpeaker: z.coerce.boolean().optional(),
+        hideBook: z.coerce.boolean().optional(),
+        hideServiceType: z.coerce.boolean().optional(),
+        hideDate: z.coerce.boolean().optional(),
+        hideSearch: z.coerce.boolean().optional(),
         from: z
             .string()
             .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')

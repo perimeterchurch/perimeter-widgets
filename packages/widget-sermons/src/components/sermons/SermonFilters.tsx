@@ -88,16 +88,18 @@ export function SermonFilters(props: SermonFiltersProps) {
     return (
         <div className='space-y-3'>
             {/* Row 1: Search */}
-            <InputGroup>
-                <InputGroupAddon align='inline-start'>
-                    <Search />
-                </InputGroupAddon>
-                <InputGroupInput
-                    value={props.search}
-                    onChange={(e) => props.onSearchChange(e.target.value)}
-                    placeholder='Search sermons...'
-                />
-            </InputGroup>
+            {!props.lockedFilters.has('search') && (
+                <InputGroup>
+                    <InputGroupAddon align='inline-start'>
+                        <Search />
+                    </InputGroupAddon>
+                    <InputGroupInput
+                        value={props.search}
+                        onChange={(e) => props.onSearchChange(e.target.value)}
+                        placeholder='Search sermons...'
+                    />
+                </InputGroup>
+            )}
 
             {/* Row 2: Filter dropdowns */}
             {(!props.lockedFilters.has('series')

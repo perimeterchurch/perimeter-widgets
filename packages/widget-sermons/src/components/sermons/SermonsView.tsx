@@ -88,12 +88,14 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const showSortView = display !== 'headless';
 
     const lockedFilters = new Set<string>();
-    if (config.seriesId) lockedFilters.add('series');
-    if (config.speakerId) lockedFilters.add('speaker');
-    if (config.bookId) lockedFilters.add('book');
-    if (config.serviceTypeId) lockedFilters.add('serviceTypes');
-    if (config.from) lockedFilters.add('from');
-    if (config.to) lockedFilters.add('to');
+    if (config.seriesId || config.hideSeries) lockedFilters.add('series');
+    if (config.speakerId || config.hideSpeaker) lockedFilters.add('speaker');
+    if (config.bookId || config.hideBook) lockedFilters.add('book');
+    if (config.serviceTypeId || config.hideServiceType)
+        lockedFilters.add('serviceTypes');
+    if (config.from || config.hideDate) lockedFilters.add('from');
+    if (config.to || config.hideDate) lockedFilters.add('to');
+    if (config.hideSearch) lockedFilters.add('search');
 
     const { data, isLoading } = useSermons({
         search: filters.search || undefined,
