@@ -116,36 +116,68 @@ function MultiSelectApiField({
 
     useEffect(() => {
         if (!field.apiPath) return;
-        // Use relative URL so MSW (service worker) can intercept in mock mode,
-        // and Vite proxy or direct fetch works in live mode
-        const sep = field.apiPath.includes('?') ? '&' : '?';
-        const url = `${field.apiPath}${sep}perPage=50`;
-        fetch(url)
-            .then((res) => {
+        let cancelled = false;
+
+        async function fetchAllPages() {
+            const sep = field.apiPath!.includes('?') ? '&' : '?';
+            const allItems: Record<string, unknown>[] = [];
+            let page = 1;
+
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+                const url = `${field.apiPath}${sep}perPage=50&page=${page}`;
+                const res = await fetch(url);
                 if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-                return res.json();
-            })
-            .then((json: { data: unknown }) => {
+                const json = (await res.json()) as { data: unknown };
                 const data = json.data;
-                const items =
-                    Array.isArray(data) ? data : (
-                        ((data as Record<string, unknown>).series
-                        ?? (data as Record<string, unknown>).sermons
-                        ?? [])
-                    );
+
+                // Non-paginated endpoints return a flat array
+                if (Array.isArray(data)) {
+                    allItems.push(...(data as Record<string, unknown>[]));
+                    break;
+                }
+
+                // Paginated endpoints return { series/sermons: [...], pagination: {...} }
+                const obj = data as Record<string, unknown>;
+                const items = (obj.series ?? obj.sermons ?? []) as Record<
+                    string,
+                    unknown
+                >[];
+                const pagination = obj.pagination as
+                    | { totalPages: number }
+                    | undefined;
+                allItems.push(...items);
+
+                if (!pagination || page >= pagination.totalPages) break;
+                page++;
+            }
+
+            if (!cancelled) {
                 setOptions(
-                    (items as Record<string, unknown>[]).map((item) => ({
+                    allItems.map((item) => ({
                         id: item.id as number,
                         name: (item.displayTitle
                             ?? item.title
                             ?? item.name) as string,
                     })),
                 );
-            })
+            }
+        }
+
+        fetchAllPages()
             .catch((err) =>
-                console.warn(`[ConfigEditor] Failed to fetch ${url}:`, err),
+                console.warn(
+                    `[ConfigEditor] Failed to fetch ${field.apiPath}:`,
+                    err,
+                ),
             )
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
     }, [field.apiPath]);
 
     // Close on click outside
