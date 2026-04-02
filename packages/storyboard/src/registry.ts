@@ -10,13 +10,15 @@ export interface ConfigField {
     /** Human-readable label */
     label: string;
     /** Field type for the config editor */
-    type: 'text' | 'number' | 'boolean' | 'select';
+    type: 'text' | 'number' | 'boolean' | 'select' | 'multiselect-api';
     /** Default value */
     defaultValue: string | number | boolean;
     /** Options for select fields */
     options?: { label: string; value: string }[];
     /** Help text shown below the field */
     description?: string;
+    /** API endpoint path for multiselect-api fields (e.g., '/api/sermons/speakers') */
+    apiPath?: string;
 }
 
 export interface WidgetModule {
@@ -125,42 +127,44 @@ export const widgetRegistry: WidgetDefinition[] = [
             },
             {
                 key: 'seriesId',
-                label: 'Lock Series IDs',
-                type: 'text',
+                label: 'Lock Series',
+                type: 'multiselect-api',
                 defaultValue: '',
-                description:
-                    'Comma-separated series IDs to lock (sermons tab only)',
+                apiPath: '/api/sermons/series',
+                description: 'Lock to specific series (sermons tab only)',
             },
             {
                 key: 'speakerId',
-                label: 'Lock Speaker IDs',
-                type: 'text',
+                label: 'Lock Speakers',
+                type: 'multiselect-api',
                 defaultValue: '',
-                description:
-                    'Comma-separated speaker IDs to lock (sermons tab only)',
+                apiPath: '/api/sermons/speakers',
+                description: 'Lock to specific speakers (sermons tab only)',
             },
             {
                 key: 'bookId',
-                label: 'Lock Book IDs',
-                type: 'text',
+                label: 'Lock Books',
+                type: 'multiselect-api',
                 defaultValue: '',
-                description:
-                    'Comma-separated book IDs to lock (sermons tab only)',
+                apiPath: '/api/sermons/books',
+                description: 'Lock to specific books (sermons tab only)',
             },
             {
                 key: 'serviceTypeId',
-                label: 'Lock Service Type IDs',
-                type: 'text',
+                label: 'Lock Service Types',
+                type: 'multiselect-api',
                 defaultValue: '',
+                apiPath: '/api/sermons/service-types',
                 description:
-                    'Comma-separated service type IDs to lock (sermons tab only)',
+                    'Lock to specific service types (sermons tab only)',
             },
             {
                 key: 'seriesTypeId',
-                label: 'Lock Series Type IDs',
-                type: 'text',
+                label: 'Lock Series Types',
+                type: 'multiselect-api',
                 defaultValue: '',
-                description: 'Comma-separated series type IDs to lock',
+                apiPath: '/api/sermons/series-types',
+                description: 'Lock to specific series types',
             },
             {
                 key: 'from',
