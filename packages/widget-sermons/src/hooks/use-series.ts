@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
 import type { SermonsConfig } from '../types';
+import { createApiError } from '../lib/api-error';
 
 export interface UseSeriesParams {
     search?: string;
@@ -45,7 +46,7 @@ export function useSeries(params: UseSeriesParams) {
                     },
                 },
             });
-            if (error) throw new Error('Failed to fetch series');
+            if (error) throw createApiError('Failed to fetch series', error);
             return data.data;
         },
     });

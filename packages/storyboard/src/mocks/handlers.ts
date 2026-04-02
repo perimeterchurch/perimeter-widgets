@@ -73,16 +73,63 @@ function apiHandlers(origin: string) {
             } satisfies ListSermonsResponse);
         }),
 
-        http.get(`${origin}/api/sermons/series`, () => {
+        http.get(`${origin}/api/sermons/series`, ({ request }) => {
+            const url = new URL(request.url);
+            const page = parseInt(url.searchParams.get('page') ?? '1');
+            const perPage = parseInt(url.searchParams.get('perPage') ?? '12');
+            const search = url.searchParams.get('search')?.toLowerCase();
+            const sort = url.searchParams.get('sort') ?? 'date';
+            const order = url.searchParams.get('order') ?? 'desc';
+
+            let filtered = [...mockSeries];
+            if (search) {
+                filtered = filtered.filter(
+                    (s) =>
+                        s.title.toLowerCase().includes(search)
+                        || (s.displayTitle?.toLowerCase().includes(search)
+                            ?? false)
+                        || (s.subtitle?.toLowerCase().includes(search)
+                            ?? false),
+                );
+            }
+
+            // Sort
+            filtered.sort((a, b) => {
+                switch (sort) {
+                    case 'title': {
+                        const titleA = (
+                            a.displayTitle ?? a.title
+                        ).toLowerCase();
+                        const titleB = (
+                            b.displayTitle ?? b.title
+                        ).toLowerCase();
+                        return titleA.localeCompare(titleB);
+                    }
+                    case 'count':
+                        return a.sermonCount - b.sermonCount;
+                    case 'date':
+                    default: {
+                        const dateA = a.latestSermonDate ?? '';
+                        const dateB = b.latestSermonDate ?? '';
+                        return dateA.localeCompare(dateB);
+                    }
+                }
+            });
+            if (order === 'desc') filtered.reverse();
+
+            // Paginate
+            const start = (page - 1) * perPage;
+            const paged = filtered.slice(start, start + perPage);
+
             return HttpResponse.json({
                 success: true,
                 data: {
-                    series: mockSeries,
+                    series: paged,
                     pagination: {
-                        page: 1,
-                        perPage: 12,
-                        total: mockSeries.length,
-                        totalPages: 1,
+                        page,
+                        perPage,
+                        total: filtered.length,
+                        totalPages: Math.ceil(filtered.length / perPage),
                     },
                 },
             } satisfies ListSeriesResponse);

@@ -32,6 +32,7 @@ import { useSeries } from '../../hooks/use-series';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SeriesGrid } from './SeriesGrid';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
+import { getPageRange } from '../../lib/pagination';
 
 interface SeriesViewProps {
     config: SermonsConfig;
@@ -77,56 +78,22 @@ const VIEW_OPTIONS = [
     },
 ];
 
-function getPageRange(
-    page: number,
-    totalPages: number,
-): (number | 'ellipsis')[] {
-    const pages: (number | 'ellipsis')[] = [];
-    if (totalPages <= 7) {
-        for (let i = 1; i <= totalPages; i++) pages.push(i);
-        return pages;
-    }
-    pages.push(1);
-    if (page > 3) pages.push('ellipsis');
-    const start = Math.max(2, page - 1);
-    const end = Math.min(totalPages - 1, page + 1);
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (page < totalPages - 2) pages.push('ellipsis');
-    pages.push(totalPages);
-    return pages;
-}
-
 export function SeriesView({ config, filters }: SeriesViewProps) {
-    const [search, setSearch] = useState('');
     const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
-    const [sortField, setSortField] = useState<SeriesSortField>('date');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-    const [page, setPage] = useState(1);
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
 
     const { data, isLoading } = useSeries({
-        search: search || undefined,
-        from: dateFrom || undefined,
-        to: dateTo || undefined,
-        page,
+        search: filters.search || undefined,
+        from: filters.from ?? undefined,
+        to: filters.to ?? undefined,
+        page: filters.page,
         perPage: config.perPage,
-        sort: sortField,
-        order: sortDirection,
+        sort: filters.sort,
+        order: filters.order,
         config,
     });
 
     const seriesList = data?.series ?? [];
     const pagination = data?.pagination;
-
-    const hasActiveFilters = !!search || !!dateFrom || !!dateTo;
-
-    const clearAll = () => {
-        setSearch('');
-        setDateFrom('');
-        setDateTo('');
-        setPage(1);
-    };
 
     return (
         <div className='space-y-4'>
@@ -136,11 +103,8 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                     <Search />
                 </InputGroupAddon>
                 <InputGroupInput
-                    value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setPage(1);
-                    }}
+                    value={filters.search}
+                    onChange={(e) => filters.setSearch(e.target.value)}
                     placeholder='Search series...'
                 />
             </InputGroup>
@@ -148,20 +112,18 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
             {/* Row 2: Date range + clear all */}
             <div className='flex items-center gap-3'>
                 <DateRangePicker
-                    from={dateFrom}
-                    to={dateTo}
-                    onFromChange={(v) => {
-                        setDateFrom(v ?? '');
-                        setPage(1);
-                    }}
-                    onToChange={(v) => {
-                        setDateTo(v ?? '');
-                        setPage(1);
-                    }}
+                    from={filters.from ?? ''}
+                    to={filters.to ?? ''}
+                    onFromChange={(v) => filters.setDateRange(v, filters.to)}
+                    onToChange={(v) => filters.setDateRange(filters.from, v)}
                 />
                 <div className='flex-1' />
-                {hasActiveFilters && (
-                    <Button variant='outline' size='sm' onClick={clearAll}>
+                {filters.hasActiveFilters && (
+                    <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={filters.clearFilters}
+                    >
                         <X className='h-3.5 w-3.5' />
                         Clear All
                     </Button>
@@ -175,16 +137,17 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                 </span>
                 <div className='flex items-center gap-2'>
                     <SortSelect
-                        sortField={sortField}
-                        sortDirection={sortDirection}
-                        onSortFieldChange={(f) => {
-                            setSortField(f as SeriesSortField);
-                            setPage(1);
-                        }}
-                        onSortDirectionChange={(d) => {
-                            setSortDirection(d);
-                            setPage(1);
-                        }}
+                        sortField={filters.sort}
+                        sortDirection={filters.order}
+                        onSortFieldChange={(field) =>
+                            filters.setSort(
+                                field as SeriesSortField,
+                                filters.order,
+                            )
+                        }
+                        onSortDirectionChange={(direction) =>
+                            filters.setSort(filters.sort, direction)
+                        }
                         fields={SORT_FIELDS}
                     />
                     <IconSelect
@@ -222,16 +185,20 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                     <PaginationContent>
                         <PaginationItem>
                             <PaginationPrevious
-                                onClick={() => setPage(Math.max(1, page - 1))}
-                                aria-disabled={page <= 1}
+                                onClick={() =>
+                                    filters.setPage(
+                                        Math.max(1, filters.page - 1),
+                                    )
+                                }
+                                aria-disabled={filters.page <= 1}
                                 className={
-                                    page <= 1 ?
+                                    filters.page <= 1 ?
                                         'pointer-events-none opacity-50'
                                     :   'cursor-pointer'
                                 }
                             />
                         </PaginationItem>
-                        {getPageRange(page, pagination.totalPages).map(
+                        {getPageRange(filters.page, pagination.totalPages).map(
                             (item, idx) =>
                                 item === 'ellipsis' ?
                                     <PaginationItem key={`e-${idx}`}>
@@ -239,8 +206,10 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                                     </PaginationItem>
                                 :   <PaginationItem key={item}>
                                         <PaginationLink
-                                            isActive={item === page}
-                                            onClick={() => setPage(item)}
+                                            isActive={item === filters.page}
+                                            onClick={() =>
+                                                filters.setPage(item)
+                                            }
                                             className='cursor-pointer'
                                         >
                                             {item}
@@ -250,16 +219,18 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                         <PaginationItem>
                             <PaginationNext
                                 onClick={() =>
-                                    setPage(
+                                    filters.setPage(
                                         Math.min(
                                             pagination.totalPages,
-                                            page + 1,
+                                            filters.page + 1,
                                         ),
                                     )
                                 }
-                                aria-disabled={page >= pagination.totalPages}
+                                aria-disabled={
+                                    filters.page >= pagination.totalPages
+                                }
                                 className={
-                                    page >= pagination.totalPages ?
+                                    filters.page >= pagination.totalPages ?
                                         'pointer-events-none opacity-50'
                                     :   'cursor-pointer'
                                 }

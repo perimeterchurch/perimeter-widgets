@@ -14,7 +14,7 @@ export function proxyS3Url(url: string): string {
 }
 
 export function sermonImageUrl(sermonId: number): string {
-    return `/api/sermons/${sermonId}/image`;
+    return `/api/sermons/sermon/${sermonId}/image`;
 }
 
 export function seriesImageUrl(seriesId: number): string {

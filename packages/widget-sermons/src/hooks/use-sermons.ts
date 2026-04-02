@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
 import type { SortField, SortOrder } from '../types';
 import type { SermonsConfig } from '../types';
+import { createApiError } from '../lib/api-error';
 
 export interface UseSermonsParams {
     search?: string;
@@ -36,9 +37,12 @@ export function useSermons(params: UseSermonsParams) {
 
     // Merge: UI filter selection takes priority, then config-resolved IDs
     const resolvedServiceTypeId =
-        selectedServiceTypeIds.length > 0
-            ? selectedServiceTypeIds.join(',')
-            : (serviceTypeId ?? undefined);
+        selectedServiceTypeIds.length > 0 ?
+            selectedServiceTypeIds.join(',')
+        :   (serviceTypeId ?? undefined);
+
+    // Sermons API only supports 'date' | 'title' — fall back to 'date' for 'count'
+    const sermonSort = sort === 'count' ? 'date' : sort;
 
     return useQuery({
         queryKey: [
@@ -51,7 +55,7 @@ export function useSermons(params: UseSermonsParams) {
                 serviceTypeId: resolvedServiceTypeId,
                 from,
                 to,
-                sort,
+                sort: sermonSort,
                 order,
                 page,
                 perPage: config.perPage,
@@ -68,7 +72,7 @@ export function useSermons(params: UseSermonsParams) {
                         bookId: book ?? undefined,
                         from: from ?? undefined,
                         to: to ?? undefined,
-                        sort,
+                        sort: sermonSort,
                         order,
                         page,
                         perPage: config.perPage,
@@ -76,7 +80,7 @@ export function useSermons(params: UseSermonsParams) {
                     },
                 },
             });
-            if (error) throw new Error('Failed to fetch sermons');
+            if (error) throw createApiError('Failed to fetch sermons', error);
             return data.data;
         },
     });

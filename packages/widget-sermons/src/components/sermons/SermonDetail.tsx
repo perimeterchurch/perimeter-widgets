@@ -12,12 +12,7 @@ import {
     SortSelect,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
-import type {
-    SermonsConfig,
-    SermonListItem,
-    SortField,
-    SortOrder,
-} from '../../types';
+import type { SermonsConfig, SortField, SortOrder } from '../../types';
 import { useSermonDetail } from '../../hooks/use-sermon-detail';
 import { useSermons } from '../../hooks/use-sermons';
 import { formatDate, sermonImageUrl } from '../../lib/format';
@@ -62,9 +57,9 @@ export function SermonDetail({
         config: { ...config, perPage: 50 },
     });
 
-    const relatedSermons = (
-        (seriesData?.sermons ?? []) as SermonListItem[]
-    ).filter((s) => s.id !== id);
+    const relatedSermons = (seriesData?.sermons ?? []).filter(
+        (s) => s.id !== id,
+    );
 
     if (error) {
         return (

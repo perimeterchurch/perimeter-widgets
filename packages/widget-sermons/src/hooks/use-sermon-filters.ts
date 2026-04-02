@@ -22,7 +22,9 @@ const sermonParams = {
     serviceTypes: parseAsString,
     from: parseAsString,
     to: parseAsString,
-    sort: parseAsStringLiteral(['date', 'title'] as const).withDefault('date'),
+    sort: parseAsStringLiteral(['date', 'title', 'count'] as const).withDefault(
+        'date',
+    ),
     order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault('desc'),
     page: parseAsInteger.withDefault(1),
 };

@@ -66,7 +66,7 @@ export interface SermonListViewProps {
 export type TabId = 'sermons' | 'series';
 export type ScreenMode = 'browse' | 'detail';
 export type ViewMode = 'grid' | 'list' | 'large';
-export type SortField = 'date' | 'title';
+export type SortField = 'date' | 'title' | 'count';
 export type SortOrder = 'asc' | 'desc';
 
 /* ------------------------------------------------------------------ */

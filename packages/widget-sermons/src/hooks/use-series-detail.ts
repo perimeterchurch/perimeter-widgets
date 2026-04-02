@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
 import type { SermonsConfig } from '../types';
+import { createApiError } from '../lib/api-error';
 
 export function useSeriesDetail(id: number | null, config: SermonsConfig) {
     return useQuery({
@@ -13,7 +14,8 @@ export function useSeriesDetail(id: number | null, config: SermonsConfig) {
                     params: { path: { id: id! } },
                 },
             );
-            if (error) throw new Error('Failed to fetch series detail');
+            if (error)
+                throw createApiError('Failed to fetch series detail', error);
             return data.data;
         },
         enabled: id !== null && id > 0,

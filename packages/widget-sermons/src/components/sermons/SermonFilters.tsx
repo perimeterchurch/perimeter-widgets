@@ -184,6 +184,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             type='button'
                             onClick={() => props.onSeriesChange(null)}
                             className='inline-flex'
+                            aria-label={`Remove ${seriesOptions.find((o) => o.value === String(props.series))?.label ?? 'series'} filter`}
                         >
                             <Badge variant='default'>
                                 {seriesOptions.find(
@@ -198,6 +199,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             type='button'
                             onClick={() => props.onSpeakerChange(null)}
                             className='inline-flex'
+                            aria-label={`Remove ${speakerOptions.find((o) => o.value === String(props.speaker))?.label ?? 'speaker'} filter`}
                         >
                             <Badge variant='default'>
                                 {speakerOptions.find(
@@ -212,6 +214,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             type='button'
                             onClick={() => props.onBookChange(null)}
                             className='inline-flex'
+                            aria-label={`Remove ${bookOptions.find((o) => o.value === String(props.book))?.label ?? 'book'} filter`}
                         >
                             <Badge variant='default'>
                                 {bookOptions.find(
@@ -233,6 +236,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                                 )
                             }
                             className='inline-flex'
+                            aria-label={`Remove ${serviceTypeOptions.find((o) => o.value === String(id))?.label ?? 'service type'} filter`}
                         >
                             <Badge variant='default'>
                                 {serviceTypeOptions.find(
@@ -247,6 +251,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             type='button'
                             onClick={() => props.onSearchChange('')}
                             className='inline-flex'
+                            aria-label='Remove search filter'
                         >
                             <Badge variant='secondary'>
                                 &ldquo;{props.search}&rdquo;{' '}

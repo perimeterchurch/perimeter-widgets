@@ -30,6 +30,7 @@ import { SermonGrid } from './SermonGrid';
 import { SermonSmallList } from './SermonSmallList';
 import { SermonLargeList } from './SermonLargeList';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
+import { getPageRange } from '../../lib/pagination';
 
 interface SermonsViewProps {
     config: SermonsConfig;
@@ -66,26 +67,6 @@ const SORT_FIELDS = [
         icon: <Type className='h-3.5 w-3.5' />,
     },
 ];
-
-/** Build a page range for the pagination component */
-function getPageRange(
-    page: number,
-    totalPages: number,
-): (number | 'ellipsis')[] {
-    const pages: (number | 'ellipsis')[] = [];
-    if (totalPages <= 7) {
-        for (let i = 1; i <= totalPages; i++) pages.push(i);
-        return pages;
-    }
-    pages.push(1);
-    if (page > 3) pages.push('ellipsis');
-    const start = Math.max(2, page - 1);
-    const end = Math.min(totalPages - 1, page + 1);
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (page < totalPages - 2) pages.push('ellipsis');
-    pages.push(totalPages);
-    return pages;
-}
 
 export function SermonsView({ config, filters }: SermonsViewProps) {
     const [viewMode, setViewMode] = useState<ViewMode>(
