@@ -5,13 +5,48 @@ import type { operations } from '@perimeter-widgets/shared';
 /*  Widget Configuration (from data-* attributes)                      */
 /* ------------------------------------------------------------------ */
 
-export const SermonsConfigSchema = z.object({
-    serviceTypes: z.string().optional(),
-    perPage: z.number().default(12),
-    defaultTab: z.enum(['sermons', 'series']).default('sermons'),
-    defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
-    apiUrl: z.string().optional(),
-});
+export const SermonsConfigSchema = z
+    .object({
+        // Existing
+        serviceTypes: z.string().optional(),
+        perPage: z.number().default(12),
+        defaultTab: z.enum(['sermons', 'series']).default('sermons'),
+        defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
+        apiUrl: z.string().optional(),
+        // Display and tab lock
+        tab: z.enum(['sermons', 'series']).optional(),
+        display: z.enum(['full', 'compact', 'headless']).default('full'),
+        // Locked filters (sermons tab only)
+        seriesId: z.coerce.number().int().positive().optional(),
+        speakerId: z.coerce.number().int().positive().optional(),
+        bookId: z.coerce.number().int().positive().optional(),
+        serviceTypeId: z.coerce.string().optional(),
+        from: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
+            .optional(),
+        to: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
+            .optional(),
+    })
+    .refine(
+        (c) => {
+            if (c.tab !== 'series') return true;
+            return (
+                !c.seriesId
+                && !c.speakerId
+                && !c.bookId
+                && !c.serviceTypeId
+                && !c.from
+                && !c.to
+            );
+        },
+        {
+            message:
+                'Sermon-only filters (seriesId, speakerId, bookId, serviceTypeId, from, to) cannot be used with tab="series"',
+        },
+    );
 
 export type SermonsConfig = z.infer<typeof SermonsConfigSchema>;
 
