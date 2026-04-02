@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
     parseAsInteger,
     parseAsString,
@@ -27,32 +28,38 @@ function serializeServiceTypeIds(ids: number[]): string | null {
 }
 
 export function useSermonFilters(config: SermonsConfig) {
-    const sermonParams = {
-        tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(
-            config.defaultTab ?? 'sermons',
-        ),
-        screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault(
-            'browse',
-        ),
-        id: parseAsInteger,
-        fromSeriesId: parseAsInteger,
-        search: parseAsString.withDefault(''),
-        series: parseAsInteger,
-        speaker: parseAsInteger,
-        book: parseAsInteger,
-        serviceTypes: parseAsString,
-        from: parseAsString,
-        to: parseAsString,
-        sort: parseAsStringLiteral([
-            'date',
-            'title',
-            'count',
-        ] as const).withDefault('date'),
-        order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault(
-            'desc',
-        ),
-        page: parseAsInteger.withDefault(1),
-    };
+    const defaultTab = config.defaultTab ?? 'sermons';
+    const sermonParams = useMemo(
+        () => ({
+            tab: parseAsStringLiteral([
+                'sermons',
+                'series',
+            ] as const).withDefault(defaultTab),
+            screen: parseAsStringLiteral([
+                'browse',
+                'detail',
+            ] as const).withDefault('browse'),
+            id: parseAsInteger,
+            fromSeriesId: parseAsInteger,
+            search: parseAsString.withDefault(''),
+            series: parseAsInteger,
+            speaker: parseAsInteger,
+            book: parseAsInteger,
+            serviceTypes: parseAsString,
+            from: parseAsString,
+            to: parseAsString,
+            sort: parseAsStringLiteral([
+                'date',
+                'title',
+                'count',
+            ] as const).withDefault('date'),
+            order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault(
+                'desc',
+            ),
+            page: parseAsInteger.withDefault(1),
+        }),
+        [defaultTab],
+    );
 
     const [params, setParams] = useQueryStates(sermonParams, {
         history: 'push',
