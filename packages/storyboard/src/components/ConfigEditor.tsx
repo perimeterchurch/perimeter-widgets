@@ -117,7 +117,8 @@ function MultiSelectApiField({
     useEffect(() => {
         if (!field.apiPath) return;
         const baseUrl = import.meta.env.VITE_API_URL || '';
-        fetch(`${baseUrl}${field.apiPath}`)
+        const sep = field.apiPath.includes('?') ? '&' : '?';
+        fetch(`${baseUrl}${field.apiPath}${sep}perPage=500`)
             .then((res) => res.json())
             .then((json: { data: unknown }) => {
                 const data = json.data;
