@@ -47,7 +47,7 @@ export function SermonDetail({
     onSermonClick,
 }: SermonDetailProps) {
     const { data: sermon, isLoading, error } = useSermonDetail(id, config);
-    const showRelated = config.display !== 'headless';
+    const showRelated = (config.display ?? 'full') !== 'headless';
     const [sortField, setSortField] = useState<SortField>('date');
     const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
 

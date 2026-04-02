@@ -80,8 +80,9 @@ const VIEW_OPTIONS = [
 
 export function SeriesView({ config, filters }: SeriesViewProps) {
     const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
-    const showSearch = config.display === 'full';
-    const showSortView = config.display !== 'headless';
+    const display = config.display ?? 'full';
+    const showSearch = display === 'full';
+    const showSortView = display !== 'headless';
 
     const { data, isLoading } = useSeries({
         search: filters.search || undefined,

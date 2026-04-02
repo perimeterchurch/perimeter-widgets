@@ -83,8 +83,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         :   (resolveServiceTypeIds(config.serviceTypes, serviceTypes)
             ?? undefined));
 
-    const showFilters = config.display === 'full';
-    const showSortView = config.display !== 'headless';
+    const display = config.display ?? 'full';
+    const showFilters = display === 'full';
+    const showSortView = display !== 'headless';
 
     const lockedFilters = new Set<string>();
     if (config.seriesId != null) lockedFilters.add('series');
