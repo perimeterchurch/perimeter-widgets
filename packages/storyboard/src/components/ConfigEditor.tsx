@@ -119,7 +119,7 @@ function MultiSelectApiField({
         // Use relative URL so MSW (service worker) can intercept in mock mode,
         // and Vite proxy or direct fetch works in live mode
         const sep = field.apiPath.includes('?') ? '&' : '?';
-        const url = `${field.apiPath}${sep}perPage=500`;
+        const url = `${field.apiPath}${sep}perPage=50`;
         fetch(url)
             .then((res) => {
                 if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
