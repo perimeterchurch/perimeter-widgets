@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import { MultiCombobox } from '@perimeter-widgets/shared';
-import type { MultiComboboxOption } from '@perimeter-widgets/shared';
+import { useState, useEffect, useRef } from 'react';
 import type { ConfigField } from '@/registry';
 
 interface ConfigEditorProps {
@@ -95,6 +93,11 @@ export function ConfigEditor({
 const inputClasses =
     'w-full rounded-md border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-700 px-3 py-1.5 text-sm text-stone-900 dark:text-stone-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none';
 
+interface ApiOption {
+    id: number;
+    name: string;
+}
+
 function MultiSelectApiField({
     field,
     value,
@@ -104,8 +107,12 @@ function MultiSelectApiField({
     value: string;
     onChange: (value: string) => void;
 }) {
-    const [options, setOptions] = useState<MultiComboboxOption[]>([]);
+    const [options, setOptions] = useState<ApiOption[]>([]);
     const [loading, setLoading] = useState(true);
+    const [open, setOpen] = useState(false);
+    const [search, setSearch] = useState('');
+    const containerRef = useRef<HTMLDivElement>(null);
+    const searchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (!field.apiPath) return;
@@ -122,8 +129,10 @@ function MultiSelectApiField({
                     );
                 setOptions(
                     (items as Record<string, unknown>[]).map((item) => ({
-                        value: String(item.id),
-                        label: `${(item.displayTitle ?? item.title ?? item.name) as string} | ${item.id}`,
+                        id: item.id as number,
+                        name: (item.displayTitle
+                            ?? item.title
+                            ?? item.name) as string,
                     })),
                 );
             })
@@ -131,24 +140,153 @@ function MultiSelectApiField({
             .finally(() => setLoading(false));
     }, [field.apiPath]);
 
-    const selectedValues =
+    // Close on click outside
+    useEffect(() => {
+        if (!open) return;
+        const handler = (e: MouseEvent) => {
+            if (
+                containerRef.current
+                && !containerRef.current.contains(e.target as Node)
+            ) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [open]);
+
+    // Focus search when opened
+    useEffect(() => {
+        if (open) searchRef.current?.focus();
+    }, [open]);
+
+    const selectedIds =
         value ?
             value
                 .split(',')
-                .map((s) => s.trim())
-                .filter(Boolean)
+                .map(Number)
+                .filter((n) => !isNaN(n) && n > 0)
         :   [];
 
+    const toggle = (id: number) => {
+        const next =
+            selectedIds.includes(id) ?
+                selectedIds.filter((x) => x !== id)
+            :   [...selectedIds, id];
+        onChange(next.length > 0 ? next.join(',') : '');
+    };
+
+    const filtered =
+        search ?
+            options.filter(
+                (o) =>
+                    o.name.toLowerCase().includes(search.toLowerCase())
+                    || String(o.id).includes(search),
+            )
+        :   options;
+
+    const selectedNames = selectedIds
+        .map((id) => options.find((o) => o.id === id)?.name)
+        .filter(Boolean);
+
     return (
-        <MultiCombobox
-            options={options}
-            value={selectedValues}
-            onValueChange={(selected) => onChange(selected.join(','))}
-            placeholder={loading ? 'Loading...' : 'Select...'}
-            selectedLabel={field.label}
-            disabled={loading}
-            multiple
-        />
+        <div ref={containerRef} className='relative'>
+            <button
+                type='button'
+                onClick={() => {
+                    setOpen(!open);
+                    setSearch('');
+                }}
+                className={`${inputClasses} text-left flex items-center justify-between gap-2`}
+            >
+                <span
+                    className={`truncate ${selectedIds.length === 0 ? 'text-stone-400' : ''}`}
+                >
+                    {loading ?
+                        'Loading...'
+                    : selectedIds.length === 0 ?
+                        'None selected'
+                    :   selectedNames.join(', ')}
+                </span>
+                <svg
+                    className='h-4 w-4 shrink-0 text-stone-400'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                >
+                    <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d={open ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}
+                    />
+                </svg>
+            </button>
+            {open && (
+                <div className='absolute z-50 mt-1 w-full rounded-md border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-700 shadow-lg'>
+                    {/* Search input */}
+                    <div className='p-1.5 border-b border-stone-100 dark:border-stone-600'>
+                        <input
+                            ref={searchRef}
+                            type='text'
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder='Search...'
+                            className='w-full rounded border-0 bg-stone-50 dark:bg-stone-600 px-2.5 py-1.5 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+                        />
+                    </div>
+                    {/* Options */}
+                    <div className='max-h-52 overflow-auto py-1'>
+                        {filtered.length === 0 && (
+                            <div className='px-3 py-2 text-xs text-stone-400'>
+                                {search ? 'No matches' : 'No options available'}
+                            </div>
+                        )}
+                        {filtered.map((opt) => {
+                            const checked = selectedIds.includes(opt.id);
+                            return (
+                                <label
+                                    key={opt.id}
+                                    className={`flex items-center gap-2.5 px-3 py-1.5 text-sm cursor-pointer transition-colors ${
+                                        checked ?
+                                            'bg-indigo-50 dark:bg-indigo-950/30'
+                                        :   'hover:bg-stone-50 dark:hover:bg-stone-600'
+                                    }`}
+                                >
+                                    <input
+                                        type='checkbox'
+                                        checked={checked}
+                                        onChange={() => toggle(opt.id)}
+                                        className='rounded border-stone-300 dark:border-stone-500 text-indigo-600 focus:ring-indigo-500'
+                                    />
+                                    <span className='flex-1 text-stone-700 dark:text-stone-200 truncate'>
+                                        {opt.name}
+                                    </span>
+                                    <span className='text-stone-400 dark:text-stone-500 text-xs font-mono tabular-nums'>
+                                        {opt.id}
+                                    </span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                    {/* Selection summary */}
+                    {selectedIds.length > 0 && (
+                        <div className='flex items-center justify-between border-t border-stone-100 dark:border-stone-600 px-3 py-1.5'>
+                            <span className='text-xs text-stone-400'>
+                                {selectedIds.length} selected
+                            </span>
+                            <button
+                                type='button'
+                                onClick={() => onChange('')}
+                                className='text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700'
+                            >
+                                Clear all
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }
 
