@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { cn } from '@perimeter-widgets/shared';
+import { cn, Skeleton } from '@perimeter-widgets/shared';
 import { ImagePlaceholder } from './ImagePlaceholder';
 
 interface MediaCardProps {
@@ -35,16 +35,28 @@ function FallbackImage({
     failed: boolean;
     onFail: () => void;
 }) {
+    const [loaded, setLoaded] = useState(false);
+
     if (failed) {
         return <ImagePlaceholder className={className} />;
     }
+
     return (
-        <img
-            src={src}
-            alt={alt}
-            className={cn('block object-cover', className)}
-            onError={onFail}
-        />
+        <div className={cn('relative overflow-hidden', className)}>
+            {!loaded && (
+                <Skeleton className='absolute inset-0 h-full w-full rounded-none' />
+            )}
+            <img
+                src={src}
+                alt={alt}
+                className={cn(
+                    'block h-full w-full object-cover transition-opacity duration-300',
+                    loaded ? 'opacity-100' : 'opacity-0',
+                )}
+                onLoad={() => setLoaded(true)}
+                onError={onFail}
+            />
+        </div>
     );
 }
 
