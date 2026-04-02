@@ -71,10 +71,17 @@ export function useSermonFilters(config: SermonsConfig) {
     const from = config.from || params.from;
     const to = config.to || params.to;
 
-    // Parse comma-separated IDs for multi-select filters, with config overrides
-    const selectedSeriesIds = parseIds(config.seriesId || params.series);
-    const selectedSpeakerIds = parseIds(config.speakerId || params.speaker);
-    const selectedBookIds = parseIds(config.bookId || params.book);
+    // Parse comma-separated IDs for multi-select filters, with config overrides.
+    // Config values may be numbers (from parseDataAttributes coercion) — coerce to string.
+    const selectedSeriesIds = parseIds(
+        (config.seriesId ? String(config.seriesId) : null) || params.series,
+    );
+    const selectedSpeakerIds = parseIds(
+        (config.speakerId ? String(config.speakerId) : null) || params.speaker,
+    );
+    const selectedBookIds = parseIds(
+        (config.bookId ? String(config.bookId) : null) || params.book,
+    );
     const selectedServiceTypeIds = parseIds(params.serviceTypes);
 
     const setTab =

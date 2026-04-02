@@ -96,7 +96,16 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     if (config.to) lockedFilters.add('to');
 
     const { data, isLoading } = useSermons({
-        ...filters,
+        search: filters.search || undefined,
+        selectedSeriesIds: filters.selectedSeriesIds,
+        selectedSpeakerIds: filters.selectedSpeakerIds,
+        selectedBookIds: filters.selectedBookIds,
+        selectedServiceTypeIds: filters.selectedServiceTypeIds,
+        from: filters.from,
+        to: filters.to,
+        sort: filters.sort,
+        order: filters.order,
+        page: filters.page,
         config,
         serviceTypeId: resolvedServiceTypeId,
     });
