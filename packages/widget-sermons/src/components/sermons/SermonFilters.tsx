@@ -72,6 +72,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                 value: `__group_${group.label}`,
                 label: group.label,
                 disabled: true,
+                isGroupHeader: true,
             },
             ...group.options,
         ]);

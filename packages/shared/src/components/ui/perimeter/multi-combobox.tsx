@@ -13,6 +13,8 @@ export interface MultiComboboxOption {
     value: string;
     label: string;
     disabled?: boolean;
+    /** Render as a non-selectable group header */
+    isGroupHeader?: boolean;
 }
 
 interface MultiComboboxBaseProps {
@@ -363,12 +365,15 @@ function MultiCombobox(props: MultiComboboxProps) {
                                         'relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none transition-colors duration-150',
                                         'data-highlighted:bg-accent data-highlighted:text-accent-foreground',
                                         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+                                        option.isGroupHeader
+                                            && 'pointer-events-none px-1.5 pt-2 pb-0.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground',
                                         option.disabled
-                                            && 'pointer-events-none opacity-40 line-through',
+                                            && !option.isGroupHeader
+                                            && 'pointer-events-none opacity-40',
                                     )}
                                 >
                                     {option.label}
-                                    {selected && (
+                                    {selected && !option.isGroupHeader && (
                                         <span className='pointer-events-none absolute right-2 flex size-4 items-center justify-center'>
                                             <CheckIcon className='size-4' />
                                         </span>
