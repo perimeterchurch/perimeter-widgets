@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { MultiCombobox } from '@perimeter-widgets/shared';
+import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import type { ConfigField } from '@/registry';
 
 interface ConfigEditorProps {
@@ -102,10 +104,8 @@ function MultiSelectApiField({
     value: string;
     onChange: (value: string) => void;
 }) {
-    const [options, setOptions] = useState<{ id: number; name: string }[]>([]);
+    const [options, setOptions] = useState<MultiComboboxOption[]>([]);
     const [loading, setLoading] = useState(true);
-    const [open, setOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!field.apiPath) return;
@@ -122,10 +122,8 @@ function MultiSelectApiField({
                     );
                 setOptions(
                     (items as Record<string, unknown>[]).map((item) => ({
-                        id: item.id as number,
-                        name: (item.displayTitle
-                            ?? item.title
-                            ?? item.name) as string,
+                        value: String(item.id),
+                        label: `${(item.displayTitle ?? item.title ?? item.name) as string} | ${item.id}`,
                     })),
                 );
             })
@@ -133,97 +131,24 @@ function MultiSelectApiField({
             .finally(() => setLoading(false));
     }, [field.apiPath]);
 
-    useEffect(() => {
-        if (!open) return;
-        const handler = (e: MouseEvent) => {
-            if (
-                dropdownRef.current
-                && !dropdownRef.current.contains(e.target as Node)
-            ) {
-                setOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, [open]);
-
-    const selectedIds =
+    const selectedValues =
         value ?
             value
                 .split(',')
-                .map(Number)
-                .filter((n) => !isNaN(n) && n > 0)
+                .map((s) => s.trim())
+                .filter(Boolean)
         :   [];
 
-    const toggle = (id: number) => {
-        const next =
-            selectedIds.includes(id) ?
-                selectedIds.filter((x) => x !== id)
-            :   [...selectedIds, id];
-        onChange(next.length > 0 ? next.join(',') : '');
-    };
-
-    const inputId = `config-${field.key}`;
-    const selectedCount = selectedIds.length;
-
     return (
-        <div ref={dropdownRef} className='relative'>
-            <button
-                id={inputId}
-                type='button'
-                onClick={() => setOpen(!open)}
-                className={`${inputClasses} text-left flex items-center justify-between`}
-            >
-                <span className={selectedCount === 0 ? 'text-stone-400' : ''}>
-                    {loading ?
-                        'Loading...'
-                    : selectedCount === 0 ?
-                        'None selected'
-                    :   `${selectedCount} selected`}
-                </span>
-                <svg
-                    className='h-4 w-4 text-stone-400'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
-                >
-                    <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M19 9l-7 7-7-7'
-                    />
-                </svg>
-            </button>
-            {open && (
-                <div className='absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-700 shadow-lg'>
-                    {options.length === 0 && !loading && (
-                        <div className='px-3 py-2 text-xs text-stone-400'>
-                            No options available
-                        </div>
-                    )}
-                    {options.map((opt) => (
-                        <label
-                            key={opt.id}
-                            className='flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-600 transition-colors'
-                        >
-                            <input
-                                type='checkbox'
-                                checked={selectedIds.includes(opt.id)}
-                                onChange={() => toggle(opt.id)}
-                                className='rounded border-stone-300 dark:border-stone-500 text-indigo-600 focus:ring-indigo-500'
-                            />
-                            <span className='text-stone-700 dark:text-stone-200 flex-1'>
-                                {opt.name}
-                            </span>
-                            <span className='text-stone-400 dark:text-stone-500 text-xs font-mono'>
-                                {opt.id}
-                            </span>
-                        </label>
-                    ))}
-                </div>
-            )}
-        </div>
+        <MultiCombobox
+            options={options}
+            value={selectedValues}
+            onValueChange={(selected) => onChange(selected.join(','))}
+            placeholder={loading ? 'Loading...' : 'Select...'}
+            selectedLabel={field.label}
+            disabled={loading}
+            multiple
+        />
     );
 }
 
