@@ -64,6 +64,7 @@ export const mockSermons: SermonListItem[] = [
         speaker: { id: 1, name: 'Pastor John Smith' },
         series: { id: 1, title: '1 Peter' },
         congregation: { id: 1 },
+        book: { id: 60, name: '1 Peter' },
     },
     {
         id: 2,
@@ -75,6 +76,7 @@ export const mockSermons: SermonListItem[] = [
         speaker: { id: 1, name: 'Pastor John Smith' },
         series: { id: 1, title: '1 Peter' },
         congregation: { id: 1 },
+        book: { id: 60, name: '1 Peter' },
     },
     {
         id: 3,
@@ -86,6 +88,7 @@ export const mockSermons: SermonListItem[] = [
         speaker: { id: 2, name: 'Pastor Jane Doe' },
         series: { id: 2, title: 'Gospel of Luke' },
         congregation: { id: 1 },
+        book: { id: 42, name: 'Luke' },
     },
 ];
 

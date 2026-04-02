@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createApiClient } from '@perimeter-widgets/shared';
-import type { SermonsConfig, SeriesListItem, Pagination } from '../types';
+import type { SermonsConfig } from '../types';
 
 export interface UseSeriesParams {
     search?: string;
@@ -11,11 +11,6 @@ export interface UseSeriesParams {
     sort?: 'date' | 'title' | 'count';
     order?: 'asc' | 'desc';
     config: SermonsConfig;
-}
-
-interface PaginatedSeriesResponse {
-    series: SeriesListItem[];
-    pagination: Pagination;
 }
 
 export function useSeries(params: UseSeriesParams) {
@@ -48,10 +43,10 @@ export function useSeries(params: UseSeriesParams) {
                         sort,
                         order,
                     },
-                } as Record<string, unknown>,
+                },
             });
             if (error) throw new Error('Failed to fetch series');
-            return data.data as unknown as PaginatedSeriesResponse;
+            return data.data;
         },
     });
 }

@@ -21,6 +21,8 @@ type ListSpeakersResponse =
     operations['listSpeakers']['responses']['200']['content']['application/json'];
 type ListBooksResponse =
     operations['listBooks']['responses']['200']['content']['application/json'];
+type ListServiceTypesResponse =
+    operations['listServiceTypes']['responses']['200']['content']['application/json'];
 
 const API_ORIGINS = ['http://localhost:5500', 'https://api.perimeter.org'];
 
@@ -74,7 +76,15 @@ function apiHandlers(origin: string) {
         http.get(`${origin}/api/sermons/series`, () => {
             return HttpResponse.json({
                 success: true,
-                data: mockSeries,
+                data: {
+                    series: mockSeries,
+                    pagination: {
+                        page: 1,
+                        perPage: 12,
+                        total: mockSeries.length,
+                        totalPages: 1,
+                    },
+                },
             } satisfies ListSeriesResponse);
         }),
 
@@ -98,7 +108,7 @@ function apiHandlers(origin: string) {
             return HttpResponse.json({
                 success: true,
                 data: mockServiceTypes,
-            });
+            } satisfies ListServiceTypesResponse);
         }),
 
         http.get(`${origin}/api/sermons/speakers`, () => {
@@ -115,7 +125,7 @@ function apiHandlers(origin: string) {
             } satisfies ListBooksResponse);
         }),
 
-        http.get(`${origin}/api/sermons/:id`, ({ params }) => {
+        http.get(`${origin}/api/sermons/sermon/:id`, ({ params }) => {
             if (Number(params.id) === mockSermonDetail.id) {
                 return HttpResponse.json({
                     success: true,

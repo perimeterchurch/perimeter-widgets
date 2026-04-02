@@ -61,8 +61,4 @@ describe('SermonsApp', () => {
         expect(screen.getByText('Series')).toBeInTheDocument();
     });
 
-    it('renders the Compilations tab', () => {
-        renderWithProviders();
-        expect(screen.getByText('Compilations')).toBeInTheDocument();
-    });
 });

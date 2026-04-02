@@ -21,12 +21,7 @@ export type SermonsConfig = z.infer<typeof SermonsConfigSchema>;
 
 type ListSermonsResponse =
     operations['listSermons']['responses']['200']['content']['application/json'];
-type SermonListItemBase = ListSermonsResponse['data']['sermons'][number];
-// The API now includes book in list responses but the published types
-// haven't been updated yet. Extend locally until @perimeterchurch/api is republished.
-export type SermonListItem = SermonListItemBase & {
-    book?: { id: number; name: string } | null;
-};
+export type SermonListItem = ListSermonsResponse['data']['sermons'][number];
 export type Pagination = ListSermonsResponse['data']['pagination'];
 
 type GetSermonResponse =
@@ -36,7 +31,7 @@ export type SermonLink = SermonDetail['links'][number];
 
 type ListSeriesResponse =
     operations['listSeries']['responses']['200']['content']['application/json'];
-export type SeriesListItem = ListSeriesResponse['data'][number];
+export type SeriesListItem = ListSeriesResponse['data']['series'][number];
 
 type GetSeriesDetailResponse =
     operations['getSeriesDetail']['responses']['200']['content']['application/json'];
@@ -68,7 +63,7 @@ export interface SermonListViewProps {
 /*  Tab and View Types                                                 */
 /* ------------------------------------------------------------------ */
 
-export type TabId = 'sermons' | 'series' | 'compilations';
+export type TabId = 'sermons' | 'series';
 export type ScreenMode = 'browse' | 'detail';
 export type ViewMode = 'grid' | 'list' | 'large';
 export type SortField = 'date' | 'title';
@@ -78,10 +73,9 @@ export type SortOrder = 'asc' | 'desc';
 /*  Service Type                                                       */
 /* ------------------------------------------------------------------ */
 
-export interface ServiceType {
-    id: number;
-    name: string;
-}
+type ListServiceTypesResponse =
+    operations['listServiceTypes']['responses']['200']['content']['application/json'];
+export type ServiceType = ListServiceTypesResponse['data'][number];
 
 /**
  * Resolve comma-separated service type names from config against the

@@ -47,9 +47,8 @@ export function useSermonFilters() {
     });
 
     const setTab = (tab: TabId) => {
-        if (tab === 'compilations') return;
         setParams({
-            tab: tab as 'sermons' | 'series',
+            tab,
             screen: 'browse',
             id: null,
             page: 1,
@@ -63,7 +62,7 @@ export function useSermonFilters() {
     /** Navigate from a series detail to a sermon detail, remembering the series */
     const setSermonFromSeries = (sermonId: number, seriesId: number) => {
         setParams({
-            tab: 'series' as 'sermons' | 'series',
+            tab: 'series',
             screen: 'detail',
             id: sermonId,
             fromSeriesId: seriesId,
@@ -73,7 +72,7 @@ export function useSermonFilters() {
     /** Navigate to a series detail view */
     const setSeriesDetail = (seriesId: number) => {
         setParams({
-            tab: 'series' as 'sermons' | 'series',
+            tab: 'series',
             screen: 'detail',
             id: seriesId,
             fromSeriesId: null,

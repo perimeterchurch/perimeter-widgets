@@ -7,7 +7,7 @@ export function useSermonDetail(id: number | null, config: SermonsConfig) {
         queryKey: ['sermon-detail', id],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
-            const { data, error } = await client.GET('/api/sermons/{id}', {
+            const { data, error } = await client.GET('/api/sermons/sermon/{id}', {
                 params: { path: { id: id! } },
             });
             if (error) throw new Error('Failed to fetch sermon detail');

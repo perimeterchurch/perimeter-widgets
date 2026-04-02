@@ -73,7 +73,7 @@ export function useSermons(params: UseSermonsParams) {
                         page,
                         perPage: config.perPage,
                         serviceTypeId: resolvedServiceTypeId,
-                    } as Record<string, unknown>,
+                    },
                 },
             });
             if (error) throw new Error('Failed to fetch sermons');
