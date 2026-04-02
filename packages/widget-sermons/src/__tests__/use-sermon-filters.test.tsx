@@ -37,15 +37,15 @@ describe('useSermonFilters', () => {
         expect(result.current.tab).toBe('sermons');
     });
 
-    it('returns locked seriesId from config', () => {
-        const { result } = renderFilters({ seriesId: 945 });
-        expect(result.current.series).toBe(945);
+    it('returns locked seriesId from config as selectedSeriesIds', () => {
+        const { result } = renderFilters({ seriesId: '945' });
+        expect(result.current.selectedSeriesIds).toEqual([945]);
     });
 
-    it('setSeries is a no-op when seriesId is locked', () => {
-        const { result } = renderFilters({ seriesId: 945 });
-        act(() => result.current.setSeries(100));
-        expect(result.current.series).toBe(945);
+    it('setSeriesIds is a no-op when seriesId is locked', () => {
+        const { result } = renderFilters({ seriesId: '945' });
+        act(() => result.current.setSeriesIds([100]));
+        expect(result.current.selectedSeriesIds).toEqual([945]);
     });
 
     it('returns locked from/to from config', () => {
@@ -58,21 +58,26 @@ describe('useSermonFilters', () => {
     });
 
     it('hasActiveFilters excludes locked filters', () => {
-        const { result } = renderFilters({ seriesId: 945 });
+        const { result } = renderFilters({ seriesId: '945' });
         expect(result.current.hasActiveFilters).toBe(false);
     });
 
     it('clearFilters does not clear locked values', () => {
-        const { result } = renderFilters({ seriesId: 945 });
-        act(() => result.current.setSpeaker(7));
+        const { result } = renderFilters({ seriesId: '945' });
+        act(() => result.current.setSpeakerIds([7]));
         expect(result.current.hasActiveFilters).toBe(true);
         act(() => result.current.clearFilters());
-        expect(result.current.series).toBe(945);
-        expect(result.current.speaker).toBeNull();
+        expect(result.current.selectedSeriesIds).toEqual([945]);
+        expect(result.current.selectedSpeakerIds).toEqual([]);
     });
 
     it('uses defaultTab for initial tab value', () => {
         const { result } = renderFilters({ defaultTab: 'series' });
         expect(result.current.tab).toBe('series');
+    });
+
+    it('supports multi-select series IDs from config', () => {
+        const { result } = renderFilters({ seriesId: '1,2,3' });
+        expect(result.current.selectedSeriesIds).toEqual([1, 2, 3]);
     });
 });

@@ -129,9 +129,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
             {showFilters && (
                 <SermonFilters
                     search={filters.search}
-                    series={filters.series}
-                    speaker={filters.speaker}
-                    book={filters.book}
+                    selectedSeriesIds={filters.selectedSeriesIds}
+                    selectedSpeakerIds={filters.selectedSpeakerIds}
+                    selectedBookIds={filters.selectedBookIds}
                     selectedServiceTypeIds={filters.selectedServiceTypeIds}
                     from={filters.from ?? ''}
                     to={filters.to ?? ''}
@@ -148,9 +148,9 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                     booksLoading={booksLoading}
                     serviceTypesLoading={serviceTypesLoading}
                     onSearchChange={filters.setSearch}
-                    onSeriesChange={filters.setSeries}
-                    onSpeakerChange={filters.setSpeaker}
-                    onBookChange={filters.setBook}
+                    onSeriesChange={filters.setSeriesIds}
+                    onSpeakerChange={filters.setSpeakerIds}
+                    onBookChange={filters.setBookIds}
                     onServiceTypesChange={filters.setServiceTypes}
                     onDateRangeChange={filters.setDateRange}
                     onSortChange={filters.setSort}

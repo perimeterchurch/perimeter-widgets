@@ -69,7 +69,8 @@ function SermonsWidget() {
             );
         }
 
-        const showTabs = !config.tab && (config.display ?? 'full') !== 'headless';
+        const showTabs =
+            !config.tab && (config.display ?? 'full') !== 'headless';
 
         return (
             <>

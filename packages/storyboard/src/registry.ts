@@ -125,24 +125,27 @@ export const widgetRegistry: WidgetDefinition[] = [
             },
             {
                 key: 'seriesId',
-                label: 'Lock Series ID',
-                type: 'number',
+                label: 'Lock Series IDs',
+                type: 'text',
                 defaultValue: '',
-                description: 'Lock to a specific series (sermons tab only)',
+                description:
+                    'Comma-separated series IDs to lock (sermons tab only)',
             },
             {
                 key: 'speakerId',
-                label: 'Lock Speaker ID',
-                type: 'number',
+                label: 'Lock Speaker IDs',
+                type: 'text',
                 defaultValue: '',
-                description: 'Lock to a specific speaker (sermons tab only)',
+                description:
+                    'Comma-separated speaker IDs to lock (sermons tab only)',
             },
             {
                 key: 'bookId',
-                label: 'Lock Book ID',
-                type: 'number',
+                label: 'Lock Book IDs',
+                type: 'text',
                 defaultValue: '',
-                description: 'Lock to a specific book (sermons tab only)',
+                description:
+                    'Comma-separated book IDs to lock (sermons tab only)',
             },
             {
                 key: 'serviceTypeId',

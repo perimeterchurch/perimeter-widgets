@@ -60,5 +60,4 @@ describe('SermonsApp', () => {
         renderWithProviders();
         expect(screen.getByText('Series')).toBeInTheDocument();
     });
-
 });

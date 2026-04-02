@@ -14,7 +14,7 @@ import type {
 } from '../types';
 
 /** Parse comma-separated IDs string into number array */
-function parseServiceTypeIds(value: string | null): number[] {
+function parseIds(value: string | null): number[] {
     if (!value) return [];
     return value
         .split(',')
@@ -23,7 +23,7 @@ function parseServiceTypeIds(value: string | null): number[] {
 }
 
 /** Serialize number array into comma-separated string */
-function serializeServiceTypeIds(ids: number[]): string | null {
+function serializeIds(ids: number[]): string | null {
     return ids.length > 0 ? ids.join(',') : null;
 }
 
@@ -42,9 +42,9 @@ export function useSermonFilters(config: SermonsConfig) {
             id: parseAsInteger,
             fromSeriesId: parseAsInteger,
             search: parseAsString.withDefault(''),
-            series: parseAsInteger,
-            speaker: parseAsInteger,
-            book: parseAsInteger,
+            series: parseAsString,
+            speaker: parseAsString,
+            book: parseAsString,
             serviceTypes: parseAsString,
             from: parseAsString,
             to: parseAsString,
@@ -68,11 +68,14 @@ export function useSermonFilters(config: SermonsConfig) {
     // Override return values for locked params.
     // Empty strings from data-* attributes mean "not set" — treat as falsy.
     const tab = config.tab || params.tab;
-    const series = config.seriesId || params.series;
-    const speaker = config.speakerId || params.speaker;
-    const book = config.bookId || params.book;
     const from = config.from || params.from;
     const to = config.to || params.to;
+
+    // Parse comma-separated IDs for multi-select filters, with config overrides
+    const selectedSeriesIds = parseIds(config.seriesId || params.series);
+    const selectedSpeakerIds = parseIds(config.speakerId || params.speaker);
+    const selectedBookIds = parseIds(config.bookId || params.book);
+    const selectedServiceTypeIds = parseIds(params.serviceTypes);
 
     const setTab =
         config.tab ?
@@ -114,42 +117,29 @@ export function useSermonFilters(config: SermonsConfig) {
         setParams({ search: search || null, page: 1 });
     };
 
-    const setSeries =
+    const setSeriesIds =
         config.seriesId ?
-            (_seriesId: number | null) => {}
-        :   (seriesId: number | null) => {
-                setParams({ series: seriesId, page: 1 });
+            (_ids: number[]) => {}
+        :   (ids: number[]) => {
+                setParams({ series: serializeIds(ids), page: 1 });
             };
 
-    const setSpeaker =
+    const setSpeakerIds =
         config.speakerId ?
-            (_speakerId: number | null) => {}
-        :   (speakerId: number | null) => {
-                setParams({ speaker: speakerId, page: 1 });
+            (_ids: number[]) => {}
+        :   (ids: number[]) => {
+                setParams({ speaker: serializeIds(ids), page: 1 });
             };
 
-    const setBook =
+    const setBookIds =
         config.bookId ?
-            (_bookId: number | null) => {}
-        :   (bookId: number | null) => {
-                setParams({ book: bookId, page: 1 });
+            (_ids: number[]) => {}
+        :   (ids: number[]) => {
+                setParams({ book: serializeIds(ids), page: 1 });
             };
-
-    const toggleServiceType = (id: number) => {
-        const current = parseServiceTypeIds(params.serviceTypes);
-        const next =
-            current.includes(id) ?
-                current.filter((x) => x !== id)
-            :   [...current, id];
-        setParams({ serviceTypes: serializeServiceTypeIds(next), page: 1 });
-    };
-
-    const clearServiceTypes = () => {
-        setParams({ serviceTypes: null, page: 1 });
-    };
 
     const setServiceTypes = (ids: number[]) => {
-        setParams({ serviceTypes: serializeServiceTypeIds(ids), page: 1 });
+        setParams({ serviceTypes: serializeIds(ids), page: 1 });
     };
 
     const setDateRange =
@@ -171,8 +161,6 @@ export function useSermonFilters(config: SermonsConfig) {
         setParams({ page });
     };
 
-    const selectedServiceTypeIds = parseServiceTypeIds(params.serviceTypes);
-
     const clearFilters = () => {
         setParams({
             search: null,
@@ -190,9 +178,9 @@ export function useSermonFilters(config: SermonsConfig) {
 
     const hasActiveFilters =
         !!params.search
-        || (!config.seriesId && params.series !== null)
-        || (!config.speakerId && params.speaker !== null)
-        || (!config.bookId && params.book !== null)
+        || (!config.seriesId && selectedSeriesIds.length > 0)
+        || (!config.speakerId && selectedSpeakerIds.length > 0)
+        || (!config.bookId && selectedBookIds.length > 0)
         || selectedServiceTypeIds.length > 0
         || (!config.from && params.from !== null)
         || (!config.to && params.to !== null);
@@ -200,22 +188,20 @@ export function useSermonFilters(config: SermonsConfig) {
     return {
         ...params,
         tab,
-        series,
-        speaker,
-        book,
         from,
         to,
+        selectedSeriesIds,
+        selectedSpeakerIds,
+        selectedBookIds,
         selectedServiceTypeIds,
         setTab,
         setScreen,
         setSermonFromSeries,
         setSeriesDetail,
         setSearch,
-        setSeries,
-        setSpeaker,
-        setBook,
-        toggleServiceType,
-        clearServiceTypes,
+        setSeriesIds,
+        setSpeakerIds,
+        setBookIds,
         setServiceTypes,
         setDateRange,
         setSort,

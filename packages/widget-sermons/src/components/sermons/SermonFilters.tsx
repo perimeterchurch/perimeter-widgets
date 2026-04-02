@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
@@ -10,6 +10,7 @@ import {
 import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { X, Search } from 'lucide-react';
+import { groupBooksByTestament } from '../../lib/bible-books';
 import type {
     Speaker,
     Book,
@@ -21,9 +22,9 @@ import type {
 
 export interface SermonFiltersProps {
     search: string;
-    series: number | null;
-    speaker: number | null;
-    book: number | null;
+    selectedSeriesIds: number[];
+    selectedSpeakerIds: number[];
+    selectedBookIds: number[];
     selectedServiceTypeIds: number[];
     from: string;
     to: string;
@@ -40,23 +41,14 @@ export interface SermonFiltersProps {
     booksLoading?: boolean;
     serviceTypesLoading?: boolean;
     onSearchChange: (value: string) => void;
-    onSeriesChange: (value: number | null) => void;
-    onSpeakerChange: (value: number | null) => void;
-    onBookChange: (value: number | null) => void;
+    onSeriesChange: (ids: number[]) => void;
+    onSpeakerChange: (ids: number[]) => void;
+    onBookChange: (ids: number[]) => void;
     onServiceTypesChange: (ids: number[]) => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
     lockedFilters: Set<string>;
-}
-
-const ALL = '__all__';
-
-function withAllOption(
-    label: string,
-    options: MultiComboboxOption[],
-): MultiComboboxOption[] {
-    return [{ value: ALL, label }, ...options];
 }
 
 export function SermonFilters(props: SermonFiltersProps) {
@@ -71,10 +63,19 @@ export function SermonFilters(props: SermonFiltersProps) {
         value: String(s.id),
         label: s.name,
     }));
-    const bookOptions: MultiComboboxOption[] = props.books.map((b) => ({
-        value: String(b.id),
-        label: b.name,
-    }));
+
+    // Bible books: sorted in canonical order with OT/NT group headers
+    const bookOptions: MultiComboboxOption[] = useMemo(() => {
+        const groups = groupBooksByTestament(props.books);
+        return groups.flatMap((group) => [
+            {
+                value: `__group_${group.label}`,
+                label: group.label,
+                disabled: true,
+            },
+            ...group.options,
+        ]);
+    }, [props.books]);
 
     const serviceTypeOptions: MultiComboboxOption[] = props.serviceTypes.map(
         (st) => ({
@@ -105,57 +106,51 @@ export function SermonFilters(props: SermonFiltersProps) {
                 <div className='flex items-center gap-2'>
                     {!props.lockedFilters.has('series') && (
                         <MultiCombobox
-                            options={withAllOption('All Series', seriesOptions)}
-                            value={
-                                props.series != null ?
-                                    String(props.series)
-                                :   null
-                            }
+                            options={seriesOptions}
+                            value={props.selectedSeriesIds.map(String)}
                             onValueChange={(v) =>
-                                props.onSeriesChange(
-                                    v != null && v !== ALL ? Number(v) : null,
-                                )
+                                props.onSeriesChange(v.map(Number))
                             }
                             placeholder='All Series'
+                            selectedLabel='Series'
                             disabled={props.seriesLoading}
                             className='flex-1'
+                            multiple
                         />
                     )}
                     {!props.lockedFilters.has('speaker') && (
                         <MultiCombobox
-                            options={withAllOption(
-                                'All Speakers',
-                                speakerOptions,
-                            )}
-                            value={
-                                props.speaker != null ?
-                                    String(props.speaker)
-                                :   null
-                            }
+                            options={speakerOptions}
+                            value={props.selectedSpeakerIds.map(String)}
                             onValueChange={(v) =>
-                                props.onSpeakerChange(
-                                    v != null && v !== ALL ? Number(v) : null,
-                                )
+                                props.onSpeakerChange(v.map(Number))
                             }
                             placeholder='All Speakers'
+                            selectedLabel='Speakers'
                             disabled={props.speakersLoading}
                             className='flex-1'
+                            multiple
                         />
                     )}
                     {!props.lockedFilters.has('book') && (
                         <MultiCombobox
-                            options={withAllOption('All Books', bookOptions)}
-                            value={
-                                props.book != null ? String(props.book) : null
-                            }
+                            options={bookOptions}
+                            value={props.selectedBookIds.map(String)}
                             onValueChange={(v) =>
                                 props.onBookChange(
-                                    v != null && v !== ALL ? Number(v) : null,
+                                    v
+                                        .filter(
+                                            (val) =>
+                                                !val.startsWith('__group_'),
+                                        )
+                                        .map(Number),
                                 )
                             }
                             placeholder='All Books'
+                            selectedLabel='Books'
                             disabled={props.booksLoading}
                             className='flex-1'
+                            multiple
                         />
                     )}
                     {props.showServiceTypeFilter && (
@@ -210,54 +205,74 @@ export function SermonFilters(props: SermonFiltersProps) {
             {/* Active filter chips */}
             {props.hasActiveFilters && (
                 <div className='flex flex-wrap gap-1.5'>
-                    {props.series && !props.lockedFilters.has('series') && (
+                    {props.selectedSeriesIds.map((id) => (
                         <button
+                            key={`series-${id}`}
                             type='button'
-                            onClick={() => props.onSeriesChange(null)}
+                            onClick={() =>
+                                props.onSeriesChange(
+                                    props.selectedSeriesIds.filter(
+                                        (x) => x !== id,
+                                    ),
+                                )
+                            }
                             className='inline-flex'
-                            aria-label={`Remove ${seriesOptions.find((o) => o.value === String(props.series))?.label ?? 'series'} filter`}
+                            aria-label={`Remove ${seriesOptions.find((o) => o.value === String(id))?.label ?? 'series'} filter`}
                         >
                             <Badge variant='default'>
                                 {seriesOptions.find(
-                                    (o) => o.value === String(props.series),
+                                    (o) => o.value === String(id),
                                 )?.label ?? 'Series'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
-                    )}
-                    {props.speaker && !props.lockedFilters.has('speaker') && (
+                    ))}
+                    {props.selectedSpeakerIds.map((id) => (
                         <button
+                            key={`speaker-${id}`}
                             type='button'
-                            onClick={() => props.onSpeakerChange(null)}
+                            onClick={() =>
+                                props.onSpeakerChange(
+                                    props.selectedSpeakerIds.filter(
+                                        (x) => x !== id,
+                                    ),
+                                )
+                            }
                             className='inline-flex'
-                            aria-label={`Remove ${speakerOptions.find((o) => o.value === String(props.speaker))?.label ?? 'speaker'} filter`}
+                            aria-label={`Remove ${speakerOptions.find((o) => o.value === String(id))?.label ?? 'speaker'} filter`}
                         >
                             <Badge variant='default'>
                                 {speakerOptions.find(
-                                    (o) => o.value === String(props.speaker),
+                                    (o) => o.value === String(id),
                                 )?.label ?? 'Speaker'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
-                    )}
-                    {props.book && !props.lockedFilters.has('book') && (
+                    ))}
+                    {props.selectedBookIds.map((id) => (
                         <button
+                            key={`book-${id}`}
                             type='button'
-                            onClick={() => props.onBookChange(null)}
+                            onClick={() =>
+                                props.onBookChange(
+                                    props.selectedBookIds.filter(
+                                        (x) => x !== id,
+                                    ),
+                                )
+                            }
                             className='inline-flex'
-                            aria-label={`Remove ${bookOptions.find((o) => o.value === String(props.book))?.label ?? 'book'} filter`}
+                            aria-label={`Remove ${bookOptions.find((o) => o.value === String(id))?.label ?? 'book'} filter`}
                         >
                             <Badge variant='default'>
-                                {bookOptions.find(
-                                    (o) => o.value === String(props.book),
-                                )?.label ?? 'Book'}{' '}
+                                {bookOptions.find((o) => o.value === String(id))
+                                    ?.label ?? 'Book'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>
-                    )}
+                    ))}
                     {props.selectedServiceTypeIds.map((id) => (
                         <button
-                            key={id}
+                            key={`st-${id}`}
                             type='button'
                             onClick={() =>
                                 props.onServiceTypesChange(

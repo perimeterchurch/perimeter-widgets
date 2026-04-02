@@ -17,9 +17,9 @@ export const SermonsConfigSchema = z
         tab: z.enum(['sermons', 'series']).optional(),
         display: z.enum(['full', 'compact', 'headless']).default('full'),
         // Locked filters (sermons tab only)
-        seriesId: z.coerce.number().int().positive().optional(),
-        speakerId: z.coerce.number().int().positive().optional(),
-        bookId: z.coerce.number().int().positive().optional(),
+        seriesId: z.coerce.string().optional(),
+        speakerId: z.coerce.string().optional(),
+        bookId: z.coerce.string().optional(),
         serviceTypeId: z.coerce.string().optional(),
         from: z
             .string()

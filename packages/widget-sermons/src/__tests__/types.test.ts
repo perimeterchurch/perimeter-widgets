@@ -47,7 +47,7 @@ describe('SermonsConfigSchema — display modes', () => {
             from: '2025-01-01',
             to: '2025-12-31',
         });
-        expect(result.seriesId).toBe(945);
+        expect(result.seriesId).toBe('945');
         expect(result.serviceTypeId).toBe('1,3');
     });
 
@@ -67,12 +67,12 @@ describe('SermonsConfigSchema — display modes', () => {
             tab: 'sermons',
             speakerId: 7,
         });
-        expect(result.speakerId).toBe(7);
+        expect(result.speakerId).toBe('7');
     });
 
     it('allows sermon-only filters when no tab is set', () => {
         const result = SermonsConfigSchema.parse({ seriesId: 945 });
-        expect(result.seriesId).toBe(945);
+        expect(result.seriesId).toBe('945');
     });
 
     it('rejects invalid date format', () => {

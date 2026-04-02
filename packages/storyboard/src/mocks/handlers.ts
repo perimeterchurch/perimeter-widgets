@@ -46,14 +46,12 @@ function apiHandlers(origin: string) {
                 );
             }
             if (seriesId) {
-                filtered = filtered.filter(
-                    (s) => s.series.id === Number(seriesId),
-                );
+                const ids = seriesId.split(',').map(Number);
+                filtered = filtered.filter((s) => ids.includes(s.series.id));
             }
             if (speakerId) {
-                filtered = filtered.filter(
-                    (s) => s.speaker.id === Number(speakerId),
-                );
+                const ids = speakerId.split(',').map(Number);
+                filtered = filtered.filter((s) => ids.includes(s.speaker.id));
             }
 
             const start = (page - 1) * perPage;

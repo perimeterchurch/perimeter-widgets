@@ -6,9 +6,9 @@ import { createApiError } from '../lib/api-error';
 
 export interface UseSermonsParams {
     search?: string;
-    series?: number | null;
-    speaker?: number | null;
-    book?: number | null;
+    selectedSeriesIds?: number[];
+    selectedSpeakerIds?: number[];
+    selectedBookIds?: number[];
     selectedServiceTypeIds?: number[];
     serviceTypeId?: string;
     from?: string | null;
@@ -22,9 +22,9 @@ export interface UseSermonsParams {
 export function useSermons(params: UseSermonsParams) {
     const {
         search,
-        series,
-        speaker,
-        book,
+        selectedSeriesIds = [],
+        selectedSpeakerIds = [],
+        selectedBookIds = [],
         selectedServiceTypeIds = [],
         serviceTypeId,
         from,
@@ -41,6 +41,15 @@ export function useSermons(params: UseSermonsParams) {
             selectedServiceTypeIds.join(',')
         :   (serviceTypeId ?? undefined);
 
+    const seriesId =
+        selectedSeriesIds.length > 0 ? selectedSeriesIds.join(',') : undefined;
+    const speakerId =
+        selectedSpeakerIds.length > 0 ?
+            selectedSpeakerIds.join(',')
+        :   undefined;
+    const bookId =
+        selectedBookIds.length > 0 ? selectedBookIds.join(',') : undefined;
+
     // Sermons API only supports 'date' | 'title' — fall back to 'date' for 'count'
     const sermonSort = sort === 'count' ? 'date' : sort;
 
@@ -49,9 +58,9 @@ export function useSermons(params: UseSermonsParams) {
             'sermons',
             {
                 search,
-                series,
-                speaker,
-                book,
+                seriesId,
+                speakerId,
+                bookId,
                 serviceTypeId: resolvedServiceTypeId,
                 from,
                 to,
@@ -67,9 +76,9 @@ export function useSermons(params: UseSermonsParams) {
                 params: {
                     query: {
                         search: search || undefined,
-                        seriesId: series ?? undefined,
-                        speakerId: speaker ?? undefined,
-                        bookId: book ?? undefined,
+                        seriesId,
+                        speakerId,
+                        bookId,
                         from: from ?? undefined,
                         to: to ?? undefined,
                         sort: sermonSort,

@@ -52,7 +52,7 @@ export function SermonDetail({
     const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
 
     const { data: seriesData } = useSermons({
-        series: sermon?.series.id ?? null,
+        selectedSeriesIds: sermon?.series.id ? [sermon.series.id] : [],
         sort: sortField,
         order: sortDirection,
         config: { ...config, perPage: 50 },
