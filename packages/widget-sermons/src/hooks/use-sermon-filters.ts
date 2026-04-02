@@ -65,13 +65,14 @@ export function useSermonFilters(config: SermonsConfig) {
         history: 'push',
     });
 
-    // Override return values for locked params
-    const tab = config.tab ?? params.tab;
-    const series = config.seriesId ?? params.series;
-    const speaker = config.speakerId ?? params.speaker;
-    const book = config.bookId ?? params.book;
-    const from = config.from ?? params.from;
-    const to = config.to ?? params.to;
+    // Override return values for locked params.
+    // Empty strings from data-* attributes mean "not set" — treat as falsy.
+    const tab = config.tab || params.tab;
+    const series = config.seriesId || params.series;
+    const speaker = config.speakerId || params.speaker;
+    const book = config.bookId || params.book;
+    const from = config.from || params.from;
+    const to = config.to || params.to;
 
     const setTab =
         config.tab ?
@@ -92,7 +93,7 @@ export function useSermonFilters(config: SermonsConfig) {
     /** Navigate from a series detail to a sermon detail, remembering the series */
     const setSermonFromSeries = (sermonId: number, seriesId: number) => {
         setParams({
-            tab: config.tab ?? 'series',
+            tab: config.tab || 'series',
             screen: 'detail',
             id: sermonId,
             fromSeriesId: seriesId,
@@ -102,7 +103,7 @@ export function useSermonFilters(config: SermonsConfig) {
     /** Navigate to a series detail view */
     const setSeriesDetail = (seriesId: number) => {
         setParams({
-            tab: config.tab ?? 'series',
+            tab: config.tab || 'series',
             screen: 'detail',
             id: seriesId,
             fromSeriesId: null,
