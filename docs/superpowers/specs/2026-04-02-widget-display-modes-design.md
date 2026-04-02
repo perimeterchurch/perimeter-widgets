@@ -37,9 +37,11 @@ The sermons widget currently has minimal configuration — `serviceTypes`, `perP
 
 ### Priority: `data-service-type-id` vs `data-service-types`
 
-`data-service-type-id` (explicit IDs) takes priority over `data-service-types` (name-based fuzzy match). If both are set, `data-service-type-id` wins.
+`data-service-type-id` (explicit IDs) takes priority over `data-service-types` (name-based fuzzy match). If both are set, `data-service-type-id` wins. This resolution happens in `SermonsView` before passing to `useSermons`.
 
 ## Display Modes
+
+### Browse view
 
 | Mode | Tab switcher | Search + filters | Date picker | Sort + View | Grid/list | Pagination |
 |------|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -49,23 +51,38 @@ The sermons widget currently has minimal configuration — `serviceTypes`, `perP
 
 *Tab switcher hidden when `data-tab` is set (single-tab lock)
 
+### Detail view
+
+| Mode | Back button | Sermon/series info | Media player | "More from series" |
+|------|:---:|:---:|:---:|:---:|
+| `full` | yes | yes | yes | yes |
+| `compact` | yes | yes | yes | yes |
+| `headless` | yes | yes | yes | no |
+
+Detail views are mostly unchanged across modes. Only headless hides the "More from this series" section to keep the view focused.
+
 ## Locked Filter Behavior
 
 - When a filter is locked via `data-*`, the corresponding dropdown/picker is **removed from the UI entirely** (invisible to the user)
-- The locked value is passed directly to the API hook, bypassing the nuqs URL state for that param
+- The locked value is passed directly to the API hook, taking priority over any user-set URL state
 - Locked values cannot be changed by the user at runtime
 - The "active filter chips" section does not show chips for locked filters
 - The "Clear All" button does not clear locked filters
+- `hasActiveFilters` only considers unlocked filters
+
+### Locked filters are sermons-tab-only
+
+Locked filters (`seriesId`, `speakerId`, `bookId`, `serviceTypeId`, `from`, `to`) only apply to the sermons tab. When both tabs are visible (no `data-tab` set), the locked filters affect the sermons tab API query but do NOT affect the series tab. The series tab always uses its own filter state from nuqs without locked overrides.
 
 ### Validation
 
-If any sermon-only filter (`seriesId`, `speakerId`, `bookId`, `serviceTypeId`, `from`, `to`) is set while `data-tab="series"`, throw a config validation error at mount time via Zod `.refine()`.
+If any sermon-only filter is set while `data-tab="series"`, throw a config validation error at mount time via Zod `.refine()`.
 
 ## Architecture
 
 ### 1. SermonsConfigSchema (types.ts)
 
-Expand the Zod schema with new optional fields:
+Expand the Zod schema with new optional fields. Use `z.coerce.string()` for `serviceTypeId` since `parseDataAttributes` auto-coerces single numeric strings to numbers:
 
 ```typescript
 export const SermonsConfigSchema = z.object({
@@ -81,7 +98,7 @@ export const SermonsConfigSchema = z.object({
     seriesId: z.coerce.number().int().positive().optional(),
     speakerId: z.coerce.number().int().positive().optional(),
     bookId: z.coerce.number().int().positive().optional(),
-    serviceTypeId: z.string().optional(),
+    serviceTypeId: z.coerce.string().optional(),
     from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 }).refine(
@@ -95,28 +112,37 @@ export const SermonsConfigSchema = z.object({
 
 ### 2. useSermonFilters (use-sermon-filters.ts)
 
-Accept config as a parameter. When `config.tab` is set, omit the `tab` param from nuqs registration. When a filter is locked (e.g., `config.seriesId`), omit that param from nuqs and return the locked value as a static field. The hook's return type stays the same — consumers don't need to know which values are locked vs dynamic.
+**"Always register, override on return" pattern.** nuqs requires a static parser map — you cannot conditionally include/exclude keys between renders. The hook always registers all params with `useQueryStates`, but accepts `config` and overrides return values for locked params:
+
+- `config.tab` set → return `config.tab` instead of `params.tab`; `setTab` becomes a no-op
+- `config.seriesId` set → return `config.seriesId` instead of `params.series`; `setSeries` becomes a no-op
+- Same pattern for all lockable filters
+- `config.defaultTab` → construct the `tab` parser with `.withDefault(config.defaultTab)` (parsers are plain objects, not hooks, so this is safe inside the hook body)
+
+The hook's return type stays the same — consumers don't need to know which values are locked vs dynamic.
 
 ### 3. App.tsx
 
-- When `config.tab` is set, force `filters.tab` to that value and skip rendering `SermonTabs`
-- When `config.display === 'headless'`, also skip `SermonTabs` regardless of tab lock
+- Read `config.tab` and `config.display` from the parsed config
+- When `config.tab` is set OR `config.display === 'headless'`, skip rendering `SermonTabs`
+- Pass `config` through to view components (already done — `useConfig<SermonsConfig>()`)
 
 ### 4. SermonsView
 
-- Receives `config.display` to control chrome
+- Reads `config.display` to control chrome
 - `display === 'full'`: show everything (current behavior)
 - `display === 'compact'`: hide `SermonFilters` component entirely
 - `display === 'headless'`: hide `SermonFilters` AND sort/view controls
-- Locked filters merge into the API query with priority over user filters
-- `SermonFilters` receives a `lockedFilters` set so it knows which dropdowns to hide
+- Service type ID merge order in `SermonsView`: `config.serviceTypeId` (locked) > `selectedServiceTypeIds` (user UI) > `resolveServiceTypeIds(config.serviceTypes)` (name-based). This resolution happens before calling `useSermons`.
+- `SermonFilters` receives a `lockedFilters` set so it knows which dropdowns to hide when `display === 'full'`
 
 ### 5. SeriesView
 
-- Same display mode handling as SermonsView
-- `display === 'full'`: show search, date range, sort, view
+- Same display mode handling
+- `display === 'full'`: show search, date range, sort, view (current behavior)
 - `display === 'compact'`: hide search and date range
 - `display === 'headless'`: hide all controls except grid and pagination
+- Locked sermon-only filters do NOT apply to the series tab
 
 ### 6. SermonFilters
 
@@ -126,9 +152,18 @@ Accept config as a parameter. When `config.tab` is set, omit the `tab` param fro
 - "Clear All" only clears unlocked filters
 - `hasActiveFilters` only considers unlocked filters
 
-### 7. Storyboard Registry
+### 7. SermonDetail
 
-Add config fields for all new params with appropriate types and descriptions.
+- `display === 'headless'`: hide "More from this series" section
+- All other modes: unchanged
+
+### 8. Storyboard Registry
+
+Add config fields for all new params. Use `'text'` type for date fields (no `'date'` type in the registry's `ConfigField`). Add select fields for `tab` and `display`.
+
+### 9. Internal navigation with locked tab
+
+When `config.tab` is set, internal navigation functions that set the tab (`setSermonFromSeries`, `setSeriesDetail`) should not change the tab value. The hook handles this by making tab-related setParams calls use `config.tab` instead of a hardcoded value when the tab is locked.
 
 ## Example Embeds
 
