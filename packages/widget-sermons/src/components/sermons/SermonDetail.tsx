@@ -47,6 +47,7 @@ export function SermonDetail({
     onSermonClick,
 }: SermonDetailProps) {
     const { data: sermon, isLoading, error } = useSermonDetail(id, config);
+    const showRelated = config.display !== 'headless';
     const [sortField, setSortField] = useState<SortField>('date');
     const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
 
@@ -144,7 +145,7 @@ export function SermonDetail({
                         )}
 
                         {/* More from this series */}
-                        {relatedSermons.length > 0 && (
+                        {showRelated && relatedSermons.length > 0 && (
                             <div className='space-y-3'>
                                 <div className='flex items-center justify-between'>
                                     <h3 className='font-semibold text-sm'>

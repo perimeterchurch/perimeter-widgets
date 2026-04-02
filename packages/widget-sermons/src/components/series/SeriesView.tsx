@@ -80,6 +80,8 @@ const VIEW_OPTIONS = [
 
 export function SeriesView({ config, filters }: SeriesViewProps) {
     const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
+    const showSearch = config.display === 'full';
+    const showSortView = config.display !== 'headless';
 
     const { data, isLoading } = useSeries({
         search: filters.search || undefined,
@@ -98,67 +100,77 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
     return (
         <div className='space-y-4'>
             {/* Row 1: Search */}
-            <InputGroup>
-                <InputGroupAddon align='inline-start'>
-                    <Search />
-                </InputGroupAddon>
-                <InputGroupInput
-                    value={filters.search}
-                    onChange={(e) => filters.setSearch(e.target.value)}
-                    placeholder='Search series...'
-                />
-            </InputGroup>
+            {showSearch && (
+                <InputGroup>
+                    <InputGroupAddon align='inline-start'>
+                        <Search />
+                    </InputGroupAddon>
+                    <InputGroupInput
+                        value={filters.search}
+                        onChange={(e) => filters.setSearch(e.target.value)}
+                        placeholder='Search series...'
+                    />
+                </InputGroup>
+            )}
 
             {/* Row 2: Date range + clear all */}
-            <div className='flex items-center gap-3'>
-                <DateRangePicker
-                    from={filters.from ?? ''}
-                    to={filters.to ?? ''}
-                    onFromChange={(v) => filters.setDateRange(v, filters.to)}
-                    onToChange={(v) => filters.setDateRange(filters.from, v)}
-                />
-                <div className='flex-1' />
-                {filters.hasActiveFilters && (
-                    <Button
-                        variant='outline'
-                        size='sm'
-                        onClick={filters.clearFilters}
-                    >
-                        <X className='h-3.5 w-3.5' />
-                        Clear All
-                    </Button>
-                )}
-            </div>
+            {showSearch && (
+                <div className='flex items-center gap-3'>
+                    <DateRangePicker
+                        from={filters.from ?? ''}
+                        to={filters.to ?? ''}
+                        onFromChange={(v) =>
+                            filters.setDateRange(v, filters.to)
+                        }
+                        onToChange={(v) =>
+                            filters.setDateRange(filters.from, v)
+                        }
+                    />
+                    <div className='flex-1' />
+                    {filters.hasActiveFilters && (
+                        <Button
+                            variant='outline'
+                            size='sm'
+                            onClick={filters.clearFilters}
+                        >
+                            <X className='h-3.5 w-3.5' />
+                            Clear All
+                        </Button>
+                    )}
+                </div>
+            )}
 
             {/* Results header: count + sort + view */}
-            <div className='flex items-center justify-between'>
-                <span className='text-sm text-[var(--color-text-muted)]'>
-                    {pagination ? `${pagination.total} series` : ''}
-                </span>
-                <div className='flex items-center gap-2'>
-                    <SortSelect
-                        sortField={filters.sort}
-                        sortDirection={filters.order}
-                        onSortFieldChange={(field) =>
-                            filters.setSort(
-                                field as SeriesSortField,
-                                filters.order,
-                            )
-                        }
-                        onSortDirectionChange={(direction) =>
-                            filters.setSort(filters.sort, direction)
-                        }
-                        fields={SORT_FIELDS}
-                    />
-                    <IconSelect
-                        value={viewMode}
-                        onChange={(v) => setViewMode(v as SeriesViewMode)}
-                        options={VIEW_OPTIONS}
-                        label='View:'
-                        icon={<Eye className='h-3.5 w-3.5 shrink-0' />}
-                    />
+            {showSortView && (
+                <div className='flex items-center justify-between'>
+                    <span className='text-sm text-[var(--color-text-muted)]'>
+                        {pagination ? `${pagination.total} series` : ''}
+                    </span>
+                    <div className='flex items-center gap-2'>
+                        <SortSelect
+                            sortField={filters.sort}
+                            sortDirection={filters.order}
+                            onSortFieldChange={(field) =>
+                                filters.setSort(
+                                    field as SeriesSortField,
+                                    filters.order,
+                                )
+                            }
+                            onSortDirectionChange={(direction) =>
+                                filters.setSort(filters.sort, direction)
+                            }
+                            fields={SORT_FIELDS}
+                        />
+                        <IconSelect
+                            value={viewMode}
+                            onChange={(v) => setViewMode(v as SeriesViewMode)}
+                            options={VIEW_OPTIONS}
+                            label='View:'
+                            icon={<Eye className='h-3.5 w-3.5 shrink-0' />}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <SkeletonTransition
                 isLoading={isLoading}
