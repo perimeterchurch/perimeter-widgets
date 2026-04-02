@@ -46,6 +46,7 @@ export function useSermonFilters(config: SermonsConfig) {
             speaker: parseAsString,
             book: parseAsString,
             serviceTypes: parseAsString,
+            seriesType: parseAsString,
             from: parseAsString,
             to: parseAsString,
             sort: parseAsStringLiteral([
@@ -83,6 +84,10 @@ export function useSermonFilters(config: SermonsConfig) {
         (config.bookId ? String(config.bookId) : null) || params.book,
     );
     const selectedServiceTypeIds = parseIds(params.serviceTypes);
+    const selectedSeriesTypeIds = parseIds(
+        (config.seriesTypeId ? String(config.seriesTypeId) : null)
+            || params.seriesType,
+    );
 
     const setTab =
         config.tab ?
@@ -149,6 +154,13 @@ export function useSermonFilters(config: SermonsConfig) {
         setParams({ serviceTypes: serializeIds(ids), page: 1 });
     };
 
+    const setSeriesTypeIds =
+        config.seriesTypeId ?
+            (_ids: number[]) => {}
+        :   (ids: number[]) => {
+                setParams({ seriesType: serializeIds(ids), page: 1 });
+            };
+
     const setDateRange =
         config.from || config.to ?
             (_from: string | null, _to: string | null) => {}
@@ -175,6 +187,7 @@ export function useSermonFilters(config: SermonsConfig) {
             speaker: config.speakerId ? undefined : null,
             book: config.bookId ? undefined : null,
             serviceTypes: null,
+            seriesType: config.seriesTypeId ? undefined : null,
             from: config.from ? undefined : null,
             to: config.to ? undefined : null,
             sort: 'date',
@@ -189,6 +202,7 @@ export function useSermonFilters(config: SermonsConfig) {
         || (!config.speakerId && selectedSpeakerIds.length > 0)
         || (!config.bookId && selectedBookIds.length > 0)
         || selectedServiceTypeIds.length > 0
+        || (!config.seriesTypeId && selectedSeriesTypeIds.length > 0)
         || (!config.from && params.from !== null)
         || (!config.to && params.to !== null);
 
@@ -201,6 +215,7 @@ export function useSermonFilters(config: SermonsConfig) {
         selectedSpeakerIds,
         selectedBookIds,
         selectedServiceTypeIds,
+        selectedSeriesTypeIds,
         setTab,
         setScreen,
         setSermonFromSeries,
@@ -210,6 +225,7 @@ export function useSermonFilters(config: SermonsConfig) {
         setSpeakerIds,
         setBookIds,
         setServiceTypes,
+        setSeriesTypeIds,
         setDateRange,
         setSort,
         setPage,

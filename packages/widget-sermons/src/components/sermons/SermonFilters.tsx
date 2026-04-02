@@ -16,6 +16,7 @@ import type {
     Book,
     SeriesListItem,
     ServiceType,
+    SeriesType,
     SortField,
     SortOrder,
 } from '../../types';
@@ -26,6 +27,7 @@ export interface SermonFiltersProps {
     selectedSpeakerIds: number[];
     selectedBookIds: number[];
     selectedServiceTypeIds: number[];
+    selectedSeriesTypeIds: number[];
     from: string;
     to: string;
     sort: SortField;
@@ -35,16 +37,20 @@ export interface SermonFiltersProps {
     speakers: Speaker[];
     books: Book[];
     serviceTypes: ServiceType[];
+    seriesTypes: SeriesType[];
     showServiceTypeFilter: boolean;
+    showSeriesTypeFilter: boolean;
     seriesLoading?: boolean;
     speakersLoading?: boolean;
     booksLoading?: boolean;
     serviceTypesLoading?: boolean;
+    seriesTypesLoading?: boolean;
     onSearchChange: (value: string) => void;
     onSeriesChange: (ids: number[]) => void;
     onSpeakerChange: (ids: number[]) => void;
     onBookChange: (ids: number[]) => void;
     onServiceTypesChange: (ids: number[]) => void;
+    onSeriesTypeChange: (ids: number[]) => void;
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
@@ -85,6 +91,13 @@ export function SermonFilters(props: SermonFiltersProps) {
         }),
     );
 
+    const seriesTypeOptions: MultiComboboxOption[] = props.seriesTypes.map(
+        (st) => ({
+            value: String(st.id),
+            label: st.name,
+        }),
+    );
+
     return (
         <div className='space-y-3'>
             {/* Row 1: Search */}
@@ -105,7 +118,8 @@ export function SermonFilters(props: SermonFiltersProps) {
             {(!props.lockedFilters.has('series')
                 || !props.lockedFilters.has('speaker')
                 || !props.lockedFilters.has('book')
-                || props.showServiceTypeFilter) && (
+                || props.showServiceTypeFilter
+                || props.showSeriesTypeFilter) && (
                 <div className='flex items-center gap-2'>
                     {!props.lockedFilters.has('series') && (
                         <MultiCombobox
@@ -166,6 +180,20 @@ export function SermonFilters(props: SermonFiltersProps) {
                             placeholder='Service Types'
                             selectedLabel='Service Types'
                             disabled={props.serviceTypesLoading}
+                            className='flex-1'
+                            multiple
+                        />
+                    )}
+                    {props.showSeriesTypeFilter && (
+                        <MultiCombobox
+                            options={seriesTypeOptions}
+                            value={props.selectedSeriesTypeIds.map(String)}
+                            onValueChange={(v) =>
+                                props.onSeriesTypeChange(v.map(Number))
+                            }
+                            placeholder='Series Types'
+                            selectedLabel='Series Types'
+                            disabled={props.seriesTypesLoading}
                             className='flex-1'
                             multiple
                         />
@@ -291,6 +319,28 @@ export function SermonFilters(props: SermonFiltersProps) {
                                 {serviceTypeOptions.find(
                                     (o) => o.value === String(id),
                                 )?.label ?? 'Service Type'}{' '}
+                                <X className='h-3 w-3' />
+                            </Badge>
+                        </button>
+                    ))}
+                    {props.selectedSeriesTypeIds.map((id) => (
+                        <button
+                            key={`srt-${id}`}
+                            type='button'
+                            onClick={() =>
+                                props.onSeriesTypeChange(
+                                    props.selectedSeriesTypeIds.filter(
+                                        (x) => x !== id,
+                                    ),
+                                )
+                            }
+                            className='inline-flex'
+                            aria-label={`Remove ${seriesTypeOptions.find((o) => o.value === String(id))?.label ?? 'series type'} filter`}
+                        >
+                            <Badge variant='default'>
+                                {seriesTypeOptions.find(
+                                    (o) => o.value === String(id),
+                                )?.label ?? 'Series Type'}{' '}
                                 <X className='h-3 w-3' />
                             </Badge>
                         </button>

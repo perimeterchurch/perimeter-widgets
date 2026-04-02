@@ -21,11 +21,13 @@ export const SermonsConfigSchema = z
         speakerId: z.coerce.string().optional(),
         bookId: z.coerce.string().optional(),
         serviceTypeId: z.coerce.string().optional(),
+        seriesTypeId: z.coerce.string().optional(),
         // Hide individual filter dropdowns
         hideSeries: z.coerce.boolean().optional(),
         hideSpeaker: z.coerce.boolean().optional(),
         hideBook: z.coerce.boolean().optional(),
         hideServiceType: z.coerce.boolean().optional(),
+        hideSeriesType: z.coerce.boolean().optional(),
         hideDate: z.coerce.boolean().optional(),
         hideSearch: z.coerce.boolean().optional(),
         from: z
@@ -118,6 +120,14 @@ export type SortOrder = 'asc' | 'desc';
 type ListServiceTypesResponse =
     operations['listServiceTypes']['responses']['200']['content']['application/json'];
 export type ServiceType = ListServiceTypesResponse['data'][number];
+
+/* ------------------------------------------------------------------ */
+/*  Series Type                                                        */
+/* ------------------------------------------------------------------ */
+
+type ListSeriesTypesResponse =
+    operations['listSeriesTypes']['responses']['200']['content']['application/json'];
+export type SeriesType = ListSeriesTypesResponse['data'][number];
 
 /**
  * Resolve comma-separated service type names from config against the

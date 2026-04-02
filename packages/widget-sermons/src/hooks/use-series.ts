@@ -5,6 +5,7 @@ import { createApiError } from '../lib/api-error';
 
 export interface UseSeriesParams {
     search?: string;
+    selectedSeriesTypeIds?: number[];
     from?: string;
     to?: string;
     page?: number;
@@ -17,6 +18,7 @@ export interface UseSeriesParams {
 export function useSeries(params: UseSeriesParams) {
     const {
         search,
+        selectedSeriesTypeIds = [],
         from,
         to,
         page = 1,
@@ -26,10 +28,15 @@ export function useSeries(params: UseSeriesParams) {
         config,
     } = params;
 
+    const seriesTypeId =
+        selectedSeriesTypeIds.length > 0 ?
+            selectedSeriesTypeIds.join(',')
+        :   undefined;
+
     return useQuery({
         queryKey: [
             'series-list',
-            { search, from, to, page, perPage, sort, order },
+            { search, seriesTypeId, from, to, page, perPage, sort, order },
         ],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
@@ -37,6 +44,7 @@ export function useSeries(params: UseSeriesParams) {
                 params: {
                     query: {
                         search: search || undefined,
+                        seriesTypeId,
                         from: from || undefined,
                         to: to || undefined,
                         page,

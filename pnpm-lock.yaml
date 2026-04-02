@@ -45,8 +45,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@perimeterchurch/api':
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.4.0
+        version: 0.4.0
       '@tanstack/react-query':
         specifier: ^5
         version: 5.90.21(react@19.2.4)
@@ -985,8 +985,8 @@ packages:
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
 
-  '@perimeterchurch/api@0.3.1':
-    resolution: {integrity: sha512-f1xwEep28FijaLtCbRIyjWDVQ62NG2l3KOekF/JlHwtAVBRl919z2Kcv8F0d6LAADIVND8CcPDjeA7964BGq7g==, tarball: https://npm.pkg.github.com/download/@perimeterchurch/api/0.3.1/f7f33fcf252caf1c5d33d6bc46a377f899f1a991}
+  '@perimeterchurch/api@0.4.0':
+    resolution: {integrity: sha512-5rqAfhAftyg2iRAA85FfQ4zDvkdLU/xDhJaNkFGW4VDzsS0QlHBjiInJG9msoCdDklYCGk/Us4JgL0VoKR2+ew==, tarball: https://npm.pkg.github.com/download/@perimeterchurch/api/0.4.0/a3ad3b041c0893fc074e72d27926e0ad2138cb69}
 
   '@radix-ui/primitive@1.1.3':
     resolution: {integrity: sha512-JTF99U/6XIjCBo0wqkU5sK10glYe27MRRsfwoiq5zzOEZLHU3A3KCMa5X/azekYRCJ0HlwI0crAXS/5dEHTzDg==}
@@ -4114,7 +4114,7 @@ snapshots:
 
   '@open-draft/until@2.1.0': {}
 
-  '@perimeterchurch/api@0.3.1':
+  '@perimeterchurch/api@0.4.0':
     dependencies:
       openapi-fetch: 0.13.8
 

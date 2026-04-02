@@ -5,6 +5,7 @@ import type {
     Speaker,
     Book,
     ServiceType,
+    SeriesType,
 } from '@perimeter-widgets/widget-sermons/types';
 
 export const mockSpeakers: Speaker[] = [
@@ -23,6 +24,11 @@ export const mockServiceTypes: ServiceType[] = [
     { id: 4, name: 'Special Event' },
 ];
 
+export const mockSeriesTypes: SeriesType[] = [
+    { id: 1, name: 'Sunday Morning Sermon' },
+    { id: 2, name: 'Special Series' },
+];
+
 export const mockBooks: Book[] = [
     { id: 60, name: '1 Peter' },
     { id: 42, name: 'Luke' },
@@ -39,6 +45,7 @@ export const mockSeries: SeriesListItem[] = [
         latestSermonDate: '2026-03-15',
         sermonCount: 3,
         book: { id: 60, name: '1 Peter' },
+        seriesType: { id: 1, name: 'Sunday Morning Sermon' },
     },
     {
         id: 2,
@@ -49,6 +56,7 @@ export const mockSeries: SeriesListItem[] = [
         latestSermonDate: '2026-03-01',
         sermonCount: 2,
         book: { id: 42, name: 'Luke' },
+        seriesType: { id: 2, name: 'Special Series' },
     },
 ];
 

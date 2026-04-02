@@ -156,6 +156,13 @@ export const widgetRegistry: WidgetDefinition[] = [
                     'Comma-separated service type IDs to lock (sermons tab only)',
             },
             {
+                key: 'seriesTypeId',
+                label: 'Lock Series Type IDs',
+                type: 'text',
+                defaultValue: '',
+                description: 'Comma-separated series type IDs to lock',
+            },
+            {
                 key: 'from',
                 label: 'Lock Start Date',
                 type: 'text',
@@ -196,6 +203,13 @@ export const widgetRegistry: WidgetDefinition[] = [
                 type: 'boolean',
                 defaultValue: false,
                 description: 'Hide the service type filter dropdown',
+            },
+            {
+                key: 'hideSeriesType',
+                label: 'Hide Series Type Filter',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the series type filter dropdown',
             },
             {
                 key: 'hideDate',

@@ -4,6 +4,7 @@ import {
     InputGroupAddon,
     InputGroupInput,
     Button,
+    MultiCombobox,
     Pagination,
     PaginationContent,
     PaginationItem,
@@ -15,6 +16,7 @@ import {
     SortSelect,
     IconSelect,
 } from '@perimeter-widgets/shared';
+import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import {
     Search,
@@ -29,6 +31,7 @@ import {
 } from 'lucide-react';
 import type { SermonsConfig } from '../../types';
 import { useSeries } from '../../hooks/use-series';
+import { useSeriesTypes } from '../../hooks/use-series-types';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SeriesGrid } from './SeriesGrid';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
@@ -83,9 +86,19 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
     const display = config.display ?? 'full';
     const showSearch = display === 'full';
     const showSortView = display !== 'headless';
+    const showSeriesTypeFilter =
+        display === 'full' && !config.seriesTypeId && !config.hideSeriesType;
+
+    const { data: seriesTypes = [], isLoading: seriesTypesLoading } =
+        useSeriesTypes(config);
+    const seriesTypeOptions: MultiComboboxOption[] = seriesTypes.map((st) => ({
+        value: String(st.id),
+        label: st.name,
+    }));
 
     const { data, isLoading } = useSeries({
         search: filters.search || undefined,
+        selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
         from: filters.from ?? undefined,
         to: filters.to ?? undefined,
         page: filters.page,
@@ -114,7 +127,25 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                 </InputGroup>
             )}
 
-            {/* Row 2: Date range + clear all */}
+            {/* Row 2: Series Type filter */}
+            {showSeriesTypeFilter && (
+                <div className='flex items-center gap-2'>
+                    <MultiCombobox
+                        options={seriesTypeOptions}
+                        value={filters.selectedSeriesTypeIds.map(String)}
+                        onValueChange={(v) =>
+                            filters.setSeriesTypeIds(v.map(Number))
+                        }
+                        placeholder='All Series Types'
+                        selectedLabel='Series Types'
+                        disabled={seriesTypesLoading}
+                        className='flex-1'
+                        multiple
+                    />
+                </div>
+            )}
+
+            {/* Row 3: Date range + clear all */}
             {showSearch && (
                 <div className='flex items-center gap-3'>
                     <DateRangePicker

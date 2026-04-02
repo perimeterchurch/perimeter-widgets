@@ -7,6 +7,7 @@ import {
     mockSpeakers,
     mockBooks,
     mockServiceTypes,
+    mockSeriesTypes,
 } from '@/mocks/data/sermons';
 
 type ListSermonsResponse =
@@ -23,6 +24,8 @@ type ListBooksResponse =
     operations['listBooks']['responses']['200']['content']['application/json'];
 type ListServiceTypesResponse =
     operations['listServiceTypes']['responses']['200']['content']['application/json'];
+type ListSeriesTypesResponse =
+    operations['listSeriesTypes']['responses']['200']['content']['application/json'];
 
 const API_ORIGINS = ['http://localhost:5500', 'https://api.perimeter.org'];
 
@@ -154,6 +157,13 @@ function apiHandlers(origin: string) {
                 success: true,
                 data: mockServiceTypes,
             } satisfies ListServiceTypesResponse);
+        }),
+
+        http.get(`${origin}/api/sermons/series-types`, () => {
+            return HttpResponse.json({
+                success: true,
+                data: mockSeriesTypes,
+            } satisfies ListSeriesTypesResponse);
         }),
 
         http.get(`${origin}/api/sermons/speakers`, () => {

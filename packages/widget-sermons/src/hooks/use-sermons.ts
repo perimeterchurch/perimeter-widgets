@@ -10,6 +10,7 @@ export interface UseSermonsParams {
     selectedSpeakerIds?: number[];
     selectedBookIds?: number[];
     selectedServiceTypeIds?: number[];
+    selectedSeriesTypeIds?: number[];
     serviceTypeId?: string;
     from?: string | null;
     to?: string | null;
@@ -26,6 +27,7 @@ export function useSermons(params: UseSermonsParams) {
         selectedSpeakerIds = [],
         selectedBookIds = [],
         selectedServiceTypeIds = [],
+        selectedSeriesTypeIds = [],
         serviceTypeId,
         from,
         to,
@@ -40,6 +42,11 @@ export function useSermons(params: UseSermonsParams) {
         selectedServiceTypeIds.length > 0 ?
             selectedServiceTypeIds.join(',')
         :   (serviceTypeId ?? undefined);
+
+    const resolvedSeriesTypeId =
+        selectedSeriesTypeIds.length > 0 ?
+            selectedSeriesTypeIds.join(',')
+        :   undefined;
 
     const seriesId =
         selectedSeriesIds.length > 0 ? selectedSeriesIds.join(',') : undefined;
@@ -62,6 +69,7 @@ export function useSermons(params: UseSermonsParams) {
                 speakerId,
                 bookId,
                 serviceTypeId: resolvedServiceTypeId,
+                seriesTypeId: resolvedSeriesTypeId,
                 from,
                 to,
                 sort: sermonSort,
@@ -86,6 +94,7 @@ export function useSermons(params: UseSermonsParams) {
                         page,
                         perPage: config.perPage,
                         serviceTypeId: resolvedServiceTypeId,
+                        seriesTypeId: resolvedSeriesTypeId,
                     },
                 },
             });
