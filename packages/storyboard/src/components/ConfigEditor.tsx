@@ -116,7 +116,7 @@ function MultiSelectApiField({
 
     useEffect(() => {
         if (!field.apiPath) return;
-        const baseUrl = import.meta.env.VITE_API_URL || '';
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5500';
         const sep = field.apiPath.includes('?') ? '&' : '?';
         fetch(`${baseUrl}${field.apiPath}${sep}perPage=500`)
             .then((res) => res.json())
