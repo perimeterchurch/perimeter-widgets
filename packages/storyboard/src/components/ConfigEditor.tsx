@@ -116,10 +116,15 @@ function MultiSelectApiField({
 
     useEffect(() => {
         if (!field.apiPath) return;
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5500';
+        // Use relative URL so MSW (service worker) can intercept in mock mode,
+        // and Vite proxy or direct fetch works in live mode
         const sep = field.apiPath.includes('?') ? '&' : '?';
-        fetch(`${baseUrl}${field.apiPath}${sep}perPage=500`)
-            .then((res) => res.json())
+        const url = `${field.apiPath}${sep}perPage=500`;
+        fetch(url)
+            .then((res) => {
+                if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+                return res.json();
+            })
             .then((json: { data: unknown }) => {
                 const data = json.data;
                 const items =
@@ -137,7 +142,9 @@ function MultiSelectApiField({
                     })),
                 );
             })
-            .catch(console.error)
+            .catch((err) =>
+                console.warn(`[ConfigEditor] Failed to fetch ${url}:`, err),
+            )
             .finally(() => setLoading(false));
     }, [field.apiPath]);
 
