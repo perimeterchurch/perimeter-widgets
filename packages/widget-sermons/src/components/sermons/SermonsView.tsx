@@ -74,16 +74,30 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     );
     const { data: serviceTypes = [], isLoading: serviceTypesLoading } =
         useServiceTypes(config);
-    const configServiceTypeIds = resolveServiceTypeIds(
-        config.serviceTypes,
-        serviceTypes,
-    );
-    const showServiceTypeFilter = !config.serviceTypes;
+    const showServiceTypeFilter = !config.serviceTypes && !config.serviceTypeId;
+
+    const resolvedServiceTypeId =
+        config.serviceTypeId
+        ?? (filters.selectedServiceTypeIds.length > 0 ?
+            filters.selectedServiceTypeIds.join(',')
+        :   (resolveServiceTypeIds(config.serviceTypes, serviceTypes)
+            ?? undefined));
+
+    const showFilters = config.display === 'full';
+    const showSortView = config.display !== 'headless';
+
+    const lockedFilters = new Set<string>();
+    if (config.seriesId != null) lockedFilters.add('series');
+    if (config.speakerId != null) lockedFilters.add('speaker');
+    if (config.bookId != null) lockedFilters.add('book');
+    if (config.serviceTypeId != null) lockedFilters.add('serviceTypes');
+    if (config.from != null) lockedFilters.add('from');
+    if (config.to != null) lockedFilters.add('to');
 
     const { data, isLoading } = useSermons({
         ...filters,
         config,
-        serviceTypeId: configServiceTypeIds,
+        serviceTypeId: resolvedServiceTypeId,
     });
     const { data: seriesData, isLoading: seriesLoading } = useSeries({
         config,
@@ -111,57 +125,62 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
 
     return (
         <div className='space-y-4'>
-            <SermonFilters
-                search={filters.search}
-                series={filters.series}
-                speaker={filters.speaker}
-                book={filters.book}
-                selectedServiceTypeIds={filters.selectedServiceTypeIds}
-                from={filters.from ?? ''}
-                to={filters.to ?? ''}
-                sort={filters.sort}
-                order={filters.order}
-                hasActiveFilters={filters.hasActiveFilters}
-                seriesList={seriesList}
-                speakers={speakers}
-                books={books}
-                serviceTypes={serviceTypes}
-                showServiceTypeFilter={showServiceTypeFilter}
-                seriesLoading={seriesLoading}
-                speakersLoading={speakersLoading}
-                booksLoading={booksLoading}
-                serviceTypesLoading={serviceTypesLoading}
-                onSearchChange={filters.setSearch}
-                onSeriesChange={filters.setSeries}
-                onSpeakerChange={filters.setSpeaker}
-                onBookChange={filters.setBook}
-                onServiceTypesChange={filters.setServiceTypes}
-                onDateRangeChange={filters.setDateRange}
-                onSortChange={filters.setSort}
-                onClearFilters={filters.clearFilters}
-            />
+            {showFilters && (
+                <SermonFilters
+                    search={filters.search}
+                    series={filters.series}
+                    speaker={filters.speaker}
+                    book={filters.book}
+                    selectedServiceTypeIds={filters.selectedServiceTypeIds}
+                    from={filters.from ?? ''}
+                    to={filters.to ?? ''}
+                    sort={filters.sort}
+                    order={filters.order}
+                    hasActiveFilters={filters.hasActiveFilters}
+                    seriesList={seriesList}
+                    speakers={speakers}
+                    books={books}
+                    serviceTypes={serviceTypes}
+                    showServiceTypeFilter={showServiceTypeFilter}
+                    seriesLoading={seriesLoading}
+                    speakersLoading={speakersLoading}
+                    booksLoading={booksLoading}
+                    serviceTypesLoading={serviceTypesLoading}
+                    onSearchChange={filters.setSearch}
+                    onSeriesChange={filters.setSeries}
+                    onSpeakerChange={filters.setSpeaker}
+                    onBookChange={filters.setBook}
+                    onServiceTypesChange={filters.setServiceTypes}
+                    onDateRangeChange={filters.setDateRange}
+                    onSortChange={filters.setSort}
+                    onClearFilters={filters.clearFilters}
+                    lockedFilters={lockedFilters}
+                />
+            )}
             {/* Results header: count + sort + view */}
-            <div className='flex items-center justify-between'>
-                <span className='text-sm text-[var(--color-text-muted)]'>
-                    {pagination ? `${pagination.total} sermons` : ''}
-                </span>
-                <div className='flex items-center gap-2'>
-                    <SortSelect
-                        sortField={filters.sort}
-                        sortDirection={filters.order}
-                        onSortFieldChange={handleSortFieldChange}
-                        onSortDirectionChange={handleSortDirectionChange}
-                        fields={SORT_FIELDS}
-                    />
-                    <IconSelect
-                        value={viewMode}
-                        onChange={(v) => setViewMode(v as ViewMode)}
-                        options={VIEW_OPTIONS}
-                        label='View:'
-                        icon={<Eye className='h-3.5 w-3.5 shrink-0' />}
-                    />
+            {showSortView && (
+                <div className='flex items-center justify-between'>
+                    <span className='text-sm text-[var(--color-text-muted)]'>
+                        {pagination ? `${pagination.total} sermons` : ''}
+                    </span>
+                    <div className='flex items-center gap-2'>
+                        <SortSelect
+                            sortField={filters.sort}
+                            sortDirection={filters.order}
+                            onSortFieldChange={handleSortFieldChange}
+                            onSortDirectionChange={handleSortDirectionChange}
+                            fields={SORT_FIELDS}
+                        />
+                        <IconSelect
+                            value={viewMode}
+                            onChange={(v) => setViewMode(v as ViewMode)}
+                            options={VIEW_OPTIONS}
+                            label='View:'
+                            icon={<Eye className='h-3.5 w-3.5 shrink-0' />}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
             <SkeletonTransition
                 isLoading={isLoading}
                 skeleton={

@@ -47,6 +47,7 @@ export interface SermonFiltersProps {
     onDateRangeChange: (from: string | null, to: string | null) => void;
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
+    lockedFilters: Set<string>;
 }
 
 const ALL = '__all__';
@@ -97,89 +98,119 @@ export function SermonFilters(props: SermonFiltersProps) {
             </InputGroup>
 
             {/* Row 2: Filter dropdowns */}
-            <div className='flex items-center gap-2'>
-                <MultiCombobox
-                    options={withAllOption('All Series', seriesOptions)}
-                    value={props.series != null ? String(props.series) : null}
-                    onValueChange={(v) =>
-                        props.onSeriesChange(
-                            v != null && v !== ALL ? Number(v) : null,
-                        )
-                    }
-                    placeholder='All Series'
-                    disabled={props.seriesLoading}
-                    className='flex-1'
-                />
-                <MultiCombobox
-                    options={withAllOption('All Speakers', speakerOptions)}
-                    value={props.speaker != null ? String(props.speaker) : null}
-                    onValueChange={(v) =>
-                        props.onSpeakerChange(
-                            v != null && v !== ALL ? Number(v) : null,
-                        )
-                    }
-                    placeholder='All Speakers'
-                    disabled={props.speakersLoading}
-                    className='flex-1'
-                />
-                <MultiCombobox
-                    options={withAllOption('All Books', bookOptions)}
-                    value={props.book != null ? String(props.book) : null}
-                    onValueChange={(v) =>
-                        props.onBookChange(
-                            v != null && v !== ALL ? Number(v) : null,
-                        )
-                    }
-                    placeholder='All Books'
-                    disabled={props.booksLoading}
-                    className='flex-1'
-                />
-                {props.showServiceTypeFilter && (
-                    <MultiCombobox
-                        options={serviceTypeOptions}
-                        value={props.selectedServiceTypeIds.map(String)}
-                        onValueChange={(v) =>
-                            props.onServiceTypesChange(v.map(Number))
-                        }
-                        placeholder='Service Types'
-                        selectedLabel='Service Types'
-                        disabled={props.serviceTypesLoading}
-                        className='flex-1'
-                        multiple
-                    />
-                )}
-            </div>
+            {(!props.lockedFilters.has('series')
+                || !props.lockedFilters.has('speaker')
+                || !props.lockedFilters.has('book')
+                || props.showServiceTypeFilter) && (
+                <div className='flex items-center gap-2'>
+                    {!props.lockedFilters.has('series') && (
+                        <MultiCombobox
+                            options={withAllOption('All Series', seriesOptions)}
+                            value={
+                                props.series != null ?
+                                    String(props.series)
+                                :   null
+                            }
+                            onValueChange={(v) =>
+                                props.onSeriesChange(
+                                    v != null && v !== ALL ? Number(v) : null,
+                                )
+                            }
+                            placeholder='All Series'
+                            disabled={props.seriesLoading}
+                            className='flex-1'
+                        />
+                    )}
+                    {!props.lockedFilters.has('speaker') && (
+                        <MultiCombobox
+                            options={withAllOption(
+                                'All Speakers',
+                                speakerOptions,
+                            )}
+                            value={
+                                props.speaker != null ?
+                                    String(props.speaker)
+                                :   null
+                            }
+                            onValueChange={(v) =>
+                                props.onSpeakerChange(
+                                    v != null && v !== ALL ? Number(v) : null,
+                                )
+                            }
+                            placeholder='All Speakers'
+                            disabled={props.speakersLoading}
+                            className='flex-1'
+                        />
+                    )}
+                    {!props.lockedFilters.has('book') && (
+                        <MultiCombobox
+                            options={withAllOption('All Books', bookOptions)}
+                            value={
+                                props.book != null ? String(props.book) : null
+                            }
+                            onValueChange={(v) =>
+                                props.onBookChange(
+                                    v != null && v !== ALL ? Number(v) : null,
+                                )
+                            }
+                            placeholder='All Books'
+                            disabled={props.booksLoading}
+                            className='flex-1'
+                        />
+                    )}
+                    {props.showServiceTypeFilter && (
+                        <MultiCombobox
+                            options={serviceTypeOptions}
+                            value={props.selectedServiceTypeIds.map(String)}
+                            onValueChange={(v) =>
+                                props.onServiceTypesChange(v.map(Number))
+                            }
+                            placeholder='Service Types'
+                            selectedLabel='Service Types'
+                            disabled={props.serviceTypesLoading}
+                            className='flex-1'
+                            multiple
+                        />
+                    )}
+                </div>
+            )}
 
             {/* Row 3: Date range + clear all */}
-            <div className='flex items-center gap-3'>
-                <DateRangePicker
-                    from={props.from}
-                    to={props.to}
-                    onFromChange={(from) => {
-                        pendingFrom.current = from;
-                        props.onDateRangeChange(from, props.to);
-                    }}
-                    onToChange={(to) =>
-                        props.onDateRangeChange(pendingFrom.current, to)
-                    }
-                />
-                <div className='flex-1' />
-                {props.hasActiveFilters && (
-                    <Button
-                        variant='outline'
-                        size='sm'
-                        onClick={props.onClearFilters}
-                    >
-                        <X className='h-3.5 w-3.5' />
-                        Clear All
-                    </Button>
-                )}
-            </div>
+            {!(
+                props.lockedFilters.has('from') && props.lockedFilters.has('to')
+            ) && (
+                <div className='flex items-center gap-3'>
+                    {!props.lockedFilters.has('from') && (
+                        <DateRangePicker
+                            from={props.from}
+                            to={props.to}
+                            onFromChange={(from) => {
+                                pendingFrom.current = from;
+                                props.onDateRangeChange(from, props.to);
+                            }}
+                            onToChange={(to) =>
+                                props.onDateRangeChange(pendingFrom.current, to)
+                            }
+                        />
+                    )}
+                    <div className='flex-1' />
+                    {props.hasActiveFilters && (
+                        <Button
+                            variant='outline'
+                            size='sm'
+                            onClick={props.onClearFilters}
+                        >
+                            <X className='h-3.5 w-3.5' />
+                            Clear All
+                        </Button>
+                    )}
+                </div>
+            )}
 
             {/* Active filter chips */}
             {props.hasActiveFilters && (
                 <div className='flex flex-wrap gap-1.5'>
-                    {props.series && (
+                    {props.series && !props.lockedFilters.has('series') && (
                         <button
                             type='button'
                             onClick={() => props.onSeriesChange(null)}
@@ -194,7 +225,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             </Badge>
                         </button>
                     )}
-                    {props.speaker && (
+                    {props.speaker && !props.lockedFilters.has('speaker') && (
                         <button
                             type='button'
                             onClick={() => props.onSpeakerChange(null)}
@@ -209,7 +240,7 @@ export function SermonFilters(props: SermonFiltersProps) {
                             </Badge>
                         </button>
                     )}
-                    {props.book && (
+                    {props.book && !props.lockedFilters.has('book') && (
                         <button
                             type='button'
                             onClick={() => props.onBookChange(null)}
