@@ -4,30 +4,13 @@ import {
     parseAsStringLiteral,
     useQueryStates,
 } from 'nuqs';
-import type { SortField, SortOrder, TabId, ScreenMode } from '../types';
-
-const sermonParams = {
-    tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(
-        'sermons',
-    ),
-    screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault(
-        'browse',
-    ),
-    id: parseAsInteger,
-    fromSeriesId: parseAsInteger,
-    search: parseAsString.withDefault(''),
-    series: parseAsInteger,
-    speaker: parseAsInteger,
-    book: parseAsInteger,
-    serviceTypes: parseAsString,
-    from: parseAsString,
-    to: parseAsString,
-    sort: parseAsStringLiteral(['date', 'title', 'count'] as const).withDefault(
-        'date',
-    ),
-    order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault('desc'),
-    page: parseAsInteger.withDefault(1),
-};
+import type {
+    SermonsConfig,
+    SortField,
+    SortOrder,
+    TabId,
+    ScreenMode,
+} from '../types';
 
 /** Parse comma-separated IDs string into number array */
 function parseServiceTypeIds(value: string | null): number[] {
@@ -43,19 +26,57 @@ function serializeServiceTypeIds(ids: number[]): string | null {
     return ids.length > 0 ? ids.join(',') : null;
 }
 
-export function useSermonFilters() {
+export function useSermonFilters(config: SermonsConfig) {
+    const sermonParams = {
+        tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(
+            config.defaultTab ?? 'sermons',
+        ),
+        screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault(
+            'browse',
+        ),
+        id: parseAsInteger,
+        fromSeriesId: parseAsInteger,
+        search: parseAsString.withDefault(''),
+        series: parseAsInteger,
+        speaker: parseAsInteger,
+        book: parseAsInteger,
+        serviceTypes: parseAsString,
+        from: parseAsString,
+        to: parseAsString,
+        sort: parseAsStringLiteral([
+            'date',
+            'title',
+            'count',
+        ] as const).withDefault('date'),
+        order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault(
+            'desc',
+        ),
+        page: parseAsInteger.withDefault(1),
+    };
+
     const [params, setParams] = useQueryStates(sermonParams, {
         history: 'push',
     });
 
-    const setTab = (tab: TabId) => {
-        setParams({
-            tab,
-            screen: 'browse',
-            id: null,
-            page: 1,
-        });
-    };
+    // Override return values for locked params
+    const tab = config.tab ?? params.tab;
+    const series = config.seriesId ?? params.series;
+    const speaker = config.speakerId ?? params.speaker;
+    const book = config.bookId ?? params.book;
+    const from = config.from ?? params.from;
+    const to = config.to ?? params.to;
+
+    const setTab =
+        config.tab ?
+            (_tab: TabId) => {}
+        :   (newTab: TabId) => {
+                setParams({
+                    tab: newTab,
+                    screen: 'browse',
+                    id: null,
+                    page: 1,
+                });
+            };
 
     const setScreen = (screen: ScreenMode, id?: number) => {
         setParams({ screen, id: id ?? null, fromSeriesId: null });
@@ -64,7 +85,7 @@ export function useSermonFilters() {
     /** Navigate from a series detail to a sermon detail, remembering the series */
     const setSermonFromSeries = (sermonId: number, seriesId: number) => {
         setParams({
-            tab: 'series',
+            tab: config.tab ?? 'series',
             screen: 'detail',
             id: sermonId,
             fromSeriesId: seriesId,
@@ -74,7 +95,7 @@ export function useSermonFilters() {
     /** Navigate to a series detail view */
     const setSeriesDetail = (seriesId: number) => {
         setParams({
-            tab: 'series',
+            tab: config.tab ?? 'series',
             screen: 'detail',
             id: seriesId,
             fromSeriesId: null,
@@ -85,17 +106,26 @@ export function useSermonFilters() {
         setParams({ search: search || null, page: 1 });
     };
 
-    const setSeries = (seriesId: number | null) => {
-        setParams({ series: seriesId, page: 1 });
-    };
+    const setSeries =
+        config.seriesId ?
+            (_seriesId: number | null) => {}
+        :   (seriesId: number | null) => {
+                setParams({ series: seriesId, page: 1 });
+            };
 
-    const setSpeaker = (speakerId: number | null) => {
-        setParams({ speaker: speakerId, page: 1 });
-    };
+    const setSpeaker =
+        config.speakerId ?
+            (_speakerId: number | null) => {}
+        :   (speakerId: number | null) => {
+                setParams({ speaker: speakerId, page: 1 });
+            };
 
-    const setBook = (bookId: number | null) => {
-        setParams({ book: bookId, page: 1 });
-    };
+    const setBook =
+        config.bookId ?
+            (_bookId: number | null) => {}
+        :   (bookId: number | null) => {
+                setParams({ book: bookId, page: 1 });
+            };
 
     const toggleServiceType = (id: number) => {
         const current = parseServiceTypeIds(params.serviceTypes);
@@ -114,9 +144,16 @@ export function useSermonFilters() {
         setParams({ serviceTypes: serializeServiceTypeIds(ids), page: 1 });
     };
 
-    const setDateRange = (from: string | null, to: string | null) => {
-        setParams({ from: from || null, to: to || null, page: 1 });
-    };
+    const setDateRange =
+        config.from || config.to ?
+            (_from: string | null, _to: string | null) => {}
+        :   (newFrom: string | null, newTo: string | null) => {
+                setParams({
+                    from: newFrom || null,
+                    to: newTo || null,
+                    page: 1,
+                });
+            };
 
     const setSort = (sort: SortField, order: SortOrder) => {
         setParams({ sort, order, page: 1 });
@@ -131,12 +168,12 @@ export function useSermonFilters() {
     const clearFilters = () => {
         setParams({
             search: null,
-            series: null,
-            speaker: null,
-            book: null,
+            series: config.seriesId ? undefined : null,
+            speaker: config.speakerId ? undefined : null,
+            book: config.bookId ? undefined : null,
             serviceTypes: null,
-            from: null,
-            to: null,
+            from: config.from ? undefined : null,
+            to: config.to ? undefined : null,
             sort: 'date',
             order: 'desc',
             page: 1,
@@ -145,15 +182,21 @@ export function useSermonFilters() {
 
     const hasActiveFilters =
         !!params.search
-        || params.series !== null
-        || params.speaker !== null
-        || params.book !== null
+        || (!config.seriesId && params.series !== null)
+        || (!config.speakerId && params.speaker !== null)
+        || (!config.bookId && params.book !== null)
         || selectedServiceTypeIds.length > 0
-        || params.from !== null
-        || params.to !== null;
+        || (!config.from && params.from !== null)
+        || (!config.to && params.to !== null);
 
     return {
         ...params,
+        tab,
+        series,
+        speaker,
+        book,
+        from,
+        to,
         selectedServiceTypeIds,
         setTab,
         setScreen,

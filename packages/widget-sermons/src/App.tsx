@@ -25,7 +25,7 @@ const fadeSlide = {
 
 function SermonsWidget() {
     const config = useConfig<SermonsConfig>();
-    const filters = useSermonFilters();
+    const filters = useSermonFilters(config);
 
     // Build a unique key for AnimatePresence based on the current "page"
     const viewKey =
