@@ -78,6 +78,7 @@
     display: none;
 }
 
+/* @sync:tokens-start */
 :root,
 :host {
     --radius: 0.625rem;
@@ -163,6 +164,7 @@
     --sidebar-border: oklch(0.35 0.01 50);
     --sidebar-ring: oklch(0.55 0.145 283);
 }
+/* @sync:tokens-end */
 
 @theme inline {
     --radius-sm: calc(var(--radius) * 0.6);
