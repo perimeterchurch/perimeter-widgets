@@ -11,7 +11,9 @@
         "typecheck": "turbo typecheck",
         "format": "prettier --write .",
         "storybook": "turbo storybook",
-        "quality": "turbo typecheck lint test && prettier --check ."
+        "quality": "turbo typecheck lint test && prettier --check .",
+        "sync:style": "pnpm --filter=@perimeter-widgets/shared sync:style",
+        "sync:tokens": "pnpm --filter=@perimeter-widgets/shared sync:tokens"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
