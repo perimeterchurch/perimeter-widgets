@@ -51,7 +51,8 @@ describe('getMPToken', () => {
     });
 
     it('returns authenticated: true for valid token', () => {
-        const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
+        const token =
+            'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
         store['mpp-widgets_AuthToken'] = token;
         expect(getMPToken()).toEqual({ authenticated: true, token });
     });
@@ -66,11 +67,36 @@ describe('getMPToken', () => {
     });
 
     it('returns authenticated: true for non-expired token', () => {
-        const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
+        const token =
+            'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
         store['mpp-widgets_AuthToken'] = token;
         store['mpp-widgets_ExpiresAfter'] = new Date(
             Date.now() + 3600000,
         ).toISOString();
+        expect(getMPToken()).toEqual({ authenticated: true, token });
+    });
+
+    it('returns expiringSoon: true when token expires within 5 minutes', () => {
+        const token =
+            'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
+        store['mpp-widgets_AuthToken'] = token;
+        store['mpp-widgets_ExpiresAfter'] = new Date(
+            Date.now() + 2 * 60 * 1000,
+        ).toISOString(); // 2 minutes from now
+        expect(getMPToken()).toEqual({
+            authenticated: true,
+            token,
+            expiringSoon: true,
+        });
+    });
+
+    it('does not return expiringSoon when token expires in more than 5 minutes', () => {
+        const token =
+            'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
+        store['mpp-widgets_AuthToken'] = token;
+        store['mpp-widgets_ExpiresAfter'] = new Date(
+            Date.now() + 30 * 60 * 1000,
+        ).toISOString(); // 30 minutes from now
         expect(getMPToken()).toEqual({ authenticated: true, token });
     });
 });

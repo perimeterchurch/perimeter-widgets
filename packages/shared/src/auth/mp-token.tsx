@@ -15,6 +15,7 @@ const EXPIRY_KEY = 'mpp-widgets_ExpiresAfter';
 export interface MPAuthState {
     authenticated: boolean;
     token?: string;
+    expiringSoon?: boolean;
 }
 
 /**
@@ -39,8 +40,15 @@ export function getMPToken(): MPAuthState {
             return { authenticated: false };
         }
 
-        if (expiresAfter && new Date(expiresAfter) < new Date()) {
-            return { authenticated: false };
+        if (expiresAfter) {
+            const expiresAt = new Date(expiresAfter);
+            if (expiresAt < new Date()) {
+                return { authenticated: false };
+            }
+            const fiveMinutes = 5 * 60 * 1000;
+            if (expiresAt.getTime() - Date.now() < fiveMinutes) {
+                return { authenticated: true, token, expiringSoon: true };
+            }
         }
 
         return { authenticated: true, token };
@@ -89,6 +97,13 @@ export function AuthProvider({
         window.addEventListener('storage', handleStorage);
         return () => window.removeEventListener('storage', handleStorage);
     }, [requiresAuth, refresh]);
+
+    // Periodically re-read token to detect expiry or silent renewal
+    useEffect(() => {
+        if (!requiresAuth || !authState.authenticated) return;
+        const interval = setInterval(refresh, 60_000);
+        return () => clearInterval(interval);
+    }, [requiresAuth, authState.authenticated, refresh]);
 
     const contextValue = useMemo(
         () => ({ ...authState, refresh }),
