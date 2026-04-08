@@ -276,6 +276,9 @@ importers:
       jsdom:
         specifier: ^26
         version: 26.1.0
+      msw:
+        specifier: ^2.12.13
+        version: 2.12.13(@types/node@22.19.15)(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
         version: 4.2.1
