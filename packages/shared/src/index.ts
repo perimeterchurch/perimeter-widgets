@@ -11,6 +11,9 @@ export type {
     operations,
 } from './api/client';
 
+// API Error
+export { createApiError } from './api/api-error';
+
 // Auth
 export { getMPToken, AuthProvider, useAuth } from './auth/mp-token';
 export type { MPAuthState } from './auth/mp-token';

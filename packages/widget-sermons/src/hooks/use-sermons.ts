@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { createApiClient } from '@perimeter-widgets/shared';
+import { createApiClient, createApiError } from '@perimeter-widgets/shared';
 import type { SortField, SortOrder } from '../types';
 import type { SermonsConfig } from '../types';
-import { createApiError } from '../lib/api-error';
 
 export interface UseSermonsParams {
     search?: string;

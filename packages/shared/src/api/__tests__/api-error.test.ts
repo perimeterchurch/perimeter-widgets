@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createApiError } from '../../lib/api-error';
+import { createApiError } from '../api-error';
 
 describe('createApiError', () => {
     it('returns error with just label when error is null', () => {
