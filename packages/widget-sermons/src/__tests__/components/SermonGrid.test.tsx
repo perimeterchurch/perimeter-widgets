@@ -33,36 +33,21 @@ const mockSermons = [
 
 describe('SermonGrid', () => {
     it('renders sermon cards with titles', () => {
-        render(
-            <SermonGrid
-                sermons={mockSermons}
-                onSermonClick={() => {}}
-            />,
-        );
+        render(<SermonGrid sermons={mockSermons} onSermonClick={() => {}} />);
 
         expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
         expect(screen.getByText('Walking in Faith')).toBeInTheDocument();
     });
 
     it('displays speaker names', () => {
-        render(
-            <SermonGrid
-                sermons={mockSermons}
-                onSermonClick={() => {}}
-            />,
-        );
+        render(<SermonGrid sermons={mockSermons} onSermonClick={() => {}} />);
 
         expect(screen.getByText('John Smith')).toBeInTheDocument();
         expect(screen.getByText('Jane Doe')).toBeInTheDocument();
     });
 
     it('shows empty state when no sermons', () => {
-        render(
-            <SermonGrid
-                sermons={[]}
-                onSermonClick={() => {}}
-            />,
-        );
+        render(<SermonGrid sermons={[]} onSermonClick={() => {}} />);
 
         expect(screen.getByText('No sermons found.')).toBeInTheDocument();
     });
@@ -70,12 +55,7 @@ describe('SermonGrid', () => {
     it('calls onSermonClick with sermon ID', async () => {
         const onClick = vi.fn();
 
-        render(
-            <SermonGrid
-                sermons={mockSermons}
-                onSermonClick={onClick}
-            />,
-        );
+        render(<SermonGrid sermons={mockSermons} onSermonClick={onClick} />);
 
         await userEvent.click(screen.getByText('Amazing Grace'));
 

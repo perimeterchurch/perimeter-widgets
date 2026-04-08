@@ -39,11 +39,15 @@ describe('WidgetErrorBoundary', () => {
         expect(
             screen.getByText('Something went wrong loading this content.'),
         ).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', { name: /try again/i }),
+        ).toBeInTheDocument();
     });
 
     it('logs error via console.error', () => {
-        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const errorSpy = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
 
         render(
             <WidgetErrorBoundary>
@@ -59,7 +63,9 @@ describe('WidgetErrorBoundary', () => {
     });
 
     it('recovers when retry button is clicked', async () => {
-        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const errorSpy = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
         let shouldThrow = true;
 
         function ConditionalChild() {
@@ -78,7 +84,9 @@ describe('WidgetErrorBoundary', () => {
         ).toBeInTheDocument();
 
         shouldThrow = false;
-        await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+        await userEvent.click(
+            screen.getByRole('button', { name: /try again/i }),
+        );
 
         expect(screen.getByText('Recovered content')).toBeInTheDocument();
 

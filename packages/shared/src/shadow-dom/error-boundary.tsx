@@ -45,8 +45,6 @@ export class WidgetErrorBoundary extends Component<Props, State> {
             );
         }
 
-        return (
-            <div key={this.state.retryKey}>{this.props.children}</div>
-        );
+        return <div key={this.state.retryKey}>{this.props.children}</div>;
     }
 }

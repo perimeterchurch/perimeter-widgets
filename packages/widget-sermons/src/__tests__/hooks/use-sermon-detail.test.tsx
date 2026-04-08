@@ -78,10 +78,9 @@ function createWrapper() {
 
 describe('useSermonDetail', () => {
     it('fetches sermon by ID', async () => {
-        const { result } = renderHook(
-            () => useSermonDetail(42, testConfig),
-            { wrapper: createWrapper() },
-        );
+        const { result } = renderHook(() => useSermonDetail(42, testConfig), {
+            wrapper: createWrapper(),
+        });
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
@@ -90,19 +89,17 @@ describe('useSermonDetail', () => {
     });
 
     it('is disabled when id is null', () => {
-        const { result } = renderHook(
-            () => useSermonDetail(null, testConfig),
-            { wrapper: createWrapper() },
-        );
+        const { result } = renderHook(() => useSermonDetail(null, testConfig), {
+            wrapper: createWrapper(),
+        });
 
         expect(result.current.fetchStatus).toBe('idle');
     });
 
     it('handles 404 response', async () => {
-        const { result } = renderHook(
-            () => useSermonDetail(999, testConfig),
-            { wrapper: createWrapper() },
-        );
+        const { result } = renderHook(() => useSermonDetail(999, testConfig), {
+            wrapper: createWrapper(),
+        });
 
         await waitFor(() => expect(result.current.isError).toBe(true));
 
