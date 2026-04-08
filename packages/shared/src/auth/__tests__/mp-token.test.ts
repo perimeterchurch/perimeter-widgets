@@ -35,20 +35,30 @@ describe('getMPToken', () => {
         expect(getMPToken()).toEqual({ authenticated: false });
     });
 
-    it('returns authenticated: false for short token', () => {
-        store['mpp-widgets_AuthToken'] = 'short';
+    it('returns authenticated: false for non-JWT token', () => {
+        store['mpp-widgets_AuthToken'] = 'not-a-jwt-token';
+        expect(getMPToken()).toEqual({ authenticated: false });
+    });
+
+    it('returns authenticated: false for token with wrong segment count', () => {
+        store['mpp-widgets_AuthToken'] = 'only.two-segments';
+        expect(getMPToken()).toEqual({ authenticated: false });
+    });
+
+    it('returns authenticated: false for token with empty segments', () => {
+        store['mpp-widgets_AuthToken'] = 'header..signature';
         expect(getMPToken()).toEqual({ authenticated: false });
     });
 
     it('returns authenticated: true for valid token', () => {
-        const token = 'a-valid-access-token-that-is-long-enough';
+        const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
         store['mpp-widgets_AuthToken'] = token;
         expect(getMPToken()).toEqual({ authenticated: true, token });
     });
 
     it('returns authenticated: false for expired token', () => {
         store['mpp-widgets_AuthToken'] =
-            'a-valid-access-token-that-is-long-enough';
+            'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
         store['mpp-widgets_ExpiresAfter'] = new Date(
             Date.now() - 60000,
         ).toISOString();
@@ -56,7 +66,7 @@ describe('getMPToken', () => {
     });
 
     it('returns authenticated: true for non-expired token', () => {
-        const token = 'a-valid-access-token-that-is-long-enough';
+        const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
         store['mpp-widgets_AuthToken'] = token;
         store['mpp-widgets_ExpiresAfter'] = new Date(
             Date.now() + 3600000,

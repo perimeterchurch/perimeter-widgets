@@ -18,6 +18,15 @@ export interface MPAuthState {
 }
 
 /**
+ * Checks if a string has JWT-like structure (three dot-separated non-empty segments).
+ * Does not decode or verify — that's the API's responsibility.
+ */
+function isJwtLike(value: string): boolean {
+    const parts = value.split('.');
+    return parts.length === 3 && parts.every((p) => p.length > 0);
+}
+
+/**
  * Reads the MP OAuth token from localStorage.
  * Returns { authenticated: true, token } if valid, { authenticated: false } otherwise.
  */
@@ -26,7 +35,7 @@ export function getMPToken(): MPAuthState {
         const token = localStorage.getItem(TOKEN_KEY);
         const expiresAfter = localStorage.getItem(EXPIRY_KEY);
 
-        if (!token || token === 'null' || token.length < 10) {
+        if (!token || token === 'null' || !isJwtLike(token)) {
             return { authenticated: false };
         }
 
