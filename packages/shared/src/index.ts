@@ -2,6 +2,9 @@
 export { mountWidget } from './shadow-dom/mount';
 export type { MountWidgetOptions, MountResult } from './shadow-dom/mount';
 
+// Error Boundary
+export { WidgetErrorBoundary } from './shadow-dom/error-boundary';
+
 // API Client
 export { createApiClient } from './api/client';
 export type {
