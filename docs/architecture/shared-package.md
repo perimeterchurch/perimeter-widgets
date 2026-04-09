@@ -262,9 +262,9 @@ Primitive UI components and design tokens are sourced from the style project's s
 pnpm sync:style
 ```
 
-Pulls 20 primitive components from the style registry into `src/components/ui/perimeter/` via shadcn CLI, then rewrites `@/` imports to relative paths. Protected files (base UI wrappers at `ui/button.tsx`, `ui/dialog.tsx`, `ui/input.tsx`, `ui/textarea.tsx`, `ui/input-group.tsx`) are backed up and restored automatically.
+Pulls 26 primitive components from the style registry into `src/components/ui/perimeter/` via shadcn CLI, then rewrites `@/` imports to relative paths. Protected files (base UI wrappers at `ui/button.tsx`, `ui/dialog.tsx`, `ui/input.tsx`, `ui/textarea.tsx`, `ui/input-group.tsx`) are backed up and restored automatically.
 
-The 6 portal-aware components (dialog, combobox, select, dropdown-menu, tooltip, multi-combobox) and 2 widget-specific compositions (icon-select, sort-select) are widget-owned and not synced.
+Portal components (dialog, combobox, select, dropdown-menu, tooltip, multi-combobox) are synced from style with optional `container`/`environment` props. The shared package re-exports portal-aware wrappers (`portal-wrappers.tsx`) that auto-inject the shadow DOM container via `usePortalContainer()`.
 
 ### Syncing Tokens
 

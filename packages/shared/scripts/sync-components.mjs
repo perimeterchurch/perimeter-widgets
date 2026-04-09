@@ -27,20 +27,26 @@ const COMPONENTS = [
     'calendar',
     'card',
     'checkbox',
+    'combobox',
     'command',
+    'dialog',
+    'dropdown-menu',
     'empty',
     'input',
     'label',
+    'multi-combobox',
     'pagination',
     'progress',
     'radio-group',
     'scroll-area',
+    'select',
     'separator',
     'skeleton',
     'spinner',
     'switch',
     'tabs',
     'textarea',
+    'tooltip',
 ];
 
 /**
@@ -103,16 +109,11 @@ function main() {
     restoreProtectedFiles(backups);
 
     // Step 4: Clean up duplicate input-group if CLI created one in perimeter/
-    const dupeInputGroup = join(
-        UI_DIR,
-        'perimeter',
-        'input-group.tsx',
-    );
+    const dupeInputGroup = join(UI_DIR, 'perimeter', 'input-group.tsx');
     if (existsSync(dupeInputGroup)) {
         unlinkSync(dupeInputGroup);
         console.log('  Removed duplicate perimeter/input-group.tsx');
     }
-
 
     // Step 5: Rewrite @/ imports to relative paths
     console.log('  Running post-sync import rewriter...');
