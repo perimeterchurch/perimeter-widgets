@@ -252,6 +252,39 @@ See [Design Tokens](../reference/design-tokens.md) for the full token reference.
 
 ---
 
+## Style Registry Sync
+
+Primitive UI components and design tokens are sourced from the style project's shadcn registry at `https://style.perimeter.org/r`. The shared package is a consumer — style is the single source of truth.
+
+### Syncing Components
+
+```bash
+pnpm sync:style
+```
+
+Pulls 20 primitive components from the style registry into `src/components/ui/perimeter/` via shadcn CLI, then rewrites `@/` imports to relative paths. Protected files (base UI wrappers at `ui/button.tsx`, `ui/dialog.tsx`, `ui/input.tsx`, `ui/textarea.tsx`, `ui/input-group.tsx`) are backed up and restored automatically.
+
+The 6 portal-aware components (dialog, combobox, select, dropdown-menu, tooltip, multi-combobox) and 2 widget-specific compositions (icon-select, sort-select) are widget-owned and not synced.
+
+### Syncing Tokens
+
+```bash
+pnpm sync:tokens
+```
+
+Fetches the default theme from the registry and regenerates CSS custom properties in `src/styles/base.css` between `@sync:tokens-start` / `@sync:tokens-end` markers. Shadow DOM selectors (`:host`, `data-theme`) are preserved.
+
+### When to Sync
+
+Run both commands after the style project publishes updates:
+
+1. Style project merges changes and deploys registry
+2. Run `pnpm sync:style && pnpm sync:tokens` in perimeter-widgets
+3. Verify: `pnpm quality` + visual check in storyboard
+4. Commit the synced files
+
+---
+
 ## Related Docs
 
 - [Architecture Overview](overview.md) — How the shared package fits in the monorepo
