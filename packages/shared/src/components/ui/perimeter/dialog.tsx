@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 
 import { cn } from '../../../lib/utils';
-import { usePortalContainer } from '../../../shadow-dom/portal-container';
 import { Button } from '../button';
 import { XIcon } from 'lucide-react';
 
@@ -16,12 +15,11 @@ function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
     return <DialogPrimitive.Trigger data-slot='dialog-trigger' {...props} />;
 }
 
-function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
-    const portalContainer = usePortalContainer();
+function DialogPortal({ container, ...props }: DialogPrimitive.Portal.Props) {
     return (
         <DialogPrimitive.Portal
             data-slot='dialog-portal'
-            container={portalContainer}
+            container={container}
             {...props}
         />
     );
@@ -51,12 +49,14 @@ function DialogContent({
     className,
     children,
     showCloseButton = true,
+    container,
     ...props
 }: DialogPrimitive.Popup.Props & {
     showCloseButton?: boolean;
+    container?: HTMLElement;
 }) {
     return (
-        <DialogPortal>
+        <DialogPortal container={container}>
             <DialogOverlay />
             <DialogPrimitive.Popup
                 data-slot='dialog-content'

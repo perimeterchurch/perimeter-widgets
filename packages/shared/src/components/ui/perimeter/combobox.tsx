@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Combobox as ComboboxPrimitive } from '@base-ui/react';
 
 import { cn } from '../../../lib/utils';
-import { usePortalContainer } from '../../../shadow-dom/portal-container';
 import { Button } from '../button';
 import {
     InputGroup,
@@ -92,15 +91,15 @@ function ComboboxContent({
     align = 'start',
     alignOffset = 0,
     anchor,
+    container,
     ...props
 }: ComboboxPrimitive.Popup.Props
     & Pick<
         ComboboxPrimitive.Positioner.Props,
         'side' | 'align' | 'sideOffset' | 'alignOffset' | 'anchor'
-    >) {
-    const portalContainer = usePortalContainer();
+    > & { container?: HTMLElement }) {
     return (
-        <ComboboxPrimitive.Portal container={portalContainer}>
+        <ComboboxPrimitive.Portal container={container}>
             <ComboboxPrimitive.Positioner
                 side={side}
                 sideOffset={sideOffset}

@@ -1,9 +1,10 @@
+'use client';
+
 import * as React from 'react';
-import { useCombobox, useMultipleSelection } from 'downshift';
+import { useCombobox, useMultipleSelection, type Environment } from 'downshift';
 import { CheckIcon, ChevronDownIcon, XIcon } from 'lucide-react';
 
 import { cn } from '../../../lib/utils';
-import { usePortalContainer } from '../../../shadow-dom/portal-container';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -13,8 +14,6 @@ export interface MultiComboboxOption {
     value: string;
     label: string;
     disabled?: boolean;
-    /** Render as a non-selectable group header */
-    isGroupHeader?: boolean;
 }
 
 interface MultiComboboxBaseProps {
@@ -28,6 +27,8 @@ interface MultiComboboxBaseProps {
     disabled?: boolean;
     /** Additional class names for the root container */
     className?: string;
+    /** Custom environment for shadow DOM support (passed to downshift hooks) */
+    environment?: Environment;
 }
 
 interface MultiComboboxSingleProps extends MultiComboboxBaseProps {
@@ -65,37 +66,9 @@ function MultiCombobox(props: MultiComboboxProps) {
         selectedLabel,
         disabled = false,
         className,
+        environment,
     } = props;
     const isMultiple = props.multiple === true;
-
-    // Shadow DOM support: downshift attaches event listeners to `window` and
-    // uses `document.getElementById` to find its elements. Inside a shadow DOM
-    // these fail because elements aren't visible from the document. Route
-    // downshift's environment through the shadow root instead.
-    const portalContainer = usePortalContainer();
-    const shadowEnv = React.useMemo(() => {
-        if (!portalContainer) return undefined;
-        const rootNode = portalContainer.getRootNode();
-        if (!(rootNode instanceof ShadowRoot)) return undefined;
-        const shadow = rootNode;
-        return {
-            addEventListener: shadow.addEventListener.bind(shadow),
-            removeEventListener: shadow.removeEventListener.bind(shadow),
-            document: new Proxy(document, {
-                get(target, prop) {
-                    if (prop === 'getElementById')
-                        return shadow.getElementById.bind(shadow);
-                    if (prop === 'activeElement')
-                        return shadow.activeElement ?? document.activeElement;
-                    const value = Reflect.get(target, prop);
-                    return typeof value === 'function' ?
-                            value.bind(target)
-                        :   value;
-                },
-            }),
-            Node: window.Node,
-        };
-    }, [portalContainer]);
 
     // Controlled vs uncontrolled state
     const isControlled = props.value !== undefined;
@@ -177,7 +150,7 @@ function MultiCombobox(props: MultiComboboxProps) {
 
     const { getDropdownProps } = useMultipleSelection({
         selectedItems,
-        ...(shadowEnv && { environment: shadowEnv }),
+        environment,
         onStateChange({ selectedItems: newSelectedItems, type }) {
             if (
                 type
@@ -212,7 +185,7 @@ function MultiCombobox(props: MultiComboboxProps) {
     } = useCombobox({
         items: filteredOptions,
         inputValue,
-        ...(shadowEnv && { environment: shadowEnv }),
+        environment,
         itemToString: (item) => item?.label ?? '',
         selectedItem: null, // We manage selection ourselves
         isItemDisabled: (item) => !!item.disabled,
@@ -224,7 +197,7 @@ function MultiCombobox(props: MultiComboboxProps) {
                     return {
                         ...changes,
                         // In multiple mode, keep menu open and input value after selection
-                        isOpen: isMultiple,
+                        isOpen: isMultiple ? true : false,
                         inputValue: isMultiple ? inputValue : '',
                     };
                 default:
@@ -283,7 +256,7 @@ function MultiCombobox(props: MultiComboboxProps) {
             {/* Trigger / Input */}
             <div
                 className={cn(
-                    'flex w-full items-center gap-1 rounded-lg border border-input bg-transparent text-sm transition-colors',
+                    'flex w-fit items-center gap-1 rounded-lg border border-input bg-transparent text-sm transition-colors',
                     'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50',
                     'hover:border-ring/50 hover:bg-muted/30',
                     disabled && 'pointer-events-none opacity-50',
@@ -333,7 +306,7 @@ function MultiCombobox(props: MultiComboboxProps) {
             <ul
                 {...getMenuProps()}
                 className={cn(
-                    'hide-scrollbar absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10',
+                    'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10',
                     !isOpen && 'hidden',
                 )}
                 style={
@@ -365,15 +338,12 @@ function MultiCombobox(props: MultiComboboxProps) {
                                         'relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none transition-colors duration-150',
                                         'data-highlighted:bg-accent data-highlighted:text-accent-foreground',
                                         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                                        option.isGroupHeader
-                                            && 'pointer-events-none px-1.5 pt-2 pb-0.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground',
                                         option.disabled
-                                            && !option.isGroupHeader
-                                            && 'pointer-events-none opacity-40',
+                                            && 'pointer-events-none opacity-40 line-through',
                                     )}
                                 >
                                     {option.label}
-                                    {selected && !option.isGroupHeader && (
+                                    {selected && (
                                         <span className='pointer-events-none absolute right-2 flex size-4 items-center justify-center'>
                                             <CheckIcon className='size-4' />
                                         </span>
