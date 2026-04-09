@@ -17,7 +17,7 @@
         "lint": "eslint src/",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
-        "sync:style": "pnpm dlx shadcn@latest add @perimeter/avatar @perimeter/badge @perimeter/button @perimeter/calendar @perimeter/card @perimeter/checkbox @perimeter/command @perimeter/empty @perimeter/input @perimeter/input-group @perimeter/label @perimeter/pagination @perimeter/progress @perimeter/radio-group @perimeter/scroll-area @perimeter/separator @perimeter/skeleton @perimeter/spinner @perimeter/switch @perimeter/tabs @perimeter/textarea && node scripts/post-sync.mjs",
+        "sync:style": "node scripts/sync-components.mjs",
         "sync:tokens": "node scripts/sync-tokens.mjs"
     },
     "dependencies": {
@@ -31,6 +31,7 @@
         "framer-motion": "^12.38.0",
         "lucide-react": "^0.577.0",
         "openapi-fetch": "^0.13.8",
+        "radix-ui": "^1.4.3",
         "react": "^19",
         "react-day-picker": "^9.14.0",
         "react-dom": "^19",
