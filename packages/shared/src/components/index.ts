@@ -36,5 +36,15 @@ export * from './ui/perimeter/tooltip';
 export { cn } from '../lib/utils';
 
 export * from './ui/perimeter/icon-select';
-export * from './ui/perimeter/multi-combobox';
 export * from './ui/perimeter/sort-select';
+
+// Portal-aware wrappers — override the base Content/MultiCombobox exports
+// with versions that auto-inject the shadow DOM portal container.
+export {
+    DialogContent,
+    ComboboxContent,
+    SelectContent,
+    DropdownMenuContent,
+    TooltipContent,
+    MultiCombobox,
+} from './ui/perimeter/portal-wrappers';
