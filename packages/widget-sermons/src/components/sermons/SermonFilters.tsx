@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
@@ -61,6 +61,9 @@ export function SermonFilters(props: SermonFiltersProps) {
     // Ref to track pending from value so onToChange doesn't use stale props
     // (DateRangePicker calls onFromChange then onToChange synchronously)
     const pendingFrom = useRef(props.from);
+
+    // Only one filter dropdown open at a time
+    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
         value: String(s.id),
         label: s.displayTitle ?? s.title,
@@ -133,6 +136,10 @@ export function SermonFilters(props: SermonFiltersProps) {
                             disabled={props.seriesLoading}
                             className='flex-1'
                             multiple
+                            isOpen={openDropdown === 'series'}
+                            onOpenChange={(open) =>
+                                setOpenDropdown(open ? 'series' : null)
+                            }
                         />
                     )}
                     {!props.lockedFilters.has('speaker') && (
@@ -147,6 +154,10 @@ export function SermonFilters(props: SermonFiltersProps) {
                             disabled={props.speakersLoading}
                             className='flex-1'
                             multiple
+                            isOpen={openDropdown === 'speaker'}
+                            onOpenChange={(open) =>
+                                setOpenDropdown(open ? 'speaker' : null)
+                            }
                         />
                     )}
                     {!props.lockedFilters.has('book') && (
@@ -168,6 +179,10 @@ export function SermonFilters(props: SermonFiltersProps) {
                             disabled={props.booksLoading}
                             className='flex-1'
                             multiple
+                            isOpen={openDropdown === 'book'}
+                            onOpenChange={(open) =>
+                                setOpenDropdown(open ? 'book' : null)
+                            }
                         />
                     )}
                     {props.showServiceTypeFilter && (
@@ -182,6 +197,10 @@ export function SermonFilters(props: SermonFiltersProps) {
                             disabled={props.serviceTypesLoading}
                             className='flex-1'
                             multiple
+                            isOpen={openDropdown === 'serviceType'}
+                            onOpenChange={(open) =>
+                                setOpenDropdown(open ? 'serviceType' : null)
+                            }
                         />
                     )}
                     {props.showSeriesTypeFilter && (
@@ -196,6 +215,10 @@ export function SermonFilters(props: SermonFiltersProps) {
                             disabled={props.seriesTypesLoading}
                             className='flex-1'
                             multiple
+                            isOpen={openDropdown === 'seriesType'}
+                            onOpenChange={(open) =>
+                                setOpenDropdown(open ? 'seriesType' : null)
+                            }
                         />
                     )}
                 </div>
