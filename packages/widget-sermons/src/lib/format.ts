@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+import { resolveApiBaseUrl } from '@perimeter-widgets/shared';
 
 export function formatDate(iso: string): string {
     return DateTime.fromISO(iso).toLocaleString(DateTime.DATE_MED);
@@ -13,12 +14,20 @@ export function proxyS3Url(url: string): string {
     return url;
 }
 
-export function sermonImageUrl(sermonId: number): string {
-    return `/api/sermons/sermon/${sermonId}/image`;
+/**
+ * Build a sermon image URL. Pass `apiBaseUrl` (from widget config) so the
+ * `<img>` tag resolves against the API origin rather than the host page's
+ * origin — otherwise an embed on example.com would request
+ * example.com/api/sermons/... and 404. When `apiBaseUrl` is omitted the
+ * shared resolver falls back to localhost in dev / api.perimeter.org in
+ * production.
+ */
+export function sermonImageUrl(sermonId: number, apiBaseUrl?: string): string {
+    return `${resolveApiBaseUrl(apiBaseUrl)}/api/sermons/sermon/${sermonId}/image`;
 }
 
-export function seriesImageUrl(seriesId: number): string {
-    return `/api/sermons/series/${seriesId}/image`;
+export function seriesImageUrl(seriesId: number, apiBaseUrl?: string): string {
+    return `${resolveApiBaseUrl(apiBaseUrl)}/api/sermons/series/${seriesId}/image`;
 }
 
 export function formatTime(seconds: number): string {

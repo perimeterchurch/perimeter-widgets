@@ -17,6 +17,10 @@ const DEV_BASE_URL = '';
  * 2. VITE_API_URL environment variable
  * 3. localhost:5500 in development, api.perimeter.org in production
  */
+export function resolveApiBaseUrl(baseUrl?: string): string {
+    return resolveBaseUrl(baseUrl);
+}
+
 function resolveBaseUrl(baseUrl?: string): string {
     if (baseUrl) return baseUrl;
 

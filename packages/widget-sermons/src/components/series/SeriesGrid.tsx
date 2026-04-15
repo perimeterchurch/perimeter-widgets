@@ -1,5 +1,6 @@
 import { Calendar, Layers, BookOpen } from 'lucide-react';
-import type { SeriesListItem } from '../../types';
+import { useConfig } from '@perimeter-widgets/shared';
+import type { SeriesListItem, SermonsConfig } from '../../types';
 import { formatDate, seriesImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
 
@@ -43,6 +44,7 @@ export function SeriesGrid({
     viewMode = 'grid',
     onSeriesClick,
 }: SeriesGridProps) {
+    const config = useConfig<SermonsConfig>();
     if (series.length === 0) {
         return (
             <div className='py-12 text-center text-muted-foreground'>
@@ -62,7 +64,7 @@ export function SeriesGrid({
                 <MediaCard
                     key={s.id}
                     viewMode={viewMode}
-                    imageUrl={seriesImageUrl(s.id)}
+                    imageUrl={seriesImageUrl(s.id, config.apiUrl)}
                     imageAlt={s.displayTitle ?? s.title}
                     title={s.displayTitle ?? s.title}
                     description={s.subtitle}

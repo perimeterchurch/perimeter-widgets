@@ -10,6 +10,7 @@
  */
 import type { ComponentProps } from 'react';
 import { usePortalContainer } from '../../../shadow-dom/portal-container';
+import { useShadowEnvironment } from '../../../shadow-dom/shadow-environment';
 
 import { DialogContent as BaseDialogContent } from './dialog';
 import { ComboboxContent as BaseComboboxContent } from './combobox';
@@ -49,7 +50,8 @@ function TooltipContent(props: ComponentProps<typeof BaseTooltipContent>) {
 }
 
 function MultiCombobox(props: MultiComboboxProps) {
-    return <BaseMultiCombobox {...props} />;
+    const environment = useShadowEnvironment();
+    return <BaseMultiCombobox environment={environment} {...props} />;
 }
 
 export {

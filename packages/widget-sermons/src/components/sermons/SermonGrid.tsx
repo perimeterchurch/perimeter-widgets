@@ -1,4 +1,5 @@
-import type { SermonListViewProps } from '../../types';
+import { useConfig } from '@perimeter-widgets/shared';
+import type { SermonListViewProps, SermonsConfig } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
 import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
@@ -6,6 +7,7 @@ import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 export type { SermonListViewProps };
 
 export function SermonGrid({ sermons, onSermonClick }: SermonListViewProps) {
+    const config = useConfig<SermonsConfig>();
     if (sermons.length === 0) {
         return (
             <div className='py-12 text-center text-muted-foreground'>
@@ -20,7 +22,10 @@ export function SermonGrid({ sermons, onSermonClick }: SermonListViewProps) {
                 <MediaCard
                     key={sermon.id}
                     viewMode='grid'
-                    imageUrl={sermon.bannerUrl ?? sermonImageUrl(sermon.id)}
+                    imageUrl={
+                        sermon.bannerUrl
+                        ?? sermonImageUrl(sermon.id, config.apiUrl)
+                    }
                     imageAlt={sermon.title}
                     title={sermon.title}
                     description={sermon.shortDescription}

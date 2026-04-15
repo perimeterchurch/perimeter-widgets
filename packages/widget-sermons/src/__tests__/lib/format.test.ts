@@ -18,23 +18,43 @@ describe('formatDate', () => {
 });
 
 describe('sermonImageUrl', () => {
-    it('returns correct path with sermon prefix', () => {
-        expect(sermonImageUrl(42)).toBe('/api/sermons/sermon/42/image');
+    it('prepends an explicit base URL when provided', () => {
+        expect(sermonImageUrl(42, 'https://api.example.com')).toBe(
+            'https://api.example.com/api/sermons/sermon/42/image',
+        );
     });
 
     it('handles different sermon IDs', () => {
-        expect(sermonImageUrl(1)).toBe('/api/sermons/sermon/1/image');
-        expect(sermonImageUrl(9999)).toBe('/api/sermons/sermon/9999/image');
+        expect(sermonImageUrl(1, 'https://api.example.com')).toBe(
+            'https://api.example.com/api/sermons/sermon/1/image',
+        );
+        expect(sermonImageUrl(9999, 'https://api.example.com')).toBe(
+            'https://api.example.com/api/sermons/sermon/9999/image',
+        );
+    });
+
+    it('falls back to resolveApiBaseUrl when no base URL is passed', () => {
+        // Vitest sets import.meta.env.DEV = true and no VITE_API_URL,
+        // so resolveApiBaseUrl returns DEV_BASE_URL = '' in dev.
+        expect(sermonImageUrl(42)).toBe('/api/sermons/sermon/42/image');
     });
 });
 
 describe('seriesImageUrl', () => {
-    it('returns correct path', () => {
-        expect(seriesImageUrl(7)).toBe('/api/sermons/series/7/image');
+    it('prepends an explicit base URL when provided', () => {
+        expect(seriesImageUrl(7, 'https://api.example.com')).toBe(
+            'https://api.example.com/api/sermons/series/7/image',
+        );
     });
 
     it('handles different series IDs', () => {
-        expect(seriesImageUrl(100)).toBe('/api/sermons/series/100/image');
+        expect(seriesImageUrl(100, 'https://api.example.com')).toBe(
+            'https://api.example.com/api/sermons/series/100/image',
+        );
+    });
+
+    it('falls back to resolveApiBaseUrl when no base URL is passed', () => {
+        expect(seriesImageUrl(7)).toBe('/api/sermons/series/7/image');
     });
 });
 
