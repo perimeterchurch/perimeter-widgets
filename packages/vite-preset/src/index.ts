@@ -48,7 +48,7 @@ export function createWidgetTestConfig(): VitestUserConfig {
         test: {
             environment: 'jsdom',
             globals: true,
-            setupFiles: [resolve(import.meta.dirname, 'test-setup.ts')],
+            setupFiles: [resolve(import.meta.dirname, 'test-setup.js')],
             css: false,
         },
     };
