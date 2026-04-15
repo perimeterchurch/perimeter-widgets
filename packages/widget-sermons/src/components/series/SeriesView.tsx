@@ -30,6 +30,7 @@ import {
     Rows3,
 } from 'lucide-react';
 import type { SermonsConfig } from '../../types';
+import { applyWidgetDefaults } from '../../types';
 import { useSeries } from '../../hooks/use-series';
 import { useSeriesTypes } from '../../hooks/use-series-types';
 import { DateRangePicker } from '../ui/DateRangePicker';
@@ -81,13 +82,20 @@ const VIEW_OPTIONS = [
     },
 ];
 
-export function SeriesView({ config, filters }: SeriesViewProps) {
+export function SeriesView({ config: rawConfig, filters }: SeriesViewProps) {
+    const config = applyWidgetDefaults(rawConfig);
     const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
     const display = config.display ?? 'full';
     const showSearch = display === 'full';
     const showSortView = display !== 'headless';
+    // Series-type dropdown is opt-in via showSeriesType. The default
+    // seriesTypeId="1" (Sunday Morning Sermon) from applyWidgetDefaults
+    // also keeps it hidden by setting the value (which the user can't
+    // change without enabling the dropdown).
     const showSeriesTypeFilter =
-        display === 'full' && !config.seriesTypeId && !config.hideSeriesType;
+        display === 'full'
+        && config.showSeriesType === true
+        && !config.seriesTypeId;
 
     const { data: seriesTypes = [], isLoading: seriesTypesLoading } =
         useSeriesTypes(config);

@@ -30,6 +30,14 @@ export const SermonsConfigSchema = z
         hideDate: z.coerce.boolean().optional(),
         hideSearch: z.coerce.boolean().optional(),
         hidePagination: z.coerce.boolean().optional(),
+        // Opt-in to show service-type / series-type dropdowns. Both default
+        // to hidden because the embedded sermons widget is generally for
+        // end-user consumption of one cohort (Sunday Morning), not internal
+        // exploration. When showSeriesType is omitted the effective filter
+        // pins to "Sunday Morning Sermon" (id=1) — see SermonsView /
+        // SeriesView.
+        showServiceType: z.coerce.boolean().optional(),
+        showSeriesType: z.coerce.boolean().optional(),
         from: z
             .string()
             .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
@@ -56,6 +64,27 @@ export const SermonsConfigSchema = z
                 'Sermon-only filters (seriesId, speakerId, bookId, serviceTypeId, from, to) cannot be used with tab="series"',
         },
     );
+
+/**
+ * Default series-type ID applied when the embedder hasn't pinned a series
+ * type AND hasn't opted into the dropdown. Matches "Sunday Morning Sermon"
+ * in MP — the primary use case for the embedded widget.
+ */
+export const DEFAULT_SERIES_TYPE_ID = '1';
+
+/**
+ * Returns a copy of the config with widget-side defaults applied:
+ * - `seriesTypeId` defaults to "Sunday Morning Sermon" (id=1) when no
+ *   explicit value is set AND the dropdown isn't opted-in via
+ *   `showSeriesType`.
+ *
+ * Both Sermons and Series tabs run config through this helper before
+ * passing to hooks/children, so the default applies uniformly.
+ */
+export function applyWidgetDefaults(config: SermonsConfig): SermonsConfig {
+    if (config.seriesTypeId || config.showSeriesType === true) return config;
+    return { ...config, seriesTypeId: DEFAULT_SERIES_TYPE_ID };
+}
 
 export type SermonsConfig = z.infer<typeof SermonsConfigSchema>;
 

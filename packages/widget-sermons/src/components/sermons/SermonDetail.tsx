@@ -170,7 +170,10 @@ export function SermonDetail({
                                             viewMode='list'
                                             imageUrl={
                                                 s.bannerUrl
-                                                ?? sermonImageUrl(s.id)
+                                                ?? sermonImageUrl(
+                                                    s.id,
+                                                    config.apiUrl,
+                                                )
                                             }
                                             imageAlt={s.title}
                                             title={s.title}
