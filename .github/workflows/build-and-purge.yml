@@ -7,6 +7,9 @@ on:
 jobs:
     build-and-purge:
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            packages: read
         steps:
             - uses: actions/checkout@v4
 
@@ -16,9 +19,13 @@ jobs:
               with:
                   node-version: '20'
                   cache: 'pnpm'
+                  registry-url: 'https://npm.pkg.github.com'
+                  scope: '@perimeterchurch'
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Run quality checks
               run: pnpm quality
