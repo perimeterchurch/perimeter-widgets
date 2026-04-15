@@ -33,7 +33,11 @@ export function DataSourceToggle() {
                 className={`inline-block size-2 rounded-full ${useMocks ? 'bg-amber-500' : 'bg-green-500'}`}
             />
             <span>
-                {switching ? 'Switching...' : useMocks ? 'Mock Data' : 'Live API'}
+                {switching ?
+                    'Switching...'
+                : useMocks ?
+                    'Mock Data'
+                :   'Live API'}
             </span>
         </button>
     );

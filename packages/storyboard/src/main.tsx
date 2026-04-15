@@ -7,9 +7,8 @@ async function bootstrap() {
     // Start MSW if mocks are enabled (persisted toggle state)
     // Skip entirely if VITE_API_MODE=local (env override)
     if (import.meta.env.DEV && import.meta.env.VITE_API_MODE !== 'local') {
-        const { shouldUseMocks, initMockWorker } = await import(
-            '@/mocks/worker'
-        );
+        const { shouldUseMocks, initMockWorker } =
+            await import('@/mocks/worker');
         if (shouldUseMocks()) {
             await initMockWorker();
         }

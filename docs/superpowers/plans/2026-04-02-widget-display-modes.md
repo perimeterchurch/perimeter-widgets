@@ -14,24 +14,25 @@
 
 ## File Map
 
-| File | Action | Responsibility |
-|------|--------|----------------|
-| `packages/widget-sermons/src/types.ts` | Modify | Expand `SermonsConfigSchema` with new fields + refine validation |
-| `packages/widget-sermons/src/hooks/use-sermon-filters.ts` | Modify | Accept config, override locked values, no-op locked setters |
-| `packages/widget-sermons/src/App.tsx` | Modify | Conditionally render tabs based on config |
-| `packages/widget-sermons/src/components/sermons/SermonsView.tsx` | Modify | Display mode chrome control, locked filter merge |
-| `packages/widget-sermons/src/components/series/SeriesView.tsx` | Modify | Display mode chrome control |
-| `packages/widget-sermons/src/components/sermons/SermonFilters.tsx` | Modify | Hide locked filter dropdowns/chips |
-| `packages/widget-sermons/src/components/sermons/SermonDetail.tsx` | Modify | Hide "More from series" in headless |
-| `packages/storyboard/src/registry.ts` | Modify | Add config fields for new params |
-| `packages/widget-sermons/src/__tests__/types.test.ts` | Modify | Test new config schema fields + validation |
-| `packages/widget-sermons/src/__tests__/use-sermon-filters.test.ts` | Create | Test locked value overrides and no-op setters |
+| File                                                               | Action | Responsibility                                                   |
+| ------------------------------------------------------------------ | ------ | ---------------------------------------------------------------- |
+| `packages/widget-sermons/src/types.ts`                             | Modify | Expand `SermonsConfigSchema` with new fields + refine validation |
+| `packages/widget-sermons/src/hooks/use-sermon-filters.ts`          | Modify | Accept config, override locked values, no-op locked setters      |
+| `packages/widget-sermons/src/App.tsx`                              | Modify | Conditionally render tabs based on config                        |
+| `packages/widget-sermons/src/components/sermons/SermonsView.tsx`   | Modify | Display mode chrome control, locked filter merge                 |
+| `packages/widget-sermons/src/components/series/SeriesView.tsx`     | Modify | Display mode chrome control                                      |
+| `packages/widget-sermons/src/components/sermons/SermonFilters.tsx` | Modify | Hide locked filter dropdowns/chips                               |
+| `packages/widget-sermons/src/components/sermons/SermonDetail.tsx`  | Modify | Hide "More from series" in headless                              |
+| `packages/storyboard/src/registry.ts`                              | Modify | Add config fields for new params                                 |
+| `packages/widget-sermons/src/__tests__/types.test.ts`              | Modify | Test new config schema fields + validation                       |
+| `packages/widget-sermons/src/__tests__/use-sermon-filters.test.ts` | Create | Test locked value overrides and no-op setters                    |
 
 ---
 
 ## Task 1: Expand SermonsConfigSchema
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/types.ts:8-14`
 - Modify: `packages/widget-sermons/src/__tests__/types.test.ts`
 
@@ -82,7 +83,10 @@ describe('SermonsConfigSchema — display modes', () => {
     });
 
     it('allows sermon-only filters when tab is sermons', () => {
-        const result = SermonsConfigSchema.parse({ tab: 'sermons', speakerId: 7 });
+        const result = SermonsConfigSchema.parse({
+            tab: 'sermons',
+            speakerId: 7,
+        });
         expect(result.speakerId).toBe(7);
     });
 
@@ -138,12 +142,12 @@ export const SermonsConfigSchema = z
         (c) => {
             if (c.tab !== 'series') return true;
             return (
-                !c.seriesId &&
-                !c.speakerId &&
-                !c.bookId &&
-                !c.serviceTypeId &&
-                !c.from &&
-                !c.to
+                !c.seriesId
+                && !c.speakerId
+                && !c.bookId
+                && !c.serviceTypeId
+                && !c.from
+                && !c.to
             );
         },
         {
@@ -170,6 +174,7 @@ git commit -m "feat: expand SermonsConfigSchema with display modes and locked fi
 ## Task 2: Update useSermonFilters for locked values
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/hooks/use-sermon-filters.ts`
 - Create: `packages/widget-sermons/src/__tests__/use-sermon-filters.test.ts`
 
@@ -267,6 +272,7 @@ Update `packages/widget-sermons/src/hooks/use-sermon-filters.ts`:
 The hook signature changes from `useSermonFilters()` to `useSermonFilters(config: SermonsConfig)`. It always registers all nuqs params but overrides return values and setters for locked params.
 
 Key changes:
+
 - Accept `config` parameter
 - Build `tab` parser with `.withDefault(config.defaultTab)` for dynamic default
 - After `useQueryStates`, override return values: e.g., `const tab = config.tab ?? params.tab`
@@ -278,10 +284,13 @@ Key changes:
 - [ ] **Step 4: Update App.tsx to pass config to useSermonFilters**
 
 In `packages/widget-sermons/src/App.tsx`, change:
+
 ```typescript
 const filters = useSermonFilters();
 ```
+
 to:
+
 ```typescript
 const filters = useSermonFilters(config);
 ```
@@ -308,6 +317,7 @@ git commit -m "feat: useSermonFilters supports locked config values"
 ## Task 3: Tab locking and display modes in App.tsx
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/App.tsx`
 
 - [ ] **Step 1: Implement conditional tab rendering**
@@ -357,6 +367,7 @@ git commit -m "feat: conditional tab rendering based on config.tab and config.di
 ## Task 4: Display modes in SermonsView
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/components/sermons/SermonsView.tsx`
 - Modify: `packages/widget-sermons/src/components/sermons/SermonFilters.tsx`
 
@@ -395,10 +406,11 @@ Update the service type resolution logic to implement the priority:
 
 ```typescript
 const resolvedServiceTypeId =
-    config.serviceTypeId ??
-    (filters.selectedServiceTypeIds.length > 0
-        ? filters.selectedServiceTypeIds.join(',')
-        : resolveServiceTypeIds(config.serviceTypes, serviceTypes) ?? undefined);
+    config.serviceTypeId
+    ?? (filters.selectedServiceTypeIds.length > 0 ?
+        filters.selectedServiceTypeIds.join(',')
+    :   (resolveServiceTypeIds(config.serviceTypes, serviceTypes)
+        ?? undefined));
 ```
 
 Remove the existing `configServiceTypeIds` and `resolvedServiceTypeId` logic in `useSermons` call and pass `serviceTypeId: resolvedServiceTypeId` directly.
@@ -430,12 +442,14 @@ git commit -m "feat: display modes and locked filters in SermonsView"
 ## Task 5: Display modes in SeriesView and SermonDetail
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/components/series/SeriesView.tsx`
 - Modify: `packages/widget-sermons/src/components/sermons/SermonDetail.tsx`
 
 - [ ] **Step 1: Add display mode logic to SeriesView**
 
 Read `config.display` and conditionally render:
+
 - `full`: show search, date range, sort, view (current)
 - `compact`: hide search and date range (InputGroup, DateRangePicker, Clear All)
 - `headless`: hide all controls except grid and pagination
@@ -478,6 +492,7 @@ git commit -m "feat: display modes in SeriesView and SermonDetail"
 ## Task 6: Storyboard registry and build
 
 **Files:**
+
 - Modify: `packages/storyboard/src/registry.ts`
 
 - [ ] **Step 1: Add config fields to storyboard registry**

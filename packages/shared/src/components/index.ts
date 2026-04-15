@@ -38,6 +38,13 @@ export { cn } from '../lib/utils';
 export * from './ui/perimeter/icon-select';
 export * from './ui/perimeter/sort-select';
 
+// Re-export MultiCombobox types (the component itself is re-exported below
+// via portal-wrappers).
+export type {
+    MultiComboboxOption,
+    MultiComboboxProps,
+} from './ui/perimeter/multi-combobox';
+
 // Portal-aware wrappers — override the base Content/MultiCombobox exports
 // with versions that auto-inject the shadow DOM portal container.
 export {

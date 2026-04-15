@@ -28,7 +28,9 @@ async function main() {
     console.log(`Fetching theme from ${THEME_URL}...`);
     const response = await fetch(THEME_URL);
     if (!response.ok) {
-        throw new Error(`Failed to fetch theme: ${response.status} ${response.statusText}`);
+        throw new Error(
+            `Failed to fetch theme: ${response.status} ${response.statusText}`,
+        );
     }
 
     const themeData = await response.json();

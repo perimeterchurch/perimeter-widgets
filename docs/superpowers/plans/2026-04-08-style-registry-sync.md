@@ -14,16 +14,16 @@
 
 ## File Map
 
-| Action | File | Responsibility |
-|--------|------|---------------|
-| Create | `packages/shared/components.json` | shadcn consumer config pointing to style registry |
-| Create | `packages/shared/scripts/post-sync.mjs` | Rewrite `@/` imports to relative paths after shadcn pull |
-| Create | `packages/shared/scripts/sync-tokens.mjs` | Fetch theme JSON, generate CSS token vars with shadow DOM selectors |
-| Modify | `packages/shared/package.json` | Add `sync:style` and `sync:tokens` scripts |
-| Modify | `package.json` (root) | Add root `sync:style` and `sync:tokens` pass-throughs |
-| Modify | `packages/shared/src/styles/base.css` | Add sync markers around token section |
-| Modify | `packages/shared/src/components/index.ts` | Update `input-group` export path if needed after sync |
-| Delete+Recreate | 21 files in `packages/shared/src/components/ui/perimeter/` | Replaced by registry-pulled versions |
+| Action          | File                                                       | Responsibility                                                      |
+| --------------- | ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| Create          | `packages/shared/components.json`                          | shadcn consumer config pointing to style registry                   |
+| Create          | `packages/shared/scripts/post-sync.mjs`                    | Rewrite `@/` imports to relative paths after shadcn pull            |
+| Create          | `packages/shared/scripts/sync-tokens.mjs`                  | Fetch theme JSON, generate CSS token vars with shadow DOM selectors |
+| Modify          | `packages/shared/package.json`                             | Add `sync:style` and `sync:tokens` scripts                          |
+| Modify          | `package.json` (root)                                      | Add root `sync:style` and `sync:tokens` pass-throughs               |
+| Modify          | `packages/shared/src/styles/base.css`                      | Add sync markers around token section                               |
+| Modify          | `packages/shared/src/components/index.ts`                  | Update `input-group` export path if needed after sync               |
+| Delete+Recreate | 21 files in `packages/shared/src/components/ui/perimeter/` | Replaced by registry-pulled versions                                |
 
 ---
 
@@ -32,6 +32,7 @@
 ### Task 1: Add components.json
 
 **Files:**
+
 - Create: `packages/shared/components.json`
 
 - [ ] **Step 1: Create the shadcn consumer config**
@@ -40,21 +41,21 @@ Create `packages/shared/components.json`:
 
 ```json
 {
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "base-nova",
-  "tsx": true,
-  "tailwind": {
-    "config": "",
-    "css": "src/styles/base.css",
-    "cssVariables": true
-  },
-  "aliases": {
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui"
-  },
-  "registries": {
-    "@perimeter": "https://style.perimeter.org/r/{name}.json"
-  }
+    "$schema": "https://ui.shadcn.com/schema.json",
+    "style": "base-nova",
+    "tsx": true,
+    "tailwind": {
+        "config": "",
+        "css": "src/styles/base.css",
+        "cssVariables": true
+    },
+    "aliases": {
+        "utils": "@/lib/utils",
+        "ui": "@/components/ui"
+    },
+    "registries": {
+        "@perimeter": "https://style.perimeter.org/r/{name}.json"
+    }
 }
 ```
 
@@ -71,6 +72,7 @@ git commit -m "chore: add shadcn components.json for style registry consumption"
 ### Task 2: Create post-sync import rewriter
 
 **Files:**
+
 - Create: `packages/shared/scripts/post-sync.mjs`
 
 The shadcn CLI writes components with `@/` path aliases (e.g., `@/lib/utils`, `@/components/ui/perimeter/button`). The shared package uses relative imports because it's consumed cross-package. This script rewrites all `@/` imports to relative paths after every sync.
@@ -197,6 +199,7 @@ git commit -m "feat: add post-sync script to rewrite @/ imports to relative path
 ### Task 3: Create token sync script
 
 **Files:**
+
 - Create: `packages/shared/scripts/sync-tokens.mjs`
 - Modify: `packages/shared/src/styles/base.css` (add markers)
 
@@ -258,7 +261,9 @@ async function main() {
     console.log(`Fetching theme from ${THEME_URL}...`);
     const response = await fetch(THEME_URL);
     if (!response.ok) {
-        throw new Error(`Failed to fetch theme: ${response.status} ${response.statusText}`);
+        throw new Error(
+            `Failed to fetch theme: ${response.status} ${response.statusText}`,
+        );
     }
 
     const themeData = await response.json();
@@ -329,6 +334,7 @@ git commit -m "feat: add token sync script with marker-based CSS replacement"
 ### Task 4: Add sync scripts to package.json
 
 **Files:**
+
 - Modify: `packages/shared/package.json`
 - Modify: `package.json` (root)
 
@@ -365,6 +371,7 @@ git commit -m "chore: add sync:style and sync:tokens scripts"
 ### Task 5: Delete synced components and pull from registry
 
 **Files:**
+
 - Delete: 21 files in `packages/shared/src/components/ui/perimeter/` (synced components only)
 - Recreate: Same 21 files via shadcn CLI from registry
 - Modify: Import paths rewritten by post-sync script
@@ -385,6 +392,7 @@ switch.tsx, tabs.tsx, textarea.tsx
 Also delete `packages/shared/src/components/ui/input-group.tsx` — the registry version will be pulled into `ui/perimeter/input-group.tsx` by the CLI (since the `ui` alias maps to `@/components/ui` and registry files are at `registry/ui/perimeter/`).
 
 After sync, update `packages/shared/src/components/index.ts` line 2:
+
 ```typescript
 // Before
 export * from './ui/input-group';
@@ -401,6 +409,7 @@ Run: `cd /Users/parkerb/dev/perimeter/claude/perimeter-widgets/packages/shared &
 This runs the shadcn CLI to pull all 21 components from the style registry, then runs `post-sync.mjs` to rewrite `@/` imports to relative paths.
 
 Watch the output for:
+
 - Which files were created/overwritten
 - Any errors from the CLI (missing dependencies, auth issues)
 - The post-sync import rewrite log
@@ -450,6 +459,7 @@ git commit -m "refactor: replace hand-copied components with registry-synced ver
 ### Task 6: Sync tokens from registry
 
 **Files:**
+
 - Modify: `packages/shared/src/styles/base.css` (token section replaced)
 
 - [ ] **Step 1: Run the token sync**
@@ -457,6 +467,7 @@ git commit -m "refactor: replace hand-copied components with registry-synced ver
 Run: `cd /Users/parkerb/dev/perimeter/claude/perimeter-widgets/packages/shared && pnpm sync:tokens`
 
 Expected output:
+
 ```
 Fetching theme from https://style.perimeter.org/r/default-theme.json...
   Light tokens: 39
@@ -467,6 +478,7 @@ Token sync complete. Updated base.css.
 - [ ] **Step 2: Verify base.css structure is intact**
 
 Read `packages/shared/src/styles/base.css` and verify:
+
 - Lines before `@sync:tokens-start` marker: Tailwind import, `@custom-variant dark`, `:host` reset, `.storybook-root`, box-sizing, button cursor, shimmer animation, scrollbar utility — all untouched
 - Between markers: Fresh token values from style registry with `:root, :host` and `.dark, :host([data-theme="dark"])` selectors
 - Lines after `@sync:tokens-end` marker: `@theme inline` block — untouched
@@ -494,6 +506,7 @@ git commit -m "refactor: sync design tokens from style registry"
 ### Task 7: Final verification and docs update
 
 **Files:**
+
 - Modify: `docs/architecture/shared-package.md` (add sync workflow section)
 
 - [ ] **Step 1: Run the storyboard**
@@ -506,7 +519,7 @@ Manually verify in the browser that the sermons widget renders correctly — com
 
 Add a new section to `docs/architecture/shared-package.md` before the "Related Docs" section:
 
-```markdown
+````markdown
 ---
 
 ## Style Registry Sync
@@ -518,6 +531,7 @@ Primitive UI components and design tokens are sourced from the style project's s
 ```bash
 pnpm sync:style
 ```
+````
 
 Pulls 21 primitive components from the style registry into `src/components/ui/perimeter/` and rewrites `@/` imports to relative paths. The 6 portal-aware components (dialog, combobox, select, dropdown-menu, tooltip, multi-combobox) are widget-owned and not synced.
 
@@ -537,7 +551,8 @@ Run both commands after the style project publishes updates:
 2. Run `pnpm sync:style && pnpm sync:tokens` in perimeter-widgets
 3. Verify: `pnpm quality` + visual check in storyboard
 4. Commit the synced files
-```
+
+````
 
 - [ ] **Step 3: Format and commit**
 
@@ -546,4 +561,4 @@ cd /Users/parkerb/dev/perimeter/claude/perimeter-widgets
 pnpm prettier --write docs/architecture/shared-package.md
 git add docs/architecture/shared-package.md
 git commit -m "docs: add style registry sync workflow to shared-package.md"
-```
+````

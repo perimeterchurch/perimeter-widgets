@@ -123,7 +123,7 @@
 }
 
 .dark,
-:host([data-theme="dark"]) {
+:host([data-theme='dark']) {
     --radius: 0.625rem;
     --background: oklch(0.147 0.012 50);
     --foreground: oklch(0.985 0.002 75);

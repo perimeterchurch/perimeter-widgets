@@ -12,12 +12,12 @@ A cross-project audit identified 4 remaining issues after the widgets hardening 
 
 ## Issues Addressed
 
-| # | Issue | Repo | Severity |
-|---|-------|------|----------|
-| 3 | Missing CORS headers for `/api/sermons/*` | perimeter-api | High |
-| 7 | No rate limiting on public sermons endpoints | perimeter-api | Medium |
-| 5 | Weak token validation (arbitrary 10-char minimum) | perimeter-widgets | Medium |
-| 4 | No proactive token expiry detection | perimeter-widgets | Medium |
+| #   | Issue                                             | Repo              | Severity |
+| --- | ------------------------------------------------- | ----------------- | -------- |
+| 3   | Missing CORS headers for `/api/sermons/*`         | perimeter-api     | High     |
+| 7   | No rate limiting on public sermons endpoints      | perimeter-api     | Medium   |
+| 5   | Weak token validation (arbitrary 10-char minimum) | perimeter-widgets | Medium   |
+| 4   | No proactive token expiry detection               | perimeter-widgets | Medium   |
 
 ---
 
@@ -60,20 +60,21 @@ Apply `withRateLimit(RateLimitPresets.relaxed)` (120 req/min per client IP) to a
 
 **Route files to update (all under `src/app/api/(public)/sermons/`):**
 
-| Route | File |
-|-------|------|
-| `GET /api/sermons` | `route.ts` |
-| `GET /api/sermons/books` | `books/route.ts` |
-| `GET /api/sermons/series` | `series/route.ts` |
-| `GET /api/sermons/series/:id` | `series/[id]/route.ts` |
+| Route                               | File                         |
+| ----------------------------------- | ---------------------------- |
+| `GET /api/sermons`                  | `route.ts`                   |
+| `GET /api/sermons/books`            | `books/route.ts`             |
+| `GET /api/sermons/series`           | `series/route.ts`            |
+| `GET /api/sermons/series/:id`       | `series/[id]/route.ts`       |
 | `GET /api/sermons/series/:id/image` | `series/[id]/image/route.ts` |
-| `GET /api/sermons/series-types` | `series-types/route.ts` |
-| `GET /api/sermons/speakers` | `speakers/route.ts` |
-| `GET /api/sermons/sermon/:id` | `sermon/[id]/route.ts` |
+| `GET /api/sermons/series-types`     | `series-types/route.ts`      |
+| `GET /api/sermons/speakers`         | `speakers/route.ts`          |
+| `GET /api/sermons/sermon/:id`       | `sermon/[id]/route.ts`       |
 | `GET /api/sermons/sermon/:id/image` | `sermon/[id]/image/route.ts` |
-| `GET /api/sermons/service-types` | `service-types/route.ts` |
+| `GET /api/sermons/service-types`    | `service-types/route.ts`     |
 
 **Pattern for non-parameterized routes** (e.g., `route.ts`, `books/route.ts`):
+
 ```typescript
 import { withRateLimit, RateLimitPresets } from '@lib/rate-limiting';
 
@@ -85,6 +86,7 @@ export const GET = wrapHandler(
 ```
 
 **Pattern for parameterized routes** (e.g., `sermon/[id]/route.ts`, `series/[id]/route.ts`) — these use `wrapHandler<RouteParams>` with a context argument:
+
 ```typescript
 import { withRateLimit, RateLimitPresets } from '@lib/rate-limiting';
 
@@ -110,6 +112,7 @@ The existing in-memory rate limiter uses per-endpoint per-IP keys and returns st
 Replace the arbitrary 10-character minimum with a JWT structure check. MP OAuth tokens are JWTs with three dot-separated segments.
 
 Add helper function:
+
 ```typescript
 function isJwtLike(value: string): boolean {
     const parts = value.split('.');
@@ -118,6 +121,7 @@ function isJwtLike(value: string): boolean {
 ```
 
 Change in `getMPToken()`:
+
 ```typescript
 // Before
 if (!token || token === 'null' || token.length < 10) {
@@ -134,6 +138,7 @@ This validates structure only — actual JWT verification is the API's responsib
 **File:** `packages/shared/src/auth/mp-token.tsx`
 
 **MPAuthState change:**
+
 ```typescript
 export interface MPAuthState {
     authenticated: boolean;
@@ -143,6 +148,7 @@ export interface MPAuthState {
 ```
 
 **getMPToken() change:** Replace the existing expiry block entirely with this logic that adds `expiringSoon` detection:
+
 ```typescript
 if (expiresAfter) {
     const expiresAt = new Date(expiresAfter);
@@ -158,6 +164,7 @@ return { authenticated: true, token };
 ```
 
 **AuthProvider change:** Add 60-second interval that calls `refresh()` when authenticated. This re-reads localStorage periodically so the widget detects:
+
 - WordPress silently renewing the token (picks up new token without page reload)
 - Token approaching expiry (`expiringSoon` propagates to consumers)
 
@@ -172,6 +179,7 @@ useEffect(() => {
 No UI changes — widgets can check `auth.expiringSoon` in the future to show a message. The plumbing is what matters now.
 
 **New tests:**
+
 - `getMPToken` returns `expiringSoon: true` when token expires within 5 minutes
 - `getMPToken` does NOT return `expiringSoon` when token expires in > 5 minutes
 - `isJwtLike` rejects non-JWT strings, accepts valid JWT structure

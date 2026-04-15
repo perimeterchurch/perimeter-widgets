@@ -16,26 +16,26 @@
 
 ### Chunk A (perimeter-api)
 
-| Action | File | Responsibility |
-|--------|------|---------------|
-| Modify | `next.config.mjs` | Add CORS headers for `/api/sermons/:path*` |
-| Modify | `src/app/api/(public)/sermons/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/books/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/series/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/series/[id]/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/series/[id]/image/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/series-types/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/speakers/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/sermon/[id]/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/sermon/[id]/image/route.ts` | Add rate limiting |
-| Modify | `src/app/api/(public)/sermons/service-types/route.ts` | Add rate limiting |
+| Action | File                                                      | Responsibility                             |
+| ------ | --------------------------------------------------------- | ------------------------------------------ |
+| Modify | `next.config.mjs`                                         | Add CORS headers for `/api/sermons/:path*` |
+| Modify | `src/app/api/(public)/sermons/route.ts`                   | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/books/route.ts`             | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/series/route.ts`            | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/series/[id]/route.ts`       | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/series/[id]/image/route.ts` | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/series-types/route.ts`      | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/speakers/route.ts`          | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/sermon/[id]/route.ts`       | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/sermon/[id]/image/route.ts` | Add rate limiting                          |
+| Modify | `src/app/api/(public)/sermons/service-types/route.ts`     | Add rate limiting                          |
 
 ### Chunk B (perimeter-widgets)
 
-| Action | File | Responsibility |
-|--------|------|---------------|
-| Modify | `packages/shared/src/auth/mp-token.tsx` | JWT validation, expiringSoon, refresh interval |
-| Modify | `packages/shared/src/auth/__tests__/mp-token.test.ts` | Updated + new tests |
+| Action | File                                                  | Responsibility                                 |
+| ------ | ----------------------------------------------------- | ---------------------------------------------- |
+| Modify | `packages/shared/src/auth/mp-token.tsx`               | JWT validation, expiringSoon, refresh interval |
+| Modify | `packages/shared/src/auth/__tests__/mp-token.test.ts` | Updated + new tests                            |
 
 ---
 
@@ -44,6 +44,7 @@
 ### Task 1: Add CORS headers for sermons
 
 **Files:**
+
 - Modify: `/Users/parkerb/dev/perimeter/claude/perimeter-api/next.config.mjs`
 
 - [ ] **Step 1: Add CORS entry to headers array**
@@ -91,6 +92,7 @@ git commit -m "fix: add CORS headers for /api/sermons endpoints"
 ### Task 2: Add rate limiting to sermons routes
 
 **Files (all under `src/app/api/(public)/sermons/` in perimeter-api):**
+
 - Modify: `route.ts`
 - Modify: `books/route.ts`
 - Modify: `series/route.ts`
@@ -109,40 +111,54 @@ There are two patterns based on whether the route has path parameters.
 For each of these 6 files, add the import and wrap the handler:
 
 **`route.ts`** — Add import, wrap existing handler:
+
 ```typescript
 import { withRateLimit, RateLimitPresets } from '@lib/rate-limiting';
 ```
+
 Change:
+
 ```typescript
 export const GET = wrapHandler(async (req) => {
 ```
+
 To:
+
 ```typescript
 export const GET = wrapHandler(
     withRateLimit(async (req) => {
 ```
+
 And close the `withRateLimit` call before the closing `);`:
+
 ```typescript
     }, RateLimitPresets.relaxed),
 );
 ```
 
 **`books/route.ts`** — Same pattern but handler takes no args:
+
 ```typescript
 import { withRateLimit, RateLimitPresets } from '@lib/rate-limiting';
 ```
+
 Change:
+
 ```typescript
 export const GET = wrapHandler(async () => {
 ```
+
 To:
+
 ```typescript
 export const GET = wrapHandler(
     withRateLimit(async () => {
 ```
+
 Close with `}, RateLimitPresets.relaxed),` before final `);`
 
 Apply the same pattern to:
+
 - **`series/route.ts`** — has `(req)` param, same as `route.ts`
 - **`series-types/route.ts`** — has `()` no params, same as `books/route.ts`
 - **`speakers/route.ts`** — has `()` no params, same as `books/route.ts`
@@ -153,21 +169,28 @@ Apply the same pattern to:
 For each of these 4 files, add the import and wrap the handler. These use `wrapHandler<RouteParams>` with a context argument.
 
 **`series/[id]/route.ts`** — Add import:
+
 ```typescript
 import { withRateLimit, RateLimitPresets } from '@lib/rate-limiting';
 ```
+
 Change:
+
 ```typescript
 export const GET = wrapHandler<RouteParams>(async (_req, { params }) => {
 ```
+
 To:
+
 ```typescript
 export const GET = wrapHandler<RouteParams>(
     withRateLimit(async (_req, { params }) => {
 ```
+
 Close with `}, RateLimitPresets.relaxed),` before final `);`
 
 Apply the same pattern to:
+
 - **`series/[id]/image/route.ts`** — same `wrapHandler<RouteParams>` pattern
 - **`sermon/[id]/route.ts`** — same pattern
 - **`sermon/[id]/image/route.ts`** — same pattern
@@ -197,6 +220,7 @@ git commit -m "feat: add rate limiting to all sermons endpoints"
 ### Task 3: JWT structure validation + updated tests
 
 **Files:**
+
 - Modify: `/Users/parkerb/dev/perimeter/claude/perimeter-widgets/packages/shared/src/auth/mp-token.tsx`
 - Modify: `/Users/parkerb/dev/perimeter/claude/perimeter-widgets/packages/shared/src/auth/__tests__/mp-token.test.ts`
 
@@ -216,10 +240,13 @@ function isJwtLike(value: string): boolean {
 ```
 
 Then in `getMPToken()`, replace line 29:
+
 ```typescript
         if (!token || token === 'null' || token.length < 10) {
 ```
+
 With:
+
 ```typescript
         if (!token || token === 'null' || !isJwtLike(token)) {
 ```
@@ -229,36 +256,43 @@ With:
 In `packages/shared/src/auth/__tests__/mp-token.test.ts`:
 
 Replace the test token string used across multiple tests. Change all occurrences of:
+
 ```typescript
-'a-valid-access-token-that-is-long-enough'
+'a-valid-access-token-that-is-long-enough';
 ```
+
 To:
+
 ```typescript
-'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature'
+'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
 ```
 
 Rename the "short token" test (around line 38):
+
 ```typescript
     it('returns authenticated: false for short token', () => {
         store['mpp-widgets_AuthToken'] = 'short';
 ```
+
 To:
+
 ```typescript
     it('returns authenticated: false for non-JWT token', () => {
         store['mpp-widgets_AuthToken'] = 'not-a-jwt-token';
 ```
 
 Add new test for `isJwtLike` behavior:
-```typescript
-    it('returns authenticated: false for token with wrong segment count', () => {
-        store['mpp-widgets_AuthToken'] = 'only.two-segments';
-        expect(getMPToken()).toEqual({ authenticated: false });
-    });
 
-    it('returns authenticated: false for token with empty segments', () => {
-        store['mpp-widgets_AuthToken'] = 'header..signature';
-        expect(getMPToken()).toEqual({ authenticated: false });
-    });
+```typescript
+it('returns authenticated: false for token with wrong segment count', () => {
+    store['mpp-widgets_AuthToken'] = 'only.two-segments';
+    expect(getMPToken()).toEqual({ authenticated: false });
+});
+
+it('returns authenticated: false for token with empty segments', () => {
+    store['mpp-widgets_AuthToken'] = 'header..signature';
+    expect(getMPToken()).toEqual({ authenticated: false });
+});
 ```
 
 - [ ] **Step 3: Run tests**
@@ -279,6 +313,7 @@ git commit -m "fix: replace length check with JWT structure validation in getMPT
 ### Task 4: Proactive expiry detection
 
 **Files:**
+
 - Modify: `/Users/parkerb/dev/perimeter/claude/perimeter-widgets/packages/shared/src/auth/mp-token.tsx`
 - Modify: `/Users/parkerb/dev/perimeter/claude/perimeter-widgets/packages/shared/src/auth/__tests__/mp-token.test.ts`
 
@@ -297,28 +332,30 @@ export interface MPAuthState {
 - [ ] **Step 2: Update getMPToken() expiry logic**
 
 Replace the existing expiry block in `getMPToken()`:
-```typescript
-        if (expiresAfter && new Date(expiresAfter) < new Date()) {
-            return { authenticated: false };
-        }
 
-        return { authenticated: true, token };
+```typescript
+if (expiresAfter && new Date(expiresAfter) < new Date()) {
+    return { authenticated: false };
+}
+
+return { authenticated: true, token };
 ```
 
 With:
-```typescript
-        if (expiresAfter) {
-            const expiresAt = new Date(expiresAfter);
-            if (expiresAt < new Date()) {
-                return { authenticated: false };
-            }
-            const fiveMinutes = 5 * 60 * 1000;
-            if (expiresAt.getTime() - Date.now() < fiveMinutes) {
-                return { authenticated: true, token, expiringSoon: true };
-            }
-        }
 
-        return { authenticated: true, token };
+```typescript
+if (expiresAfter) {
+    const expiresAt = new Date(expiresAfter);
+    if (expiresAt < new Date()) {
+        return { authenticated: false };
+    }
+    const fiveMinutes = 5 * 60 * 1000;
+    if (expiresAt.getTime() - Date.now() < fiveMinutes) {
+        return { authenticated: true, token, expiringSoon: true };
+    }
+}
+
+return { authenticated: true, token };
 ```
 
 - [ ] **Step 3: Add refresh interval to AuthProvider**
@@ -326,12 +363,12 @@ With:
 In the `AuthProvider` component, add a new `useEffect` after the existing storage event listener (after line 82):
 
 ```typescript
-    // Periodically re-read token to detect expiry or silent renewal
-    useEffect(() => {
-        if (!requiresAuth || !authState.authenticated) return;
-        const interval = setInterval(refresh, 60_000);
-        return () => clearInterval(interval);
-    }, [requiresAuth, authState.authenticated, refresh]);
+// Periodically re-read token to detect expiry or silent renewal
+useEffect(() => {
+    if (!requiresAuth || !authState.authenticated) return;
+    const interval = setInterval(refresh, 60_000);
+    return () => clearInterval(interval);
+}, [requiresAuth, authState.authenticated, refresh]);
 ```
 
 - [ ] **Step 4: Add expiringSoon tests**
@@ -339,27 +376,27 @@ In the `AuthProvider` component, add a new `useEffect` after the existing storag
 In `packages/shared/src/auth/__tests__/mp-token.test.ts`, add these tests:
 
 ```typescript
-    it('returns expiringSoon: true when token expires within 5 minutes', () => {
-        const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
-        store['mpp-widgets_AuthToken'] = token;
-        store['mpp-widgets_ExpiresAfter'] = new Date(
-            Date.now() + 2 * 60 * 1000,
-        ).toISOString(); // 2 minutes from now
-        expect(getMPToken()).toEqual({
-            authenticated: true,
-            token,
-            expiringSoon: true,
-        });
+it('returns expiringSoon: true when token expires within 5 minutes', () => {
+    const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
+    store['mpp-widgets_AuthToken'] = token;
+    store['mpp-widgets_ExpiresAfter'] = new Date(
+        Date.now() + 2 * 60 * 1000,
+    ).toISOString(); // 2 minutes from now
+    expect(getMPToken()).toEqual({
+        authenticated: true,
+        token,
+        expiringSoon: true,
     });
+});
 
-    it('does not return expiringSoon when token expires in more than 5 minutes', () => {
-        const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
-        store['mpp-widgets_AuthToken'] = token;
-        store['mpp-widgets_ExpiresAfter'] = new Date(
-            Date.now() + 30 * 60 * 1000,
-        ).toISOString(); // 30 minutes from now
-        expect(getMPToken()).toEqual({ authenticated: true, token });
-    });
+it('does not return expiringSoon when token expires in more than 5 minutes', () => {
+    const token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature';
+    store['mpp-widgets_AuthToken'] = token;
+    store['mpp-widgets_ExpiresAfter'] = new Date(
+        Date.now() + 30 * 60 * 1000,
+    ).toISOString(); // 30 minutes from now
+    expect(getMPToken()).toEqual({ authenticated: true, token });
+});
 ```
 
 - [ ] **Step 5: Run tests**

@@ -2,7 +2,7 @@
 
 > **Date:** 2026-04-02
 > **Status:** Approved
-> **Scope:** Sermons widget data-* attribute config expansion
+> **Scope:** Sermons widget data-\* attribute config expansion
 
 ## Problem
 
@@ -14,26 +14,26 @@ The sermons widget currently has minimal configuration — `serviceTypes`, `perP
 
 ## New `data-*` Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `data-tab` | `'sermons' \| 'series'` | — | Lock to single tab, hide tab switcher |
-| `data-display` | `'full' \| 'compact' \| 'headless'` | `'full'` | Controls chrome level |
-| `data-series-id` | number | — | Lock series filter (sermons tab only) |
-| `data-speaker-id` | number | — | Lock speaker filter (sermons tab only) |
-| `data-book-id` | number | — | Lock book filter (sermons tab only) |
-| `data-service-type-id` | string (comma-sep IDs) | — | Lock service type filter by ID (sermons tab only) |
-| `data-from` | `YYYY-MM-DD` | — | Lock start date (sermons tab only) |
-| `data-to` | `YYYY-MM-DD` | — | Lock end date (sermons tab only) |
+| Attribute              | Type                                | Default  | Description                                       |
+| ---------------------- | ----------------------------------- | -------- | ------------------------------------------------- |
+| `data-tab`             | `'sermons' \| 'series'`             | —        | Lock to single tab, hide tab switcher             |
+| `data-display`         | `'full' \| 'compact' \| 'headless'` | `'full'` | Controls chrome level                             |
+| `data-series-id`       | number                              | —        | Lock series filter (sermons tab only)             |
+| `data-speaker-id`      | number                              | —        | Lock speaker filter (sermons tab only)            |
+| `data-book-id`         | number                              | —        | Lock book filter (sermons tab only)               |
+| `data-service-type-id` | string (comma-sep IDs)              | —        | Lock service type filter by ID (sermons tab only) |
+| `data-from`            | `YYYY-MM-DD`                        | —        | Lock start date (sermons tab only)                |
+| `data-to`              | `YYYY-MM-DD`                        | —        | Lock end date (sermons tab only)                  |
 
 ### Existing attributes (unchanged)
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `data-service-types` | string | — | Name-based fuzzy match (existing behavior) |
-| `data-per-page` | number | 12 | Items per page |
-| `data-default-tab` | `'sermons' \| 'series'` | `'sermons'` | Initial tab when `data-tab` is not set |
-| `data-default-view` | `'grid' \| 'list' \| 'large'` | `'grid'` | Default view mode |
-| `data-api-url` | string | — | API base URL override |
+| Attribute            | Type                          | Default     | Description                                |
+| -------------------- | ----------------------------- | ----------- | ------------------------------------------ |
+| `data-service-types` | string                        | —           | Name-based fuzzy match (existing behavior) |
+| `data-per-page`      | number                        | 12          | Items per page                             |
+| `data-default-tab`   | `'sermons' \| 'series'`       | `'sermons'` | Initial tab when `data-tab` is not set     |
+| `data-default-view`  | `'grid' \| 'list' \| 'large'` | `'grid'`    | Default view mode                          |
+| `data-api-url`       | string                        | —           | API base URL override                      |
 
 ### Priority: `data-service-type-id` vs `data-service-types`
 
@@ -43,21 +43,21 @@ The sermons widget currently has minimal configuration — `serviceTypes`, `perP
 
 ### Browse view
 
-| Mode | Tab switcher | Search + filters | Date picker | Sort + View | Grid/list | Pagination |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|
-| `full` | yes* | yes | yes | yes | yes | yes |
-| `compact` | yes* | no | no | yes | yes | yes |
-| `headless` | no | no | no | no | yes | yes |
+| Mode       | Tab switcher | Search + filters | Date picker | Sort + View | Grid/list | Pagination |
+| ---------- | :----------: | :--------------: | :---------: | :---------: | :-------: | :--------: |
+| `full`     |    yes\*     |       yes        |     yes     |     yes     |    yes    |    yes     |
+| `compact`  |    yes\*     |        no        |     no      |     yes     |    yes    |    yes     |
+| `headless` |      no      |        no        |     no      |     no      |    yes    |    yes     |
 
-*Tab switcher hidden when `data-tab` is set (single-tab lock)
+\*Tab switcher hidden when `data-tab` is set (single-tab lock)
 
 ### Detail view
 
-| Mode | Back button | Sermon/series info | Media player | "More from series" |
-|------|:---:|:---:|:---:|:---:|
-| `full` | yes | yes | yes | yes |
-| `compact` | yes | yes | yes | yes |
-| `headless` | yes | yes | yes | no |
+| Mode       | Back button | Sermon/series info | Media player | "More from series" |
+| ---------- | :---------: | :----------------: | :----------: | :----------------: |
+| `full`     |     yes     |        yes         |     yes      |        yes         |
+| `compact`  |     yes     |        yes         |     yes      |        yes         |
+| `headless` |     yes     |        yes         |     yes      |         no         |
 
 Detail views are mostly unchanged across modes. Only headless hides the "More from this series" section to keep the view focused.
 
@@ -85,29 +85,47 @@ If any sermon-only filter is set while `data-tab="series"`, throw a config valid
 Expand the Zod schema with new optional fields. Use `z.coerce.string()` for `serviceTypeId` since `parseDataAttributes` auto-coerces single numeric strings to numbers:
 
 ```typescript
-export const SermonsConfigSchema = z.object({
-    // Existing
-    serviceTypes: z.string().optional(),
-    perPage: z.number().default(12),
-    defaultTab: z.enum(['sermons', 'series']).default('sermons'),
-    defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
-    apiUrl: z.string().optional(),
-    // New
-    tab: z.enum(['sermons', 'series']).optional(),
-    display: z.enum(['full', 'compact', 'headless']).default('full'),
-    seriesId: z.coerce.number().int().positive().optional(),
-    speakerId: z.coerce.number().int().positive().optional(),
-    bookId: z.coerce.number().int().positive().optional(),
-    serviceTypeId: z.coerce.string().optional(),
-    from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-    to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-}).refine(
-    (c) => {
-        if (c.tab !== 'series') return true;
-        return !c.seriesId && !c.speakerId && !c.bookId && !c.serviceTypeId && !c.from && !c.to;
-    },
-    { message: 'Sermon-only filters (seriesId, speakerId, bookId, serviceTypeId, from, to) cannot be used with tab="series"' },
-);
+export const SermonsConfigSchema = z
+    .object({
+        // Existing
+        serviceTypes: z.string().optional(),
+        perPage: z.number().default(12),
+        defaultTab: z.enum(['sermons', 'series']).default('sermons'),
+        defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
+        apiUrl: z.string().optional(),
+        // New
+        tab: z.enum(['sermons', 'series']).optional(),
+        display: z.enum(['full', 'compact', 'headless']).default('full'),
+        seriesId: z.coerce.number().int().positive().optional(),
+        speakerId: z.coerce.number().int().positive().optional(),
+        bookId: z.coerce.number().int().positive().optional(),
+        serviceTypeId: z.coerce.string().optional(),
+        from: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/)
+            .optional(),
+        to: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/)
+            .optional(),
+    })
+    .refine(
+        (c) => {
+            if (c.tab !== 'series') return true;
+            return (
+                !c.seriesId
+                && !c.speakerId
+                && !c.bookId
+                && !c.serviceTypeId
+                && !c.from
+                && !c.to
+            );
+        },
+        {
+            message:
+                'Sermon-only filters (seriesId, speakerId, bookId, serviceTypeId, from, to) cannot be used with tab="series"',
+        },
+    );
 ```
 
 ### 2. useSermonFilters (use-sermon-filters.ts)
@@ -168,26 +186,36 @@ When `config.tab` is set, internal navigation functions that set the tab (`setSe
 ## Example Embeds
 
 ### Full widget (default)
+
 ```html
 <div id="perimeter-sermons"></div>
 ```
 
 ### Sermons only, locked to a specific series
+
 ```html
 <div id="perimeter-sermons" data-tab="sermons" data-series-id="945"></div>
 ```
 
 ### Compact series browser
+
 ```html
 <div id="perimeter-sermons" data-tab="series" data-display="compact"></div>
 ```
 
 ### Headless sermon grid for a specific speaker
+
 ```html
-<div id="perimeter-sermons" data-tab="sermons" data-display="headless" data-speaker-id="7"></div>
+<div
+    id="perimeter-sermons"
+    data-tab="sermons"
+    data-display="headless"
+    data-speaker-id="7"
+></div>
 ```
 
 ### Invalid (throws at mount)
+
 ```html
 <div id="perimeter-sermons" data-tab="series" data-speaker-id="7"></div>
 <!-- Error: Sermon-only filters cannot be used with tab="series" -->

@@ -1,6 +1,8 @@
 import { createContext, useContext, type ReactNode } from 'react';
 
-const PortalContainerContext = createContext<HTMLElement | undefined>(undefined);
+const PortalContainerContext = createContext<HTMLElement | undefined>(
+    undefined,
+);
 
 export function PortalContainerProvider({
     container,
