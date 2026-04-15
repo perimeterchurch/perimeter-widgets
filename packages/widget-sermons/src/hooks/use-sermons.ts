@@ -1,14 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { createApiClient } from '@perimeter-widgets/shared';
-import type { PaginatedSermonsResponse, SortField, SortOrder } from '../types';
-import { resolveCampusId, type SermonsConfig } from '../types';
+import { createApiClient, createApiError } from '@perimeter-widgets/shared';
+import type { SortField, SortOrder } from '../types';
+import type { SermonsConfig } from '../types';
 
 export interface UseSermonsParams {
     search?: string;
-    series?: number | null;
-    speaker?: number | null;
-    book?: number | null;
-    campus?: number | null;
+    selectedSeriesIds?: number[];
+    selectedSpeakerIds?: number[];
+    selectedBookIds?: number[];
+    selectedServiceTypeIds?: number[];
+    selectedSeriesTypeIds?: number[];
     from?: string | null;
     to?: string | null;
     sort?: SortField;
@@ -20,10 +21,11 @@ export interface UseSermonsParams {
 export function useSermons(params: UseSermonsParams) {
     const {
         search,
-        series,
-        speaker,
-        book,
-        campus,
+        selectedSeriesIds = [],
+        selectedSpeakerIds = [],
+        selectedBookIds = [],
+        selectedServiceTypeIds = [],
+        selectedSeriesTypeIds = [],
         from,
         to,
         sort = 'date',
@@ -31,20 +33,42 @@ export function useSermons(params: UseSermonsParams) {
         page = 1,
         config,
     } = params;
-    const campusId = campus ?? resolveCampusId(config.campus);
+
+    const resolvedServiceTypeId =
+        selectedServiceTypeIds.length > 0 ?
+            selectedServiceTypeIds.join(',')
+        :   undefined;
+
+    const resolvedSeriesTypeId =
+        selectedSeriesTypeIds.length > 0 ?
+            selectedSeriesTypeIds.join(',')
+        :   undefined;
+
+    const seriesId =
+        selectedSeriesIds.length > 0 ? selectedSeriesIds.join(',') : undefined;
+    const speakerId =
+        selectedSpeakerIds.length > 0 ?
+            selectedSpeakerIds.join(',')
+        :   undefined;
+    const bookId =
+        selectedBookIds.length > 0 ? selectedBookIds.join(',') : undefined;
+
+    // Sermons API only supports 'date' | 'title' — fall back to 'date' for 'count'
+    const sermonSort = sort === 'count' ? 'date' : sort;
 
     return useQuery({
         queryKey: [
             'sermons',
             {
                 search,
-                series,
-                speaker,
-                book,
-                campus: campusId,
+                seriesId,
+                speakerId,
+                bookId,
+                serviceTypeId: resolvedServiceTypeId,
+                seriesTypeId: resolvedSeriesTypeId,
                 from,
                 to,
-                sort,
+                sort: sermonSort,
                 order,
                 page,
                 perPage: config.perPage,
@@ -52,21 +76,26 @@ export function useSermons(params: UseSermonsParams) {
         ],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
-            const sp = new URLSearchParams();
-            if (search) sp.set('search', search);
-            if (series) sp.set('seriesId', String(series));
-            if (speaker) sp.set('speakerId', String(speaker));
-            if (book) sp.set('bookId', String(book));
-            if (campusId) sp.set('congregationId', String(campusId));
-            if (from) sp.set('from', from);
-            if (to) sp.set('to', to);
-            sp.set('sort', sort);
-            sp.set('order', order);
-            sp.set('page', String(page));
-            sp.set('perPage', String(config.perPage));
-            return client.get<PaginatedSermonsResponse>(
-                `/api/sermons?${sp.toString()}`,
-            );
+            const { data, error } = await client.GET('/api/sermons', {
+                params: {
+                    query: {
+                        search: search || undefined,
+                        seriesId,
+                        speakerId,
+                        bookId,
+                        from: from ?? undefined,
+                        to: to ?? undefined,
+                        sort: sermonSort,
+                        order,
+                        page,
+                        perPage: config.perPage,
+                        serviceTypeId: resolvedServiceTypeId,
+                        seriesTypeId: resolvedSeriesTypeId,
+                    },
+                },
+            });
+            if (error) throw createApiError('Failed to fetch sermons', error);
+            return data.data;
         },
     });
 }

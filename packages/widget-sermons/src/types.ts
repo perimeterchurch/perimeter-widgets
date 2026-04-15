@@ -1,95 +1,98 @@
 import { z } from 'zod';
+import type { operations } from '@perimeter-widgets/shared';
 
 /* ------------------------------------------------------------------ */
 /*  Widget Configuration (from data-* attributes)                      */
 /* ------------------------------------------------------------------ */
 
-export const SermonsConfigSchema = z.object({
-    campus: z.union([z.number(), z.string()]).optional(),
-    perPage: z.number().default(12),
-    defaultTab: z.enum(['sermons', 'series']).default('sermons'),
-    defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
-    apiUrl: z.string().optional(),
-});
+export const SermonsConfigSchema = z
+    .object({
+        // Existing
+        perPage: z.number().default(12),
+        defaultTab: z.enum(['sermons', 'series']).default('sermons'),
+        defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
+        apiUrl: z.string().optional(),
+        // Display and tab lock
+        tab: z.enum(['sermons', 'series']).optional(),
+        display: z.enum(['full', 'compact', 'headless']).default('full'),
+        // Locked filters (sermons tab only)
+        seriesId: z.coerce.string().optional(),
+        speakerId: z.coerce.string().optional(),
+        bookId: z.coerce.string().optional(),
+        serviceTypeId: z.coerce.string().optional(),
+        seriesTypeId: z.coerce.string().optional(),
+        // Hide individual filter dropdowns
+        hideSeries: z.coerce.boolean().optional(),
+        hideSpeaker: z.coerce.boolean().optional(),
+        hideBook: z.coerce.boolean().optional(),
+        hideServiceType: z.coerce.boolean().optional(),
+        hideSeriesType: z.coerce.boolean().optional(),
+        hideDate: z.coerce.boolean().optional(),
+        hideSearch: z.coerce.boolean().optional(),
+        hidePagination: z.coerce.boolean().optional(),
+        from: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
+            .optional(),
+        to: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
+            .optional(),
+    })
+    .refine(
+        (c) => {
+            if (c.tab !== 'series') return true;
+            return (
+                !c.seriesId
+                && !c.speakerId
+                && !c.bookId
+                && !c.serviceTypeId
+                && !c.from
+                && !c.to
+            );
+        },
+        {
+            message:
+                'Sermon-only filters (seriesId, speakerId, bookId, serviceTypeId, from, to) cannot be used with tab="series"',
+        },
+    );
 
 export type SermonsConfig = z.infer<typeof SermonsConfigSchema>;
 
 /* ------------------------------------------------------------------ */
-/*  API Response Types                                                 */
+/*  API Response Types (derived from OpenAPI spec)                     */
 /* ------------------------------------------------------------------ */
 
-export type Speaker = {
-    id: number;
-    name: string;
-    bio: string | null;
-};
+type ListSermonsResponse =
+    operations['listSermons']['responses']['200']['content']['application/json'];
+export type SermonListItem = ListSermonsResponse['data']['sermons'][number];
+export type Pagination = ListSermonsResponse['data']['pagination'];
 
-export type Book = {
-    id: number;
-    name: string;
-};
+type GetSermonResponse =
+    operations['getSermon']['responses']['200']['content']['application/json'];
+export type SermonDetail = GetSermonResponse['data'];
+export type SermonLink = SermonDetail['links'][number];
 
-export type SermonLink = {
-    id: number;
-    url: string;
-    type: string;
-    mediaType: 'video' | 'audio' | 'document';
-    duration: string | null;
-    position: number | null;
-};
+type ListSeriesResponse =
+    operations['listSeries']['responses']['200']['content']['application/json'];
+export type SeriesListItem = ListSeriesResponse['data']['series'][number];
 
-export type SermonListItem = {
-    id: number;
-    title: string;
-    subtitle: string | null;
-    shortDescription: string | null;
-    date: string;
-    bannerUrl: string | null;
-    speaker: { id: number; name: string };
-    series: { id: number; title: string };
-    congregation: { id: number };
-};
+type GetSeriesDetailResponse =
+    operations['getSeriesDetail']['responses']['200']['content']['application/json'];
+export type SeriesDetail = GetSeriesDetailResponse['data'];
 
-export type SermonDetail = SermonListItem & {
-    description: string | null;
-    transcript: string | null;
-    scriptureLinks: string | null;
-    book: Book | null;
-    speaker: Speaker;
-    links: SermonLink[];
-};
+type ListSpeakersResponse =
+    operations['listSpeakers']['responses']['200']['content']['application/json'];
+export type Speaker = ListSpeakersResponse['data'][number];
 
-export type SeriesListItem = {
-    id: number;
-    title: string;
-    displayTitle: string | null;
-    subtitle: string | null;
-    description: string | null;
-    latestSermonDate: string | null;
-    sermonCount: number;
-    book: Book | null;
-};
-
-export type SeriesDetail = SeriesListItem & {
-    sermons: SermonListItem[];
-};
-
-export type Pagination = {
-    page: number;
-    perPage: number;
-    total: number;
-    totalPages: number;
-};
+type ListBooksResponse =
+    operations['listBooks']['responses']['200']['content']['application/json'];
+export type Book = ListBooksResponse['data'][number];
 
 /**
  * Response shape for GET /api/sermons (after envelope unwrap).
- * Note: createApiClient automatically unwraps the { success, data } envelope,
- * so hooks receive this type directly — NOT the raw { success: true, data: { ... } } wrapper.
  */
-export type PaginatedSermonsResponse = {
-    sermons: SermonListItem[];
-    pagination: Pagination;
-};
+export type PaginatedSermonsResponse = ListSermonsResponse['data'];
 
 /* ------------------------------------------------------------------ */
 /*  Shared Component Props                                             */
@@ -104,27 +107,24 @@ export interface SermonListViewProps {
 /*  Tab and View Types                                                 */
 /* ------------------------------------------------------------------ */
 
-export type TabId = 'sermons' | 'series' | 'compilations';
+export type TabId = 'sermons' | 'series';
 export type ScreenMode = 'browse' | 'detail';
 export type ViewMode = 'grid' | 'list' | 'large';
-export type SortField = 'date' | 'title';
+export type SortField = 'date' | 'title' | 'count';
 export type SortOrder = 'asc' | 'desc';
 
 /* ------------------------------------------------------------------ */
-/*  Campus ID Mapping (backwards compat)                               */
+/*  Service Type                                                       */
 /* ------------------------------------------------------------------ */
 
-const CAMPUS_SLUG_MAP: Record<string, number> = {
-    buckhead: 1,
-    brookhaven: 2,
-    'peachtree-corners': 3,
-};
+type ListServiceTypesResponse =
+    operations['listServiceTypes']['responses']['200']['content']['application/json'];
+export type ServiceType = ListServiceTypesResponse['data'][number];
 
-/** Resolve campus config (string slug or number) to a congregation ID */
-export function resolveCampusId(
-    campus: string | number | undefined,
-): number | undefined {
-    if (campus === undefined || campus === '') return undefined;
-    if (typeof campus === 'number') return campus;
-    return CAMPUS_SLUG_MAP[campus] ?? undefined;
-}
+/* ------------------------------------------------------------------ */
+/*  Series Type                                                        */
+/* ------------------------------------------------------------------ */
+
+type ListSeriesTypesResponse =
+    operations['listSeriesTypes']['responses']['200']['content']['application/json'];
+export type SeriesType = ListSeriesTypesResponse['data'][number];

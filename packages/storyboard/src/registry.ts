@@ -10,13 +10,15 @@ export interface ConfigField {
     /** Human-readable label */
     label: string;
     /** Field type for the config editor */
-    type: 'text' | 'number' | 'boolean' | 'select';
+    type: 'text' | 'number' | 'boolean' | 'select' | 'multiselect-api';
     /** Default value */
     defaultValue: string | number | boolean;
     /** Options for select fields */
     options?: { label: string; value: string }[];
     /** Help text shown below the field */
     description?: string;
+    /** API endpoint path for multiselect-api fields (e.g., '/api/sermons/speakers') */
+    apiPath?: string;
 }
 
 export interface WidgetModule {
@@ -60,22 +62,6 @@ export const widgetRegistry: WidgetDefinition[] = [
             };
         },
         configFields: [
-            // NOTE: Migrated from string slugs to integer congregation IDs.
-            // Existing WordPress embeds using data-campus="buckhead" will still work
-            // via resolveCampusId() backwards-compatible mapping in the widget.
-            {
-                key: 'campus',
-                label: 'Campus',
-                type: 'select',
-                defaultValue: '',
-                options: [
-                    { label: 'All Campuses', value: '' },
-                    { label: 'Buckhead', value: '1' },
-                    { label: 'Brookhaven', value: '2' },
-                    { label: 'Peachtree Corners', value: '3' },
-                ],
-                description: 'Filter sermons by campus location',
-            },
             {
                 key: 'perPage',
                 label: 'Per Page',
@@ -105,6 +91,142 @@ export const widgetRegistry: WidgetDefinition[] = [
                     { label: 'Large Cards', value: 'large' },
                 ],
                 description: 'Default sermon list layout',
+            },
+            {
+                key: 'tab',
+                label: 'Tab Lock',
+                type: 'select',
+                defaultValue: '',
+                options: [
+                    { label: 'Both (default)', value: '' },
+                    { label: 'Sermons only', value: 'sermons' },
+                    { label: 'Series only', value: 'series' },
+                ],
+                description: 'Lock to a single tab and hide the tab switcher',
+            },
+            {
+                key: 'display',
+                label: 'Display Mode',
+                type: 'select',
+                defaultValue: 'full',
+                options: [
+                    { label: 'Full', value: 'full' },
+                    { label: 'Compact', value: 'compact' },
+                    { label: 'Headless', value: 'headless' },
+                ],
+                description:
+                    'Chrome level: full (all UI), compact (sort/view/grid/pagination), headless (grid/pagination only)',
+            },
+            {
+                key: 'seriesId',
+                label: 'Lock Series',
+                type: 'multiselect-api',
+                defaultValue: '',
+                apiPath: '/api/sermons/series',
+                description: 'Lock to specific series (sermons tab only)',
+            },
+            {
+                key: 'speakerId',
+                label: 'Lock Speakers',
+                type: 'multiselect-api',
+                defaultValue: '',
+                apiPath: '/api/sermons/speakers',
+                description: 'Lock to specific speakers (sermons tab only)',
+            },
+            {
+                key: 'bookId',
+                label: 'Lock Books',
+                type: 'multiselect-api',
+                defaultValue: '',
+                apiPath: '/api/sermons/books',
+                description: 'Lock to specific books (sermons tab only)',
+            },
+            {
+                key: 'serviceTypeId',
+                label: 'Lock Service Types',
+                type: 'multiselect-api',
+                defaultValue: '',
+                apiPath: '/api/sermons/service-types',
+                description:
+                    'Lock to specific service types (sermons tab only)',
+            },
+            {
+                key: 'seriesTypeId',
+                label: 'Lock Series Types',
+                type: 'multiselect-api',
+                defaultValue: '',
+                apiPath: '/api/sermons/series-types',
+                description: 'Lock to specific series types',
+            },
+            {
+                key: 'from',
+                label: 'Lock Start Date',
+                type: 'text',
+                defaultValue: '',
+                description: 'Lock start date YYYY-MM-DD (sermons tab only)',
+            },
+            {
+                key: 'to',
+                label: 'Lock End Date',
+                type: 'text',
+                defaultValue: '',
+                description: 'Lock end date YYYY-MM-DD (sermons tab only)',
+            },
+            {
+                key: 'hideSeries',
+                label: 'Hide Series Filter',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the series filter dropdown',
+            },
+            {
+                key: 'hideSpeaker',
+                label: 'Hide Speaker Filter',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the speaker filter dropdown',
+            },
+            {
+                key: 'hideBook',
+                label: 'Hide Book Filter',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the book filter dropdown',
+            },
+            {
+                key: 'hideServiceType',
+                label: 'Hide Service Type Filter',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the service type filter dropdown',
+            },
+            {
+                key: 'hideSeriesType',
+                label: 'Hide Series Type Filter',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the series type filter dropdown',
+            },
+            {
+                key: 'hideDate',
+                label: 'Hide Date Filter',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the date range picker',
+            },
+            {
+                key: 'hideSearch',
+                label: 'Hide Search',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the search input',
+            },
+            {
+                key: 'hidePagination',
+                label: 'Hide Pagination',
+                type: 'boolean',
+                defaultValue: false,
+                description: 'Hide the pagination controls',
             },
         ],
     },

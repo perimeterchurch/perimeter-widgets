@@ -1,57 +1,82 @@
-import { Badge } from '@perimeter-widgets/shared';
+import { Calendar, Layers, BookOpen } from 'lucide-react';
 import type { SeriesListItem } from '../../types';
-import { formatDate } from '../../lib/format';
+import { formatDate, seriesImageUrl } from '../../lib/format';
+import { MediaCard } from '../ui/MediaCard';
 
 interface SeriesGridProps {
     series: SeriesListItem[];
+    viewMode?: 'grid' | 'list' | 'large';
     onSeriesClick: (id: number) => void;
 }
 
-export function SeriesGrid({ series, onSeriesClick }: SeriesGridProps) {
+const iconClass = 'inline h-3 w-3 shrink-0';
+
+function DateLabel({ date }: { date: string }) {
+    return (
+        <span className='flex items-center gap-1'>
+            <Calendar className={iconClass} />
+            {date}
+        </span>
+    );
+}
+
+function SermonCountLabel({ count }: { count: number }) {
+    return (
+        <span className='flex items-center gap-1'>
+            <Layers className={iconClass} />
+            {count} sermon{count !== 1 ? 's' : ''}
+        </span>
+    );
+}
+
+function BookLabel({ name }: { name: string }) {
+    return (
+        <span className='flex items-center gap-1'>
+            <BookOpen className={iconClass} />
+            {name}
+        </span>
+    );
+}
+
+export function SeriesGrid({
+    series,
+    viewMode = 'grid',
+    onSeriesClick,
+}: SeriesGridProps) {
     if (series.length === 0) {
         return (
-            <div className='py-12 text-center text-stone-500 dark:text-stone-400'>
+            <div className='py-12 text-center text-muted-foreground'>
                 No series found.
             </div>
         );
     }
 
+    const wrapperClass =
+        viewMode === 'list' ? 'divide-y divide-border'
+        : viewMode === 'large' ? 'space-y-4'
+        : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3';
+
     return (
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+        <div className={wrapperClass}>
             {series.map((s) => (
-                <button
+                <MediaCard
                     key={s.id}
-                    type='button'
+                    viewMode={viewMode}
+                    imageUrl={seriesImageUrl(s.id)}
+                    imageAlt={s.displayTitle ?? s.title}
+                    title={s.displayTitle ?? s.title}
+                    description={s.subtitle}
+                    topLeft={
+                        s.latestSermonDate ?
+                            <DateLabel date={formatDate(s.latestSermonDate)} />
+                        :   undefined
+                    }
+                    bottomLeft={<SermonCountLabel count={s.sermonCount} />}
+                    bottomRight={
+                        s.book ? <BookLabel name={s.book.name} /> : undefined
+                    }
                     onClick={() => onSeriesClick(s.id)}
-                    className='rounded-lg border border-stone-200 dark:border-stone-700 p-4 text-left space-y-2 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
-                >
-                    <div className='space-y-0.5'>
-                        <p className='font-semibold text-sm leading-snug text-stone-900 dark:text-stone-100 line-clamp-2'>
-                            {s.displayTitle ?? s.title}
-                        </p>
-                        {s.subtitle && (
-                            <p className='text-xs text-stone-500 dark:text-stone-400 line-clamp-1'>
-                                {s.subtitle}
-                            </p>
-                        )}
-                    </div>
-                    <div className='flex flex-wrap items-center gap-1.5'>
-                        <span className='text-xs text-stone-400'>
-                            {s.sermonCount} sermon
-                            {s.sermonCount !== 1 ? 's' : ''}
-                        </span>
-                        {s.latestSermonDate && (
-                            <span className='text-xs text-stone-400'>
-                                · {formatDate(s.latestSermonDate)}
-                            </span>
-                        )}
-                    </div>
-                    {s.book && (
-                        <Badge variant='secondary' size='sm'>
-                            {s.book.name}
-                        </Badge>
-                    )}
-                </button>
+                />
             ))}
         </div>
     );

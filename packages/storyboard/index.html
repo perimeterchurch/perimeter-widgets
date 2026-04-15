@@ -6,6 +6,16 @@
         <title>Perimeter Widgets — Storyboard</title>
     </head>
     <body>
+        <script>
+            // Apply stored theme immediately to prevent flash of wrong theme
+            (function () {
+                var t = localStorage.getItem('storyboard-theme');
+                if (t === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            })();
+        </script>
         <div id="root"></div>
         <script type="module" src="/src/main.tsx"></script>
     </body>

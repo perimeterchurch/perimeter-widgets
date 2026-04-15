@@ -1,6 +1,12 @@
 import { useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Tabs, LoadingSpinner } from '@perimeter-widgets/shared';
+import {
+    Tabs,
+    TabsList,
+    TabsTrigger,
+    Spinner,
+} from '@perimeter-widgets/shared';
+import { Video, Headphones, FileText } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
 import { AudioPlayer } from './AudioPlayer';
 import type { SermonLink } from '../../types';
@@ -27,15 +33,36 @@ export interface MediaTabsProps {
 
 type MediaTab = 'video' | 'audio' | 'document';
 
+const iconClass = 'h-4 w-4';
+
 export function MediaTabs({ links }: MediaTabsProps) {
     const videoLink = links.find((l) => l.mediaType === 'video');
     const audioLink = links.find((l) => l.mediaType === 'audio');
     const docLink = links.find((l) => l.mediaType === 'document');
 
-    const availableTabs: { id: MediaTab; label: string }[] = [];
-    if (videoLink) availableTabs.push({ id: 'video', label: 'Watch' });
-    if (audioLink) availableTabs.push({ id: 'audio', label: 'Listen' });
-    if (docLink) availableTabs.push({ id: 'document', label: 'PDF' });
+    const availableTabs: {
+        id: MediaTab;
+        label: string;
+        icon: React.ReactNode;
+    }[] = [];
+    if (videoLink)
+        availableTabs.push({
+            id: 'video',
+            label: 'Watch',
+            icon: <Video className={iconClass} />,
+        });
+    if (audioLink)
+        availableTabs.push({
+            id: 'audio',
+            label: 'Listen',
+            icon: <Headphones className={iconClass} />,
+        });
+    if (docLink)
+        availableTabs.push({
+            id: 'document',
+            label: 'PDF',
+            icon: <FileText className={iconClass} />,
+        });
 
     const [activeTab, setActiveTab] = useState<string>(
         availableTabs[0]?.id ?? 'video',
@@ -44,13 +71,22 @@ export function MediaTabs({ links }: MediaTabsProps) {
     if (availableTabs.length === 0) return null;
 
     return (
-        <div className='overflow-hidden rounded-lg border border-[var(--color-border)]'>
-            <Tabs
-                tabs={availableTabs}
-                activeTab={activeTab}
-                onChange={setActiveTab}
-            />
-            <div className='min-h-[300px]'>
+        <div className='space-y-2'>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className='h-10'>
+                    {availableTabs.map((tab) => (
+                        <TabsTrigger
+                            key={tab.id}
+                            value={tab.id}
+                            className='gap-1.5 px-4 text-sm'
+                        >
+                            {tab.icon}
+                            {tab.label}
+                        </TabsTrigger>
+                    ))}
+                </TabsList>
+            </Tabs>
+            <div className='overflow-hidden rounded-lg border border-[var(--color-border)] min-h-[300px]'>
                 <AnimatePresence mode='wait'>
                     {activeTab === 'video' && videoLink && (
                         <motion.div
@@ -75,9 +111,9 @@ export function MediaTabs({ links }: MediaTabsProps) {
                             <Suspense
                                 fallback={
                                     <div className='flex h-[400px] items-center justify-center'>
-                                        <LoadingSpinner
-                                            size='lg'
-                                            label='Loading PDF viewer'
+                                        <Spinner
+                                            className='size-8'
+                                            aria-label='Loading PDF viewer'
                                         />
                                     </div>
                                 }

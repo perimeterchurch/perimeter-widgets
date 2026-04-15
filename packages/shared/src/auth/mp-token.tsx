@@ -15,6 +15,16 @@ const EXPIRY_KEY = 'mpp-widgets_ExpiresAfter';
 export interface MPAuthState {
     authenticated: boolean;
     token?: string;
+    expiringSoon?: boolean;
+}
+
+/**
+ * Checks if a string has JWT-like structure (three dot-separated non-empty segments).
+ * Does not decode or verify — that's the API's responsibility.
+ */
+function isJwtLike(value: string): boolean {
+    const parts = value.split('.');
+    return parts.length === 3 && parts.every((p) => p.length > 0);
 }
 
 /**
@@ -26,12 +36,19 @@ export function getMPToken(): MPAuthState {
         const token = localStorage.getItem(TOKEN_KEY);
         const expiresAfter = localStorage.getItem(EXPIRY_KEY);
 
-        if (!token || token === 'null' || token.length < 10) {
+        if (!token || token === 'null' || !isJwtLike(token)) {
             return { authenticated: false };
         }
 
-        if (expiresAfter && new Date(expiresAfter) < new Date()) {
-            return { authenticated: false };
+        if (expiresAfter) {
+            const expiresAt = new Date(expiresAfter);
+            if (expiresAt < new Date()) {
+                return { authenticated: false };
+            }
+            const fiveMinutes = 5 * 60 * 1000;
+            if (expiresAt.getTime() - Date.now() < fiveMinutes) {
+                return { authenticated: true, token, expiringSoon: true };
+            }
         }
 
         return { authenticated: true, token };
@@ -80,6 +97,13 @@ export function AuthProvider({
         window.addEventListener('storage', handleStorage);
         return () => window.removeEventListener('storage', handleStorage);
     }, [requiresAuth, refresh]);
+
+    // Periodically re-read token to detect expiry or silent renewal
+    useEffect(() => {
+        if (!requiresAuth || !authState.authenticated) return;
+        const interval = setInterval(refresh, 60_000);
+        return () => clearInterval(interval);
+    }, [requiresAuth, authState.authenticated, refresh]);
 
     const contextValue = useMemo(
         () => ({ ...authState, refresh }),

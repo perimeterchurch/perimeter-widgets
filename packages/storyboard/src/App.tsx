@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { widgetRegistry } from '@/registry';
 import { WidgetPreview } from '@/components/WidgetPreview';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { DataSourceToggle } from '@/components/DataSourceToggle';
 
 const statusIcons = {
     ready: '●',
@@ -32,7 +33,10 @@ export function App() {
                             Storyboard
                         </span>
                     </div>
-                    <ThemeToggle />
+                    <div className='flex items-center gap-2'>
+                        <DataSourceToggle />
+                        <ThemeToggle />
+                    </div>
                 </div>
                 <p className='text-sm text-stone-500 dark:text-stone-400 mt-1'>
                     Preview and configure widgets as they appear on

@@ -1,19 +1,10 @@
-import { Badge, Tabs } from '@perimeter-widgets/shared';
+import { Tabs, TabsList, TabsTrigger } from '@perimeter-widgets/shared';
+import { BookOpen, Library } from 'lucide-react';
 import type { TabId } from '../types';
 
-const TABS = [
-    { id: 'sermons' as const, label: 'Sermons' },
-    { id: 'series' as const, label: 'Series' },
-    {
-        id: 'compilations' as const,
-        label: 'Compilations',
-        disabled: true,
-        badge: (
-            <Badge size='sm' variant='secondary'>
-                Soon
-            </Badge>
-        ),
-    },
+const TAB_DEFS: { id: TabId; label: string; icon: React.ReactNode }[] = [
+    { id: 'sermons', label: 'Sermons', icon: <BookOpen className='h-4 w-4' /> },
+    { id: 'series', label: 'Series', icon: <Library className='h-4 w-4' /> },
 ];
 
 export interface SermonTabsProps {
@@ -24,9 +15,21 @@ export interface SermonTabsProps {
 export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
     return (
         <Tabs
-            tabs={TABS}
-            activeTab={activeTab}
-            onChange={(id) => onTabChange(id as TabId)}
-        />
+            value={activeTab}
+            onValueChange={(value) => onTabChange(value as TabId)}
+        >
+            <TabsList className='h-10'>
+                {TAB_DEFS.map((tab) => (
+                    <TabsTrigger
+                        key={tab.id}
+                        value={tab.id}
+                        className='gap-1.5 px-4 text-sm'
+                    >
+                        {tab.icon}
+                        {tab.label}
+                    </TabsTrigger>
+                ))}
+            </TabsList>
+        </Tabs>
     );
 }

@@ -1,5 +1,13 @@
 import { ArrowLeft } from 'lucide-react';
-import { Badge, EmptyState, Skeleton } from '@perimeter-widgets/shared';
+import {
+    Badge,
+    Button,
+    Empty,
+    EmptyHeader,
+    EmptyTitle,
+    EmptyDescription,
+    Skeleton,
+} from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import type { SermonsConfig } from '../../types';
 import { useSeriesDetail } from '../../hooks/use-series-detail';
@@ -23,30 +31,36 @@ export function SeriesDetail({
     if (error) {
         return (
             <div>
-                <button
-                    type='button'
+                <Button
+                    variant='outline'
+                    size='sm'
                     onClick={onBack}
-                    className='flex items-center gap-1 text-sm text-primary mb-4'
+                    className='mb-4'
                 >
                     <ArrowLeft className='h-4 w-4' /> Back
-                </button>
-                <EmptyState
-                    title='Series not found'
-                    description='This series may have been removed or is unavailable.'
-                />
+                </Button>
+                <Empty>
+                    <EmptyHeader>
+                        <EmptyTitle>Series not found</EmptyTitle>
+                        <EmptyDescription>
+                            This series may have been removed or is unavailable.
+                        </EmptyDescription>
+                    </EmptyHeader>
+                </Empty>
             </div>
         );
     }
 
     return (
         <div>
-            <button
-                type='button'
+            <Button
+                variant='outline'
+                size='sm'
                 onClick={onBack}
-                className='flex items-center gap-1 text-sm text-primary mb-4'
+                className='mb-4'
             >
-                <ArrowLeft className='h-4 w-4' /> Back to series
-            </button>
+                <ArrowLeft className='h-4 w-4' /> Back
+            </Button>
             <SkeletonTransition
                 isLoading={isLoading}
                 skeleton={
@@ -78,16 +92,11 @@ export function SeriesDetail({
                                     {series.sermonCount !== 1 ? 's' : ''}
                                 </span>
                                 {series.book && (
-                                    <Badge variant='secondary' size='sm'>
+                                    <Badge variant='secondary'>
                                         {series.book.name}
                                     </Badge>
                                 )}
                             </div>
-                            {series.description && (
-                                <p className='text-sm text-stone-600 dark:text-stone-300 mt-2'>
-                                    {series.description}
-                                </p>
-                            )}
                         </div>
 
                         <div className='divide-y divide-stone-200 dark:divide-stone-700'>

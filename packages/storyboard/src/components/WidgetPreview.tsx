@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { mountWidget, type MountResult } from '@perimeter-widgets/shared';
 import { ConfigEditor } from '@/components/ConfigEditor';
 import type { WidgetDefinition } from '@/registry';
@@ -20,6 +21,9 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
     const [mountKey, setMountKey] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [theme, setTheme] = useState(getResolvedTheme);
+    const [fullscreen, setFullscreen] = useState(false);
+    const fullscreenMountRef = useRef<MountResult | null>(null);
+    const [fullscreenKey, setFullscreenKey] = useState(0);
 
     // Watch for theme changes on document element
     useEffect(() => {
@@ -34,8 +38,8 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
     }, []);
 
     const handleChange = useCallback(
-        (key: string, value: string | number | boolean) => {
-            setConfig((prev) => ({ ...prev, [key]: value }));
+        (newValues: Record<string, string | number | boolean>) => {
+            setConfig(newValues);
         },
         [],
     );
@@ -79,6 +83,45 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
         };
     }, [widget, config, mountKey, theme]);
 
+    // Mount widget in fullscreen modal
+    useEffect(() => {
+        if (!fullscreen) {
+            fullscreenMountRef.current?.destroy();
+            fullscreenMountRef.current = null;
+            return;
+        }
+
+        let cancelled = false;
+        widget
+            .load()
+            .then(({ component, styles }) => {
+                if (cancelled) return;
+                fullscreenMountRef.current = mountWidget({
+                    elementId: `${widget.elementId}-fullscreen`,
+                    component,
+                    styles,
+                    defaults: config,
+                });
+            })
+            .catch(console.error);
+
+        return () => {
+            cancelled = true;
+            fullscreenMountRef.current?.destroy();
+            fullscreenMountRef.current = null;
+        };
+    }, [fullscreen, widget, config, fullscreenKey, theme]);
+
+    // Close on Escape
+    useEffect(() => {
+        if (!fullscreen) return;
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setFullscreen(false);
+        };
+        document.addEventListener('keydown', handler);
+        return () => document.removeEventListener('keydown', handler);
+    }, [fullscreen]);
+
     return (
         <div className='space-y-6'>
             {/* Header */}
@@ -100,12 +143,20 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
                     <span className='text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider'>
                         Preview
                     </span>
-                    <button
-                        onClick={() => setMountKey((k) => k + 1)}
-                        className='text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
-                    >
-                        Remount
-                    </button>
+                    <div className='flex items-center gap-3'>
+                        <button
+                            onClick={() => setFullscreen(true)}
+                            className='text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
+                        >
+                            Fullscreen
+                        </button>
+                        <button
+                            onClick={() => setMountKey((k) => k + 1)}
+                            className='text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
+                        >
+                            Remount
+                        </button>
+                    </div>
                 </div>
                 <div className='border border-stone-200 dark:border-stone-700 rounded-lg overflow-hidden bg-white dark:bg-stone-900 min-h-[200px]'>
                     {error ?
@@ -154,6 +205,53 @@ export function WidgetPreview({ widget }: WidgetPreviewProps) {
                     {generateEmbedCode(widget, config)}
                 </pre>
             </div>
+
+            {/* Fullscreen modal */}
+            {fullscreen
+                && createPortal(
+                    <div
+                        className='fixed inset-0 z-50 flex flex-col bg-white dark:bg-stone-950'
+                        role='dialog'
+                        aria-modal='true'
+                        aria-label={`${widget.name} fullscreen preview`}
+                    >
+                        {/* Modal header */}
+                        <div className='flex items-center justify-between border-b border-stone-200 dark:border-stone-800 px-6 py-3'>
+                            <div className='flex items-center gap-3'>
+                                <h3 className='text-sm font-semibold text-stone-900 dark:text-stone-100'>
+                                    {widget.name}
+                                </h3>
+                                <StatusBadge status={widget.status} />
+                            </div>
+                            <div className='flex items-center gap-3'>
+                                <button
+                                    onClick={() =>
+                                        setFullscreenKey((k) => k + 1)
+                                    }
+                                    className='text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
+                                >
+                                    Remount
+                                </button>
+                                <button
+                                    onClick={() => setFullscreen(false)}
+                                    className='text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors px-2 py-1 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800'
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                        {/* Widget mount */}
+                        <div className='flex-1 overflow-auto'>
+                            <div
+                                key={fullscreenKey}
+                                id={`${widget.elementId}-fullscreen`}
+                                data-theme={theme}
+                                {...buildDataAttributes(config)}
+                            />
+                        </div>
+                    </div>,
+                    document.body,
+                )}
         </div>
     );
 }

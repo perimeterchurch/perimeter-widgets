@@ -119,9 +119,9 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 
 ### Branch Model
 
-- **`main`** — production releases only. Never commit or push directly
-- **`dev`** — integration branch. All work merges here via pull request. Never commit or push directly
-- **Feature branches** — created off `dev`, merged back via PR
+- **`main`** — production. Updated only via batched release PR from `dev`. Never commit or push directly
+- **`dev`** — integration branch. All feature work merges here via pull request. Never commit or push directly
+- **Feature branches** — created off `dev`, merged back via PR targeting `dev`
 
 ### Branch Naming
 
@@ -135,7 +135,7 @@ Use conventional prefixes: `feat/`, `fix/`, `refactor/`, `chore/`, `docs/`, `tes
 3. ... make changes, commit atomically ...
 4. pnpm quality                            # must pass before PR
 5. git push -u origin feat/my-feature      # push the feature branch only
-6. NO_COLOR=1 gh pr create --base dev      # open PR targeting dev
+6. Write PR body to file, then: gh pr create --base dev --body-file <path>
 7. Developer reviews and merges on GitHub
 ```
 
@@ -145,12 +145,27 @@ Use conventional prefixes: `feat/`, `fix/`, `refactor/`, `chore/`, `docs/`, `tes
 - **Conventional commit format:** `type: subject` — e.g., `feat: add sermon search endpoint`
 - **Write commit bodies for non-obvious changes** — the subject says what, the body says why
 
-### Pull Requests
+### Pull Requests (Feature)
 
-- **Always target `dev`** — never open a PR against `main`
-- **Use `NO_COLOR=1` for PR commands** — `NO_COLOR=1 gh pr create --body "..."` prevents ANSI escape codes. If colors still leak through, write the body with the **Write tool** and pass it with `--body-file`
+- **Always target `dev`** — never open a feature PR against `main`
+- **Always use `--body-file` for PR commands** — write the PR body to a temp file with the **Write tool**, then pass it with `gh pr create --body-file <path>`. This prevents ANSI escape codes from leaking into PR descriptions
 - **Run `pnpm quality` before opening** — the branch must pass typecheck + lint + format + test
 - **The developer merges** — Claude creates the PR and pushes the branch; the developer reviews and merges on GitHub
+
+### Releasing to Production (Batched Release PR)
+
+When `dev` is stable and ready for production, the developer opens a single release PR from `dev` → `main`:
+
+```
+1. git checkout dev && git pull
+2. Write release body to file, then: gh pr create --base main --head dev --title "Release: <summary>" --body-file <path>
+3. Developer reviews the cumulative diff, approves, and merges on GitHub
+```
+
+- **One PR per release cycle** — batches all reviewed work from `dev`, not one PR per feature
+- **No feature-level PRs to `main`** — all individual changes are already reviewed when they merge into `dev`
+- **The developer decides when to release** — Claude never opens a release PR to `main` unless explicitly asked
+- **Run `pnpm quality` on `dev` before releasing** — ensure the integration branch is clean
 
 ### Branch Protection
 

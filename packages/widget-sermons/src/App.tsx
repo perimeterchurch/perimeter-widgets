@@ -25,7 +25,7 @@ const fadeSlide = {
 
 function SermonsWidget() {
     const config = useConfig<SermonsConfig>();
-    const filters = useSermonFilters();
+    const filters = useSermonFilters(config);
 
     // Build a unique key for AnimatePresence based on the current "page"
     const viewKey =
@@ -36,34 +36,51 @@ function SermonsWidget() {
     // Determine which content to render
     const renderContent = () => {
         if (filters.screen === 'detail' && filters.id) {
-            if (filters.tab === 'series') {
+            // Viewing a series detail
+            if (filters.tab === 'series' && !filters.fromSeriesId) {
                 return (
                     <SeriesDetail
                         id={filters.id}
                         config={config}
                         onBack={() => filters.setScreen('browse')}
-                        onSermonClick={(id) => {
-                            filters.setScreen('detail', id);
+                        onSermonClick={(sermonId) => {
+                            // Navigate to sermon detail, remembering which series we came from
+                            filters.setSermonFromSeries(sermonId, filters.id!);
                         }}
                     />
                 );
             }
+            // Viewing a sermon detail
             return (
                 <SermonDetail
                     id={filters.id}
                     config={config}
-                    onBack={() => filters.setScreen('browse')}
+                    onBack={() => {
+                        if (filters.fromSeriesId) {
+                            filters.setSeriesDetail(filters.fromSeriesId);
+                        } else {
+                            filters.setScreen('browse');
+                        }
+                    }}
+                    onSermonClick={(sermonId) =>
+                        filters.setScreen('detail', sermonId)
+                    }
                 />
             );
         }
 
+        const showTabs =
+            !config.tab && (config.display ?? 'full') !== 'headless';
+
         return (
             <>
-                <SermonTabs
-                    activeTab={filters.tab}
-                    onTabChange={filters.setTab}
-                />
-                <div className='mt-4'>
+                {showTabs && (
+                    <SermonTabs
+                        activeTab={filters.tab}
+                        onTabChange={filters.setTab}
+                    />
+                )}
+                <div className={showTabs ? 'mt-4' : ''}>
                     <AnimatePresence mode='wait'>
                         <motion.div key={filters.tab} {...fadeSlide}>
                             {filters.tab === 'sermons' && (

@@ -4,6 +4,8 @@ import type {
     SeriesListItem,
     Speaker,
     Book,
+    ServiceType,
+    SeriesType,
 } from '@perimeter-widgets/widget-sermons/types';
 
 export const mockSpeakers: Speaker[] = [
@@ -13,6 +15,18 @@ export const mockSpeakers: Speaker[] = [
         bio: 'Senior Pastor at Perimeter Church since 2010.',
     },
     { id: 2, name: 'Pastor Jane Doe', bio: 'Teaching Pastor and author.' },
+];
+
+export const mockServiceTypes: ServiceType[] = [
+    { id: 1, name: 'Worship Service' },
+    { id: 2, name: 'Youth' },
+    { id: 3, name: 'Kids' },
+    { id: 4, name: 'Special Event' },
+];
+
+export const mockSeriesTypes: SeriesType[] = [
+    { id: 1, name: 'Sunday Morning Sermon' },
+    { id: 2, name: 'Special Series' },
 ];
 
 export const mockBooks: Book[] = [
@@ -31,6 +45,7 @@ export const mockSeries: SeriesListItem[] = [
         latestSermonDate: '2026-03-15',
         sermonCount: 3,
         book: { id: 60, name: '1 Peter' },
+        seriesType: { id: 1, name: 'Sunday Morning Sermon' },
     },
     {
         id: 2,
@@ -41,6 +56,7 @@ export const mockSeries: SeriesListItem[] = [
         latestSermonDate: '2026-03-01',
         sermonCount: 2,
         book: { id: 42, name: 'Luke' },
+        seriesType: { id: 2, name: 'Special Series' },
     },
 ];
 
@@ -56,6 +72,7 @@ export const mockSermons: SermonListItem[] = [
         speaker: { id: 1, name: 'Pastor John Smith' },
         series: { id: 1, title: '1 Peter' },
         congregation: { id: 1 },
+        book: { id: 60, name: '1 Peter' },
     },
     {
         id: 2,
@@ -67,6 +84,7 @@ export const mockSermons: SermonListItem[] = [
         speaker: { id: 1, name: 'Pastor John Smith' },
         series: { id: 1, title: '1 Peter' },
         congregation: { id: 1 },
+        book: { id: 60, name: '1 Peter' },
     },
     {
         id: 3,
@@ -78,6 +96,7 @@ export const mockSermons: SermonListItem[] = [
         speaker: { id: 2, name: 'Pastor Jane Doe' },
         series: { id: 2, title: 'Gospel of Luke' },
         congregation: { id: 1 },
+        book: { id: 42, name: 'Luke' },
     },
 ];
 
