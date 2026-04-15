@@ -5,7 +5,8 @@ node_modules/
 .env.local
 .DS_Store
 # dist/ is NOT ignored — committed for jsDelivr CDN serving
-# But storyboard dist is a dev build, not for CDN
+# But storyboard and internal package dist/ are local build artifacts, not for CDN
 packages/storyboard/dist/
+packages/vite-preset/dist/
 .superpowers/
 .worktrees/

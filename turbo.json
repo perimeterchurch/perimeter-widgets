@@ -10,11 +10,13 @@
         },
         "dev": {
             "cache": false,
-            "persistent": true
+            "persistent": true,
+            "dependsOn": ["^build"]
         },
         "storybook": {
             "cache": false,
-            "persistent": true
+            "persistent": true,
+            "dependsOn": ["^build"]
         },
         "lint": {},
         "typecheck": {}
