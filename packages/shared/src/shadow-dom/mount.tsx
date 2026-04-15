@@ -9,6 +9,7 @@ import {
     type WidgetConfig,
 } from './config';
 import { PortalContainerProvider } from './portal-container';
+import { ShadowEnvironmentProvider } from './shadow-environment';
 import { WidgetErrorBoundary } from './error-boundary';
 
 export interface MountWidgetOptions {
@@ -95,17 +96,19 @@ export function mountWidget(options: MountWidgetOptions): MountResult | null {
 
     root.render(
         <StrictMode>
-            <PortalContainerProvider container={mountPoint}>
-                <QueryClientProvider client={queryClient}>
-                    <AuthProvider requiresAuth={requiresAuth}>
-                        <ConfigProvider config={config}>
-                            <WidgetErrorBoundary>
-                                <Component />
-                            </WidgetErrorBoundary>
-                        </ConfigProvider>
-                    </AuthProvider>
-                </QueryClientProvider>
-            </PortalContainerProvider>
+            <ShadowEnvironmentProvider shadowRoot={shadowRoot}>
+                <PortalContainerProvider container={mountPoint}>
+                    <QueryClientProvider client={queryClient}>
+                        <AuthProvider requiresAuth={requiresAuth}>
+                            <ConfigProvider config={config}>
+                                <WidgetErrorBoundary>
+                                    <Component />
+                                </WidgetErrorBoundary>
+                            </ConfigProvider>
+                        </AuthProvider>
+                    </QueryClientProvider>
+                </PortalContainerProvider>
+            </ShadowEnvironmentProvider>
         </StrictMode>,
     );
 

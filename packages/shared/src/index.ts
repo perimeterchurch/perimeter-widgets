@@ -6,7 +6,7 @@ export type { MountWidgetOptions, MountResult } from './shadow-dom/mount';
 export { WidgetErrorBoundary } from './shadow-dom/error-boundary';
 
 // API Client
-export { createApiClient } from './api/client';
+export { createApiClient, resolveApiBaseUrl } from './api/client';
 export type {
     WidgetApiClientOptions,
     paths,

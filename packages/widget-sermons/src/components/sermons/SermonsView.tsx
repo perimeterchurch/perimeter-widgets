@@ -19,6 +19,7 @@ import type {
     SortField,
     SortOrder,
 } from '../../types';
+import { applyWidgetDefaults } from '../../types';
 import { useSermons } from '../../hooks/use-sermons';
 import { useSeries } from '../../hooks/use-series';
 import { useSpeakers } from '../../hooks/use-speakers';
@@ -68,7 +69,8 @@ const SORT_FIELDS = [
     },
 ];
 
-export function SermonsView({ config, filters }: SermonsViewProps) {
+export function SermonsView({ config: rawConfig, filters }: SermonsViewProps) {
+    const config = applyWidgetDefaults(rawConfig);
     const [viewMode, setViewMode] = useState<ViewMode>(
         config.defaultView ?? 'grid',
     );
@@ -76,9 +78,15 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         useServiceTypes(config);
     const { data: seriesTypes = [], isLoading: seriesTypesLoading } =
         useSeriesTypes(config);
+    // Both type filters are opt-in. The embedder shows them by setting
+    // data-show-service-type / data-show-series-type. When pinned via
+    // serviceTypeId / seriesTypeId, the dropdown stays hidden (the value
+    // is locked). The schema transform also pins seriesTypeId="1" by
+    // default — see SermonsConfigSchema.
     const showServiceTypeFilter =
-        !config.serviceTypeId && !config.hideServiceType;
-    const showSeriesTypeFilter = !config.seriesTypeId && !config.hideSeriesType;
+        config.showServiceType === true && !config.serviceTypeId;
+    const showSeriesTypeFilter =
+        config.showSeriesType === true && !config.seriesTypeId;
 
     const display = config.display ?? 'full';
     const showFilters = display === 'full';
