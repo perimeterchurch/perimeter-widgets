@@ -28,34 +28,80 @@
 
 /* Tailwind v4 registers internal --tw-* variables via `@property` rules with
  * initial values. Inside a shadow root those registrations aren't always
- * picked up (Firefox, and some Chromium versions), leaving `border`,
- * focus rings, shadows, etc. broken because `var(--tw-border-style)` and
- * friends resolve to empty. Set the same defaults universally so the
- * widget renders correctly even when @property registration is silent.
- * Values are taken verbatim from the @property initial-value declarations
- * in the bundled Tailwind output and must stay in sync if Tailwind adds
- * new internal variables. */
+ * picked up (Firefox, and some Chromium versions), leaving borders, focus
+ * rings, shadows, hover states, and other utilities broken.
+ *
+ * The complete set below mirrors Tailwind's own @layer properties fallback
+ * block (the one inside @supports for browsers without @property). We apply
+ * it unconditionally so shadow DOM contexts always have valid defaults.
+ *
+ * To regenerate after a Tailwind upgrade, build the widget and run:
+ *   node -e "const js=require('fs').readFileSync('dist/sermons/sermons.js','utf8');
+ *   const m=[...js.slice(js.indexOf('@layer properties'),js.indexOf('@layer properties')+5000)
+ *   .matchAll(/(--tw-[\w-]+):\s*([^;]+)/g)];m.forEach(v=>console.log('    '+v[1]+': '+v[2]+';'));"
+ */
 *,
 *::before,
 *::after {
     --tw-translate-x: 0;
     --tw-translate-y: 0;
     --tw-translate-z: 0;
+    --tw-rotate-x: initial;
+    --tw-rotate-y: initial;
+    --tw-rotate-z: initial;
+    --tw-skew-x: initial;
+    --tw-skew-y: initial;
     --tw-space-y-reverse: 0;
     --tw-space-x-reverse: 0;
     --tw-divide-y-reverse: 0;
     --tw-border-style: solid;
+    --tw-leading: initial;
+    --tw-font-weight: initial;
+    --tw-tracking: initial;
+    --tw-ordinal: initial;
+    --tw-slashed-zero: initial;
+    --tw-numeric-figure: initial;
+    --tw-numeric-spacing: initial;
+    --tw-numeric-fraction: initial;
     --tw-shadow: 0 0 #0000;
+    --tw-shadow-color: initial;
     --tw-shadow-alpha: 100%;
     --tw-inset-shadow: 0 0 #0000;
+    --tw-inset-shadow-color: initial;
     --tw-inset-shadow-alpha: 100%;
+    --tw-ring-color: initial;
     --tw-ring-shadow: 0 0 #0000;
+    --tw-inset-ring-color: initial;
     --tw-inset-ring-shadow: 0 0 #0000;
-    --tw-ring-offset-width: 0;
+    --tw-ring-inset: initial;
+    --tw-ring-offset-width: 0px;
     --tw-ring-offset-color: #fff;
     --tw-ring-offset-shadow: 0 0 #0000;
     --tw-outline-style: solid;
+    --tw-blur: initial;
+    --tw-brightness: initial;
+    --tw-contrast: initial;
+    --tw-grayscale: initial;
+    --tw-hue-rotate: initial;
+    --tw-invert: initial;
+    --tw-opacity: initial;
+    --tw-saturate: initial;
+    --tw-sepia: initial;
+    --tw-drop-shadow: initial;
+    --tw-drop-shadow-color: initial;
     --tw-drop-shadow-alpha: 100%;
+    --tw-drop-shadow-size: initial;
+    --tw-backdrop-blur: initial;
+    --tw-backdrop-brightness: initial;
+    --tw-backdrop-contrast: initial;
+    --tw-backdrop-grayscale: initial;
+    --tw-backdrop-hue-rotate: initial;
+    --tw-backdrop-invert: initial;
+    --tw-backdrop-opacity: initial;
+    --tw-backdrop-saturate: initial;
+    --tw-backdrop-sepia: initial;
+    --tw-duration: initial;
+    --tw-ease: initial;
     --tw-content: '';
 }
 
