@@ -51,6 +51,25 @@ jobs:
                   git commit -m "chore: update built widget files"
                   git push
 
+            # Copy the freshly-built dist/ to dev so both branches stay in sync.
+            # Without this, every release PR from dev → main conflicts on
+            # dist/ because main has CI commits that dev doesn't know about.
+            # We can't fast-forward (dev has feature commits main doesn't), so
+            # we check out dev, overwrite its dist/, commit, and push.
+            - name: Backport dist to dev
+              if: steps.check-dist.outputs.changed == 'true'
+              run: |
+                  cp -r dist/ /tmp/dist-backup
+                  git fetch origin dev --depth=1
+                  git checkout origin/dev
+                  cp -r /tmp/dist-backup/. dist/
+                  git add dist/
+                  if ! git diff --staged --quiet; then
+                      git commit -m "chore: sync built widget files from main"
+                      git push origin HEAD:refs/heads/dev
+                  fi
+                  git checkout -
+
             # jsDelivr's @latest resolves to the highest semver tag, NOT main HEAD.
             # Without a tag bump, every release leaves @latest pointing at the previous
             # tag and the new dist/ never reaches embedded sites until the cache TTL
