@@ -708,11 +708,17 @@ git commit -m "feat: add cross-filter narrowing to listServiceTypes"
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
+- [ ] **Step 0: Verify `getAllSeries` exists and returns the expected shape**
+
+Read `sermons-system.ts` for a method that returns all series with their `seriesType` attached (the cache key `buildCacheKey('series', 'all')` at line 522 suggests such a method exists). Confirm the method name and return shape — it should return `SeriesListItem[]` where each item has a `seriesType: { id, name } | null`.
+
+If the method is named differently (e.g. `getSeriesList` or similar), substitute the correct name in the code sketch below. If no such method exists, use the `getSeriesMap()` helper at line 195 as the first option, or add a minimal `getAllSeries` helper before proceeding.
+
 - [ ] **Step 1: Note the two-join-away dimension**
 
 `Pocket_Platform_Sermons` has no `Series_Type_ID` column — seriesType is a property of the Series, not the sermon. So the narrowing subquery for seriesTypes projects **distinct Series_IDs** from the sermon filter, then reads those series' `Sermon_Series_Type_ID` values.
 
-Use the in-memory `getAllSeries()` cache (already populated elsewhere) to avoid an extra MP roundtrip for the series→seriesType mapping.
+Use the in-memory `getAllSeries()` cache (verified in Step 0) to avoid an extra MP roundtrip for the series→seriesType mapping.
 
 - [ ] **Step 2: Write the failing tests**
 
@@ -1601,7 +1607,7 @@ Expected: FAIL — module does not exist.
 - [ ] **Step 4: Implement the hook**
 
 ```ts
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 
 export type Dimension =
     | 'speaker'
@@ -1672,7 +1678,12 @@ export function useFilterLabelCache(): FilterLabelCache {
         [],
     );
 
-    return { getLabel, absorb, mergeSelectedIntoOptions };
+    // Memoize the returned object so consumers that list `labelCache` in
+    // useEffect deps don't re-run on every parent render.
+    return useMemo(
+        () => ({ getLabel, absorb, mergeSelectedIntoOptions }),
+        [getLabel, absorb, mergeSelectedIntoOptions],
+    );
 }
 ```
 
@@ -1761,7 +1772,10 @@ useEffect(() => {
 The existing `useSpeakers(config)` / `useBooks(config)` calls in `SermonsView` are now the *unfiltered primer* fetches. Add new *narrowed* fetches alongside them, passing in filter state from `useSermonFilters`:
 
 ```ts
-const { data: narrowedSpeakers = [], isLoading: speakersLoading } = useSpeakers({
+const {
+    data: narrowedSpeakers = [],
+    isLoading: speakersLoading,
+} = useSpeakers({
     config,
     search: filters.search || undefined,
     selectedSeriesIds: filters.selectedSeriesIds,
@@ -1771,15 +1785,49 @@ const { data: narrowedSpeakers = [], isLoading: speakersLoading } = useSpeakers(
     from: filters.from,
     to: filters.to,
 });
-// Same pattern for narrowedBooks, narrowedSeries, narrowedServiceTypes,
-// narrowedSeriesTypes.
+
+const {
+    data: narrowedBooks = [],
+    isLoading: booksLoading,
+} = useBooks({
+    config,
+    search: filters.search || undefined,
+    selectedSeriesIds: filters.selectedSeriesIds,
+    selectedSpeakerIds: filters.selectedSpeakerIds,
+    selectedServiceTypeIds: filters.selectedServiceTypeIds,
+    selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
+    from: filters.from,
+    to: filters.to,
+});
+
+const {
+    data: narrowedSeriesPage,
+    isLoading: seriesLoading,
+} = useSeries({
+    config,
+    perPage: 50,
+    search: filters.search || undefined,
+    selectedSpeakerIds: filters.selectedSpeakerIds,
+    selectedBookIds: filters.selectedBookIds,
+    selectedServiceTypeIds: filters.selectedServiceTypeIds,
+    selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
+    from: filters.from,
+    to: filters.to,
+});
+const narrowedSeries = narrowedSeriesPage?.series ?? [];
+
+// Same array-returning pattern for narrowedServiceTypes (useServiceTypes)
+// and narrowedSeriesTypes (useSeriesTypes) — both return arrays, so the
+// `= []` default is correct.
 ```
+
+`useSpeakers` / `useBooks` / `useServiceTypes` / `useSeriesTypes` return arrays (`Speaker[]`, `Book[]`, etc.), so `= []` is the right default for them. `useSeries` returns `{ series, pagination }`, so unwrap it explicitly into `narrowedSeries` before passing to `SermonFilters`.
 
 TanStack Query dedupes the primer fetch (no filter params) from the narrowed fetch (filtered params) because the query keys differ.
 
 - [ ] **Step 3: Pass narrowed lists AND the labelCache to SermonFilters**
 
-Update the `<SermonFilters>` props to receive `speakers={narrowedSpeakers}`, `books={narrowedBooks}`, `seriesList={narrowedSeries.series ?? []}`, etc., plus a new `labelCache={labelCache}` prop.
+Update the `<SermonFilters>` props to receive `speakers={narrowedSpeakers}`, `books={narrowedBooks}`, `seriesList={narrowedSeries}`, `serviceTypes={narrowedServiceTypes}`, `seriesTypes={narrowedSeriesTypes}`, plus a new `labelCache={labelCache}` prop.
 
 - [ ] **Step 4: Run the widget tests**
 
