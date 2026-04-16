@@ -2,6 +2,7 @@ import { useConfig } from '@perimeter-widgets/shared';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { SermonsConfig } from './types';
+import { applyWidgetDefaults } from './types';
 import { useSermonFilters } from './hooks/use-sermon-filters';
 import { SermonTabs } from './components/SermonTabs';
 import { SermonsView } from './components/sermons/SermonsView';
@@ -24,7 +25,8 @@ const fadeSlide = {
 };
 
 function SermonsWidget() {
-    const config = useConfig<SermonsConfig>();
+    const rawConfig = useConfig<SermonsConfig>();
+    const config = applyWidgetDefaults(rawConfig);
     const filters = useSermonFilters(config);
 
     // Build a unique key for AnimatePresence based on the current "page"
