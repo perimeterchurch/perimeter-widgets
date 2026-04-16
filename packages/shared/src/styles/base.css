@@ -26,6 +26,39 @@
     box-sizing: border-box;
 }
 
+/* Tailwind v4 registers internal --tw-* variables via `@property` rules with
+ * initial values. Inside a shadow root those registrations aren't always
+ * picked up (Firefox, and some Chromium versions), leaving `border`,
+ * focus rings, shadows, etc. broken because `var(--tw-border-style)` and
+ * friends resolve to empty. Set the same defaults universally so the
+ * widget renders correctly even when @property registration is silent.
+ * Values are taken verbatim from the @property initial-value declarations
+ * in the bundled Tailwind output and must stay in sync if Tailwind adds
+ * new internal variables. */
+*,
+*::before,
+*::after {
+    --tw-translate-x: 0;
+    --tw-translate-y: 0;
+    --tw-translate-z: 0;
+    --tw-space-y-reverse: 0;
+    --tw-space-x-reverse: 0;
+    --tw-divide-y-reverse: 0;
+    --tw-border-style: solid;
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-alpha: 100%;
+    --tw-inset-shadow: 0 0 #0000;
+    --tw-inset-shadow-alpha: 100%;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-inset-ring-shadow: 0 0 #0000;
+    --tw-ring-offset-width: 0;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-offset-shadow: 0 0 #0000;
+    --tw-outline-style: solid;
+    --tw-drop-shadow-alpha: 100%;
+    --tw-content: '';
+}
+
 @layer base {
     button,
     [role='button'] {
