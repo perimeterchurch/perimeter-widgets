@@ -51,6 +51,28 @@ jobs:
                   git commit -m "chore: update built widget files"
                   git push
 
+            # jsDelivr's @latest resolves to the highest semver tag, NOT main HEAD.
+            # Without a tag bump, every release leaves @latest pointing at the previous
+            # tag and the new dist/ never reaches embedded sites until the cache TTL
+            # expires (and even then @latest is wrong). Bump the patch and tag.
+            - name: Bump patch tag for @latest
+              if: steps.check-dist.outputs.changed == 'true'
+              id: tag
+              run: |
+                  git fetch --tags
+                  latest_tag=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+                  if [ -z "$latest_tag" ]; then
+                      next_tag="v0.1.0"
+                  else
+                      base=${latest_tag#v}
+                      IFS=. read -r major minor patch <<< "$base"
+                      next_tag="v${major}.${minor}.$((patch + 1))"
+                  fi
+                  echo "Tagging $next_tag (previous: ${latest_tag:-none})"
+                  git tag "$next_tag"
+                  git push origin "$next_tag"
+                  echo "tag=$next_tag" >> $GITHUB_OUTPUT
+
             - name: Purge jsDelivr cache
               if: steps.check-dist.outputs.changed == 'true'
               run: |
@@ -58,10 +80,19 @@ jobs:
                   import { readFileSync } from 'fs';
                   const manifest = JSON.parse(readFileSync('./dist/manifest.json', 'utf8'));
                   const widgets = Object.values(manifest.widgets);
-                  await Promise.all(widgets.map(async (w) => {
-                    const url = 'https://purge.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/' + w.file;
-                    console.log('Purging: ' + url);
-                    const r = await fetch(url);
-                    console.log('  Status: ' + r.status);
-                  }));
+                  // Purge both @latest and the new tag, just in case anyone hit
+                  // either URL before the tag landed.
+                  const tag = process.env.NEW_TAG;
+                  const refs = ['@latest', tag ? '@' + tag : null].filter(Boolean);
+                  const tasks = widgets.flatMap((w) =>
+                      refs.map(async (ref) => {
+                          const url = `https://purge.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets${ref}/${w.file}`;
+                          console.log('Purging: ' + url);
+                          const r = await fetch(url);
+                          console.log('  Status: ' + r.status);
+                      }),
+                  );
+                  await Promise.all(tasks);
                   EOF
+              env:
+                  NEW_TAG: ${{ steps.tag.outputs.tag }}
