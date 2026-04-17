@@ -98,7 +98,7 @@ export function SeriesView({ config: rawConfig, filters }: SeriesViewProps) {
         && !config.seriesTypeId;
 
     const { data: seriesTypes = [], isLoading: seriesTypesLoading } =
-        useSeriesTypes(config);
+        useSeriesTypes({ config });
     const seriesTypeOptions: MultiComboboxOption[] = seriesTypes.map((st) => ({
         value: String(st.id),
         label: st.name,

@@ -20,7 +20,7 @@ export function SermonSmallList({
     }
 
     return (
-        <div className='divide-y divide-border'>
+        <div>
             {sermons.map((sermon) => (
                 <MediaCard
                     key={sermon.id}

@@ -4,6 +4,9 @@ import type { SermonsConfig } from '../types';
 
 export interface UseSeriesParams {
     search?: string;
+    selectedSpeakerIds?: number[];
+    selectedBookIds?: number[];
+    selectedServiceTypeIds?: number[];
     selectedSeriesTypeIds?: number[];
     from?: string;
     to?: string;
@@ -17,6 +20,9 @@ export interface UseSeriesParams {
 export function useSeries(params: UseSeriesParams) {
     const {
         search,
+        selectedSpeakerIds = [],
+        selectedBookIds = [],
+        selectedServiceTypeIds = [],
         selectedSeriesTypeIds = [],
         from,
         to,
@@ -27,6 +33,16 @@ export function useSeries(params: UseSeriesParams) {
         config,
     } = params;
 
+    const speakerId =
+        selectedSpeakerIds.length > 0 ?
+            selectedSpeakerIds.join(',')
+        :   undefined;
+    const bookId =
+        selectedBookIds.length > 0 ? selectedBookIds.join(',') : undefined;
+    const serviceTypeId =
+        selectedServiceTypeIds.length > 0 ?
+            selectedServiceTypeIds.join(',')
+        :   undefined;
     const seriesTypeId =
         selectedSeriesTypeIds.length > 0 ?
             selectedSeriesTypeIds.join(',')
@@ -35,7 +51,20 @@ export function useSeries(params: UseSeriesParams) {
     return useQuery({
         queryKey: [
             'series-list',
-            { search, seriesTypeId, from, to, page, perPage, sort, order },
+            config.apiUrl,
+            {
+                search,
+                speakerId,
+                bookId,
+                serviceTypeId,
+                seriesTypeId,
+                from,
+                to,
+                page,
+                perPage,
+                sort,
+                order,
+            },
         ],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
@@ -43,6 +72,9 @@ export function useSeries(params: UseSeriesParams) {
                 params: {
                     query: {
                         search: search || undefined,
+                        speakerId,
+                        bookId,
+                        serviceTypeId,
                         seriesTypeId,
                         from: from || undefined,
                         to: to || undefined,
