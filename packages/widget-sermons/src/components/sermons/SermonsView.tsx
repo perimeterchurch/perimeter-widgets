@@ -75,9 +75,9 @@ export function SermonsView({ config: rawConfig, filters }: SermonsViewProps) {
         config.defaultView ?? 'grid',
     );
     const { data: serviceTypes = [], isLoading: serviceTypesLoading } =
-        useServiceTypes(config);
+        useServiceTypes({ config });
     const { data: seriesTypes = [], isLoading: seriesTypesLoading } =
-        useSeriesTypes(config);
+        useSeriesTypes({ config });
     // Both type filters are opt-in. The embedder shows them by setting
     // data-show-service-type / data-show-series-type. When pinned via
     // serviceTypeId / seriesTypeId, the dropdown stays hidden (the value
@@ -124,8 +124,8 @@ export function SermonsView({ config: rawConfig, filters }: SermonsViewProps) {
     });
     const seriesList = seriesData?.series ?? [];
     const { data: speakers = [], isLoading: speakersLoading } =
-        useSpeakers(config);
-    const { data: books = [], isLoading: booksLoading } = useBooks(config);
+        useSpeakers({ config });
+    const { data: books = [], isLoading: booksLoading } = useBooks({ config });
 
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
