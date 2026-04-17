@@ -86,7 +86,7 @@ export function SermonsView({ config: rawConfig, filters }: SermonsViewProps) {
     const { data: allSeriesPage } = useSeries({ config, perPage: 50 });
     const allSeriesItems = useMemo(
         () => allSeriesPage?.series ?? [],
-        [allSeriesPage],
+        [allSeriesPage?.series],
     );
 
     // Absorb primer results into the label cache via effects — inline absorb
