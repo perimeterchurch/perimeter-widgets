@@ -71,19 +71,38 @@ export function SermonFilters(props: SermonFiltersProps) {
 
     // Only one filter dropdown open at a time
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-    const seriesOptions: MultiComboboxOption[] = props.seriesList.map((s) => ({
-        value: String(s.id),
-        label: s.displayTitle ?? s.title,
-    }));
-    const speakerOptions: MultiComboboxOption[] = props.speakers.map((s) => ({
-        value: String(s.id),
-        label: s.name,
-    }));
+    const seriesOptionsRaw: MultiComboboxOption[] = props.seriesList.map(
+        (s) => ({
+            value: String(s.id),
+            label: s.displayTitle ?? s.title,
+        }),
+    );
+    const seriesOptions: MultiComboboxOption[] =
+        props.labelCache.mergeSelectedIntoOptions(
+            'series',
+            seriesOptionsRaw,
+            props.selectedSeriesIds,
+        );
 
-    // Bible books: sorted in canonical order with OT/NT group headers
+    const speakerOptionsRaw: MultiComboboxOption[] = props.speakers.map(
+        (s) => ({
+            value: String(s.id),
+            label: s.name,
+        }),
+    );
+    const speakerOptions: MultiComboboxOption[] =
+        props.labelCache.mergeSelectedIntoOptions(
+            'speaker',
+            speakerOptionsRaw,
+            props.selectedSpeakerIds,
+        );
+
+    // Bible books: sorted in canonical order with OT/NT group headers.
+    // Selected books that narrowed out of props.books are appended after the
+    // grouped section (ungrouped) via labelCache.mergeSelectedIntoOptions.
     const bookOptions: MultiComboboxOption[] = useMemo(() => {
         const groups = groupBooksByTestament(props.books);
-        return groups.flatMap((group) => [
+        const grouped: MultiComboboxOption[] = groups.flatMap((group) => [
             {
                 value: `__group_${group.label}`,
                 label: group.label,
@@ -92,21 +111,38 @@ export function SermonFilters(props: SermonFiltersProps) {
             },
             ...group.options,
         ]);
-    }, [props.books]);
+        return props.labelCache.mergeSelectedIntoOptions(
+            'book',
+            grouped,
+            props.selectedBookIds,
+        );
+    }, [props.books, props.labelCache, props.selectedBookIds]);
 
-    const serviceTypeOptions: MultiComboboxOption[] = props.serviceTypes.map(
+    const serviceTypeOptionsRaw: MultiComboboxOption[] = props.serviceTypes.map(
         (st) => ({
             value: String(st.id),
             label: st.name,
         }),
     );
+    const serviceTypeOptions: MultiComboboxOption[] =
+        props.labelCache.mergeSelectedIntoOptions(
+            'serviceType',
+            serviceTypeOptionsRaw,
+            props.selectedServiceTypeIds,
+        );
 
-    const seriesTypeOptions: MultiComboboxOption[] = props.seriesTypes.map(
+    const seriesTypeOptionsRaw: MultiComboboxOption[] = props.seriesTypes.map(
         (st) => ({
             value: String(st.id),
             label: st.name,
         }),
     );
+    const seriesTypeOptions: MultiComboboxOption[] =
+        props.labelCache.mergeSelectedIntoOptions(
+            'seriesType',
+            seriesTypeOptionsRaw,
+            props.selectedSeriesTypeIds,
+        );
 
     return (
         <div className='space-y-3'>

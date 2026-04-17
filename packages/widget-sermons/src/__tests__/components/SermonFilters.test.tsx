@@ -1,13 +1,21 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, renderHook, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
     SermonFilters,
     type SermonFiltersProps,
 } from '../../components/sermons/SermonFilters';
-import type { FilterLabelCache } from '../../hooks/use-filter-label-cache';
+import {
+    useFilterLabelCache,
+    type FilterLabelCache,
+} from '../../hooks/use-filter-label-cache';
 
-/** Minimal stub — Task 25 requires the prop but doesn't consume it. */
+/**
+ * Faithful stub that mimics mergeSelectedIntoOptions so tests that don't care
+ * about cache rehydration still see correct option lists (selected-but-missing
+ * ids appear with a fallback label).
+ */
 const labelCacheStub: FilterLabelCache = {
     getLabel: () => undefined,
     absorb: () => {},
@@ -270,5 +278,102 @@ describe('SermonFilters locked filter suppression', () => {
         // but the trigger still exists) — assert via presence of the trigger
         // placeholder text for an unselected dropdown.
         expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
+    });
+});
+
+describe('SermonFilters labelCache integration', () => {
+    /**
+     * Open the Nth dropdown (by its "toggle menu" aria-label). The filter row
+     * renders the dropdowns in order: series, speaker, book, (serviceType),
+     * (seriesType).
+     */
+    async function openDropdown(index: number) {
+        const toggles = screen.getAllByRole('button', { name: /toggle menu/i });
+        const toggle = toggles[index];
+        if (!toggle) throw new Error(`No dropdown at index ${index}`);
+        await userEvent.click(toggle);
+    }
+
+    it('shows a selected-but-narrowed-out speaker in the dropdown using the cached label', async () => {
+        const { result } = renderHook(() => useFilterLabelCache());
+        result.current.absorb('speaker', [
+            { id: 1, label: 'A' },
+            { id: 2, label: 'B' },
+        ]);
+
+        render(
+            <SermonFilters
+                {...makeProps({
+                    speakers: [{ id: 1, name: 'A', bio: null }],
+                    selectedSpeakerIds: [1, 2],
+                    hasActiveFilters: true,
+                    labelCache: result.current,
+                })}
+            />,
+        );
+
+        // Speaker dropdown is the second one (index 1).
+        await openDropdown(1);
+
+        const optionA = await screen.findByRole('option', { name: 'A' });
+        const optionB = await screen.findByRole('option', { name: 'B' });
+        expect(optionA).toBeInTheDocument();
+        expect(optionB).toBeInTheDocument();
+
+        // "B" appears after "A" in the DOM order (narrowed options first).
+        expect(
+            optionA.compareDocumentPosition(optionB)
+                & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
+    });
+
+    it('falls back to "Speaker <id>" when a selected speaker is unseen by the cache', async () => {
+        const { result } = renderHook(() => useFilterLabelCache());
+
+        render(
+            <SermonFilters
+                {...makeProps({
+                    speakers: [],
+                    selectedSpeakerIds: [42],
+                    hasActiveFilters: true,
+                    labelCache: result.current,
+                })}
+            />,
+        );
+
+        await openDropdown(1);
+
+        expect(
+            await screen.findByRole('option', { name: 'Speaker 42' }),
+        ).toBeInTheDocument();
+    });
+
+    it('renders the chip for a narrowed-out speaker using the cached label', () => {
+        const { result } = renderHook(() => useFilterLabelCache());
+        result.current.absorb('speaker', [
+            { id: 1, label: 'A' },
+            { id: 2, label: 'B' },
+        ]);
+
+        render(
+            <SermonFilters
+                {...makeProps({
+                    // Only speaker 1 is in the narrowed facet list; 2 is cached.
+                    speakers: [{ id: 1, name: 'A', bio: null }],
+                    selectedSpeakerIds: [1, 2],
+                    hasActiveFilters: true,
+                    labelCache: result.current,
+                })}
+            />,
+        );
+
+        expect(
+            screen.getByRole('button', { name: /Remove A filter/ }),
+        ).toBeInTheDocument();
+        // Chip for the narrowed-out speaker resolves to the cached label "B",
+        // not the generic "Speaker" fallback.
+        expect(
+            screen.getByRole('button', { name: /Remove B filter/ }),
+        ).toBeInTheDocument();
     });
 });
