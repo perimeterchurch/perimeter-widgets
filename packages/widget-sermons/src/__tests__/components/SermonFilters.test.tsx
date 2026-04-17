@@ -5,6 +5,14 @@ import {
     SermonFilters,
     type SermonFiltersProps,
 } from '../../components/sermons/SermonFilters';
+import type { FilterLabelCache } from '../../hooks/use-filter-label-cache';
+
+/** Minimal stub — Task 25 requires the prop but doesn't consume it. */
+const labelCacheStub: FilterLabelCache = {
+    getLabel: () => undefined,
+    absorb: () => {},
+    mergeSelectedIntoOptions: (_d, options) => options,
+};
 
 /**
  * Factory that returns a full set of SermonFilters props with sensible
@@ -68,6 +76,7 @@ function makeProps(
         onSortChange: () => {},
         onClearFilters: () => {},
         lockedFilters: new Set<string>(),
+        labelCache: labelCacheStub,
         ...overrides,
     };
 }

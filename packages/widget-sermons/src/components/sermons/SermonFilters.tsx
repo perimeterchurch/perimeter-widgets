@@ -11,6 +11,7 @@ import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { X, Search } from 'lucide-react';
 import { groupBooksByTestament } from '../../lib/bible-books';
+import type { FilterLabelCache } from '../../hooks/use-filter-label-cache';
 import type {
     Speaker,
     Book,
@@ -55,6 +56,12 @@ export interface SermonFiltersProps {
     onSortChange: (sort: SortField, order: SortOrder) => void;
     onClearFilters: () => void;
     lockedFilters: Set<string>;
+    /**
+     * Label cache for rehydrating selected filter chips that aren't present in
+     * the current narrowed facet lists. Wired here for Task 25; consumed in
+     * Task 26.
+     */
+    labelCache: FilterLabelCache;
 }
 
 export function SermonFilters(props: SermonFiltersProps) {
