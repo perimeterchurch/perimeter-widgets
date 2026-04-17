@@ -66,8 +66,8 @@ export function useFilterLabelCache(): FilterLabelCache {
                 .map((id) => ({
                     value: String(id),
                     label:
-                        cacheRef.current.get(dimension)?.get(id) ??
-                        `${DIMENSION_SINGULAR[dimension]} ${id}`,
+                        cacheRef.current.get(dimension)?.get(id)
+                        ?? `${DIMENSION_SINGULAR[dimension]} ${id}`,
                 }));
             return [...narrowedOptions, ...missing];
         },

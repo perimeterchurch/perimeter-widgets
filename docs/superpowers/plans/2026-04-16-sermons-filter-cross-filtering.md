@@ -17,6 +17,7 @@
 ### perimeter-api
 
 **Modified:**
+
 - `src/data/models/sermons/index.ts` — add `FacetQuerySchema` variants for each facets endpoint
 - `src/systems/mp/sermons/sermons-system.ts` — LIKE search fix, `listSeries` bug fix, new private helpers for cross-filter narrowing, extended facet methods
 - `src/services/sermons/sermons-service.ts` — thread facet query params to system
@@ -29,11 +30,13 @@
 - `docs/domains/sermons.md` — update search + known-limitations sections
 
 **Created:**
+
 - `tests/systems/mp/sermons/sermons-system.test.ts` — unit tests for `buildSermonFilter`, filter-hash canonicalization, listSpeakers/Books/ServiceTypes/SeriesTypes cross-filter paths, and the `listSeries` reassignment bug fix
 
 ### perimeter-widgets
 
 **Modified:**
+
 - `packages/widget-sermons/src/hooks/use-speakers.ts` — accept cross-filter params
 - `packages/widget-sermons/src/hooks/use-books.ts` — accept cross-filter params
 - `packages/widget-sermons/src/hooks/use-service-types.ts` — accept cross-filter params
@@ -47,6 +50,7 @@
 - `packages/shared/src/components/ui/perimeter/combobox.tsx` — popover border
 
 **Created:**
+
 - `packages/widget-sermons/src/hooks/use-filter-label-cache.ts` — ref-backed per-dimension label cache with mount-time unfiltered prime
 - `packages/widget-sermons/src/__tests__/hooks/use-speakers.test.tsx` — hook forwards filter params
 - `packages/widget-sermons/src/__tests__/hooks/use-books.test.tsx` — hook forwards filter params
@@ -63,6 +67,7 @@ This plan produces **two PRs that must ship in order**:
 2. **PR B (perimeter-widgets)** — Tasks 15–28 below. Depends on PR A being deployed. Target `dev` in `perimeter-widgets`.
 
 Feature branches:
+
 - perimeter-api: `feat/sermons-facets-cross-filter`
 - perimeter-widgets: `feat/sermons-filter-cross-filtering` (already created for the spec commit)
 
@@ -77,6 +82,7 @@ This chunk ships the minimum to unbreak sermon search and fix the existing serie
 ### Task 1: Switch to feature branch in perimeter-api
 
 **Files:**
+
 - n/a (git only)
 
 - [ ] **Step 1: Confirm the repo is on `dev` with a clean tree**
@@ -100,6 +106,7 @@ Expected: `Switched to a new branch 'feat/sermons-facets-cross-filter'`.
 ### Task 2: Add failing test for LIKE-based sermon search
 
 **Files:**
+
 - Create: `tests/systems/mp/sermons/sermons-system.test.ts`
 
 - [ ] **Step 1: Look at a reference test file to mirror its patterns**
@@ -124,6 +131,7 @@ Expected: FAIL — assertion error showing the filter string contains `contains(
 ### Task 3: Implement the LIKE search replacement
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts:662-667`
 
 - [ ] **Step 1: Replace the `contains()` predicate with `LIKE`**
@@ -181,6 +189,7 @@ matching the pattern already shipping in contacts-system.ts."
 ### Task 4: Add failing test for listSeries reassignment bug
 
 **Files:**
+
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
 - [ ] **Step 1: Write the failing test**
@@ -200,6 +209,7 @@ Expected: FAIL — assertion shows both the type-1 and type-2 entries are return
 ### Task 5: Fix the listSeries reassignment bug
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts:467-474`
 
 - [ ] **Step 1: Change the reassignment source**
@@ -254,6 +264,7 @@ filtering the already-filtered set."
 ### Task 6: Manual E2E check against real MP (search fix)
 
 **Files:**
+
 - n/a (manual verification)
 
 - [ ] **Step 1: Start the dev API**
@@ -294,6 +305,7 @@ This chunk adds cross-filter query params to the four facet endpoints plus `/ser
 ### Task 7: Add Zod schemas for facet queries
 
 **Files:**
+
 - Modify: `src/data/models/sermons/index.ts` (add after `SeriesQuerySchema`)
 
 - [ ] **Step 1: Add `BaseFacetQueryShape` and per-dimension schemas**
@@ -330,9 +342,7 @@ export const SpeakersQuerySchema = z
     .omit({ speakerId: true });
 export type SpeakersQuery = z.infer<typeof SpeakersQuerySchema>;
 
-export const BooksQuerySchema = z
-    .object(FacetBaseShape)
-    .omit({ bookId: true });
+export const BooksQuerySchema = z.object(FacetBaseShape).omit({ bookId: true });
 export type BooksQuery = z.infer<typeof BooksQuerySchema>;
 
 export const ServiceTypesQuerySchema = z
@@ -391,6 +401,7 @@ git commit -m "feat: add facet query schemas for sermon cross-filtering"
 ### Task 8: Add filter-hash canonicalization helper
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
@@ -481,6 +492,7 @@ git commit -m "feat: add canonicalizeFacetFilter helper for facet cache keys"
 ### Task 9: Extend buildSermonFilter to translate seriesTypeId inline
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 
 - [ ] **Step 1: Read the current `listSermons` flow**
@@ -549,6 +561,7 @@ git commit -m "feat: add mergeSeriesTypeIntoSeriesId helper for facet narrowing"
 ### Task 10: Extend listSpeakers with cross-filter narrowing
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
@@ -648,6 +661,7 @@ git commit -m "feat: add cross-filter narrowing to listSpeakers"
 ### Task 11a: Extend listBooks with cross-filter narrowing
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
@@ -658,6 +672,7 @@ Same shape as Task 10 for books: baseline (no filter), cross-filter narrows via 
 - [ ] **Step 2: Extend listBooks**
 
 Find the current `listBooks` (or equivalent — may be named `listReferencedBooks` given the cache key at line 74; confirm by reading the method). Use the Task 10 shape, substituting:
+
 - Query type: `BooksQuery`
 - Dropped dimension in destructure: `bookId`
 - Projection column: `Book_ID`
@@ -677,6 +692,7 @@ git commit -m "feat: add cross-filter narrowing to listBooks"
 ### Task 11b: Extend listServiceTypes with cross-filter narrowing
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
@@ -687,6 +703,7 @@ Same shape as Task 11a. Dimension table: `Pocket_Platform_Service_Types`, PK `Se
 - [ ] **Step 2: Extend listServiceTypes**
 
 Use the Task 10 shape, substituting:
+
 - Query type: `ServiceTypesQuery`
 - Dropped dimension: `serviceTypeId`
 - Projection column: `Service_Type_ID`
@@ -705,6 +722,7 @@ git commit -m "feat: add cross-filter narrowing to listServiceTypes"
 ### Task 11c: Extend listSeriesTypes with cross-filter narrowing
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
@@ -787,6 +805,7 @@ git commit -m "feat: add cross-filter narrowing to listSeriesTypes"
 ### Task 12: Extend listSeries with cross-filter narrowing
 
 **Files:**
+
 - Modify: `src/systems/mp/sermons/sermons-system.ts`
 - Modify: `tests/systems/mp/sermons/sermons-system.test.ts`
 
@@ -861,6 +880,7 @@ git commit -m "feat: add cross-filter narrowing to listSeries"
 ### Task 13: Thread facet queries through service + controller + routes
 
 **Files:**
+
 - Modify: `src/services/sermons/sermons-service.ts`
 - Modify: `src/controllers/sermons/sermons-controller.ts`
 - Modify: `src/app/api/(public)/sermons/speakers/route.ts`
@@ -943,6 +963,7 @@ git commit -m "feat: thread facet query params through service, controller, rout
 ### Task 14: Update sermons domain docs and run quality
 
 **Files:**
+
 - Modify: `docs/domains/sermons.md`
 
 - [ ] **Step 1: Update the docs**
@@ -973,6 +994,7 @@ git commit -m "docs: update sermons domain docs for cross-filter params and LIKE
 ### Task 15: Manual E2E check against real MP (facets narrowing)
 
 **Files:**
+
 - n/a
 
 - [ ] **Step 1: Start the dev API**
@@ -1015,6 +1037,7 @@ Expected: narrowed lists vs unfiltered. Compare counts to sanity-check the narro
 ### Task 16: Open PR A (perimeter-api)
 
 **Files:**
+
 - n/a
 
 - [ ] **Step 1: Push the branch**
@@ -1044,6 +1067,7 @@ This chunk is small and doesn't depend on the API changes. It can be merged in e
 ### Task 17: Switch to feature branch in perimeter-widgets
 
 **Files:**
+
 - n/a
 
 - [ ] **Step 1: Confirm the branch**
@@ -1060,6 +1084,7 @@ Expected: `feat/sermons-filter-cross-filtering`.
 ### Task 18: Dropdown popover border (multi-combobox + combobox)
 
 **Files:**
+
 - Modify: `packages/shared/src/components/ui/perimeter/multi-combobox.tsx:317`
 - Modify: `packages/shared/src/components/ui/perimeter/combobox.tsx`
 
@@ -1068,13 +1093,15 @@ Expected: `feat/sermons-filter-cross-filtering`.
 In `multi-combobox.tsx`, find the popover `ul` className (line ~317). Replace `ring-1 ring-foreground/10` with `border border-foreground/20`. Keep everything else.
 
 Before:
+
 ```ts
-'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10'
+'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10';
 ```
 
 After:
+
 ```ts
-'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md border border-foreground/20'
+'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md border border-foreground/20';
 ```
 
 - [ ] **Step 2: Apply the same change in combobox.tsx**
@@ -1108,6 +1135,7 @@ git commit -m "fix: give combobox popovers a visible border in light mode"
 ### Task 19: Small-list card hover and per-row border
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/components/ui/MediaCard.tsx:188-213`
 - Modify: `packages/widget-sermons/src/components/sermons/SermonSmallList.tsx`
 
@@ -1116,13 +1144,17 @@ git commit -m "fix: give combobox popovers a visible border in light mode"
 In `MediaCard.tsx`, find the `viewMode === 'list'` branch. Replace the `CardButton`'s className:
 
 Before:
+
 ```ts
-className='flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
+className =
+    'flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
 ```
 
 After:
+
 ```ts
-className='flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
+className =
+    'flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
 ```
 
 - [ ] **Step 2: Remove `divide-y` from the wrapper**
@@ -1145,6 +1177,7 @@ pnpm dev
 ```
 
 Open the storyboard. Switch the sermons widget to Small list view. Confirm:
+
 - Each row has a bottom border
 - The final row does NOT have a bottom border
 - Hovering a row shows a noticeably darker background than before
@@ -1163,6 +1196,7 @@ git commit -m "feat: add per-row border and stronger hover to small-list sermon 
 ### Task 20: Suppress pill badges and dropdowns for locked filters
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/components/sermons/SermonFilters.tsx`
 - Create or Modify: `packages/widget-sermons/src/__tests__/components/SermonFilters.test.tsx`
 
@@ -1240,6 +1274,7 @@ This chunk depends on PR A being deployed and the `@perimeterchurch/api` npm pac
 ### Task 20.5: Bump @perimeterchurch/api dependency after PR A publishes
 
 **Files:**
+
 - Modify: `packages/shared/package.json`
 - Modify: `pnpm-lock.yaml`
 
@@ -1296,6 +1331,7 @@ git commit -m "chore: bump @perimeterchurch/api for sermons facet params"
 ### Task 21: Extend useSpeakers with cross-filter params
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/hooks/use-speakers.ts`
 - Create: `packages/widget-sermons/src/__tests__/hooks/use-speakers.test.tsx`
 
@@ -1356,13 +1392,13 @@ export function useSpeakers(params: UseSpeakersParams) {
     const bookId =
         selectedBookIds.length > 0 ? selectedBookIds.join(',') : undefined;
     const serviceTypeId =
-        selectedServiceTypeIds.length > 0
-            ? selectedServiceTypeIds.join(',')
-            : undefined;
+        selectedServiceTypeIds.length > 0 ?
+            selectedServiceTypeIds.join(',')
+        :   undefined;
     const seriesTypeId =
-        selectedSeriesTypeIds.length > 0
-            ? selectedSeriesTypeIds.join(',')
-            : undefined;
+        selectedSeriesTypeIds.length > 0 ?
+            selectedSeriesTypeIds.join(',')
+        :   undefined;
 
     return useQuery({
         queryKey: [
@@ -1372,22 +1408,19 @@ export function useSpeakers(params: UseSpeakersParams) {
         ],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
-            const { data, error } = await client.GET(
-                '/api/sermons/speakers',
-                {
-                    params: {
-                        query: {
-                            search: search || undefined,
-                            seriesId,
-                            bookId,
-                            serviceTypeId,
-                            seriesTypeId,
-                            from: from || undefined,
-                            to: to || undefined,
-                        },
+            const { data, error } = await client.GET('/api/sermons/speakers', {
+                params: {
+                    query: {
+                        search: search || undefined,
+                        seriesId,
+                        bookId,
+                        serviceTypeId,
+                        seriesTypeId,
+                        from: from || undefined,
+                        to: to || undefined,
                     },
                 },
-            );
+            });
             if (error) throw createApiError('Failed to fetch speakers', error);
             return data.data;
         },
@@ -1402,13 +1435,17 @@ This step assumes Task 20.5 (bumping `@perimeterchurch/api`) has been completed 
 The only caller today is `SermonsView.tsx`. It passes `config` directly. The new signature requires an object — update the call site:
 
 Before:
+
 ```ts
 const { data: speakers = [], isLoading: speakersLoading } = useSpeakers(config);
 ```
 
 After (baseline — no filters wired yet, Task 26 will wire them):
+
 ```ts
-const { data: speakers = [], isLoading: speakersLoading } = useSpeakers({ config });
+const { data: speakers = [], isLoading: speakersLoading } = useSpeakers({
+    config,
+});
 ```
 
 - [ ] **Step 5: Run the tests**
@@ -1430,6 +1467,7 @@ git commit -m "feat: extend useSpeakers with cross-filter params"
 ### Task 22: Extend useBooks, useServiceTypes, useSeriesTypes
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/hooks/use-books.ts`
 - Modify: `packages/widget-sermons/src/hooks/use-service-types.ts`
 - Modify: `packages/widget-sermons/src/hooks/use-series-types.ts`
@@ -1466,6 +1504,7 @@ git commit -m "feat: extend useBooks/useServiceTypes/useSeriesTypes with cross-f
 ### Task 23: Extend useSeries with cross-filter params
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/hooks/use-series.ts`
 
 - [ ] **Step 1: Extend `UseSeriesParams` and update the body**
@@ -1478,9 +1517,9 @@ const speakerId =
 const bookId =
     selectedBookIds.length > 0 ? selectedBookIds.join(',') : undefined;
 const serviceTypeId =
-    selectedServiceTypeIds.length > 0
-        ? selectedServiceTypeIds.join(',')
-        : undefined;
+    selectedServiceTypeIds.length > 0 ?
+        selectedServiceTypeIds.join(',')
+    :   undefined;
 ```
 
 Include the serialized strings in the queryKey's object and in the `params.query` passed to `client.GET('/api/sermons/series', ...)`. Add `config.apiUrl` to the queryKey array. Final queryKey shape:
@@ -1502,7 +1541,7 @@ queryKey: [
         sort,
         order,
     },
-]
+];
 ```
 
 And the `params.query`:
@@ -1548,6 +1587,7 @@ git commit -m "feat: extend useSeries with speaker/book/serviceType cross-filter
 ### Task 24: Create useFilterLabelCache hook
 
 **Files:**
+
 - Create: `packages/widget-sermons/src/hooks/use-filter-label-cache.ts`
 - Create: `packages/widget-sermons/src/__tests__/hooks/use-filter-label-cache.test.tsx`
 
@@ -1590,6 +1630,7 @@ The hook uses a `useRef<Map<Dimension, Map<number, string>>>()` so the cache sur
 - [ ] **Step 2: Write the failing tests**
 
 Test:
+
 1. `absorb` + `getLabel` round-trips a label.
 2. `absorb` with a partial list doesn't remove previously-absorbed entries (cache only grows).
 3. `mergeSelectedIntoOptions` appends selected-but-missing options at the bottom, using cached labels.
@@ -1662,9 +1703,7 @@ export function useFilterLabelCache(): FilterLabelCache {
             narrowedOptions: { value: string; label: string }[],
             selectedIds: number[],
         ) => {
-            const presentValues = new Set(
-                narrowedOptions.map((o) => o.value),
-            );
+            const presentValues = new Set(narrowedOptions.map((o) => o.value));
             const missing = selectedIds
                 .filter((id) => !presentValues.has(String(id)))
                 .map((id) => ({
@@ -1705,6 +1744,7 @@ git commit -m "feat: add useFilterLabelCache for selected-option preservation"
 ### Task 25: Prime the label cache with unfiltered facets fetches
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/components/sermons/SermonsView.tsx`
 
 - [ ] **Step 1: Instantiate the cache and fire unfiltered primer fetches**
@@ -1769,27 +1809,23 @@ useEffect(() => {
 
 - [ ] **Step 2: Replace the existing filtered facet hook calls with narrowed variants**
 
-The existing `useSpeakers(config)` / `useBooks(config)` calls in `SermonsView` are now the *unfiltered primer* fetches. Add new *narrowed* fetches alongside them, passing in filter state from `useSermonFilters`:
+The existing `useSpeakers(config)` / `useBooks(config)` calls in `SermonsView` are now the _unfiltered primer_ fetches. Add new _narrowed_ fetches alongside them, passing in filter state from `useSermonFilters`:
 
 ```ts
-const {
-    data: narrowedSpeakers = [],
-    isLoading: speakersLoading,
-} = useSpeakers({
-    config,
-    search: filters.search || undefined,
-    selectedSeriesIds: filters.selectedSeriesIds,
-    selectedBookIds: filters.selectedBookIds,
-    selectedServiceTypeIds: filters.selectedServiceTypeIds,
-    selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-    from: filters.from,
-    to: filters.to,
-});
+const { data: narrowedSpeakers = [], isLoading: speakersLoading } = useSpeakers(
+    {
+        config,
+        search: filters.search || undefined,
+        selectedSeriesIds: filters.selectedSeriesIds,
+        selectedBookIds: filters.selectedBookIds,
+        selectedServiceTypeIds: filters.selectedServiceTypeIds,
+        selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
+        from: filters.from,
+        to: filters.to,
+    },
+);
 
-const {
-    data: narrowedBooks = [],
-    isLoading: booksLoading,
-} = useBooks({
+const { data: narrowedBooks = [], isLoading: booksLoading } = useBooks({
     config,
     search: filters.search || undefined,
     selectedSeriesIds: filters.selectedSeriesIds,
@@ -1800,10 +1836,7 @@ const {
     to: filters.to,
 });
 
-const {
-    data: narrowedSeriesPage,
-    isLoading: seriesLoading,
-} = useSeries({
+const { data: narrowedSeriesPage, isLoading: seriesLoading } = useSeries({
     config,
     perPage: 50,
     search: filters.search || undefined,
@@ -1848,6 +1881,7 @@ git commit -m "feat: wire SermonsView with narrowed facet hooks and label cache 
 ### Task 26: Merge selected options in SermonFilters via labelCache
 
 **Files:**
+
 - Modify: `packages/widget-sermons/src/components/sermons/SermonFilters.tsx`
 - Modify: `packages/widget-sermons/src/__tests__/components/SermonFilters.test.tsx`
 
@@ -1918,6 +1952,7 @@ git commit -m "feat: preserve selected filter options via label cache"
 ### Task 27: Manual E2E of widget cross-filtering
 
 **Files:**
+
 - n/a
 
 - [ ] **Step 1: Start storyboard pointed at a local perimeter-api with the API PR merged**
@@ -1943,6 +1978,7 @@ Open the storyboard, navigate to the sermons widget. Test:
 - [ ] **Step 3: Verify locked filters don't render pills**
 
 Edit the storyboard config to pin `data-speaker-id="5"` (or whatever valid speaker ID). Confirm:
+
 - The Speakers dropdown does NOT render.
 - No speaker chip renders even though `params.speaker` is set.
 - Sermons returned are still narrowed to that speaker.
@@ -1956,6 +1992,7 @@ Type a search term with `'` in it. Confirm no 502 and sensible results.
 ### Task 28: Run pnpm quality and open PR B
 
 **Files:**
+
 - n/a
 
 - [ ] **Step 1: Run quality**

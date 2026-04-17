@@ -59,10 +59,9 @@ describe('useBooks', () => {
             }),
         );
 
-        const { result } = renderHook(
-            () => useBooks({ config: testConfig }),
-            { wrapper: createWrapper() },
-        );
+        const { result } = renderHook(() => useBooks({ config: testConfig }), {
+            wrapper: createWrapper(),
+        });
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 

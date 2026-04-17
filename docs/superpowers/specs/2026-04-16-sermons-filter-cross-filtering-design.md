@@ -39,13 +39,13 @@ Each facets endpoint gains optional cross-filter query params that mirror the se
 
 ### Endpoints and new params
 
-| Endpoint | Adds these query params (optional) |
-| --- | --- |
-| `GET /api/sermons/speakers` | `search`, `seriesId`, `bookId`, `congregationId`, `serviceTypeId`, `seriesTypeId`, `from`, `to` |
-| `GET /api/sermons/books` | `search`, `seriesId`, `speakerId`, `congregationId`, `serviceTypeId`, `seriesTypeId`, `from`, `to` |
-| `GET /api/sermons/service-types` | `search`, `seriesId`, `speakerId`, `bookId`, `congregationId`, `seriesTypeId`, `from`, `to` |
-| `GET /api/sermons/series-types` | `search`, `seriesId`, `speakerId`, `bookId`, `congregationId`, `serviceTypeId`, `from`, `to` |
-| `GET /api/sermons/series` | Adds cross-filter narrowing (by sermon subset) via `speakerId`, `bookId`, `congregationId`, `serviceTypeId`. `search`, `seriesTypeId`, `from`, `to` already exist and keep their current behavior (filter over the series dimension itself). |
+| Endpoint                         | Adds these query params (optional)                                                                                                                                                                                                           |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/sermons/speakers`      | `search`, `seriesId`, `bookId`, `congregationId`, `serviceTypeId`, `seriesTypeId`, `from`, `to`                                                                                                                                              |
+| `GET /api/sermons/books`         | `search`, `seriesId`, `speakerId`, `congregationId`, `serviceTypeId`, `seriesTypeId`, `from`, `to`                                                                                                                                           |
+| `GET /api/sermons/service-types` | `search`, `seriesId`, `speakerId`, `bookId`, `congregationId`, `seriesTypeId`, `from`, `to`                                                                                                                                                  |
+| `GET /api/sermons/series-types`  | `search`, `seriesId`, `speakerId`, `bookId`, `congregationId`, `serviceTypeId`, `from`, `to`                                                                                                                                                 |
+| `GET /api/sermons/series`        | Adds cross-filter narrowing (by sermon subset) via `speakerId`, `bookId`, `congregationId`, `serviceTypeId`. `search`, `seriesTypeId`, `from`, `to` already exist and keep their current behavior (filter over the series dimension itself). |
 
 Each endpoint never passes its own dimension as a cross-filter param (a speaker filter shouldn't self-filter the speakers endpoint). Comma-separated ID strings are used everywhere, consistent with the existing `seriesTypeId` convention.
 
@@ -59,6 +59,7 @@ Each facets route file currently calls its controller with **no arguments** and 
 4. Add a Zod schema (e.g. `SpeakersQuerySchema`, `BooksQuerySchema`, etc.) in `src/data/models/sermons/index.ts` and validate at the controller (matching how `/series` and root `/` routes already do).
 
 Routes to touch:
+
 - `/api/(public)/sermons/speakers/route.ts`
 - `/api/(public)/sermons/books/route.ts`
 - `/api/(public)/sermons/service-types/route.ts`
@@ -94,6 +95,7 @@ Cache keys for facets responses include a hash of the cross-filter param set:
 When no cross-filter params are present, use the existing keys (`speakers:all`, etc.) so existing cache entries aren't invalidated.
 
 **Filter-hash canonicalization** — required so `?speakerId=1,2` and `?speakerId=2,1` collapse to the same key:
+
 - For each param, trim whitespace.
 - For comma-separated ID params, split, coerce to integers, drop NaN and zero, sort ascending, rejoin with comma.
 - Omit any param whose value is `undefined` or an empty string.
@@ -147,6 +149,7 @@ if (query.search) {
 ### Evidence the pattern works
 
 `contacts-system.ts` ships these LIKE predicates against MP's REST API in production:
+
 - line 90: `Display_Name LIKE '%…%' OR First_Name LIKE '%…%' OR Last_Name LIKE '%…%'`
 - line 432: `Email_Address LIKE '%${query}%'`
 - line 450: `${fields.map(f => \`${f} LIKE '%${term}%'\`).join(' OR ')}`
@@ -160,6 +163,7 @@ MP accepts raw SQL predicates in `$filter`; it is not strict OData.
 ### Docs
 
 Update `perimeter-api/docs/domains/sermons.md`:
+
 - Line ~34 (search param description): "Text search via SQL `LIKE` on Title and Short_Description"
 - Known Limitations: remove the `contains()` entry and its full-text constraint; optionally mention that search is a substring match.
 
@@ -176,6 +180,7 @@ Update `perimeter-api/docs/domains/sermons.md`:
 Extend the facet hooks to accept the active filter set and forward it. Query keys include the filter set so TanStack Query refetches on filter change.
 
 `use-speakers.ts`:
+
 ```ts
 export interface UseSpeakersParams {
     search?: string;
@@ -199,8 +204,17 @@ Query keys include every input that affects the response, including `config.apiU
 queryKey: [
     'speakers',
     config.apiUrl,
-    { search, seriesId, bookId, serviceTypeId, seriesTypeId, from, to, congregationId },
-]
+    {
+        search,
+        seriesId,
+        bookId,
+        serviceTypeId,
+        seriesTypeId,
+        from,
+        to,
+        congregationId,
+    },
+];
 ```
 
 Drop the hard-coded `staleTime: 10 * 60 * 1000` on speakers and `30 * 60 * 1000` on books. With cross-filter keys, each filter combination is its own cache entry, so stale-time freshness matters less; leave defaults.
@@ -231,6 +245,7 @@ When facets narrow, a currently-selected option can fall out of its own dropdown
 **Approach: prime the label cache with one unfiltered fetch per dimension on mount.** On first render, `SermonsView` fires an unfiltered fetch for each dimension (`useSpeakers({ config })` with no filters, etc.) to populate a label cache covering every option's ID → label. That cache persists for the lifetime of the widget instance. Subsequent facets fetches are filtered as normal and populate the cache with anything new.
 
 Build this as a single shared helper `useFilterLabelCache(config)` that:
+
 - On mount, fires all five unfiltered dimension fetches in parallel (reusing the existing `useSpeakers({ config })` etc. signatures — just with no filter inputs, which produces the unfiltered cache entry on server).
 - Stores the union of every seen option in a ref-backed `Map<dimension, Map<id, label>>`.
 - Exposes `getLabel(dimension, id)` and `mergeSelectedIntoOptions(dimension, narrowedOptions, selectedIds)`.
@@ -251,14 +266,14 @@ While a facets hook is re-fetching after a filter change, the affected dropdowns
 
 In `SermonFilters.tsx`, wrap each chip-rendering block in the same `!lockedFilters.has(...)` guard that already gates the dropdown:
 
-| Chip | Guard |
-| --- | --- |
-| `selectedSeriesIds.map(...)` | `!lockedFilters.has('series')` |
-| `selectedSpeakerIds.map(...)` | `!lockedFilters.has('speaker')` |
-| `selectedBookIds.map(...)` | `!lockedFilters.has('book')` |
-| `selectedServiceTypeIds.map(...)` | `!lockedFilters.has('serviceTypes')` |
-| `selectedSeriesTypeIds.map(...)` | `!lockedFilters.has('seriesType')` |
-| `props.search && ...` (search chip) | `!lockedFilters.has('search')` |
+| Chip                                | Guard                                |
+| ----------------------------------- | ------------------------------------ |
+| `selectedSeriesIds.map(...)`        | `!lockedFilters.has('series')`       |
+| `selectedSpeakerIds.map(...)`       | `!lockedFilters.has('speaker')`      |
+| `selectedBookIds.map(...)`          | `!lockedFilters.has('book')`         |
+| `selectedServiceTypeIds.map(...)`   | `!lockedFilters.has('serviceTypes')` |
+| `selectedSeriesTypeIds.map(...)`    | `!lockedFilters.has('seriesType')`   |
+| `props.search && ...` (search chip) | `!lockedFilters.has('search')`       |
 
 This removes both the visual chip and the remove button handler. The underlying filter state still applies to the API query (the lock is there because the embedder wants it), but the user has no UI affordance to see or change it.
 
@@ -275,8 +290,9 @@ This removes both the visual chip and the remove button handler. The underlying 
 Change in `packages/shared/src/components/ui/perimeter/multi-combobox.tsx`. The popover menu (line ~317):
 
 Current:
+
 ```ts
-'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10'
+'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10';
 ```
 
 Replace `ring-1 ring-foreground/10` with `border border-foreground/20`. Keep `shadow-md` and `bg-popover`. Apply the identical change in `combobox.tsx` (single-select variant) for consistency.
@@ -292,13 +308,15 @@ No trigger change — only the expanded menu.
 In `packages/widget-sermons/src/components/ui/MediaCard.tsx`, the `viewMode === 'list'` branch (line ~186-213).
 
 Current className on the card button:
+
 ```ts
-'flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
+'flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
 ```
 
 New className:
+
 ```ts
-'flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
+'flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
 ```
 
 Changes: per-row `border-b border-border`, `last:border-b-0` to suppress the trailing border on the final row, stronger `hover:bg-muted`.
@@ -314,16 +332,16 @@ Grid and Large-list branches unchanged — their existing `CARD_BASE` hover trea
 ### perimeter-api
 
 - **Unit (System layer):** Each facets method gets a test covering:
-  - No cross-filter params → returns full dimension list.
-  - Single cross-filter param → returns narrowed list.
-  - Cross-filter with no matching sermons → returns empty list.
-  - Sermon-filter includes the new `search` term and narrowing behaves correctly.
-  - A facets method does not pass its own dimension as a cross-filter.
+    - No cross-filter params → returns full dimension list.
+    - Single cross-filter param → returns narrowed list.
+    - Cross-filter with no matching sermons → returns empty list.
+    - Sermon-filter includes the new `search` term and narrowing behaves correctly.
+    - A facets method does not pass its own dimension as a cross-filter.
 - **Unit (System layer) for search fix:** `buildSermonFilter` test matrix:
-  - Plain search term → `LIKE '%term%'`.
-  - Term containing `'` → `''` doubled.
-  - Term containing `%` or `_` → passes through as a wildcard (matches contacts-system; documented trade-off).
-  - Combined with other filters still produces a valid SQL filter string.
+    - Plain search term → `LIKE '%term%'`.
+    - Term containing `'` → `''` doubled.
+    - Term containing `%` or `_` → passes through as a wildcard (matches contacts-system; documented trade-off).
+    - Combined with other filters still produces a valid SQL filter string.
 - **Manual E2E against real MP:** Run a sermon search against a live/dev perimeter-api with a term containing `'`, `%`, `_`, `[`, and a backslash. Confirm no 502 and the results are sensible. This validates the assumption that MP accepts the LIKE shape end-to-end before committing to rolling out.
 - **Unit (cache):** Cache keys for facets include the filter hash when present; use the legacy key when empty.
 - **Integration:** One happy-path test per facets endpoint with MSW-mocked MP responses.

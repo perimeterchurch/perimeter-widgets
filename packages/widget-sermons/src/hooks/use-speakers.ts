@@ -46,22 +46,19 @@ export function useSpeakers(params: UseSpeakersParams) {
         ],
         queryFn: async () => {
             const client = createApiClient({ baseUrl: config.apiUrl });
-            const { data, error } = await client.GET(
-                '/api/sermons/speakers',
-                {
-                    params: {
-                        query: {
-                            search: search || undefined,
-                            seriesId,
-                            bookId,
-                            serviceTypeId,
-                            seriesTypeId,
-                            from: from || undefined,
-                            to: to || undefined,
-                        },
+            const { data, error } = await client.GET('/api/sermons/speakers', {
+                params: {
+                    query: {
+                        search: search || undefined,
+                        seriesId,
+                        bookId,
+                        serviceTypeId,
+                        seriesTypeId,
+                        from: from || undefined,
+                        to: to || undefined,
                     },
                 },
-            );
+            });
             if (error) throw createApiError('Failed to fetch speakers', error);
             return data.data;
         },
