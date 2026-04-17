@@ -187,7 +187,7 @@ export function MediaCard({
         return (
             <CardButton
                 onClick={onClick}
-                className='flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
+                className='flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
             >
                 <FallbackImage
                     src={imageUrl}

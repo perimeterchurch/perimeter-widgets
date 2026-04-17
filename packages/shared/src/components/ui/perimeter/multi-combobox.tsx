@@ -314,7 +314,7 @@ function MultiCombobox(props: MultiComboboxProps) {
             <ul
                 {...getMenuProps()}
                 className={cn(
-                    'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10',
+                    'absolute z-50 mt-1 max-h-60 w-full min-w-[var(--trigger-width)] overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md border border-foreground/20',
                     !isOpen && 'hidden',
                 )}
                 style={
