@@ -121,8 +121,10 @@ export function SermonFilters(props: SermonFiltersProps) {
             {(!props.lockedFilters.has('series')
                 || !props.lockedFilters.has('speaker')
                 || !props.lockedFilters.has('book')
-                || props.showServiceTypeFilter
-                || props.showSeriesTypeFilter) && (
+                || (props.showServiceTypeFilter
+                    && !props.lockedFilters.has('serviceTypes'))
+                || (props.showSeriesTypeFilter
+                    && !props.lockedFilters.has('seriesType'))) && (
                 <div className='flex items-center gap-2'>
                     {!props.lockedFilters.has('series') && (
                         <MultiCombobox
@@ -185,42 +187,44 @@ export function SermonFilters(props: SermonFiltersProps) {
                             }
                         />
                     )}
-                    {props.showServiceTypeFilter && (
-                        <MultiCombobox
-                            options={serviceTypeOptions}
-                            value={props.selectedServiceTypeIds.map(String)}
-                            onValueChange={(v) =>
-                                props.onServiceTypesChange(v.map(Number))
-                            }
-                            placeholder='Service Types'
-                            selectedLabel='Service Types'
-                            disabled={props.serviceTypesLoading}
-                            className='flex-1'
-                            multiple
-                            isOpen={openDropdown === 'serviceType'}
-                            onOpenChange={(open) =>
-                                setOpenDropdown(open ? 'serviceType' : null)
-                            }
-                        />
-                    )}
-                    {props.showSeriesTypeFilter && (
-                        <MultiCombobox
-                            options={seriesTypeOptions}
-                            value={props.selectedSeriesTypeIds.map(String)}
-                            onValueChange={(v) =>
-                                props.onSeriesTypeChange(v.map(Number))
-                            }
-                            placeholder='Series Types'
-                            selectedLabel='Series Types'
-                            disabled={props.seriesTypesLoading}
-                            className='flex-1'
-                            multiple
-                            isOpen={openDropdown === 'seriesType'}
-                            onOpenChange={(open) =>
-                                setOpenDropdown(open ? 'seriesType' : null)
-                            }
-                        />
-                    )}
+                    {!props.lockedFilters.has('serviceTypes')
+                        && props.showServiceTypeFilter && (
+                            <MultiCombobox
+                                options={serviceTypeOptions}
+                                value={props.selectedServiceTypeIds.map(String)}
+                                onValueChange={(v) =>
+                                    props.onServiceTypesChange(v.map(Number))
+                                }
+                                placeholder='Service Types'
+                                selectedLabel='Service Types'
+                                disabled={props.serviceTypesLoading}
+                                className='flex-1'
+                                multiple
+                                isOpen={openDropdown === 'serviceType'}
+                                onOpenChange={(open) =>
+                                    setOpenDropdown(open ? 'serviceType' : null)
+                                }
+                            />
+                        )}
+                    {!props.lockedFilters.has('seriesType')
+                        && props.showSeriesTypeFilter && (
+                            <MultiCombobox
+                                options={seriesTypeOptions}
+                                value={props.selectedSeriesTypeIds.map(String)}
+                                onValueChange={(v) =>
+                                    props.onSeriesTypeChange(v.map(Number))
+                                }
+                                placeholder='Series Types'
+                                selectedLabel='Series Types'
+                                disabled={props.seriesTypesLoading}
+                                className='flex-1'
+                                multiple
+                                isOpen={openDropdown === 'seriesType'}
+                                onOpenChange={(open) =>
+                                    setOpenDropdown(open ? 'seriesType' : null)
+                                }
+                            />
+                        )}
                 </div>
             )}
 
@@ -259,116 +263,122 @@ export function SermonFilters(props: SermonFiltersProps) {
             {/* Active filter chips */}
             {props.hasActiveFilters && (
                 <div className='flex flex-wrap gap-1.5'>
-                    {props.selectedSeriesIds.map((id) => (
-                        <button
-                            key={`series-${id}`}
-                            type='button'
-                            onClick={() =>
-                                props.onSeriesChange(
-                                    props.selectedSeriesIds.filter(
-                                        (x) => x !== id,
-                                    ),
-                                )
-                            }
-                            className='inline-flex'
-                            aria-label={`Remove ${seriesOptions.find((o) => o.value === String(id))?.label ?? 'series'} filter`}
-                        >
-                            <Badge variant='default'>
-                                {seriesOptions.find(
-                                    (o) => o.value === String(id),
-                                )?.label ?? 'Series'}{' '}
-                                <X className='h-3 w-3' />
-                            </Badge>
-                        </button>
-                    ))}
-                    {props.selectedSpeakerIds.map((id) => (
-                        <button
-                            key={`speaker-${id}`}
-                            type='button'
-                            onClick={() =>
-                                props.onSpeakerChange(
-                                    props.selectedSpeakerIds.filter(
-                                        (x) => x !== id,
-                                    ),
-                                )
-                            }
-                            className='inline-flex'
-                            aria-label={`Remove ${speakerOptions.find((o) => o.value === String(id))?.label ?? 'speaker'} filter`}
-                        >
-                            <Badge variant='default'>
-                                {speakerOptions.find(
-                                    (o) => o.value === String(id),
-                                )?.label ?? 'Speaker'}{' '}
-                                <X className='h-3 w-3' />
-                            </Badge>
-                        </button>
-                    ))}
-                    {props.selectedBookIds.map((id) => (
-                        <button
-                            key={`book-${id}`}
-                            type='button'
-                            onClick={() =>
-                                props.onBookChange(
-                                    props.selectedBookIds.filter(
-                                        (x) => x !== id,
-                                    ),
-                                )
-                            }
-                            className='inline-flex'
-                            aria-label={`Remove ${bookOptions.find((o) => o.value === String(id))?.label ?? 'book'} filter`}
-                        >
-                            <Badge variant='default'>
-                                {bookOptions.find((o) => o.value === String(id))
-                                    ?.label ?? 'Book'}{' '}
-                                <X className='h-3 w-3' />
-                            </Badge>
-                        </button>
-                    ))}
-                    {props.selectedServiceTypeIds.map((id) => (
-                        <button
-                            key={`st-${id}`}
-                            type='button'
-                            onClick={() =>
-                                props.onServiceTypesChange(
-                                    props.selectedServiceTypeIds.filter(
-                                        (x) => x !== id,
-                                    ),
-                                )
-                            }
-                            className='inline-flex'
-                            aria-label={`Remove ${serviceTypeOptions.find((o) => o.value === String(id))?.label ?? 'service type'} filter`}
-                        >
-                            <Badge variant='default'>
-                                {serviceTypeOptions.find(
-                                    (o) => o.value === String(id),
-                                )?.label ?? 'Service Type'}{' '}
-                                <X className='h-3 w-3' />
-                            </Badge>
-                        </button>
-                    ))}
-                    {props.selectedSeriesTypeIds.map((id) => (
-                        <button
-                            key={`srt-${id}`}
-                            type='button'
-                            onClick={() =>
-                                props.onSeriesTypeChange(
-                                    props.selectedSeriesTypeIds.filter(
-                                        (x) => x !== id,
-                                    ),
-                                )
-                            }
-                            className='inline-flex'
-                            aria-label={`Remove ${seriesTypeOptions.find((o) => o.value === String(id))?.label ?? 'series type'} filter`}
-                        >
-                            <Badge variant='default'>
-                                {seriesTypeOptions.find(
-                                    (o) => o.value === String(id),
-                                )?.label ?? 'Series Type'}{' '}
-                                <X className='h-3 w-3' />
-                            </Badge>
-                        </button>
-                    ))}
-                    {props.search && (
+                    {!props.lockedFilters.has('series')
+                        && props.selectedSeriesIds.map((id) => (
+                            <button
+                                key={`series-${id}`}
+                                type='button'
+                                onClick={() =>
+                                    props.onSeriesChange(
+                                        props.selectedSeriesIds.filter(
+                                            (x) => x !== id,
+                                        ),
+                                    )
+                                }
+                                className='inline-flex'
+                                aria-label={`Remove ${seriesOptions.find((o) => o.value === String(id))?.label ?? 'series'} filter`}
+                            >
+                                <Badge variant='default'>
+                                    {seriesOptions.find(
+                                        (o) => o.value === String(id),
+                                    )?.label ?? 'Series'}{' '}
+                                    <X className='h-3 w-3' />
+                                </Badge>
+                            </button>
+                        ))}
+                    {!props.lockedFilters.has('speaker')
+                        && props.selectedSpeakerIds.map((id) => (
+                            <button
+                                key={`speaker-${id}`}
+                                type='button'
+                                onClick={() =>
+                                    props.onSpeakerChange(
+                                        props.selectedSpeakerIds.filter(
+                                            (x) => x !== id,
+                                        ),
+                                    )
+                                }
+                                className='inline-flex'
+                                aria-label={`Remove ${speakerOptions.find((o) => o.value === String(id))?.label ?? 'speaker'} filter`}
+                            >
+                                <Badge variant='default'>
+                                    {speakerOptions.find(
+                                        (o) => o.value === String(id),
+                                    )?.label ?? 'Speaker'}{' '}
+                                    <X className='h-3 w-3' />
+                                </Badge>
+                            </button>
+                        ))}
+                    {!props.lockedFilters.has('book')
+                        && props.selectedBookIds.map((id) => (
+                            <button
+                                key={`book-${id}`}
+                                type='button'
+                                onClick={() =>
+                                    props.onBookChange(
+                                        props.selectedBookIds.filter(
+                                            (x) => x !== id,
+                                        ),
+                                    )
+                                }
+                                className='inline-flex'
+                                aria-label={`Remove ${bookOptions.find((o) => o.value === String(id))?.label ?? 'book'} filter`}
+                            >
+                                <Badge variant='default'>
+                                    {bookOptions.find(
+                                        (o) => o.value === String(id),
+                                    )?.label ?? 'Book'}{' '}
+                                    <X className='h-3 w-3' />
+                                </Badge>
+                            </button>
+                        ))}
+                    {!props.lockedFilters.has('serviceTypes')
+                        && props.selectedServiceTypeIds.map((id) => (
+                            <button
+                                key={`st-${id}`}
+                                type='button'
+                                onClick={() =>
+                                    props.onServiceTypesChange(
+                                        props.selectedServiceTypeIds.filter(
+                                            (x) => x !== id,
+                                        ),
+                                    )
+                                }
+                                className='inline-flex'
+                                aria-label={`Remove ${serviceTypeOptions.find((o) => o.value === String(id))?.label ?? 'service type'} filter`}
+                            >
+                                <Badge variant='default'>
+                                    {serviceTypeOptions.find(
+                                        (o) => o.value === String(id),
+                                    )?.label ?? 'Service Type'}{' '}
+                                    <X className='h-3 w-3' />
+                                </Badge>
+                            </button>
+                        ))}
+                    {!props.lockedFilters.has('seriesType')
+                        && props.selectedSeriesTypeIds.map((id) => (
+                            <button
+                                key={`srt-${id}`}
+                                type='button'
+                                onClick={() =>
+                                    props.onSeriesTypeChange(
+                                        props.selectedSeriesTypeIds.filter(
+                                            (x) => x !== id,
+                                        ),
+                                    )
+                                }
+                                className='inline-flex'
+                                aria-label={`Remove ${seriesTypeOptions.find((o) => o.value === String(id))?.label ?? 'series type'} filter`}
+                            >
+                                <Badge variant='default'>
+                                    {seriesTypeOptions.find(
+                                        (o) => o.value === String(id),
+                                    )?.label ?? 'Series Type'}{' '}
+                                    <X className='h-3 w-3' />
+                                </Badge>
+                            </button>
+                        ))}
+                    {!props.lockedFilters.has('search') && props.search && (
                         <button
                             type='button'
                             onClick={() => props.onSearchChange('')}
