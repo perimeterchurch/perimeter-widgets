@@ -20,20 +20,21 @@
 
 ### Created (hand-written)
 
-| File | Responsibility |
-| --- | --- |
-| `packages/registry/package.json` | Declare `@perimeter-widgets/registry` workspace package with `exports` (including `./ui/perimeter/*` subpaths), `build` script chain |
-| `packages/registry/components.json` | shadcn CLI config so `shadcn build` resolves aliases when emitting `public/r/*.json` |
-| `packages/registry/tsconfig.json` | Map `@/` aliases (`@/lib/*`, `@/hooks/*`, `@/components/ui/*`) to registry-local paths so on-disk shadcn source compiles inside the workspace |
-| `packages/registry/src/index.ts` | Barrel — re-export all 56 components + `cn` from `./lib/utils` |
-| `packages/registry/.gitignore` | Ignore `public/r/`, `registry.json`, `node_modules/`, tsbuildinfo |
-| `apps/site/package.json` | Declare `@perimeter-widgets/site` Next.js app with build script chain and the registry workspace dep |
-| `apps/site/.gitignore` | Ignore `.next/`, `out/`, `public/r/`, generated demo files |
-| `apps/site/scripts/copy-registry-output.ts` | Copy `packages/registry/public/r/*.json` → `apps/site/public/r/*.json` |
+| File                                        | Responsibility                                                                                                                                |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/registry/package.json`            | Declare `@perimeter-widgets/registry` workspace package with `exports` (including `./ui/perimeter/*` subpaths), `build` script chain          |
+| `packages/registry/components.json`         | shadcn CLI config so `shadcn build` resolves aliases when emitting `public/r/*.json`                                                          |
+| `packages/registry/tsconfig.json`           | Map `@/` aliases (`@/lib/*`, `@/hooks/*`, `@/components/ui/*`) to registry-local paths so on-disk shadcn source compiles inside the workspace |
+| `packages/registry/src/index.ts`            | Barrel — re-export all 56 components + `cn` from `./lib/utils`                                                                                |
+| `packages/registry/.gitignore`              | Ignore `public/r/`, `registry.json`, `node_modules/`, tsbuildinfo                                                                             |
+| `apps/site/package.json`                    | Declare `@perimeter-widgets/site` Next.js app with build script chain and the registry workspace dep                                          |
+| `apps/site/.gitignore`                      | Ignore `.next/`, `out/`, `public/r/`, generated demo files                                                                                    |
+| `apps/site/scripts/copy-registry-output.ts` | Copy `packages/registry/public/r/*.json` → `apps/site/public/r/*.json`                                                                        |
 
 ### Moved from `style/` via subtree → `git mv`
 
 Under `packages/registry/`:
+
 - `registry/ui/perimeter/` (56 components + 56 demos + `lib/utils.ts`)
 - `registry/themes/` (3 theme JSONs)
 - `registry/base.json`
@@ -45,6 +46,7 @@ Under `packages/registry/`:
 `registry.json` is NOT moved — it's gitignored in style so never lands in the subtree. It's regenerated from source by `generate-registry.ts` in Chunk 2.
 
 Under `apps/site/`:
+
 - `src/app/` (home, components, templates, tokens, docs, changelog, layout, globals.css)
 - `src/components/site/` (15 files)
 - `src/templates/` (5 files)
@@ -66,28 +68,29 @@ Under `apps/site/`:
 
 ### Modified (perimeter-widgets existing files)
 
-| File | Change |
-| --- | --- |
-| `pnpm-workspace.yaml` | Add `apps/*` and `widgets/*` globs (widgets/* is a no-op until Phase 3) |
-| `turbo.json` | Extend `build.outputs` to include `apps/site/out/**`, `apps/site/public/r/**`, `packages/registry/public/r/**`, `packages/registry/registry.json` (Task 25 Step 1) |
-| `package.json` (root) | Add convenience scripts: `site:dev`, `site:build`, `registry:build` |
-| `eslint.config.js` (root) | Add glob entries for `apps/site/**` and `packages/registry/**` if the current flat config doesn't already wildcard |
-| `.prettierignore` (root) | Add `apps/site/.next/`, `apps/site/out/`, `packages/registry/public/r/` |
+| File                      | Change                                                                                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm-workspace.yaml`     | Add `apps/*` and `widgets/*` globs (widgets/\* is a no-op until Phase 3)                                                                                           |
+| `turbo.json`              | Extend `build.outputs` to include `apps/site/out/**`, `apps/site/public/r/**`, `packages/registry/public/r/**`, `packages/registry/registry.json` (Task 25 Step 1) |
+| `package.json` (root)     | Add convenience scripts: `site:dev`, `site:build`, `registry:build`                                                                                                |
+| `eslint.config.js` (root) | Add glob entries for `apps/site/**` and `packages/registry/**` if the current flat config doesn't already wildcard                                                 |
+| `.prettierignore` (root)  | Add `apps/site/.next/`, `apps/site/out/`, `packages/registry/public/r/`                                                                                            |
 
 ### Import rewrites (site source, after relocation)
 
 ~51 total rewrites across ~18 files. All are scoped to ImportDeclaration strings — NOT to doc/sample strings inside page content:
+
 - 19 `@/components/ui/<name>` imports → `@perimeter-widgets/registry`
-  - src/app/components/[category]/[slug]/page.tsx (import only; doc sample strings preserved)
-  - src/app/docs/getting-started/page.tsx (import only; doc sample strings preserved)
-  - src/app/layout.tsx
-  - src/app/templates/[slug]/page.tsx
-  - src/app/templates/page.tsx
-  - src/components/site/{code-block, component-playground, copy-install-button, mode-toggle, playground-controls, search-palette, search-trigger, theme-switcher}.tsx
+    - src/app/components/[category]/[slug]/page.tsx (import only; doc sample strings preserved)
+    - src/app/docs/getting-started/page.tsx (import only; doc sample strings preserved)
+    - src/app/layout.tsx
+    - src/app/templates/[slug]/page.tsx
+    - src/app/templates/page.tsx
+    - src/components/site/{code-block, component-playground, copy-install-button, mode-toggle, playground-controls, search-palette, search-trigger, theme-switcher}.tsx
 - 3 `@/lib/utils` imports (outside the dropped `src/components/ui/`) → `@perimeter-widgets/registry` (re-exports `cn`)
-  - src/components/site/{docs-sidebar, code-block, example-card}.tsx
+    - src/components/site/{docs-sidebar, code-block, example-card}.tsx
 - 29 `@registry/ui/perimeter/<name>` imports → `@perimeter-widgets/registry`
-  - src/templates/{marketing-landing, dashboard, login, data-table, settings}.tsx
+    - src/templates/{marketing-landing, dashboard, login, data-table, settings}.tsx
 
 ---
 
@@ -138,6 +141,7 @@ Expected: both commands list at least one commit each. If either is empty, the b
 ### Task 2: Add style remote and subtree-import to staging prefix
 
 **Files:**
+
 - Create: `.style-staging/` (entire subtree; transient — removed by end of chunk)
 
 - [ ] **Step 1: Add the style remote**
@@ -174,6 +178,7 @@ Expected: output shows style commits (e.g., "feat: compact selection display..."
 A subsequent prettier-reformat commit after the `git mv` operations would muddy git's rename heuristic and weaken `git log` traceability. Reformat in place NOW, as a single commit that applies to the staged paths only — the subsequent moves then see a clean similarity index.
 
 **Files:**
+
 - Modify: every `.ts`, `.tsx`, `.js`, `.mjs`, `.json`, `.md`, `.css` under `.style-staging/`
 
 - [ ] **Step 1: Preview the diff size**
@@ -207,6 +212,7 @@ with clean similarity indices, preserving git log traceability."
 ### Task 3: Move registry sources into `packages/registry/`
 
 **Files:**
+
 - Move: `.style-staging/registry/*` → `packages/registry/`
 
 Note: `.style-staging/registry.json` does not exist. Style's `.gitignore` lists `registry.json` so it never landed in the subtree. The manifest is regenerated by `generate-registry.ts` in Chunk 2 Task 16 from the sources being moved now.
@@ -252,6 +258,7 @@ git commit -m "chore: relocate style registry sources into packages/registry/"
 ### Task 4: Move utils + hooks into `packages/registry/`
 
 **Files:**
+
 - Move: `.style-staging/src/lib/utils.ts` → `packages/registry/lib/utils.ts`
 - Move: `.style-staging/src/hooks/*` → `packages/registry/hooks/`
 
@@ -290,6 +297,7 @@ git commit -m "chore: relocate registry utils and hooks into packages/registry/"
 ### Task 6: Move and rewrite `generate-registry.ts`
 
 **Files:**
+
 - Move: `.style-staging/scripts/generate-registry.ts` → `packages/registry/scripts/generate-registry.ts`
 - Modify: path constants + emitted path string templates inside the script
 
@@ -304,16 +312,16 @@ git mv .style-staging/scripts/generate-registry.ts packages/registry/scripts/gen
 
 Open `packages/registry/scripts/generate-registry.ts`. There are five places where `src/` or `registry/` prefixes must be stripped (referenced line numbers are for style's current version):
 
-| Line | Before | After |
-| --- | --- | --- |
-| ~15 | `const UI_DIR = join(ROOT, "registry/ui/perimeter");` | `const UI_DIR = join(ROOT, "ui/perimeter");` |
-| ~15 | `const THEMES_DIR = join(ROOT, "registry/themes");` | `const THEMES_DIR = join(ROOT, "themes");` |
-| ~17 | `const BASE_FILE = join(ROOT, "registry/base.json");` | `const BASE_FILE = join(ROOT, "base.json");` |
-| ~87 | `const hooksDir = join(ROOT, "src/hooks");` | `const hooksDir = join(ROOT, "hooks");` |
-| ~81 | `{ path: "src/lib/utils.ts", type: "registry:lib" }` (emit in `utils` item block) | `{ path: "lib/utils.ts", type: "registry:lib" }` |
-| ~95 | `` { path: `src/hooks/${file}`, ... } `` | `` { path: `hooks/${file}`, ... } `` |
-| ~152 | `` { path: `registry/ui/perimeter/${file}`, ... } `` | `` { path: `ui/perimeter/${file}`, ... } `` |
-| ~176 | `` { path: `registry/themes/${file}`, ... } `` | `` { path: `themes/${file}`, ... } `` |
+| Line | Before                                                                            | After                                            |
+| ---- | --------------------------------------------------------------------------------- | ------------------------------------------------ |
+| ~15  | `const UI_DIR = join(ROOT, "registry/ui/perimeter");`                             | `const UI_DIR = join(ROOT, "ui/perimeter");`     |
+| ~15  | `const THEMES_DIR = join(ROOT, "registry/themes");`                               | `const THEMES_DIR = join(ROOT, "themes");`       |
+| ~17  | `const BASE_FILE = join(ROOT, "registry/base.json");`                             | `const BASE_FILE = join(ROOT, "base.json");`     |
+| ~87  | `const hooksDir = join(ROOT, "src/hooks");`                                       | `const hooksDir = join(ROOT, "hooks");`          |
+| ~81  | `{ path: "src/lib/utils.ts", type: "registry:lib" }` (emit in `utils` item block) | `{ path: "lib/utils.ts", type: "registry:lib" }` |
+| ~95  | ``{ path: `src/hooks/${file}`, ... }``                                            | ``{ path: `hooks/${file}`, ... }``               |
+| ~152 | ``{ path: `registry/ui/perimeter/${file}`, ... }``                                | ``{ path: `ui/perimeter/${file}`, ... }``        |
+| ~176 | ``{ path: `registry/themes/${file}`, ... }``                                      | ``{ path: `themes/${file}`, ... }``              |
 
 Additionally, the `OUTPUT` constant (`join(ROOT, "registry.json")`) stays — the script writes `registry.json` at the package root.
 
@@ -350,6 +358,7 @@ git commit -m "chore(registry): move generate-registry.ts and rewrite all five p
 ### Task 7: Move and rewrite `generate-theme-css.ts` to emit two dialects
 
 **Files:**
+
 - Move: `.style-staging/scripts/generate-theme-css.ts` → `packages/registry/scripts/generate-theme-css.ts`
 - Rewrite: the full file body (keep theme-reading logic, replace target/write logic)
 
@@ -364,10 +373,10 @@ git mv .style-staging/scripts/generate-theme-css.ts packages/registry/scripts/ge
 Overwrite `packages/registry/scripts/generate-theme-css.ts` with the following. This rewrite (a) reads themes from `./themes/*.json` relative to the registry package, (b) emits the rich site dialect (`:root`, `.light`, `.dark`, `:host`, `:host([data-mode="dark"])`, and per-slug `[data-theme="<slug>"]` overrides) into `apps/site/src/app/globals.css`, (c) emits the fused shadow-DOM-aware shared dialect into `packages/shared/src/styles/base.css`, (d) asserts the sorted token-key set is identical across both outputs, (e) exits non-zero if markers are missing or keys drift.
 
 ```typescript
-import { readdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { execSync } from "node:child_process";
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 interface ThemeFile {
     name: string;
@@ -378,86 +387,110 @@ interface ThemeFile {
 }
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const REGISTRY_ROOT = resolve(SCRIPT_DIR, "..");
-const MONOREPO_ROOT = resolve(REGISTRY_ROOT, "../..");
-const THEMES_DIR = join(REGISTRY_ROOT, "themes");
-const SITE_GLOBALS = join(MONOREPO_ROOT, "apps/site/src/app/globals.css");
-const SHARED_BASE = join(MONOREPO_ROOT, "packages/shared/src/styles/base.css");
+const REGISTRY_ROOT = resolve(SCRIPT_DIR, '..');
+const MONOREPO_ROOT = resolve(REGISTRY_ROOT, '../..');
+const THEMES_DIR = join(REGISTRY_ROOT, 'themes');
+const SITE_GLOBALS = join(MONOREPO_ROOT, 'apps/site/src/app/globals.css');
+const SHARED_BASE = join(MONOREPO_ROOT, 'packages/shared/src/styles/base.css');
 
-const SITE_START = "/* @generated-themes-start */";
-const SITE_END = "/* @generated-themes-end */";
-const SHARED_START = "/* @sync:tokens-start */";
-const SHARED_END = "/* @sync:tokens-end */";
+const SITE_START = '/* @generated-themes-start */';
+const SITE_END = '/* @generated-themes-end */';
+const SHARED_START = '/* @sync:tokens-start */';
+const SHARED_END = '/* @sync:tokens-end */';
 
-function cssBlock(selector: string, vars: Record<string, string>, indent = "    "): string {
+function cssBlock(
+    selector: string,
+    vars: Record<string, string>,
+    indent = '    ',
+): string {
     const entries = Object.entries(vars)
         .map(([k, v]) => `${indent}--${k}: ${v};`)
-        .join("\n");
+        .join('\n');
     return `${selector} {\n${entries}\n}`;
 }
 
 async function readThemes(): Promise<ThemeFile[]> {
-    const files = (await readdir(THEMES_DIR)).filter((f) => f.endsWith(".json")).sort();
+    const files = (await readdir(THEMES_DIR))
+        .filter((f) => f.endsWith('.json'))
+        .sort();
     return Promise.all(
-        files.map(async (f) => JSON.parse(await readFile(join(THEMES_DIR, f), "utf-8"))),
+        files.map(async (f) =>
+            JSON.parse(await readFile(join(THEMES_DIR, f), 'utf-8')),
+        ),
     );
 }
 
 function buildSiteBlock(themes: ThemeFile[]): string {
-    const defaultTheme = themes.find((t) => t.name === "default");
-    if (!defaultTheme) throw new Error("themes/default.json is required");
+    const defaultTheme = themes.find((t) => t.name === 'default');
+    if (!defaultTheme) throw new Error('themes/default.json is required');
 
     const blocks: string[] = [];
-    blocks.push(cssBlock(":root", defaultTheme.cssVars.light, "  "));
-    blocks.push("");
-    blocks.push(cssBlock(".light", defaultTheme.cssVars.light, "  "));
-    blocks.push("");
-    blocks.push(cssBlock(".dark", defaultTheme.cssVars.dark, "  "));
-    blocks.push("");
-    blocks.push(cssBlock(":host", defaultTheme.cssVars.light, "  "));
-    blocks.push("");
-    blocks.push(cssBlock(':host([data-mode="dark"])', defaultTheme.cssVars.dark, "  "));
+    blocks.push(cssBlock(':root', defaultTheme.cssVars.light, '  '));
+    blocks.push('');
+    blocks.push(cssBlock('.light', defaultTheme.cssVars.light, '  '));
+    blocks.push('');
+    blocks.push(cssBlock('.dark', defaultTheme.cssVars.dark, '  '));
+    blocks.push('');
+    blocks.push(cssBlock(':host', defaultTheme.cssVars.light, '  '));
+    blocks.push('');
+    blocks.push(
+        cssBlock(':host([data-mode="dark"])', defaultTheme.cssVars.dark, '  '),
+    );
 
     for (const theme of themes) {
-        if (theme.name === "default") continue;
+        if (theme.name === 'default') continue;
         const slug = theme.name;
-        blocks.push("");
-        blocks.push(cssBlock(`[data-theme="${slug}"]`, theme.cssVars.light, "  "));
-        blocks.push("");
-        blocks.push(cssBlock(`[data-theme="${slug}"].dark`, theme.cssVars.dark, "  "));
-        blocks.push("");
-        blocks.push(cssBlock(`:host([data-theme="${slug}"])`, theme.cssVars.light, "  "));
-        blocks.push("");
+        blocks.push('');
         blocks.push(
-            cssBlock(`:host([data-theme="${slug}"][data-mode="dark"])`, theme.cssVars.dark, "  "),
+            cssBlock(`[data-theme="${slug}"]`, theme.cssVars.light, '  '),
+        );
+        blocks.push('');
+        blocks.push(
+            cssBlock(`[data-theme="${slug}"].dark`, theme.cssVars.dark, '  '),
+        );
+        blocks.push('');
+        blocks.push(
+            cssBlock(
+                `:host([data-theme="${slug}"])`,
+                theme.cssVars.light,
+                '  ',
+            ),
+        );
+        blocks.push('');
+        blocks.push(
+            cssBlock(
+                `:host([data-theme="${slug}"][data-mode="dark"])`,
+                theme.cssVars.dark,
+                '  ',
+            ),
         );
     }
 
-    return blocks.join("\n");
+    return blocks.join('\n');
 }
 
 function buildSharedBlock(themes: ThemeFile[]): string {
-    const defaultTheme = themes.find((t) => t.name === "default");
-    if (!defaultTheme) throw new Error("themes/default.json is required");
+    const defaultTheme = themes.find((t) => t.name === 'default');
+    if (!defaultTheme) throw new Error('themes/default.json is required');
 
     const lightEntries = Object.entries(defaultTheme.cssVars.light)
         .map(([k, v]) => `    --${k}: ${v};`)
-        .join("\n");
+        .join('\n');
     const darkEntries = Object.entries(defaultTheme.cssVars.dark)
         .map(([k, v]) => `    --${k}: ${v};`)
-        .join("\n");
+        .join('\n');
 
     return [
-        ":root,",
-        ":host {",
+        ':root,',
+        ':host {',
         lightEntries,
-        "}",
-        "",
-        ".dark,",
+        '}',
+        '',
+        '.dark,',
         ":host([data-theme='dark']) {",
         darkEntries,
-        "}",
-    ].join("\n");
+        '}',
+    ].join('\n');
 }
 
 async function injectBetweenMarkers(
@@ -466,13 +499,13 @@ async function injectBetweenMarkers(
     end: string,
     block: string,
 ): Promise<void> {
-    const source = await readFile(file, "utf-8");
+    const source = await readFile(file, 'utf-8');
     const startIdx = source.indexOf(start);
     const endIdx = source.indexOf(end);
     if (startIdx === -1 || endIdx === -1) {
         throw new Error(
-            `${file} is missing theme markers (${start} / ${end}). ` +
-                `Add both markers manually before running this script.`,
+            `${file} is missing theme markers (${start} / ${end}). `
+                + `Add both markers manually before running this script.`,
         );
     }
     const before = source.slice(0, startIdx + start.length);
@@ -481,16 +514,16 @@ async function injectBetweenMarkers(
 }
 
 function assertTokenParity(themes: ThemeFile[]): void {
-    const defaultTheme = themes.find((t) => t.name === "default");
-    if (!defaultTheme) throw new Error("themes/default.json is required");
+    const defaultTheme = themes.find((t) => t.name === 'default');
+    if (!defaultTheme) throw new Error('themes/default.json is required');
 
     const lightKeys = Object.keys(defaultTheme.cssVars.light).sort();
     const darkKeys = Object.keys(defaultTheme.cssVars.dark).sort();
     if (JSON.stringify(lightKeys) !== JSON.stringify(darkKeys)) {
         throw new Error(
-            `Token key drift: default theme's light and dark blocks have different keys.\n` +
-                `  Light-only: ${lightKeys.filter((k) => !darkKeys.includes(k)).join(", ")}\n` +
-                `  Dark-only: ${darkKeys.filter((k) => !lightKeys.includes(k)).join(", ")}`,
+            `Token key drift: default theme's light and dark blocks have different keys.\n`
+                + `  Light-only: ${lightKeys.filter((k) => !darkKeys.includes(k)).join(', ')}\n`
+                + `  Dark-only: ${darkKeys.filter((k) => !lightKeys.includes(k)).join(', ')}`,
         );
     }
 }
@@ -503,19 +536,26 @@ async function main(): Promise<void> {
     const sharedBlock = buildSharedBlock(themes);
 
     await injectBetweenMarkers(SITE_GLOBALS, SITE_START, SITE_END, siteBlock);
-    await injectBetweenMarkers(SHARED_BASE, SHARED_START, SHARED_END, sharedBlock);
+    await injectBetweenMarkers(
+        SHARED_BASE,
+        SHARED_START,
+        SHARED_END,
+        sharedBlock,
+    );
 
-    execSync(`pnpm prettier --write "${SITE_GLOBALS}" "${SHARED_BASE}"`, { stdio: "ignore" });
+    execSync(`pnpm prettier --write "${SITE_GLOBALS}" "${SHARED_BASE}"`, {
+        stdio: 'ignore',
+    });
 
     console.log(
-        `Injected ${themes.length} theme(s) into:\n` +
-            `  ${SITE_GLOBALS}\n` +
-            `  ${SHARED_BASE}`,
+        `Injected ${themes.length} theme(s) into:\n`
+            + `  ${SITE_GLOBALS}\n`
+            + `  ${SHARED_BASE}`,
     );
 }
 
 main().catch((err) => {
-    console.error("Failed to generate theme CSS:", err.message ?? err);
+    console.error('Failed to generate theme CSS:', err.message ?? err);
     process.exit(1);
 });
 ```
@@ -534,6 +574,7 @@ The script does not run end-to-end until (a) `apps/site/src/app/globals.css` exi
 ### Task 8: Move site scripts into `apps/site/scripts/`
 
 **Files:**
+
 - Move: `.style-staging/scripts/collect-demos.ts` → `apps/site/scripts/collect-demos.ts`
 - Move: `.style-staging/scripts/generate-sitemap.ts` → `apps/site/scripts/generate-sitemap.ts`
 
@@ -567,6 +608,7 @@ git commit -m "chore(site): relocate collect-demos and generate-sitemap scripts 
 ### Task 9: Move site app sources into `apps/site/`
 
 **Files:**
+
 - Move: `.style-staging/src/app/` → `apps/site/src/app/`
 - Move: `.style-staging/src/components/site/` → `apps/site/src/components/site/`
 - Move: `.style-staging/src/templates/` → `apps/site/src/templates/`
@@ -643,6 +685,7 @@ git commit -m "chore(site): relocate style app sources into apps/site/"
 ### Task 10: Drop the remaining staging files and remove `.style-staging/`
 
 **Files:**
+
 - Delete: everything remaining under `.style-staging/`
 
 - [ ] **Step 1: List what's left**
@@ -688,6 +731,7 @@ find .style-staging 2>/dev/null | head
 ```
 
 Expected:
+
 - `packages/registry/` contains: `ui/`, `themes/`, `lib/`, `hooks/`, `scripts/`, `base.json`, `registry.json`.
 - `apps/site/` contains: `src/`, `scripts/`, `public/`, `next.config.ts`, `next-env.d.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `tsconfig.json`, `components.json`, `CHANGELOG.md`.
 - `apps/site/src/` contains: `app/`, `components/site/`, `templates/`, `lib/` (no `components/ui/`).
@@ -721,6 +765,7 @@ This chunk makes `packages/registry/` a real workspace package that builds. At t
 ### Task 12: Add `packages/registry/package.json`
 
 **Files:**
+
 - Create: `packages/registry/package.json`
 
 - [ ] **Step 1: Write the package manifest**
@@ -793,6 +838,7 @@ git commit -m "feat(registry): add @perimeter-widgets/registry package manifest"
 `shadcn build` needs a `components.json` in the cwd so the CLI can resolve the `aliases` map used to rewrite `@/` imports inside emitted JSON. Style keeps one alongside its `registry.json`; the registry package needs its own. Aliases trim to those the registry items actually reference.
 
 **Files:**
+
 - Create: `packages/registry/components.json`
 
 - [ ] **Step 1: Write the config**
@@ -836,6 +882,7 @@ git commit -m "feat(registry): add components.json for shadcn build"
 ### Task 13: Add `packages/registry/tsconfig.json`
 
 **Files:**
+
 - Create: `packages/registry/tsconfig.json`
 
 - [ ] **Step 1: Write the tsconfig**
@@ -856,7 +903,14 @@ Create `packages/registry/tsconfig.json`:
         "moduleResolution": "bundler",
         "noEmit": true
     },
-    "include": ["src/**/*", "ui/**/*", "lib/**/*", "hooks/**/*", "themes/**/*.json", "scripts/**/*"],
+    "include": [
+        "src/**/*",
+        "ui/**/*",
+        "lib/**/*",
+        "hooks/**/*",
+        "themes/**/*.json",
+        "scripts/**/*"
+    ],
     "exclude": ["node_modules", "public/r"]
 }
 ```
@@ -885,6 +939,7 @@ git commit -m "feat(registry): add tsconfig with @/ path aliases"
 ### Task 14: Write `packages/registry/src/index.ts` barrel
 
 **Files:**
+
 - Create: `packages/registry/src/index.ts`
 
 - [ ] **Step 1: Enumerate component names**
@@ -901,65 +956,65 @@ Create `packages/registry/src/index.ts`:
 
 ```typescript
 // Component re-exports
-export * from "../ui/perimeter/accordion";
-export * from "../ui/perimeter/alert";
-export * from "../ui/perimeter/alert-dialog";
-export * from "../ui/perimeter/aspect-ratio";
-export * from "../ui/perimeter/avatar";
-export * from "../ui/perimeter/badge";
-export * from "../ui/perimeter/breadcrumb";
-export * from "../ui/perimeter/button";
-export * from "../ui/perimeter/button-group";
-export * from "../ui/perimeter/calendar";
-export * from "../ui/perimeter/card";
-export * from "../ui/perimeter/carousel";
-export * from "../ui/perimeter/chart";
-export * from "../ui/perimeter/checkbox";
-export * from "../ui/perimeter/collapsible";
-export * from "../ui/perimeter/combobox";
-export * from "../ui/perimeter/command";
-export * from "../ui/perimeter/context-menu";
-export * from "../ui/perimeter/dialog";
-export * from "../ui/perimeter/direction";
-export * from "../ui/perimeter/drawer";
-export * from "../ui/perimeter/dropdown-menu";
-export * from "../ui/perimeter/empty";
-export * from "../ui/perimeter/field";
-export * from "../ui/perimeter/hover-card";
-export * from "../ui/perimeter/input";
-export * from "../ui/perimeter/input-group";
-export * from "../ui/perimeter/input-otp";
-export * from "../ui/perimeter/item";
-export * from "../ui/perimeter/kbd";
-export * from "../ui/perimeter/label";
-export * from "../ui/perimeter/menubar";
-export * from "../ui/perimeter/multi-combobox";
-export * from "../ui/perimeter/native-select";
-export * from "../ui/perimeter/navigation-menu";
-export * from "../ui/perimeter/pagination";
-export * from "../ui/perimeter/popover";
-export * from "../ui/perimeter/progress";
-export * from "../ui/perimeter/radio-group";
-export * from "../ui/perimeter/resizable";
-export * from "../ui/perimeter/scroll-area";
-export * from "../ui/perimeter/select";
-export * from "../ui/perimeter/separator";
-export * from "../ui/perimeter/sheet";
-export * from "../ui/perimeter/sidebar";
-export * from "../ui/perimeter/skeleton";
-export * from "../ui/perimeter/slider";
-export * from "../ui/perimeter/sonner";
-export * from "../ui/perimeter/spinner";
-export * from "../ui/perimeter/switch";
-export * from "../ui/perimeter/table";
-export * from "../ui/perimeter/tabs";
-export * from "../ui/perimeter/textarea";
-export * from "../ui/perimeter/toggle";
-export * from "../ui/perimeter/toggle-group";
-export * from "../ui/perimeter/tooltip";
+export * from '../ui/perimeter/accordion';
+export * from '../ui/perimeter/alert';
+export * from '../ui/perimeter/alert-dialog';
+export * from '../ui/perimeter/aspect-ratio';
+export * from '../ui/perimeter/avatar';
+export * from '../ui/perimeter/badge';
+export * from '../ui/perimeter/breadcrumb';
+export * from '../ui/perimeter/button';
+export * from '../ui/perimeter/button-group';
+export * from '../ui/perimeter/calendar';
+export * from '../ui/perimeter/card';
+export * from '../ui/perimeter/carousel';
+export * from '../ui/perimeter/chart';
+export * from '../ui/perimeter/checkbox';
+export * from '../ui/perimeter/collapsible';
+export * from '../ui/perimeter/combobox';
+export * from '../ui/perimeter/command';
+export * from '../ui/perimeter/context-menu';
+export * from '../ui/perimeter/dialog';
+export * from '../ui/perimeter/direction';
+export * from '../ui/perimeter/drawer';
+export * from '../ui/perimeter/dropdown-menu';
+export * from '../ui/perimeter/empty';
+export * from '../ui/perimeter/field';
+export * from '../ui/perimeter/hover-card';
+export * from '../ui/perimeter/input';
+export * from '../ui/perimeter/input-group';
+export * from '../ui/perimeter/input-otp';
+export * from '../ui/perimeter/item';
+export * from '../ui/perimeter/kbd';
+export * from '../ui/perimeter/label';
+export * from '../ui/perimeter/menubar';
+export * from '../ui/perimeter/multi-combobox';
+export * from '../ui/perimeter/native-select';
+export * from '../ui/perimeter/navigation-menu';
+export * from '../ui/perimeter/pagination';
+export * from '../ui/perimeter/popover';
+export * from '../ui/perimeter/progress';
+export * from '../ui/perimeter/radio-group';
+export * from '../ui/perimeter/resizable';
+export * from '../ui/perimeter/scroll-area';
+export * from '../ui/perimeter/select';
+export * from '../ui/perimeter/separator';
+export * from '../ui/perimeter/sheet';
+export * from '../ui/perimeter/sidebar';
+export * from '../ui/perimeter/skeleton';
+export * from '../ui/perimeter/slider';
+export * from '../ui/perimeter/sonner';
+export * from '../ui/perimeter/spinner';
+export * from '../ui/perimeter/switch';
+export * from '../ui/perimeter/table';
+export * from '../ui/perimeter/tabs';
+export * from '../ui/perimeter/textarea';
+export * from '../ui/perimeter/toggle';
+export * from '../ui/perimeter/toggle-group';
+export * from '../ui/perimeter/tooltip';
 
 // Utility
-export { cn } from "../lib/utils";
+export { cn } from '../lib/utils';
 ```
 
 Note: a component file that doesn't export a default-exportable set of symbols (e.g., `sonner` re-exports from the `sonner` package; `direction` is a provider) will still compile via `export *` — anything that's exported gets re-exported. If a file has zero exports, TypeScript will warn; inspect the offending file if a warning fires.
@@ -986,6 +1041,7 @@ git commit -m "feat(registry): add workspace barrel re-exporting all 56 componen
 ### Task 15: Root workspace wiring — install deps and verify resolve
 
 **Files:**
+
 - Modify: `pnpm-workspace.yaml`
 
 - [ ] **Step 1: Add globs to workspace config**
@@ -994,9 +1050,9 @@ Open `pnpm-workspace.yaml` at the monorepo root. Add `apps/*` and `widgets/*` to
 
 ```yaml
 packages:
-  - "packages/*"
-  - "apps/*"
-  - "widgets/*"
+    - 'packages/*'
+    - 'apps/*'
+    - 'widgets/*'
 ```
 
 - [ ] **Step 2: Install**
@@ -1122,6 +1178,7 @@ This chunk turns `apps/site/` into a functional Next.js 16 app that consumes the
 ### Task 17: Write `apps/site/package.json`
 
 **Files:**
+
 - Create: `apps/site/package.json`
 
 - [ ] **Step 1: Write the manifest**
@@ -1199,6 +1256,7 @@ git commit -m "feat(site): add @perimeter-widgets/site Next.js app manifest"
 The registry package ships raw TypeScript (`main: "src/index.ts"`). Next.js won't transpile workspace-symlinked `.ts` sources unless the package is explicitly listed in `transpilePackages`. Without this, `next build` fails with "Failed to parse source" on any import of `@perimeter-widgets/registry`.
 
 **Files:**
+
 - Modify: `apps/site/next.config.ts`
 
 - [ ] **Step 1: Read current contents**
@@ -1210,13 +1268,13 @@ cat apps/site/next.config.ts
 Expected (from style):
 
 ```typescript
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  output: "export",
-  turbopack: {
-    root: import.meta.dirname,
-  },
+    output: 'export',
+    turbopack: {
+        root: import.meta.dirname,
+    },
 };
 
 export default nextConfig;
@@ -1227,11 +1285,11 @@ export default nextConfig;
 Replace the file with:
 
 ```typescript
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-    output: "export",
-    transpilePackages: ["@perimeter-widgets/registry"],
+    output: 'export',
+    transpilePackages: ['@perimeter-widgets/registry'],
     turbopack: {
         root: import.meta.dirname,
     },
@@ -1252,6 +1310,7 @@ git commit -m "feat(site): transpile @perimeter-widgets/registry (ships raw TS)"
 ### Task 18: Update `apps/site/tsconfig.json`
 
 **Files:**
+
 - Modify: `apps/site/tsconfig.json`
 
 - [ ] **Step 1: Read the current file**
@@ -1288,7 +1347,12 @@ Replace the contents of `apps/site/tsconfig.json` with:
         "incremental": true,
         "plugins": [{ "name": "next" }]
     },
-    "include": ["src/**/*", "scripts/**/*", "next-env.d.ts", ".next/types/**/*.ts"],
+    "include": [
+        "src/**/*",
+        "scripts/**/*",
+        "next-env.d.ts",
+        ".next/types/**/*.ts"
+    ],
     "exclude": ["node_modules", "out", ".next"]
 }
 ```
@@ -1307,6 +1371,7 @@ git commit -m "feat(site): rewrite tsconfig for workspace layout (drop @registry
 ### Task 19: Strip `components`/`ui` aliases from `apps/site/components.json`
 
 **Files:**
+
 - Modify: `apps/site/components.json`
 
 - [ ] **Step 1: Read current contents**
@@ -1319,23 +1384,29 @@ Expected (inherited from style):
 
 ```json
 {
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "base-nova",
-  "rsc": true,
-  "tsx": true,
-  "tailwind": { "config": "", "css": "src/app/globals.css", "baseColor": "neutral", "cssVariables": true, "prefix": "" },
-  "iconLibrary": "lucide",
-  "rtl": false,
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
-  },
-  "menuColor": "default",
-  "menuAccent": "subtle",
-  "registries": {}
+    "$schema": "https://ui.shadcn.com/schema.json",
+    "style": "base-nova",
+    "rsc": true,
+    "tsx": true,
+    "tailwind": {
+        "config": "",
+        "css": "src/app/globals.css",
+        "baseColor": "neutral",
+        "cssVariables": true,
+        "prefix": ""
+    },
+    "iconLibrary": "lucide",
+    "rtl": false,
+    "aliases": {
+        "components": "@/components",
+        "utils": "@/lib/utils",
+        "ui": "@/components/ui",
+        "lib": "@/lib",
+        "hooks": "@/hooks"
+    },
+    "menuColor": "default",
+    "menuAccent": "subtle",
+    "registries": {}
 }
 ```
 
@@ -1372,6 +1443,7 @@ duplicate tree we just dropped."
 Tailwind v4 scans the project directory it sits in for utility classes. After Chunk 1 dropped `src/components/ui/`, the registry components at `packages/registry/ui/perimeter/*.tsx` are outside the site's default scan — their utility classes will not be emitted in the generated CSS, and registry components will render unstyled.
 
 **Files:**
+
 - Modify: `apps/site/src/app/globals.css`
 
 - [ ] **Step 1: Add the `@source` directive**
@@ -1410,6 +1482,7 @@ git commit -m "feat(site): add @source directive for Tailwind to scan registry c
 ### Task 20: Rewrite site imports from `@/components/ui/*` and `@registry/*` → `@perimeter-widgets/registry`
 
 **Files:**
+
 - Modify: ~18 files total — 19 `@/components/ui/<name>` imports (site chrome + app pages), 3 `@/lib/utils` imports (site chrome), and 29 `@registry/ui/perimeter/<name>` imports (templates).
 
 - [ ] **Step 1: List files needing rewrite**
@@ -1480,6 +1553,7 @@ pnpm --filter @perimeter-widgets/site typecheck
 ```
 
 Expected: errors fall into these buckets:
+
 1. Missing type exports from `@perimeter-widgets/registry` — fix by adding a named export in `packages/registry/src/index.ts`.
 2. Type-only imports that need `import type` — fix in place.
 3. Next.js 16 RSC boundary errors (if components flagged `"use client"` got imported at compile time into a server page that didn't exist in style's set). Fix by matching the boundary.
@@ -1498,6 +1572,7 @@ git commit -m "refactor(site): rewrite @/components/ui and @/lib/utils imports t
 ### Task 21: Rewrite `collect-demos.ts` for the new layout
 
 **Files:**
+
 - Modify: `apps/site/scripts/collect-demos.ts`
 - Modify: `packages/registry/package.json` (add `./ui/perimeter/*` subpath export)
 
@@ -1525,9 +1600,9 @@ Note: the more-specific `*.demo` pattern appears **before** the broader `*` patt
 Replace with:
 
 ```typescript
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 interface ManifestEntry {
     slug: string;
@@ -1539,21 +1614,21 @@ interface ManifestEntry {
 }
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const SITE_ROOT = resolve(SCRIPT_DIR, "..");
-const REGISTRY_DIR = resolve(SITE_ROOT, "../../packages/registry");
-const DEMO_DIR = join(REGISTRY_DIR, "ui/perimeter");
-const OUTPUT_DIR = join(SITE_ROOT, "src/lib");
-const MANIFEST = join(OUTPUT_DIR, "demo-manifest.json");
-const IMPORTS = join(OUTPUT_DIR, "demo-imports.ts");
+const SITE_ROOT = resolve(SCRIPT_DIR, '..');
+const REGISTRY_DIR = resolve(SITE_ROOT, '../../packages/registry');
+const DEMO_DIR = join(REGISTRY_DIR, 'ui/perimeter');
+const OUTPUT_DIR = join(SITE_ROOT, 'src/lib');
+const MANIFEST = join(OUTPUT_DIR, 'demo-manifest.json');
+const IMPORTS = join(OUTPUT_DIR, 'demo-imports.ts');
 
 async function collect(): Promise<void> {
     const files = await readdir(DEMO_DIR);
-    const demoFiles = files.filter((f) => f.endsWith(".demo.tsx")).sort();
+    const demoFiles = files.filter((f) => f.endsWith('.demo.tsx')).sort();
 
     const manifest: ManifestEntry[] = [];
     for (const file of demoFiles) {
-        const content = await readFile(join(DEMO_DIR, file), "utf-8");
-        const slug = file.replace(".demo.tsx", "");
+        const content = await readFile(join(DEMO_DIR, file), 'utf-8');
+        const slug = file.replace('.demo.tsx', '');
 
         const nameMatch = content.match(/name:\s*"([^"]+)"/);
         const descMatch = content.match(/description:\s*"([^"]+)"/);
@@ -1575,43 +1650,48 @@ async function collect(): Promise<void> {
     }
 
     manifest.sort(
-        (a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name),
+        (a, b) =>
+            a.category.localeCompare(b.category)
+            || a.name.localeCompare(b.name),
     );
 
     await mkdir(OUTPUT_DIR, { recursive: true });
-    await writeFile(MANIFEST, JSON.stringify(manifest, null, 2) + "\n");
+    await writeFile(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
     console.log(`Collected ${manifest.length} demo(s) → ${MANIFEST}`);
 
     const header = `// Auto-generated by apps/site/scripts/collect-demos.ts — do not edit manually\n\n`;
     const typeImport = `import type { ControlsConfig, DemoExample, DemoMeta } from "@/lib/demo-types";\n\n`;
     const moduleInterface = [
-        "export interface DemoModule {",
-        "    meta: DemoMeta;",
-        "    controls: ControlsConfig;",
-        "    Playground: React.ComponentType<Record<string, unknown>>;",
-        "    examples: DemoExample[];",
-        "}",
-        "",
-    ].join("\n");
+        'export interface DemoModule {',
+        '    meta: DemoMeta;',
+        '    controls: ControlsConfig;',
+        '    Playground: React.ComponentType<Record<string, unknown>>;',
+        '    examples: DemoExample[];',
+        '}',
+        '',
+    ].join('\n');
     const lines = manifest.map(
         (entry) =>
             `    "${entry.slug}": () => import("@perimeter-widgets/registry/ui/perimeter/${entry.slug}.demo") as unknown as Promise<DemoModule>,`,
     );
     const body = [
-        "// Each demo exports a Playground typed to its specific controls config.",
-        "// We widen via assertion so all demos share the DemoModule interface.",
-        "export const demoImports: Record<string, () => Promise<DemoModule>> = {",
+        '// Each demo exports a Playground typed to its specific controls config.',
+        '// We widen via assertion so all demos share the DemoModule interface.',
+        'export const demoImports: Record<string, () => Promise<DemoModule>> = {',
         ...lines,
-        "};",
-        "",
-    ].join("\n");
+        '};',
+        '',
+    ].join('\n');
 
-    await writeFile(IMPORTS, header + typeImport + moduleInterface + "\n" + body);
+    await writeFile(
+        IMPORTS,
+        header + typeImport + moduleInterface + '\n' + body,
+    );
     console.log(`Wrote ${manifest.length} imports → ${IMPORTS}`);
 }
 
 collect().catch((err) => {
-    console.error("collect-demos failed:", err);
+    console.error('collect-demos failed:', err);
     process.exit(1);
 });
 ```
@@ -1640,6 +1720,7 @@ Expected: 56. If lower, a `.demo.tsx` file is missing `meta` fields — inspect 
 ### Task 22: Add `copy-registry-output.ts`
 
 **Files:**
+
 - Create: `apps/site/scripts/copy-registry-output.ts`
 
 - [ ] **Step 1: Write the script**
@@ -1651,19 +1732,19 @@ Create `apps/site/scripts/copy-registry-output.ts`:
  * Copy the registry package's shadcn-build output into the site's public/r/.
  * Runs in the site's build chain after `pnpm --filter @perimeter-widgets/registry build`.
  */
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const SITE_ROOT = resolve(SCRIPT_DIR, "..");
-const REGISTRY_OUTPUT = resolve(SITE_ROOT, "../../packages/registry/public/r");
-const SITE_OUTPUT = join(SITE_ROOT, "public/r");
+const SITE_ROOT = resolve(SCRIPT_DIR, '..');
+const REGISTRY_OUTPUT = resolve(SITE_ROOT, '../../packages/registry/public/r');
+const SITE_OUTPUT = join(SITE_ROOT, 'public/r');
 
 if (!existsSync(REGISTRY_OUTPUT)) {
     console.error(
-        `Registry output not found at ${REGISTRY_OUTPUT}. ` +
-            `Run 'pnpm --filter @perimeter-widgets/registry build' first.`,
+        `Registry output not found at ${REGISTRY_OUTPUT}. `
+            + `Run 'pnpm --filter @perimeter-widgets/registry build' first.`,
     );
     process.exit(1);
 }
@@ -1674,7 +1755,9 @@ if (existsSync(SITE_OUTPUT)) {
 mkdirSync(SITE_OUTPUT, { recursive: true });
 cpSync(REGISTRY_OUTPUT, SITE_OUTPUT, { recursive: true });
 
-const count = readdirSync(SITE_OUTPUT).filter((f) => f.endsWith(".json")).length;
+const count = readdirSync(SITE_OUTPUT).filter((f) =>
+    f.endsWith('.json'),
+).length;
 console.log(`Copied ${count} registry JSON files to ${SITE_OUTPUT}`);
 ```
 
@@ -1735,6 +1818,7 @@ pnpm --filter @perimeter-widgets/site build
 ```
 
 Expected steps:
+
 1. Registry build: regenerate registry.json, run shadcn build, run generate-theme-css.
 2. Site copy: copy-registry-output.ts writes to `apps/site/public/r/`.
 3. Collect demos: manifest refreshed.
@@ -1791,6 +1875,7 @@ Expected: clean. If any `public/r/`, `out/`, `.next/`, or `demo-*` files appear 
 ### Task 24: Update root `package.json` with convenience scripts
 
 **Files:**
+
 - Modify: `package.json` (monorepo root)
 
 - [ ] **Step 1: Add scripts**
@@ -1963,6 +2048,7 @@ and wires up two new workspace entries:
 - `apps/site/` — Next.js 16 showcase consuming the registry via workspace import
 
 After this PR:
+
 - `pnpm --filter @perimeter-widgets/site build` produces a static export
   serving `/r/*.json` at `apps/site/out/r/`.
 - `pnpm --filter @perimeter-widgets/registry build` runs shadcn build +
