@@ -1,7 +1,7 @@
 /**
  * Generate registry.json from component source files.
  *
- * Scans registry/ui/perimeter/ for all .tsx files, extracts npm dependencies
+ * Scans ui/perimeter/ for all .tsx files, extracts npm dependencies
  * and inter-component registryDependencies from import statements, and
  * writes the complete registry.json manifest.
  *
@@ -12,9 +12,9 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const ROOT = process.cwd();
-const UI_DIR = join(ROOT, 'registry/ui/perimeter');
-const THEMES_DIR = join(ROOT, 'registry/themes');
-const BASE_FILE = join(ROOT, 'registry/base.json');
+const UI_DIR = join(ROOT, 'ui/perimeter');
+const THEMES_DIR = join(ROOT, 'themes');
+const BASE_FILE = join(ROOT, 'base.json');
 const OUTPUT = join(ROOT, 'registry.json');
 
 interface RegistryItem {
@@ -78,13 +78,13 @@ async function generateRegistry() {
     items.push({
         name: 'utils',
         type: 'registry:lib',
-        files: [{ path: 'src/lib/utils.ts', type: 'registry:lib' }],
+        files: [{ path: 'lib/utils.ts', type: 'registry:lib' }],
         dependencies: ['clsx', 'tailwind-merge'],
     });
 
     // 2. Add hooks (check if hooks directory exists)
     try {
-        const hooksDir = join(ROOT, 'src/hooks');
+        const hooksDir = join(ROOT, 'hooks');
         const hookFiles = await readdir(hooksDir);
         for (const file of hookFiles) {
             if (!file.endsWith('.ts') && !file.endsWith('.tsx')) continue;
@@ -92,7 +92,7 @@ async function generateRegistry() {
             items.push({
                 name,
                 type: 'registry:hook',
-                files: [{ path: `src/hooks/${file}`, type: 'registry:hook' }],
+                files: [{ path: `hooks/${file}`, type: 'registry:hook' }],
             });
         }
     } catch (err: unknown) {
@@ -150,7 +150,7 @@ async function generateRegistry() {
             name,
             type: 'registry:ui',
             files: [
-                { path: `registry/ui/perimeter/${file}`, type: 'registry:ui' },
+                { path: `ui/perimeter/${file}`, type: 'registry:ui' },
             ],
         };
 
@@ -176,7 +176,7 @@ async function generateRegistry() {
                 name: theme.name,
                 type: theme.type || 'registry:theme',
                 files: [
-                    { path: `registry/themes/${file}`, type: 'registry:theme' },
+                    { path: `themes/${file}`, type: 'registry:theme' },
                 ],
                 cssVars: theme.cssVars,
             });
