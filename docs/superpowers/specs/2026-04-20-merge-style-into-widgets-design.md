@@ -53,10 +53,10 @@ perimeter-widgets/
 │       ├── src/components/widgets/        # Phase 4: preview, config editor, theme/data toggles
 │       ├── src/lib/                       # demo-types, highlight, extract-source, embed-code
 │       ├── src/mocks/                     # Phase 4: MSW handlers
-│       ├── scripts/                       # collect-demos, generate-theme-css, copy-registry-output, sitemap
+│       ├── scripts/                       # collect-demos, copy-registry-output, sitemap
 │       ├── public/r/                      # shadcn build output (copied from registry package)
 │       ├── public/brand/                  # Phase 5: brand assets for /design/branding
-│       ├── components.json                # shadcn config (unchanged from style)
+│       ├── components.json                # shadcn config (components/ui aliases removed)
 │       ├── next.config.ts
 │       └── package.json                   # @perimeter-widgets/site
 
@@ -145,7 +145,7 @@ import { Button } from "@perimeter-widgets/registry";
 
 **Registry manifest paths.** Style's `registry.json` contains paths like `src/lib/utils.ts` and `src/hooks/use-copy-to-clipboard.ts` that are relative to `style/` cwd. After the move, `lib/utils.ts` and `hooks/*.ts` live at `packages/registry/lib/` and `packages/registry/hooks/` (moved there during Phase 1). `packages/registry/scripts/generate-registry.ts` (moved from style, with its `UI_DIR`/`THEMES_DIR`/`OUTPUT` path constants updated) regenerates `registry.json` with paths relative to the new registry-package root before `shadcn build` runs.
 
-**Themes.** `packages/registry/themes/*.json` is the canonical source. A single script (`apps/site/scripts/generate-theme-css.ts`, ported from `style/scripts/`) regenerates the token block in two places, emitting each file's existing dialect:
+**Themes.** `packages/registry/themes/*.json` is the canonical source. A single script (`packages/registry/scripts/generate-theme-css.ts`, ported from `style/scripts/`) regenerates the token block in two places, emitting each file's existing dialect:
 
 | File | Existing dialect | Keep as-is because |
 | --- | --- | --- |
@@ -167,11 +167,11 @@ The theme regenerator lives in `packages/registry/scripts/generate-theme-css.ts`
 - Routes: `/components`, `/components/[category]`, `/components/[category]/[slug]`, `/templates`, `/templates/[slug]`, `/docs`, `/changelog`
 - `generate-sitemap.ts`, `next.config.ts` (static export), webpack dev (Turbopack hangs on 56 dynamic demo imports)
 - Theme list discovery (`readdirSync` on `packages/registry/themes/`), `data-theme` + `.dark` runtime switching
-- `components.json` (shadcn CLI config), even though site imports come from the workspace registry — the file is kept so `pnpm dlx shadcn@latest add @perimeter/<name>` can still run inside the site if ever needed
+- `components.json` (shadcn CLI config), ported from `style/` but with the `components` and `ui` aliases removed so `pnpm dlx shadcn@latest add @perimeter/<name>` inside `apps/site/` fails loudly rather than re-materializing the duplicate `src/components/ui/` tree. `shadcn build` does not run in the site — it runs in `packages/registry/` against `packages/registry/registry.json` — so the site keeps `components.json` only for editor tooling and to document the alias stance.
 
 ### Rewritten in Phase 1
 
-- Every `@/components/ui/<name>` import in site source (roughly 30 imports across site chrome, search palette, install button, layout, pages, templates, docs) becomes `@perimeter-widgets/registry`. Style's `src/components/ui/*` (the 56-file duplicate installed copy) is not carried into `apps/site/`.
+- Every `@/components/ui/<name>` import in site source (roughly 44 imports across site chrome, search palette, install button, layout, pages, templates, docs) becomes `@perimeter-widgets/registry`. Style's `src/components/ui/*` (the 55-file duplicate installed copy — 55 of the 56 registry components, `multi-combobox` absent) is not carried into `apps/site/`.
 - Every `@/lib/utils` import in site source becomes `@perimeter-widgets/registry` (re-exports `cn`) or a relative import if the site keeps a local copy.
 
 ### Script placement summary
