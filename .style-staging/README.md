@@ -15,11 +15,11 @@ shadcn-compatible component registry and showcase site for Perimeter Church. Bui
 
 ```json
 {
-  "registries": {
-    "perimeter": {
-      "url": "https://style.perimeter.org/r"
+    "registries": {
+        "perimeter": {
+            "url": "https://style.perimeter.org/r"
+        }
     }
-  }
 }
 ```
 
@@ -32,7 +32,7 @@ pnpm dlx shadcn@latest add @perimeter/button
 **3. Import and use** — components land in your `src/components/ui/`:
 
 ```tsx
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 ```
 
 ## Development

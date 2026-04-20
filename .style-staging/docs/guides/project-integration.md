@@ -8,9 +8,9 @@ How to integrate the Perimeter design system registry into each consuming projec
 
 ```json
 {
-  "registries": {
-    "@perimeter": "https://style.perimeter.org/r/{name}.json"
-  }
+    "registries": {
+        "@perimeter": "https://style.perimeter.org/r/{name}.json"
+    }
 }
 ```
 
@@ -154,10 +154,10 @@ pnpm dlx shadcn@latest add @perimeter/button @perimeter/card @perimeter/table @p
 ```css
 /* src/styles/tokens.css — app-specific extensions */
 :root {
-  --chart-attendance: oklch(0.55 0.15 280);
-  --chart-giving: oklch(0.6 0.16 145);
-  --service-9am: oklch(0.65 0.12 60);
-  --service-11am: oklch(0.55 0.14 200);
+    --chart-attendance: oklch(0.55 0.15 280);
+    --chart-giving: oklch(0.6 0.16 145);
+    --service-9am: oklch(0.65 0.12 60);
+    --service-11am: oklch(0.55 0.14 200);
 }
 ```
 
@@ -186,10 +186,10 @@ Add overrides in your `globals.css` AFTER the base tokens:
 
 /* Project-specific overrides */
 :root {
-  --primary: oklch(0.45 0.12 250); /* Different primary for this project */
+    --primary: oklch(0.45 0.12 250); /* Different primary for this project */
 }
 .dark {
-  --primary: oklch(0.55 0.12 250);
+    --primary: oklch(0.55 0.12 250);
 }
 ```
 

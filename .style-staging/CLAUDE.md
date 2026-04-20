@@ -153,9 +153,9 @@ Components should support both **controlled** (`value` + `onValueChange`) and **
 
 ```typescript
 interface Props {
-  value?: string | null; // Controlled — component reflects this value
-  defaultValue?: string | null; // Uncontrolled — initial value, component manages state internally
-  onValueChange?: (value: string | null) => void; // Called in both modes
+    value?: string | null; // Controlled — component reflects this value
+    defaultValue?: string | null; // Uncontrolled — initial value, component manages state internally
+    onValueChange?: (value: string | null) => void; // Called in both modes
 }
 ```
 
@@ -276,20 +276,20 @@ Imports should be ordered from furthest to closest, with a blank line between ea
 
 ```typescript
 // 1. Node built-ins
-import { readdirSync } from "node:fs";
+import { readdirSync } from 'node:fs';
 
 // 2. External dependencies
-import { createHighlighter } from "shiki";
+import { createHighlighter } from 'shiki';
 
 // 3. Path aliases (internal code)
-import { highlight } from "@/lib/highlight";
-import { Button } from "@registry/ui/perimeter/button";
+import { highlight } from '@/lib/highlight';
+import { Button } from '@registry/ui/perimeter/button';
 
 // 4. Relative imports (same directory)
-import { PlaygroundControls } from "./playground-controls";
+import { PlaygroundControls } from './playground-controls';
 
 // 5. Type-only imports
-import type { ControlsConfig } from "@/lib/demo-types";
+import type { ControlsConfig } from '@/lib/demo-types';
 ```
 
 ## File Naming and Organization

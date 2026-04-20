@@ -33,14 +33,16 @@ These 4 components render `Portal` inline inside their content wrapper. Add `con
 ```tsx
 // Before
 function SelectContent({ className, ...props }) {
-  return <SelectPrimitive.Portal>...</SelectPrimitive.Portal>;
+    return <SelectPrimitive.Portal>...</SelectPrimitive.Portal>;
 }
 
 // After
 function SelectContent({ className, container, ...props }) {
-  return (
-    <SelectPrimitive.Portal container={container}>...</SelectPrimitive.Portal>
-  );
+    return (
+        <SelectPrimitive.Portal container={container}>
+            ...
+        </SelectPrimitive.Portal>
+    );
 }
 ```
 
@@ -51,18 +53,18 @@ Dialog has a separate `DialogPortal` wrapper function that `DialogContent` calls
 ```tsx
 // Before
 function DialogPortal({ ...props }) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
+    return <DialogPrimitive.Portal data-slot='dialog-portal' {...props} />;
 }
 
 // After
 function DialogPortal({ container, ...props }) {
-  return (
-    <DialogPrimitive.Portal
-      data-slot="dialog-portal"
-      container={container}
-      {...props}
-    />
-  );
+    return (
+        <DialogPrimitive.Portal
+            data-slot='dialog-portal'
+            container={container}
+            {...props}
+        />
+    );
 }
 ```
 

@@ -85,12 +85,12 @@ Themes are partial token overrides stored in `registry/themes/*.json`:
 
 ```json
 {
-  "name": "perimeter-api-theme",
-  "type": "registry:theme",
-  "cssVars": {
-    "light": { "primary": "oklch(0.45 0.12 250)" },
-    "dark": { "primary": "oklch(0.55 0.12 250)" }
-  }
+    "name": "perimeter-api-theme",
+    "type": "registry:theme",
+    "cssVars": {
+        "light": { "primary": "oklch(0.45 0.12 250)" },
+        "dark": { "primary": "oklch(0.55 0.12 250)" }
+    }
 }
 ```
 
@@ -102,11 +102,11 @@ The `@theme inline` block in `globals.css` maps CSS variables to Tailwind's name
 
 ```css
 @theme inline {
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  /* ... */
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    /* ... */
 }
 ```
 

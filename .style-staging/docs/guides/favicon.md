@@ -18,14 +18,14 @@ In `src/app/layout.tsx`, add the `icons` field to the metadata export:
 
 ```typescript
 export const metadata: Metadata = {
-  // ...existing fields
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: "/apple-touch-icon.png",
-  },
+    // ...existing fields
+    icons: {
+        icon: [
+            { url: '/favicon.ico', sizes: '32x32' },
+            { url: '/icon.svg', type: 'image/svg+xml' },
+        ],
+        apple: '/apple-touch-icon.png',
+    },
 };
 ```
 

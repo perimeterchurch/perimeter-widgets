@@ -138,14 +138,14 @@ The current `src/app/page.tsx` has a link to `/editor`. Replace the entire page 
 
 ```tsx
 export default function HomePage() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-3xl font-bold">Perimeter Style</h1>
-      <p className="text-muted-foreground mt-2">
-        Component showcase — coming soon
-      </p>
-    </main>
-  );
+    return (
+        <main className='flex min-h-screen items-center justify-center'>
+            <h1 className='text-3xl font-bold'>Perimeter Style</h1>
+            <p className='text-muted-foreground mt-2'>
+                Component showcase — coming soon
+            </p>
+        </main>
+    );
 }
 ```
 
@@ -178,93 +178,93 @@ Create `registry/themes/default.json` with the full token set currently in `glob
 
 ```json
 {
-  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-  "name": "default-theme",
-  "type": "registry:theme",
-  "cssVars": {
-    "light": {
-      "radius": "0.625rem",
-      "background": "oklch(0.985 0.002 75)",
-      "foreground": "oklch(0.147 0.012 50)",
-      "card": "oklch(0.985 0.002 75)",
-      "card-foreground": "oklch(0.147 0.012 50)",
-      "popover": "oklch(0.985 0.002 75)",
-      "popover-foreground": "oklch(0.147 0.012 50)",
-      "primary": "oklch(0.488 0.145 283)",
-      "primary-foreground": "oklch(0.985 0 0)",
-      "secondary": "oklch(0.97 0.003 75)",
-      "secondary-foreground": "oklch(0.41 0.01 50)",
-      "muted": "oklch(0.96 0.003 75)",
-      "muted-foreground": "oklch(0.553 0.01 50)",
-      "accent": "oklch(0.96 0.003 75)",
-      "accent-foreground": "oklch(0.41 0.01 50)",
-      "destructive": "oklch(0.577 0.245 27)",
-      "destructive-foreground": "oklch(0.985 0 0)",
-      "border": "oklch(0.87 0.006 75)",
-      "input": "oklch(0.87 0.006 75)",
-      "ring": "oklch(0.488 0.145 283)",
-      "chart-1": "oklch(0.488 0.145 283)",
-      "chart-2": "oklch(0.59 0.16 145)",
-      "chart-3": "oklch(0.78 0.15 80)",
-      "chart-4": "oklch(0.577 0.245 27)",
-      "chart-5": "oklch(0.62 0.17 230)",
-      "success": "oklch(0.59 0.16 145)",
-      "success-foreground": "oklch(0.985 0 0)",
-      "warning": "oklch(0.78 0.15 80)",
-      "warning-foreground": "oklch(0.985 0 0)",
-      "info": "oklch(0.62 0.17 230)",
-      "info-foreground": "oklch(0.985 0 0)",
-      "sidebar": "oklch(0.97 0.003 75)",
-      "sidebar-foreground": "oklch(0.147 0.012 50)",
-      "sidebar-primary": "oklch(0.488 0.145 283)",
-      "sidebar-primary-foreground": "oklch(0.985 0 0)",
-      "sidebar-accent": "oklch(0.96 0.003 75)",
-      "sidebar-accent-foreground": "oklch(0.41 0.01 50)",
-      "sidebar-border": "oklch(0.87 0.006 75)",
-      "sidebar-ring": "oklch(0.488 0.145 283)"
-    },
-    "dark": {
-      "radius": "0.625rem",
-      "background": "oklch(0.147 0.012 50)",
-      "foreground": "oklch(0.985 0.002 75)",
-      "card": "oklch(0.21 0.012 50)",
-      "card-foreground": "oklch(0.985 0.002 75)",
-      "popover": "oklch(0.21 0.012 50)",
-      "popover-foreground": "oklch(0.985 0.002 75)",
-      "primary": "oklch(0.55 0.145 283)",
-      "primary-foreground": "oklch(0.985 0 0)",
-      "secondary": "oklch(0.27 0.01 50)",
-      "secondary-foreground": "oklch(0.87 0.006 75)",
-      "muted": "oklch(0.27 0.01 50)",
-      "muted-foreground": "oklch(0.7 0.006 75)",
-      "accent": "oklch(0.27 0.01 50)",
-      "accent-foreground": "oklch(0.87 0.006 75)",
-      "destructive": "oklch(0.65 0.235 27)",
-      "destructive-foreground": "oklch(0.985 0 0)",
-      "border": "oklch(0.35 0.01 50)",
-      "input": "oklch(0.35 0.01 50)",
-      "ring": "oklch(0.55 0.145 283)",
-      "chart-1": "oklch(0.55 0.145 283)",
-      "chart-2": "oklch(0.64 0.16 145)",
-      "chart-3": "oklch(0.82 0.15 80)",
-      "chart-4": "oklch(0.65 0.235 27)",
-      "chart-5": "oklch(0.67 0.17 230)",
-      "success": "oklch(0.64 0.16 145)",
-      "success-foreground": "oklch(0.985 0 0)",
-      "warning": "oklch(0.82 0.15 80)",
-      "warning-foreground": "oklch(0.985 0 0)",
-      "info": "oklch(0.67 0.17 230)",
-      "info-foreground": "oklch(0.985 0 0)",
-      "sidebar": "oklch(0.21 0.012 50)",
-      "sidebar-foreground": "oklch(0.985 0.002 75)",
-      "sidebar-primary": "oklch(0.55 0.145 283)",
-      "sidebar-primary-foreground": "oklch(0.985 0 0)",
-      "sidebar-accent": "oklch(0.27 0.01 50)",
-      "sidebar-accent-foreground": "oklch(0.87 0.006 75)",
-      "sidebar-border": "oklch(0.35 0.01 50)",
-      "sidebar-ring": "oklch(0.55 0.145 283)"
+    "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+    "name": "default-theme",
+    "type": "registry:theme",
+    "cssVars": {
+        "light": {
+            "radius": "0.625rem",
+            "background": "oklch(0.985 0.002 75)",
+            "foreground": "oklch(0.147 0.012 50)",
+            "card": "oklch(0.985 0.002 75)",
+            "card-foreground": "oklch(0.147 0.012 50)",
+            "popover": "oklch(0.985 0.002 75)",
+            "popover-foreground": "oklch(0.147 0.012 50)",
+            "primary": "oklch(0.488 0.145 283)",
+            "primary-foreground": "oklch(0.985 0 0)",
+            "secondary": "oklch(0.97 0.003 75)",
+            "secondary-foreground": "oklch(0.41 0.01 50)",
+            "muted": "oklch(0.96 0.003 75)",
+            "muted-foreground": "oklch(0.553 0.01 50)",
+            "accent": "oklch(0.96 0.003 75)",
+            "accent-foreground": "oklch(0.41 0.01 50)",
+            "destructive": "oklch(0.577 0.245 27)",
+            "destructive-foreground": "oklch(0.985 0 0)",
+            "border": "oklch(0.87 0.006 75)",
+            "input": "oklch(0.87 0.006 75)",
+            "ring": "oklch(0.488 0.145 283)",
+            "chart-1": "oklch(0.488 0.145 283)",
+            "chart-2": "oklch(0.59 0.16 145)",
+            "chart-3": "oklch(0.78 0.15 80)",
+            "chart-4": "oklch(0.577 0.245 27)",
+            "chart-5": "oklch(0.62 0.17 230)",
+            "success": "oklch(0.59 0.16 145)",
+            "success-foreground": "oklch(0.985 0 0)",
+            "warning": "oklch(0.78 0.15 80)",
+            "warning-foreground": "oklch(0.985 0 0)",
+            "info": "oklch(0.62 0.17 230)",
+            "info-foreground": "oklch(0.985 0 0)",
+            "sidebar": "oklch(0.97 0.003 75)",
+            "sidebar-foreground": "oklch(0.147 0.012 50)",
+            "sidebar-primary": "oklch(0.488 0.145 283)",
+            "sidebar-primary-foreground": "oklch(0.985 0 0)",
+            "sidebar-accent": "oklch(0.96 0.003 75)",
+            "sidebar-accent-foreground": "oklch(0.41 0.01 50)",
+            "sidebar-border": "oklch(0.87 0.006 75)",
+            "sidebar-ring": "oklch(0.488 0.145 283)"
+        },
+        "dark": {
+            "radius": "0.625rem",
+            "background": "oklch(0.147 0.012 50)",
+            "foreground": "oklch(0.985 0.002 75)",
+            "card": "oklch(0.21 0.012 50)",
+            "card-foreground": "oklch(0.985 0.002 75)",
+            "popover": "oklch(0.21 0.012 50)",
+            "popover-foreground": "oklch(0.985 0.002 75)",
+            "primary": "oklch(0.55 0.145 283)",
+            "primary-foreground": "oklch(0.985 0 0)",
+            "secondary": "oklch(0.27 0.01 50)",
+            "secondary-foreground": "oklch(0.87 0.006 75)",
+            "muted": "oklch(0.27 0.01 50)",
+            "muted-foreground": "oklch(0.7 0.006 75)",
+            "accent": "oklch(0.27 0.01 50)",
+            "accent-foreground": "oklch(0.87 0.006 75)",
+            "destructive": "oklch(0.65 0.235 27)",
+            "destructive-foreground": "oklch(0.985 0 0)",
+            "border": "oklch(0.35 0.01 50)",
+            "input": "oklch(0.35 0.01 50)",
+            "ring": "oklch(0.55 0.145 283)",
+            "chart-1": "oklch(0.55 0.145 283)",
+            "chart-2": "oklch(0.64 0.16 145)",
+            "chart-3": "oklch(0.82 0.15 80)",
+            "chart-4": "oklch(0.65 0.235 27)",
+            "chart-5": "oklch(0.67 0.17 230)",
+            "success": "oklch(0.64 0.16 145)",
+            "success-foreground": "oklch(0.985 0 0)",
+            "warning": "oklch(0.82 0.15 80)",
+            "warning-foreground": "oklch(0.985 0 0)",
+            "info": "oklch(0.67 0.17 230)",
+            "info-foreground": "oklch(0.985 0 0)",
+            "sidebar": "oklch(0.21 0.012 50)",
+            "sidebar-foreground": "oklch(0.985 0.002 75)",
+            "sidebar-primary": "oklch(0.55 0.145 283)",
+            "sidebar-primary-foreground": "oklch(0.985 0 0)",
+            "sidebar-accent": "oklch(0.27 0.01 50)",
+            "sidebar-accent-foreground": "oklch(0.87 0.006 75)",
+            "sidebar-border": "oklch(0.35 0.01 50)",
+            "sidebar-ring": "oklch(0.55 0.145 283)"
+        }
     }
-  }
 }
 ```
 
@@ -288,73 +288,75 @@ git commit -m "feat: add default.json theme with full warm stone palette"
 - [ ] **Step 1: Write the theme CSS generation script**
 
 ```typescript
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
 
 interface ThemeFile {
-  name: string;
-  cssVars: {
-    light: Record<string, string>;
-    dark: Record<string, string>;
-  };
+    name: string;
+    cssVars: {
+        light: Record<string, string>;
+        dark: Record<string, string>;
+    };
 }
 
 function cssBlock(selector: string, vars: Record<string, string>): string {
-  const entries = Object.entries(vars)
-    .map(([key, value]) => `  --${key}: ${value};`)
-    .join("\n");
-  return `${selector} {\n${entries}\n}`;
+    const entries = Object.entries(vars)
+        .map(([key, value]) => `  --${key}: ${value};`)
+        .join('\n');
+    return `${selector} {\n${entries}\n}`;
 }
 
 async function generateThemeCSS() {
-  const themesDir = join(process.cwd(), "registry", "themes");
-  const outputDir = join(process.cwd(), "src", "styles");
-  const outputPath = join(outputDir, "themes.css");
+    const themesDir = join(process.cwd(), 'registry', 'themes');
+    const outputDir = join(process.cwd(), 'src', 'styles');
+    const outputPath = join(outputDir, 'themes.css');
 
-  const files = await readdir(themesDir);
-  const jsonFiles = files.filter((f) => f.endsWith(".json")).sort();
+    const files = await readdir(themesDir);
+    const jsonFiles = files.filter((f) => f.endsWith('.json')).sort();
 
-  const blocks: string[] = [
-    "/* Auto-generated from registry/themes/ — do not edit manually */",
-    "",
-  ];
+    const blocks: string[] = [
+        '/* Auto-generated from registry/themes/ — do not edit manually */',
+        '',
+    ];
 
-  // Find default.json first — it becomes :root and .dark
-  const defaultFile = jsonFiles.find((f) => f === "default.json");
-  if (!defaultFile) {
-    throw new Error("registry/themes/default.json is required");
-  }
+    // Find default.json first — it becomes :root and .dark
+    const defaultFile = jsonFiles.find((f) => f === 'default.json');
+    if (!defaultFile) {
+        throw new Error('registry/themes/default.json is required');
+    }
 
-  const defaultTheme: ThemeFile = JSON.parse(
-    await readFile(join(themesDir, defaultFile), "utf-8"),
-  );
-  blocks.push(cssBlock(":root", defaultTheme.cssVars.light));
-  blocks.push("");
-  blocks.push(cssBlock(".dark", defaultTheme.cssVars.dark));
-
-  // Process remaining themes as data-theme overrides
-  for (const file of jsonFiles) {
-    if (file === "default.json") continue;
-
-    const theme: ThemeFile = JSON.parse(
-      await readFile(join(themesDir, file), "utf-8"),
+    const defaultTheme: ThemeFile = JSON.parse(
+        await readFile(join(themesDir, defaultFile), 'utf-8'),
     );
-    const slug = file.replace(".json", "").replace("-theme", "");
+    blocks.push(cssBlock(':root', defaultTheme.cssVars.light));
+    blocks.push('');
+    blocks.push(cssBlock('.dark', defaultTheme.cssVars.dark));
 
-    blocks.push("");
-    blocks.push(cssBlock(`[data-theme="${slug}"]`, theme.cssVars.light));
-    blocks.push("");
-    blocks.push(cssBlock(`[data-theme="${slug}"].dark`, theme.cssVars.dark));
-  }
+    // Process remaining themes as data-theme overrides
+    for (const file of jsonFiles) {
+        if (file === 'default.json') continue;
 
-  await mkdir(outputDir, { recursive: true });
-  await writeFile(outputPath, blocks.join("\n") + "\n");
-  console.log(`Generated ${outputPath} from ${jsonFiles.length} theme(s)`);
+        const theme: ThemeFile = JSON.parse(
+            await readFile(join(themesDir, file), 'utf-8'),
+        );
+        const slug = file.replace('.json', '').replace('-theme', '');
+
+        blocks.push('');
+        blocks.push(cssBlock(`[data-theme="${slug}"]`, theme.cssVars.light));
+        blocks.push('');
+        blocks.push(
+            cssBlock(`[data-theme="${slug}"].dark`, theme.cssVars.dark),
+        );
+    }
+
+    await mkdir(outputDir, { recursive: true });
+    await writeFile(outputPath, blocks.join('\n') + '\n');
+    console.log(`Generated ${outputPath} from ${jsonFiles.length} theme(s)`);
 }
 
 generateThemeCSS().catch((err) => {
-  console.error("Failed to generate theme CSS:", err);
-  process.exit(1);
+    console.error('Failed to generate theme CSS:', err);
+    process.exit(1);
 });
 ```
 
@@ -480,61 +482,58 @@ git commit -m "chore: add shiki for build-time syntax highlighting"
 
 ```typescript
 export interface EnumControl {
-  type: "enum";
-  options: readonly string[];
-  default: string;
+    type: 'enum';
+    options: readonly string[];
+    default: string;
 }
 
 export interface BooleanControl {
-  type: "boolean";
-  default: boolean;
+    type: 'boolean';
+    default: boolean;
 }
 
 export interface StringControl {
-  type: "string";
-  default: string;
+    type: 'string';
+    default: string;
 }
 
 export interface NumberControl {
-  type: "number";
-  default: number;
-  min?: number;
-  max?: number;
-  step?: number;
+    type: 'number';
+    default: number;
+    min?: number;
+    max?: number;
+    step?: number;
 }
 
 export type ControlDescriptor =
-  | EnumControl
-  | BooleanControl
-  | StringControl
-  | NumberControl;
+    | EnumControl
+    | BooleanControl
+    | StringControl
+    | NumberControl;
 
 export type ControlsConfig = Record<string, ControlDescriptor>;
 
-type InferControlType<T extends ControlDescriptor> = T extends EnumControl
-  ? T["options"][number]
-  : T extends BooleanControl
-    ? boolean
-    : T extends StringControl
-      ? string
-      : T extends NumberControl
-        ? number
-        : never;
+type InferControlType<T extends ControlDescriptor> =
+    T extends EnumControl ? T['options'][number]
+    : T extends BooleanControl ? boolean
+    : T extends StringControl ? string
+    : T extends NumberControl ? number
+    : never;
 
 export type PlaygroundProps<T extends ControlsConfig> = {
-  [K in keyof T]: InferControlType<T[K]>;
+    [K in keyof T]: InferControlType<T[K]>;
 };
 
 export interface DemoMeta {
-  name: string;
-  description: string;
-  category: string;
-  install: string;
+    name: string;
+    description: string;
+    category: string;
+    install: string;
 }
 
 export interface DemoExample {
-  name: string;
-  render: () => React.ReactNode;
+    name: string;
+    render: () => React.ReactNode;
 }
 ```
 
@@ -559,29 +558,29 @@ git commit -m "feat: add ControlsConfig and PlaygroundProps type infrastructure"
 - [ ] **Step 1: Write the highlight wrapper**
 
 ```typescript
-import { createHighlighter, type Highlighter } from "shiki";
+import { createHighlighter, type Highlighter } from 'shiki';
 
 let highlighter: Highlighter | null = null;
 
 async function getHighlighter(): Promise<Highlighter> {
-  if (!highlighter) {
-    highlighter = await createHighlighter({
-      themes: ["github-dark", "github-light"],
-      langs: ["tsx", "bash", "json", "css"],
-    });
-  }
-  return highlighter;
+    if (!highlighter) {
+        highlighter = await createHighlighter({
+            themes: ['github-dark', 'github-light'],
+            langs: ['tsx', 'bash', 'json', 'css'],
+        });
+    }
+    return highlighter;
 }
 
 export async function highlight(
-  code: string,
-  lang: string = "tsx",
+    code: string,
+    lang: string = 'tsx',
 ): Promise<string> {
-  const h = await getHighlighter();
-  return h.codeToHtml(code, {
-    lang,
-    themes: { light: "github-light", dark: "github-dark" },
-  });
+    const h = await getHighlighter();
+    return h.codeToHtml(code, {
+        lang,
+        themes: { light: 'github-light', dark: 'github-dark' },
+    });
 }
 ```
 
@@ -702,67 +701,68 @@ git commit -m "feat: add lightweight theme context provider"
 This script scans `registry/ui/perimeter/*.demo.tsx` files, extracts `meta` exports using regex (not runtime import — avoids TSX compilation), and writes a JSON manifest.
 
 ```typescript
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
 
 interface ManifestEntry {
-  slug: string;
-  name: string;
-  description: string;
-  category: string;
-  install: string;
-  demoFile: string;
+    slug: string;
+    name: string;
+    description: string;
+    category: string;
+    install: string;
+    demoFile: string;
 }
 
 async function collectDemos() {
-  const registryDir = join(process.cwd(), "registry", "ui", "perimeter");
-  const outputDir = join(process.cwd(), "src", "lib");
-  const outputPath = join(outputDir, "demo-manifest.json");
+    const registryDir = join(process.cwd(), 'registry', 'ui', 'perimeter');
+    const outputDir = join(process.cwd(), 'src', 'lib');
+    const outputPath = join(outputDir, 'demo-manifest.json');
 
-  const files = await readdir(registryDir);
-  const demoFiles = files.filter((f) => f.endsWith(".demo.tsx")).sort();
+    const files = await readdir(registryDir);
+    const demoFiles = files.filter((f) => f.endsWith('.demo.tsx')).sort();
 
-  const manifest: ManifestEntry[] = [];
+    const manifest: ManifestEntry[] = [];
 
-  for (const file of demoFiles) {
-    const content = await readFile(join(registryDir, file), "utf-8");
-    const slug = file.replace(".demo.tsx", "");
+    for (const file of demoFiles) {
+        const content = await readFile(join(registryDir, file), 'utf-8');
+        const slug = file.replace('.demo.tsx', '');
 
-    // Extract meta fields using regex
-    const nameMatch = content.match(/name:\s*"([^"]+)"/);
-    const descMatch = content.match(/description:\s*"([^"]+)"/);
-    const catMatch = content.match(/category:\s*"([^"]+)"/);
-    const installMatch = content.match(/install:\s*"([^"]+)"/);
+        // Extract meta fields using regex
+        const nameMatch = content.match(/name:\s*"([^"]+)"/);
+        const descMatch = content.match(/description:\s*"([^"]+)"/);
+        const catMatch = content.match(/category:\s*"([^"]+)"/);
+        const installMatch = content.match(/install:\s*"([^"]+)"/);
 
-    if (!nameMatch || !descMatch || !catMatch || !installMatch) {
-      console.warn(`Skipping ${file}: missing meta fields`);
-      continue;
+        if (!nameMatch || !descMatch || !catMatch || !installMatch) {
+            console.warn(`Skipping ${file}: missing meta fields`);
+            continue;
+        }
+
+        manifest.push({
+            slug,
+            name: nameMatch[1],
+            description: descMatch[1],
+            category: catMatch[1],
+            install: installMatch[1],
+            demoFile: `@registry/ui/perimeter/${slug}.demo`,
+        });
     }
 
-    manifest.push({
-      slug,
-      name: nameMatch[1],
-      description: descMatch[1],
-      category: catMatch[1],
-      install: installMatch[1],
-      demoFile: `@registry/ui/perimeter/${slug}.demo`,
-    });
-  }
+    // Sort by category then name
+    manifest.sort(
+        (a, b) =>
+            a.category.localeCompare(b.category)
+            || a.name.localeCompare(b.name),
+    );
 
-  // Sort by category then name
-  manifest.sort(
-    (a, b) =>
-      a.category.localeCompare(b.category) || a.name.localeCompare(b.name),
-  );
-
-  await mkdir(outputDir, { recursive: true });
-  await writeFile(outputPath, JSON.stringify(manifest, null, 2) + "\n");
-  console.log(`Collected ${manifest.length} demo(s) → ${outputPath}`);
+    await mkdir(outputDir, { recursive: true });
+    await writeFile(outputPath, JSON.stringify(manifest, null, 2) + '\n');
+    console.log(`Collected ${manifest.length} demo(s) → ${outputPath}`);
 }
 
 collectDemos().catch((err) => {
-  console.error("Failed to collect demos:", err);
-  process.exit(1);
+    console.error('Failed to collect demos:', err);
+    process.exit(1);
 });
 ```
 
@@ -803,38 +803,38 @@ git commit -m "feat: add demo manifest collection script"
 `src/components/site/theme-switcher.tsx` — a `"use client"` component:
 
 ```tsx
-"use client";
+'use client';
 
-import { useTheme } from "@/lib/theme-context";
+import { useTheme } from '@/lib/theme-context';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 export function ThemeSwitcher() {
-  const { theme, setTheme, availableThemes } = useTheme();
+    const { theme, setTheme, availableThemes } = useTheme();
 
-  return (
-    <Select value={theme} onValueChange={setTheme}>
-      <SelectTrigger className="w-[140px] h-8 text-xs">
-        <SelectValue placeholder="Default" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="">Default</SelectItem>
-        {availableThemes.map((t) => (
-          <SelectItem key={t} value={t}>
-            {t
-              .split("-")
-              .map((w) => w[0].toUpperCase() + w.slice(1))
-              .join(" ")}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
+    return (
+        <Select value={theme} onValueChange={setTheme}>
+            <SelectTrigger className='w-[140px] h-8 text-xs'>
+                <SelectValue placeholder='Default' />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value=''>Default</SelectItem>
+                {availableThemes.map((t) => (
+                    <SelectItem key={t} value={t}>
+                        {t
+                            .split('-')
+                            .map((w) => w[0].toUpperCase() + w.slice(1))
+                            .join(' ')}
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    );
 }
 ```
 
@@ -843,32 +843,30 @@ export function ThemeSwitcher() {
 `src/components/site/mode-toggle.tsx` — a `"use client"` component:
 
 ```tsx
-"use client";
+'use client';
 
-import { useTheme } from "@/lib/theme-context";
-import { Button } from "@/components/ui/button";
-import { Sun, Moon } from "lucide-react";
+import { useTheme } from '@/lib/theme-context';
+import { Button } from '@/components/ui/button';
+import { Sun, Moon } from 'lucide-react';
 
 export function ModeToggle() {
-  const { mode, toggleMode } = useTheme();
+    const { mode, toggleMode } = useTheme();
 
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-8 w-8"
-      onClick={toggleMode}
-    >
-      {mode === "light" ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
-      <span className="sr-only">
-        Toggle {mode === "light" ? "dark" : "light"} mode
-      </span>
-    </Button>
-  );
+    return (
+        <Button
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8'
+            onClick={toggleMode}
+        >
+            {mode === 'light' ?
+                <Sun className='h-4 w-4' />
+            :   <Moon className='h-4 w-4' />}
+            <span className='sr-only'>
+                Toggle {mode === 'light' ? 'dark' : 'light'} mode
+            </span>
+        </Button>
+    );
 }
 ```
 
@@ -877,43 +875,43 @@ export function ModeToggle() {
 `src/components/site/top-nav.tsx` — server component with client sub-components:
 
 ```tsx
-import Link from "next/link";
-import { ThemeSwitcher } from "./theme-switcher";
-import { ModeToggle } from "./mode-toggle";
+import Link from 'next/link';
+import { ThemeSwitcher } from './theme-switcher';
+import { ModeToggle } from './mode-toggle';
 
 const NAV_LINKS = [
-  { href: "/components", label: "Components" },
-  { href: "/templates", label: "Templates" },
-  { href: "/tokens", label: "Tokens" },
-  { href: "/docs/getting-started", label: "Getting Started" },
+    { href: '/components', label: 'Components' },
+    { href: '/templates', label: 'Templates' },
+    { href: '/tokens', label: 'Tokens' },
+    { href: '/docs/getting-started', label: 'Getting Started' },
 ];
 
 export function TopNav() {
-  return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-      <div className="flex h-14 items-center gap-6 px-6">
-        <Link href="/" className="flex items-center gap-2 font-bold">
-          Perimeter Style
-        </Link>
-        <nav className="flex items-center gap-4 text-sm">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="ml-auto flex items-center gap-3">
-          {/* SearchTrigger added in Task 16 */}
-          <ThemeSwitcher />
-          <ModeToggle />
-        </div>
-      </div>
-    </header>
-  );
+    return (
+        <header className='sticky top-0 z-50 border-b bg-background/95 backdrop-blur'>
+            <div className='flex h-14 items-center gap-6 px-6'>
+                <Link href='/' className='flex items-center gap-2 font-bold'>
+                    Perimeter Style
+                </Link>
+                <nav className='flex items-center gap-4 text-sm'>
+                    {NAV_LINKS.map((link) => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className='text-muted-foreground hover:text-foreground transition-colors'
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
+                </nav>
+                <div className='ml-auto flex items-center gap-3'>
+                    {/* SearchTrigger added in Task 16 */}
+                    <ThemeSwitcher />
+                    <ModeToggle />
+                </div>
+            </div>
+        </header>
+    );
 }
 ```
 
@@ -951,19 +949,19 @@ Key sections: "Getting Started" (hardcoded links to /docs/getting-started), then
 `src/app/components/layout.tsx`:
 
 ```tsx
-import { DocsSidebar } from "@/components/site/docs-sidebar";
+import { DocsSidebar } from '@/components/site/docs-sidebar';
 
 export default function ComponentsLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  return (
-    <div className="flex">
-      <DocsSidebar />
-      <main className="flex-1 min-w-0 p-8">{children}</main>
-    </div>
-  );
+    return (
+        <div className='flex'>
+            <DocsSidebar />
+            <main className='flex-1 min-w-0 p-8'>{children}</main>
+        </div>
+    );
 }
 ```
 
@@ -1030,21 +1028,21 @@ This chunk builds the dynamic component page infrastructure: the playground with
 
 - Accepts a `ControlsConfig` and current values
 - Renders the appropriate input for each control type:
-  - `enum` → segmented button group (row of buttons, active one highlighted)
-  - `boolean` → toggle switch with label
-  - `string` → text input
-  - `number` → number input with optional min/max/step
+    - `enum` → segmented button group (row of buttons, active one highlighted)
+    - `boolean` → toggle switch with label
+    - `string` → text input
+    - `number` → number input with optional min/max/step
 - Calls `onChange(name, value)` when any control changes
 
 ```typescript
-"use client";
+'use client';
 
-import type { ControlsConfig, ControlDescriptor } from "@/lib/demo-types";
+import type { ControlsConfig, ControlDescriptor } from '@/lib/demo-types';
 
 interface PlaygroundControlsProps {
-  controls: ControlsConfig;
-  values: Record<string, unknown>;
-  onChange: (name: string, value: unknown) => void;
+    controls: ControlsConfig;
+    values: Record<string, unknown>;
+    onChange: (name: string, value: unknown) => void;
 }
 ```
 
@@ -1075,22 +1073,22 @@ git commit -m "feat: add playground controls renderer for enum/boolean/string/nu
 - Accepts: `Playground` component, `controls` config, `defaultCodeHtml` (pre-rendered HTML string from build time), `componentName` (string)
 - Manages control state with `useState` (initialized from control defaults)
 - Renders a tabbed interface: Preview | Code
-  - Preview tab: renders the Playground component with current control values in a centered display area
-  - Code tab: shows the build-time pre-highlighted default code. Code is NOT re-highlighted when controls change (Shiki is async/server-only). Instead, a plain-text version of the current props is shown above the highlighted default as a "Current props" hint. This keeps the Code tab useful without needing client-side Shiki.
+    - Preview tab: renders the Playground component with current control values in a centered display area
+    - Code tab: shows the build-time pre-highlighted default code. Code is NOT re-highlighted when controls change (Shiki is async/server-only). Instead, a plain-text version of the current props is shown above the highlighted default as a "Current props" hint. This keeps the Code tab useful without needing client-side Shiki.
 - Renders PlaygroundControls below the preview area
 
 ```typescript
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
-import type { ControlsConfig } from "@/lib/demo-types";
-import { PlaygroundControls } from "./playground-controls";
+import { useState, useMemo } from 'react';
+import type { ControlsConfig } from '@/lib/demo-types';
+import { PlaygroundControls } from './playground-controls';
 
 interface ComponentPlaygroundProps {
-  playground: React.ComponentType<Record<string, unknown>>;
-  controls: ControlsConfig;
-  componentName: string;
-  defaultCodeHtml: string;
+    playground: React.ComponentType<Record<string, unknown>>;
+    controls: ControlsConfig;
+    componentName: string;
+    defaultCodeHtml: string;
 }
 ```
 
@@ -1122,13 +1120,13 @@ git commit -m "feat: add component playground with interactive controls and code
 - Copy button that copies the raw source code to clipboard
 
 ```typescript
-"use client";
+'use client';
 
 interface ExampleCardProps {
-  name: string;
-  children: React.ReactNode;
-  codeHtml: string;
-  rawCode: string;
+    name: string;
+    children: React.ReactNode;
+    codeHtml: string;
+    rawCode: string;
 }
 ```
 
@@ -1152,37 +1150,37 @@ This is the main page for each component. It:
 - Uses `generateStaticParams` to enumerate all components from the demo manifest
 - Dynamically imports the demo file based on the slug
 - Renders:
-  1. Breadcrumb (category → component name)
-  2. Title + description from `meta`
-  3. `ComponentPlayground` with the Playground component, controls, and pre-highlighted default code
-  4. Examples section — maps over `examples`, renders each in an `ExampleCard` with pre-highlighted source
-  5. Installation section with the install command
+    1. Breadcrumb (category → component name)
+    2. Title + description from `meta`
+    3. `ComponentPlayground` with the Playground component, controls, and pre-highlighted default code
+    4. Examples section — maps over `examples`, renders each in an `ExampleCard` with pre-highlighted source
+    5. Installation section with the install command
 
 ```typescript
-import manifest from "@/lib/demo-manifest.json";
+import manifest from '@/lib/demo-manifest.json';
 
 export function generateStaticParams() {
-  return manifest.map((entry) => ({
-    category: entry.category,
-    slug: entry.slug,
-  }));
+    return manifest.map((entry) => ({
+        category: entry.category,
+        slug: entry.slug,
+    }));
 }
 
 // Dynamic import using a lookup map generated at build time.
 // Since Next.js static export requires deterministic imports,
 // use a mapping object rather than template literal import().
 const DEMO_IMPORTS: Record<string, () => Promise<DemoModule>> = {
-  button: () => import("@registry/ui/perimeter/button.demo"),
-  card: () => import("@registry/ui/perimeter/card.demo"),
-  // ... one entry per component — generated by collect-demos.ts
-  // or maintained manually (55 entries)
+    button: () => import('@registry/ui/perimeter/button.demo'),
+    card: () => import('@registry/ui/perimeter/card.demo'),
+    // ... one entry per component — generated by collect-demos.ts
+    // or maintained manually (55 entries)
 };
 
 interface DemoModule {
-  meta: DemoMeta;
-  controls: ControlsConfig;
-  Playground: React.ComponentType<Record<string, unknown>>;
-  examples: DemoExample[];
+    meta: DemoMeta;
+    controls: ControlsConfig;
+    Playground: React.ComponentType<Record<string, unknown>>;
+    examples: DemoExample[];
 }
 ```
 
@@ -1222,8 +1220,8 @@ git commit -m "feat: add dynamic component page with playground, examples, and c
 - [ ] **Step 1: Write the extraction utility**
 
 ```typescript
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 /**
  * Extracts example render function bodies from a demo file's raw source.
@@ -1234,27 +1232,27 @@ import { join } from "node:path";
  * paren counting. Single-expression JSX without parens is not supported.
  */
 export async function extractExampleSources(slug: string): Promise<string[]> {
-  const filePath = join(
-    process.cwd(),
-    "registry",
-    "ui",
-    "perimeter",
-    `${slug}.demo.tsx`,
-  );
-  const source = await readFile(filePath, "utf-8");
+    const filePath = join(
+        process.cwd(),
+        'registry',
+        'ui',
+        'perimeter',
+        `${slug}.demo.tsx`,
+    );
+    const source = await readFile(filePath, 'utf-8');
 
-  const sources: string[] = [];
-  const renderRegex = /render:\s*\(\)\s*=>\s*\(/g;
-  let match;
+    const sources: string[] = [];
+    const renderRegex = /render:\s*\(\)\s*=>\s*\(/g;
+    let match;
 
-  while ((match = renderRegex.exec(source)) !== null) {
-    // Start after the opening paren
-    const startIdx = match.index + match[0].length;
-    const body = extractBalancedParens(source, startIdx);
-    if (body) sources.push(body.trim());
-  }
+    while ((match = renderRegex.exec(source)) !== null) {
+        // Start after the opening paren
+        const startIdx = match.index + match[0].length;
+        const body = extractBalancedParens(source, startIdx);
+        if (body) sources.push(body.trim());
+    }
 
-  return sources;
+    return sources;
 }
 
 /**
@@ -1263,35 +1261,35 @@ export async function extractExampleSources(slug: string): Promise<string[]> {
  * literals, and string literals (skips quoted content).
  */
 function extractBalancedParens(
-  source: string,
-  startIdx: number,
+    source: string,
+    startIdx: number,
 ): string | null {
-  let depth = 1;
-  let i = startIdx;
+    let depth = 1;
+    let i = startIdx;
 
-  while (i < source.length && depth > 0) {
-    const ch = source[i];
+    while (i < source.length && depth > 0) {
+        const ch = source[i];
 
-    // Skip string literals
-    if (ch === '"' || ch === "'" || ch === "`") {
-      const quote = ch;
-      i++;
-      while (i < source.length && source[i] !== quote) {
-        if (source[i] === "\\") i++; // skip escaped char
+        // Skip string literals
+        if (ch === '"' || ch === "'" || ch === '`') {
+            const quote = ch;
+            i++;
+            while (i < source.length && source[i] !== quote) {
+                if (source[i] === '\\') i++; // skip escaped char
+                i++;
+            }
+        } else if (ch === '(') {
+            depth++;
+        } else if (ch === ')') {
+            depth--;
+            if (depth === 0) {
+                return source.slice(startIdx, i);
+            }
+        }
         i++;
-      }
-    } else if (ch === "(") {
-      depth++;
-    } else if (ch === ")") {
-      depth--;
-      if (depth === 0) {
-        return source.slice(startIdx, i);
-      }
     }
-    i++;
-  }
 
-  return null;
+    return null;
 }
 ```
 
@@ -1300,12 +1298,12 @@ function extractBalancedParens(
 Create a test script at `scripts/test-extract.ts`:
 
 ```typescript
-import { extractExampleSources } from "../src/lib/extract-source";
+import { extractExampleSources } from '../src/lib/extract-source';
 
 async function main() {
-  const sources = await extractExampleSources("button");
-  console.log(`Found ${sources.length} examples`);
-  sources.forEach((s, i) => console.log(`\n--- Example ${i + 1} ---\n${s}`));
+    const sources = await extractExampleSources('button');
+    console.log(`Found ${sources.length} examples`);
+    sources.forEach((s, i) => console.log(`\n--- Example ${i + 1} ---\n${s}`));
 }
 main();
 ```
@@ -1461,95 +1459,95 @@ git commit -m "feat: add getting started docs page"
 
 ```typescript
 export const TOKEN_GROUPS = [
-  {
-    name: "Primary",
-    tokens: ["primary", "primary-foreground"],
-    usedBy: ["button (default)", "badge (default)", "links"],
-  },
-  {
-    name: "Secondary",
-    tokens: ["secondary", "secondary-foreground"],
-    usedBy: ["button (secondary)", "badge (secondary)"],
-  },
-  {
-    name: "Destructive",
-    tokens: ["destructive", "destructive-foreground"],
-    usedBy: [
-      "button (destructive)",
-      "badge (destructive)",
-      "alert (destructive)",
-    ],
-  },
-  {
-    name: "Success",
-    tokens: ["success", "success-foreground"],
-    usedBy: ["alert (success)", "badge (success)"],
-  },
-  {
-    name: "Warning",
-    tokens: ["warning", "warning-foreground"],
-    usedBy: ["alert (warning)"],
-  },
-  {
-    name: "Info",
-    tokens: ["info", "info-foreground"],
-    usedBy: ["alert (info)"],
-  },
-  {
-    name: "Background",
-    tokens: ["background", "foreground"],
-    usedBy: ["page background", "default text color"],
-  },
-  {
-    name: "Muted",
-    tokens: ["muted", "muted-foreground"],
-    usedBy: ["disabled states", "placeholder text", "secondary text"],
-  },
-  {
-    name: "Accent",
-    tokens: ["accent", "accent-foreground"],
-    usedBy: ["hover states", "active sidebar items"],
-  },
-  {
-    name: "Card",
-    tokens: ["card", "card-foreground"],
-    usedBy: ["card", "dialog", "dropdown-menu"],
-  },
-  {
-    name: "Popover",
-    tokens: ["popover", "popover-foreground"],
-    usedBy: ["popover", "hover-card", "command"],
-  },
-  {
-    name: "Border & Input",
-    tokens: ["border", "input", "ring"],
-    usedBy: ["input borders", "card borders", "focus rings"],
-  },
-  {
-    name: "Charts",
-    tokens: ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"],
-    usedBy: ["chart"],
-  },
-  {
-    name: "Sidebar",
-    tokens: [
-      "sidebar",
-      "sidebar-foreground",
-      "sidebar-primary",
-      "sidebar-primary-foreground",
-      "sidebar-accent",
-      "sidebar-accent-foreground",
-      "sidebar-border",
-      "sidebar-ring",
-    ],
-    usedBy: ["sidebar"],
-  },
-  {
-    name: "Layout",
-    tokens: ["radius"],
-    usedBy: ["all components with rounded corners"],
-    isNonColor: true,
-  },
+    {
+        name: 'Primary',
+        tokens: ['primary', 'primary-foreground'],
+        usedBy: ['button (default)', 'badge (default)', 'links'],
+    },
+    {
+        name: 'Secondary',
+        tokens: ['secondary', 'secondary-foreground'],
+        usedBy: ['button (secondary)', 'badge (secondary)'],
+    },
+    {
+        name: 'Destructive',
+        tokens: ['destructive', 'destructive-foreground'],
+        usedBy: [
+            'button (destructive)',
+            'badge (destructive)',
+            'alert (destructive)',
+        ],
+    },
+    {
+        name: 'Success',
+        tokens: ['success', 'success-foreground'],
+        usedBy: ['alert (success)', 'badge (success)'],
+    },
+    {
+        name: 'Warning',
+        tokens: ['warning', 'warning-foreground'],
+        usedBy: ['alert (warning)'],
+    },
+    {
+        name: 'Info',
+        tokens: ['info', 'info-foreground'],
+        usedBy: ['alert (info)'],
+    },
+    {
+        name: 'Background',
+        tokens: ['background', 'foreground'],
+        usedBy: ['page background', 'default text color'],
+    },
+    {
+        name: 'Muted',
+        tokens: ['muted', 'muted-foreground'],
+        usedBy: ['disabled states', 'placeholder text', 'secondary text'],
+    },
+    {
+        name: 'Accent',
+        tokens: ['accent', 'accent-foreground'],
+        usedBy: ['hover states', 'active sidebar items'],
+    },
+    {
+        name: 'Card',
+        tokens: ['card', 'card-foreground'],
+        usedBy: ['card', 'dialog', 'dropdown-menu'],
+    },
+    {
+        name: 'Popover',
+        tokens: ['popover', 'popover-foreground'],
+        usedBy: ['popover', 'hover-card', 'command'],
+    },
+    {
+        name: 'Border & Input',
+        tokens: ['border', 'input', 'ring'],
+        usedBy: ['input borders', 'card borders', 'focus rings'],
+    },
+    {
+        name: 'Charts',
+        tokens: ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'],
+        usedBy: ['chart'],
+    },
+    {
+        name: 'Sidebar',
+        tokens: [
+            'sidebar',
+            'sidebar-foreground',
+            'sidebar-primary',
+            'sidebar-primary-foreground',
+            'sidebar-accent',
+            'sidebar-accent-foreground',
+            'sidebar-border',
+            'sidebar-ring',
+        ],
+        usedBy: ['sidebar'],
+    },
+    {
+        name: 'Layout',
+        tokens: ['radius'],
+        usedBy: ['all components with rounded corners'],
+        isNonColor: true,
+    },
 ];
 ```
 

@@ -55,7 +55,7 @@ Before:
 
 ```tsx
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
+    return <DialogPrimitive.Portal data-slot='dialog-portal' {...props} />;
 }
 ```
 
@@ -63,13 +63,13 @@ After:
 
 ```tsx
 function DialogPortal({ container, ...props }: DialogPrimitive.Portal.Props) {
-  return (
-    <DialogPrimitive.Portal
-      data-slot="dialog-portal"
-      container={container}
-      {...props}
-    />
-  );
+    return (
+        <DialogPrimitive.Portal
+            data-slot='dialog-portal'
+            container={container}
+            {...props}
+        />
+    );
 }
 ```
 
@@ -293,23 +293,23 @@ In `multi-combobox.tsx`, find `MultiComboboxBaseProps` (line 19). Add the `envir
 
 ```tsx
 interface MultiComboboxBaseProps {
-  /** Available options */
-  options: MultiComboboxOption[];
-  /** Placeholder text when nothing is selected */
-  placeholder?: string;
-  /** Short label shown when items are selected (e.g., "Fruits"). Falls back to placeholder. */
-  selectedLabel?: string;
-  /** Disable the entire combobox */
-  disabled?: boolean;
-  /** Additional class names for the root container */
-  className?: string;
-  /** Custom environment for shadow DOM support (passed to downshift hooks) */
-  environment?: {
-    addEventListener: typeof window.addEventListener;
-    removeEventListener: typeof window.removeEventListener;
-    document: Document;
-    Node: typeof Node;
-  };
+    /** Available options */
+    options: MultiComboboxOption[];
+    /** Placeholder text when nothing is selected */
+    placeholder?: string;
+    /** Short label shown when items are selected (e.g., "Fruits"). Falls back to placeholder. */
+    selectedLabel?: string;
+    /** Disable the entire combobox */
+    disabled?: boolean;
+    /** Additional class names for the root container */
+    className?: string;
+    /** Custom environment for shadow DOM support (passed to downshift hooks) */
+    environment?: {
+        addEventListener: typeof window.addEventListener;
+        removeEventListener: typeof window.removeEventListener;
+        document: Document;
+        Node: typeof Node;
+    };
 }
 ```
 

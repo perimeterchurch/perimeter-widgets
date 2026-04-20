@@ -185,9 +185,9 @@ Each component page (`/components/[category]/[slug]`) renders:
 1. **Breadcrumb** — Category → Component name
 2. **Title + description** — from `meta`
 3. **Interactive playground** — Preview | Code tabs
-   - Preview: live component with current control values
-   - Code: auto-generated usage snippet reflecting current controls
-   - Controls panel below: Storybook-style inputs derived from `controls` export
+    - Preview: live component with current control values
+    - Code: auto-generated usage snippet reflecting current controls
+    - Controls panel below: Storybook-style inputs derived from `controls` export
 4. **Static examples** — each named scenario with live render + copyable source code
 5. **Installation** — shadcn CLI command from `meta.install`
 
@@ -261,26 +261,26 @@ App-specific templates added later as consuming projects migrate.
 ```css
 /* From default.json */
 :root {
-  --primary: oklch(0.55 0.08 45); /* ... all tokens */
+    --primary: oklch(0.55 0.08 45); /* ... all tokens */
 }
 .dark {
-  --primary: oklch(0.85 0.06 45); /* ... */
+    --primary: oklch(0.85 0.06 45); /* ... */
 }
 
 /* From perimeter-api.json — overrides only */
-[data-theme="perimeter-api"] {
-  --primary: oklch(0.5 0.1 220); /* ... */
+[data-theme='perimeter-api'] {
+    --primary: oklch(0.5 0.1 220); /* ... */
 }
-[data-theme="perimeter-api"].dark {
-  /* ... */
+[data-theme='perimeter-api'].dark {
+    /* ... */
 }
 
 /* From metrics.json — overrides only */
-[data-theme="metrics"] {
-  /* ... */
+[data-theme='metrics'] {
+    /* ... */
 }
-[data-theme="metrics"].dark {
-  /* ... */
+[data-theme='metrics'].dark {
+    /* ... */
 }
 ```
 

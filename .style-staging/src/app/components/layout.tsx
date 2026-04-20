@@ -1,9 +1,9 @@
-import { SidebarLayout } from "@/components/site/sidebar-layout";
+import { SidebarLayout } from '@/components/site/sidebar-layout';
 
 export default function ComponentsLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  return <SidebarLayout>{children}</SidebarLayout>;
+    return <SidebarLayout>{children}</SidebarLayout>;
 }

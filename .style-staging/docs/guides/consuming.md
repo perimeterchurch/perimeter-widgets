@@ -12,9 +12,9 @@ Add the Perimeter registry to your project's `components.json`:
 
 ```json
 {
-  "registries": {
-    "@perimeter": "https://style.perimeter.org/r/{name}.json"
-  }
+    "registries": {
+        "@perimeter": "https://style.perimeter.org/r/{name}.json"
+    }
 }
 ```
 
@@ -61,8 +61,8 @@ For custom branding, apply theme overrides in your CSS:
 ```css
 /* Override just the tokens you need */
 :root {
-  --primary: oklch(0.45 0.12 250);
-  --primary-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.45 0.12 250);
+    --primary-foreground: oklch(0.985 0 0);
 }
 ```
 

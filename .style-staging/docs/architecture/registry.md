@@ -28,20 +28,26 @@ CLI fetches JSON, rewrites imports, writes .tsx to consumer's project
 
 ```json
 {
-  "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "perimeter",
-  "homepage": "https://style.perimeter.org",
-  "items": [
-    {
-      "name": "button",
-      "type": "registry:ui",
-      "files": [
-        { "path": "registry/ui/perimeter/button.tsx", "type": "registry:ui" }
-      ],
-      "dependencies": ["@radix-ui/react-slot", "class-variance-authority"],
-      "registryDependencies": ["utils"]
-    }
-  ]
+    "$schema": "https://ui.shadcn.com/schema/registry.json",
+    "name": "perimeter",
+    "homepage": "https://style.perimeter.org",
+    "items": [
+        {
+            "name": "button",
+            "type": "registry:ui",
+            "files": [
+                {
+                    "path": "registry/ui/perimeter/button.tsx",
+                    "type": "registry:ui"
+                }
+            ],
+            "dependencies": [
+                "@radix-ui/react-slot",
+                "class-variance-authority"
+            ],
+            "registryDependencies": ["utils"]
+        }
+    ]
 }
 ```
 
@@ -71,9 +77,9 @@ In the consuming project's `components.json`:
 
 ```json
 {
-  "registries": {
-    "@perimeter": "https://style.perimeter.org/r/{name}.json"
-  }
+    "registries": {
+        "@perimeter": "https://style.perimeter.org/r/{name}.json"
+    }
 }
 ```
 
@@ -96,12 +102,12 @@ Themes are `registry:theme` items defined in `registry/themes/*.json`. They cont
 
 ```json
 {
-  "name": "perimeter-api-theme",
-  "type": "registry:theme",
-  "cssVars": {
-    "light": { "primary": "oklch(0.45 0.12 250)" },
-    "dark": { "primary": "oklch(0.55 0.12 250)" }
-  }
+    "name": "perimeter-api-theme",
+    "type": "registry:theme",
+    "cssVars": {
+        "light": { "primary": "oklch(0.45 0.12 250)" },
+        "dark": { "primary": "oklch(0.55 0.12 250)" }
+    }
 }
 ```
 

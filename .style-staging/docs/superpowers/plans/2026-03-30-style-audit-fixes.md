@@ -180,21 +180,21 @@ In `src/lib/theme-context.tsx`, modify the `ThemeProvider` component:
 1. Add localStorage keys as constants at the top of the file (after imports):
 
 ```typescript
-const STORAGE_KEY_THEME = "perimeter-style-theme";
-const STORAGE_KEY_MODE = "perimeter-style-mode";
+const STORAGE_KEY_THEME = 'perimeter-style-theme';
+const STORAGE_KEY_MODE = 'perimeter-style-mode';
 ```
 
 2. Update `useState` initializers (lines 36-37) to read from localStorage:
 
 ```typescript
 const [theme, setThemeState] = useState(() => {
-  if (typeof window === "undefined") return defaultTheme;
-  return localStorage.getItem(STORAGE_KEY_THEME) ?? defaultTheme;
+    if (typeof window === 'undefined') return defaultTheme;
+    return localStorage.getItem(STORAGE_KEY_THEME) ?? defaultTheme;
 });
-const [mode, setModeState] = useState<"light" | "dark">(() => {
-  if (typeof window === "undefined") return defaultMode;
-  const stored = localStorage.getItem(STORAGE_KEY_MODE);
-  return stored === "light" || stored === "dark" ? stored : defaultMode;
+const [mode, setModeState] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return defaultMode;
+    const stored = localStorage.getItem(STORAGE_KEY_MODE);
+    return stored === 'light' || stored === 'dark' ? stored : defaultMode;
 });
 ```
 
@@ -202,23 +202,23 @@ const [mode, setModeState] = useState<"light" | "dark">(() => {
 
 ```typescript
 const setTheme = useCallback((t: string) => {
-  setThemeState(t);
-  localStorage.setItem(STORAGE_KEY_THEME, t);
-  if (t) {
-    document.documentElement.setAttribute("data-theme", t);
-  } else {
-    document.documentElement.removeAttribute("data-theme");
-  }
+    setThemeState(t);
+    localStorage.setItem(STORAGE_KEY_THEME, t);
+    if (t) {
+        document.documentElement.setAttribute('data-theme', t);
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
 }, []);
 ```
 
 4. Update `setMode` callback (lines 48-51) to persist:
 
 ```typescript
-const setMode = useCallback((m: "light" | "dark") => {
-  setModeState(m);
-  localStorage.setItem(STORAGE_KEY_MODE, m);
-  document.documentElement.classList.toggle("dark", m === "dark");
+const setMode = useCallback((m: 'light' | 'dark') => {
+    setModeState(m);
+    localStorage.setItem(STORAGE_KEY_MODE, m);
+    document.documentElement.classList.toggle('dark', m === 'dark');
 }, []);
 ```
 
@@ -227,13 +227,13 @@ const setMode = useCallback((m: "light" | "dark") => {
 ```typescript
 const initialRef = useRef(false);
 useEffect(() => {
-  if (!initialRef.current) {
-    initialRef.current = true;
-    document.documentElement.classList.toggle("dark", mode === "dark");
-    if (theme) {
-      document.documentElement.setAttribute("data-theme", theme);
+    if (!initialRef.current) {
+        initialRef.current = true;
+        document.documentElement.classList.toggle('dark', mode === 'dark');
+        if (theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
     }
-  }
 }, [mode, theme]);
 ```
 
@@ -263,30 +263,29 @@ git commit -m "fix: persist theme and mode selections to localStorage"
 Add import at top of `src/app/templates/[slug]/page.tsx` (after existing imports around line 10):
 
 ```typescript
-import manifest from "@/lib/demo-manifest.json";
+import manifest from '@/lib/demo-manifest.json';
 ```
 
 Replace the component list section (lines 57-66) with linked badges that resolve to the correct category:
 
 ```tsx
 {
-  /* Component list */
+    /* Component list */
 }
-<div className="flex flex-wrap items-center gap-2">
-  <span className="text-sm font-medium text-muted-foreground">
-    Components used:
-  </span>
-  {meta.components.map((comp) => {
-    const entry = manifest.find((e) => e.slug === comp);
-    const href = entry
-      ? `/components/${entry.category}/${comp}`
-      : "/components";
-    return (
-      <Link key={comp} href={href}>
-        <Badge variant="secondary">{comp}</Badge>
-      </Link>
-    );
-  })}
+<div className='flex flex-wrap items-center gap-2'>
+    <span className='text-sm font-medium text-muted-foreground'>
+        Components used:
+    </span>
+    {meta.components.map((comp) => {
+        const entry = manifest.find((e) => e.slug === comp);
+        const href =
+            entry ? `/components/${entry.category}/${comp}` : '/components';
+        return (
+            <Link key={comp} href={href}>
+                <Badge variant='secondary'>{comp}</Badge>
+            </Link>
+        );
+    })}
 </div>;
 ```
 
@@ -317,27 +316,27 @@ git commit -m "fix: link template component badges to correct detail pages"
 All four error boundaries share the same structure. Create `src/app/error.tsx`:
 
 ```tsx
-"use client";
+'use client';
 
 interface ErrorProps {
-  error: Error & { digest?: string };
-  reset: () => void;
+    error: Error & { digest?: string };
+    reset: () => void;
 }
 
 export default function ErrorBoundary({ error, reset }: ErrorProps) {
-  return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center">
-      <h2 className="text-2xl font-bold">Something went wrong</h2>
-      <p className="max-w-md text-muted-foreground">{error.message}</p>
-      <button
-        type="button"
-        onClick={reset}
-        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-      >
-        Try again
-      </button>
-    </div>
-  );
+    return (
+        <div className='flex min-h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center'>
+            <h2 className='text-2xl font-bold'>Something went wrong</h2>
+            <p className='max-w-md text-muted-foreground'>{error.message}</p>
+            <button
+                type='button'
+                onClick={reset}
+                className='rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
+            >
+                Try again
+            </button>
+        </div>
+    );
 }
 ```
 
@@ -348,27 +347,27 @@ Create `src/app/components/error.tsx`, `src/app/templates/error.tsx`, and `src/a
 For each of the three files, write:
 
 ```tsx
-"use client";
+'use client';
 
 interface ErrorProps {
-  error: Error & { digest?: string };
-  reset: () => void;
+    error: Error & { digest?: string };
+    reset: () => void;
 }
 
 export default function ErrorBoundary({ error, reset }: ErrorProps) {
-  return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center">
-      <h2 className="text-2xl font-bold">Something went wrong</h2>
-      <p className="max-w-md text-muted-foreground">{error.message}</p>
-      <button
-        type="button"
-        onClick={reset}
-        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-      >
-        Try again
-      </button>
-    </div>
-  );
+    return (
+        <div className='flex min-h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center'>
+            <h2 className='text-2xl font-bold'>Something went wrong</h2>
+            <p className='max-w-md text-muted-foreground'>{error.message}</p>
+            <button
+                type='button'
+                onClick={reset}
+                className='rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
+            >
+                Try again
+            </button>
+        </div>
+    );
 }
 ```
 
@@ -401,36 +400,39 @@ const [importError, setImportError] = useState<string | null>(null);
 
 ```typescript
 useEffect(() => {
-  const importFn = demoImports[slug];
-  if (!importFn) {
-    setImportError(`No demo found for "${slug}"`);
-    return;
-  }
-  importFn()
-    .then((mod) => {
-      setPlayground(
-        () => mod.Playground as React.ComponentType<Record<string, unknown>>,
-      );
-    })
-    .catch((err: unknown) => {
-      setImportError(
-        err instanceof Error ? err.message : "Failed to load component demo",
-      );
-    });
+    const importFn = demoImports[slug];
+    if (!importFn) {
+        setImportError(`No demo found for "${slug}"`);
+        return;
+    }
+    importFn()
+        .then((mod) => {
+            setPlayground(
+                () =>
+                    mod.Playground as React.ComponentType<
+                        Record<string, unknown>
+                    >,
+            );
+        })
+        .catch((err: unknown) => {
+            setImportError(
+                err instanceof Error ?
+                    err.message
+                :   'Failed to load component demo',
+            );
+        });
 }, [slug]);
 ```
 
 3. Update the preview render (around lines 118-124) to show error state:
 
 ```tsx
-<div className="flex min-h-48 items-center justify-center bg-background p-8">
-  {importError ? (
-    <div className="text-sm text-destructive">{importError}</div>
-  ) : Playground ? (
-    <Playground {...values} />
-  ) : (
-    <div className="text-sm text-muted-foreground">Loading...</div>
-  )}
+<div className='flex min-h-48 items-center justify-center bg-background p-8'>
+    {importError ?
+        <div className='text-sm text-destructive'>{importError}</div>
+    : Playground ?
+        <Playground {...values} />
+    :   <div className='text-sm text-muted-foreground'>Loading...</div>}
 </div>
 ```
 
@@ -455,19 +457,19 @@ git commit -m "fix: add error handling to playground dynamic import"
 In `src/app/tokens/page.tsx`, add `join` import from `node:path` (after the existing `readFileSync` import on line 1):
 
 ```typescript
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 ```
 
 Update line 20:
 
 ```typescript
 // Before:
-const raw = readFileSync("registry/themes/default.json", "utf-8");
+const raw = readFileSync('registry/themes/default.json', 'utf-8');
 // After:
 const raw = readFileSync(
-  join(process.cwd(), "registry", "themes", "default.json"),
-  "utf-8",
+    join(process.cwd(), 'registry', 'themes', 'default.json'),
+    'utf-8',
 );
 ```
 
@@ -476,17 +478,17 @@ const raw = readFileSync(
 In `src/app/layout.tsx`, add `join` import:
 
 ```typescript
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 ```
 
 Update line 14:
 
 ```typescript
 // Before:
-const availableThemes = readdirSync("registry/themes");
+const availableThemes = readdirSync('registry/themes');
 // After:
-const availableThemes = readdirSync(join(process.cwd(), "registry", "themes"));
+const availableThemes = readdirSync(join(process.cwd(), 'registry', 'themes'));
 ```
 
 - [ ] **Step 3: Verify build still works**
@@ -516,30 +518,31 @@ git commit -m "fix: use absolute paths for build-time file reads"
 Create `src/lib/build-snippet.ts`:
 
 ```typescript
-import type { ControlsConfig } from "@/lib/demo-types";
+import type { ControlsConfig } from '@/lib/demo-types';
 
 export function buildSnippet(
-  componentName: string,
-  controls: ControlsConfig,
-  values?: Record<string, unknown>,
+    componentName: string,
+    controls: ControlsConfig,
+    values?: Record<string, unknown>,
 ): string {
-  const props = Object.entries(controls)
-    .filter(([name]) => name !== "children")
-    .map(([name, desc]) => {
-      const val = values ? (values[name] ?? desc.default) : desc.default;
-      if (typeof val === "boolean") return val ? name : `${name}={false}`;
-      if (typeof val === "number") return `${name}={${val}}`;
-      return `${name}="${val}"`;
-    });
+    const props = Object.entries(controls)
+        .filter(([name]) => name !== 'children')
+        .map(([name, desc]) => {
+            const val = values ? (values[name] ?? desc.default) : desc.default;
+            if (typeof val === 'boolean') return val ? name : `${name}={false}`;
+            if (typeof val === 'number') return `${name}={${val}}`;
+            return `${name}="${val}"`;
+        });
 
-  const childrenControl = controls["children"];
-  const childrenVal = values
-    ? (values["children"] ?? childrenControl?.default)
-    : childrenControl?.default;
-  const children = childrenVal ? String(childrenVal) : "...";
+    const childrenControl = controls['children'];
+    const childrenVal =
+        values ?
+            (values['children'] ?? childrenControl?.default)
+        :   childrenControl?.default;
+    const children = childrenVal ? String(childrenVal) : '...';
 
-  const propsStr = props.length > 0 ? " " + props.join(" ") : "";
-  return `<${componentName}${propsStr}>${children}</${componentName}>`;
+    const propsStr = props.length > 0 ? ' ' + props.join(' ') : '';
+    return `<${componentName}${propsStr}>${children}</${componentName}>`;
 }
 ```
 
@@ -550,7 +553,7 @@ In `src/app/components/[category]/[slug]/page.tsx`:
 1. Add import (after existing imports):
 
 ```typescript
-import { buildSnippet } from "@/lib/build-snippet";
+import { buildSnippet } from '@/lib/build-snippet';
 ```
 
 2. Replace the `buildPlaygroundSnippet` function call on line 55:
@@ -571,7 +574,7 @@ In `src/components/site/component-playground.tsx`:
 1. Add import:
 
 ```typescript
-import { buildSnippet } from "@/lib/build-snippet";
+import { buildSnippet } from '@/lib/build-snippet';
 ```
 
 2. Replace the `buildCodeSnippet` call inside `updateCodeHighlight` (line 87):
@@ -662,18 +665,18 @@ In `src/app/layout.tsx`, enhance the existing metadata export (lines 29-36):
 
 ```typescript
 export const metadata: Metadata = {
-  title: {
-    template: "%s — Perimeter Style",
-    default: "Perimeter Style — Design System",
-  },
-  description:
-    "shadcn-compatible component registry for Perimeter Church projects",
-  openGraph: {
-    type: "website",
-    siteName: "Perimeter Style",
+    title: {
+        template: '%s — Perimeter Style',
+        default: 'Perimeter Style — Design System',
+    },
     description:
-      "shadcn-compatible component registry for Perimeter Church projects",
-  },
+        'shadcn-compatible component registry for Perimeter Church projects',
+    openGraph: {
+        type: 'website',
+        siteName: 'Perimeter Style',
+        description:
+            'shadcn-compatible component registry for Perimeter Church projects',
+    },
 };
 ```
 
@@ -683,14 +686,14 @@ In `src/app/page.tsx`, add before the component:
 
 ```typescript
 export const metadata: Metadata = {
-  title: "Perimeter Style — Design System",
-  description:
-    "55 shadcn-compatible components, 5 page templates, and design tokens for Perimeter Church projects.",
-  openGraph: {
-    title: "Perimeter Style — Design System",
+    title: 'Perimeter Style — Design System',
     description:
-      "55 shadcn-compatible components, 5 page templates, and design tokens for Perimeter Church projects.",
-  },
+        '55 shadcn-compatible components, 5 page templates, and design tokens for Perimeter Church projects.',
+    openGraph: {
+        title: 'Perimeter Style — Design System',
+        description:
+            '55 shadcn-compatible components, 5 page templates, and design tokens for Perimeter Church projects.',
+    },
 };
 ```
 
@@ -702,14 +705,14 @@ In `src/app/components/page.tsx`, add:
 
 ```typescript
 export const metadata: Metadata = {
-  title: "Components",
-  description:
-    "Browse all components in the Perimeter Style registry, organized by category.",
-  openGraph: {
-    title: "Components — Perimeter Style",
+    title: 'Components',
     description:
-      "Browse all components in the Perimeter Style registry, organized by category.",
-  },
+        'Browse all components in the Perimeter Style registry, organized by category.',
+    openGraph: {
+        title: 'Components — Perimeter Style',
+        description:
+            'Browse all components in the Perimeter Style registry, organized by category.',
+    },
 };
 ```
 
@@ -719,18 +722,18 @@ In `src/app/components/[category]/page.tsx`, enhance `generateMetadata` (lines 1
 
 ```typescript
 export async function generateMetadata({
-  params,
+    params,
 }: PageProps): Promise<Metadata> {
-  const { category } = await params;
-  const title = capitalize(category);
-  return {
-    title,
-    description: `${title} components in the Perimeter Style registry.`,
-    openGraph: {
-      title: `${title} — Perimeter Style`,
-      description: `${title} components in the Perimeter Style registry.`,
-    },
-  };
+    const { category } = await params;
+    const title = capitalize(category);
+    return {
+        title,
+        description: `${title} components in the Perimeter Style registry.`,
+        openGraph: {
+            title: `${title} — Perimeter Style`,
+            description: `${title} components in the Perimeter Style registry.`,
+        },
+    };
 }
 ```
 
@@ -742,22 +745,22 @@ In `src/app/components/[category]/[slug]/page.tsx`, enhance `generateMetadata` (
 
 ```typescript
 export async function generateMetadata({
-  params,
+    params,
 }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const entry = manifest.find((e) => e.slug === slug);
-  const name = entry?.name ?? slug;
-  const description =
-    entry?.description ??
-    `${name} component from the Perimeter Style registry.`;
-  return {
-    title: name,
-    description,
-    openGraph: {
-      title: `${name} — Perimeter Style`,
-      description,
-    },
-  };
+    const { slug } = await params;
+    const entry = manifest.find((e) => e.slug === slug);
+    const name = entry?.name ?? slug;
+    const description =
+        entry?.description
+        ?? `${name} component from the Perimeter Style registry.`;
+    return {
+        title: name,
+        description,
+        openGraph: {
+            title: `${name} — Perimeter Style`,
+            description,
+        },
+    };
 }
 ```
 
@@ -767,14 +770,14 @@ In `src/app/templates/page.tsx`, add:
 
 ```typescript
 export const metadata: Metadata = {
-  title: "Templates",
-  description:
-    "Full-page template compositions built with Perimeter Style components.",
-  openGraph: {
-    title: "Templates — Perimeter Style",
+    title: 'Templates',
     description:
-      "Full-page template compositions built with Perimeter Style components.",
-  },
+        'Full-page template compositions built with Perimeter Style components.',
+    openGraph: {
+        title: 'Templates — Perimeter Style',
+        description:
+            'Full-page template compositions built with Perimeter Style components.',
+    },
 };
 ```
 
@@ -782,21 +785,21 @@ In `src/app/templates/[slug]/page.tsx`, enhance `generateMetadata` (lines 18-24)
 
 ```typescript
 export async function generateMetadata({
-  params,
+    params,
 }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const entry = TEMPLATE_ENTRIES.find((e) => e.slug === slug);
-  const name = entry?.meta.name ?? slug;
-  const description =
-    entry?.meta.description ?? `${name} template from Perimeter Style.`;
-  return {
-    title: name,
-    description,
-    openGraph: {
-      title: `${name} — Perimeter Style`,
-      description,
-    },
-  };
+    const { slug } = await params;
+    const entry = TEMPLATE_ENTRIES.find((e) => e.slug === slug);
+    const name = entry?.meta.name ?? slug;
+    const description =
+        entry?.meta.description ?? `${name} template from Perimeter Style.`;
+    return {
+        title: name,
+        description,
+        openGraph: {
+            title: `${name} — Perimeter Style`,
+            description,
+        },
+    };
 }
 ```
 
@@ -806,14 +809,14 @@ In `src/app/tokens/page.tsx`, update the existing metadata (line 10):
 
 ```typescript
 export const metadata: Metadata = {
-  title: "Design Tokens",
-  description:
-    "All CSS custom properties from the Perimeter Style default theme. OKLCH color format with light and dark mode values.",
-  openGraph: {
-    title: "Design Tokens — Perimeter Style",
+    title: 'Design Tokens',
     description:
-      "All CSS custom properties from the Perimeter Style default theme.",
-  },
+        'All CSS custom properties from the Perimeter Style default theme. OKLCH color format with light and dark mode values.',
+    openGraph: {
+        title: 'Design Tokens — Perimeter Style',
+        description:
+            'All CSS custom properties from the Perimeter Style default theme.',
+    },
 };
 ```
 
@@ -823,14 +826,14 @@ In `src/app/docs/getting-started/page.tsx`, add or enhance the metadata export:
 
 ```typescript
 export const metadata: Metadata = {
-  title: "Getting Started",
-  description:
-    "Install and configure the Perimeter Style registry in your project.",
-  openGraph: {
-    title: "Getting Started — Perimeter Style",
+    title: 'Getting Started',
     description:
-      "Install and configure the Perimeter Style registry in your project.",
-  },
+        'Install and configure the Perimeter Style registry in your project.',
+    openGraph: {
+        title: 'Getting Started — Perimeter Style',
+        description:
+            'Install and configure the Perimeter Style registry in your project.',
+    },
 };
 ```
 
@@ -871,74 +874,76 @@ Sitemap: https://style.perimeter.org/sitemap.xml
 Create `scripts/generate-sitemap.ts`:
 
 ```typescript
-import { readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-import manifest from "../src/lib/demo-manifest.json";
-import { TEMPLATE_SLUGS } from "../src/templates";
+import manifest from '../src/lib/demo-manifest.json';
+import { TEMPLATE_SLUGS } from '../src/templates';
 
-const BASE_URL = "https://style.perimeter.org";
+const BASE_URL = 'https://style.perimeter.org';
 
 function discoverDocRoutes(): string[] {
-  const docsDir = join(process.cwd(), "src", "app", "docs");
-  const routes: string[] = [];
+    const docsDir = join(process.cwd(), 'src', 'app', 'docs');
+    const routes: string[] = [];
 
-  function scan(dir: string, prefix: string) {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      if (entry.isDirectory()) {
-        const sub = join(dir, entry.name);
-        const hasPage = readdirSync(sub).some((f) => f.startsWith("page."));
-        if (hasPage) routes.push(`${prefix}/${entry.name}`);
-        scan(sub, `${prefix}/${entry.name}`);
-      }
+    function scan(dir: string, prefix: string) {
+        for (const entry of readdirSync(dir, { withFileTypes: true })) {
+            if (entry.isDirectory()) {
+                const sub = join(dir, entry.name);
+                const hasPage = readdirSync(sub).some((f) =>
+                    f.startsWith('page.'),
+                );
+                if (hasPage) routes.push(`${prefix}/${entry.name}`);
+                scan(sub, `${prefix}/${entry.name}`);
+            }
+        }
     }
-  }
 
-  scan(docsDir, "/docs");
-  return routes;
+    scan(docsDir, '/docs');
+    return routes;
 }
 
 function generateSitemap(): string {
-  const urls: string[] = [
-    "/",
-    "/components",
-    "/templates",
-    "/tokens",
-    "/changelog",
-  ];
+    const urls: string[] = [
+        '/',
+        '/components',
+        '/templates',
+        '/tokens',
+        '/changelog',
+    ];
 
-  // Doc routes (filesystem-driven)
-  urls.push(...discoverDocRoutes());
+    // Doc routes (filesystem-driven)
+    urls.push(...discoverDocRoutes());
 
-  // Component category and detail pages
-  const categories = new Set<string>();
-  for (const entry of manifest) {
-    categories.add(entry.category);
-    urls.push(`/components/${entry.category}/${entry.slug}`);
-  }
-  for (const category of categories) {
-    urls.push(`/components/${category}`);
-  }
+    // Component category and detail pages
+    const categories = new Set<string>();
+    for (const entry of manifest) {
+        categories.add(entry.category);
+        urls.push(`/components/${entry.category}/${entry.slug}`);
+    }
+    for (const category of categories) {
+        urls.push(`/components/${category}`);
+    }
 
-  // Template detail pages
-  for (const slug of TEMPLATE_SLUGS) {
-    urls.push(`/templates/${slug}`);
-  }
+    // Template detail pages
+    for (const slug of TEMPLATE_SLUGS) {
+        urls.push(`/templates/${slug}`);
+    }
 
-  const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((url) => `  <url>\n    <loc>${BASE_URL}${url}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`).join("\n")}
+${urls.map((url) => `  <url>\n    <loc>${BASE_URL}${url}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`).join('\n')}
 </urlset>`;
 
-  return xml;
+    return xml;
 }
 
 const sitemap = generateSitemap();
-writeFileSync(join(process.cwd(), "public", "sitemap.xml"), sitemap, "utf-8");
+writeFileSync(join(process.cwd(), 'public', 'sitemap.xml'), sitemap, 'utf-8');
 console.log(
-  `Generated sitemap.xml with ${sitemap.match(/<url>/g)?.length ?? 0} URLs`,
+    `Generated sitemap.xml with ${sitemap.match(/<url>/g)?.length ?? 0} URLs`,
 );
 ```
 
@@ -981,21 +986,21 @@ git commit -m "feat: add sitemap generator and robots.txt"
 In `src/app/layout.tsx`, add the skip link as the first child of `<body>` (after line 48), and wrap `{children}` with a `<main>` element:
 
 ```tsx
-<body className="min-h-full flex flex-col">
-  <a
-    href="#main"
-    className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:rounded-md focus:bg-background focus:p-4 focus:text-foreground focus:shadow-lg"
-  >
-    Skip to content
-  </a>
-  <ThemeProvider availableThemes={availableThemes}>
-    <TopNav />
-    <main id="main" className="flex-1">
-      {children}
-    </main>
-    <SearchPalette />
-  </ThemeProvider>
-  <Toaster />
+<body className='min-h-full flex flex-col'>
+    <a
+        href='#main'
+        className='sr-only focus:not-sr-only focus:absolute focus:z-50 focus:rounded-md focus:bg-background focus:p-4 focus:text-foreground focus:shadow-lg'
+    >
+        Skip to content
+    </a>
+    <ThemeProvider availableThemes={availableThemes}>
+        <TopNav />
+        <main id='main' className='flex-1'>
+            {children}
+        </main>
+        <SearchPalette />
+    </ThemeProvider>
+    <Toaster />
 </body>
 ```
 
@@ -1039,14 +1044,14 @@ In `src/app/layout.tsx`, add the `icons` field to the metadata export:
 
 ```typescript
 export const metadata: Metadata = {
-  // ...existing fields
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: "/apple-touch-icon.png",
-  },
+    // ...existing fields
+    icons: {
+        icon: [
+            { url: '/favicon.ico', sizes: '32x32' },
+            { url: '/icon.svg', type: 'image/svg+xml' },
+        ],
+        apple: '/apple-touch-icon.png',
+    },
 };
 ```
 ````
@@ -1086,16 +1091,12 @@ In `src/components/site/component-playground.tsx`, replace the loading state in 
 
 ```tsx
 {
-  importError ? (
-    <div className="text-sm text-destructive">{importError}</div>
-  ) : Playground ? (
-    <Playground {...values} />
-  ) : (
-    <div className="flex w-full flex-col items-center gap-4 p-8">
-      <div className="h-10 w-48 animate-pulse rounded-md bg-muted" />
-      <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
-    </div>
-  );
+    importError ? <div className='text-sm text-destructive'>{importError}</div>
+    : Playground ? <Playground {...values} />
+    : <div className='flex w-full flex-col items-center gap-4 p-8'>
+            <div className='h-10 w-48 animate-pulse rounded-md bg-muted' />
+            <div className='h-6 w-32 animate-pulse rounded-md bg-muted' />
+        </div>;
 }
 ```
 
@@ -1209,115 +1210,115 @@ Read `src/lib/token-usage.ts` to identify the distinct group names. The category
 In `src/components/site/token-page-client.tsx`, add state for search query and active category filter. Add a toolbar above the existing view toggle:
 
 ```tsx
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 
-import { TokenGrid } from "./token-grid";
-import { TokenTable } from "./token-table";
+import { TokenGrid } from './token-grid';
+import { TokenTable } from './token-table';
 
-import type { TokenGroup, TokenValues } from "@/lib/token-usage";
+import type { TokenGroup, TokenValues } from '@/lib/token-usage';
 
-type ViewMode = "grid" | "table";
+type ViewMode = 'grid' | 'table';
 
 interface TokenPageClientProps {
-  groups: TokenGroup[];
-  values: TokenValues;
+    groups: TokenGroup[];
+    values: TokenValues;
 }
 
 export function TokenPageClient({ groups, values }: TokenPageClientProps) {
-  const [view, setView] = useState<ViewMode>("grid");
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+    const [view, setView] = useState<ViewMode>('grid');
+    const [search, setSearch] = useState('');
+    const [activeCategory, setActiveCategory] = useState('all');
 
-  const categories = useMemo(() => {
-    const names = groups.map((g) => g.name);
-    return ["all", ...names];
-  }, [groups]);
+    const categories = useMemo(() => {
+        const names = groups.map((g) => g.name);
+        return ['all', ...names];
+    }, [groups]);
 
-  const filteredGroups = useMemo(() => {
-    return groups
-      .filter((group) => {
-        if (activeCategory === "all") return true;
-        return group.name === activeCategory;
-      })
-      .map((group) => {
-        if (!search) return group;
-        const filtered = group.tokens.filter((t) =>
-          t.toLowerCase().includes(search.toLowerCase()),
-        );
-        return filtered.length > 0 ? { ...group, tokens: filtered } : null;
-      })
-      .filter(Boolean) as TokenGroup[];
-  }, [groups, search, activeCategory]);
+    const filteredGroups = useMemo(() => {
+        return groups
+            .filter((group) => {
+                if (activeCategory === 'all') return true;
+                return group.name === activeCategory;
+            })
+            .map((group) => {
+                if (!search) return group;
+                const filtered = group.tokens.filter((t) =>
+                    t.toLowerCase().includes(search.toLowerCase()),
+                );
+                return filtered.length > 0 ?
+                        { ...group, tokens: filtered }
+                    :   null;
+            })
+            .filter(Boolean) as TokenGroup[];
+    }, [groups, search, activeCategory]);
 
-  return (
-    <div className="space-y-4">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <input
-          type="text"
-          placeholder="Search tokens..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="h-9 rounded-md border bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-        <div className="flex gap-1">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setActiveCategory(cat)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                activeCategory === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              {cat === "all"
-                ? "All"
-                : cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </button>
-          ))}
+    return (
+        <div className='space-y-4'>
+            {/* Toolbar */}
+            <div className='flex flex-wrap items-center gap-3'>
+                <input
+                    type='text'
+                    placeholder='Search tokens...'
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className='h-9 rounded-md border bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring'
+                />
+                <div className='flex gap-1'>
+                    {categories.map((cat) => (
+                        <button
+                            key={cat}
+                            type='button'
+                            onClick={() => setActiveCategory(cat)}
+                            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                                activeCategory === cat ?
+                                    'bg-primary text-primary-foreground'
+                                :   'bg-muted text-muted-foreground hover:bg-muted/80'
+                            }`}
+                        >
+                            {cat === 'all' ?
+                                'All'
+                            :   cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        </button>
+                    ))}
+                </div>
+                <div className='ml-auto flex gap-1'>
+                    <button
+                        type='button'
+                        onClick={() => setView('grid')}
+                        className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                            view === 'grid' ?
+                                'bg-primary text-primary-foreground'
+                            :   'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
+                    >
+                        Grid
+                    </button>
+                    <button
+                        type='button'
+                        onClick={() => setView('table')}
+                        className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                            view === 'table' ?
+                                'bg-primary text-primary-foreground'
+                            :   'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
+                    >
+                        Table
+                    </button>
+                </div>
+            </div>
+
+            {/* Empty state */}
+            {filteredGroups.length === 0 ?
+                <div className='flex min-h-32 items-center justify-center text-sm text-muted-foreground'>
+                    No tokens matching &ldquo;{search}&rdquo;
+                </div>
+            : view === 'grid' ?
+                <TokenGrid groups={filteredGroups} values={values} />
+            :   <TokenTable groups={filteredGroups} values={values} />}
         </div>
-        <div className="ml-auto flex gap-1">
-          <button
-            type="button"
-            onClick={() => setView("grid")}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-              view === "grid"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            Grid
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("table")}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-              view === "table"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            Table
-          </button>
-        </div>
-      </div>
-
-      {/* Empty state */}
-      {filteredGroups.length === 0 ? (
-        <div className="flex min-h-32 items-center justify-center text-sm text-muted-foreground">
-          No tokens matching &ldquo;{search}&rdquo;
-        </div>
-      ) : view === "grid" ? (
-        <TokenGrid groups={filteredGroups} values={values} />
-      ) : (
-        <TokenTable groups={filteredGroups} values={values} />
-      )}
-    </div>
-  );
+    );
 }
 ```
 
@@ -1347,15 +1348,15 @@ In `src/app/tokens/page.tsx`, pass the raw JSON string to the client component:
 
 ```typescript
 function readTokenValues(): { values: TokenValues; rawJson: string } {
-  const raw = readFileSync(
-    join(process.cwd(), "registry", "themes", "default.json"),
-    "utf-8",
-  );
-  const theme = JSON.parse(raw) as ThemeFile;
-  return {
-    values: { light: theme.cssVars.light, dark: theme.cssVars.dark },
-    rawJson: JSON.stringify(theme.cssVars, null, 2),
-  };
+    const raw = readFileSync(
+        join(process.cwd(), 'registry', 'themes', 'default.json'),
+        'utf-8',
+    );
+    const theme = JSON.parse(raw) as ThemeFile;
+    return {
+        values: { light: theme.cssVars.light, dark: theme.cssVars.dark },
+        rawJson: JSON.stringify(theme.cssVars, null, 2),
+    };
 }
 ```
 
@@ -1363,25 +1364,25 @@ Update the render to pass `rawJson`:
 
 ```tsx
 export default function TokensPage() {
-  const { values, rawJson } = readTokenValues();
+    const { values, rawJson } = readTokenValues();
 
-  return (
-    <div className="mx-auto max-w-6xl space-y-8 p-8">
-      <div>
-        <h1 className="text-3xl font-bold">Design Tokens</h1>
-        <p className="mt-1 text-muted-foreground">
-          All CSS custom properties from the default theme. Click any token to
-          copy its CSS variable name.
-        </p>
-      </div>
+    return (
+        <div className='mx-auto max-w-6xl space-y-8 p-8'>
+            <div>
+                <h1 className='text-3xl font-bold'>Design Tokens</h1>
+                <p className='mt-1 text-muted-foreground'>
+                    All CSS custom properties from the default theme. Click any
+                    token to copy its CSS variable name.
+                </p>
+            </div>
 
-      <TokenPageClient
-        groups={TOKEN_GROUPS}
-        values={values}
-        rawJson={rawJson}
-      />
-    </div>
-  );
+            <TokenPageClient
+                groups={TOKEN_GROUPS}
+                values={values}
+                rawJson={rawJson}
+            />
+        </div>
+    );
 }
 ```
 
@@ -1393,9 +1394,9 @@ Add to props interface:
 
 ```typescript
 interface TokenPageClientProps {
-  groups: TokenGroup[];
-  values: TokenValues;
-  rawJson: string;
+    groups: TokenGroup[];
+    values: TokenValues;
+    rawJson: string;
 }
 ```
 
@@ -1409,9 +1410,9 @@ Add copy handler:
 
 ```typescript
 function copyThemeJson() {
-  navigator.clipboard.writeText(rawJson);
-  setCopied(true);
-  setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(rawJson);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
 }
 ```
 
@@ -1419,11 +1420,11 @@ Add copy button in the toolbar (between search and view toggle):
 
 ```tsx
 <button
-  type="button"
-  onClick={copyThemeJson}
-  className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/80"
+    type='button'
+    onClick={copyThemeJson}
+    className='rounded-md bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/80'
 >
-  {copied ? "Copied!" : "Copy JSON"}
+    {copied ? 'Copied!' : 'Copy JSON'}
 </button>
 ```
 
@@ -1448,23 +1449,23 @@ In `src/app/components/[category]/[slug]/page.tsx`, after the breadcrumb and des
 
 ```tsx
 {
-  /* Usage snippet */
+    /* Usage snippet */
 }
-<section className="space-y-2">
-  <h2 className="text-xl font-semibold">Usage</h2>
-  <CodeBlock
-    html={usageCodeHtml}
-    rawCode={usageCode}
-    language="tsx"
-    showHeader={false}
-  />
+<section className='space-y-2'>
+    <h2 className='text-xl font-semibold'>Usage</h2>
+    <CodeBlock
+        html={usageCodeHtml}
+        rawCode={usageCode}
+        language='tsx'
+        showHeader={false}
+    />
 </section>;
 ```
 
 Before the return statement, build the usage snippet:
 
 ```typescript
-const importName = meta.name.replace(/\s+/g, "");
+const importName = meta.name.replace(/\s+/g, '');
 const usageCode = `import { ${importName} } from "@/components/ui/${slug}";\n\n${playgroundCode}`;
 const usageCodeHtml = await highlight(usageCode);
 ```
@@ -1472,7 +1473,7 @@ const usageCodeHtml = await highlight(usageCode);
 Add `CodeBlock` to imports if not already:
 
 ```typescript
-import { CodeBlock } from "@/components/site/code-block";
+import { CodeBlock } from '@/components/site/code-block';
 ```
 
 - [ ] **Step 2: Verify it renders**
@@ -1499,14 +1500,14 @@ git commit -m "feat: add auto-generated usage snippets to component detail pages
 In `src/app/components/[category]/[slug]/page.tsx`, import template entries:
 
 ```typescript
-import { TEMPLATE_ENTRIES } from "@/templates";
+import { TEMPLATE_ENTRIES } from '@/templates';
 ```
 
 Before the return statement, find matching templates:
 
 ```typescript
 const usedInTemplates = TEMPLATE_ENTRIES.filter((t) =>
-  t.meta.components.includes(slug),
+    t.meta.components.includes(slug),
 );
 ```
 
@@ -1514,25 +1515,25 @@ After the Installation section (around line 120), add:
 
 ```tsx
 {
-  usedInTemplates.length > 0 && (
-    <section className="space-y-2">
-      <h2 className="text-xl font-semibold">Used in Templates</h2>
-      <div className="flex flex-wrap gap-2">
-        {usedInTemplates.map((t) => (
-          <Link key={t.slug} href={`/templates/${t.slug}`}>
-            <Badge variant="secondary">{t.meta.name}</Badge>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
+    usedInTemplates.length > 0 && (
+        <section className='space-y-2'>
+            <h2 className='text-xl font-semibold'>Used in Templates</h2>
+            <div className='flex flex-wrap gap-2'>
+                {usedInTemplates.map((t) => (
+                    <Link key={t.slug} href={`/templates/${t.slug}`}>
+                        <Badge variant='secondary'>{t.meta.name}</Badge>
+                    </Link>
+                ))}
+            </div>
+        </section>
+    );
 }
 ```
 
 Add `Badge` to imports:
 
 ```typescript
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge';
 ```
 
 - [ ] **Step 2: Verify it renders**
@@ -1568,10 +1569,10 @@ Add preset definitions:
 
 ```typescript
 const WIDTH_PRESETS = [
-  { label: "Mobile", width: 375 },
-  { label: "Tablet", width: 768 },
-  { label: "Desktop", width: 1280 },
-  { label: "Full", width: null },
+    { label: 'Mobile', width: 375 },
+    { label: 'Tablet', width: 768 },
+    { label: 'Desktop', width: 1280 },
+    { label: 'Full', width: null },
 ] as const;
 ```
 
@@ -1579,24 +1580,24 @@ Add drag handler:
 
 ```typescript
 const handleDragStart = useCallback((e: React.PointerEvent) => {
-  e.preventDefault();
-  setIsDragging(true);
-  const startX = e.clientX;
-  const startWidth = previewRef.current?.offsetWidth ?? 800;
+    e.preventDefault();
+    setIsDragging(true);
+    const startX = e.clientX;
+    const startWidth = previewRef.current?.offsetWidth ?? 800;
 
-  function onMove(ev: PointerEvent) {
-    const delta = ev.clientX - startX;
-    setPreviewWidth(Math.max(320, startWidth + delta));
-  }
+    function onMove(ev: PointerEvent) {
+        const delta = ev.clientX - startX;
+        setPreviewWidth(Math.max(320, startWidth + delta));
+    }
 
-  function onUp() {
-    setIsDragging(false);
-    document.removeEventListener("pointermove", onMove);
-    document.removeEventListener("pointerup", onUp);
-  }
+    function onUp() {
+        setIsDragging(false);
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+    }
 
-  document.addEventListener("pointermove", onMove);
-  document.addEventListener("pointerup", onUp);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
 }, []);
 ```
 
@@ -1606,61 +1607,61 @@ Inside the Preview tab content area, wrap the existing preview div with responsi
 
 ```tsx
 {
-  /* Preview tab content */
+    /* Preview tab content */
 }
 <div
-  className="transition-all duration-300 ease-in-out"
-  style={{
-    opacity: activeTab === "preview" ? 1 : 0,
-    height: activeTab === "preview" ? "auto" : 0,
-    overflow: activeTab === "preview" ? "visible" : "hidden",
-  }}
+    className='transition-all duration-300 ease-in-out'
+    style={{
+        opacity: activeTab === 'preview' ? 1 : 0,
+        height: activeTab === 'preview' ? 'auto' : 0,
+        overflow: activeTab === 'preview' ? 'visible' : 'hidden',
+    }}
 >
-  {/* Responsive toolbar */}
-  <div className="flex items-center gap-1 border-b px-3 py-1.5">
-    {WIDTH_PRESETS.map((preset) => (
-      <button
-        key={preset.label}
-        type="button"
-        onClick={() => setPreviewWidth(preset.width)}
-        className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
-          previewWidth === preset.width
-            ? "bg-primary text-primary-foreground"
-            : "text-muted-foreground hover:bg-muted"
-        }`}
-      >
-        {preset.label}
-      </button>
-    ))}
-    {previewWidth && (
-      <span className="ml-2 text-xs text-muted-foreground">
-        {previewWidth}px
-      </span>
-    )}
-  </div>
-
-  {/* Preview container with optional width constraint */}
-  <div className="flex justify-center bg-background">
-    <div
-      ref={previewRef}
-      className="relative w-full"
-      style={{ maxWidth: previewWidth ?? undefined }}
-    >
-      <div className="flex min-h-48 items-center justify-center p-8">
-        {/* ...existing playground/error/loading render... */}
-      </div>
-
-      {/* Drag handle */}
-      {previewWidth && (
-        <div
-          onPointerDown={handleDragStart}
-          className={`absolute right-0 top-0 bottom-0 w-2 cursor-col-resize transition-colors hover:bg-primary/20 ${
-            isDragging ? "bg-primary/30" : ""
-          }`}
-        />
-      )}
+    {/* Responsive toolbar */}
+    <div className='flex items-center gap-1 border-b px-3 py-1.5'>
+        {WIDTH_PRESETS.map((preset) => (
+            <button
+                key={preset.label}
+                type='button'
+                onClick={() => setPreviewWidth(preset.width)}
+                className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                    previewWidth === preset.width ?
+                        'bg-primary text-primary-foreground'
+                    :   'text-muted-foreground hover:bg-muted'
+                }`}
+            >
+                {preset.label}
+            </button>
+        ))}
+        {previewWidth && (
+            <span className='ml-2 text-xs text-muted-foreground'>
+                {previewWidth}px
+            </span>
+        )}
     </div>
-  </div>
+
+    {/* Preview container with optional width constraint */}
+    <div className='flex justify-center bg-background'>
+        <div
+            ref={previewRef}
+            className='relative w-full'
+            style={{ maxWidth: previewWidth ?? undefined }}
+        >
+            <div className='flex min-h-48 items-center justify-center p-8'>
+                {/* ...existing playground/error/loading render... */}
+            </div>
+
+            {/* Drag handle */}
+            {previewWidth && (
+                <div
+                    onPointerDown={handleDragStart}
+                    className={`absolute right-0 top-0 bottom-0 w-2 cursor-col-resize transition-colors hover:bg-primary/20 ${
+                        isDragging ? 'bg-primary/30' : ''
+                    }`}
+                />
+            )}
+        </div>
+    </div>
 </div>;
 ```
 
@@ -1691,7 +1692,7 @@ In `scripts/generate-theme-css.ts`, after the `:root` block is generated, add a 
 
 ```typescript
 // After generating `:root { ... }` block:
-blocks.push(cssBlock(".light", defaultTheme.cssVars.light));
+blocks.push(cssBlock('.light', defaultTheme.cssVars.light));
 ```
 
 This emits `.light { --background: ...; --foreground: ...; ... }` with all light-mode values, allowing any element with `class="light"` to force light-mode CSS variables regardless of page mode.
@@ -1721,7 +1722,7 @@ git commit -m "feat: add .light forced-mode class to generated theme CSS"
 In the `<TabsList>` (around line 104), add:
 
 ```tsx
-<TabsTrigger value="compare">Compare</TabsTrigger>
+<TabsTrigger value='compare'>Compare</TabsTrigger>
 ```
 
 - [ ] **Step 2: Add Compare tab content**
@@ -1730,33 +1731,33 @@ After the Code tab's content div and before the closing `</div>` of the border c
 
 ```tsx
 <div
-  className="transition-all duration-300 ease-in-out"
-  style={{
-    opacity: activeTab === "compare" ? 1 : 0,
-    height: activeTab === "compare" ? "auto" : 0,
-    overflow: activeTab === "compare" ? "visible" : "hidden",
-  }}
+    className='transition-all duration-300 ease-in-out'
+    style={{
+        opacity: activeTab === 'compare' ? 1 : 0,
+        height: activeTab === 'compare' ? 'auto' : 0,
+        overflow: activeTab === 'compare' ? 'visible' : 'hidden',
+    }}
 >
-  <div className="grid min-h-48 grid-cols-1 sm:grid-cols-2">
-    {/* Light mode */}
-    <div className="light border-b p-4 sm:border-b-0 sm:border-r">
-      <p className="mb-3 text-center text-xs font-medium text-muted-foreground">
-        Light
-      </p>
-      <div className="flex items-center justify-center rounded-md bg-background p-4">
-        {Playground && <Playground {...values} />}
-      </div>
+    <div className='grid min-h-48 grid-cols-1 sm:grid-cols-2'>
+        {/* Light mode */}
+        <div className='light border-b p-4 sm:border-b-0 sm:border-r'>
+            <p className='mb-3 text-center text-xs font-medium text-muted-foreground'>
+                Light
+            </p>
+            <div className='flex items-center justify-center rounded-md bg-background p-4'>
+                {Playground && <Playground {...values} />}
+            </div>
+        </div>
+        {/* Dark mode */}
+        <div className='dark p-4'>
+            <p className='mb-3 text-center text-xs font-medium text-muted-foreground'>
+                Dark
+            </p>
+            <div className='flex items-center justify-center rounded-md bg-background p-4'>
+                {Playground && <Playground {...values} />}
+            </div>
+        </div>
     </div>
-    {/* Dark mode */}
-    <div className="dark p-4">
-      <p className="mb-3 text-center text-xs font-medium text-muted-foreground">
-        Dark
-      </p>
-      <div className="flex items-center justify-center rounded-md bg-background p-4">
-        {Playground && <Playground {...values} />}
-      </div>
-    </div>
-  </div>
 </div>
 ```
 
@@ -1784,7 +1785,7 @@ git commit -m "feat: add Compare tab for light/dark side-by-side preview"
 Add import:
 
 ```typescript
-import { useTheme } from "@/lib/theme-context";
+import { useTheme } from '@/lib/theme-context';
 ```
 
 Inside the component function, get available themes:
@@ -1796,7 +1797,7 @@ const { availableThemes } = useTheme();
 In the `<TabsList>`, add:
 
 ```tsx
-<TabsTrigger value="themes">Themes</TabsTrigger>
+<TabsTrigger value='themes'>Themes</TabsTrigger>
 ```
 
 - [ ] **Step 2: Add Themes tab content**
@@ -1805,43 +1806,43 @@ After the Compare tab content, add:
 
 ```tsx
 <div
-  className="transition-all duration-300 ease-in-out"
-  style={{
-    opacity: activeTab === "themes" ? 1 : 0,
-    height: activeTab === "themes" ? "auto" : 0,
-    overflow: activeTab === "themes" ? "visible" : "hidden",
-  }}
+    className='transition-all duration-300 ease-in-out'
+    style={{
+        opacity: activeTab === 'themes' ? 1 : 0,
+        height: activeTab === 'themes' ? 'auto' : 0,
+        overflow: activeTab === 'themes' ? 'visible' : 'hidden',
+    }}
 >
-  <div className="space-y-6 p-4">
-    {["", ...availableThemes].map((themeSlug) => (
-      <div key={themeSlug || "default"}>
-        <p className="mb-3 text-sm font-medium">
-          {themeSlug
-            ? themeSlug
-                .split("-")
-                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                .join(" ")
-            : "Default"}
-        </p>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* Light — use .light class to force light-mode CSS variables */}
-          <div
-            data-theme={themeSlug || undefined}
-            className="light flex items-center justify-center rounded-md border bg-background p-4"
-          >
-            {Playground && <Playground {...values} />}
-          </div>
-          {/* Dark */}
-          <div
-            data-theme={themeSlug || undefined}
-            className="dark flex items-center justify-center rounded-md border bg-background p-4"
-          >
-            {Playground && <Playground {...values} />}
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
+    <div className='space-y-6 p-4'>
+        {['', ...availableThemes].map((themeSlug) => (
+            <div key={themeSlug || 'default'}>
+                <p className='mb-3 text-sm font-medium'>
+                    {themeSlug ?
+                        themeSlug
+                            .split('-')
+                            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                            .join(' ')
+                    :   'Default'}
+                </p>
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                    {/* Light — use .light class to force light-mode CSS variables */}
+                    <div
+                        data-theme={themeSlug || undefined}
+                        className='light flex items-center justify-center rounded-md border bg-background p-4'
+                    >
+                        {Playground && <Playground {...values} />}
+                    </div>
+                    {/* Dark */}
+                    <div
+                        data-theme={themeSlug || undefined}
+                        className='dark flex items-center justify-center rounded-md border bg-background p-4'
+                    >
+                        {Playground && <Playground {...values} />}
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
 </div>
 ```
 
@@ -1898,100 +1899,105 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 Create `src/app/changelog/page.tsx`:
 
 ```tsx
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Changelog",
-  description: "Release notes and updates for the Perimeter Style registry.",
-  openGraph: {
-    title: "Changelog — Perimeter Style",
-    description: "Release notes and updates for the Perimeter Style registry.",
-  },
+    title: 'Changelog',
+    description: 'Release notes and updates for the Perimeter Style registry.',
+    openGraph: {
+        title: 'Changelog — Perimeter Style',
+        description:
+            'Release notes and updates for the Perimeter Style registry.',
+    },
 };
 
 interface ChangelogSection {
-  version: string;
-  date: string;
-  categories: Record<string, string[]>;
+    version: string;
+    date: string;
+    categories: Record<string, string[]>;
 }
 
 function parseChangelog(content: string): ChangelogSection[] {
-  const sections: ChangelogSection[] = [];
-  let current: ChangelogSection | null = null;
-  let currentCategory = "";
+    const sections: ChangelogSection[] = [];
+    let current: ChangelogSection | null = null;
+    let currentCategory = '';
 
-  for (const line of content.split("\n")) {
-    const versionMatch = line.match(/^## \[(.+?)\](?:\s*-\s*(.+))?/);
-    if (versionMatch) {
-      if (current) sections.push(current);
-      current = {
-        version: versionMatch[1],
-        date: versionMatch[2]?.trim() ?? "",
-        categories: {},
-      };
-      continue;
+    for (const line of content.split('\n')) {
+        const versionMatch = line.match(/^## \[(.+?)\](?:\s*-\s*(.+))?/);
+        if (versionMatch) {
+            if (current) sections.push(current);
+            current = {
+                version: versionMatch[1],
+                date: versionMatch[2]?.trim() ?? '',
+                categories: {},
+            };
+            continue;
+        }
+
+        const categoryMatch = line.match(/^### (.+)/);
+        if (categoryMatch && current) {
+            currentCategory = categoryMatch[1];
+            current.categories[currentCategory] = [];
+            continue;
+        }
+
+        const itemMatch = line.match(/^- (.+)/);
+        if (itemMatch && current && currentCategory) {
+            current.categories[currentCategory].push(itemMatch[1]);
+        }
     }
 
-    const categoryMatch = line.match(/^### (.+)/);
-    if (categoryMatch && current) {
-      currentCategory = categoryMatch[1];
-      current.categories[currentCategory] = [];
-      continue;
-    }
-
-    const itemMatch = line.match(/^- (.+)/);
-    if (itemMatch && current && currentCategory) {
-      current.categories[currentCategory].push(itemMatch[1]);
-    }
-  }
-
-  if (current) sections.push(current);
-  return sections;
+    if (current) sections.push(current);
+    return sections;
 }
 
 export default function ChangelogPage() {
-  const raw = readFileSync(join(process.cwd(), "CHANGELOG.md"), "utf-8");
-  const sections = parseChangelog(raw);
+    const raw = readFileSync(join(process.cwd(), 'CHANGELOG.md'), 'utf-8');
+    const sections = parseChangelog(raw);
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-8 p-8">
-      <div>
-        <h1 className="text-3xl font-bold">Changelog</h1>
-        <p className="mt-1 text-muted-foreground">
-          Release notes and updates for the Perimeter Style registry.
-        </p>
-      </div>
-
-      {sections.map((section) => (
-        <article key={section.version} className="space-y-4">
-          <div className="flex items-baseline gap-3">
-            <h2 className="text-xl font-semibold">{section.version}</h2>
-            {section.date && (
-              <span className="text-sm text-muted-foreground">
-                {section.date}
-              </span>
-            )}
-          </div>
-
-          {Object.entries(section.categories).map(([category, items]) => (
-            <div key={category}>
-              <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-                {category}
-              </h3>
-              <ul className="list-inside list-disc space-y-1 text-sm">
-                {items.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
+    return (
+        <div className='mx-auto max-w-3xl space-y-8 p-8'>
+            <div>
+                <h1 className='text-3xl font-bold'>Changelog</h1>
+                <p className='mt-1 text-muted-foreground'>
+                    Release notes and updates for the Perimeter Style registry.
+                </p>
             </div>
-          ))}
-        </article>
-      ))}
-    </div>
-  );
+
+            {sections.map((section) => (
+                <article key={section.version} className='space-y-4'>
+                    <div className='flex items-baseline gap-3'>
+                        <h2 className='text-xl font-semibold'>
+                            {section.version}
+                        </h2>
+                        {section.date && (
+                            <span className='text-sm text-muted-foreground'>
+                                {section.date}
+                            </span>
+                        )}
+                    </div>
+
+                    {Object.entries(section.categories).map(
+                        ([category, items]) => (
+                            <div key={category}>
+                                <h3 className='mb-2 text-sm font-medium text-muted-foreground'>
+                                    {category}
+                                </h3>
+                                <ul className='list-inside list-disc space-y-1 text-sm'>
+                                    {items.map((item, i) => (
+                                        <li key={i}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ),
+                    )}
+                </article>
+            ))}
+        </div>
+    );
 }
 ```
 
@@ -2042,23 +2048,23 @@ Add a JSON file to `registry/themes/`. The filename becomes the theme slug (e.g.
 
 ```json
 {
-  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-  "name": "my-project",
-  "type": "registry:theme",
-  "cssVars": {
-    "light": {
-      "primary": "oklch(0.50 0.16 200)",
-      "primary-foreground": "oklch(0.985 0 0)",
-      "ring": "oklch(0.50 0.16 200)",
-      "chart-1": "oklch(0.50 0.16 200)"
-    },
-    "dark": {
-      "primary": "oklch(0.60 0.16 200)",
-      "primary-foreground": "oklch(0.147 0 0)",
-      "ring": "oklch(0.60 0.16 200)",
-      "chart-1": "oklch(0.60 0.16 200)"
+    "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+    "name": "my-project",
+    "type": "registry:theme",
+    "cssVars": {
+        "light": {
+            "primary": "oklch(0.50 0.16 200)",
+            "primary-foreground": "oklch(0.985 0 0)",
+            "ring": "oklch(0.50 0.16 200)",
+            "chart-1": "oklch(0.50 0.16 200)"
+        },
+        "dark": {
+            "primary": "oklch(0.60 0.16 200)",
+            "primary-foreground": "oklch(0.147 0 0)",
+            "ring": "oklch(0.60 0.16 200)",
+            "chart-1": "oklch(0.60 0.16 200)"
+        }
     }
-  }
 }
 ```
 ````
@@ -2389,65 +2395,68 @@ Run `pnpm typecheck` to see all errors. Common causes: missing return types on a
 Create `src/app/docs/troubleshooting/page.tsx`:
 
 ```tsx
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Troubleshooting",
-  description: "Common issues and solutions for the Perimeter Style project.",
-  openGraph: {
-    title: "Troubleshooting — Perimeter Style",
-    description: "Common issues and solutions for the Perimeter Style project.",
-  },
+    title: 'Troubleshooting',
+    description: 'Common issues and solutions for the Perimeter Style project.',
+    openGraph: {
+        title: 'Troubleshooting — Perimeter Style',
+        description:
+            'Common issues and solutions for the Perimeter Style project.',
+    },
 };
 
 const ISSUES = [
-  {
-    title: "Dev server hangs on startup",
-    description:
-      "Turbopack cannot trace 55 dynamic demo imports. The pnpm dev command already uses --webpack to avoid this. If you see a hang, make sure you're running pnpm dev (not next dev directly).",
-  },
-  {
-    title: "Components look outdated",
-    description:
-      "Run pnpm registry:build to regenerate the built registry JSON in public/r/. This must be run after any change to files in registry/ui/perimeter/.",
-  },
-  {
-    title: "Theme not applying",
-    description:
-      "Check that the data-theme attribute is set on the <html> element. For dark mode, ensure the .dark class is also present. Run pnpm generate:themes if you've modified theme JSON files.",
-  },
-  {
-    title: "Demo not showing in showcase",
-    description:
-      "Run pnpm collect:demos to regenerate the demo manifest and import map. Verify your demo file exports meta, controls, Playground, and examples.",
-  },
-  {
-    title: "Build fails with type errors",
-    description:
-      "Run pnpm typecheck to see all errors. Common causes: missing return types on async functions, incorrect import paths after moving files.",
-  },
+    {
+        title: 'Dev server hangs on startup',
+        description:
+            "Turbopack cannot trace 55 dynamic demo imports. The pnpm dev command already uses --webpack to avoid this. If you see a hang, make sure you're running pnpm dev (not next dev directly).",
+    },
+    {
+        title: 'Components look outdated',
+        description:
+            'Run pnpm registry:build to regenerate the built registry JSON in public/r/. This must be run after any change to files in registry/ui/perimeter/.',
+    },
+    {
+        title: 'Theme not applying',
+        description:
+            "Check that the data-theme attribute is set on the <html> element. For dark mode, ensure the .dark class is also present. Run pnpm generate:themes if you've modified theme JSON files.",
+    },
+    {
+        title: 'Demo not showing in showcase',
+        description:
+            'Run pnpm collect:demos to regenerate the demo manifest and import map. Verify your demo file exports meta, controls, Playground, and examples.',
+    },
+    {
+        title: 'Build fails with type errors',
+        description:
+            'Run pnpm typecheck to see all errors. Common causes: missing return types on async functions, incorrect import paths after moving files.',
+    },
 ];
 
 export default function TroubleshootingPage() {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Troubleshooting</h1>
-        <p className="mt-1 text-muted-foreground">
-          Common issues and how to resolve them.
-        </p>
-      </div>
+    return (
+        <div className='space-y-8'>
+            <div>
+                <h1 className='text-3xl font-bold'>Troubleshooting</h1>
+                <p className='mt-1 text-muted-foreground'>
+                    Common issues and how to resolve them.
+                </p>
+            </div>
 
-      <div className="space-y-6">
-        {ISSUES.map((issue) => (
-          <section key={issue.title} className="space-y-2">
-            <h2 className="text-lg font-semibold">{issue.title}</h2>
-            <p className="text-sm text-muted-foreground">{issue.description}</p>
-          </section>
-        ))}
-      </div>
-    </div>
-  );
+            <div className='space-y-6'>
+                {ISSUES.map((issue) => (
+                    <section key={issue.title} className='space-y-2'>
+                        <h2 className='text-lg font-semibold'>{issue.title}</h2>
+                        <p className='text-sm text-muted-foreground'>
+                            {issue.description}
+                        </p>
+                    </section>
+                ))}
+            </div>
+        </div>
+    );
 }
 ```
 
