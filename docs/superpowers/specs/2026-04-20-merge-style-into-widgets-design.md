@@ -8,7 +8,7 @@
 
 ## Context
 
-The `style/` project (Next.js 16, standalone repo, deployed at `style.perimeter.org`) is the canonical shadcn registry for Perimeter. It owns 38 components, 3 themes, 5 page templates, and a showcase site with interactive demos. Its registry is served as JSON at `style.perimeter.org/r/*.json` and installed by other projects via `pnpm dlx shadcn@latest add @perimeter/<name>`.
+The `style/` project (Next.js 16, standalone repo, deployed at `style.perimeter.org`) is the canonical shadcn registry for Perimeter. It owns 56 components (plus a `utils` lib and two hooks in the registry manifest), 3 themes, 5 page templates, and a showcase site with interactive demos. Its registry is served as JSON at `style.perimeter.org/r/*.json` and installed by other projects via `pnpm dlx shadcn@latest add @perimeter/<name>`.
 
 The `perimeter-widgets/` monorepo (Turborepo, Vite) builds self-contained IIFE widgets that embed on `perimeter.org` via shadow DOM. Today it consumes style's components through a sync script (`sync:style`) that runs the shadcn CLI and copies components into `packages/shared/src/components/ui/perimeter/`. Token values are fetched from `https://style.perimeter.org/r/default-theme.json` by `sync:tokens`. Both are manual flows; they drift silently, require `shared`-specific wrapper duplicates (`button.tsx`, `dialog.tsx`, `input.tsx`, `textarea.tsx`, `input-group.tsx`) to work around import-path rewrites, and mean a round trip through a public URL to get the latest tokens.
 
@@ -50,21 +50,30 @@ perimeter-widgets/
 │       │   ├── docs/                      # from style
 │       │   └── changelog/                 # from style
 │       ├── src/components/site/           # nav, sidebar, search, playground, code-block
-│       ├── src/lib/                       # demo-types, highlight, extract-source
-│       ├── src/mocks/                     # MSW handlers (moved from storyboard)
-│       ├── scripts/                       # collect-demos, generate-theme-css, copy-registry, sitemap
+│       ├── src/components/widgets/        # Phase 4: preview, config editor, theme/data toggles
+│       ├── src/lib/                       # demo-types, highlight, extract-source, embed-code
+│       ├── src/mocks/                     # Phase 4: MSW handlers
+│       ├── scripts/                       # collect-demos, generate-theme-css, copy-registry-output, sitemap
 │       ├── public/r/                      # shadcn build output (copied from registry package)
-│       ├── public/brand/                  # brand assets for /design/branding
+│       ├── public/brand/                  # Phase 5: brand assets for /design/branding
+│       ├── components.json                # shadcn config (unchanged from style)
 │       ├── next.config.ts
 │       └── package.json                   # @perimeter-widgets/site
+
+(No `src/components/ui/` in the site. Style currently keeps a second installed copy of the 56 registry components at `style/src/components/ui/*` and imports them via `@/components/ui/*` in ~10 site files. After the merge, the site imports registry components directly from `@perimeter-widgets/registry` and that duplicate copy goes away — `components.json` still lists the shadcn aliases, but the physical directory is not materialized inside the site. Rewriting the ~30 site imports from `@/components/ui/<name>` to `@perimeter-widgets/registry` is part of Phase 1.)
 │
 ├── packages/
 │   ├── registry/                          # single source of truth
-│   │   ├── ui/perimeter/*.tsx             # 38 components
-│   │   ├── ui/perimeter/*.demo.tsx
+│   │   ├── ui/perimeter/*.tsx             # 56 components + their *.demo.tsx siblings
 │   │   ├── ui/perimeter/lib/
+│   │   ├── lib/utils.ts                   # moved from style/src/lib/utils.ts (shadcn "utils" item)
+│   │   ├── hooks/use-copy-to-clipboard.ts # moved from style/src/hooks/
+│   │   ├── hooks/use-mobile.ts            # moved from style/src/hooks/
 │   │   ├── themes/*.json                  # default, perimeter-api, metrics
-│   │   ├── registry.json                  # shadcn CLI manifest
+│   │   ├── registry.json                  # shadcn CLI manifest (paths relative to packages/registry/)
+│   │   ├── base.json                      # preserved from style/registry/base.json
+│   │   ├── public/r/                      # shadcn build output (local to registry package)
+│   │   ├── scripts/generate-registry.ts   # moved from style/scripts/; paths updated
 │   │   ├── src/index.ts                   # workspace re-exports
 │   │   ├── tsconfig.json                  # @/ aliases for on-disk shadcn compatibility
 │   │   └── package.json                   # @perimeter-widgets/registry
@@ -73,12 +82,18 @@ perimeter-widgets/
 │   │       ├── api/                       # unchanged
 │   │       ├── auth/                      # unchanged
 │   │       ├── components/motion/         # unchanged
+│   │       ├── components/ui/perimeter/
+│   │       │   ├── icon-select.tsx        # KEPT — widget-original composition
+│   │       │   ├── sort-select.tsx        # KEPT — widget-original composition
+│   │       │   └── portal-wrappers.tsx    # KEPT — shadow-DOM portal injection over registry components
 │   │       ├── shadow-dom/                # unchanged
-│   │       ├── styles/base.css            # shadow-DOM reset; token block regenerated from registry
-│   │       ├── stories/                   # unchanged
+│   │       ├── styles/base.css            # shadow-DOM reset; token block regenerated by registry script
+│   │       ├── stories/                   # non-design stories only (5 design stories retired in Phase 5)
 │   │       └── lib/, utils/               # unchanged
-│   │   # DELETED: src/components/ui/ (wrappers), src/components/ui/perimeter/ (synced copy)
-│   │   # DELETED: scripts/sync-components.mjs, sync-tokens.mjs, post-sync.mjs
+│   │   # DELETED from Phase 2:
+│   │   #   - src/components/ui/{button,dialog,input,textarea,input-group}.tsx (wrapper duplicates)
+│   │   #   - src/components/ui/perimeter/*.tsx EXCEPT the three widget-originals listed above
+│   │   #   - scripts/sync-components.mjs, sync-tokens.mjs, post-sync.mjs
 │   └── vite-preset/
 │
 ├── widgets/
@@ -94,7 +109,11 @@ perimeter-widgets/
 **Retired:**
 - `packages/storyboard/` — functionality moves into `apps/site/src/app/widgets/`.
 - `packages/shared/scripts/sync-*.mjs` — no external sync once the registry is local.
-- `packages/shared/src/components/ui/**` — wrapper duplicates and synced copies.
+- `packages/shared/src/components/ui/{button,dialog,input,textarea,input-group}.tsx` — wrapper duplicates; widgets import the registry versions directly.
+- Most of `packages/shared/src/components/ui/perimeter/*.tsx` — the synced copy, except the three widget-originals (`icon-select`, `sort-select`, `portal-wrappers`) that stay.
+- `style/src/components/ui/*` — not ported; the site imports registry components directly.
+- Style's `/tokens` route — redirected to `/design/colors` in Phase 5.
+- The 5 design stories in `packages/shared/src/stories/` (Colors, Typography, Spacing, BorderRadius, Shadows) — retired in Phase 5 once their content is on `/design/*`. Non-design stories (if any remain) stay, and root `pnpm storybook` remains functional.
 - `style/` repo — archived after Phase 6 cutover.
 
 ## `packages/registry/` as the Single Source of Truth
@@ -107,7 +126,7 @@ The registry package has two jobs, served from the same files:
 // packages/registry/src/index.ts
 export { Button, buttonVariants } from "../ui/perimeter/button";
 export { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/perimeter/card";
-// ... etc. for all 38 components
+// ... etc. for all 56 components
 ```
 
 Widgets and the site import these directly:
@@ -116,29 +135,50 @@ Widgets and the site import these directly:
 import { Button } from "@perimeter-widgets/registry";
 ```
 
-**Job 2 — be built by `shadcn build` for external consumers.** Running `shadcn build` inside `packages/registry/` reads `registry.json` + `ui/perimeter/*.tsx` and emits `/r/<component>.json` files. Those files are copied into `apps/site/public/r/` during the site's build so they ship with the Next.js static export at `style.perimeter.org/r/*.json`. External install commands do not change.
+**Job 2 — be built by `shadcn build` for external consumers.** Running `shadcn build` inside `packages/registry/` reads `registry.json` + `ui/perimeter/*.tsx` and emits `public/r/<component>.json` files (shadcn CLI's default output path, relative to cwd). Those files are copied into `apps/site/public/r/` during the site's build by `apps/site/scripts/copy-registry-output.ts` so they ship with the Next.js static export at `style.perimeter.org/r/*.json`. External install commands do not change.
 
-**Import paths inside registry source.** Registry components today use `@/lib/utils` and `@/components/ui/button`. The shadcn CLI rewrites these at install time for external consumers, so the on-disk form must keep `@/` aliases. Inside the monorepo, `packages/registry/tsconfig.json` defines `paths` so TypeScript resolves `@/` → `./ui/perimeter/` locally. This lets the same files both ship through shadcn CLI (external) and be importable as a workspace package (internal).
+**Import paths inside registry source.** Registry components today use `@/lib/utils` and `@/components/ui/button`. The shadcn CLI rewrites these at install time for external consumers, so the on-disk form must keep `@/` aliases. Inside the monorepo, `packages/registry/tsconfig.json` defines `paths` so TypeScript resolves `@/lib/utils` → `./lib/utils` and `@/components/ui/<name>` → `./ui/perimeter/<name>` locally. This lets the same files both ship through shadcn CLI (external) and be importable as a workspace package (internal).
 
-**Themes.** `packages/registry/themes/*.json` is the canonical source. A single script (`generate-theme-css.ts`) regenerates the token block in:
-- `apps/site/src/app/globals.css` (same markers style uses today: `@generated-themes-start` / `@generated-themes-end`)
-- `packages/shared/src/styles/base.css` (same markers sync-tokens uses today: `@sync:tokens-start` / `@sync:tokens-end`)
+**Registry manifest paths.** Style's `registry.json` contains paths like `src/lib/utils.ts` and `src/hooks/use-copy-to-clipboard.ts` that are relative to `style/` cwd. After the move, `lib/utils.ts` and `hooks/*.ts` live at `packages/registry/lib/` and `packages/registry/hooks/` (moved there during Phase 1). `packages/registry/scripts/generate-registry.ts` (moved from style, with its `UI_DIR`/`THEMES_DIR`/`OUTPUT` path constants updated) regenerates `registry.json` with paths relative to the new registry-package root before `shadcn build` runs.
 
-No more `fetch('https://style.perimeter.org/...')`. Both files regenerate from local JSON.
+**Themes.** `packages/registry/themes/*.json` is the canonical source. A single script (`apps/site/scripts/generate-theme-css.ts`, ported from `style/scripts/`) regenerates the token block in two places, emitting each file's existing dialect:
 
-**Wrapper deletion.** `packages/shared/src/components/ui/{button,dialog,input,textarea,input-group}.tsx` are near-verbatim copies of registry sources. Differences (verified via diff): prettier formatting (single vs double quotes, 4 vs 2 indent), relative vs `@/` imports, and a minor `container` prop drift in `dialog.tsx` now covered by the recent portal-prop work. These wrappers exist only because the shadcn CLI's import rewriting forced them into `shared`. After the merge, widgets import registry components directly; the wrappers are deleted.
+| File | Existing dialect | Keep as-is because |
+| --- | --- | --- |
+| `apps/site/src/app/globals.css` | `:root` / `.dark` blocks plus `[data-theme="<slug>"]` project overrides (uses style's richer multi-theme format between `@generated-themes-start` / `@generated-themes-end` markers) | The site switches themes at runtime via `data-theme`; existing selector semantics must be preserved. |
+| `packages/shared/src/styles/base.css` | Fused `:root, :host { … }` and `.dark, :host([data-theme='dark']) { … }` blocks between `@sync:tokens-start` / `@sync:tokens-end` | Shadow-DOM widgets rely on `:host` selectors working inside their shadow root. |
+
+The script reads `packages/registry/themes/default.json` once and emits each dialect from the same token object. No `fetch('https://style.perimeter.org/...')`. The two output blocks are regenerated together — a small assertion step confirms the token key set is identical between them so the two CSS files can't drift.
+
+**Wrapper deletion, precisely.** `packages/shared/src/components/ui/{button,dialog,input,textarea,input-group}.tsx` are near-verbatim copies of registry sources. Differences (verified via diff): prettier formatting, relative vs `@/` imports, and a minor `container` prop drift in `dialog.tsx` now covered by the portal-prop work. These five files are deleted in Phase 2; widgets import registry versions directly. `packages/shared/src/components/ui/perimeter/` keeps exactly three files that are widget-originals, not synced copies: `icon-select.tsx`, `sort-select.tsx`, and `portal-wrappers.tsx`. `portal-wrappers.tsx` imports `usePortalContainer` / `useShadowEnvironment` from `packages/shared/src/shadow-dom/` and wraps registry components to auto-inject the shadow-root portal container — it stays in shared to avoid a `registry → shared → registry` cycle.
 
 ## Site App Feature Parity and New Surfaces
 
-### Ported unchanged from style (Phase 1)
+### Ported from style (Phase 1)
 
 - Root layout, `globals.css` (with tokens regenerated from `packages/registry/themes/`)
 - `src/components/site/` — top nav, sidebar, search, playground, code-block, Shiki server + client highlighters
-- `src/lib/{demo-types,highlight,highlight-client,extract-source}.ts`
+- `src/lib/{demo-types,highlight,highlight-client,extract-source,build-snippet,theme-context,token-usage}.ts` (+ `utils.ts` if used only by site; otherwise the site imports `cn` from `@perimeter-widgets/registry`)
 - Demo collection (`scripts/collect-demos.ts` → `demo-manifest.json` + `demo-imports.ts`), adapted to point at `packages/registry/ui/perimeter/*.demo.tsx`
 - Routes: `/components`, `/components/[category]`, `/components/[category]/[slug]`, `/templates`, `/templates/[slug]`, `/docs`, `/changelog`
-- `generate-sitemap.ts`, `next.config.ts` (static export), webpack dev (Turbopack hangs on 38 dynamic demo imports)
+- `generate-sitemap.ts`, `next.config.ts` (static export), webpack dev (Turbopack hangs on 56 dynamic demo imports)
 - Theme list discovery (`readdirSync` on `packages/registry/themes/`), `data-theme` + `.dark` runtime switching
+- `components.json` (shadcn CLI config), even though site imports come from the workspace registry — the file is kept so `pnpm dlx shadcn@latest add @perimeter/<name>` can still run inside the site if ever needed
+
+### Rewritten in Phase 1
+
+- Every `@/components/ui/<name>` import in site source (roughly 30 imports across site chrome, search palette, install button, layout, pages, templates, docs) becomes `@perimeter-widgets/registry`. Style's `src/components/ui/*` (the 56-file duplicate installed copy) is not carried into `apps/site/`.
+- Every `@/lib/utils` import in site source becomes `@perimeter-widgets/registry` (re-exports `cn`) or a relative import if the site keeps a local copy.
+
+### Script placement summary
+
+| Script | Lives in | Purpose |
+| --- | --- | --- |
+| `generate-registry.ts` | `packages/registry/scripts/` | Scans `ui/perimeter/*.tsx` + `themes/*.json`, writes `registry.json` with correct relative paths |
+| `collect-demos.ts` | `apps/site/scripts/` | Reads `packages/registry/ui/perimeter/*.demo.tsx`, writes `apps/site/src/lib/{demo-manifest.json,demo-imports.ts}` |
+| `generate-theme-css.ts` | `apps/site/scripts/` | Reads `packages/registry/themes/*.json`, updates site `globals.css` + shared `base.css` (two dialects) |
+| `copy-registry-output.ts` | `apps/site/scripts/` | Copies `packages/registry/public/r/*` → `apps/site/public/r/*` |
+| `generate-sitemap.ts` | `apps/site/scripts/` | Reads site routes, writes `out/sitemap.xml` |
 
 ### New — `/widgets` section (subsumes storyboard, Phase 4)
 
@@ -166,24 +206,27 @@ Turborepo tasks and dependencies:
 
 | Package | Task | Depends on |
 | --- | --- | --- |
-| `packages/registry` | `build` | — (runs `shadcn build`, emits `dist/r/*.json`) |
+| `packages/registry` | `build` | — (runs `generate-registry.ts` then `shadcn build`; emits `packages/registry/public/r/*.json`) |
 | `packages/shared` | `build` | `^build` (registry) |
 | `widgets/sermons` | `build` | `^build` (shared → registry) |
-| `apps/site` | `build` | `^build` (consumes registry, copies `dist/r/*.json` into `public/r/`) |
+| `apps/site` | `build` | `^build` (consumes registry, copies registry's `public/r/*.json` into the site's `public/r/`) |
 
 `apps/site` build script chain (replaces style's current chain):
 
 ```
 pnpm build (in apps/site)
-  1. pnpm --filter @perimeter-widgets/registry build       # shadcn build → packages/registry/dist/r/
-  2. tsx scripts/copy-registry-output.ts                    # → apps/site/public/r/
-  3. tsx scripts/generate-theme-css.ts                      # inject tokens into apps/site/src/app/globals.css
+  1. pnpm --filter @perimeter-widgets/registry build       # generate-registry.ts + shadcn build
+                                                           # → packages/registry/public/r/*.json
+  2. tsx scripts/copy-registry-output.ts                    # → apps/site/public/r/*.json
+  3. tsx scripts/generate-theme-css.ts                      # update apps/site/src/app/globals.css
+                                                           #   AND packages/shared/src/styles/base.css
+                                                           #   (two dialects, same tokens)
   4. tsx scripts/collect-demos.ts                           # scan packages/registry/ui/perimeter/*.demo.tsx
   5. tsx scripts/generate-sitemap.ts
   6. next build
 ```
 
-**Dev loop.** Root `pnpm dev` → `turbo dev --filter=@perimeter-widgets/site`. Site runs `next dev --webpack` (Turbopack still hangs on demo dynamic imports). Editing a registry component file or widget source triggers Next's webpack dev server recompile; widget sources are imported directly via workspace alias in dev, bypassing the IIFE build.
+**Dev loop.** During Phases 1–3, root `pnpm dev` continues to point at storyboard (`turbo dev --filter=@perimeter-widgets/storyboard`). The site is started via `pnpm --filter @perimeter-widgets/site dev`. In Phase 4 (storyboard retirement), root `pnpm dev` flips to `turbo dev --filter=@perimeter-widgets/site`. Site runs `next dev --webpack` (Turbopack still hangs on demo dynamic imports). Editing a registry component file or widget source triggers Next's webpack dev server recompile; widget sources are imported directly via workspace alias in dev, bypassing the IIFE build.
 
 **Quality.** Root `pnpm quality` → `turbo typecheck lint test && prettier --check .`. `./quality.sh` in the parent `claude/` workspace continues to work (the perimeter-widgets project still reports pass/fail; style drops off the table after cutover).
 
@@ -195,33 +238,45 @@ pnpm build (in apps/site)
 
 Each phase is a feature branch off `dev` → PR to `dev`. `dev` stays deployable throughout. Old `style.perimeter.org` continues to serve from the standalone `style/` repo until Phase 6.
 
+### Phase 0 — `style/` merge freeze
+
+Before Phase 1 is opened, announce a merge freeze on `style/dev` for the window that Phase 1 is in review. Any style commit that lands between `git fetch style-upstream` and the Phase 1 PR merge does not reach perimeter-widgets and would need to be re-applied by hand. The freeze is short (typically days, not weeks) and only applies to `style/dev`, not to the standalone deploy which stays live.
+
 ### Phase 1 — `feat/registry-package-subtree`
 
 - `git remote add style-upstream https://github.com/perimeterchurch/style.git`
 - `git fetch style-upstream`
 - `git subtree add --prefix=.style-staging style-upstream/dev` (stages style's full tree + history at a temp path)
 - Within the same branch, split the staged tree across its final homes via `git mv`:
-  - `.style-staging/registry/` → `packages/registry/` (ui + themes + lib + registry.json)
-  - `.style-staging/src/` → `apps/site/src/`
-  - `.style-staging/scripts/` → `apps/site/scripts/`
+  - `.style-staging/registry/` (ui + themes + base.json) → `packages/registry/` (keeping existing shape: `ui/perimeter/`, `themes/`, `base.json`)
+  - `.style-staging/registry.json` → `packages/registry/registry.json`
+  - `.style-staging/src/lib/utils.ts` → `packages/registry/lib/utils.ts`
+  - `.style-staging/src/hooks/` → `packages/registry/hooks/`
+  - `.style-staging/scripts/generate-registry.ts` → `packages/registry/scripts/generate-registry.ts` (update `UI_DIR`/`THEMES_DIR`/`BASE_FILE`/`OUTPUT` constants to paths relative to the new package root)
+  - `.style-staging/scripts/{collect-demos,generate-theme-css,generate-sitemap}.ts` → `apps/site/scripts/`
+  - `.style-staging/src/` (everything except `lib/utils.ts` + `hooks/`) → `apps/site/src/`
+  - `.style-staging/src/components/ui/` → **not ported** (site imports from `@perimeter-widgets/registry` instead)
   - `.style-staging/public/` → `apps/site/public/`
   - `.style-staging/next.config.ts`, `tsconfig.json`, `components.json`, `postcss.config.mjs` → `apps/site/`
   - `.style-staging/CHANGELOG.md` → merge into `apps/site/CHANGELOG.md`
   - Drop `.style-staging` when empty
-- Add `packages/registry/package.json` (`@perimeter-widgets/registry`) with a minimal `src/index.ts` that re-exports all components. Add `packages/registry/tsconfig.json` with `paths: { "@/*": ["./ui/perimeter/*"] }`.
-- Add `apps/site/package.json` (`@perimeter-widgets/site`); update its `collect:demos` + `generate:themes` scripts to point at `packages/registry/`.
-- Update `pnpm-workspace.yaml` to add `apps/*` and `widgets/*` globs.
+- Add `packages/registry/package.json` (`@perimeter-widgets/registry`) with a `build` script that runs `tsx scripts/generate-registry.ts && shadcn build`, and `src/index.ts` re-exports for all 56 components.
+- Add `packages/registry/tsconfig.json` with `paths: { "@/lib/*": ["./lib/*"], "@/hooks/*": ["./hooks/*"], "@/components/ui/*": ["./ui/perimeter/*"] }`.
+- Add `apps/site/package.json` (`@perimeter-widgets/site`); re-wire its `collect:demos` + `generate:themes` + `copy:registry` scripts to read from `packages/registry/` and write to site outputs.
+- Rewrite site imports: every `@/components/ui/<name>` → `@perimeter-widgets/registry`; every `@/lib/utils` → `@perimeter-widgets/registry` (which re-exports `cn`).
+- Update `pnpm-workspace.yaml` to add `apps/*` and `widgets/*` globs (the `widgets/*` glob is a no-op until Phase 3 — adding it here avoids a workspace-config change in Phase 3).
 - Update root `turbo.json` with site and registry task graphs.
-- **Verification:** `pnpm -w install` resolves; `pnpm --filter @perimeter-widgets/site build` produces a working static export serving `/r/*.json`; `pnpm --filter @perimeter-widgets/site dev` runs the showcase; `git log --follow packages/registry/ui/perimeter/button.tsx` reaches back into style's history.
-- Storyboard is not retired in this phase; site runs alongside it. `style.perimeter.org` still served from old `style/`.
+- **Verification:** `pnpm -w install` resolves; `pnpm --filter @perimeter-widgets/registry build` emits `packages/registry/public/r/*.json`; `pnpm --filter @perimeter-widgets/site build` produces a working static export serving `/r/*.json`; `pnpm --filter @perimeter-widgets/site dev` runs the showcase; `git log --all packages/registry/ui/perimeter/button.tsx` shows style's commits as ancestors (note: `git log --follow` is rename-heuristic-based and may not always traverse the subtree merge; the canonical verification is that the commits are reachable as ancestors of HEAD, which subtree-add guarantees).
+- Storyboard is not retired in this phase; site runs alongside it. Root `pnpm dev` continues to start storyboard. `style.perimeter.org` still served from old `style/`.
 
 ### Phase 2 — `refactor/shared-imports-from-registry`
 
-- In `packages/shared/`: replace every `import ... from './components/ui/perimeter/<name>'` with `from '@perimeter-widgets/registry'`.
-- Delete `packages/shared/src/components/ui/{button,dialog,input,textarea,input-group}.tsx` (wrapper duplicates) and the entire `packages/shared/src/components/ui/perimeter/` directory.
+- In `packages/shared/`: replace every `import ... from './components/ui/perimeter/<name>'` with `from '@perimeter-widgets/registry'`, except for `icon-select`, `sort-select`, and `portal-wrappers` which remain local.
+- Update `packages/shared/src/components/index.ts` so the `BaseInput`, `BaseTextarea`, `BaseButton`, `BaseDialog` renamed re-exports come from `@perimeter-widgets/registry`; delete the five wrapper files (`button.tsx`, `dialog.tsx`, `input.tsx`, `textarea.tsx`, `input-group.tsx`).
+- Delete every synced file under `packages/shared/src/components/ui/perimeter/` EXCEPT `icon-select.tsx`, `sort-select.tsx`, `portal-wrappers.tsx`. Update imports in these three files (e.g., `portal-wrappers.tsx` line 14–21) to pull their base components from `@perimeter-widgets/registry` instead of sibling files.
 - Delete `packages/shared/scripts/{sync-components,sync-tokens,post-sync}.mjs` and the root `sync:style` / `sync:tokens` scripts.
-- Have `apps/site/scripts/generate-theme-css.ts` also update `packages/shared/src/styles/base.css` between its existing `@sync:tokens-start` / `@sync:tokens-end` markers (keep the markers so the diff stays scoped).
-- **Verification:** `pnpm quality` passes; `pnpm --filter widget-sermons build` produces a working IIFE with identical visual output; storyboard still runs against the updated shared package.
+- Extend `apps/site/scripts/generate-theme-css.ts` to also update `packages/shared/src/styles/base.css` between its existing `@sync:tokens-start` / `@sync:tokens-end` markers. The script emits each file's dialect (site: `:root`/`.dark` + `[data-theme="slug"]` overrides; shared: fused `:root, :host` + `.dark, :host([data-theme='dark'])`). A post-write assertion compares the sorted token-key set across both outputs and fails if they differ.
+- **Verification:** `pnpm quality` passes; `pnpm --filter widget-sermons build` produces a working IIFE with visual output matching pre-Phase-2 (byte or snapshot comparison); storyboard still runs against the updated shared package.
 
 ### Phase 3 — `chore/widgets-directory-rename`
 
@@ -259,7 +314,10 @@ Each phase is a feature branch off `dev` → PR to `dev`. `dev` stays deployable
   - Build command: `pnpm --filter @perimeter-widgets/site build`
   - Output directory: `apps/site/out` (Next.js static export)
 - Smoke-test the deployment: load the showcase, test theme switcher, open `/r/button.json` directly, run `pnpm dlx shadcn@latest add @perimeter/button` from a scratch directory.
-- Confirm `metrics/`, `perimeter-api/`, and `widgets/sermons/` still build against the new deployment.
+- Confirm each downstream shadcn consumer still installs from the new URL. The known set is:
+  - `metrics/` (dashboard app — consumes components via shadcn CLI)
+  - `perimeter-api/` (Next.js 16 API + frontend — consumes components via shadcn CLI)
+  - the monorepo's own `widgets/sermons/` (via workspace import; should be unaffected, but confirm the IIFE builds)
 - Archive the standalone `style/` GitHub repo (read-only on GitHub); remove the `style/` directory from the parent `claude/` workspace.
 - Update parent `claude/CLAUDE.md` project table: remove `style/`, update `perimeter-widgets/` description to reflect merged showcase + registry + design system.
 - Update `perimeter-widgets/CLAUDE.md` with the new app/package/widget layout, the retired storyboard, and the design-system pages.
@@ -276,8 +334,8 @@ Each phase is a feature branch off `dev` → PR to `dev`. `dev` stays deployable
 
 ## Risks and Mitigations
 
-- **Subtree merge conflicts on first commit.** Mitigation: `.style-staging` prefix isolates the import from all existing paths; `git mv` is used for relocation so history follows. Phase 1 explicitly tests that `git log --follow` works before merging the PR.
-- **Demo collection breakage.** Style's demo collector uses regex extraction from `.demo.tsx` files; any path-rewrite mistake breaks the manifest. Mitigation: run `collect:demos` inside the new site during Phase 1 and verify all 38 demos resolve before opening the PR.
+- **Subtree merge conflicts on first commit.** Mitigation: `.style-staging` prefix isolates the import from all existing paths; `git mv` is used for relocation so history follows via git's rename detection. Phase 1 explicitly verifies style commits appear as ancestors via `git log --all <path>` before merging the PR (this is a stronger guarantee than `--follow`, which is a heuristic).
+- **Demo collection breakage.** Style's demo collector uses regex extraction from `.demo.tsx` files; any path-rewrite mistake breaks the manifest. Mitigation: run `collect:demos` inside the new site during Phase 1 and verify all 56 demos resolve (the manifest should list 56 entries matching the component count) before opening the PR.
 - **Theme regeneration drift.** `generate-theme-css.ts` updates two files now (site globals + shared base.css). A divergence bug there would cause widget visuals to drift. Mitigation: assert equality between regenerated blocks across both files in a script-level check; CI fails if markers or counts differ.
 - **Vercel cutover downtime.** Repointing the domain is an atomic DNS-level change in Vercel. Mitigation: keep the old `style/` Vercel project enabled until after the new deploy verifies; switch the domain last. Roll back by re-enabling the old project.
 - **External consumer breakage during cutover.** Any JSON shape or path difference between the old build and the new build breaks `shadcn add`. Mitigation: Phase 6 includes an explicit diff of `/r/*.json` outputs between the old deployment and the new deployment before cutover.
@@ -285,7 +343,7 @@ Each phase is a feature branch off `dev` → PR to `dev`. `dev` stays deployable
 
 ## Testing
 
-- **Phase 1:** site builds, `/r/*.json` is present in `out/`, demos render, `git log --follow` reaches style history.
+- **Phase 1:** site builds, `/r/*.json` is present in `out/`, all 56 demos render, style commits are reachable as ancestors (verify via `git log --all -- packages/registry/ui/perimeter/button.tsx`).
 - **Phase 2:** `pnpm quality` passes; sermons IIFE build output is byte-compared (or visually compared) against pre-Phase-2 output.
 - **Phase 3:** IIFE dist path unchanged; install resolves; site + storyboard + sermons all build.
 - **Phase 4:** `/widgets/sermons` functional parity checklist against storyboard features; MSW + local API mode both work.
@@ -295,5 +353,6 @@ Each phase is a feature branch off `dev` → PR to `dev`. `dev` stays deployable
 ## Open Questions
 
 - Should the design-page data (typography scale, spacing scale) be lifted into `packages/registry/tokens.json` now, or stay in CSS until a real use case demands extraction? **Default:** stay in CSS; extract later if needed.
-- Do we want to rename `@perimeter-widgets/widget-sermons` to `@perimeter-widgets/sermons` during Phase 3, or keep the package name and only rename the directory? **Default:** keep the package name to minimize churn; directory rename is sufficient for the user's stated preference.
+- Do we want to rename `@perimeter-widgets/widget-sermons` to `@perimeter-widgets/sermons` during Phase 3, or keep the package name and only rename the directory? **Default:** keep the package name to minimize churn; directory rename is sufficient for the user's stated preference. If future widgets (e.g. `widgets/events/`) adopt the shorter `@perimeter-widgets/events` form, sermons can be renamed at that point for consistency.
 - Should the merged CLAUDE.md in `perimeter-widgets/` be restructured (separate site/registry/widgets sections) or just amended? **Default:** amend in Phase 6; a full restructure can be a follow-up if the doc grows unwieldy.
+- Which stories in `packages/shared/src/stories/` (beyond the 5 design stories) should also retire? **Default:** audit in Phase 5 — retire any that duplicate `/design/*` content; keep ones that test component behavior (motion, interactions) since those are not design-system documentation.
