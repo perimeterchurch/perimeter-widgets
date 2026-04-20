@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "metrics-theme",
+  "type": "registry:theme",
+  "cssVars": {
+    "light": {
+      "primary": "oklch(0.50 0.16 160)",
+      "primary-foreground": "oklch(0.985 0 0)",
+      "ring": "oklch(0.50 0.16 160)",
+      "chart-1": "oklch(0.50 0.16 160)"
+    },
+    "dark": {
+      "primary": "oklch(0.60 0.16 160)",
+      "primary-foreground": "oklch(0.985 0 0)",
+      "ring": "oklch(0.60 0.16 160)",
+      "chart-1": "oklch(0.60 0.16 160)"
+    }
+  }
+}

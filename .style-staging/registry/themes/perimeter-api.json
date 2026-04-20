@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "perimeter-api-theme",
+  "type": "registry:theme",
+  "cssVars": {
+    "light": {
+      "primary": "oklch(0.45 0.12 250)",
+      "primary-foreground": "oklch(0.985 0 0)",
+      "ring": "oklch(0.45 0.12 250)",
+      "chart-1": "oklch(0.45 0.12 250)"
+    },
+    "dark": {
+      "primary": "oklch(0.55 0.12 250)",
+      "primary-foreground": "oklch(0.985 0 0)",
+      "ring": "oklch(0.55 0.12 250)",
+      "chart-1": "oklch(0.55 0.12 250)"
+    }
+  }
+}
