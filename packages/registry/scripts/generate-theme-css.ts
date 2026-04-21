@@ -37,6 +37,13 @@ async function readThemes(): Promise<ThemeFile[]> {
     );
 }
 
+// The site and shared blocks intentionally use different selectors:
+//   - Site (this file): `.dark` class + `:host([data-mode="dark"])` — matches the
+//     showcase app's theme-mode-toggle convention inherited from style.
+//   - Shared (below): `:host([data-theme='dark'])` — matches the widget
+//     runtime's shadow-host attribute set by packages/shared/src/shadow-dom/mount.tsx.
+// Two consumers, two conventions; both CSS blocks are regenerated from the same
+// tokens so the values stay in lockstep even though the selectors differ.
 function buildSiteBlock(themes: ThemeFile[]): string {
     const defaultTheme = themes.find((t) => t.name === 'default');
     if (!defaultTheme) throw new Error('themes/default.json is required');
