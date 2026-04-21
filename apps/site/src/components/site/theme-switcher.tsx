@@ -9,7 +9,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
+} from '@perimeter-widgets/registry';
 
 function formatThemeName(slug: string): string {
     return slug

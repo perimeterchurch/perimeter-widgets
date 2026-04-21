@@ -15,7 +15,7 @@ export const metadata: Metadata = {
             'Install and configure the Perimeter Style registry in your project.',
     },
 };
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@perimeter-widgets/registry';
 
 const SECTIONS = {
     configRegistry: {
@@ -37,8 +37,8 @@ const SECTIONS = {
         lang: 'bash',
     },
     usage: {
-        code: `import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+        code: `import { Button } from "@perimeter-widgets/registry"
+import { Card, CardHeader, CardTitle, CardContent } from "@perimeter-widgets/registry"
 
 export function MyPage() {
   return (

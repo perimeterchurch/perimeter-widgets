@@ -3,7 +3,7 @@
 import { Sun, Moon } from 'lucide-react';
 
 import { useTheme } from '@/lib/theme-context';
-import { Button } from '@/components/ui/button';
+import { Button } from '@perimeter-widgets/registry';
 
 export function ModeToggle() {
     const { mode, toggleMode } = useTheme();

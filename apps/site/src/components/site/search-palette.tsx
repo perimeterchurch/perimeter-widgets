@@ -11,7 +11,7 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-} from '@/components/ui/command';
+} from '@perimeter-widgets/registry';
 import manifest from '@/lib/demo-manifest.json';
 import type { ManifestEntry } from '@/lib/demo-types';
 

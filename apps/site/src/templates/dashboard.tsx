@@ -6,19 +6,19 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@registry/ui/perimeter/card';
+} from '@perimeter-widgets/registry';
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from '@registry/ui/perimeter/tabs';
+} from '@perimeter-widgets/registry';
 import {
     Avatar,
     AvatarFallback,
     AvatarImage,
-} from '@registry/ui/perimeter/avatar';
-import { Badge } from '@registry/ui/perimeter/badge';
+} from '@perimeter-widgets/registry';
+import { Badge } from '@perimeter-widgets/registry';
 import {
     BarChartIcon,
     CalendarIcon,

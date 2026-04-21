@@ -2,8 +2,8 @@
 
 import { SearchIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Kbd } from '@/components/ui/kbd';
+import { Button } from '@perimeter-widgets/registry';
+import { Kbd } from '@perimeter-widgets/registry';
 
 export function SearchTrigger() {
     return (

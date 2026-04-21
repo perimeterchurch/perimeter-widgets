@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@perimeter-widgets/registry';
 import { ThemeProvider } from '@/lib/theme-context';
 import { TopNav } from '@/components/site/top-nav';
 import { SearchPalette } from '@/components/site/search-palette';

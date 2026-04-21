@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@perimeter-widgets/registry';
 import { TEMPLATE_ENTRIES } from '@/templates';
 
 import { TemplateCard } from './template-card';

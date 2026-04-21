@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@registry/ui/perimeter/button';
+import { Button } from '@perimeter-widgets/registry';
 import {
     Card,
     CardContent,
@@ -8,10 +8,10 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from '@registry/ui/perimeter/card';
-import { Checkbox } from '@registry/ui/perimeter/checkbox';
-import { Input } from '@registry/ui/perimeter/input';
-import { Label } from '@registry/ui/perimeter/label';
+} from '@perimeter-widgets/registry';
+import { Checkbox } from '@perimeter-widgets/registry';
+import { Input } from '@perimeter-widgets/registry';
+import { Label } from '@perimeter-widgets/registry';
 
 export const meta = {
     name: 'Login',

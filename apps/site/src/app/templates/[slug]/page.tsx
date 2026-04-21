@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@perimeter-widgets/registry';
 import { CopyInstallButton } from '@/components/site/copy-install-button';
 import { highlight } from '@/lib/highlight';
 import manifest from '@/lib/demo-manifest.json';

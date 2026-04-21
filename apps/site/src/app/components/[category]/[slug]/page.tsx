@@ -14,8 +14,8 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Badge } from '@/components/ui/badge';
+} from '@perimeter-widgets/registry';
+import { Badge } from '@perimeter-widgets/registry';
 import { buildSnippet } from '@/lib/build-snippet';
 import { extractExampleSources } from '@/lib/extract-source';
 import { highlight } from '@/lib/highlight';

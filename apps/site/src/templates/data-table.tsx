@@ -1,8 +1,8 @@
 'use client';
 
-import { Badge } from '@registry/ui/perimeter/badge';
-import { Button } from '@registry/ui/perimeter/button';
-import { Input } from '@registry/ui/perimeter/input';
+import { Badge } from '@perimeter-widgets/registry';
+import { Button } from '@perimeter-widgets/registry';
+import { Input } from '@perimeter-widgets/registry';
 import {
     Pagination,
     PaginationContent,
@@ -11,7 +11,7 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-} from '@registry/ui/perimeter/pagination';
+} from '@perimeter-widgets/registry';
 import {
     Table,
     TableBody,
@@ -19,7 +19,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@registry/ui/perimeter/table';
+} from '@perimeter-widgets/registry';
 import { SearchIcon } from 'lucide-react';
 
 export const meta = {

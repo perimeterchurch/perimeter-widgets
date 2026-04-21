@@ -3,7 +3,7 @@
 import { CheckIcon, CopyIcon, TerminalIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@perimeter-widgets/registry';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 
 interface CopyInstallButtonProps {

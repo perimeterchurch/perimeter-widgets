@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@registry/ui/perimeter/button';
+import { Button } from '@perimeter-widgets/registry';
 import {
     Card,
     CardContent,
@@ -8,24 +8,24 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from '@registry/ui/perimeter/card';
-import { Input } from '@registry/ui/perimeter/input';
-import { Label } from '@registry/ui/perimeter/label';
+} from '@perimeter-widgets/registry';
+import { Input } from '@perimeter-widgets/registry';
+import { Label } from '@perimeter-widgets/registry';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@registry/ui/perimeter/select';
-import { Separator } from '@registry/ui/perimeter/separator';
-import { Switch } from '@registry/ui/perimeter/switch';
+} from '@perimeter-widgets/registry';
+import { Separator } from '@perimeter-widgets/registry';
+import { Switch } from '@perimeter-widgets/registry';
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from '@registry/ui/perimeter/tabs';
+} from '@perimeter-widgets/registry';
 
 export const meta = {
     name: 'Settings',

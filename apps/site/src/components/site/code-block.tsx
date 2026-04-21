@@ -10,8 +10,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { cn } from '@perimeter-widgets/registry';
+import { Button } from '@perimeter-widgets/registry';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 
 const COLLAPSE_THRESHOLD = 20;

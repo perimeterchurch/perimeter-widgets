@@ -9,7 +9,7 @@ const WIDTH_PRESETS = [
     { label: 'Full', width: null },
 ] as const;
 
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@perimeter-widgets/registry';
 import { useTheme } from '@/lib/theme-context';
 import { PlaygroundControls } from './playground-controls';
 import { CodeBlock } from './code-block';

@@ -5,15 +5,15 @@ import {
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
-} from '@registry/ui/perimeter/accordion';
-import { Badge } from '@registry/ui/perimeter/badge';
-import { Button } from '@registry/ui/perimeter/button';
+} from '@perimeter-widgets/registry';
+import { Badge } from '@perimeter-widgets/registry';
+import { Button } from '@perimeter-widgets/registry';
 import {
     Card,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@registry/ui/perimeter/card';
+} from '@perimeter-widgets/registry';
 import {
     CalendarIcon,
     HeartIcon,

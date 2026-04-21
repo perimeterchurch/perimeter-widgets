@@ -1,7 +1,7 @@
 'use client';
 
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
+import { Switch } from '@perimeter-widgets/registry';
+import { Input } from '@perimeter-widgets/registry';
 
 import type { ControlsConfig, ControlDescriptor } from '@/lib/demo-types';
 
