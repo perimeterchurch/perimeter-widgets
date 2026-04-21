@@ -2,6 +2,9 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+/* Scan the registry package so Tailwind emits utility classes used by registry components. */
+@source "../../../../packages/registry/ui/perimeter/**/*.{ts,tsx}";
+
 @custom-variant dark (&:is(.dark *):not(.light *, .light));
 
 /* === GENERATED THEME TOKENS (do not edit between markers) === */
