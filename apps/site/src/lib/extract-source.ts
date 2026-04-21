@@ -4,6 +4,9 @@ import { join } from 'node:path';
 export async function extractExampleSources(slug: string): Promise<string[]> {
     const filePath = join(
         process.cwd(),
+        '..',
+        '..',
+        'packages',
         'registry',
         'ui',
         'perimeter',

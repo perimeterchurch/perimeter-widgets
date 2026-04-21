@@ -22,7 +22,7 @@ const INSTALL_COMMAND = 'pnpm dlx shadcn@latest add @perimeter/perimeter-base';
 
 const componentCount = manifest.length;
 const themeCount = readdirSync(
-    join(process.cwd(), 'registry', 'themes'),
+    join(process.cwd(), '..', '..', 'packages', 'registry', 'themes'),
 ).filter((f) => f.endsWith('.json')).length;
 
 const STATS = [

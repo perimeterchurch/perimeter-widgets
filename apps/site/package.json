@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "pnpm --filter @perimeter-widgets/registry run build:themes && pnpm collect:demos && next dev --webpack",
-        "build": "pnpm --filter @perimeter-widgets/registry run build && pnpm copy:registry && pnpm collect:demos && pnpm generate:sitemap && next build",
+        "build": "pnpm --filter @perimeter-widgets/registry run build && pnpm copy:registry && pnpm collect:demos && pnpm generate:sitemap && next build --webpack",
         "start": "next start",
         "lint": "eslint .",
         "typecheck": "tsc --noEmit",

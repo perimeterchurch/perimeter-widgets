@@ -3,6 +3,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
+            "@/lib/utils": ["../../packages/registry/lib/utils"],
+            "@/hooks/*": ["../../packages/registry/hooks/*"],
+            "@/components/ui/*": ["../../packages/registry/ui/perimeter/*"],
             "@/*": ["./src/*"]
         },
         "jsx": "preserve",
@@ -17,6 +20,7 @@
         "skipLibCheck": true,
         "noEmit": true,
         "incremental": true,
+        "noUncheckedIndexedAccess": false,
         "plugins": [{ "name": "next" }]
     },
     "include": ["src/**/*", "scripts/**/*", "next-env.d.ts", ".next/types/**/*.ts"],

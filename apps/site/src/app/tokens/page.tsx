@@ -28,7 +28,7 @@ interface ThemeFile {
 
 function readTokenValues(): { values: TokenValues; rawJson: string } {
     const raw = readFileSync(
-        join(process.cwd(), 'registry', 'themes', 'default.json'),
+        join(process.cwd(), '..', '..', 'packages', 'registry', 'themes', 'default.json'),
         'utf-8',
     );
     const theme = JSON.parse(raw) as ThemeFile;

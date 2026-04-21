@@ -12,7 +12,7 @@ import { SearchPalette } from '@/components/site/search-palette';
 import './globals.css';
 
 // Runs at build time only (output: "export") — discovers theme files automatically
-const availableThemes = readdirSync(join(process.cwd(), 'registry', 'themes'))
+const availableThemes = readdirSync(join(process.cwd(), '..', '..', 'packages', 'registry', 'themes'))
     .filter((f) => f.endsWith('.json') && f !== 'default.json')
     .map((f) => f.replace('.json', ''))
     .sort();
