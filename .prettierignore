@@ -3,3 +3,14 @@ packages/storyboard/dist/
 packages/storyboard/public/mockServiceWorker.js
 pnpm-lock.yaml
 packages/shared/storybook-static
+
+# Site app build artifacts
+.turbo/
+apps/site/.next/
+apps/site/out/
+
+# Generated files (site + registry)
+apps/site/src/lib/demo-manifest.json
+apps/site/src/lib/demo-imports.ts
+packages/registry/public/r/
+packages/registry/registry.json
