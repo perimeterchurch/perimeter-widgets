@@ -7,7 +7,9 @@
     "types": "src/index.ts",
     "exports": {
         ".": "./src/index.ts",
-        "./themes/*": "./themes/*"
+        "./themes/*": "./themes/*",
+        "./ui/perimeter/*.demo": "./ui/perimeter/*.demo.tsx",
+        "./ui/perimeter/*": "./ui/perimeter/*.tsx"
     },
     "scripts": {
         "build": "tsx scripts/generate-registry.ts && shadcn build && tsx scripts/generate-theme-css.ts",
