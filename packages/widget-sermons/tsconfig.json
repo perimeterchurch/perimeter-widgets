@@ -1,9 +1,0 @@
-{
-    "extends": "../../tsconfig.base.json",
-    "compilerOptions": {
-        "outDir": "dist",
-        "rootDir": "src",
-        "types": ["vitest/globals", "@testing-library/jest-dom/vitest"]
-    },
-    "include": ["src", "../../env.d.ts"]
-}

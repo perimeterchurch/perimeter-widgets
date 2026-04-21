@@ -24,12 +24,12 @@ Turborepo monorepo of self-contained React widgets for embedding on perimeter.or
 
 ### Monorepo Packages
 
-| Package                 | Name                             | Purpose                                                                |
-| ----------------------- | -------------------------------- | ---------------------------------------------------------------------- |
-| `packages/shared/`      | `@perimeter-widgets/shared`      | API client, auth, shadow DOM mount, shared components, Tailwind preset |
-| `packages/vite-preset/` | `@perimeter-widgets/vite-preset` | Shared Vite config factory for widgets + `vite-tsconfig-paths`         |
-| `packages/storyboard/`  | `@perimeter-widgets/storyboard`  | Dev preview app with MSW mocking, config editor, embed code generator  |
-| `packages/widget-*/`    | `@perimeter-widgets/widget-*`    | Individual widget packages                                             |
+| Package                 | Name                               | Purpose                                                                |
+| ----------------------- | ---------------------------------- | ---------------------------------------------------------------------- |
+| `packages/shared/`      | `@perimeter-widgets/shared`        | API client, auth, shadow DOM mount, shared components, Tailwind preset |
+| `packages/vite-preset/` | `@perimeter-widgets/vite-preset`   | Shared Vite config factory for widgets + `vite-tsconfig-paths`         |
+| `packages/storyboard/`  | `@perimeter-widgets/storyboard`    | Dev preview app with MSW mocking, config editor, embed code generator  |
+| `widgets/<name>/`       | `@perimeter-widgets/widget-<name>` | Individual widget packages (e.g. `widgets/sermons/`)                   |
 
 ### Widget Build Pipeline
 
@@ -107,7 +107,7 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 
 ## Adding a New Widget
 
-1. Create `packages/widget-<name>/` with entry point, components, hooks, tests
+1. Create `widgets/<name>/` with entry point, components, hooks, tests
 2. Add 3-line `vite.config.ts` using `createWidgetConfig()` from `@perimeter-widgets/vite-preset`
 3. Add 1-line `vitest.config.ts` using `createWidgetTestConfig()`
 4. Add entry to `packages/storyboard/src/registry.ts` with config fields
