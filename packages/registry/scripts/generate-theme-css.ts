@@ -30,10 +30,21 @@ function cssBlock(selector: string, vars: Record<string, string>, indent = '    
     return `${selector} {\n${entries}\n}`;
 }
 
-async function readThemes(): Promise<ThemeFile[]> {
+interface LoadedTheme extends ThemeFile {
+    slug: string;
+}
+
+// Theme files declare `name` with a `-theme` suffix (e.g. "default-theme"); the
+// slug we use in selectors strips that suffix so the default theme is "default",
+// "metrics-theme" becomes "metrics", etc.
+async function readThemes(): Promise<LoadedTheme[]> {
     const files = (await readdir(THEMES_DIR)).filter((f) => f.endsWith('.json')).sort();
     return Promise.all(
-        files.map(async (f) => JSON.parse(await readFile(join(THEMES_DIR, f), 'utf-8'))),
+        files.map(async (f) => {
+            const theme: ThemeFile = JSON.parse(await readFile(join(THEMES_DIR, f), 'utf-8'));
+            const slug = f.replace(/\.json$/, '').replace(/-theme$/, '');
+            return { ...theme, slug };
+        }),
     );
 }
 
@@ -44,8 +55,8 @@ async function readThemes(): Promise<ThemeFile[]> {
 //     runtime's shadow-host attribute set by packages/shared/src/shadow-dom/mount.tsx.
 // Two consumers, two conventions; both CSS blocks are regenerated from the same
 // tokens so the values stay in lockstep even though the selectors differ.
-function buildSiteBlock(themes: ThemeFile[]): string {
-    const defaultTheme = themes.find((t) => t.name === 'default');
+function buildSiteBlock(themes: LoadedTheme[]): string {
+    const defaultTheme = themes.find((t) => t.slug === 'default');
     if (!defaultTheme) throw new Error('themes/default.json is required');
 
     const blocks: string[] = [];
@@ -60,8 +71,8 @@ function buildSiteBlock(themes: ThemeFile[]): string {
     blocks.push(cssBlock(':host([data-mode="dark"])', defaultTheme.cssVars.dark, '  '));
 
     for (const theme of themes) {
-        if (theme.name === 'default') continue;
-        const slug = theme.name;
+        if (theme.slug === 'default') continue;
+        const { slug } = theme;
         blocks.push('');
         blocks.push(cssBlock(`[data-theme="${slug}"]`, theme.cssVars.light, '  '));
         blocks.push('');
@@ -77,8 +88,8 @@ function buildSiteBlock(themes: ThemeFile[]): string {
     return blocks.join('\n');
 }
 
-function buildSharedBlock(themes: ThemeFile[]): string {
-    const defaultTheme = themes.find((t) => t.name === 'default');
+function buildSharedBlock(themes: LoadedTheme[]): string {
+    const defaultTheme = themes.find((t) => t.slug === 'default');
     if (!defaultTheme) throw new Error('themes/default.json is required');
 
     const lightEntries = Object.entries(defaultTheme.cssVars.light)
@@ -121,8 +132,8 @@ async function injectBetweenMarkers(
     await writeFile(file, `${before}\n${block}\n${after}`);
 }
 
-function assertTokenParity(themes: ThemeFile[]): void {
-    const defaultTheme = themes.find((t) => t.name === 'default');
+function assertTokenParity(themes: LoadedTheme[]): void {
+    const defaultTheme = themes.find((t) => t.slug === 'default');
     if (!defaultTheme) throw new Error('themes/default.json is required');
 
     const lightKeys = Object.keys(defaultTheme.cssVars.light).sort();
