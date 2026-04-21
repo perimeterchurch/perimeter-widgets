@@ -28,10 +28,10 @@ async function collect(): Promise<void> {
         const content = await readFile(join(DEMO_DIR, file), 'utf-8');
         const slug = file.replace('.demo.tsx', '');
 
-        const nameMatch = content.match(/name:\s*"([^"]+)"/);
-        const descMatch = content.match(/description:\s*"([^"]+)"/);
-        const catMatch = content.match(/category:\s*"([^"]+)"/);
-        const installMatch = content.match(/install:\s*"([^"]+)"/);
+        const nameMatch = content.match(/name:\s*['"]([^'"]+)['"]/);
+        const descMatch = content.match(/description:\s*['"]([^'"]+)['"]/);
+        const catMatch = content.match(/category:\s*['"]([^'"]+)['"]/);
+        const installMatch = content.match(/install:\s*['"]([^'"]+)['"]/);
         if (!nameMatch || !descMatch || !catMatch || !installMatch) {
             console.warn(`Skipping ${file}: missing meta fields`);
             continue;
