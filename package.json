@@ -12,8 +12,6 @@
         "format": "prettier --write .",
         "storybook": "turbo storybook",
         "quality": "turbo typecheck lint test && prettier --check .",
-        "sync:style": "pnpm --filter=@perimeter-widgets/shared sync:style",
-        "sync:tokens": "pnpm --filter=@perimeter-widgets/shared sync:tokens",
         "site:dev": "pnpm --filter @perimeter-widgets/site dev",
         "site:build": "pnpm --filter @perimeter-widgets/site build",
         "site:typecheck": "pnpm --filter @perimeter-widgets/site typecheck",

@@ -4,6 +4,9 @@
         "outDir": "dist",
         "rootDir": "src",
         "paths": {
+            "@/lib/utils": ["../registry/lib/utils"],
+            "@/hooks/*": ["../registry/hooks/*"],
+            "@/components/ui/*": ["../registry/ui/perimeter/*"],
             "@/*": ["./src/*"]
         }
     },
