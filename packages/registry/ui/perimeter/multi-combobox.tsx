@@ -29,6 +29,10 @@ interface MultiComboboxBaseProps {
     className?: string;
     /** Custom environment for shadow DOM support (passed to downshift hooks) */
     environment?: Environment;
+    /** Controlled open state. Omit for uncontrolled. */
+    isOpen?: boolean;
+    /** Called when the popover open state changes (in either controlled or uncontrolled mode) */
+    onOpenChange?: (isOpen: boolean) => void;
 }
 
 interface MultiComboboxSingleProps extends MultiComboboxBaseProps {
@@ -189,6 +193,9 @@ function MultiCombobox(props: MultiComboboxProps) {
         itemToString: (item) => item?.label ?? '',
         selectedItem: null, // We manage selection ourselves
         isItemDisabled: (item) => !!item.disabled,
+        ...(props.isOpen !== undefined && { isOpen: props.isOpen }),
+        onIsOpenChange: ({ isOpen: nextIsOpen }) =>
+            props.onOpenChange?.(nextIsOpen ?? false),
         stateReducer(_state, actionAndChanges) {
             const { changes, type } = actionAndChanges;
             switch (type) {
