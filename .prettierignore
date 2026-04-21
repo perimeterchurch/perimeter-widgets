@@ -7,6 +7,7 @@ packages/shared/storybook-static
 # Site app build artifacts
 .turbo/
 apps/site/.next/
+apps/site/next-env.d.ts
 apps/site/out/
 
 # Generated files (site + registry)
