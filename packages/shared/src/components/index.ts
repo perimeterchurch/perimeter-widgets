@@ -1,52 +1,15 @@
-// Registry components — top-level ui/
-export * from './ui/input-group';
-export { Input as BaseInput } from './ui/input';
-export { Textarea as BaseTextarea } from './ui/textarea';
-export { Button as BaseButton } from './ui/button';
-export { Dialog as BaseDialog } from './ui/dialog';
+// Registry components — re-exported from the workspace package. This brings
+// in all 56 shadcn components (Accordion, Button, Card, etc.) plus `cn`.
+export * from '@perimeter-widgets/registry';
 
-// Registry components — perimeter preset
-export * from './ui/perimeter/avatar';
-export * from './ui/perimeter/badge';
-export * from './ui/perimeter/button';
-export * from './ui/perimeter/calendar';
-export * from './ui/perimeter/card';
-export * from './ui/perimeter/checkbox';
-export * from './ui/perimeter/combobox';
-export * from './ui/perimeter/command';
-export * from './ui/perimeter/dialog';
-export * from './ui/perimeter/dropdown-menu';
-export * from './ui/perimeter/empty';
-export * from './ui/perimeter/input';
-export * from './ui/perimeter/label';
-export * from './ui/perimeter/pagination';
-export * from './ui/perimeter/progress';
-export * from './ui/perimeter/radio-group';
-export * from './ui/perimeter/scroll-area';
-export * from './ui/perimeter/select';
-export * from './ui/perimeter/separator';
-export * from './ui/perimeter/skeleton';
-export * from './ui/perimeter/spinner';
-export * from './ui/perimeter/switch';
-export * from './ui/perimeter/tabs';
-export * from './ui/perimeter/textarea';
-export * from './ui/perimeter/tooltip';
-
-// Utility
-export { cn } from '../lib/utils';
-
+// Widget-specific compositions (not in the registry)
 export * from './ui/perimeter/icon-select';
 export * from './ui/perimeter/sort-select';
 
-// Re-export MultiCombobox types (the component itself is re-exported below
-// via portal-wrappers).
-export type {
-    MultiComboboxOption,
-    MultiComboboxProps,
-} from './ui/perimeter/multi-combobox';
-
-// Portal-aware wrappers — override the base Content/MultiCombobox exports
-// with versions that auto-inject the shadow DOM portal container.
+// Portal-aware wrappers — override the corresponding named exports from the
+// registry star-export above with versions that auto-inject the shadow DOM
+// portal container from widget context. ES module semantics resolve the last
+// named re-export for a given name, so these win for consumers.
 export {
     DialogContent,
     ComboboxContent,
