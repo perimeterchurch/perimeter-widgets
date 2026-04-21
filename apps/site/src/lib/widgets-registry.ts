@@ -1,8 +1,10 @@
 /**
- * Widget registry — defines all widgets available in the storyboard
- * with their configurable fields, defaults, and metadata.
+ * Widget registry — metadata + configurable data-* attributes for each widget.
+ *
+ * The site's /widgets preview loads the widget's built IIFE (from
+ * /widget-bundles/<id>.js) — the same artifact WordPress consumes via
+ * jsDelivr — not a workspace import. So no dynamic loader lives here.
  */
-import type { ComponentType } from 'react';
 
 export interface ConfigField {
     /** Data attribute name in camelCase (e.g., 'perPage' → data-per-page) */
@@ -21,24 +23,17 @@ export interface ConfigField {
     apiPath?: string;
 }
 
-export interface WidgetModule {
-    component: ComponentType;
-    styles: string;
-}
-
 export interface WidgetDefinition {
-    /** Unique widget ID */
+    /** Unique widget ID — also the slug in /widgets/[slug] and the dist-dir name */
     id: string;
     /** Display name */
     name: string;
     /** Short description */
     description: string;
-    /** Target element ID for mounting */
+    /** Target element ID for the mount div (data-xyz attrs set on this) */
     elementId: string;
     /** Widget status */
     status: 'ready' | 'skeleton' | 'planned';
-    /** Async loader — must use static import paths for Vite to resolve */
-    load: () => Promise<WidgetModule>;
     /** Configurable data-* attributes */
     configFields: ConfigField[];
 }
@@ -51,16 +46,6 @@ export const widgetRegistry: WidgetDefinition[] = [
             'Search and browse sermons and sermon series with watch/listen view',
         elementId: 'perimeter-sermons',
         status: 'ready',
-        load: async () => {
-            const [app, styles] = await Promise.all([
-                import('@perimeter-widgets/widget-sermons/app'),
-                import('@perimeter-widgets/widget-sermons/styles?inline'),
-            ]);
-            return {
-                component: app.SermonsApp,
-                styles: styles.default,
-            };
-        },
         configFields: [
             {
                 key: 'perPage',
@@ -231,3 +216,7 @@ export const widgetRegistry: WidgetDefinition[] = [
         ],
     },
 ];
+
+export function getWidget(id: string): WidgetDefinition | undefined {
+    return widgetRegistry.find((w) => w.id === id);
+}

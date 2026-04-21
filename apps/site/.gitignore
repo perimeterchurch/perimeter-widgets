@@ -3,6 +3,7 @@ out/
 node_modules/
 public/r/
 public/sitemap.xml
+public/widget-bundles
 src/lib/demo-manifest.json
 src/lib/demo-imports.ts
 tsconfig.tsbuildinfo

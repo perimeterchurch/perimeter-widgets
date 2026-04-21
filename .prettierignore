@@ -1,6 +1,4 @@
 dist/
-packages/storyboard/dist/
-packages/storyboard/public/mockServiceWorker.js
 pnpm-lock.yaml
 packages/shared/storybook-static
 
@@ -15,5 +13,6 @@ apps/site/src/lib/demo-manifest.json
 apps/site/src/lib/demo-imports.ts
 apps/site/public/r/
 apps/site/public/sitemap.xml
+apps/site/public/widget-bundles/
 packages/registry/public/r/
 packages/registry/registry.json

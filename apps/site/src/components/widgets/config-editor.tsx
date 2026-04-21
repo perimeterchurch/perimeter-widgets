@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
-import type { ConfigField } from '@/registry';
+import type { ConfigField } from '@/lib/widgets-registry';
 
 interface ConfigEditorProps {
     fields: ConfigField[];
@@ -67,25 +69,6 @@ export function ConfigEditor({
                     />
                 ))}
             </div>
-            <div className='px-4 py-3 border-t border-stone-100 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 rounded-b-lg'>
-                <p className='text-xs text-stone-400'>
-                    Data attributes:{' '}
-                    <code className='text-stone-500 dark:text-stone-300'>
-                        {fields
-                            .map((f) => {
-                                const val = draft[f.key] ?? f.defaultValue;
-                                if (val === '' || val === false) return null;
-                                const attr = f.key.replace(
-                                    /[A-Z]/g,
-                                    (m) => `-${m.toLowerCase()}`,
-                                );
-                                return `data-${attr}="${val}"`;
-                            })
-                            .filter(Boolean)
-                            .join(' ')}
-                    </code>
-                </p>
-            </div>
         </div>
     );
 }
@@ -97,6 +80,8 @@ interface ApiOption {
     id: number;
     name: string;
 }
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.perimeter.org';
 
 function MultiSelectApiField({
     field,
@@ -119,25 +104,23 @@ function MultiSelectApiField({
         let cancelled = false;
 
         async function fetchAllPages() {
-            const sep = field.apiPath!.includes('?') ? '&' : '?';
+            const apiPath = field.apiPath!;
+            const sep = apiPath.includes('?') ? '&' : '?';
             const allItems: Record<string, unknown>[] = [];
             let page = 1;
 
-            // eslint-disable-next-line no-constant-condition
             while (true) {
-                const url = `${field.apiPath}${sep}perPage=50&page=${page}`;
+                const url = `${API_BASE}${apiPath}${sep}perPage=50&page=${page}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
                 const json = (await res.json()) as { data: unknown };
                 const data = json.data;
 
-                // Non-paginated endpoints return a flat array
                 if (Array.isArray(data)) {
                     allItems.push(...(data as Record<string, unknown>[]));
                     break;
                 }
 
-                // Paginated endpoints return { series/sermons: [...], pagination: {...} }
                 const obj = data as Record<string, unknown>;
                 const items = (obj.series ?? obj.sermons ?? []) as Record<
                     string,
@@ -180,7 +163,6 @@ function MultiSelectApiField({
         };
     }, [field.apiPath]);
 
-    // Close on click outside
     useEffect(() => {
         if (!open) return;
         const handler = (e: MouseEvent) => {
@@ -195,7 +177,6 @@ function MultiSelectApiField({
         return () => document.removeEventListener('mousedown', handler);
     }, [open]);
 
-    // Focus search when opened
     useEffect(() => {
         if (open) searchRef.current?.focus();
     }, [open]);
@@ -264,7 +245,6 @@ function MultiSelectApiField({
             </button>
             {open && (
                 <div className='absolute z-50 mt-1 w-full rounded-md border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-700 shadow-lg'>
-                    {/* Search input */}
                     <div className='p-1.5 border-b border-stone-100 dark:border-stone-600'>
                         <input
                             ref={searchRef}
@@ -275,7 +255,6 @@ function MultiSelectApiField({
                             className='w-full rounded border-0 bg-stone-50 dark:bg-stone-600 px-2.5 py-1.5 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-indigo-500'
                         />
                     </div>
-                    {/* Options */}
                     <div className='max-h-52 overflow-auto py-1'>
                         {filtered.length === 0 && (
                             <div className='px-3 py-2 text-xs text-stone-400'>
@@ -309,7 +288,6 @@ function MultiSelectApiField({
                             );
                         })}
                     </div>
-                    {/* Selection summary */}
                     {selectedIds.length > 0 && (
                         <div className='flex items-center justify-between border-t border-stone-100 dark:border-stone-600 px-3 py-1.5'>
                             <span className='text-xs text-stone-400'>
