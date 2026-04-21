@@ -23,6 +23,11 @@
         "noUncheckedIndexedAccess": false,
         "plugins": [{ "name": "next" }]
     },
-    "include": ["src/**/*", "scripts/**/*", "next-env.d.ts", ".next/types/**/*.ts"],
+    "include": [
+        "src/**/*",
+        "scripts/**/*",
+        "next-env.d.ts",
+        ".next/types/**/*.ts"
+    ],
     "exclude": ["node_modules", "out", ".next"]
 }

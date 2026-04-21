@@ -12,5 +12,7 @@ apps/site/out/
 # Generated files (site + registry)
 apps/site/src/lib/demo-manifest.json
 apps/site/src/lib/demo-imports.ts
+apps/site/public/r/
+apps/site/public/sitemap.xml
 packages/registry/public/r/
 packages/registry/registry.json

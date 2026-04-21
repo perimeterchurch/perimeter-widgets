@@ -9,8 +9,16 @@
         },
         "jsx": "react-jsx",
         "moduleResolution": "bundler",
-        "noEmit": true
+        "noEmit": true,
+        "noUncheckedIndexedAccess": false
     },
-    "include": ["src/**/*", "ui/**/*", "lib/**/*", "hooks/**/*", "themes/**/*.json", "scripts/**/*"],
-    "exclude": ["node_modules", "public/r"]
+    "include": [
+        "src/**/*",
+        "ui/**/*",
+        "lib/**/*",
+        "hooks/**/*",
+        "themes/**/*.json",
+        "scripts/**/*"
+    ],
+    "exclude": ["node_modules", "public/r", "ui/**/*.demo.tsx"]
 }

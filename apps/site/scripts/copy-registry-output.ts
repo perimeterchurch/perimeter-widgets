@@ -13,8 +13,8 @@ const SITE_OUTPUT = join(SITE_ROOT, 'public/r');
 
 if (!existsSync(REGISTRY_OUTPUT)) {
     console.error(
-        `Registry output not found at ${REGISTRY_OUTPUT}. ` +
-            `Run 'pnpm --filter @perimeter-widgets/registry build' first.`,
+        `Registry output not found at ${REGISTRY_OUTPUT}. `
+            + `Run 'pnpm --filter @perimeter-widgets/registry build' first.`,
     );
     process.exit(1);
 }
@@ -25,5 +25,7 @@ if (existsSync(SITE_OUTPUT)) {
 mkdirSync(SITE_OUTPUT, { recursive: true });
 cpSync(REGISTRY_OUTPUT, SITE_OUTPUT, { recursive: true });
 
-const count = readdirSync(SITE_OUTPUT).filter((f) => f.endsWith('.json')).length;
+const count = readdirSync(SITE_OUTPUT).filter((f) =>
+    f.endsWith('.json'),
+).length;
 console.log(`Copied ${count} registry JSON files to ${SITE_OUTPUT}`);

@@ -48,7 +48,9 @@ async function collect(): Promise<void> {
     }
 
     manifest.sort(
-        (a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name),
+        (a, b) =>
+            a.category.localeCompare(b.category)
+            || a.name.localeCompare(b.name),
     );
 
     await mkdir(OUTPUT_DIR, { recursive: true });
@@ -79,7 +81,10 @@ async function collect(): Promise<void> {
         '',
     ].join('\n');
 
-    await writeFile(IMPORTS, header + typeImport + moduleInterface + '\n' + body);
+    await writeFile(
+        IMPORTS,
+        header + typeImport + moduleInterface + '\n' + body,
+    );
     console.log(`Wrote ${manifest.length} imports → ${IMPORTS}`);
 }
 

@@ -149,9 +149,7 @@ async function generateRegistry() {
         const item: RegistryItem = {
             name,
             type: 'registry:ui',
-            files: [
-                { path: `ui/perimeter/${file}`, type: 'registry:ui' },
-            ],
+            files: [{ path: `ui/perimeter/${file}`, type: 'registry:ui' }],
         };
 
         if (dependencies.length > 0) item.dependencies = dependencies;
@@ -175,9 +173,7 @@ async function generateRegistry() {
             items.push({
                 name: theme.name,
                 type: theme.type || 'registry:theme',
-                files: [
-                    { path: `themes/${file}`, type: 'registry:theme' },
-                ],
+                files: [{ path: `themes/${file}`, type: 'registry:theme' }],
                 cssVars: theme.cssVars,
             });
         }

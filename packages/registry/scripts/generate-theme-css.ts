@@ -23,7 +23,11 @@ const SITE_END = '/* @generated-themes-end */';
 const SHARED_START = '/* @sync:tokens-start */';
 const SHARED_END = '/* @sync:tokens-end */';
 
-function cssBlock(selector: string, vars: Record<string, string>, indent = '    '): string {
+function cssBlock(
+    selector: string,
+    vars: Record<string, string>,
+    indent = '    ',
+): string {
     const entries = Object.entries(vars)
         .map(([k, v]) => `${indent}--${k}: ${v};`)
         .join('\n');
@@ -38,10 +42,14 @@ interface LoadedTheme extends ThemeFile {
 // slug we use in selectors strips that suffix so the default theme is "default",
 // "metrics-theme" becomes "metrics", etc.
 async function readThemes(): Promise<LoadedTheme[]> {
-    const files = (await readdir(THEMES_DIR)).filter((f) => f.endsWith('.json')).sort();
+    const files = (await readdir(THEMES_DIR))
+        .filter((f) => f.endsWith('.json'))
+        .sort();
     return Promise.all(
         files.map(async (f) => {
-            const theme: ThemeFile = JSON.parse(await readFile(join(THEMES_DIR, f), 'utf-8'));
+            const theme: ThemeFile = JSON.parse(
+                await readFile(join(THEMES_DIR, f), 'utf-8'),
+            );
             const slug = f.replace(/\.json$/, '').replace(/-theme$/, '');
             return { ...theme, slug };
         }),
@@ -68,20 +76,36 @@ function buildSiteBlock(themes: LoadedTheme[]): string {
     blocks.push('');
     blocks.push(cssBlock(':host', defaultTheme.cssVars.light, '  '));
     blocks.push('');
-    blocks.push(cssBlock(':host([data-mode="dark"])', defaultTheme.cssVars.dark, '  '));
+    blocks.push(
+        cssBlock(':host([data-mode="dark"])', defaultTheme.cssVars.dark, '  '),
+    );
 
     for (const theme of themes) {
         if (theme.slug === 'default') continue;
         const { slug } = theme;
         blocks.push('');
-        blocks.push(cssBlock(`[data-theme="${slug}"]`, theme.cssVars.light, '  '));
-        blocks.push('');
-        blocks.push(cssBlock(`[data-theme="${slug}"].dark`, theme.cssVars.dark, '  '));
-        blocks.push('');
-        blocks.push(cssBlock(`:host([data-theme="${slug}"])`, theme.cssVars.light, '  '));
+        blocks.push(
+            cssBlock(`[data-theme="${slug}"]`, theme.cssVars.light, '  '),
+        );
         blocks.push('');
         blocks.push(
-            cssBlock(`:host([data-theme="${slug}"][data-mode="dark"])`, theme.cssVars.dark, '  '),
+            cssBlock(`[data-theme="${slug}"].dark`, theme.cssVars.dark, '  '),
+        );
+        blocks.push('');
+        blocks.push(
+            cssBlock(
+                `:host([data-theme="${slug}"])`,
+                theme.cssVars.light,
+                '  ',
+            ),
+        );
+        blocks.push('');
+        blocks.push(
+            cssBlock(
+                `:host([data-theme="${slug}"][data-mode="dark"])`,
+                theme.cssVars.dark,
+                '  ',
+            ),
         );
     }
 
@@ -123,8 +147,8 @@ async function injectBetweenMarkers(
     const endIdx = source.indexOf(end);
     if (startIdx === -1 || endIdx === -1) {
         throw new Error(
-            `${file} is missing theme markers (${start} / ${end}). ` +
-                `Add both markers manually before running this script.`,
+            `${file} is missing theme markers (${start} / ${end}). `
+                + `Add both markers manually before running this script.`,
         );
     }
     const before = source.slice(0, startIdx + start.length);
@@ -140,9 +164,9 @@ function assertTokenParity(themes: LoadedTheme[]): void {
     const darkKeys = Object.keys(defaultTheme.cssVars.dark).sort();
     if (JSON.stringify(lightKeys) !== JSON.stringify(darkKeys)) {
         throw new Error(
-            `Token key drift: default theme's light and dark blocks have different keys.\n` +
-                `  Light-only: ${lightKeys.filter((k) => !darkKeys.includes(k)).join(', ')}\n` +
-                `  Dark-only: ${darkKeys.filter((k) => !lightKeys.includes(k)).join(', ')}`,
+            `Token key drift: default theme's light and dark blocks have different keys.\n`
+                + `  Light-only: ${lightKeys.filter((k) => !darkKeys.includes(k)).join(', ')}\n`
+                + `  Dark-only: ${darkKeys.filter((k) => !lightKeys.includes(k)).join(', ')}`,
         );
     }
 }
@@ -155,14 +179,21 @@ async function main(): Promise<void> {
     const sharedBlock = buildSharedBlock(themes);
 
     await injectBetweenMarkers(SITE_GLOBALS, SITE_START, SITE_END, siteBlock);
-    await injectBetweenMarkers(SHARED_BASE, SHARED_START, SHARED_END, sharedBlock);
+    await injectBetweenMarkers(
+        SHARED_BASE,
+        SHARED_START,
+        SHARED_END,
+        sharedBlock,
+    );
 
-    execSync(`pnpm prettier --write "${SITE_GLOBALS}" "${SHARED_BASE}"`, { stdio: 'ignore' });
+    execSync(`pnpm prettier --write "${SITE_GLOBALS}" "${SHARED_BASE}"`, {
+        stdio: 'ignore',
+    });
 
     console.log(
-        `Injected ${themes.length} theme(s) into:\n` +
-            `  ${SITE_GLOBALS}\n` +
-            `  ${SHARED_BASE}`,
+        `Injected ${themes.length} theme(s) into:\n`
+            + `  ${SITE_GLOBALS}\n`
+            + `  ${SHARED_BASE}`,
     );
 }
 

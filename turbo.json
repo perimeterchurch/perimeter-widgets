@@ -5,12 +5,11 @@
             "dependsOn": ["^build"],
             "outputs": [
                 "dist/**",
-                "apps/site/out/**",
-                "apps/site/public/r/**",
-                "apps/site/src/lib/demo-manifest.json",
-                "apps/site/src/lib/demo-imports.ts",
-                "packages/registry/public/r/**",
-                "packages/registry/registry.json"
+                "out/**",
+                "public/r/**",
+                "registry.json",
+                "src/lib/demo-manifest.json",
+                "src/lib/demo-imports.ts"
             ]
         },
         "test": {
