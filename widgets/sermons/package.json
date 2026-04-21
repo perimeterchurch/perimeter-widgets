@@ -12,10 +12,10 @@
     },
     "scripts": {
         "build": "vite build",
+        "dev": "vite build --watch",
         "test": "vitest run",
         "typecheck": "tsc --noEmit",
-        "lint": "eslint src/",
-        "dev": "vite"
+        "lint": "eslint src/"
     },
     "dependencies": {
         "@headlessui/react": "^2.2.9",

@@ -7,6 +7,7 @@ import { ModeToggle } from './mode-toggle';
 const NAV_LINKS = [
     { href: '/components', label: 'Components' },
     { href: '/templates', label: 'Templates' },
+    { href: '/widgets', label: 'Widgets' },
     { href: '/tokens', label: 'Tokens' },
     { href: '/docs/getting-started', label: 'Getting Started' },
     { href: '/changelog', label: 'Changelog' },
