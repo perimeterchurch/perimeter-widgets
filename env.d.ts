@@ -12,8 +12,6 @@ interface ImportMetaEnv {
     // --- API ---
     /** Override API base URL (default: localhost:5500 in dev, api.perimeter.org in prod) */
     readonly VITE_API_URL?: string;
-    /** Storyboard only: "mock" (default) or "local" to skip MSW and hit real API */
-    readonly VITE_API_MODE?: 'mock' | 'local';
 
     // --- Vite built-ins ---
     readonly DEV: boolean;

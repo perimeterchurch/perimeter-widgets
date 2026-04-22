@@ -4,5 +4,4 @@ packages:
     - widgets/*
 onlyBuiltDependencies:
     - esbuild
-    - msw
     - turbo
