@@ -10,11 +10,11 @@
 
 ## This PR adds / changes
 
-| Action | File | Notes |
-| --- | --- | --- |
-| Modify | `CLAUDE.md` (perimeter-widgets root) | Add a short "Deployment" subsection pointing at `style.perimeter.org` |
-| Modify | `../CLAUDE.md` (parent `claude/` workspace) | Drop the `style/` row from the project table; update the `perimeter-widgets/` description to reflect merged showcase + registry + widget preview + design; drop `style` from the `quality.sh` list in the cross-project section |
-| Create | `docs/superpowers/plans/2026-04-22-merge-style-phase-6-cutover.md` | This plan — doubles as the operator runbook |
+| Action | File                                                               | Notes                                                                                                                                                                                                                           |
+| ------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Modify | `CLAUDE.md` (perimeter-widgets root)                               | Add a short "Deployment" subsection pointing at `style.perimeter.org`                                                                                                                                                           |
+| Modify | `../CLAUDE.md` (parent `claude/` workspace)                        | Drop the `style/` row from the project table; update the `perimeter-widgets/` description to reflect merged showcase + registry + widget preview + design; drop `style` from the `quality.sh` list in the cross-project section |
+| Create | `docs/superpowers/plans/2026-04-22-merge-style-phase-6-cutover.md` | This plan — doubles as the operator runbook                                                                                                                                                                                     |
 
 No `vercel.json` is committed. Vercel auto-detects Next.js + pnpm workspaces from a `Root Directory = apps/site` setting and requires no file-level config for the static-export build. Any future overrides go in `apps/site/vercel.json` when needed.
 
