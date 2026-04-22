@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import type { WidgetDefinition } from '@/lib/widgets-registry';
 import { configToDataAttrs } from '@/lib/data-attrs';
+import { useTheme } from '@/lib/theme-context';
 
 interface WidgetMountProps {
     widget: WidgetDefinition;
@@ -15,12 +16,15 @@ interface WidgetMountProps {
  * Mounts a widget by rendering its target <div> and injecting the IIFE bundle.
  * The widget's own script calls mountWidget() and attaches a shadow root to the div.
  *
- * When mountKey changes we tear down the div and re-add a fresh <script> tag; the
- * IIFE re-runs against the new div, giving the widget clean state with the new
- * data-* attributes.
+ * The site's theme mode is propagated via `data-theme="dark"|"light"` on the
+ * mount div — the widget's shared CSS uses `:host([data-theme='dark'])` to
+ * switch tokens (class-based dark mode doesn't cross the shadow boundary).
+ * Mode changes force a full re-mount so the widget initializes against the
+ * new shadow-host attribute.
  */
 export function WidgetMount({ widget, config, mountKey }: WidgetMountProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const { mode } = useTheme();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -29,7 +33,7 @@ export function WidgetMount({ widget, config, mountKey }: WidgetMountProps) {
         // Adding a cache-busting query so repeated mounts during dev pick up the
         // freshly rebuilt bundle instead of a stale one.
         const script = document.createElement('script');
-        script.src = `/widget-bundles/${widget.id}.js?t=${mountKey}`;
+        script.src = `/widget-bundles/${widget.id}.js?t=${mountKey}-${mode}`;
         script.async = true;
         document.body.appendChild(script);
 
@@ -39,16 +43,21 @@ export function WidgetMount({ widget, config, mountKey }: WidgetMountProps) {
             const host = document.getElementById(widget.elementId);
             if (host?.shadowRoot) host.shadowRoot.innerHTML = '';
         };
-    }, [widget.id, widget.elementId, mountKey]);
+    }, [widget.id, widget.elementId, mountKey, mode]);
 
     const attrs = configToDataAttrs(config);
 
     return (
         <div
             ref={containerRef}
-            className='rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-4 min-h-[400px]'
+            className='rounded-lg border bg-background p-4 min-h-[400px]'
         >
-            <div id={widget.elementId} key={mountKey} {...attrs} />
+            <div
+                id={widget.elementId}
+                key={`${mountKey}-${mode}`}
+                {...attrs}
+                data-theme={mode}
+            />
         </div>
     );
 }

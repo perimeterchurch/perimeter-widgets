@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "pnpm --filter @perimeter-widgets/registry run build:themes && pnpm collect:demos && pnpm link:widgets && next dev --webpack",
+        "dev": "pnpm --filter @perimeter-widgets/registry run build:themes && pnpm collect:demos && next dev --webpack",
         "build": "pnpm --filter @perimeter-widgets/registry run build && pnpm copy:registry && pnpm collect:demos && pnpm sync:widgets && pnpm generate:sitemap && next build --webpack",
         "start": "next start",
         "lint": "eslint .",
@@ -12,7 +12,6 @@
         "collect:demos": "tsx scripts/collect-demos.ts",
         "copy:registry": "tsx scripts/copy-registry-output.ts",
         "sync:widgets": "tsx scripts/sync-widget-bundles.ts",
-        "link:widgets": "tsx scripts/sync-widget-bundles.ts --link",
         "generate:sitemap": "tsx scripts/generate-sitemap.ts",
         "format:check": "prettier --check ."
     },

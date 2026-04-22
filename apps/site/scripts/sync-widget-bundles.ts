@@ -1,22 +1,13 @@
 /**
- * Sync widget IIFE bundles into the site's public/widget-bundles/ so the
- * /widgets preview can load them via <script> tags.
+ * Copy built widget IIFE bundles into the site's public/widget-bundles/ for
+ * the production static export. The /widgets preview loads each widget at
+ * the flat URL `/widget-bundles/<widget>.js`.
  *
- * Default: copy each `<repo>/dist/<widget>/<widget>.js` into
- *          `apps/site/public/widget-bundles/<widget>.js` (used by `next build`).
- * --link:  symlink `apps/site/public/widget-bundles/` → `<repo>/dist/` so
- *          `vite build --watch` rebuilds are picked up immediately in dev.
+ * Used only by `next build`. Dev mode doesn't need this script — the
+ * widget's `dev` script sets WIDGET_DEV_OUT_DIR so `vite build --watch`
+ * writes directly into apps/site/public/widget-bundles/.
  */
-import {
-    copyFileSync,
-    existsSync,
-    lstatSync,
-    mkdirSync,
-    readdirSync,
-    rmSync,
-    symlinkSync,
-    unlinkSync,
-} from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -26,51 +17,22 @@ const MONOREPO_ROOT = resolve(SITE_ROOT, '../..');
 const DIST_DIR = join(MONOREPO_ROOT, 'dist');
 const OUT_DIR = join(SITE_ROOT, 'public/widget-bundles');
 
-const mode = process.argv.includes('--link') ? 'link' : 'copy';
-
-function clean() {
-    if (!existsSync(OUT_DIR)) return;
-    // Use lstatSync (not statSync) so we check the symlink itself, not its target.
-    // unlinkSync for symlinks removes the link without touching the target;
-    // rmSync with recursive handles a real directory.
-    const stat = lstatSync(OUT_DIR);
-    if (stat.isSymbolicLink()) unlinkSync(OUT_DIR);
-    else rmSync(OUT_DIR, { recursive: true, force: true });
-}
-
-function linkMode() {
-    clean();
-    mkdirSync(dirname(OUT_DIR), { recursive: true });
-    symlinkSync(DIST_DIR, OUT_DIR, 'dir');
-    console.log(`Linked ${OUT_DIR} → ${DIST_DIR}`);
-}
-
-function copyMode() {
-    clean();
-    mkdirSync(OUT_DIR, { recursive: true });
-
-    if (!existsSync(DIST_DIR)) {
-        console.warn(
-            `[sync-widget-bundles] ${DIST_DIR} does not exist. Build widgets first with 'pnpm -w build'.`,
-        );
-        return;
-    }
-
-    const widgetDirs = readdirSync(DIST_DIR, { withFileTypes: true }).filter(
-        (d) => d.isDirectory(),
+if (!existsSync(DIST_DIR)) {
+    console.warn(
+        `[sync-widget-bundles] ${DIST_DIR} does not exist. Build widgets first with 'pnpm -w build'.`,
     );
-
-    let count = 0;
-    for (const dir of widgetDirs) {
-        const bundleName = `${dir.name}.js`;
-        const src = join(DIST_DIR, dir.name, bundleName);
-        if (!existsSync(src)) continue;
-        const dest = join(OUT_DIR, bundleName);
-        copyFileSync(src, dest);
-        count++;
-    }
-    console.log(`Copied ${count} widget bundle(s) to ${OUT_DIR}`);
+    process.exit(0);
 }
 
-if (mode === 'link') linkMode();
-else copyMode();
+mkdirSync(OUT_DIR, { recursive: true });
+
+const widgets = readdirSync(DIST_DIR, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => ({ id: d.name, src: join(DIST_DIR, d.name, `${d.name}.js`) }))
+    .filter((w) => existsSync(w.src));
+
+for (const w of widgets) {
+    copyFileSync(w.src, join(OUT_DIR, `${w.id}.js`));
+}
+
+console.log(`Copied ${widgets.length} widget bundle(s) to ${OUT_DIR}`);

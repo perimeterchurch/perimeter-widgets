@@ -12,7 +12,7 @@
     },
     "scripts": {
         "build": "vite build",
-        "dev": "vite build --watch",
+        "dev": "WIDGET_DEV_OUT_DIR=../../apps/site/public/widget-bundles vite build --watch",
         "test": "vitest run",
         "typecheck": "tsc --noEmit",
         "lint": "eslint src/"
