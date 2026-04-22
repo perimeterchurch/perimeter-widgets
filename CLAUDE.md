@@ -53,6 +53,10 @@ Reads MP OAuth token from `localStorage` (`mpp-widgets_AuthToken` / `mpp-widgets
 
 Built files in `dist/` are committed to the repo. Served via jsDelivr `@latest`. GitHub Action purges CDN cache on push to `main`.
 
+### Site Deployment
+
+`apps/site` deploys to `style.perimeter.org` via Vercel. The project's Root Directory is `apps/site`; Vercel auto-detects Next.js + pnpm workspaces and runs the site's `build` script, which chains registry build → copy-registry → sync-widget-bundles → collect-demos → sitemap → `next build`. Static export lands at `apps/site/out/` and serves at the root, so `/r/*.json`, `/widgets/[slug]`, `/components/*`, `/design/*`, `/templates/*`, `/docs/*`, and `/changelog` are all one deploy.
+
 ### Widget preview (`/widgets`)
 
 The site at `apps/site/` hosts `/widgets` and `/widgets/[slug]` pages that preview each widget live. Previews load the same IIFE bundle (`dist/<widget>/<widget>.js`) that WordPress consumes via jsDelivr, so what you see on `style.perimeter.org/widgets/sermons` is byte-for-byte what you ship.
