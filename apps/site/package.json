@@ -8,7 +8,7 @@
         "build": "pnpm --filter @perimeter-widgets/registry run build && pnpm copy:registry && pnpm collect:demos && pnpm sync:widgets && pnpm generate:sitemap && next build --webpack",
         "start": "next start",
         "lint": "eslint .",
-        "typecheck": "tsc --noEmit",
+        "typecheck": "pnpm collect:demos && tsc --noEmit",
         "collect:demos": "tsx scripts/collect-demos.ts",
         "copy:registry": "tsx scripts/copy-registry-output.ts",
         "sync:widgets": "tsx scripts/sync-widget-bundles.ts",
