@@ -15,6 +15,7 @@ import {
     readdirSync,
     rmSync,
     symlinkSync,
+    unlinkSync,
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,9 +30,11 @@ const mode = process.argv.includes('--link') ? 'link' : 'copy';
 
 function clean() {
     if (!existsSync(OUT_DIR)) return;
-    // If it's a symlink we want to unlink; if it's a dir we want rm -rf.
+    // Use lstatSync (not statSync) so we check the symlink itself, not its target.
+    // unlinkSync for symlinks removes the link without touching the target;
+    // rmSync with recursive handles a real directory.
     const stat = lstatSync(OUT_DIR);
-    if (stat.isSymbolicLink()) rmSync(OUT_DIR);
+    if (stat.isSymbolicLink()) unlinkSync(OUT_DIR);
     else rmSync(OUT_DIR, { recursive: true, force: true });
 }
 
