@@ -12,15 +12,15 @@ import type { ComponentProps } from 'react';
 import { usePortalContainer } from '../../../shadow-dom/portal-container';
 import { useShadowEnvironment } from '../../../shadow-dom/shadow-environment';
 
-import { DialogContent as BaseDialogContent } from './dialog';
-import { ComboboxContent as BaseComboboxContent } from './combobox';
-import { SelectContent as BaseSelectContent } from './select';
-import { DropdownMenuContent as BaseDropdownMenuContent } from './dropdown-menu';
-import { TooltipContent as BaseTooltipContent } from './tooltip';
 import {
+    DialogContent as BaseDialogContent,
+    ComboboxContent as BaseComboboxContent,
+    SelectContent as BaseSelectContent,
+    DropdownMenuContent as BaseDropdownMenuContent,
+    TooltipContent as BaseTooltipContent,
     MultiCombobox as BaseMultiCombobox,
     type MultiComboboxProps,
-} from './multi-combobox';
+} from '@perimeter-widgets/registry';
 
 function DialogContent(props: ComponentProps<typeof BaseDialogContent>) {
     const container = usePortalContainer();

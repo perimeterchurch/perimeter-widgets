@@ -8,28 +8,29 @@ Turborepo monorepo of self-contained React widgets for embedding on perimeter.or
 
 ## Commands
 
-| Command                              | Description                                       |
-| ------------------------------------ | ------------------------------------------------- |
-| `pnpm dev`                           | Start widget storyboard (full widget previews)    |
-| `pnpm build`                         | Build all widgets to `dist/`                      |
-| `pnpm build --filter=widget-sermons` | Build a single widget                             |
-| `pnpm test`                          | Run all widget tests via Turborepo                |
-| `pnpm test --filter=widget-sermons`  | Run tests for a single widget                     |
-| `pnpm storybook`                     | Start Storybook v10 for shared components         |
-| `pnpm lint`                          | Run ESLint across all packages                    |
-| `pnpm typecheck`                     | TypeScript type checking                          |
-| `pnpm quality`                       | Run all checks (typecheck + lint + format + test) |
+| Command                              | Description                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------------ |
+| `pnpm dev`                           | Start the site (`apps/site`) and rebuild all widgets in watch mode — open `/widgets` |
+| `pnpm build`                         | Build every package (registry, site, widgets) via Turborepo                          |
+| `pnpm build --filter=widget-sermons` | Build a single widget                                                                |
+| `pnpm test`                          | Run all tests via Turborepo                                                          |
+| `pnpm test --filter=widget-sermons`  | Run tests for a single widget                                                        |
+| `pnpm storybook`                     | Start Storybook v10 for shared components                                            |
+| `pnpm lint`                          | Run ESLint across all packages                                                       |
+| `pnpm typecheck`                     | TypeScript type checking                                                             |
+| `pnpm quality`                       | Run all checks (typecheck + lint + format + test)                                    |
 
 ## Architecture
 
 ### Monorepo Packages
 
-| Package                 | Name                             | Purpose                                                                |
-| ----------------------- | -------------------------------- | ---------------------------------------------------------------------- |
-| `packages/shared/`      | `@perimeter-widgets/shared`      | API client, auth, shadow DOM mount, shared components, Tailwind preset |
-| `packages/vite-preset/` | `@perimeter-widgets/vite-preset` | Shared Vite config factory for widgets + `vite-tsconfig-paths`         |
-| `packages/storyboard/`  | `@perimeter-widgets/storyboard`  | Dev preview app with MSW mocking, config editor, embed code generator  |
-| `packages/widget-*/`    | `@perimeter-widgets/widget-*`    | Individual widget packages                                             |
+| Package                 | Name                               | Purpose                                                                  |
+| ----------------------- | ---------------------------------- | ------------------------------------------------------------------------ |
+| `apps/site/`            | `@perimeter-widgets/site`          | Next.js showcase + widget preview + registry build (style.perimeter.org) |
+| `packages/registry/`    | `@perimeter-widgets/registry`      | shadcn component source (56 components) + themes + build scripts         |
+| `packages/shared/`      | `@perimeter-widgets/shared`        | API client, auth, shadow DOM mount, shared components, Tailwind preset   |
+| `packages/vite-preset/` | `@perimeter-widgets/vite-preset`   | Shared Vite config factory for widgets + `vite-tsconfig-paths`           |
+| `widgets/<name>/`       | `@perimeter-widgets/widget-<name>` | Individual widget packages (e.g. `widgets/sermons/`)                     |
 
 ### Widget Build Pipeline
 
@@ -52,25 +53,31 @@ Reads MP OAuth token from `localStorage` (`mpp-widgets_AuthToken` / `mpp-widgets
 
 Built files in `dist/` are committed to the repo. Served via jsDelivr `@latest`. GitHub Action purges CDN cache on push to `main`.
 
-### Storyboard
+### Site Deployment
 
-The storyboard (`pnpm dev`) provides:
+`apps/site` deploys to `style.perimeter.org` via Vercel. The project's Root Directory is `apps/site`; Vercel auto-detects Next.js + pnpm workspaces and runs the site's `build` script, which chains registry build → copy-registry → sync-widget-bundles → collect-demos → sitemap → `next build`. Static export lands at `apps/site/out/` and serves at the root, so `/r/*.json`, `/widgets/[slug]`, `/components/*`, `/design/*`, `/templates/*`, `/docs/*`, and `/changelog` are all one deploy.
 
-- Widget registry with metadata and status (ready/skeleton/planned)
-- Live config editor for data-\* attributes with instant re-mount
-- Auto-generated embed code snippets
-- MSW mocking (skip with `VITE_API_MODE=local` to hit real API)
+### Widget preview (`/widgets`)
+
+The site at `apps/site/` hosts `/widgets` and `/widgets/[slug]` pages that preview each widget live. Previews load the same IIFE bundle (`dist/<widget>/<widget>.js`) that WordPress consumes via jsDelivr, so what you see on `style.perimeter.org/widgets/sermons` is byte-for-byte what you ship.
+
+- **Production:** `pnpm --filter @perimeter-widgets/site build` copies `dist/<widget>/*.js` into `apps/site/public/widget-bundles/` → static export at `/widget-bundles/<widget>.js`.
+- **Dev:** `pnpm dev` runs two things in parallel via Turborepo:
+    - Each widget package's `dev` script is `vite build --watch` — rebuilds its IIFE on every source save.
+    - `apps/site` starts Next.js with `next dev --webpack` after symlinking `apps/site/public/widget-bundles/` → monorepo-root `dist/`, so every widget rebuild is picked up immediately by the site's `<script>` loader (the config-editor bumps a cache-busting query on re-mount).
+- The preview page has a live config editor for `data-*` attributes, a copy-pasteable embed snippet, and a re-mount button that tears down the widget's shadow DOM and reloads the bundle.
+- Widget previews hit the real API. Configure via `NEXT_PUBLIC_API_URL` (defaults to `https://api.perimeter.org`).
 
 ## Environment Variables
 
 Defined in `env.d.ts` at monorepo root. Convention: `VITE_<DOMAIN>_<NAME>`.
 
-| Variable        | Default                                             | Description                                          |
-| --------------- | --------------------------------------------------- | ---------------------------------------------------- |
-| `VITE_API_URL`  | `localhost:5500` (dev) / `api.perimeter.org` (prod) | API base URL override                                |
-| `VITE_API_MODE` | `mock`                                              | `mock` (MSW) or `local` (real API) — storyboard only |
+| Variable              | Default                                             | Description                                                            |
+| --------------------- | --------------------------------------------------- | ---------------------------------------------------------------------- |
+| `VITE_API_URL`        | `localhost:5500` (dev) / `api.perimeter.org` (prod) | API base URL override for widgets                                      |
+| `NEXT_PUBLIC_API_URL` | `https://api.perimeter.org`                         | API base URL for the site's widget preview config editor (client-side) |
 
-Setup: `cp .env.example .env.local` or inline: `VITE_API_MODE=local pnpm dev`
+Setup: `cp .env.example .env.local` or inline: `VITE_API_URL=localhost:5500 pnpm dev`
 
 ## Path Aliases
 
@@ -107,13 +114,14 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 
 ## Adding a New Widget
 
-1. Create `packages/widget-<name>/` with entry point, components, hooks, tests
+1. Create `widgets/<name>/` with entry point, components, hooks, tests
 2. Add 3-line `vite.config.ts` using `createWidgetConfig()` from `@perimeter-widgets/vite-preset`
 3. Add 1-line `vitest.config.ts` using `createWidgetTestConfig()`
-4. Add entry to `packages/storyboard/src/registry.ts` with config fields
+4. Add entry to `apps/site/src/lib/widgets-registry.ts` with metadata + config fields
 5. `pnpm build --filter=widget-<name>` — output lands in `dist/<name>/`
-6. Commit dist, push to main — GitHub Action purges jsDelivr
-7. Add `<div>` + `<script>` tag on WordPress once — never touch it again
+6. `pnpm dev` → visit `http://localhost:3000/widgets/<name>` to live-preview it
+7. Commit dist, push to main — GitHub Action purges jsDelivr
+8. Add `<div>` + `<script>` tag on WordPress once — never touch it again
 
 ## Git Workflow
 

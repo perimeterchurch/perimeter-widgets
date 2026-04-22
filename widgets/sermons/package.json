@@ -1,0 +1,52 @@
+{
+    "name": "@perimeter-widgets/widget-sermons",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "src/index.tsx",
+    "exports": {
+        ".": "./src/index.tsx",
+        "./app": "./src/App.tsx",
+        "./styles": "./src/styles.css",
+        "./types": "./src/types.ts"
+    },
+    "scripts": {
+        "build": "vite build",
+        "dev": "WIDGET_DEV_OUT_DIR=../../apps/site/public/widget-bundles vite build --watch",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint src/"
+    },
+    "dependencies": {
+        "@headlessui/react": "^2.2.9",
+        "@perimeter-widgets/shared": "workspace:*",
+        "@tanstack/react-query": "^5",
+        "dompurify": "^3.3.3",
+        "framer-motion": "^12.38.0",
+        "hls.js": "^1.6.15",
+        "lucide-react": "^0.577.0",
+        "luxon": "^3.7.2",
+        "nuqs": "^2.8.9",
+        "react": "^19",
+        "react-dom": "^19",
+        "react-pdf": "^10.4.1",
+        "zod": "^3"
+    },
+    "devDependencies": {
+        "@perimeter-widgets/vite-preset": "workspace:*",
+        "@testing-library/jest-dom": "^6",
+        "@testing-library/react": "^16",
+        "@testing-library/user-event": "^14.6.1",
+        "@types/dompurify": "^3.2.0",
+        "@types/luxon": "^3.7.1",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@vitejs/plugin-react": "^4",
+        "jsdom": "^26",
+        "msw": "^2.12.13",
+        "tailwindcss": "^4",
+        "typescript": "^5.7",
+        "vite": "^6",
+        "vitest": "^3"
+    }
+}

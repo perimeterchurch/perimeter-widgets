@@ -1,0 +1,24 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/lib/*": ["./lib/*", "./ui/perimeter/lib/*"],
+            "@/hooks/*": ["./hooks/*"],
+            "@/components/ui/*": ["./ui/perimeter/*"]
+        },
+        "jsx": "react-jsx",
+        "moduleResolution": "bundler",
+        "noEmit": true,
+        "noUncheckedIndexedAccess": false
+    },
+    "include": [
+        "src/**/*",
+        "ui/**/*",
+        "lib/**/*",
+        "hooks/**/*",
+        "themes/**/*.json",
+        "scripts/**/*"
+    ],
+    "exclude": ["node_modules", "public/r", "ui/**/*.demo.tsx"]
+}

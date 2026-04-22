@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://style.perimeter.org/sitemap.xml

@@ -3,7 +3,14 @@
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
-            "outputs": ["dist/**"]
+            "outputs": [
+                "dist/**",
+                "out/**",
+                "public/r/**",
+                "registry.json",
+                "src/lib/demo-manifest.json",
+                "src/lib/demo-imports.ts"
+            ]
         },
         "test": {
             "dependsOn": ["^build"]
