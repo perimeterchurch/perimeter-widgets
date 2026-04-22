@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 @import '@perimeter-widgets/shared/styles';
 
-/* Ensure Tailwind scans widget + shared component source files for class usage.
-   Without this, the storyboard's ?inline CSS import misses widget classes because
-   Tailwind v4 auto-detection only follows the CSS module graph, not JS imports. */
-@source "../../../packages/shared/src/components/ui/";
+/* Tell Tailwind where to look for class usage. Its auto-detection only follows
+   the CSS module graph; it doesn't traverse JS imports, so we have to point it
+   at every source tree the widget ends up rendering. */
+@source "../../../packages/registry/ui/perimeter/";
+@source "../../../packages/shared/src/components/";
 @source "./components";
 @source "./hooks";
