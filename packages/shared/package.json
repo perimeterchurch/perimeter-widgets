@@ -8,8 +8,7 @@
     "exports": {
         ".": "./src/index.ts",
         "./styles": "./src/styles/base.css",
-        "./components/motion": "./src/components/motion/index.ts",
-        "./motion": "./src/lib/motion/config.ts"
+        "./components/motion": "./src/components/motion/index.ts"
     },
     "scripts": {
         "test": "vitest run",
