@@ -9,7 +9,7 @@ import {
     ContextMenuTrigger,
 } from './context-menu';
 
-import type { ControlsConfig } from '@/lib/demo-types';
+import type { ControlsConfig } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Context Menu',

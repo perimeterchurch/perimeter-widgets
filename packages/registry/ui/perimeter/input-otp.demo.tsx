@@ -5,7 +5,7 @@ import {
     InputOTPSeparator,
 } from './input-otp';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Input OTP',

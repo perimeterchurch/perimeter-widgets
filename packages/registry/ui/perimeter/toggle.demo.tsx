@@ -2,7 +2,7 @@ import { BoldIcon, ItalicIcon, UnderlineIcon } from 'lucide-react';
 
 import { Toggle } from './toggle';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Toggle',

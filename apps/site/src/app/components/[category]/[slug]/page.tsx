@@ -22,7 +22,7 @@ import { highlight } from '@/lib/highlight';
 import { demoImports } from '@/lib/demo-imports';
 import manifest from '@/lib/demo-manifest.json';
 
-import type { DemoExample } from '@/lib/demo-types';
+import type { DemoExample } from '@perimeter-widgets/registry/lib/demo-types';
 
 interface PageProps {
     params: Promise<{ category: string; slug: string }>;

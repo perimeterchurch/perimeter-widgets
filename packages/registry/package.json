@@ -8,6 +8,7 @@
     "exports": {
         ".": "./src/index.ts",
         "./themes/*": "./themes/*",
+        "./lib/*": "./lib/*.ts",
         "./ui/perimeter/*.demo": "./ui/perimeter/*.demo.tsx",
         "./ui/perimeter/*": "./ui/perimeter/*.tsx"
     },

@@ -1,5 +1,5 @@
 import { MultiCombobox, type MultiComboboxOption } from './multi-combobox';
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 const fruits: MultiComboboxOption[] = [
     { value: 'apple', label: 'Apple' },

@@ -4,7 +4,7 @@ import {
     ResizablePanelGroup,
 } from './resizable';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Resizable',

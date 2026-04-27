@@ -1,4 +1,4 @@
-import type { ControlsConfig } from '@/lib/demo-types';
+import type { ControlsConfig } from '@perimeter-widgets/registry/lib/demo-types';
 
 export function buildSnippet(
     componentName: string,

@@ -5,7 +5,7 @@ import {
     ButtonGroupText,
 } from './button-group';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Button Group',

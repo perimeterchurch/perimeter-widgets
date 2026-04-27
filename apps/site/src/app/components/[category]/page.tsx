@@ -3,7 +3,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import manifest from '@/lib/demo-manifest.json';
-import { capitalize, type ManifestEntry } from '@/lib/demo-types';
+import {
+    capitalize,
+    type ManifestEntry,
+} from '@perimeter-widgets/registry/lib/demo-types';
 
 interface PageProps {
     params: Promise<{ category: string }>;

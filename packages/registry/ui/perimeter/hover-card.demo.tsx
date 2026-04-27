@@ -3,7 +3,7 @@ import { CalendarDaysIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Hover Card',
