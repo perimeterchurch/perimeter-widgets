@@ -38,5 +38,8 @@ export { createQueryClient } from './api/query-client';
 export { formatDate } from './lib/format';
 export { useSafeHtml } from './lib/use-safe-html';
 
+// DOM helpers
+export { useClickOutside } from './lib/use-click-outside';
+
 // Components
 export * from './components';

@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown, Check } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+import { useClickOutside } from '../../../lib/use-click-outside';
 
 export interface SortFieldOption {
     value: string;
@@ -27,18 +28,11 @@ export function SortSelect({
 }: SortSelectProps) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (!open || !ref.current) return;
-        const root = ref.current.getRootNode() as Document | ShadowRoot;
-        const handleClick = (e: Event) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) {
-                setOpen(false);
-            }
-        };
-        root.addEventListener('mousedown', handleClick);
-        return () => root.removeEventListener('mousedown', handleClick);
-    }, [open]);
+    useClickOutside(
+        ref,
+        useCallback(() => setOpen(false), []),
+        open,
+    );
 
     const activeField = fields.find((f) => f.value === sortField);
     const DirectionIcon = sortDirection === 'asc' ? ArrowUp : ArrowDown;
