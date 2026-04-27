@@ -16,6 +16,7 @@
         "build:manifest": "tsx scripts/generate-registry.ts",
         "build:shadcn": "shadcn build",
         "build:themes": "tsx scripts/generate-theme-css.ts",
+        "lint": "eslint .",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
