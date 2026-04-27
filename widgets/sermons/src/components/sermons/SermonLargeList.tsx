@@ -1,6 +1,6 @@
-import { useConfig } from '@perimeter-widgets/shared';
+import { formatDate, useConfig } from '@perimeter-widgets/shared';
 import type { SermonListViewProps, SermonsConfig } from '../../types';
-import { formatDate, sermonImageUrl } from '../../lib/format';
+import { sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
 import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 

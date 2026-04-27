@@ -1,7 +1,7 @@
 import { Calendar, Layers, BookOpen } from 'lucide-react';
-import { useConfig } from '@perimeter-widgets/shared';
+import { formatDate, useConfig } from '@perimeter-widgets/shared';
 import type { SeriesListItem, SermonsConfig } from '../../types';
-import { formatDate, seriesImageUrl } from '../../lib/format';
+import { seriesImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
 
 interface SeriesGridProps {

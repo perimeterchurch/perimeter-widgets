@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import DOMPurify from 'dompurify';
-import { DateTime } from 'luxon';
 import { ArrowLeft, Calendar, Type } from 'lucide-react';
 import {
     Button,
@@ -10,12 +8,14 @@ import {
     EmptyDescription,
     Skeleton,
     SortSelect,
+    formatDate,
+    useSafeHtml,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import type { SermonsConfig, SortField, SortOrder } from '../../types';
 import { useSermonDetail } from '../../hooks/use-sermon-detail';
 import { useSermons } from '../../hooks/use-sermons';
-import { formatDate, sermonImageUrl } from '../../lib/format';
+import { sermonImageUrl } from '../../lib/format';
 import { MediaTabs } from '../players/MediaTabs';
 import { MediaCard } from '../ui/MediaCard';
 import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
@@ -47,6 +47,7 @@ export function SermonDetail({
     onSermonClick,
 }: SermonDetailProps) {
     const { data: sermon, isLoading, error } = useSermonDetail(id, config);
+    const safeDescription = useSafeHtml(sermon?.description);
     const showRelated = (config.display ?? 'full') !== 'headless';
     const [sortField, setSortField] = useState<SortField>('date');
     const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
@@ -114,10 +115,8 @@ export function SermonDetail({
                             </h2>
                             <p className='text-sm text-stone-500 dark:text-stone-400 mt-1'>
                                 {sermon.speaker.name} ·{' '}
-                                {DateTime.fromISO(sermon.date).toLocaleString(
-                                    DateTime.DATE_MED,
-                                )}{' '}
-                                · {sermon.series.title}
+                                {formatDate(sermon.date)} ·{' '}
+                                {sermon.series.title}
                             </p>
                             {sermon.scriptureLinks && (
                                 <p className='text-xs text-stone-400 mt-1'>
@@ -135,11 +134,7 @@ export function SermonDetail({
                                 </h3>
                                 <div
                                     className='text-sm text-stone-600 dark:text-stone-300 prose prose-sm'
-                                    dangerouslySetInnerHTML={{
-                                        __html: DOMPurify.sanitize(
-                                            sermon.description,
-                                        ),
-                                    }}
+                                    dangerouslySetInnerHTML={safeDescription}
                                 />
                             </div>
                         )}

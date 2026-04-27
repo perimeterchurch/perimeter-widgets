@@ -1,9 +1,4 @@
-import { DateTime } from 'luxon';
 import { resolveApiBaseUrl } from '@perimeter-widgets/shared';
-
-export function formatDate(iso: string): string {
-    return DateTime.fromISO(iso).toLocaleString(DateTime.DATE_MED);
-}
 
 const S3_ORIGIN = 'https://perimeter-files.s3.amazonaws.com';
 
