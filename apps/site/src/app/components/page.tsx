@@ -7,7 +7,7 @@ import {
     capitalize,
     groupByCategory,
     type ManifestEntry,
-} from '@/lib/demo-types';
+} from '@perimeter-widgets/registry/lib/demo-types';
 
 export const metadata: Metadata = {
     title: 'Components',

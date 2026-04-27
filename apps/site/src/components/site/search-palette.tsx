@@ -13,7 +13,7 @@ import {
     CommandList,
 } from '@perimeter-widgets/registry';
 import manifest from '@/lib/demo-manifest.json';
-import type { ManifestEntry } from '@/lib/demo-types';
+import type { ManifestEntry } from '@perimeter-widgets/registry/lib/demo-types';
 
 export function SearchPalette() {
     const [open, setOpen] = useState(false);

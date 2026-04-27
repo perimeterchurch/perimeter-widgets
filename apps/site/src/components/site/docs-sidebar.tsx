@@ -5,7 +5,10 @@ import { usePathname } from 'next/navigation';
 
 import { cn } from '@perimeter-widgets/registry';
 import manifest from '@/lib/demo-manifest.json';
-import { groupByCategory, type ManifestEntry } from '@/lib/demo-types';
+import {
+    groupByCategory,
+    type ManifestEntry,
+} from '@perimeter-widgets/registry/lib/demo-types';
 
 export function DocsSidebar() {
     const pathname = usePathname();

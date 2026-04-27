@@ -1,7 +1,7 @@
 import { Input } from './input';
 import { Label } from './label';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Label',

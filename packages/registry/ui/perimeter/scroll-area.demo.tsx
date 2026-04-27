@@ -1,7 +1,7 @@
 import { ScrollArea } from './scroll-area';
 import { Separator } from './separator';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Scroll Area',

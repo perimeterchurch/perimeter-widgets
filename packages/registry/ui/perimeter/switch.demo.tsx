@@ -1,7 +1,7 @@
 import { Label } from './label';
 import { Switch } from './switch';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Switch',

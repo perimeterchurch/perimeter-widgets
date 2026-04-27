@@ -17,7 +17,7 @@ import { buildSnippet } from '@/lib/build-snippet';
 import { demoImports } from '@/lib/demo-imports';
 import { highlightClient } from '@/lib/highlight-client';
 
-import type { ControlsConfig } from '@/lib/demo-types';
+import type { ControlsConfig } from '@perimeter-widgets/registry/lib/demo-types';
 
 interface ComponentPlaygroundProps {
     slug: string;

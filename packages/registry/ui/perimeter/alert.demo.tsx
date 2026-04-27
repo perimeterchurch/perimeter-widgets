@@ -2,7 +2,7 @@ import { AlertCircleIcon, InfoIcon, TerminalIcon } from 'lucide-react';
 
 import { Alert, AlertDescription, AlertTitle } from './alert';
 
-import type { ControlsConfig, PlaygroundProps } from '@/lib/demo-types';
+import type { ControlsConfig, PlaygroundProps } from '../../lib/demo-types';
 
 export const meta = {
     name: 'Alert',

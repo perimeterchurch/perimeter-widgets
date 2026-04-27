@@ -3,7 +3,10 @@
 import { Switch } from '@perimeter-widgets/registry';
 import { Input } from '@perimeter-widgets/registry';
 
-import type { ControlsConfig, ControlDescriptor } from '@/lib/demo-types';
+import type {
+    ControlsConfig,
+    ControlDescriptor,
+} from '@perimeter-widgets/registry/lib/demo-types';
 
 interface PlaygroundControlsProps {
     controls: ControlsConfig;
