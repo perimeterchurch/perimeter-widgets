@@ -7,11 +7,11 @@ import {
     EmptyTitle,
     EmptyDescription,
     Skeleton,
+    formatDate,
 } from '@perimeter-widgets/shared';
 import { SkeletonTransition } from '@perimeter-widgets/shared/components/motion';
 import type { SermonsConfig } from '../../types';
 import { useSeriesDetail } from '../../hooks/use-series-detail';
-import { formatDate } from '../../lib/format';
 
 interface SeriesDetailProps {
     id: number;

@@ -34,5 +34,9 @@ export {
 // React Query
 export { createQueryClient } from './api/query-client';
 
+// Formatting & sanitization helpers
+export { formatDate } from './lib/format';
+export { useSafeHtml } from './lib/use-safe-html';
+
 // Components
 export * from './components';
