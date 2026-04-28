@@ -157,11 +157,8 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
                     <DateRangePicker
                         from={filters.from ?? ''}
                         to={filters.to ?? ''}
-                        onFromChange={(v) =>
-                            filters.setDateRange(v, filters.to)
-                        }
-                        onToChange={(v) =>
-                            filters.setDateRange(filters.from, v)
+                        onRangeChange={(from, to) =>
+                            filters.setDateRange(from || null, to || null)
                         }
                     />
                     <div className='flex-1' />
@@ -233,7 +230,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
             {!config.hidePagination
                 && pagination
                 && pagination.totalPages > 1 && (
-                    <Pagination>
+                    <Pagination aria-label='Series results pagination'>
                         <PaginationContent>
                             <PaginationItem>
                                 <PaginationPrevious

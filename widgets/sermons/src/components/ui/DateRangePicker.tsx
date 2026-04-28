@@ -19,8 +19,12 @@ export interface DateRangePreset {
 export interface DateRangePickerProps {
     from: string;
     to: string;
-    onFromChange: (value: string) => void;
-    onToChange: (value: string) => void;
+    /**
+     * Fires once with the resulting (from, to) pair when the user applies a
+     * change — clearing, picking presets, or hitting Apply on the calendar.
+     * Empty strings mean "no value".
+     */
+    onRangeChange: (from: string, to: string) => void;
     mode?: 'date' | 'datetime';
     placeholder?: string;
     clearable?: boolean;
@@ -43,8 +47,7 @@ type ActiveSide = 'start' | 'end';
 export function DateRangePicker({
     from,
     to,
-    onFromChange,
-    onToChange,
+    onRangeChange,
     mode = 'date',
     placeholder,
     clearable = false,
@@ -95,10 +98,9 @@ export function DateRangePicker({
     const handleClear = useCallback(
         (e: React.MouseEvent) => {
             e.stopPropagation();
-            onFromChange('');
-            onToChange('');
+            onRangeChange('', '');
         },
-        [onFromChange, onToChange],
+        [onRangeChange],
     );
 
     const handleClose = useCallback(() => {
@@ -158,8 +160,7 @@ export function DateRangePicker({
                     startValue={from}
                     endValue={to}
                     onApply={(start, end) => {
-                        onFromChange(start);
-                        onToChange(end);
+                        onRangeChange(start, end);
                         handleClose();
                     }}
                     onClose={handleClose}

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import {
     Badge,
@@ -27,6 +28,11 @@ export function SeriesDetail({
     onSermonClick,
 }: SeriesDetailProps) {
     const { data: series, isLoading, error } = useSeriesDetail(id, config);
+    const titleRef = useRef<HTMLHeadingElement>(null);
+
+    useEffect(() => {
+        if (series) titleRef.current?.focus();
+    }, [series]);
 
     if (error) {
         return (
@@ -78,7 +84,11 @@ export function SeriesDetail({
                 {series && (
                     <div className='space-y-4'>
                         <div>
-                            <h2 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
+                            <h2
+                                ref={titleRef}
+                                tabIndex={-1}
+                                className='text-xl font-bold text-stone-900 dark:text-stone-100 outline-none'
+                            >
                                 {series.displayTitle ?? series.title}
                             </h2>
                             {series.subtitle && (

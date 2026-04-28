@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Calendar, Type } from 'lucide-react';
 import {
     Button,
@@ -51,6 +51,11 @@ export function SermonDetail({
     const showRelated = (config.display ?? 'full') !== 'headless';
     const [sortField, setSortField] = useState<SortField>('date');
     const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
+    const titleRef = useRef<HTMLHeadingElement>(null);
+
+    useEffect(() => {
+        if (sermon) titleRef.current?.focus();
+    }, [sermon]);
 
     const { data: seriesData } = useSermons({
         selectedSeriesIds: sermon?.series.id ? [sermon.series.id] : [],
@@ -110,7 +115,11 @@ export function SermonDetail({
                 {sermon && (
                     <div className='space-y-6'>
                         <div>
-                            <h2 className='text-xl font-bold text-stone-900 dark:text-stone-100'>
+                            <h2
+                                ref={titleRef}
+                                tabIndex={-1}
+                                className='text-xl font-bold text-stone-900 dark:text-stone-100 outline-none'
+                            >
                                 {sermon.title}
                             </h2>
                             <p className='text-sm text-stone-500 dark:text-stone-400 mt-1'>
