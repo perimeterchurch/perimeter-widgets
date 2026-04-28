@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
@@ -89,13 +89,16 @@ export interface SermonFiltersProps {
     labelCache: FilterLabelCache;
 }
 
-export function SermonFilters(props: SermonFiltersProps) {
-    // Ref to track pending from value so onToChange doesn't use stale props
-    // (DateRangePicker calls onFromChange then onToChange synchronously)
-    const pendingFrom = useRef(props.from);
+type OpenDropdown =
+    | 'series'
+    | 'speaker'
+    | 'book'
+    | 'serviceType'
+    | 'seriesType';
 
+export function SermonFilters(props: SermonFiltersProps) {
     // Only one filter dropdown open at a time
-    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const [openDropdown, setOpenDropdown] = useState<OpenDropdown | null>(null);
     const seriesOptionsRaw: MultiComboboxOption[] = props.seriesList.map(
         (s) => ({
             value: String(s.id),
@@ -305,12 +308,11 @@ export function SermonFilters(props: SermonFiltersProps) {
                         <DateRangePicker
                             from={props.from}
                             to={props.to}
-                            onFromChange={(from) => {
-                                pendingFrom.current = from;
-                                props.onDateRangeChange(from, props.to);
-                            }}
-                            onToChange={(to) =>
-                                props.onDateRangeChange(pendingFrom.current, to)
+                            onRangeChange={(from, to) =>
+                                props.onDateRangeChange(
+                                    from || null,
+                                    to || null,
+                                )
                             }
                         />
                     )}

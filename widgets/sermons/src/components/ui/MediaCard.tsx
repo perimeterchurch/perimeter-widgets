@@ -26,16 +26,13 @@ function FallbackImage({
     src,
     alt,
     className,
-    failed,
-    onFail,
 }: {
     src: string;
     alt: string;
     className?: string;
-    failed: boolean;
-    onFail: () => void;
 }) {
     const [loaded, setLoaded] = useState(false);
+    const [failed, setFailed] = useState(false);
 
     if (failed) {
         return <ImagePlaceholder className={className} />;
@@ -54,7 +51,7 @@ function FallbackImage({
                     loaded ? 'opacity-100' : 'opacity-0',
                 )}
                 onLoad={() => setLoaded(true)}
-                onError={onFail}
+                onError={() => setFailed(true)}
             />
         </div>
     );
@@ -167,8 +164,6 @@ export function MediaCard({
     onClick,
     viewMode,
 }: MediaCardProps) {
-    const [imgFailed, setImgFailed] = useState(false);
-
     const infoProps = {
         title,
         topLeft,
@@ -190,10 +185,9 @@ export function MediaCard({
                 className='flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
             >
                 <FallbackImage
+                    key={imageUrl}
                     src={imageUrl}
                     alt={imageAlt}
-                    failed={imgFailed}
-                    onFail={() => setImgFailed(true)}
                     className='h-10 w-10 flex-shrink-0 rounded'
                 />
                 <div className='min-w-0 flex-1'>
@@ -219,10 +213,9 @@ export function MediaCard({
                 className={cn('flex w-full flex-row', CARD_BASE)}
             >
                 <FallbackImage
+                    key={imageUrl}
                     src={imageUrl}
                     alt={imageAlt}
-                    failed={imgFailed}
-                    onFail={() => setImgFailed(true)}
                     className='aspect-video w-56 flex-shrink-0'
                 />
                 <div className='flex flex-1 flex-col gap-1 p-4'>
@@ -244,10 +237,9 @@ export function MediaCard({
             className={cn('flex flex-col', CARD_BASE)}
         >
             <FallbackImage
+                key={imageUrl}
                 src={imageUrl}
                 alt={imageAlt}
-                failed={imgFailed}
-                onFail={() => setImgFailed(true)}
                 className='aspect-video w-full'
             />
             <div className='flex flex-1 flex-col gap-1 p-3'>

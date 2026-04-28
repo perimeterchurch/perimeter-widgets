@@ -322,7 +322,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
             {!config.hidePagination
                 && pagination
                 && pagination.totalPages > 1 && (
-                    <Pagination>
+                    <Pagination aria-label='Sermon results pagination'>
                         <PaginationContent>
                             <PaginationItem>
                                 <PaginationPrevious
