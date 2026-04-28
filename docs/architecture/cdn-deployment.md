@@ -39,8 +39,7 @@ WordPress embeds use `@latest` and never need to change their script tags. Cache
     "widgets": {
         "sermons": {
             "file": "dist/sermons/sermons.js",
-            "sizeBytes": 230822,
-            "buildTimestamp": "2026-03-17T10:24:00.000Z"
+            "sizeBytes": 230822
         }
     }
 }
