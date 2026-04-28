@@ -171,9 +171,44 @@ function assertTokenParity(themes: LoadedTheme[]): void {
     }
 }
 
+/**
+ * Non-default themes are partial overrides — they must declare matching keys
+ * in light/dark (so dark mode doesn't silently fall back to default for some
+ * keys), and every key they declare must exist in the default theme (so a
+ * typo'd key doesn't silently emit a CSS variable nothing reads).
+ */
+function assertNonDefaultThemes(themes: LoadedTheme[]): void {
+    const defaultTheme = themes.find((t) => t.slug === 'default');
+    if (!defaultTheme) throw new Error('themes/default.json is required');
+    const defaultKeys = new Set(Object.keys(defaultTheme.cssVars.light));
+
+    for (const theme of themes) {
+        if (theme.slug === 'default') continue;
+
+        const lightKeys = Object.keys(theme.cssVars.light).sort();
+        const darkKeys = Object.keys(theme.cssVars.dark).sort();
+        if (JSON.stringify(lightKeys) !== JSON.stringify(darkKeys)) {
+            throw new Error(
+                `Theme '${theme.slug}': light and dark blocks have different keys.\n`
+                    + `  Light-only: ${lightKeys.filter((k) => !darkKeys.includes(k)).join(', ')}\n`
+                    + `  Dark-only: ${darkKeys.filter((k) => !lightKeys.includes(k)).join(', ')}`,
+            );
+        }
+
+        const unknown = lightKeys.filter((k) => !defaultKeys.has(k));
+        if (unknown.length > 0) {
+            throw new Error(
+                `Theme '${theme.slug}': declares keys not present in the default theme: ${unknown.join(', ')}.\n`
+                    + `  Add them to themes/default.json first, or remove them from this theme.`,
+            );
+        }
+    }
+}
+
 async function main(): Promise<void> {
     const themes = await readThemes();
     assertTokenParity(themes);
+    assertNonDefaultThemes(themes);
 
     const siteBlock = buildSiteBlock(themes);
     const sharedBlock = buildSharedBlock(themes);
