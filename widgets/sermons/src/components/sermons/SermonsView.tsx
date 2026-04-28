@@ -19,7 +19,6 @@ import type {
     SortField,
     SortOrder,
 } from '../../types';
-import { applyWidgetDefaults } from '../../types';
 import { useSermons } from '../../hooks/use-sermons';
 import { useSeries } from '../../hooks/use-series';
 import { useSpeakers } from '../../hooks/use-speakers';
@@ -70,8 +69,7 @@ const SORT_FIELDS = [
     },
 ];
 
-export function SermonsView({ config: rawConfig, filters }: SermonsViewProps) {
-    const config = applyWidgetDefaults(rawConfig);
+export function SermonsView({ config, filters }: SermonsViewProps) {
     const [viewMode, setViewMode] = useState<ViewMode>(
         config.defaultView ?? 'grid',
     );
