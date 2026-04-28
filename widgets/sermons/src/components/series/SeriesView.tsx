@@ -30,7 +30,6 @@ import {
     Rows3,
 } from 'lucide-react';
 import type { SermonsConfig } from '../../types';
-import { applyWidgetDefaults } from '../../types';
 import { useSeries } from '../../hooks/use-series';
 import { useSeriesTypes } from '../../hooks/use-series-types';
 import { DateRangePicker } from '../ui/DateRangePicker';
@@ -82,8 +81,7 @@ const VIEW_OPTIONS = [
     },
 ];
 
-export function SeriesView({ config: rawConfig, filters }: SeriesViewProps) {
-    const config = applyWidgetDefaults(rawConfig);
+export function SeriesView({ config, filters }: SeriesViewProps) {
     const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
     const display = config.display ?? 'full';
     const showSearch = display === 'full';

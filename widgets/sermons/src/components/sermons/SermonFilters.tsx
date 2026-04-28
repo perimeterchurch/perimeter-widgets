@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, type ReactNode } from 'react';
 import {
     InputGroup,
     InputGroupAddon,
@@ -10,6 +10,31 @@ import {
 import type { MultiComboboxOption } from '@perimeter-widgets/shared';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { X, Search } from 'lucide-react';
+
+function FilterChip({
+    label,
+    ariaLabel,
+    onRemove,
+    variant = 'default',
+}: {
+    label: ReactNode;
+    ariaLabel: string;
+    onRemove: () => void;
+    variant?: 'default' | 'secondary';
+}) {
+    return (
+        <button
+            type='button'
+            onClick={onRemove}
+            className='inline-flex'
+            aria-label={ariaLabel}
+        >
+            <Badge variant={variant}>
+                {label} <X className='h-3 w-3' />
+            </Badge>
+        </button>
+    );
+}
 import { groupBooksByTestament } from '../../lib/bible-books';
 import type { FilterLabelCache } from '../../hooks/use-filter-label-cache';
 import type {
@@ -306,133 +331,86 @@ export function SermonFilters(props: SermonFiltersProps) {
             {/* Active filter chips */}
             {props.hasActiveFilters && (
                 <div className='flex flex-wrap gap-1.5'>
-                    {!props.lockedFilters.has('series')
-                        && props.selectedSeriesIds.map((id) => (
-                            <button
-                                key={`series-${id}`}
-                                type='button'
-                                onClick={() =>
-                                    props.onSeriesChange(
-                                        props.selectedSeriesIds.filter(
-                                            (x) => x !== id,
-                                        ),
-                                    )
-                                }
-                                className='inline-flex'
-                                aria-label={`Remove ${seriesOptions.find((o) => o.value === String(id))?.label ?? 'series'} filter`}
-                            >
-                                <Badge variant='default'>
-                                    {seriesOptions.find(
-                                        (o) => o.value === String(id),
-                                    )?.label ?? 'Series'}{' '}
-                                    <X className='h-3 w-3' />
-                                </Badge>
-                            </button>
-                        ))}
-                    {!props.lockedFilters.has('speaker')
-                        && props.selectedSpeakerIds.map((id) => (
-                            <button
-                                key={`speaker-${id}`}
-                                type='button'
-                                onClick={() =>
-                                    props.onSpeakerChange(
-                                        props.selectedSpeakerIds.filter(
-                                            (x) => x !== id,
-                                        ),
-                                    )
-                                }
-                                className='inline-flex'
-                                aria-label={`Remove ${speakerOptions.find((o) => o.value === String(id))?.label ?? 'speaker'} filter`}
-                            >
-                                <Badge variant='default'>
-                                    {speakerOptions.find(
-                                        (o) => o.value === String(id),
-                                    )?.label ?? 'Speaker'}{' '}
-                                    <X className='h-3 w-3' />
-                                </Badge>
-                            </button>
-                        ))}
-                    {!props.lockedFilters.has('book')
-                        && props.selectedBookIds.map((id) => (
-                            <button
-                                key={`book-${id}`}
-                                type='button'
-                                onClick={() =>
-                                    props.onBookChange(
-                                        props.selectedBookIds.filter(
-                                            (x) => x !== id,
-                                        ),
-                                    )
-                                }
-                                className='inline-flex'
-                                aria-label={`Remove ${bookOptions.find((o) => o.value === String(id))?.label ?? 'book'} filter`}
-                            >
-                                <Badge variant='default'>
-                                    {bookOptions.find(
-                                        (o) => o.value === String(id),
-                                    )?.label ?? 'Book'}{' '}
-                                    <X className='h-3 w-3' />
-                                </Badge>
-                            </button>
-                        ))}
-                    {!props.lockedFilters.has('serviceTypes')
-                        && props.selectedServiceTypeIds.map((id) => (
-                            <button
-                                key={`st-${id}`}
-                                type='button'
-                                onClick={() =>
-                                    props.onServiceTypesChange(
-                                        props.selectedServiceTypeIds.filter(
-                                            (x) => x !== id,
-                                        ),
-                                    )
-                                }
-                                className='inline-flex'
-                                aria-label={`Remove ${serviceTypeOptions.find((o) => o.value === String(id))?.label ?? 'service type'} filter`}
-                            >
-                                <Badge variant='default'>
-                                    {serviceTypeOptions.find(
-                                        (o) => o.value === String(id),
-                                    )?.label ?? 'Service Type'}{' '}
-                                    <X className='h-3 w-3' />
-                                </Badge>
-                            </button>
-                        ))}
-                    {!props.lockedFilters.has('seriesType')
-                        && props.selectedSeriesTypeIds.map((id) => (
-                            <button
-                                key={`srt-${id}`}
-                                type='button'
-                                onClick={() =>
-                                    props.onSeriesTypeChange(
-                                        props.selectedSeriesTypeIds.filter(
-                                            (x) => x !== id,
-                                        ),
-                                    )
-                                }
-                                className='inline-flex'
-                                aria-label={`Remove ${seriesTypeOptions.find((o) => o.value === String(id))?.label ?? 'series type'} filter`}
-                            >
-                                <Badge variant='default'>
-                                    {seriesTypeOptions.find(
-                                        (o) => o.value === String(id),
-                                    )?.label ?? 'Series Type'}{' '}
-                                    <X className='h-3 w-3' />
-                                </Badge>
-                            </button>
-                        ))}
+                    {(
+                        [
+                            {
+                                lockedKey: 'series',
+                                ids: props.selectedSeriesIds,
+                                options: seriesOptions,
+                                onChange: props.onSeriesChange,
+                                fallback: 'Series',
+                                noun: 'series',
+                            },
+                            {
+                                lockedKey: 'speaker',
+                                ids: props.selectedSpeakerIds,
+                                options: speakerOptions,
+                                onChange: props.onSpeakerChange,
+                                fallback: 'Speaker',
+                                noun: 'speaker',
+                            },
+                            {
+                                lockedKey: 'book',
+                                ids: props.selectedBookIds,
+                                options: bookOptions,
+                                onChange: props.onBookChange,
+                                fallback: 'Book',
+                                noun: 'book',
+                            },
+                            {
+                                lockedKey: 'serviceTypes',
+                                ids: props.selectedServiceTypeIds,
+                                options: serviceTypeOptions,
+                                onChange: props.onServiceTypesChange,
+                                fallback: 'Service Type',
+                                noun: 'service type',
+                            },
+                            {
+                                lockedKey: 'seriesType',
+                                ids: props.selectedSeriesTypeIds,
+                                options: seriesTypeOptions,
+                                onChange: props.onSeriesTypeChange,
+                                fallback: 'Series Type',
+                                noun: 'series type',
+                            },
+                        ] as const
+                    ).flatMap(
+                        ({
+                            lockedKey,
+                            ids,
+                            options,
+                            onChange,
+                            fallback,
+                            noun,
+                        }) =>
+                            props.lockedFilters.has(lockedKey) ?
+                                []
+                            :   ids.map((id) => {
+                                    const label =
+                                        options.find(
+                                            (o) => o.value === String(id),
+                                        )?.label ?? fallback;
+                                    return (
+                                        <FilterChip
+                                            key={`${lockedKey}-${id}`}
+                                            label={label}
+                                            ariaLabel={`Remove ${options.find((o) => o.value === String(id))?.label ?? noun} filter`}
+                                            onRemove={() =>
+                                                onChange(
+                                                    ids.filter((x) => x !== id),
+                                                )
+                                            }
+                                        />
+                                    );
+                                }),
+                    )}
                     {!props.lockedFilters.has('search') && props.search && (
-                        <button
-                            type='button'
-                            onClick={() => props.onSearchChange('')}
-                            className='inline-flex'
-                            aria-label='Remove search filter'
-                        >
-                            <Badge variant='secondary'>
-                                &ldquo;{props.search}&rdquo;{' '}
-                                <X className='h-3 w-3' />
-                            </Badge>
-                        </button>
+                        <FilterChip
+                            label={<>&ldquo;{props.search}&rdquo;</>}
+                            ariaLabel='Remove search filter'
+                            onRemove={() => props.onSearchChange('')}
+                            variant='secondary'
+                        />
                     )}
                 </div>
             )}
