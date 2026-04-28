@@ -115,11 +115,16 @@ function MultiCombobox(props: MultiComboboxProps) {
 
     // --- Selection helpers ---
 
-    const selectedValues: string[] =
-        isMultiple ? ((currentValue as string[] | undefined) ?? [])
-        : (currentValue as string | null | undefined) != null ?
-            [currentValue as string]
-        :   [];
+    // Memoized so downstream useCallback/useMemo deps stay stable across
+    // renders when the underlying value didn't change.
+    const selectedValues = React.useMemo<string[]>(
+        () =>
+            isMultiple ? ((currentValue as string[] | undefined) ?? [])
+            : (currentValue as string | null | undefined) != null ?
+                [currentValue as string]
+            :   [],
+        [isMultiple, currentValue],
+    );
 
     const isSelected = React.useCallback(
         (value: string) => selectedValues.includes(value),
