@@ -6,7 +6,6 @@ const DIST_DIR = resolve(import.meta.dirname, '../dist');
 interface ManifestEntry {
     file: string;
     sizeBytes: number;
-    buildTimestamp: string;
 }
 
 interface Manifest {
@@ -38,7 +37,6 @@ function generateManifest(): void {
             manifest.widgets[entry] = {
                 file: `dist/${entry}/${jsFile}`,
                 sizeBytes: jsStat.size,
-                buildTimestamp: new Date().toISOString(),
             };
         } catch {
             console.warn(`Warning: ${jsPath} not found, skipping.`);
