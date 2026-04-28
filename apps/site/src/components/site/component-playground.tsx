@@ -1,6 +1,14 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import {
+    Component,
+    useState,
+    useMemo,
+    useEffect,
+    useRef,
+    useCallback,
+    type ReactNode,
+} from 'react';
 
 const WIDTH_PRESETS = [
     { label: 'Mobile', width: 375 },
@@ -33,6 +41,34 @@ function buildDefaults(controls: ControlsConfig): Record<string, unknown> {
         defaults[name] = descriptor.default;
     }
     return defaults;
+}
+
+class PlaygroundErrorBoundary extends Component<
+    { children: ReactNode },
+    { error: Error | null }
+> {
+    state = { error: null as Error | null };
+    static getDerivedStateFromError(error: Error) {
+        return { error };
+    }
+    componentDidCatch(error: Error) {
+        console.error('[ComponentPlayground] render error:', error);
+    }
+    render() {
+        if (this.state.error) {
+            return (
+                <div className='flex min-h-48 flex-col items-center justify-center gap-2 p-8 text-center'>
+                    <p className='text-sm font-medium text-destructive'>
+                        Component preview failed to render
+                    </p>
+                    <p className='max-w-md text-xs text-muted-foreground'>
+                        {this.state.error.message}
+                    </p>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
 }
 
 export function ComponentPlayground({
@@ -143,181 +179,197 @@ export function ComponentPlayground({
                     <TabsTrigger value='themes'>Themes</TabsTrigger>
                 </TabsList>
 
-                <div className='relative overflow-hidden rounded-lg border'>
-                    <div
-                        className='transition-all duration-300 ease-in-out'
-                        style={{
-                            opacity: activeTab === 'preview' ? 1 : 0,
-                            height: activeTab === 'preview' ? 'auto' : 0,
-                            overflow:
-                                activeTab === 'preview' ? 'visible' : 'hidden',
-                        }}
-                    >
-                        {/* Responsive toolbar */}
-                        <div className='flex items-center gap-1 border-b px-3 py-1.5'>
-                            {WIDTH_PRESETS.map((preset) => (
-                                <button
-                                    key={preset.label}
-                                    type='button'
-                                    onClick={() =>
-                                        setPreviewWidth(preset.width)
-                                    }
-                                    className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
-                                        previewWidth === preset.width ?
-                                            'bg-primary text-primary-foreground'
-                                        :   'text-muted-foreground hover:bg-muted'
-                                    }`}
-                                >
-                                    {preset.label}
-                                </button>
-                            ))}
-                            {previewWidth && (
-                                <span className='ml-2 text-xs text-muted-foreground'>
-                                    {previewWidth}px
-                                </span>
-                            )}
-                        </div>
-
-                        <div className='flex justify-center bg-background'>
-                            <div
-                                ref={previewRef}
-                                className='relative w-full'
-                                style={{ maxWidth: previewWidth ?? undefined }}
-                            >
-                                <div className='flex min-h-48 items-center justify-center p-8'>
-                                    {importError ?
-                                        <div className='text-sm text-destructive'>
-                                            {importError}
-                                        </div>
-                                    : Playground ?
-                                        <Playground {...values} />
-                                    :   <div className='flex w-full flex-col items-center gap-4 p-8'>
-                                            <div className='h-10 w-48 animate-pulse rounded-md bg-muted' />
-                                            <div className='h-6 w-32 animate-pulse rounded-md bg-muted' />
-                                        </div>
-                                    }
-                                </div>
-
-                                {/* Drag handle */}
-                                {previewWidth && (
-                                    <div
-                                        onPointerDown={handleDragStart}
-                                        className={`absolute right-0 top-0 bottom-0 w-2 cursor-col-resize transition-colors hover:bg-primary/20 ${
-                                            isDragging ? 'bg-primary/30' : ''
+                <PlaygroundErrorBoundary key={slug}>
+                    <div className='relative overflow-hidden rounded-lg border'>
+                        <div
+                            className='transition-all duration-300 ease-in-out'
+                            style={{
+                                opacity: activeTab === 'preview' ? 1 : 0,
+                                height: activeTab === 'preview' ? 'auto' : 0,
+                                overflow:
+                                    activeTab === 'preview' ? 'visible' : (
+                                        'hidden'
+                                    ),
+                            }}
+                        >
+                            {/* Responsive toolbar */}
+                            <div className='flex items-center gap-1 border-b px-3 py-1.5'>
+                                {WIDTH_PRESETS.map((preset) => (
+                                    <button
+                                        key={preset.label}
+                                        type='button'
+                                        onClick={() =>
+                                            setPreviewWidth(preset.width)
+                                        }
+                                        className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                                            previewWidth === preset.width ?
+                                                'bg-primary text-primary-foreground'
+                                            :   'text-muted-foreground hover:bg-muted'
                                         }`}
-                                    />
+                                    >
+                                        {preset.label}
+                                    </button>
+                                ))}
+                                {previewWidth && (
+                                    <span className='ml-2 text-xs text-muted-foreground'>
+                                        {previewWidth}px
+                                    </span>
                                 )}
                             </div>
-                        </div>
-                    </div>
 
-                    <div
-                        className='transition-all duration-300 ease-in-out'
-                        style={{
-                            opacity: activeTab === 'code' ? 1 : 0,
-                            height: activeTab === 'code' ? 'auto' : 0,
-                            overflow:
-                                activeTab === 'code' ? 'visible' : 'hidden',
-                        }}
-                    >
-                        <CodeBlock
-                            html={codeHtml}
-                            rawCode={codeRaw}
-                            showHeader={false}
-                            className='rounded-none border-0'
-                        />
-                    </div>
+                            <div className='flex justify-center bg-background'>
+                                <div
+                                    ref={previewRef}
+                                    className='relative w-full'
+                                    style={{
+                                        maxWidth: previewWidth ?? undefined,
+                                    }}
+                                >
+                                    <div className='flex min-h-48 items-center justify-center p-8'>
+                                        {importError ?
+                                            <div className='text-sm text-destructive'>
+                                                {importError}
+                                            </div>
+                                        : Playground ?
+                                            <Playground {...values} />
+                                        :   <div className='flex w-full flex-col items-center gap-4 p-8'>
+                                                <div className='h-10 w-48 animate-pulse rounded-md bg-muted' />
+                                                <div className='h-6 w-32 animate-pulse rounded-md bg-muted' />
+                                            </div>
+                                        }
+                                    </div>
 
-                    <div
-                        className='transition-all duration-300 ease-in-out'
-                        style={{
-                            opacity: activeTab === 'compare' ? 1 : 0,
-                            height: activeTab === 'compare' ? 'auto' : 0,
-                            overflow:
-                                activeTab === 'compare' ? 'visible' : 'hidden',
-                        }}
-                    >
-                        <div className='grid min-h-48 grid-cols-1 sm:grid-cols-2'>
-                            {/* Light mode */}
-                            <div className='light border-b bg-background text-foreground p-4 sm:border-b-0 sm:border-r'>
-                                <p className='mb-3 text-center text-xs font-medium text-muted-foreground'>
-                                    Light
-                                </p>
-                                <div className='flex items-center justify-center rounded-md border border-border bg-background p-4'>
-                                    {Playground ?
-                                        <Playground {...values} />
-                                    :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
-                                    }
-                                </div>
-                            </div>
-                            {/* Dark mode */}
-                            <div className='dark bg-background text-foreground p-4'>
-                                <p className='mb-3 text-center text-xs font-medium text-muted-foreground'>
-                                    Dark
-                                </p>
-                                <div className='flex items-center justify-center rounded-md border border-border bg-background p-4'>
-                                    {Playground ?
-                                        <Playground {...values} />
-                                    :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        className='transition-all duration-300 ease-in-out'
-                        style={{
-                            opacity: activeTab === 'themes' ? 1 : 0,
-                            height: activeTab === 'themes' ? 'auto' : 0,
-                            overflow:
-                                activeTab === 'themes' ? 'visible' : 'hidden',
-                        }}
-                    >
-                        <div className='space-y-6 p-4'>
-                            {['', ...availableThemes].map((themeSlug) => (
-                                <div key={themeSlug || 'default'}>
-                                    <p className='mb-3 text-sm font-medium'>
-                                        {themeSlug ?
-                                            themeSlug
-                                                .split('-')
-                                                .map(
-                                                    (w) =>
-                                                        w
-                                                            .charAt(0)
-                                                            .toUpperCase()
-                                                        + w.slice(1),
+                                    {/* Drag handle */}
+                                    {previewWidth && (
+                                        <div
+                                            onPointerDown={handleDragStart}
+                                            className={`absolute right-0 top-0 bottom-0 w-2 cursor-col-resize transition-colors hover:bg-primary/20 ${
+                                                isDragging ? 'bg-primary/30' : (
+                                                    ''
                                                 )
-                                                .join(' ')
-                                        :   'Default'}
+                                            }`}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            className='transition-all duration-300 ease-in-out'
+                            style={{
+                                opacity: activeTab === 'code' ? 1 : 0,
+                                height: activeTab === 'code' ? 'auto' : 0,
+                                overflow:
+                                    activeTab === 'code' ? 'visible' : 'hidden',
+                            }}
+                        >
+                            <CodeBlock
+                                html={codeHtml}
+                                rawCode={codeRaw}
+                                showHeader={false}
+                                className='rounded-none border-0'
+                            />
+                        </div>
+
+                        <div
+                            className='transition-all duration-300 ease-in-out'
+                            style={{
+                                opacity: activeTab === 'compare' ? 1 : 0,
+                                height: activeTab === 'compare' ? 'auto' : 0,
+                                overflow:
+                                    activeTab === 'compare' ? 'visible' : (
+                                        'hidden'
+                                    ),
+                            }}
+                        >
+                            <div className='grid min-h-48 grid-cols-1 sm:grid-cols-2'>
+                                {/* Light mode */}
+                                <div className='light border-b bg-background text-foreground p-4 sm:border-b-0 sm:border-r'>
+                                    <p className='mb-3 text-center text-xs font-medium text-muted-foreground'>
+                                        Light
                                     </p>
-                                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                                        {/* Light — use .light class to force light-mode CSS variables */}
-                                        <div
-                                            data-theme={themeSlug || undefined}
-                                            className='light flex items-center justify-center rounded-md border border-border bg-background text-foreground p-4'
-                                        >
-                                            {Playground ?
-                                                <Playground {...values} />
-                                            :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
-                                            }
-                                        </div>
-                                        {/* Dark */}
-                                        <div
-                                            data-theme={themeSlug || undefined}
-                                            className='dark flex items-center justify-center rounded-md border border-border bg-background text-foreground p-4'
-                                        >
-                                            {Playground ?
-                                                <Playground {...values} />
-                                            :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
-                                            }
-                                        </div>
+                                    <div className='flex items-center justify-center rounded-md border border-border bg-background p-4'>
+                                        {Playground ?
+                                            <Playground {...values} />
+                                        :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
+                                        }
                                     </div>
                                 </div>
-                            ))}
+                                {/* Dark mode */}
+                                <div className='dark bg-background text-foreground p-4'>
+                                    <p className='mb-3 text-center text-xs font-medium text-muted-foreground'>
+                                        Dark
+                                    </p>
+                                    <div className='flex items-center justify-center rounded-md border border-border bg-background p-4'>
+                                        {Playground ?
+                                            <Playground {...values} />
+                                        :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            className='transition-all duration-300 ease-in-out'
+                            style={{
+                                opacity: activeTab === 'themes' ? 1 : 0,
+                                height: activeTab === 'themes' ? 'auto' : 0,
+                                overflow:
+                                    activeTab === 'themes' ? 'visible' : (
+                                        'hidden'
+                                    ),
+                            }}
+                        >
+                            <div className='space-y-6 p-4'>
+                                {['', ...availableThemes].map((themeSlug) => (
+                                    <div key={themeSlug || 'default'}>
+                                        <p className='mb-3 text-sm font-medium'>
+                                            {themeSlug ?
+                                                themeSlug
+                                                    .split('-')
+                                                    .map(
+                                                        (w) =>
+                                                            w
+                                                                .charAt(0)
+                                                                .toUpperCase()
+                                                            + w.slice(1),
+                                                    )
+                                                    .join(' ')
+                                            :   'Default'}
+                                        </p>
+                                        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                                            {/* Light — use .light class to force light-mode CSS variables */}
+                                            <div
+                                                data-theme={
+                                                    themeSlug || undefined
+                                                }
+                                                className='light flex items-center justify-center rounded-md border border-border bg-background text-foreground p-4'
+                                            >
+                                                {Playground ?
+                                                    <Playground {...values} />
+                                                :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
+                                                }
+                                            </div>
+                                            {/* Dark */}
+                                            <div
+                                                data-theme={
+                                                    themeSlug || undefined
+                                                }
+                                                className='dark flex items-center justify-center rounded-md border border-border bg-background text-foreground p-4'
+                                            >
+                                                {Playground ?
+                                                    <Playground {...values} />
+                                                :   <div className='h-10 w-32 animate-pulse rounded-md bg-muted' />
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                </PlaygroundErrorBoundary>
             </Tabs>
 
             {Object.keys(controls).length > 0 && (

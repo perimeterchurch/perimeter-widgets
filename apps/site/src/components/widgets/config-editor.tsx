@@ -106,33 +106,46 @@ function MultiSelectApiField({
         async function fetchAllPages() {
             const apiPath = field.apiPath!;
             const sep = apiPath.includes('?') ? '&' : '?';
-            const allItems: Record<string, unknown>[] = [];
-            let page = 1;
 
-            while (true) {
+            async function fetchPage(page: number): Promise<unknown> {
                 const url = `${API_BASE}${apiPath}${sep}perPage=50&page=${page}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
                 const json = (await res.json()) as { data: unknown };
-                const data = json.data;
+                return json.data;
+            }
 
+            function extractItems(data: unknown): Record<string, unknown>[] {
                 if (Array.isArray(data)) {
-                    allItems.push(...(data as Record<string, unknown>[]));
-                    break;
+                    return data as Record<string, unknown>[];
                 }
-
                 const obj = data as Record<string, unknown>;
-                const items = (obj.series ?? obj.sermons ?? []) as Record<
+                return (obj.series ?? obj.sermons ?? []) as Record<
                     string,
                     unknown
                 >[];
-                const pagination = obj.pagination as
-                    | { totalPages: number }
-                    | undefined;
-                allItems.push(...items);
+            }
 
-                if (!pagination || page >= pagination.totalPages) break;
-                page++;
+            // Fetch page 1 first to learn the page count, then fan out the
+            // remaining pages in parallel. Endpoints that return a top-level
+            // array (no pagination envelope) short-circuit after page 1.
+            const firstData = await fetchPage(1);
+            const allItems: Record<string, unknown>[] = extractItems(firstData);
+
+            if (!Array.isArray(firstData)) {
+                const pagination = (firstData as Record<string, unknown>)
+                    .pagination as { totalPages: number } | undefined;
+                if (pagination && pagination.totalPages > 1) {
+                    const rest = await Promise.all(
+                        Array.from(
+                            { length: pagination.totalPages - 1 },
+                            (_, i) => fetchPage(i + 2),
+                        ),
+                    );
+                    for (const data of rest) {
+                        allItems.push(...extractItems(data));
+                    }
+                }
             }
 
             if (!cancelled) {
