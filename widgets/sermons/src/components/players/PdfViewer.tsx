@@ -15,8 +15,15 @@ import {
 import { Button, Spinner } from '@perimeter-widgets/shared';
 import { proxyS3Url } from '../../lib/format';
 
-// Use CDN worker to avoid Turbopack bundling issues
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Use a CDN worker to avoid Turbopack bundling issues. Override with
+// VITE_PDFJS_WORKER_URL — `${version}` is interpolated against pdfjs.version.
+const WORKER_URL_TEMPLATE =
+    import.meta.env.VITE_PDFJS_WORKER_URL
+    ?? '//unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = WORKER_URL_TEMPLATE.replace(
+    '${version}',
+    pdfjs.version,
+);
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */

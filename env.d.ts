@@ -13,6 +13,13 @@ interface ImportMetaEnv {
     /** Override API base URL (default: localhost:5500 in dev, api.perimeter.org in prod) */
     readonly VITE_API_URL?: string;
 
+    // --- Asset CDNs ---
+    /**
+     * Override the pdfjs worker URL template used by PdfViewer. Use `${version}`
+     * as a placeholder for pdfjs.version. Default points at unpkg.
+     */
+    readonly VITE_PDFJS_WORKER_URL?: string;
+
     // --- Vite built-ins ---
     readonly DEV: boolean;
     readonly PROD: boolean;
