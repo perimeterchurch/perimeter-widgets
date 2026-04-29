@@ -60,4 +60,26 @@ describe('SermonsApp', () => {
         renderWithProviders();
         expect(screen.getByText('Series')).toBeInTheDocument();
     });
+
+    it('hides tabs when config.tab pins a single view', () => {
+        // Embedder pinned to sermons — the tab strip should not render
+        // because there's nothing the user can switch to.
+        renderWithProviders({ tab: 'sermons' });
+        expect(screen.queryByRole('tab', { name: /sermons/i })).toBeNull();
+        expect(screen.queryByRole('tab', { name: /series/i })).toBeNull();
+    });
+
+    it('hides tabs in headless display mode', () => {
+        renderWithProviders({ display: 'headless' });
+        expect(screen.queryByRole('tab', { name: /sermons/i })).toBeNull();
+        expect(screen.queryByRole('tab', { name: /series/i })).toBeNull();
+    });
+
+    it('marks the configured defaultTab as active', () => {
+        renderWithProviders({ defaultTab: 'series' });
+        const seriesTab = screen.getByRole('tab', { name: /series/i });
+        const sermonsTab = screen.getByRole('tab', { name: /sermons/i });
+        expect(seriesTab).toHaveAttribute('aria-selected', 'true');
+        expect(sermonsTab).toHaveAttribute('aria-selected', 'false');
+    });
 });
