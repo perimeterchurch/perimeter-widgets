@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
     Pagination,
     PaginationContent,
@@ -20,11 +20,7 @@ import type {
     SortOrder,
 } from '../../types';
 import { useSermons } from '../../hooks/use-sermons';
-import { useSeries } from '../../hooks/use-series';
-import { useSpeakers } from '../../hooks/use-speakers';
-import { useBooks } from '../../hooks/use-books';
-import { useServiceTypes } from '../../hooks/use-service-types';
-import { useSeriesTypes } from '../../hooks/use-series-types';
+import { useSermonFacets } from '../../hooks/use-sermon-facets';
 import { useFilterLabelCache } from '../../hooks/use-filter-label-cache';
 import { SermonFilters } from './SermonFilters';
 import { SermonGrid } from './SermonGrid';
@@ -75,54 +71,6 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     );
     const labelCache = useFilterLabelCache();
 
-    // --- Unfiltered primer fetches: populate the label cache so selected
-    // options survive even when the narrowed facet lists exclude them.
-    const { data: allSpeakers = [] } = useSpeakers({ config });
-    const { data: allBooks = [] } = useBooks({ config });
-    const { data: allServiceTypes = [] } = useServiceTypes({ config });
-    const { data: allSeriesTypes = [] } = useSeriesTypes({ config });
-    const { data: allSeriesPage } = useSeries({ config, perPage: 50 });
-    const allSeriesItems = useMemo(
-        () => allSeriesPage?.series ?? [],
-        [allSeriesPage?.series],
-    );
-
-    // Absorb primer results into the label cache via effects — inline absorb
-    // would fire twice under React StrictMode's double-render.
-    useEffect(() => {
-        labelCache.absorb(
-            'speaker',
-            allSpeakers.map((s) => ({ id: s.id, label: s.name })),
-        );
-    }, [allSpeakers, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'book',
-            allBooks.map((b) => ({ id: b.id, label: b.name })),
-        );
-    }, [allBooks, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'series',
-            allSeriesItems.map((s) => ({
-                id: s.id,
-                label: s.displayTitle ?? s.title,
-            })),
-        );
-    }, [allSeriesItems, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'serviceType',
-            allServiceTypes.map((s) => ({ id: s.id, label: s.name })),
-        );
-    }, [allServiceTypes, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'seriesType',
-            allSeriesTypes.map((s) => ({ id: s.id, label: s.name })),
-        );
-    }, [allSeriesTypes, labelCache]);
-
     // Both type filters are opt-in. The embedder shows them by setting
     // data-show-service-type / data-show-series-type. When pinned via
     // serviceTypeId / seriesTypeId, the dropdown stays hidden (the value
@@ -136,18 +84,6 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
     const display = config.display ?? 'full';
     const showFilters = display === 'full';
     const showSortView = display !== 'headless';
-
-    const lockedFilters = new Set<string>();
-    if (config.seriesId || config.hideSeries) lockedFilters.add('series');
-    if (config.speakerId || config.hideSpeaker) lockedFilters.add('speaker');
-    if (config.bookId || config.hideBook) lockedFilters.add('book');
-    if (config.serviceTypeId || config.hideServiceType)
-        lockedFilters.add('serviceTypes');
-    if (config.seriesTypeId || config.hideSeriesType)
-        lockedFilters.add('seriesType');
-    if (config.from || config.hideDate) lockedFilters.add('from');
-    if (config.to || config.hideDate) lockedFilters.add('to');
-    if (config.hideSearch) lockedFilters.add('search');
 
     const { data, isLoading } = useSermons({
         search: filters.search || undefined,
@@ -164,63 +100,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
         config,
     });
 
-    // --- Narrowed facet fetches: the lists rendered in the filter dropdowns,
-    // scoped by the currently-selected filters from every other dimension.
-    const { data: narrowedSpeakers = [], isLoading: speakersLoading } =
-        useSpeakers({
-            config,
-            search: filters.search || undefined,
-            selectedSeriesIds: filters.selectedSeriesIds,
-            selectedBookIds: filters.selectedBookIds,
-            selectedServiceTypeIds: filters.selectedServiceTypeIds,
-            selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-            from: filters.from ?? undefined,
-            to: filters.to ?? undefined,
-        });
-    const { data: narrowedBooks = [], isLoading: booksLoading } = useBooks({
-        config,
-        search: filters.search || undefined,
-        selectedSeriesIds: filters.selectedSeriesIds,
-        selectedSpeakerIds: filters.selectedSpeakerIds,
-        selectedServiceTypeIds: filters.selectedServiceTypeIds,
-        selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-        from: filters.from ?? undefined,
-        to: filters.to ?? undefined,
-    });
-    const { data: narrowedServiceTypes = [], isLoading: serviceTypesLoading } =
-        useServiceTypes({
-            config,
-            search: filters.search || undefined,
-            selectedSeriesIds: filters.selectedSeriesIds,
-            selectedSpeakerIds: filters.selectedSpeakerIds,
-            selectedBookIds: filters.selectedBookIds,
-            selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-            from: filters.from ?? undefined,
-            to: filters.to ?? undefined,
-        });
-    const { data: narrowedSeriesTypes = [], isLoading: seriesTypesLoading } =
-        useSeriesTypes({
-            config,
-            search: filters.search || undefined,
-            selectedSeriesIds: filters.selectedSeriesIds,
-            selectedSpeakerIds: filters.selectedSpeakerIds,
-            selectedBookIds: filters.selectedBookIds,
-            selectedServiceTypeIds: filters.selectedServiceTypeIds,
-            from: filters.from ?? undefined,
-            to: filters.to ?? undefined,
-        });
-    const { data: narrowedSeriesPage, isLoading: seriesLoading } = useSeries({
-        config,
-        perPage: 50,
-        search: filters.search || undefined,
-        selectedSpeakerIds: filters.selectedSpeakerIds,
-        selectedBookIds: filters.selectedBookIds,
-        selectedServiceTypeIds: filters.selectedServiceTypeIds,
-        selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-        from: filters.from ?? undefined,
-        to: filters.to ?? undefined,
-    });
-    const narrowedSeries = narrowedSeriesPage?.series ?? [];
+    const facets = useSermonFacets({ config, filters, labelCache });
 
     const sermons = data?.sermons ?? [];
     const pagination = data?.pagination;
@@ -252,19 +132,19 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                     sort={filters.sort}
                     order={filters.order}
                     hasActiveFilters={filters.hasActiveFilters}
-                    seriesList={narrowedSeries}
-                    speakers={narrowedSpeakers}
-                    books={narrowedBooks}
-                    serviceTypes={narrowedServiceTypes}
-                    seriesTypes={narrowedSeriesTypes}
+                    seriesList={facets.series}
+                    speakers={facets.speakers}
+                    books={facets.books}
+                    serviceTypes={facets.serviceTypes}
+                    seriesTypes={facets.seriesTypes}
                     labelCache={labelCache}
                     showServiceTypeFilter={showServiceTypeFilter}
                     showSeriesTypeFilter={showSeriesTypeFilter}
-                    seriesLoading={seriesLoading}
-                    speakersLoading={speakersLoading}
-                    booksLoading={booksLoading}
-                    serviceTypesLoading={serviceTypesLoading}
-                    seriesTypesLoading={seriesTypesLoading}
+                    seriesLoading={facets.seriesLoading}
+                    speakersLoading={facets.speakersLoading}
+                    booksLoading={facets.booksLoading}
+                    serviceTypesLoading={facets.serviceTypesLoading}
+                    seriesTypesLoading={facets.seriesTypesLoading}
                     onSearchChange={filters.setSearch}
                     onSeriesChange={filters.setSeriesIds}
                     onSpeakerChange={filters.setSpeakerIds}
@@ -274,7 +154,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
                     onDateRangeChange={filters.setDateRange}
                     onSortChange={filters.setSort}
                     onClearFilters={filters.clearFilters}
-                    lockedFilters={lockedFilters}
+                    lockedFilters={filters.lockedFilters}
                 />
             )}
             {/* Results header: count + sort + view */}

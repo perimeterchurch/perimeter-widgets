@@ -206,6 +206,22 @@ export function useSermonFilters(config: SermonsConfig) {
         || (!config.from && params.from !== null)
         || (!config.to && params.to !== null);
 
+    // A filter is "locked" when the embedder either pinned it via a data-*
+    // attribute (e.g. data-series-id) or hid it via data-hide-* — the
+    // setters above already no-op in those cases as defense-in-depth, but
+    // consumers also need to know the lock state to suppress UI affordances.
+    const lockedFilters = new Set<string>();
+    if (config.seriesId || config.hideSeries) lockedFilters.add('series');
+    if (config.speakerId || config.hideSpeaker) lockedFilters.add('speaker');
+    if (config.bookId || config.hideBook) lockedFilters.add('book');
+    if (config.serviceTypeId || config.hideServiceType)
+        lockedFilters.add('serviceTypes');
+    if (config.seriesTypeId || config.hideSeriesType)
+        lockedFilters.add('seriesType');
+    if (config.from || config.hideDate) lockedFilters.add('from');
+    if (config.to || config.hideDate) lockedFilters.add('to');
+    if (config.hideSearch) lockedFilters.add('search');
+
     return {
         ...params,
         tab,
@@ -231,5 +247,6 @@ export function useSermonFilters(config: SermonsConfig) {
         setPage,
         clearFilters,
         hasActiveFilters,
+        lockedFilters,
     };
 }
