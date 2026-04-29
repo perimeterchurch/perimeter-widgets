@@ -18,10 +18,10 @@ const DIST_DIR = join(MONOREPO_ROOT, 'dist');
 const OUT_DIR = join(SITE_ROOT, 'public/widget-bundles');
 
 if (!existsSync(DIST_DIR)) {
-    console.warn(
+    console.error(
         `[sync-widget-bundles] ${DIST_DIR} does not exist. Build widgets first with 'pnpm -w build'.`,
     );
-    process.exit(0);
+    process.exit(1);
 }
 
 mkdirSync(OUT_DIR, { recursive: true });
