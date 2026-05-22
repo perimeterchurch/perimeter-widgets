@@ -13,15 +13,15 @@ Implementation plan: `docs/superpowers/plans/2026-05-22-perimeter-widgets-phase-
 
 ## Commands
 
-| Command | Description |
-| --- | --- |
-| `pnpm install` | Install dependencies |
-| `pnpm dev` | Run dev tasks across the workspace (Studio + widget watches) |
-| `pnpm build` | Build every package via Turborepo |
-| `pnpm test` | Run all tests |
-| `pnpm lint` | Lint all packages |
-| `pnpm typecheck` | Type-check all packages |
-| `pnpm quality` | typecheck + lint + test + prettier check (gate before PR) |
+| Command          | Description                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| `pnpm install`   | Install dependencies                                         |
+| `pnpm dev`       | Run dev tasks across the workspace (Studio + widget watches) |
+| `pnpm build`     | Build every package via Turborepo                            |
+| `pnpm test`      | Run all tests                                                |
+| `pnpm lint`      | Lint all packages                                            |
+| `pnpm typecheck` | Type-check all packages                                      |
+| `pnpm quality`   | typecheck + lint + test + prettier check (gate before PR)    |
 
 ## Critical rules
 

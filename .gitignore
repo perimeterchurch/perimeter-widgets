@@ -1,12 +1,10 @@
-node_modules/
-.turbo/
+node_modules
+.turbo
+.next
+dist
+coverage
 *.tsbuildinfo
 .env
 .env.local
+.env.*.local
 .DS_Store
-# dist/ is NOT ignored — committed for jsDelivr CDN serving.
-# But internal package dist/ (e.g. vite-preset's tsc output) is a local build
-# artifact, not for CDN.
-packages/vite-preset/dist/
-.superpowers/
-.worktrees/
