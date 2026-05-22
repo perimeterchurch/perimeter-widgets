@@ -1,3 +1,4 @@
+# extended beyond plan to protect preserved docs/legacy trees from prettier reformatting
 dist
 .next
 .turbo
