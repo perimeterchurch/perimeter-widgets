@@ -262,7 +262,7 @@ GitHub Actions workflow runs on PR and on push to `dev`:
 ## Acceptance criteria for Phase 1
 
 1. `pnpm install && pnpm quality` from a clean clone of the new repo exits 0.
-2. `pnpm build` produces `dist/example/index.js` (an IIFE) under the per-widget gzipped size budget (umbrella: 120 KB starting target).
+2. `pnpm build` produces `dist/example/index.js` (an IIFE) under the per-widget gzipped size budget (umbrella: 220 KB).
 3. `pnpm --filter @perimeter/studio dev` starts Studio at `localhost:3000`.
 4. `localhost:3000/components/button` renders the button with all variants.
 5. `localhost:3000/widgets/example` renders the example widget. Toggling **As shipped** loads the IIFE and the widget re-renders from the bundle. Toggling **Native** brings HMR back.
@@ -282,7 +282,7 @@ In as-shipped mode the IIFE has its own React tree, so the Studio's React contex
 | Vite library-mode IIFE + Tailwind CSS pipeline mis-bundles styles (loses purge info, or splits CSS across files) | Pin `cssCodeSplit: false`, verify in CI that exactly one CSS asset is emitted per build and that it ends up inlined in the JS via the `?inline` import inside `<ThemeProvider>`. Snapshot test on the example widget. |
 | Native and as-shipped render modes drift in behavior over time | Both paths share `mountWidget`'s internals (theme resolve, provider stack, shadow-root attach). A Phase 1 test asserts the two produce the same DOM string for a given config — running in jsdom against the example widget. |
 | TypeScript path resolution across packages becomes fragile (a problem in the existing repo) | No path aliases inside published packages — only inside `apps/studio`. Cross-package types resolve through `package.json#exports`. |
-| Bundle size already over budget before any real widget ships | Phase 1 sets up a CI check that fails the build if the example widget exceeds the **120 KB gzipped** starting target (same as the umbrella's per-widget budget). React + ReactDOM are bundled in, so a tighter budget than the umbrella's would be counter-productive; the example widget should sit comfortably under it. |
+| Bundle size already over budget before any real widget ships | Phase 1 sets up a CI check that fails the build if the example widget exceeds **220 KB gzipped** (matches the umbrella, revised after first-widget measurement). React 19 + ReactDOM alone are ~125 KB gz; with TanStack Query + zod + the runtime, a fresh example widget lands ~207 KB — small headroom by design. |
 
 ## Out of scope (Phase 1)
 
