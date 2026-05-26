@@ -116,6 +116,49 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.19.19)(jsdom@26.1.0)
 
+  packages/api-hooks:
+    dependencies:
+      '@perimeter/api-types':
+        specifier: workspace:*
+        version: link:../api-types
+      '@perimeter/widget-runtime':
+        specifier: workspace:*
+        version: link:../widget-runtime
+    devDependencies:
+      '@tanstack/react-query':
+        specifier: ^5.62.7
+        version: 5.100.13(react@19.2.6)
+      '@testing-library/jest-dom':
+        specifier: ^6.6.3
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.1.0
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@types/react':
+        specifier: ^19.0.7
+        version: 19.2.15
+      '@types/react-dom':
+        specifier: ^19.0.3
+        version: 19.2.3(@types/react@19.2.15)
+      '@vitest/coverage-v8':
+        specifier: ^2.1.8
+        version: 2.1.9(vitest@2.1.9(@types/node@22.19.19)(jsdom@25.0.1))
+      jsdom:
+        specifier: ^25.0.1
+        version: 25.0.1
+      react:
+        specifier: ^19.0.0
+        version: 19.2.6
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.6(react@19.2.6)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.19.19)(jsdom@25.0.1)
+
   packages/api-types:
     devDependencies:
       '@vitest/coverage-v8':
