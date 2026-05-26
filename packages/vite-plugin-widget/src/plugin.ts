@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { Plugin } from 'vite';
-import { buildVirtualEntry, VIRTUAL_ENTRY_ID, CSS_PLACEHOLDER } from './virtual-entry';
+import { buildVirtualEntry, VIRTUAL_ENTRY_ID, CSS_PLACEHOLDER } from './virtual-entry.ts';
 
 const RUNTIME_PACKAGE = '@perimeter/widget-runtime';
 
