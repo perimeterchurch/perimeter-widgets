@@ -1,6 +1,4 @@
-import * as React from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import { flushSync } from 'react-dom';
 import { MPLocalStorageAuth, type AuthProvider } from '@perimeter/auth';
 import { createApiClient } from '@perimeter/api-client';
 import { resolveTokens } from '@perimeter/theme';
@@ -11,7 +9,6 @@ import { deregisterInstance, getCss, type InstanceHandle, registerInstance } fro
 import { AuthProviderProvider } from './providers/auth-provider';
 import { AuthGate } from './providers/auth-gate';
 import { ErrorBoundary } from './providers/error-boundary';
-import { ThemeProvider } from './providers/theme-provider';
 import { makeWidgetQueryClient, QueryProvider } from './providers/query-provider';
 import { ApiClientContext } from './hooks/use-api-client';
 
@@ -50,6 +47,14 @@ export function mountWidget<S extends z.ZodTypeAny>(opts: MountOptions<S>): Moun
   // Clear any previous mount in this shadow root.
   while (shadow.firstChild) shadow.removeChild(shadow.firstChild);
 
+  // The theme <style> lives OUTSIDE the React tree. Token updates rewrite its
+  // textContent directly via applyCss(), avoiding a React re-render + the
+  // flushSync-from-lifecycle warning that triggers when `updateTokens` is
+  // called from inside a React effect (e.g. Studio's theme-overrides effect).
+  const styleEl = document.createElement('style');
+  styleEl.setAttribute('data-perimeter-theme', '');
+  shadow.appendChild(styleEl);
+
   function buildCss(): string {
     const { cssText } = resolveTokens({
       widgetOverrides: definition.themeOverrides,
@@ -60,6 +65,11 @@ export function mountWidget<S extends z.ZodTypeAny>(opts: MountOptions<S>): Moun
     return `${cssText}\n${widgetCss}`;
   }
 
+  function applyCss(): void {
+    styleEl.textContent = buildCss();
+  }
+  applyCss();
+
   const auth = (opts.authFactory ?? (() => new MPLocalStorageAuth()))();
   const apiClient = createApiClient({ baseUrl: opts.apiBaseUrl ?? DEFAULT_API_URL, auth });
 
@@ -69,44 +79,37 @@ export function mountWidget<S extends z.ZodTypeAny>(opts: MountOptions<S>): Moun
   const queryClient = makeWidgetQueryClient();
   const App = definition.App;
 
-  function render(): void {
-    root.render(
-      <ErrorBoundary widgetName={definition.name}>
-        <ThemeProvider cssText={buildCss()}>
-          <AuthProviderProvider value={auth}>
-            <AuthGate widgetName={definition.name} mode={definition.auth}>
-              <ApiClientContext.Provider value={apiClient}>
-                <QueryProvider client={queryClient}>
-                  <App config={mergedConfig} auth={auth} />
-                </QueryProvider>
-              </ApiClientContext.Provider>
-            </AuthGate>
-          </AuthProviderProvider>
-        </ThemeProvider>
-      </ErrorBoundary>,
-    );
-  }
+  root.render(
+    <ErrorBoundary widgetName={definition.name}>
+      <AuthProviderProvider value={auth}>
+        <AuthGate widgetName={definition.name} mode={definition.auth}>
+          <ApiClientContext.Provider value={apiClient}>
+            <QueryProvider client={queryClient}>
+              <App config={mergedConfig} auth={auth} />
+            </QueryProvider>
+          </ApiClientContext.Provider>
+        </AuthGate>
+      </AuthProviderProvider>
+    </ErrorBoundary>,
+  );
 
   const handle: MountedWidget = {
     unmount() {
+      // Release auth listeners/timers BEFORE unmounting React, so any in-flight
+      // onChange callback doesn't fire against a tree that's being torn down.
+      (auth as DisposableAuth).dispose?.();
       root.unmount();
       while (shadow.firstChild) shadow.removeChild(shadow.firstChild);
-      // Release any listeners/timers held by the AuthProvider (e.g. MPLocalStorageAuth's
-      // window 'storage' listener and setInterval). Optional so this runtime works with
-      // any AuthProvider impl, gracefully no-op if the impl doesn't expose dispose().
-      (auth as DisposableAuth).dispose?.();
       deregisterInstance(definition.name, handle);
     },
     updateTokens(overrides) {
       runtimeOverrides = overrides;
-      // applyOverrides callers (e.g. Studio) expect to read the updated CSS variables
-      // synchronously after the call returns, so flush the React update immediately.
-      flushSync(() => {
-        render();
-      });
+      // Direct DOM mutation — synchronous, no React re-render, no flushSync.
+      // Studio's applyOverrides callers can read the new CSS variables
+      // immediately after this call returns.
+      applyCss();
     },
   };
   registerInstance(definition.name, handle);
-  render();
   return handle;
 }
