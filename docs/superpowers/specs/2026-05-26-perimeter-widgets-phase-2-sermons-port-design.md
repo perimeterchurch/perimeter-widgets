@@ -107,7 +107,7 @@ widgets/sermons/
 @perimeter/api-types         (codegen output only; no internal deps)
 
 @perimeter/api-hooks         → @perimeter/api-types
-                             → @perimeter/api-client      (uses useApiClient from runtime)
+                             → @perimeter/widget-runtime  (consumes useApiClient(), not @perimeter/api-client directly)
                              → @tanstack/react-query      (peer)
 
 @perimeter/widget-sermons    → @perimeter/api-hooks
@@ -120,15 +120,15 @@ widgets/sermons/
 
 ### Build-time codegen
 
-A new root script `pnpm generate:api-types` runs:
+The OpenAPI spec is **vendored** into `packages/api-types/spec/spec.yaml` so CI is deterministic — it does not depend on the perimeter-api sibling checkout being present. A new root script `pnpm generate:api-types` runs:
 
 ```
-openapi-typescript ../perimeter-api/openapi/spec.yaml -o packages/api-types/src/operations.ts
+openapi-typescript packages/api-types/spec/spec.yaml -o packages/api-types/src/operations.ts
 ```
 
-`operations.ts` is generated and committed. CI verifies sync by regenerating and diffing; PR fails if drift. The generator is not part of `pnpm quality` (a missing `perimeter-api` sibling repo shouldn't break quality), but it is part of `.github/workflows/ci.yml` as an extra step requiring the sibling repo to be present.
+Both `spec.yaml` and `operations.ts` are generated artifacts committed to the repo. CI verifies sync by regenerating `operations.ts` from the vendored `spec.yaml` and diffing — PR fails if drift.
 
-For Phase 2, since the perimeter-api sibling repo is a checkout-time concern, the CI step runs only if `../perimeter-api/openapi/spec.yaml` exists. PR-time drift detection is a forward-looking convention; the initial Phase 2 commit pre-generates the file.
+Syncing the vendored spec from perimeter-api is a manual step (a separate `pnpm sync:api-spec` script copies `../perimeter-api/openapi/spec.yaml` over the vendored copy and re-runs codegen). That step is documented but explicitly **not** required in CI for Phase 2 — automating cross-repo sync is deferred to a later phase.
 
 ## API hooks layer
 
@@ -139,6 +139,7 @@ Each hook in `@perimeter/api-hooks` is a thin typed wrapper around React Query +
 import type { operations } from '@perimeter/api-types';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useApiClient } from '@perimeter/widget-runtime';
+import { serializeQuery } from '../internal/serialize-query';   // shared helper
 
 type Params = operations['listSermons']['parameters']['query'];
 type Response = operations['listSermons']['responses']['200']['content']['application/json'];
@@ -148,7 +149,7 @@ export function useSermons(params: Params): UseQueryResult<Response> {
   return useQuery({
     queryKey: ['sermons', params],
     queryFn: async () => {
-      const search = new URLSearchParams(params as Record<string, string>).toString();
+      const search = serializeQuery(params);
       const res = await client.fetch(`/sermons?${search}`);
       if (!res.ok) throw new Error(`Sermons request failed: ${res.status}`);
       return (await res.json()) as Response;
@@ -158,6 +159,15 @@ export function useSermons(params: Params): UseQueryResult<Response> {
 ```
 
 Same shape for: `useSermonDetail`, `useSeries`, `useSeriesDetail`, `useSpeakers`, `useBooks`, `useServiceTypes`, `useSeriesTypes`, `useSermonFacets`. Each returns the standard `UseQueryResult<T>` so consumers handle `isLoading` / `error` / `data` uniformly. Operation names follow the perimeter-api OpenAPI `operationId` convention.
+
+**Query serialization.** A raw `new URLSearchParams(params as Record<string, string>)` corrupts non-string params (numbers stringify naively; arrays become `"[object Object]"`; `undefined` becomes the literal `"undefined"`). The package ships a small internal `serializeQuery(params)` helper that:
+
+- Skips `undefined` and `null` values.
+- Coerces numbers and booleans to strings.
+- Encodes arrays as repeated keys (`speakerId=1&speakerId=2`).
+- Encodes dates as ISO `YYYY-MM-DD`.
+
+The helper has its own unit test in `packages/api-hooks/tests/internal/`. Every hook uses it.
 
 ## Data flow
 
@@ -192,7 +202,11 @@ Every component below `App` receives `config` as a prop. `useSermonFilters(confi
 
 Legacy uses `nuqs` to sync filter state to `window.location.search`. Same approach ports unchanged. The widget runs inside a shadow root but URL state is window-global, so two embeds on the same page would collide.
 
-**Hardening:** `<NuqsAdapter>` is configured with a prefix derived from the embed element's `id` attribute. If the embed `<div id="perimeter-sermons-1">`, nuqs uses prefix `perimeter-sermons-1.` so multiple embeds don't fight. Legacy didn't do this (single embed assumed); we add the prefix during the port. Behavior is identical when only one embed exists (the prefix is just longer URL keys).
+**Hardening:** `<NuqsAdapter>` is configured with a prefix derived from the embed element's `id` attribute. If the embed `<div id="perimeter-sermons-1">`, nuqs uses prefix `perimeter-sermons-1.` so multiple embeds don't fight.
+
+**Fallback when no `id` is set.** Legacy WP embeds may not declare an `id` (only `data-perimeter-widget`). At mount time the widget sets a stable id on the target if missing, using `crypto.randomUUID()` — assigned in the runtime's mount path or in the widget's App init effect (decision deferred to implementation). The randomized id changes per page load but is stable within a session, which is the contract nuqs needs.
+
+Legacy didn't do this (single embed assumed); we add the prefix during the port. Behavior is identical when only one embed exists (the prefix is just longer URL keys).
 
 ## Error & loading states
 
@@ -209,7 +223,7 @@ Legacy uses `nuqs` to sync filter state to `window.location.search`. Same approa
 
 ## Testing strategy
 
-Legacy had ~150 assertions across 18 test files (`widgets/sermons/src/__tests__/`).
+Legacy had ~150 assertions across ~18 test files (`widgets/sermons/src/__tests__/`). The table below is representative — the planner enumerates the exact set by listing the legacy `__tests__/` directory. Files not enumerated below (e.g., MediaCard, Modal, DatePicker tests if present) follow the same relocation rule: widget-internal stays in `widgets/sermons/tests/`; hook tests for endpoint-driven hooks relocate to `packages/api-hooks/tests/`.
 
 | Test file | Source | Lands in |
 |---|---|---|
@@ -237,7 +251,7 @@ Mocking: hook tests mock `useApiClient` at the runtime context boundary; compone
 
 ## Verification in Studio
 
-- Add an entry to `apps/studio/src/lib/widgets-registry.ts` and `widget-definitions.ts`.
+- Add a sermons entry to `apps/studio/src/lib/widgets-registry.ts` (metadata: `{ slug: 'sermons', title: 'Sermons', definition: sermonsDefinition }`) and to `apps/studio/src/lib/widget-definitions.ts` (the client-side import map; see Phase 1's `[Chunk 8]` pattern around lines 4079–4106 of `2026-05-22-perimeter-widgets-phase-1-foundation.md` plan).
 - No new Studio routes; `/widgets/sermons` works automatically via the `[slug]` dynamic route.
 - Native + As-shipped modes both work. Theme overrides in `/theme` propagate to both (Phase 1 contract).
 
