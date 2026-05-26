@@ -4,20 +4,20 @@ import { useApiClient } from '@perimeter/widget-runtime';
 import { serializeQuery } from '../internal/serialize-query';
 import { fetchJson } from '../internal/fetch-json';
 
-export type UseSermonsParams = NonNullable<operations['listSermons']['parameters']['query']>;
-export type UseSermonsResponse =
-  operations['listSermons']['responses']['200']['content']['application/json'];
+export type UseBooksParams = NonNullable<operations['listBooks']['parameters']['query']>;
+export type UseBooksResponse =
+  operations['listBooks']['responses']['200']['content']['application/json'];
 
-export function useSermons(params: UseSermonsParams): UseQueryResult<UseSermonsResponse> {
+export function useBooks(params: UseBooksParams = {}): UseQueryResult<UseBooksResponse> {
   const client = useApiClient();
   return useQuery({
-    queryKey: ['sermons', params],
+    queryKey: ['books', params],
     queryFn: async () => {
       const search = serializeQuery(params);
-      return fetchJson<UseSermonsResponse>(
+      return fetchJson<UseBooksResponse>(
         client,
-        `/api/sermons${search ? `?${search}` : ''}`,
-        'Sermons',
+        `/api/sermons/books${search ? `?${search}` : ''}`,
+        'Books',
       );
     },
   });

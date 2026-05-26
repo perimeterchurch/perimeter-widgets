@@ -2,6 +2,7 @@ import type { operations } from '@perimeter/api-types';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useApiClient } from '@perimeter/widget-runtime';
 import { serializeQuery } from '../internal/serialize-query';
+import { fetchJson } from '../internal/fetch-json';
 
 export type UseSeriesParams = NonNullable<operations['listSeries']['parameters']['query']>;
 export type UseSeriesResponse =
@@ -13,9 +14,11 @@ export function useSeries(params: UseSeriesParams): UseQueryResult<UseSeriesResp
     queryKey: ['series', params],
     queryFn: async () => {
       const search = serializeQuery(params);
-      const res = await client.fetch(`/api/sermons/series${search ? `?${search}` : ''}`);
-      if (!res.ok) throw new Error(`Series request failed: ${res.status}`);
-      return (await res.json()) as UseSeriesResponse;
+      return fetchJson<UseSeriesResponse>(
+        client,
+        `/api/sermons/series${search ? `?${search}` : ''}`,
+        'Series',
+      );
     },
   });
 }

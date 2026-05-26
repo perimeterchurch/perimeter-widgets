@@ -3,15 +3,15 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useApiClient } from '@perimeter/widget-runtime';
 import { fetchJson } from '../internal/fetch-json';
 
-export type UseSermonDetailResponse =
-  operations['getSermon']['responses']['200']['content']['application/json'];
+export type UseSeriesDetailResponse =
+  operations['getSeriesDetail']['responses']['200']['content']['application/json'];
 
-export function useSermonDetail(id: number): UseQueryResult<UseSermonDetailResponse> {
+export function useSeriesDetail(id: number): UseQueryResult<UseSeriesDetailResponse> {
   const client = useApiClient();
   return useQuery({
-    queryKey: ['sermon', id],
+    queryKey: ['series-detail', id],
     queryFn: async () =>
-      fetchJson<UseSermonDetailResponse>(client, `/api/sermons/sermon/${id}`, 'Sermon detail'),
+      fetchJson<UseSeriesDetailResponse>(client, `/api/sermons/series/${id}`, 'Series detail'),
     enabled: Number.isFinite(id) && id > 0,
   });
 }
