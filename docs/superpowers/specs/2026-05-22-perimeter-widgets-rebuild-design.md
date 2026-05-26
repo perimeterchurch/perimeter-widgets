@@ -290,7 +290,7 @@ Greenfield rebuild. The existing repo is archived to a `legacy/v1` branch for re
 | `data-*`-based theme overrides allow arbitrary CSS values into the shadow root | Token schema validation rejects unknown tokens; values are written into typed CSS-variable declarations only, never injected as raw CSS |
 | Vercel Blob + KV adds a moving part vs. pure static deploys | Static-deploy remains a viable fallback if Blob proves operationally heavier than expected (see Open Questions) |
 | MP localStorage token is brittle and XSS-prone | Token handling is isolated to `MPLocalStorageAuth`; the rest of the system speaks only to `AuthProvider`, so a cookie-session replacement is a single swap |
-| Bundle size growth with all-React-bundled-in | Per-widget budget: **220 KB gzipped** (revised from 120 KB after Phase-1 measurement — React 19 + ReactDOM + TanStack Query + zod + runtime weigh ~200 KB gz on their own). Tree-shaking verified at build. If multiple widgets push past the budget, the loader-script path can be extended to share React across bundles loaded together — out of scope for this rebuild |
+| Bundle size growth with all-React-bundled-in | Per-widget budget: **500 KB gzipped** (revised upward in Phase 2 — the Phase 1 platform stack alone is ~200 KB gz: React 19 + ReactDOM + TanStack Query + zod + runtime; sermons additionally bundles react-pdf, HLS.js, framer-motion, luxon, nuqs, headlessui, and lucide-react, which is the basis for the raise). Tree-shaking verified at build. If multiple widgets push past the budget, the loader-script path can be extended to share React across bundles loaded together — out of scope for this rebuild |
 
 ## Phase specs
 
