@@ -27,6 +27,7 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-implied-eval': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
       'no-implied-eval': 'off',
     },
   },
