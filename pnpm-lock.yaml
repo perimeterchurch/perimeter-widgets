@@ -53,6 +53,9 @@ importers:
       '@perimeter/widget-runtime':
         specifier: workspace:*
         version: link:../../packages/widget-runtime
+      '@perimeter/widget-sermons':
+        specifier: workspace:*
+        version: link:../../widgets/sermons
       next:
         specifier: ^16.0.0
         version: 16.2.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
