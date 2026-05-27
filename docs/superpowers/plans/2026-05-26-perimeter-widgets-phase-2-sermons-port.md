@@ -1307,7 +1307,89 @@ For each (Tasks 3.2-3.5):
 
 ---
 
+## Chunk 6a: Expand `@perimeter/ui` with the components sermons depends on (ADDED MID-EXECUTION)
+
+**Why this exists:** Chunk 6 execution surfaced a planning gap. The legacy sermons widget consumes ~13 richer UI components + 2 hooks from the legacy shadcn registry (`legacy/v1:packages/registry/ui/perimeter/` and `legacy/v1:packages/shared/`) via `@perimeter-widgets/shared`. The rebuilt `@perimeter/ui` deliberately ships only 5 hand-written primitives (Button, Card, Input, Label, Skeleton). The Phase 2 spec's "faithful 1:1 port" never reconciled this. **Decision (user, 2026-05-27): expand `@perimeter/ui` with the needed components as shared, hand-owned code** — the long-term-correct home; future widgets reuse them. This adds `@base-ui/react`, `class-variance-authority`, and `downshift` as `@perimeter/ui` dependencies.
+
+**Outcome:** `@perimeter/ui` exports the components + hooks below, each in its own file, each added to `package.json#exports`, each with at least a smoke render test. `pnpm --filter @perimeter/ui lint && typecheck && test` exit 0.
+
+### Components to port (from `legacy/v1`)
+
+From `legacy/v1:packages/registry/ui/perimeter/`:
+- `tabs.tsx` → `Tabs`, `TabsList`, `TabsTrigger` (+ panel if present). Uses `@base-ui/react/tabs`.
+- `combobox.tsx` → `Combobox`. Uses `downshift`.
+- `multi-combobox.tsx` → `MultiCombobox`, `MultiComboboxOption`. Uses `downshift`.
+- `input-group.tsx` → `InputGroup`, `InputGroupAddon`, `InputGroupInput`.
+- `pagination.tsx` → `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationNext`, `PaginationPrevious`, `PaginationEllipsis`.
+- `badge.tsx` → `Badge`.
+- `empty.tsx` → `Empty`, `EmptyHeader`, `EmptyTitle`, `EmptyDescription`.
+- `spinner.tsx` → `Spinner`.
+- `textarea.tsx` → `Textarea` (input-group depends on it — port if referenced).
+
+From `legacy/v1:packages/shared/src/components/ui/perimeter/`:
+- `sort-select.tsx` → `SortSelect`. Uses `useClickOutside`.
+- `icon-select.tsx` → `IconSelect`. Uses `useClickOutside`.
+
+From `legacy/v1:packages/shared/src/components/motion/`:
+- `SkeletonTransition.tsx` → `SkeletonTransition`. Uses `framer-motion` + a small `motion/config`. Port the `config` too (`legacy/v1:packages/shared/src/lib/motion/config.ts`).
+
+Hooks (from `legacy/v1:packages/shared/src/lib/`):
+- `use-click-outside.ts` → `useClickOutside`.
+- `use-safe-html.ts` → `useSafeHtml` (needed by SermonDetail in Chunk 7).
+
+### Dependencies to add to `@perimeter/ui/package.json`
+
+```
+"@base-ui/react": "^1.3.0",
+"class-variance-authority": "^0.7.1",
+"downshift": "^9.3.2",
+"framer-motion": "^12.0.0"
+```
+(`clsx`, `tailwind-merge`, `lucide-react`, `react` are already there or added as needed. Note legacy used `lucide-react ^0.577.0` in shared — match the version already in @perimeter/ui to avoid a second copy.)
+
+### Import-alias translation rules
+
+Legacy registry components use path aliases that don't exist in `@perimeter/ui`:
+- `@/lib/utils` (their `cn`) → `./utils/cn` (the `cn` already in `@perimeter/ui`).
+- `@/components/ui/button` → `./button` (the existing `@perimeter/ui` Button). **Check API compatibility** — the registry `Button` has `cva` variants; the existing `@perimeter/ui` Button has `variant: primary|secondary|ghost` + `size`. If a ported component (e.g. pagination) needs a registry-Button variant the new Button lacks, either (a) extend the new Button's variants, or (b) use the new Button's nearest equivalent. Note the divergence in your report.
+- `@/components/ui/input` → `./input`; `@/components/ui/textarea` → `./textarea` (port textarea if needed).
+- `'use client'` directives: harmless in the IIFE build; keep or drop consistently (the existing @perimeter/ui components don't use them — drop for consistency).
+
+### Tasks
+
+- [ ] **6a.1:** Add the four deps to `@perimeter/ui/package.json`; `pnpm install`.
+- [ ] **6a.2:** Port `use-click-outside.ts` + `use-safe-html.ts` into `@perimeter/ui/src/hooks/` (or `src/lib/`); export via subpath. Port their legacy tests if present.
+- [ ] **6a.3:** Port the registry components one at a time, each into its own `@perimeter/ui/src/<name>.tsx`, translating import aliases. Add each to `package.json#exports` (subpath like `./tabs`, `./multi-combobox`, `./pagination`, etc.). Write a smoke render test per component (renders without throwing; key roles/text present).
+- [ ] **6a.4:** Port `SortSelect`, `IconSelect`, `SkeletonTransition` (+ motion config). Subpath exports.
+- [ ] **6a.5:** `pnpm --filter @perimeter/ui lint && typecheck && test` → exit 0. Do NOT run repo-wide `pnpm quality` yet (the sermons package is mid-port and red until Chunk 6 resumes).
+- [ ] **6a.6:** Commit `packages/ui` + `pnpm-lock.yaml`. Message:
+
+  ```
+  feat(ui): expand @perimeter/ui with sermons-required components
+
+  Ports Tabs, Combobox, MultiCombobox, InputGroup, Pagination, Badge,
+  Empty, Spinner, Textarea, SortSelect, IconSelect, SkeletonTransition
+  + useClickOutside/useSafeHtml from the legacy shadcn registry. Adds
+  @base-ui/react, class-variance-authority, downshift, framer-motion as
+  @perimeter/ui deps. Each component is its own file + subpath export
+  with a smoke test. Decided mid-Phase-2 (component layer the sermons
+  port depends on; the slimmed Phase 1 @perimeter/ui shipped only 5
+  primitives).
+
+  Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+  ```
+
+### Chunk 6a acceptance
+
+- `@perimeter/ui` exports all the components + 2 hooks above, each tested.
+- `pnpm --filter @perimeter/ui lint && typecheck && test` exit 0.
+- The bundle-size implication (these add to the eventual sermons IIFE) is tracked by the Chunk 8 bundle test against the 500 KB budget.
+
+---
+
 ## Chunk 6: UI primitives + non-detail components
+
+> **Resumes after Chunk 6a.** When porting SermonTabs/SeriesView/SermonGrid/etc., repoint the legacy `@perimeter-widgets/shared` value imports (Tabs, MultiCombobox, InputGroup, Pagination, Badge, Empty, Spinner, SortSelect, IconSelect, SkeletonTransition) to their new `@perimeter/ui/<name>` subpaths. The 9 widget files ported during the first Chunk 6 attempt are uncommitted on disk and finalized here once their sibling components (SermonTabs, SeriesView) resolve.
 
 **Outcome:** All UI primitives (`DatePicker`, `DateRangePicker`, `ImagePlaceholder`, `MediaCard`, `Modal`) and the non-detail components (`SermonTabs`, sermons/`SermonGrid`/`SermonLargeList`/`SermonSmallList`, series/`SeriesGrid`/`SeriesView`) ported. `SermonGrid.test.tsx` passes.
 
