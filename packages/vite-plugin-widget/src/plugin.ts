@@ -44,6 +44,17 @@ export function perimeterWidget(options: PerimeterWidgetPluginOptions): Plugin {
       pkgVersion = pkg.version ?? '0.0.0';
       entryAbsPath = path.resolve(root, options.entry ?? 'src/index.ts');
       return {
+        // Widgets ship as self-contained IIFEs straight to browsers — there is
+        // no downstream bundler to substitute `process.env.NODE_ENV`. Vite's
+        // library mode does not define it automatically, so the development
+        // branches of React, ReactDOM, React Query, prop-types, etc. survive
+        // minification as dead-but-unremovable code (and their dev builds ship
+        // alongside the prod ones). Pinning it to "production" lets the minifier
+        // tree-shake those branches out. Production-only by design; behavior is
+        // unchanged because these widgets always run in production.
+        define: {
+          'process.env.NODE_ENV': '"production"',
+        },
         build: {
           lib: {
             entry: VIRTUAL_ENTRY_ID,
