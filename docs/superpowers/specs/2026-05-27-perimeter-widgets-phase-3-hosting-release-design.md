@@ -77,7 +77,11 @@ interface KvClient {
 
 The driver is selected by env: `RELEASE_STORE_DRIVER=memory` uses the in-memory fake
 (tests + local dev with no cloud creds); otherwise the Vercel driver activates when
-`KV_*` / `BLOB_*` are present. `store.ts` exposes the only operations the rest of the
+`KV_*` / `BLOB_*` are present. The Vercel driver's **env detection is an explicit,
+tested unit**: it resolves the KV connection from whichever vars the store exposes
+(`KV_REST_API_URL` + `KV_REST_API_TOKEN` for Vercel KV, or `REDIS_URL` for a marketplace
+Upstash store) and throws a clear error if neither is present — the "confirmed at wiring
+time" unknown must not become a silent runtime guess. `store.ts` exposes the only operations the rest of the
 system uses: `listBuilds(name)`, `recordBuild(name, record)`, `getLatest(name)`,
 `setLatest(name, version, by)`, `listActivity()`, `uploadBundle(...)`, `readBundle(...)`.
 
@@ -90,6 +94,10 @@ All values are JSON. Keys owned exclusively by `@perimeter/release-store`.
 | `latest:<name>` | `"1.4.2"` — the live version pointer | promote / rollback |
 | `builds:<name>` | array of `BuildRecord`, newest first | publish |
 | `activity` | append-only `ActivityEntry[]`, capped at the last 200 | publish / promote / rollback |
+
+The `activity` cap is a read-modify-write on one key; it is **intentionally not made
+atomic**. Concurrent writes have a theoretical lost-update window, which is acceptable
+because promote/publish are manual, single-admin operations at this scale.
 
 ```ts
 type BuildRecord = {
@@ -181,8 +189,11 @@ Reuse the sibling pattern (metrics/helpdesk) verbatim, adapted to Studio:
 - **Cookie prefix `studio`** (not `perimeter`/`metrics`). **Stateless** — no DB adapter,
   matching helpdesk; the cookie session carries identity.
 - `app/api/auth/[...all]/route.ts` mounts the Better Auth handler.
-- `middleware.ts` with matcher `/admin/:path*`: missing/invalid `studio.session_token`
-  → redirect to `/admin/login` (MP OAuth sign-in). Everything outside `/admin` stays
+- `middleware.ts` with matcher `/admin/:path*`: a **presence check** at the edge (via
+  Better Auth's `getSessionCookie`, mirroring the metrics middleware) — no `studio.session_token`
+  cookie → redirect to `/admin/login` (MP OAuth sign-in). The edge does **not** verify the
+  signature/expiry (that avoids redirect loops and keeps edge work cheap); full validation
+  happens in the server actions via `auth.api.getSession`. Everything outside `/admin` stays
   public-readable.
 - MP OAuth redirect URI: `https://studio.perimeter.org/api/auth/callback/ministryplatform`.
 
@@ -214,7 +225,9 @@ The design is built around injectable clients so no test touches real Vercel ser
 
 ## Provisioning (Vercel dashboard — developer steps, documented for the plan)
 
-1. Create a **Blob store**; bind `BLOB_READ_WRITE_TOKEN` to both `apps/cdn` and Studio.
+1. Create a **Blob store**. Studio + the publish script need the read-write token
+   (`BLOB_READ_WRITE_TOKEN`); `apps/cdn` is read-only, so bind a read-only token there
+   if Vercel Blob offers one, to keep its credentials matching the read-only boundary.
 2. Confirm the existing **Redis/KV** binding exposes env vars to both apps. The Vercel
    driver adapts to whichever the store provides (`KV_REST_API_URL`/`KV_REST_API_TOKEN`
    for Vercel KV, or `REDIS_URL` for a marketplace Upstash store) — to be confirmed at
