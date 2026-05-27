@@ -48,13 +48,22 @@ packages/release-store/                          NEW package @perimeter/release-
 
 apps/cdn/                                         NEW Next.js app @ widgets.perimeter.org
   package.json · next.config.ts · tsconfig.json · vitest.config.ts
-  src/app/layout.tsx                      minimal root layout (route-handler-only app)
-  src/app/[name]/[version]/index.js/route.ts        immutable bundle
-  src/app/[name]/[version]/index.js.map/route.ts     immutable sourcemap
-  src/app/[name]/latest.js/route.ts                  302 → versioned
-  src/app/manifest.json/route.ts                     names → /latest.js
+  src/app/layout.tsx · src/app/page.tsx   minimal shell (route-handler-only app)
+  src/app/api/bundle/[name]/[version]/route.ts       immutable bundle
+  src/app/api/bundle-map/[name]/[version]/route.ts   immutable sourcemap
+  src/app/api/latest/[name]/route.ts                 302 → versioned
+  src/app/api/manifest/route.ts                      names → /latest.js
+  src/lib/store.ts                        lazy memoized getStore() accessor
   src/lib/cache.ts                        cache-control header constants
   tests/*.test.ts
+
+  # next.config.ts rewrites map the PUBLIC dotted URLs → the /api routes above.
+  # This mirrors the proven Studio pattern (next.config rewrites /widget-bundles/:name.js
+  # → /api/widget-bundles/:name) and avoids relying on dotted route-segment folders.
+  #   /:name/:version/index.js.map → /api/bundle-map/:name/:version
+  #   /:name/:version/index.js     → /api/bundle/:name/:version
+  #   /:name/latest.js             → /api/latest/:name
+  #   /manifest.json               → /api/manifest
 
 apps/studio/                                      CHANGED
   src/middleware.ts                       gate /admin/* (presence check, prefix `studio`)
@@ -818,11 +827,22 @@ Read-only Next.js app. Every route is tested by importing its `GET` handler and 
 }
 ```
 
-- [ ] **Step 2: Write `next.config.ts`**
+- [ ] **Step 2: Write `next.config.ts`** — rewrites map public dotted URLs to clean `/api` routes (proven Studio pattern). Order the `.js.map` rewrite before `.js` for clarity (they don't actually collide, since segment literals differ).
 
 ```ts
 import type { NextConfig } from 'next';
-const config: NextConfig = {};
+
+const config: NextConfig = {
+  async rewrites() {
+    return [
+      { source: '/:name/:version/index.js.map', destination: '/api/bundle-map/:name/:version' },
+      { source: '/:name/:version/index.js', destination: '/api/bundle/:name/:version' },
+      { source: '/:name/latest.js', destination: '/api/latest/:name' },
+      { source: '/manifest.json', destination: '/api/manifest' },
+    ];
+  },
+};
+
 export default config;
 ```
 
@@ -883,14 +903,20 @@ export const POINTER = 'public, s-maxage=300, stale-while-revalidate=86400';
 export const JS_CONTENT_TYPE = 'application/javascript; charset=utf-8';
 ```
 
-- [ ] **Step 7: Write `src/lib/store.ts`**
+- [ ] **Step 7: Write `src/lib/store.ts`** — **lazy + memoized.** Do NOT call `getStore()` at module top level: route-handler modules are imported during `next build`, and `getStore()` throws without KV/Blob env. A lazy accessor defers that to request time.
 
 ```ts
 import { getStore } from '@perimeter/release-store';
-export const store = getStore();
+import type { ReleaseStore } from '@perimeter/release-store';
+
+let cached: ReleaseStore | undefined;
+
+export function releaseStore(): ReleaseStore {
+  return (cached ??= getStore());
+}
 ```
 
-- [ ] **Step 8: Verify build wiring** — `pnpm install && pnpm --filter @perimeter/cdn typecheck` → exit 0.
+- [ ] **Step 8: Verify build wiring** — `pnpm install && pnpm --filter @perimeter/cdn typecheck` → exit 0. (Full `next build` is verified in Task 10 once routes exist.)
 
 - [ ] **Step 9: Commit**
 
@@ -902,28 +928,28 @@ git commit -m "chore(cdn): scaffold widgets.perimeter.org Next app"
 ### Task 9: Immutable bundle + sourcemap routes
 
 **Files:**
-- Create: `apps/cdn/src/app/[name]/[version]/index.js/route.ts`
-- Create: `apps/cdn/src/app/[name]/[version]/index.js.map/route.ts`
+- Create: `apps/cdn/src/app/api/bundle/[name]/[version]/route.ts`
+- Create: `apps/cdn/src/app/api/bundle-map/[name]/[version]/route.ts`
 - Test: `apps/cdn/tests/versioned.test.ts`
 
-> The route folder names `index.js` and `index.js.map` are literal segments so the URL ends in `.js`/`.js.map`. Next.js App Router permits dots in segment folder names.
+> These are clean `/api` route handlers; the public dotted URLs reach them via the `next.config.ts` rewrites from Task 8. No dotted route-segment folders.
 
-- [ ] **Step 1: Write the failing test** — mock `@/lib/store` with a memory store seeded with a bundle.
+- [ ] **Step 1: Write the failing test** — mock `@/lib/store` with a memory store seeded with a bundle. Note the mock returns `releaseStore` (the lazy accessor), not `store`.
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createStore, createMemoryKv, createMemoryBlob } from '@perimeter/release-store';
 
 const memory = createStore(createMemoryKv(), createMemoryBlob());
-vi.mock('@/lib/store', () => ({ store: memory }));
+vi.mock('@/lib/store', () => ({ releaseStore: () => memory }));
 
 beforeEach(async () => {
   await memory.uploadBundle('sermons/1.0.0/index.js', Buffer.from('BUNDLE'), 'application/javascript');
 });
 
-describe('GET /[name]/[version]/index.js', () => {
+describe('GET /api/bundle/[name]/[version]', () => {
   it('streams the immutable bundle with the 1-year cache header', async () => {
-    const { GET } = await import('@/app/[name]/[version]/index.js/route');
+    const { GET } = await import('@/app/api/bundle/[name]/[version]/route');
     const res = await GET(new Request('https://widgets.perimeter.org/sermons/1.0.0/index.js'), {
       params: Promise.resolve({ name: 'sermons', version: '1.0.0' }),
     });
@@ -934,7 +960,7 @@ describe('GET /[name]/[version]/index.js', () => {
   });
 
   it('404s an unknown version', async () => {
-    const { GET } = await import('@/app/[name]/[version]/index.js/route');
+    const { GET } = await import('@/app/api/bundle/[name]/[version]/route');
     const res = await GET(new Request('https://x/sermons/9.9.9/index.js'), {
       params: Promise.resolve({ name: 'sermons', version: '9.9.9' }),
     });
@@ -945,17 +971,17 @@ describe('GET /[name]/[version]/index.js', () => {
 
 - [ ] **Step 2: Run to verify it fails** — FAIL (route missing).
 
-- [ ] **Step 3: Write `index.js/route.ts`**
+- [ ] **Step 3: Write `api/bundle/[name]/[version]/route.ts`**
 
 ```ts
-import { store } from '@/lib/store';
+import { releaseStore } from '@/lib/store';
 import { IMMUTABLE, JS_CONTENT_TYPE } from '@/lib/cache';
 
 type Ctx = { params: Promise<{ name: string; version: string }> };
 
 export async function GET(_req: Request, ctx: Ctx): Promise<Response> {
   const { name, version } = await ctx.params;
-  const stream = await store.readBundle(`${name}/${version}/index.js`);
+  const stream = await releaseStore().readBundle(`${name}/${version}/index.js`);
   if (!stream) return new Response('not found', { status: 404 });
   return new Response(stream, {
     headers: { 'content-type': JS_CONTENT_TYPE, 'cache-control': IMMUTABLE },
@@ -963,17 +989,17 @@ export async function GET(_req: Request, ctx: Ctx): Promise<Response> {
 }
 ```
 
-- [ ] **Step 4: Write `index.js.map/route.ts`** (same shape, path `…/index.js.map`, content-type `application/json`)
+- [ ] **Step 4: Write `api/bundle-map/[name]/[version]/route.ts`** (same shape; reads the `.map`, content-type `application/json`)
 
 ```ts
-import { store } from '@/lib/store';
+import { releaseStore } from '@/lib/store';
 import { IMMUTABLE } from '@/lib/cache';
 
 type Ctx = { params: Promise<{ name: string; version: string }> };
 
 export async function GET(_req: Request, ctx: Ctx): Promise<Response> {
   const { name, version } = await ctx.params;
-  const stream = await store.readBundle(`${name}/${version}/index.js.map`);
+  const stream = await releaseStore().readBundle(`${name}/${version}/index.js.map`);
   if (!stream) return new Response('not found', { status: 404 });
   return new Response(stream, {
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': IMMUTABLE },
@@ -986,15 +1012,15 @@ export async function GET(_req: Request, ctx: Ctx): Promise<Response> {
 - [ ] **Step 6: Commit**
 
 ```bash
-git add "apps/cdn/src/app/[name]" apps/cdn/tests/versioned.test.ts
+git add apps/cdn/src/app/api apps/cdn/tests/versioned.test.ts
 git commit -m "feat(cdn): serve immutable versioned bundle + sourcemap"
 ```
 
 ### Task 10: `latest.js` 302 + `manifest.json`
 
 **Files:**
-- Create: `apps/cdn/src/app/[name]/latest.js/route.ts`
-- Create: `apps/cdn/src/app/manifest.json/route.ts`
+- Create: `apps/cdn/src/app/api/latest/[name]/route.ts`
+- Create: `apps/cdn/src/app/api/manifest/route.ts`
 - Test: `apps/cdn/tests/latest.test.ts`, `apps/cdn/tests/manifest.test.ts`
 
 - [ ] **Step 1: Write the failing tests**
@@ -1005,18 +1031,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createStore, createMemoryKv, createMemoryBlob } from '@perimeter/release-store';
 
 const memory = createStore(createMemoryKv(), createMemoryBlob());
-vi.mock('@/lib/store', () => ({ store: memory }));
+vi.mock('@/lib/store', () => ({ releaseStore: () => memory }));
 
 const build = (v: string) => ({ version: v, sha: 'x', sizeGz: 1, builtAt: 't', blobPath: `sermons/${v}/index.js` });
 
-describe('GET /[name]/latest.js', () => {
+describe('GET /api/latest/[name]', () => {
   beforeEach(async () => {
     await memory.recordBuild('sermons', build('1.0.0'));
   });
 
   it('302-redirects to the live versioned URL with the pointer cache header', async () => {
     await memory.setLatest('sermons', '1.0.0', 'promote', 'me');
-    const { GET } = await import('@/app/[name]/latest.js/route');
+    const { GET } = await import('@/app/api/latest/[name]/route');
     const res = await GET(new Request('https://widgets.perimeter.org/sermons/latest.js'), {
       params: Promise.resolve({ name: 'sermons' }),
     });
@@ -1026,7 +1052,7 @@ describe('GET /[name]/latest.js', () => {
   });
 
   it('404s when the widget was never promoted', async () => {
-    const { GET } = await import('@/app/[name]/latest.js/route');
+    const { GET } = await import('@/app/api/latest/[name]/route');
     const res = await GET(new Request('https://x/sermons/latest.js'), {
       params: Promise.resolve({ name: 'sermons' }),
     });
@@ -1037,17 +1063,17 @@ describe('GET /[name]/latest.js', () => {
 
 ```ts
 // tests/manifest.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { createStore, createMemoryKv, createMemoryBlob } from '@perimeter/release-store';
 
 const memory = createStore(createMemoryKv(), createMemoryBlob());
-vi.mock('@/lib/store', () => ({ store: memory }));
+vi.mock('@/lib/store', () => ({ releaseStore: () => memory }));
 
-describe('GET /manifest.json', () => {
+describe('GET /api/manifest', () => {
   it('lists only promoted widgets as name → latest.js URLs', async () => {
     await memory.recordBuild('sermons', { version: '1.0.0', sha: 'x', sizeGz: 1, builtAt: 't', blobPath: 'sermons/1.0.0/index.js' });
     await memory.setLatest('sermons', '1.0.0', 'promote', 'me');
-    const { GET } = await import('@/app/manifest.json/route');
+    const { GET } = await import('@/app/api/manifest/route');
     const res = await GET();
     expect(res.headers.get('cache-control')).toBe('public, s-maxage=300, stale-while-revalidate=86400');
     expect(await res.json()).toEqual({ sermons: '/sermons/latest.js' });
@@ -1079,17 +1105,17 @@ In `store.ts`:
   ```
 Add a store test in `tests/store.test.ts` asserting `listWidgets` returns promoted widgets only, and re-run `pnpm --filter @perimeter/release-store test`.
 
-- [ ] **Step 4: Write `latest.js/route.ts`**
+- [ ] **Step 4: Write `api/latest/[name]/route.ts`**
 
 ```ts
-import { store } from '@/lib/store';
+import { releaseStore } from '@/lib/store';
 import { POINTER } from '@/lib/cache';
 
 type Ctx = { params: Promise<{ name: string }> };
 
 export async function GET(_req: Request, ctx: Ctx): Promise<Response> {
   const { name } = await ctx.params;
-  const version = await store.getLatest(name);
+  const version = await releaseStore().getLatest(name);
   if (!version) return new Response('not found', { status: 404 });
   return new Response(null, {
     status: 302,
@@ -1098,14 +1124,14 @@ export async function GET(_req: Request, ctx: Ctx): Promise<Response> {
 }
 ```
 
-- [ ] **Step 5: Write `manifest.json/route.ts`**
+- [ ] **Step 5: Write `api/manifest/route.ts`**
 
 ```ts
-import { store } from '@/lib/store';
+import { releaseStore } from '@/lib/store';
 import { POINTER } from '@/lib/cache';
 
 export async function GET(): Promise<Response> {
-  const widgets = await store.listWidgets();
+  const widgets = await releaseStore().listWidgets();
   const manifest = Object.fromEntries(widgets.map((name) => [name, `/${name}/latest.js`]));
   return new Response(JSON.stringify(manifest), {
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': POINTER },
@@ -1115,7 +1141,12 @@ export async function GET(): Promise<Response> {
 
 - [ ] **Step 6: Run to verify it passes** — `pnpm --filter @perimeter/release-store test && pnpm --filter @perimeter/cdn test` → PASS.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Verify the real build + rewrites resolve** — the unit tests call handlers directly and don't exercise Next routing, so confirm the framework wiring once:
+  - `RELEASE_STORE_DRIVER=memory pnpm --filter @perimeter/cdn build` → completes with no error (proves the lazy `releaseStore()` doesn't throw at build/collection time, and the routes compile).
+  - Optionally, smoke the rewrites: `RELEASE_STORE_DRIVER=memory pnpm --filter @perimeter/cdn dev` in one shell, then in another `curl -sI http://localhost:3001/sermons/1.0.0/index.js` should 404 (empty memory store) — a 404 from the route handler (not a Next 404 page) confirms the rewrite resolved to `/api/bundle/...`. Stop the dev server after.
+  - If a rewrite source pattern is rejected by Next 16, fall back to a single catch-all `src/app/api/[...segments]/route.ts` that parses the path — but the Studio-proven `:param` + literal-suffix form should work.
+
+- [ ] **Step 8: Commit**
 
 ```bash
 git add apps/cdn packages/release-store
@@ -1328,6 +1359,8 @@ main().catch((err: unknown) => {
 Run: `RELEASE_STORE_DRIVER=memory pnpm publish-widget sermons`
 Expected: builds sermons, prints `Published sermons@<version> (… KB gz) — available, not yet live.` (The memory store is per-process, so the record won't persist — this only verifies the pipeline runs end-to-end without throwing.)
 
+> Note: `widgets/sermons/package.json` currently has `"version": "0.0.0"`, so on `main` the published version is `0.0.0` and the immutable path is `sermons/0.0.0/index.js`. That is valid (functionally fine), just not a meaningful semver. Bumping the sermons version is a separate decision — do NOT change it as part of this task; expect `0.0.0` until the owner bumps it.
+
 - [ ] **Step 4: Commit**
 
 ```bash
@@ -1502,7 +1535,7 @@ export default function AdminLogin() {
       <h1 className="text-xl font-semibold">Admin sign-in</h1>
       <button
         className="rounded-md border border-border px-4 py-2 text-sm"
-        onClick={() => void signIn.oauth2({ providerId: 'ministryplatform', callbackURL: '/admin/releases' })}
+        onClick={() => void signIn.social({ provider: 'ministryplatform', callbackURL: '/admin/releases' })}
       >
         Sign in with Ministry Platform
       </button>
@@ -1511,7 +1544,7 @@ export default function AdminLogin() {
 }
 ```
 
-> Verify the client sign-in call against the installed Better Auth version. For `genericOAuth`, the client method is `signIn.oauth2({ providerId, callbackURL })`. If the installed version exposes it differently (e.g. `authClient.signIn.oauth2`), adjust — the metrics app's sign-in component is the reference.
+> This matches the **verified** metrics reference (`metrics/src/app/signin/page.tsx:25`): `authClient.signIn.social({ provider: 'ministryplatform', callbackURL })`. `signIn` here is the destructured `authClient.signIn`, so `signIn.social(...)` is identical. Do NOT use `signIn.oauth2(...)` — the working sibling app uses `.social({ provider })`.
 
 - [ ] **Step 5: Run to verify it passes** — `pnpm --filter @perimeter/studio test` → middleware tests PASS.
 
@@ -1538,11 +1571,17 @@ Server component lists builds + activity; server actions do promote/rollback wit
 
 - [ ] **Step 1: Add the dependency** — `apps/studio/package.json` dependencies add `"@perimeter/release-store": "workspace:*"`, then `pnpm install`.
 
-- [ ] **Step 2: Write `src/lib/release-store.ts`**
+- [ ] **Step 2: Write `src/lib/release-store.ts`** — lazy + memoized (same rationale as the cdn app: server-action/page modules are imported during `next build`).
 
 ```ts
 import { getStore } from '@perimeter/release-store';
-export const store = getStore();
+import type { ReleaseStore } from '@perimeter/release-store';
+
+let cached: ReleaseStore | undefined;
+
+export function releaseStore(): ReleaseStore {
+  return (cached ??= getStore());
+}
 ```
 
 - [ ] **Step 3: Write the failing test** — mock the session + store; assert the action re-checks the session and calls `setLatest`.
@@ -1552,7 +1591,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createStore, createMemoryKv, createMemoryBlob } from '@perimeter/release-store';
 
 const memory = createStore(createMemoryKv(), createMemoryBlob());
-vi.mock('@/lib/release-store', () => ({ store: memory }));
+vi.mock('@/lib/release-store', () => ({ releaseStore: () => memory }));
 
 const getSession = vi.fn();
 vi.mock('@/lib/auth/better-auth', () => ({ auth: { api: { getSession } } }));
@@ -1591,7 +1630,7 @@ describe('promote action', () => {
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth/better-auth';
-import { store } from '@/lib/release-store';
+import { releaseStore } from '@/lib/release-store';
 
 async function requireUser(): Promise<string> {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -1601,13 +1640,13 @@ async function requireUser(): Promise<string> {
 
 export async function promote(name: string, version: string): Promise<void> {
   const by = await requireUser();
-  await store.setLatest(name, version, 'promote', by);
+  await releaseStore().setLatest(name, version, 'promote', by);
   revalidatePath('/admin/releases');
 }
 
 export async function rollback(name: string, version: string): Promise<void> {
   const by = await requireUser();
-  await store.setLatest(name, version, 'rollback', by);
+  await releaseStore().setLatest(name, version, 'rollback', by);
   revalidatePath('/admin/releases');
 }
 ```
@@ -1717,11 +1756,12 @@ export function ReleasePanel({ name, builds, latest, onPromote, onRollback }: Pr
 
 ```tsx
 import * as React from 'react';
-import { store } from '@/lib/release-store';
+import { releaseStore } from '@/lib/release-store';
 import { promote, rollback } from './actions';
 import { ReleasePanel } from './release-panel';
 
 export default async function ReleasesPage(): Promise<React.JSX.Element> {
+  const store = releaseStore();
   const widgets = await store.listWidgets();
   // Include widgets that have builds but were never promoted, too.
   const names = Array.from(new Set([...widgets, 'sermons']));
@@ -1809,7 +1849,7 @@ import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { createStore, createMemoryKv, createMemoryBlob, publishWidget } from '@perimeter/release-store';
 
 const memory = createStore(createMemoryKv(), createMemoryBlob());
-vi.mock('@/lib/store', () => ({ store: memory }));
+vi.mock('@/lib/store', () => ({ releaseStore: () => memory }));
 
 beforeAll(async () => {
   // publish 1.0.0 and 1.1.0 via the orchestration with injected hooks
@@ -1830,8 +1870,8 @@ beforeAll(async () => {
 
 describe('hosting lifecycle', () => {
   it('serves nothing until promoted, then 302s to the promoted version, then rolls back', async () => {
-    const latest = await import('@/app/[name]/latest.js/route');
-    const manifest = await import('@/app/manifest.json/route');
+    const latest = await import('@/app/api/latest/[name]/route');
+    const manifest = await import('@/app/api/manifest/route');
 
     // not live yet
     let res = await latest.GET(new Request('https://x/sermons/latest.js'), { params: Promise.resolve({ name: 'sermons' }) });
@@ -1850,7 +1890,7 @@ describe('hosting lifecycle', () => {
     expect(res.headers.get('location')).toBe('/sermons/1.0.0/index.js');
 
     // the versioned bytes for both still exist
-    const v100 = await import('@/app/[name]/[version]/index.js/route');
+    const v100 = await import('@/app/api/bundle/[name]/[version]/route');
     const r = await v100.GET(new Request('https://x/sermons/1.0.0/index.js'), { params: Promise.resolve({ name: 'sermons', version: '1.0.0' }) });
     expect(await r.text()).toBe('JS-1.0.0');
   });
