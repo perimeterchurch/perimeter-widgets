@@ -279,10 +279,7 @@ function MultiCombobox(props: MultiComboboxProps) {
           className="flex items-center px-2"
         >
           <ChevronDownIcon
-            className={cn(
-              'size-4 text-muted-fg transition-transform',
-              isOpen && 'rotate-180',
-            )}
+            className={cn('size-4 text-muted-fg transition-transform', isOpen && 'rotate-180')}
           />
         </button>
       </div>

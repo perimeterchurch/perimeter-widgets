@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 const S3_ORIGIN = 'https://perimeter-files.s3.amazonaws.com';
 
 const PRODUCTION_BASE_URL = 'https://api.perimeter.org';
@@ -41,6 +43,10 @@ export function sermonImageUrl(sermonId: number, apiBaseUrl?: string): string {
 
 export function seriesImageUrl(seriesId: number, apiBaseUrl?: string): string {
   return `${resolveApiBaseUrl(apiBaseUrl)}/api/sermons/series/${seriesId}/image`;
+}
+
+export function formatDate(iso: string): string {
+  return DateTime.fromISO(iso).toLocaleString(DateTime.DATE_MED);
 }
 
 export function formatTime(seconds: number): string {

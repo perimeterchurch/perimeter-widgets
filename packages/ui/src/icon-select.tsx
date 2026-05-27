@@ -43,8 +43,7 @@ export function IconSelect({ value, onChange, options, label, icon, className }:
       >
         {icon}
         <span>
-          {label}{' '}
-          <span className="font-medium text-fg">{activeOption?.label ?? value}</span>
+          {label} <span className="font-medium text-fg">{activeOption?.label ?? value}</span>
         </span>
       </button>
 

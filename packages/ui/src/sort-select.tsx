@@ -51,8 +51,7 @@ export function SortSelect({
       >
         <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />
         <span>
-          Sort by:{' '}
-          <span className="font-medium text-fg">{activeField?.label ?? sortField}</span>
+          Sort by: <span className="font-medium text-fg">{activeField?.label ?? sortField}</span>
         </span>
         <DirectionIcon className="h-3 w-3 shrink-0" />
       </button>
@@ -73,9 +72,7 @@ export function SortSelect({
                 onClick={() => onSortFieldChange(field.value)}
                 className="flex w-full items-center gap-2.5 px-3 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-fg"
               >
-                <span className="flex shrink-0 items-center text-muted-fg">
-                  {field.icon}
-                </span>
+                <span className="flex shrink-0 items-center text-muted-fg">{field.icon}</span>
                 <span
                   className={cn('flex-1 text-left', sortField === field.value && 'font-medium')}
                 >
