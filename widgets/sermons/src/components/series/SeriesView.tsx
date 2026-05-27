@@ -23,23 +23,7 @@ import { DateRangePicker } from '../ui/DateRangePicker';
 import { SeriesGrid } from './SeriesGrid';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 import { getPageRange } from '../../lib/pagination';
-
-/** Comma-join selected IDs into the query param, or `undefined` when empty. */
-function idsParam(ids: number[]): string | undefined {
-  return ids.length > 0 ? ids.join(',') : undefined;
-}
-
-/** Drop `undefined` values so we can hand a clean object to exact-optional
- * `@perimeter/api-hooks` param types under `exactOptionalPropertyTypes`. */
-function defined<T extends Record<string, unknown>>(
-  obj: T,
-): { [K in keyof T]: Exclude<T[K], undefined> } {
-  const out: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (value !== undefined) out[key] = value;
-  }
-  return out as { [K in keyof T]: Exclude<T[K], undefined> };
-}
+import { defined, idsParam } from '../../lib/query-params';
 
 interface SeriesViewProps {
   config: SermonsConfig;

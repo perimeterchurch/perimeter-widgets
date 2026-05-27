@@ -1,0 +1,161 @@
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, Calendar, Type } from 'lucide-react';
+import { Button } from '@perimeter/ui/button';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@perimeter/ui/empty';
+import { Skeleton } from '@perimeter/ui/skeleton';
+import { SortSelect } from '@perimeter/ui/sort-select';
+import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
+import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
+import { useSermonDetail, useSermons } from '@perimeter/api-hooks';
+import type { SermonsConfig, SortField, SortOrder } from '../../types';
+import { formatDate, sermonImageUrl } from '../../lib/format';
+import { defined } from '../../lib/query-params';
+import { MediaTabs } from '../players/MediaTabs';
+import { MediaCard } from '../ui/MediaCard';
+import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
+
+interface SermonDetailProps {
+  id: number;
+  config: SermonsConfig;
+  onBack: () => void;
+  onSermonClick?: ((id: number) => void) | undefined;
+}
+
+const SORT_FIELDS = [
+  {
+    value: 'date',
+    label: 'Date',
+    icon: <Calendar className="h-3.5 w-3.5" />,
+  },
+  {
+    value: 'title',
+    label: 'Title',
+    icon: <Type className="h-3.5 w-3.5" />,
+  },
+];
+
+export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetailProps) {
+  const { data, isLoading, error } = useSermonDetail(id);
+  const sermon = data?.data;
+  const safeDescription = useSafeHtml(sermon?.description);
+  const showRelated = (config.display ?? 'full') !== 'headless';
+  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (sermon) titleRef.current?.focus();
+  }, [sermon]);
+
+  const { data: seriesData } = useSermons(
+    defined({
+      seriesId: sermon?.series.id ? String(sermon.series.id) : undefined,
+      // Sermons sort only over date/title; 'count' is series-only.
+      sort: sortField === 'count' ? 'date' : sortField,
+      order: sortDirection,
+      perPage: 50,
+    }),
+  );
+
+  const relatedSermons = (seriesData?.data.sermons ?? []).filter((s) => s.id !== id);
+
+  if (error) {
+    return (
+      <div>
+        <Button variant="outline" size="sm" onClick={onBack} className="mb-4">
+          <ArrowLeft className="h-4 w-4" /> Back
+        </Button>
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>Sermon not found</EmptyTitle>
+            <EmptyDescription>
+              This sermon may have been removed or is unavailable.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Button variant="outline" size="sm" onClick={onBack} className="mb-4">
+        <ArrowLeft className="h-4 w-4" /> Back
+      </Button>
+      <SkeletonTransition
+        isLoading={isLoading}
+        skeleton={
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-2/3" />
+            <Skeleton className="h-5 w-1/2" />
+            <Skeleton className="h-64 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        }
+      >
+        {sermon && (
+          <div className="space-y-6">
+            <div>
+              <h2
+                ref={titleRef}
+                tabIndex={-1}
+                className="text-xl font-bold text-stone-900 dark:text-stone-100 outline-none"
+              >
+                {sermon.title}
+              </h2>
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
+                {sermon.speaker.name} · {formatDate(sermon.date)} · {sermon.series.title}
+              </p>
+              {sermon.scriptureLinks && (
+                <p className="text-xs text-stone-400 mt-1">Scripture: {sermon.scriptureLinks}</p>
+              )}
+            </div>
+            {sermon.links.length > 0 && <MediaTabs links={sermon.links} />}
+            {sermon.description && (
+              <div className="rounded-lg bg-stone-50 p-4 dark:bg-stone-900">
+                <h3 className="font-semibold text-sm mb-2">About this sermon</h3>
+                <div
+                  className="text-sm text-stone-600 dark:text-stone-300 prose prose-sm"
+                  dangerouslySetInnerHTML={safeDescription}
+                />
+              </div>
+            )}
+
+            {/* More from this series */}
+            {showRelated && relatedSermons.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">More from this series</h3>
+                  <SortSelect
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    onSortFieldChange={(f: string) => setSortField(f as SortField)}
+                    onSortDirectionChange={(d: SortOrder) => setSortDirection(d)}
+                    fields={SORT_FIELDS}
+                  />
+                </div>
+                <div className="divide-y divide-border">
+                  {relatedSermons.map((s) => (
+                    <MediaCard
+                      key={s.id}
+                      viewMode="list"
+                      imageUrl={s.bannerUrl ?? sermonImageUrl(s.id, config.apiUrl)}
+                      imageAlt={s.title}
+                      title={s.title}
+                      description={s.shortDescription}
+                      topLeft={<DateLabel date={formatDate(s.date)} />}
+                      topRight={<SeriesPill name={s.series.title} />}
+                      bottomLeft={<SpeakerLabel name={s.speaker.name} />}
+                      bottomRight={s.book?.name ? <BookLabel name={s.book.name} /> : undefined}
+                      onClick={() => onSermonClick?.(s.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </SkeletonTransition>
+    </div>
+  );
+}
