@@ -3,19 +3,16 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import exampleRaw from '@perimeter/widget-example';
+import example from '@perimeter/widget-example';
 import {
   autoMount,
   disposeAutoMount,
   mountWidget,
   clearAll,
   registerCss,
-  type WidgetDefinition,
 } from '@perimeter/widget-runtime';
 import { ThemeOverridesProvider } from '@/lib/theme-overrides-context';
 import { NativeRenderer } from '@/lib/widget-preview/native-renderer';
-
-const example = exampleRaw as unknown as WidgetDefinition;
 
 const BUNDLE = path.resolve(__dirname, '../../../dist/example/example.iife.js');
 const noAuth = () => ({

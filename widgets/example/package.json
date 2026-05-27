@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.tsx",
+      "types": "./src/index.widget.d.ts",
       "default": "./src/index.tsx"
     }
   },

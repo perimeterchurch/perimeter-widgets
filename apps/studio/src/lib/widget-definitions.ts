@@ -3,6 +3,6 @@ import sermons from '@perimeter/widget-sermons';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 
 export const widgetDefinitions: Record<string, WidgetDefinition> = {
-  example: example as unknown as WidgetDefinition,
+  example,
   sermons,
 };
