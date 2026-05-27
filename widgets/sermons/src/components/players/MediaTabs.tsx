@@ -3,10 +3,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
 import { Spinner } from '@perimeter/ui/spinner';
 import { Video, Headphones, FileText } from 'lucide-react';
-import { VideoPlayer } from './VideoPlayer';
 import { AudioPlayer } from './AudioPlayer';
 import type { SermonLink } from '../../types';
 
+// VideoPlayer pulls in hls.js (~150-200 KB). Lazy-load it (like PdfViewer) so
+// that weight stays out of the main IIFE chunk and only loads on demand.
+const VideoPlayer = lazy(() => import('./VideoPlayer'));
 const PdfViewer = lazy(() => import('./PdfViewer').then((m) => ({ default: m.PdfViewer })));
 
 const fade = {
@@ -78,7 +80,15 @@ export function MediaTabs({ links }: MediaTabsProps) {
         <AnimatePresence mode="wait">
           {activeTab === 'video' && videoLink && (
             <motion.div key="video" {...fade} className="aspect-video">
-              <VideoPlayer url={videoLink.url} />
+              <Suspense
+                fallback={
+                  <div className="flex h-full items-center justify-center bg-black">
+                    <Spinner className="size-8" aria-label="Loading video player" />
+                  </div>
+                }
+              >
+                <VideoPlayer url={videoLink.url} />
+              </Suspense>
             </motion.div>
           )}
           {activeTab === 'audio' && audioLink && (

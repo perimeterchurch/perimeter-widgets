@@ -2,6 +2,16 @@ import { useMemo } from 'react';
 import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode } from '../types';
 
+/**
+ * Per-embed URL-key prefix. nuqs v2's adapter exposes no global prefix, so we
+ * namespace each query-state key to its own URL parameter via `useQueryStates`'
+ * `urlKeys` option. Passing a non-empty `prefix` makes `tab` → `<prefix>tab`,
+ * etc., so two sermons embeds on one page never collide on URL params.
+ */
+export interface UseSermonFiltersOptions {
+  prefix?: string | undefined;
+}
+
 /** Parse comma-separated IDs string into number array */
 function parseIds(value: string | null): number[] {
   if (!value) return [];
@@ -16,7 +26,8 @@ function serializeIds(ids: number[]): string | null {
   return ids.length > 0 ? ids.join(',') : null;
 }
 
-export function useSermonFilters(config: SermonsConfig) {
+export function useSermonFilters(config: SermonsConfig, options: UseSermonFiltersOptions = {}) {
+  const { prefix } = options;
   const defaultTab = config.defaultTab ?? 'sermons';
   const sermonParams = useMemo(
     () => ({
@@ -39,8 +50,18 @@ export function useSermonFilters(config: SermonsConfig) {
     [defaultTab],
   );
 
+  // Map each state key to a prefixed URL param so multiple embeds don't
+  // collide. With no prefix the keys map to themselves (identity).
+  const urlKeys = useMemo(() => {
+    if (!prefix) return undefined;
+    return Object.fromEntries(
+      Object.keys(sermonParams).map((key) => [key, `${prefix}${key}`]),
+    ) as Record<keyof typeof sermonParams, string>;
+  }, [prefix, sermonParams]);
+
   const [params, setParams] = useQueryStates(sermonParams, {
     history: 'push',
+    ...(urlKeys ? { urlKeys } : {}),
   });
 
   // Override return values for locked params.

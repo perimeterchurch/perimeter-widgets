@@ -81,4 +81,36 @@ describe('useSermonFilters', () => {
     const { result } = renderFilters({ seriesId: '1,2,3' });
     expect(result.current.selectedSeriesIds).toEqual([1, 2, 3]);
   });
+
+  const baseConfig: SermonsConfig = {
+    perPage: 12,
+    defaultTab: 'sermons',
+    defaultView: 'grid',
+    display: 'full',
+  };
+
+  function renderWithParams(searchParams: string, options?: { prefix?: string }) {
+    return renderHook(() => useSermonFilters(baseConfig, options ?? {}), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <NuqsTestingAdapter searchParams={searchParams}>{children}</NuqsTestingAdapter>
+      ),
+    });
+  }
+
+  it('reads the prefixed URL key when a prefix is set (multi-embed namespacing)', () => {
+    // With prefix 'sx.', the hook reads from `sx.tab`, not bare `tab`.
+    const { result } = renderWithParams('?sx.tab=series', { prefix: 'sx.' });
+    expect(result.current.tab).toBe('series');
+  });
+
+  it('ignores a bare key when a prefix is set (embeds do not collide)', () => {
+    // A bare `?tab=series` must NOT leak into a prefixed embed — it stays default.
+    const { result } = renderWithParams('?tab=series', { prefix: 'sx.' });
+    expect(result.current.tab).toBe('sermons');
+  });
+
+  it('reads the bare URL key with no prefix (identity)', () => {
+    const { result } = renderWithParams('?tab=series');
+    expect(result.current.tab).toBe('series');
+  });
 });

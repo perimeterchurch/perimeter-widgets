@@ -172,3 +172,5 @@ export function VideoPlayer({ url }: { url: string }) {
     </div>
   );
 }
+
+export default VideoPlayer;
