@@ -3,9 +3,11 @@ import { resolveKvConfig } from '../src/drivers/env';
 
 describe('resolveKvConfig', () => {
   it('detects Vercel KV REST vars', () => {
-    expect(
-      resolveKvConfig({ KV_REST_API_URL: 'https://x', KV_REST_API_TOKEN: 't' }),
-    ).toEqual({ kind: 'vercel-kv', url: 'https://x', token: 't' });
+    expect(resolveKvConfig({ KV_REST_API_URL: 'https://x', KV_REST_API_TOKEN: 't' })).toEqual({
+      kind: 'vercel-kv',
+      url: 'https://x',
+      token: 't',
+    });
   });
 
   it('throws a clear, actionable error when no recognized vars are present', () => {
