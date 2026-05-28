@@ -27,7 +27,7 @@ async function main(): Promise<void> {
       gitSha: () => sh('git rev-parse --short HEAD'),
       gitBranch: () => sh('git rev-parse --abbrev-ref HEAD'),
       build: async (n) => {
-        sh(`pnpm --filter @perimeter/widget-${n} build`);
+        execSync(`pnpm --filter @perimeter/widget-${n} build`, { cwd: repoRoot, stdio: 'inherit' });
       },
       readArtifact: (p) => readFileSync(path.join(repoRoot, p)),
     },
