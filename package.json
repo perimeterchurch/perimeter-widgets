@@ -14,7 +14,8 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "quality": "turbo typecheck lint test && pnpm format:check"
+    "quality": "turbo typecheck lint test && pnpm format:check",
+    "publish-widget": "tsx packages/release-store/scripts/publish-widget.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
@@ -24,6 +25,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.1.0",
     "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
     "turbo": "^2.3.3",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
