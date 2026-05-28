@@ -21,4 +21,12 @@ describe('admin middleware', () => {
     expect(res?.status).toBe(307);
     expect(res?.headers.get('location')).toContain('/admin/login');
   });
+
+  it('redirects the bare /admin path when no session cookie', async () => {
+    const { middleware } = await import('../src/middleware');
+    const req = new NextRequest('https://studio.perimeter.org/admin');
+    const res = middleware(req);
+    expect(res?.status).toBe(307);
+    expect(res?.headers.get('location')).toContain('/admin/login');
+  });
 });

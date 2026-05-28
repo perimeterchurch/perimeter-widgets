@@ -8,5 +8,8 @@ export function middleware(req: NextRequest): NextResponse | undefined {
 }
 
 export const config = {
-  matcher: ['/admin/((?!login).*)'],
+  // Gate the bare /admin path AND every nested /admin/* except /admin/login.
+  // Without the bare-path entry the negative-lookahead matcher requires at
+  // least one trailing character, leaving /admin itself ungated.
+  matcher: ['/admin', '/admin/((?!login).*)'],
 };
