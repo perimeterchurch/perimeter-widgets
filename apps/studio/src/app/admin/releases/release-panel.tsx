@@ -10,9 +10,12 @@ type Props = {
   onRollback: (name: string, version: string) => Promise<void>;
 };
 
-// Compare two dotted versions left-to-right; non-numeric trailing segments
-// (e.g. dev builds like 0.0.0-abc1234) collapse to NaN and abort the
-// comparison — those builds never trigger the rollback label.
+// Compare two dotted versions left-to-right. Non-numeric segments (e.g.
+// dev-build tails like `0.0.0-abc1234`) coerce to NaN; NaN diffs are falsy
+// so they don't decide the result on their own — when only the trailing
+// segments are non-numeric AND share the same numeric prefix, the function
+// returns 0 (treated as "Promote"). A dev build vs a real release still
+// orders correctly by the leading numeric segments.
 function compareVersions(a: string, b: string): number {
   const as = a.split('.').map(Number);
   const bs = b.split('.').map(Number);

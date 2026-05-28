@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { releaseStore } from '@/lib/release-store';
-
-export const dynamic = 'force-dynamic';
 import { promote, rollback } from './actions';
 import { ReleasePanel } from './release-panel';
+
+// Opt out of static prerender: releaseStore() → getStore() reads KV/Blob env
+// at first-request time. revalidate=0 only affects data caching, not the
+// build-time render attempt; force-dynamic skips the attempt entirely.
+export const dynamic = 'force-dynamic';
 
 export default async function ReleasesPage(): Promise<React.JSX.Element> {
   const store = releaseStore();
