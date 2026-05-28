@@ -1,3 +1,8 @@
+// apps/studio/tsconfig.json overrides the base config with declaration:false +
+// declarationMap:false because Better Auth's inferred types trigger TS2742
+// ("inferred type cannot be named without a reference") under d.ts generation
+// even though this app has noEmit:true. Removing those overrides will break
+// typecheck on the `auth` / `authClient` exports.
 import { betterAuth } from 'better-auth';
 import { genericOAuth } from 'better-auth/plugins';
 
