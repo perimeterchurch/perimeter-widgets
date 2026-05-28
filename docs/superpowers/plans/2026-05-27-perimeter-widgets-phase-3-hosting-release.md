@@ -6,7 +6,7 @@
 
 **Architecture:** A new read-only Next.js app (`apps/cdn`) streams immutable bundles from Blob and 302-redirects `latest.js` to the live version read from KV. A shared `@perimeter/release-store` package owns the KV schema + Blob paths behind injectable `KvClient`/`BlobClient` interfaces (in-memory driver for tests/local, Vercel driver in prod). A `publish-widget` script and the Studio `/admin/releases` server actions are the only writers; everything flows through the package — no inter-app API.
 
-**Tech Stack:** pnpm 10 workspaces, Turborepo, TypeScript (strict + `exactOptionalPropertyTypes` + `verbatimModuleSyntax`), Vitest, Next.js 16 (App Router, route handlers, server actions), Better Auth (`genericOAuth` MP provider), `@vercel/kv`, `@vercel/blob`, `tsx`.
+**Tech Stack:** pnpm 10 workspaces, Turborepo, TypeScript (strict + `exactOptionalPropertyTypes` + `verbatimModuleSyntax`), Vitest, Next.js 16 (App Router, route handlers, server actions), Better Auth (`genericOAuth` MP provider), `@upstash/redis` (Vercel's Redis Marketplace stores are Upstash under the hood; `@vercel/kv` is deprecated), `@vercel/blob`, `tsx`.
 
 **Spec:** `docs/superpowers/specs/2026-05-27-perimeter-widgets-phase-3-hosting-release-design.md`
 
@@ -40,7 +40,7 @@ packages/release-store/                          NEW package @perimeter/release-
   src/store.ts                 createStore(kv, blob) → ReleaseStore (all logic)
   src/keys.ts                  KV key builders (latest:/builds:/activity)
   src/drivers/memory.ts        in-memory KvClient + BlobClient (tests + local)
-  src/drivers/vercel.ts        @vercel/kv + @vercel/blob impls
+  src/drivers/vercel.ts        @upstash/redis + @vercel/blob impls
   src/drivers/env.ts           resolveKvConfig(env) detection + getStore() selector
   scripts/publish-widget.ts    CLI: build → upload → record (thin wrapper)
   src/publish.ts               publishWidget(opts, store) orchestration (testable)
@@ -113,8 +113,8 @@ Pure data layer. Fully unit-testable with the in-memory driver; no cloud creds.
     "publish-widget": "tsx scripts/publish-widget.ts"
   },
   "dependencies": {
-    "@vercel/blob": "^0.27.0",
-    "@vercel/kv": "^3.0.0"
+    "@upstash/redis": "^1.35.0",
+    "@vercel/blob": "^0.27.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.8",
@@ -694,16 +694,16 @@ describe('getStore', () => {
 
 - [ ] **Step 2: Run to verify it fails** — FAIL (`getStore` not exported).
 
-- [ ] **Step 3: Write `src/drivers/vercel.ts`**
+- [ ] **Step 3: Write `src/drivers/vercel.ts`** — uses `@upstash/redis`, which is what Vercel's Redis Marketplace stores actually run under the hood (the older `@vercel/kv` is deprecated; it was just a thin wrapper around `@upstash/redis`). The Marketplace integration exposes the same `KV_REST_API_URL` + `KV_REST_API_TOKEN` env vars.
 
 ```ts
-import { createClient } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 import { put, head } from '@vercel/blob';
 import type { BlobClient, KvClient } from '../clients.ts';
 import type { KvConfig } from './env.ts';
 
 export function createVercelKv(config: KvConfig): KvClient {
-  const client = createClient({ url: config.url, token: config.token });
+  const client = new Redis({ url: config.url, token: config.token });
   return {
     async get<T>(key: string): Promise<T | null> {
       return (await client.get<T>(key)) ?? null;
