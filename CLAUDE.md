@@ -4,12 +4,17 @@ Guidance for Claude Code working in this repository.
 
 ## Status
 
-Rebuild in progress. The platform is being rebuilt from scratch per the
-specs at `docs/superpowers/specs/2026-05-22-perimeter-widgets-rebuild-design.md`
-(umbrella) and `docs/superpowers/specs/2026-05-22-perimeter-widgets-phase-1-foundation-design.md`
-(current phase).
+Phases 1 (foundation), 2 (sermons cutover prep), and 3 (hosting + release) are complete.
 
-Implementation plan: `docs/superpowers/plans/2026-05-22-perimeter-widgets-phase-1-foundation.md`.
+Umbrella spec: `docs/superpowers/specs/2026-05-22-perimeter-widgets-rebuild-design.md`
+
+Phase 3 design spec: `docs/superpowers/specs/2026-05-27-perimeter-widgets-phase-3-hosting-release-design.md`
+
+Phase 3 implementation plan: `docs/superpowers/plans/2026-05-27-perimeter-widgets-phase-3-hosting-release.md`
+
+**Release workflow:** run `pnpm publish-widget <name>` to build, upload, and record a new version, then promote it at `/admin/releases` on the studio.
+
+**Phase 4** is next: cutover from jsDelivr to `widgets.perimeter.org`.
 
 ## Commands
 
