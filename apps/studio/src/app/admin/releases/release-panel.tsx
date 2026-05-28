@@ -10,7 +10,21 @@ type Props = {
   onRollback: (name: string, version: string) => Promise<void>;
 };
 
-export function ReleasePanel({ name, builds, latest, onPromote, onRollback: _onRollback }: Props): React.JSX.Element {
+// Compare two dotted versions left-to-right; non-numeric trailing segments
+// (e.g. dev builds like 0.0.0-abc1234) collapse to NaN and abort the
+// comparison — those builds never trigger the rollback label.
+function compareVersions(a: string, b: string): number {
+  const as = a.split('.').map(Number);
+  const bs = b.split('.').map(Number);
+  const len = Math.max(as.length, bs.length);
+  for (let i = 0; i < len; i++) {
+    const diff = (as[i] ?? 0) - (bs[i] ?? 0);
+    if (diff) return diff;
+  }
+  return 0;
+}
+
+export function ReleasePanel({ name, builds, latest, onPromote, onRollback }: Props): React.JSX.Element {
   const [pending, setPending] = React.useState(false);
   const act = (fn: () => Promise<void>) => () => {
     setPending(true);
@@ -23,6 +37,9 @@ export function ReleasePanel({ name, builds, latest, onPromote, onRollback: _onR
       <ul className="divide-y divide-border">
         {builds.map((b) => {
           const live = b.version === latest;
+          const isRollback = latest !== null && compareVersions(b.version, latest) < 0;
+          const handler = isRollback ? onRollback : onPromote;
+          const label = isRollback ? `Roll back to ${b.version}` : `Promote ${b.version}`;
           return (
             <li key={b.version} className="flex items-center gap-3 py-2 text-sm">
               <span className="font-mono">{b.version}</span>
@@ -34,9 +51,9 @@ export function ReleasePanel({ name, builds, latest, onPromote, onRollback: _onR
                   <button
                     disabled={pending}
                     className="rounded-md border border-border px-2 py-1 text-xs"
-                    onClick={act(() => onPromote(name, b.version))}
+                    onClick={act(() => handler(name, b.version))}
                   >
-                    {`Promote ${b.version}`}
+                    {label}
                   </button>
                 )}
               </span>
