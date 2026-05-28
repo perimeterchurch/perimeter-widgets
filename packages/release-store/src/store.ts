@@ -1,6 +1,6 @@
 import type { BlobClient, KvClient } from './clients';
 import type { ActivityEntry, BuildRecord, ReleaseStore } from './types';
-import { ACTIVITY_KEY, buildsKey, latestKey } from './keys';
+import { ACTIVITY_KEY, buildsKey, latestKey, WIDGETS_KEY } from './keys';
 
 const ACTIVITY_CAP = 200;
 
@@ -45,6 +45,8 @@ export function createStore(kv: KvClient, blob: BlobClient): ReleaseStore {
         throw new Error(`Cannot ${action} ${name}@${version}: not a built version`);
       }
       await kv.set(latestKey(name), version);
+      const widgets = (await kv.get<string[]>(WIDGETS_KEY)) ?? [];
+      if (!widgets.includes(name)) await kv.set(WIDGETS_KEY, [...widgets, name].sort());
       await pushActivity({
         action,
         widget: name,
@@ -56,6 +58,10 @@ export function createStore(kv: KvClient, blob: BlobClient): ReleaseStore {
 
     async listActivity() {
       return (await kv.get<ActivityEntry[]>(ACTIVITY_KEY)) ?? [];
+    },
+
+    async listWidgets() {
+      return (await kv.get<string[]>(WIDGETS_KEY)) ?? [];
     },
 
     uploadBundle(blobPath, body, contentType) {

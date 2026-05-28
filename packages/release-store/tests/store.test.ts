@@ -82,4 +82,17 @@ describe('createStore', () => {
     const stream = await s.readBundle('sermons/1.0.0/index.js');
     expect(await new Response(stream).text()).toBe('js');
   });
+
+  it('lists promoted widgets only, sorted, and excludes never-promoted ones', async () => {
+    const s = freshStore();
+    await s.recordBuild('sermons', rec('1.0.0'));
+    await s.recordBuild('events', rec('1.0.0'));
+    expect(await s.listWidgets()).toEqual([]); // recorded but not promoted
+    await s.setLatest('sermons', '1.0.0', 'promote', 'me');
+    await s.setLatest('events', '1.0.0', 'promote', 'me');
+    expect(await s.listWidgets()).toEqual(['events', 'sermons']);
+    // Re-promoting an existing widget should not duplicate
+    await s.setLatest('sermons', '1.0.0', 'promote', 'me');
+    expect(await s.listWidgets()).toEqual(['events', 'sermons']);
+  });
 });
