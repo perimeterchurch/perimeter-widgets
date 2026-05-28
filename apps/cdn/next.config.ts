@@ -1,0 +1,14 @@
+import type { NextConfig } from 'next';
+
+const config: NextConfig = {
+  async rewrites() {
+    return [
+      { source: '/:name/:version/index.js.map', destination: '/api/bundle-map/:name/:version' },
+      { source: '/:name/:version/index.js', destination: '/api/bundle/:name/:version' },
+      { source: '/:name/latest.js', destination: '/api/latest/:name' },
+      { source: '/manifest.json', destination: '/api/manifest' },
+    ];
+  },
+};
+
+export default config;
