@@ -34,7 +34,12 @@ describe('createStore', () => {
     const s = freshStore();
     await s.recordBuild('sermons', rec('1.0.0'));
     const activity = await s.listActivity();
-    expect(activity[0]).toMatchObject({ action: 'publish', widget: 'sermons', version: '1.0.0', by: 'script' });
+    expect(activity[0]).toMatchObject({
+      action: 'publish',
+      widget: 'sermons',
+      version: '1.0.0',
+      by: 'script',
+    });
   });
 
   it('setLatest writes the pointer and an activity entry', async () => {
@@ -43,12 +48,18 @@ describe('createStore', () => {
     await s.setLatest('sermons', '1.0.0', 'promote', 'me@perimeter.org');
     expect(await s.getLatest('sermons')).toBe('1.0.0');
     const activity = await s.listActivity();
-    expect(activity[0]).toMatchObject({ action: 'promote', version: '1.0.0', by: 'me@perimeter.org' });
+    expect(activity[0]).toMatchObject({
+      action: 'promote',
+      version: '1.0.0',
+      by: 'me@perimeter.org',
+    });
   });
 
   it('setLatest rejects a version that was never built', async () => {
     const s = freshStore();
-    await expect(s.setLatest('sermons', '9.9.9', 'promote', 'me')).rejects.toThrow(/not.*built|unknown/i);
+    await expect(s.setLatest('sermons', '9.9.9', 'promote', 'me')).rejects.toThrow(
+      /not.*built|unknown/i,
+    );
   });
 
   it('getLatest returns null when never promoted', async () => {
