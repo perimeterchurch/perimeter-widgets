@@ -22,23 +22,7 @@ Turborepo monorepo of self-contained React widgets for embedding on perimeter.or
 
 ## Architecture
 
-<<<<<<< Updated upstream
 ### Monorepo Packages
-||||||| Stash base
-- Always use `pnpm`; never npm or npx.
-- Never commit directly to `dev` or `main`. Use a feature branch and a PR.
-- Conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `test:`, `ci:`.
-- Read the active phase spec before modifying the platform.
-=======
-- Always use `pnpm`; never npm or npx.
-- Never commit directly to `dev` or `main`. Use a feature branch and a PR.
-- Conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `test:`, `ci:`.
-- Read the active phase spec before modifying the platform.
-- Never use the `any` type and never add eslint-disable comments to silence lint — fix the underlying type/lint error instead.
-- Always Read a file before editing it.
-- Run tests/lint/typecheck through turbo from the root (`pnpm test`/`lint`/`typecheck`). Packages delegate to `turbo test` and have no local vitest binary, so `pnpm vitest` inside a package fails; scope one package with `--filter=<pkg>`.
-- Run `pnpm format` (prettier --write) before `pnpm quality` — the gate only runs `format:check` and will fail on unformatted files; do not create separate formatting-only commits.
->>>>>>> Stashed changes
 
 | Package                 | Name                               | Purpose                                                                  |
 | ----------------------- | ---------------------------------- | ------------------------------------------------------------------------ |
@@ -107,6 +91,9 @@ The storyboard uses `@/*` → `src/*` aliases (leaf package). Shared and widget 
 - **Read docs before code** — check `docs/` for architecture and guides before modifying the codebase
 - **Never add eslint-disable comments** — fix the underlying code instead of suppressing warnings. eslint-disable comments hide problems and rot over time
 - **Never use `any` in production code** — `@typescript-eslint/no-explicit-any` is enforced as an error. Use proper types, generics, or `unknown` instead. Test and story files are exempt from this rule
+- **Read a file before editing it** — always read the current contents before an edit so you don't clobber unseen changes
+- **Run tests, lint, and typecheck from the root** — `pnpm test`/`lint`/`typecheck` go through Turborepo. Packages delegate to `turbo test` and have no local vitest binary, so `pnpm vitest` inside a package fails; scope one package with `--filter=<pkg>`
+- **Run `pnpm format` before `pnpm quality`** — the quality gate only runs `format:check` and fails on unformatted files; don't create separate formatting-only commits
 
 ## Context Loading
 
