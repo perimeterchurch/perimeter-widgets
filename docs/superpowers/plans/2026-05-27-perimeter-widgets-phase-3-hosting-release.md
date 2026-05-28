@@ -178,7 +178,7 @@ git commit -m "chore(release-store): scaffold package"
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import type { BuildRecord, ActivityEntry } from '../src/types.ts';
+import type { BuildRecord, ActivityEntry } from '../src/types';
 
 describe('release-store types', () => {
   it('constructs a BuildRecord (optional prUrl omitted)', () => {
@@ -208,7 +208,7 @@ describe('release-store types', () => {
 - [ ] **Step 2: Run to verify it fails**
 
 Run: `pnpm --filter @perimeter/release-store test`
-Expected: FAIL — `Cannot find module '../src/types.ts'`.
+Expected: FAIL — `Cannot find module '../src/types'`.
 
 - [ ] **Step 3: Write `src/types.ts`**
 
@@ -292,7 +292,7 @@ git commit -m "feat(release-store): add data types and client interfaces"
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { latestKey, buildsKey, ACTIVITY_KEY } from '../src/keys.ts';
+import { latestKey, buildsKey, ACTIVITY_KEY } from '../src/keys';
 
 describe('kv keys', () => {
   it('builds per-widget keys', () => {
@@ -334,7 +334,7 @@ git commit -m "feat(release-store): add kv key builders"
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { createMemoryKv, createMemoryBlob } from '../src/drivers/memory.ts';
+import { createMemoryKv, createMemoryBlob } from '../src/drivers/memory';
 
 describe('memory kv', () => {
   it('round-trips values and returns null for missing keys', async () => {
@@ -369,7 +369,7 @@ describe('memory blob', () => {
 - [ ] **Step 3: Write `src/drivers/memory.ts`**
 
 ```ts
-import type { BlobClient, KvClient } from '../clients.ts';
+import type { BlobClient, KvClient } from '../clients';
 
 export function createMemoryKv(): KvClient {
   const store = new Map<string, unknown>();
@@ -429,9 +429,9 @@ git commit -m "feat(release-store): add in-memory kv + blob driver"
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { createStore } from '../src/store.ts';
-import { createMemoryKv, createMemoryBlob } from '../src/drivers/memory.ts';
-import type { BuildRecord } from '../src/types.ts';
+import { createStore } from '../src/store';
+import { createMemoryKv, createMemoryBlob } from '../src/drivers/memory';
+import type { BuildRecord } from '../src/types';
 
 const rec = (version: string): BuildRecord => ({
   version,
@@ -508,9 +508,9 @@ describe('createStore', () => {
 - [ ] **Step 3: Write `src/store.ts`**
 
 ```ts
-import type { BlobClient, KvClient } from './clients.ts';
-import type { ActivityEntry, BuildRecord, ReleaseStore } from './types.ts';
-import { ACTIVITY_KEY, buildsKey, latestKey } from './keys.ts';
+import type { BlobClient, KvClient } from './clients';
+import type { ActivityEntry, BuildRecord, ReleaseStore } from './types';
+import { ACTIVITY_KEY, buildsKey, latestKey } from './keys';
 
 const ACTIVITY_CAP = 200;
 
@@ -579,10 +579,10 @@ export function createStore(kv: KvClient, blob: BlobClient): ReleaseStore {
 - [ ] **Step 5: Update `src/index.ts` to export the public surface**
 
 ```ts
-export { createStore } from './store.ts';
-export { createMemoryKv, createMemoryBlob } from './drivers/memory.ts';
-export type { BuildRecord, ActivityEntry, ActivityAction, ReleaseStore } from './types.ts';
-export type { KvClient, BlobClient } from './clients.ts';
+export { createStore } from './store';
+export { createMemoryKv, createMemoryBlob } from './drivers/memory';
+export type { BuildRecord, ActivityEntry, ActivityAction, ReleaseStore } from './types';
+export type { KvClient, BlobClient } from './clients';
 ```
 
 - [ ] **Step 6: Verify typecheck + lint** — `pnpm --filter @perimeter/release-store typecheck && pnpm --filter @perimeter/release-store lint` → exit 0.
@@ -610,7 +610,7 @@ The real-cloud impl plus the `getStore()` factory. Env detection is a pure, test
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { resolveKvConfig } from '../src/drivers/env.ts';
+import { resolveKvConfig } from '../src/drivers/env';
 
 describe('resolveKvConfig', () => {
   it('detects Vercel KV REST vars', () => {
@@ -679,7 +679,7 @@ git commit -m "feat(release-store): add KV env detection"
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { getStore } from '../src/drivers/env.ts';
+import { getStore } from '../src/drivers/env';
 
 describe('getStore', () => {
   it('returns a working store when RELEASE_STORE_DRIVER=memory', async () => {
@@ -706,8 +706,8 @@ describe('getStore', () => {
 ```ts
 import { Redis } from '@upstash/redis';
 import { put, head } from '@vercel/blob';
-import type { BlobClient, KvClient } from '../clients.ts';
-import type { KvConfig } from './env.ts';
+import type { BlobClient, KvClient } from '../clients';
+import type { KvConfig } from './env';
 
 export function createVercelKv(config: KvConfig): KvClient {
   const client = new Redis({ url: config.url, token: config.token });
@@ -756,10 +756,10 @@ export function createVercelBlob(token: string): BlobClient {
 - [ ] **Step 4: Add `getStore` to `src/drivers/env.ts`**
 
 ```ts
-import { createStore } from '../store.ts';
-import type { ReleaseStore } from '../types.ts';
-import { createMemoryKv, createMemoryBlob } from './memory.ts';
-import { createVercelKv, createVercelBlob } from './vercel.ts';
+import { createStore } from '../store';
+import type { ReleaseStore } from '../types';
+import { createMemoryKv, createMemoryBlob } from './memory';
+import { createVercelKv, createVercelBlob } from './vercel';
 
 export function getStore(env: Record<string, string | undefined> = process.env): ReleaseStore {
   if (env['RELEASE_STORE_DRIVER'] === 'memory') {
@@ -776,7 +776,7 @@ export function getStore(env: Record<string, string | undefined> = process.env):
 
 (Add the imports at the top of `env.ts` alongside the existing code.)
 
-- [ ] **Step 5: Export `getStore` from `src/index.ts`** — add `export { getStore, resolveKvConfig } from './drivers/env.ts';`
+- [ ] **Step 5: Export `getStore` from `src/index.ts`** — add `export { getStore, resolveKvConfig } from './drivers/env';`
 
 - [ ] **Step 6: Run to verify it passes** — `pnpm --filter @perimeter/release-store test` → PASS. Then `pnpm install` (picks up `@vercel/kv`, `@vercel/blob`) and `pnpm --filter @perimeter/release-store typecheck` → exit 0.
 
@@ -1177,8 +1177,8 @@ The build → upload → record pipeline. The orchestration is a pure function t
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { createStore, createMemoryKv, createMemoryBlob } from '../src/index.ts';
-import { publishWidget, computeVersion } from '../src/publish.ts';
+import { createStore, createMemoryKv, createMemoryBlob } from '../src/index';
+import { publishWidget, computeVersion } from '../src/publish';
 
 describe('computeVersion', () => {
   it('uses bare version on main', () => {
@@ -1239,7 +1239,7 @@ describe('publishWidget', () => {
 
 ```ts
 import { gzipSync } from 'node:zlib';
-import type { BuildRecord, ReleaseStore } from './types.ts';
+import type { BuildRecord, ReleaseStore } from './types';
 
 export function computeVersion(pkgVersion: string, sha: string, branch: string): string {
   return branch === 'main' ? pkgVersion : `${pkgVersion}-${sha}`;
@@ -1293,7 +1293,7 @@ export async function publishWidget(opts: PublishOptions, hooks: PublishHooks): 
 
 - [ ] **Step 4: Run to verify it passes** — PASS.
 
-- [ ] **Step 5: Export from `src/index.ts`** — `export { publishWidget, computeVersion } from './publish.ts';` plus `export type { PublishHooks, PublishOptions } from './publish.ts';`
+- [ ] **Step 5: Export from `src/index.ts`** — `export { publishWidget, computeVersion } from './publish';` plus `export type { PublishHooks, PublishOptions } from './publish';`
 
 - [ ] **Step 6: Commit**
 
@@ -1315,7 +1315,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getStore, publishWidget } from '../src/index.ts';
+import { getStore, publishWidget } from '../src/index';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
@@ -1494,7 +1494,7 @@ vi.mock('better-auth/cookies', () => ({
 
 describe('admin middleware', () => {
   it('passes through when a session cookie is present', async () => {
-    const { middleware } = await import('../src/middleware.ts');
+    const { middleware } = await import('../src/middleware');
     const req = new NextRequest('https://studio.perimeter.org/admin/releases');
     req.cookies.set('studio.session_token', 'x');
     const res = middleware(req);
@@ -1502,7 +1502,7 @@ describe('admin middleware', () => {
   });
 
   it('redirects to /admin/login when no session cookie', async () => {
-    const { middleware } = await import('../src/middleware.ts');
+    const { middleware } = await import('../src/middleware');
     const req = new NextRequest('https://studio.perimeter.org/admin/releases');
     const res = middleware(req);
     expect(res?.status).toBe(307);
