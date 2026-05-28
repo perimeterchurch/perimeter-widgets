@@ -10,6 +10,11 @@ beforeAll(() => {
   Element.prototype.scrollIntoView = vi.fn();
 });
 
+// The pdf.js worker source is bundled via ?raw (a Vite build feature).
+// Vitest returns an empty string for raw imports; mock it explicitly so
+// URL.createObjectURL (also mocked below) receives a predictable value.
+vi.mock('pdfjs-dist/build/pdf.worker.min.mjs?raw', () => ({ default: '' }));
+
 // Mock react-pdf before the component imports it. The mock fires
 // onLoadSuccess synchronously with a fixed page count so tests can drive
 // the toolbar without going near a real PDF or worker.

@@ -15,13 +15,15 @@ import {
 import { Button } from '@perimeter/ui/button';
 import { Spinner } from '@perimeter/ui/spinner';
 import { proxyS3Url } from '../../lib/format';
+import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?raw';
 
-// Use a CDN worker to avoid Turbopack bundling issues. Override with
-// VITE_PDFJS_WORKER_URL — `${version}` is interpolated against pdfjs.version.
-const WORKER_URL_TEMPLATE =
-  import.meta.env.VITE_PDFJS_WORKER_URL ??
-  '//unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs';
-pdfjs.GlobalWorkerOptions.workerSrc = WORKER_URL_TEMPLATE.replace('${version}', pdfjs.version);
+// Inline the pdf.js worker into the IIFE bundle to avoid a runtime dependency
+// on unpkg.com and to satisfy strict CSP script-src rules. A blob URL is
+// created once at module init and assigned to workerSrc; pdf.js spawns a Worker
+// from it for all document loads.
+pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(
+  new Blob([pdfWorkerSrc], { type: 'application/javascript' }),
+);
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
