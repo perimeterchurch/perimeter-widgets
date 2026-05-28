@@ -21,7 +21,8 @@ export interface PublishOptions {
 
 export async function publishWidget(opts: PublishOptions, hooks: PublishHooks): Promise<BuildRecord> {
   const { name } = opts;
-  const version = computeVersion(hooks.readPackageVersion(name), hooks.gitSha(), hooks.gitBranch());
+  const sha = hooks.gitSha();
+  const version = computeVersion(hooks.readPackageVersion(name), sha, hooks.gitBranch());
 
   const existing = await hooks.store.listBuilds(name);
   if (existing.some((b) => b.version === version) && !opts.force) {
@@ -41,7 +42,7 @@ export async function publishWidget(opts: PublishOptions, hooks: PublishHooks): 
 
   const record: BuildRecord = {
     version,
-    sha: hooks.gitSha(),
+    sha,
     sizeGz: gzipSync(js).length,
     builtAt: new Date().toISOString(),
     blobPath,
