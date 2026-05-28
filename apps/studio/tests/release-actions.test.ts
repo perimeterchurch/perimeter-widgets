@@ -33,3 +33,19 @@ describe('promote action', () => {
     expect(activity[0]).toMatchObject({ action: 'promote', by: 'me@perimeter.org' });
   });
 });
+
+describe('rollback action', () => {
+  it('rejects when there is no session', async () => {
+    getSession.mockResolvedValue(null);
+    const { rollback } = await import('@/app/admin/releases/actions');
+    await expect(rollback('sermons', '1.0.0')).rejects.toThrow(/unauthorized/i);
+  });
+
+  it('records the activity entry as a rollback', async () => {
+    getSession.mockResolvedValue({ user: { email: 'me@perimeter.org' } });
+    const { rollback } = await import('@/app/admin/releases/actions');
+    await rollback('sermons', '1.0.0');
+    const activity = await memory.listActivity();
+    expect(activity[0]).toMatchObject({ action: 'rollback', by: 'me@perimeter.org' });
+  });
+});
