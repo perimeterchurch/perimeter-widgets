@@ -19,14 +19,19 @@ export interface PublishOptions {
   force: boolean;
 }
 
-export async function publishWidget(opts: PublishOptions, hooks: PublishHooks): Promise<BuildRecord> {
+export async function publishWidget(
+  opts: PublishOptions,
+  hooks: PublishHooks,
+): Promise<BuildRecord> {
   const { name } = opts;
   const sha = hooks.gitSha();
   const version = computeVersion(hooks.readPackageVersion(name), sha, hooks.gitBranch());
 
   const existing = await hooks.store.listBuilds(name);
   if (existing.some((b) => b.version === version) && !opts.force) {
-    throw new Error(`Build ${name}@${version} already exists; versions are immutable (use --force on a -sha dev build)`);
+    throw new Error(
+      `Build ${name}@${version} already exists; versions are immutable (use --force on a -sha dev build)`,
+    );
   }
 
   await hooks.build(name);

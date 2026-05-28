@@ -50,6 +50,8 @@ describe('publishWidget', () => {
       readArtifact: () => Buffer.from('JS'),
     };
     await publishWidget({ name: 'sermons', force: false }, hooks);
-    await expect(publishWidget({ name: 'sermons', force: false }, hooks)).rejects.toThrow(/already/i);
+    await expect(publishWidget({ name: 'sermons', force: false }, hooks)).rejects.toThrow(
+      /already/i,
+    );
   });
 });

@@ -33,7 +33,9 @@ async function main(): Promise<void> {
     },
   );
 
-  console.log(`Published ${name}@${record.version} (${(record.sizeGz / 1024).toFixed(1)} KB gz) — available, not yet live.`);
+  console.log(
+    `Published ${name}@${record.version} (${(record.sizeGz / 1024).toFixed(1)} KB gz) — available, not yet live.`,
+  );
 }
 
 main().catch((err: unknown) => {
