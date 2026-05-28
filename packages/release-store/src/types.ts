@@ -28,6 +28,6 @@ export interface ReleaseStore {
     by: string,
   ): Promise<void>;
   listActivity(): Promise<ActivityEntry[]>;
-  uploadBundle(blobPath: string, body: Buffer, contentType: string): Promise<void>;
+  uploadBundle(blobPath: string, body: Uint8Array, contentType: string): Promise<void>;
   readBundle(blobPath: string): Promise<ReadableStream | null>;
 }
