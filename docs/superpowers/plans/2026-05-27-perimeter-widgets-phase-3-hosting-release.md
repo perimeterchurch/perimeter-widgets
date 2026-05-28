@@ -243,7 +243,7 @@ export interface ReleaseStore {
     by: string,
   ): Promise<void>;
   listActivity(): Promise<ActivityEntry[]>;
-  uploadBundle(blobPath: string, body: Buffer, contentType: string): Promise<void>;
+  uploadBundle(blobPath: string, body: Uint8Array, contentType: string): Promise<void>;
   readBundle(blobPath: string): Promise<ReadableStream | null>;
 }
 ```
@@ -252,12 +252,19 @@ export interface ReleaseStore {
 
 ```ts
 export interface KvClient {
+  // get<T> is a caller-asserted shape; the store knows what it wrote.
   get<T>(key: string): Promise<T | null>;
-  set<T>(key: string, value: T): Promise<void>;
+  // set takes `unknown` honestly — an unconstrained `set<T>(value: T)` would
+  // infer T from the argument at every call site, giving the same type-safety
+  // as `unknown`. We persist JSON-serializable values; the store handles it.
+  set(key: string, value: unknown): Promise<void>;
 }
 
 export interface BlobClient {
-  put(path: string, body: Buffer, contentType: string): Promise<void>;
+  // Uint8Array (not Buffer) keeps this interface driver-agnostic: Node Buffer
+  // structurally satisfies Uint8Array, so memory + Vercel drivers + the publish
+  // script (which reads via fs.readFileSync → Buffer) all fit without casts.
+  put(path: string, body: Uint8Array, contentType: string): Promise<void>;
   get(path: string): Promise<ReadableStream | null>;
   exists(path: string): Promise<boolean>;
 }
@@ -378,9 +385,9 @@ export function createMemoryKv(): KvClient {
 }
 
 export function createMemoryBlob(): BlobClient {
-  const store = new Map<string, Buffer>();
+  const store = new Map<string, Uint8Array>();
   return {
-    put(path: string, body: Buffer): Promise<void> {
+    put(path: string, body: Uint8Array): Promise<void> {
       store.set(path, body);
       return Promise.resolve();
     },
@@ -390,7 +397,7 @@ export function createMemoryBlob(): BlobClient {
       return Promise.resolve(
         new ReadableStream({
           start(controller) {
-            controller.enqueue(new Uint8Array(buf));
+            controller.enqueue(buf);
             controller.close();
           },
         }),
