@@ -78,6 +78,9 @@ importers:
 
   apps/studio:
     dependencies:
+      '@perimeter/release-store':
+        specifier: workspace:*
+        version: link:../../packages/release-store
       '@perimeter/theme':
         specifier: workspace:*
         version: link:../../packages/theme
