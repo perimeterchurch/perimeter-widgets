@@ -16,4 +16,12 @@ describe('getStore', () => {
     });
     expect(await b.listBuilds('w')).toHaveLength(0);
   });
+
+  it('throws when BLOB_PUBLIC_BASE_URL is missing', () => {
+    expect(() => getStore({
+      KV_REST_API_URL: 'https://x',
+      KV_REST_API_TOKEN: 't',
+      BLOB_READ_WRITE_TOKEN: 'b',
+    })).toThrow(/BLOB_PUBLIC_BASE_URL/);
+  });
 });

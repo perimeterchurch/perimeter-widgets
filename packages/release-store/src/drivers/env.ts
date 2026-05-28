@@ -33,5 +33,9 @@ export function getStore(env: Record<string, string | undefined> = process.env):
   if (!blobToken) {
     throw new Error('release-store: BLOB_READ_WRITE_TOKEN is required for the Vercel driver.');
   }
-  return createStore(createVercelKv(kvConfig), createVercelBlob(blobToken));
+  const blobBaseUrl = env['BLOB_PUBLIC_BASE_URL'];
+  if (!blobBaseUrl) {
+    throw new Error('release-store: BLOB_PUBLIC_BASE_URL is required for the Vercel driver.');
+  }
+  return createStore(createVercelKv(kvConfig), createVercelBlob(blobToken, blobBaseUrl));
 }
