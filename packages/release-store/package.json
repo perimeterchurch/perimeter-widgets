@@ -1,0 +1,26 @@
+{
+  "name": "@perimeter/release-store",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./src/index.ts" }
+  },
+  "scripts": {
+    "build": "echo \"(no-op)\"",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "publish-widget": "tsx scripts/publish-widget.ts"
+  },
+  "dependencies": {
+    "@vercel/blob": "^0.27.0",
+    "@vercel/kv": "^3.0.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
