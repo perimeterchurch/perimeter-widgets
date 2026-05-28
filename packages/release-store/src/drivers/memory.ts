@@ -16,7 +16,7 @@ export function createMemoryKv(): KvClient {
 export function createMemoryBlob(): BlobClient {
   const store = new Map<string, Uint8Array>();
   return {
-    put(path: string, body: Uint8Array): Promise<void> {
+    put(path: string, body: Uint8Array, _contentType: string): Promise<void> {
       store.set(path, body);
       return Promise.resolve();
     },
@@ -24,7 +24,7 @@ export function createMemoryBlob(): BlobClient {
       const buf = store.get(path);
       if (!buf) return Promise.resolve(null);
       return Promise.resolve(
-        new ReadableStream({
+        new ReadableStream<Uint8Array>({
           start(controller) {
             controller.enqueue(buf);
             controller.close();
