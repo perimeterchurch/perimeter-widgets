@@ -8,3 +8,8 @@ coverage
 .env.local
 .env.*.local
 .DS_Store
+
+# Next.js auto-generates next-env.d.ts; its contents flip between
+# `.next/dev/types` and `.next/types` depending on the last command.
+# CI runs `next build` before typecheck, so the file is always present.
+apps/*/next-env.d.ts
