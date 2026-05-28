@@ -5,6 +5,11 @@ import { ACTIVITY_KEY, buildsKey, latestKey } from './keys';
 const ACTIVITY_CAP = 200;
 
 export function createStore(kv: KvClient, blob: BlobClient): ReleaseStore {
+  // Non-atomic read-modify-write. Acceptable for this product: publish/promote/
+  // rollback are low-frequency manual admin operations, so a concurrent-write
+  // race would require two admins acting in the same millisecond. The spec
+  // calls this out intentionally; do not "fix" with a transaction without
+  // re-reading it.
   async function pushActivity(entry: ActivityEntry): Promise<void> {
     const log = (await kv.get<ActivityEntry[]>(ACTIVITY_KEY)) ?? [];
     await kv.set(ACTIVITY_KEY, [entry, ...log].slice(0, ACTIVITY_CAP));

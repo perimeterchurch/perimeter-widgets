@@ -62,6 +62,7 @@ describe('createStore', () => {
     const activity = await s.listActivity();
     expect(activity).toHaveLength(200);
     expect(activity[0]?.version).toBe('1.0.204');
+    expect(activity[199]?.version).toBe('1.0.5');
   });
 
   it('uploadBundle + readBundle round-trips through blob', async () => {
