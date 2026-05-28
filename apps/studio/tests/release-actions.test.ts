@@ -13,7 +13,13 @@ beforeEach(async () => {
   getSession.mockReset();
   const builds = await memory.listBuilds('sermons');
   if (!builds.some((b) => b.version === '1.0.0')) {
-    await memory.recordBuild('sermons', { version: '1.0.0', sha: 'x', sizeGz: 1, builtAt: 't', blobPath: 'sermons/1.0.0/index.js' });
+    await memory.recordBuild('sermons', {
+      version: '1.0.0',
+      sha: 'x',
+      sizeGz: 1,
+      builtAt: 't',
+      blobPath: 'sermons/1.0.0/index.js',
+    });
   }
 });
 

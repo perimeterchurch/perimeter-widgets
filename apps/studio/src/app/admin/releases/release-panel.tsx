@@ -27,7 +27,13 @@ function compareVersions(a: string, b: string): number {
   return 0;
 }
 
-export function ReleasePanel({ name, builds, latest, onPromote, onRollback }: Props): React.JSX.Element {
+export function ReleasePanel({
+  name,
+  builds,
+  latest,
+  onPromote,
+  onRollback,
+}: Props): React.JSX.Element {
   const [pending, setPending] = React.useState(false);
   const act = (fn: () => Promise<void>) => () => {
     setPending(true);
