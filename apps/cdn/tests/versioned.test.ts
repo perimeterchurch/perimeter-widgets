@@ -5,8 +5,16 @@ const memory = createStore(createMemoryKv(), createMemoryBlob());
 vi.mock('@/lib/store', () => ({ releaseStore: () => memory }));
 
 beforeEach(async () => {
-  await memory.uploadBundle('sermons/1.0.0/index.js', Buffer.from('BUNDLE'), 'application/javascript');
-  await memory.uploadBundle('sermons/1.0.0/index.js.map', Buffer.from('SOURCEMAP'), 'application/json');
+  await memory.uploadBundle(
+    'sermons/1.0.0/index.js',
+    Buffer.from('BUNDLE'),
+    'application/javascript',
+  );
+  await memory.uploadBundle(
+    'sermons/1.0.0/index.js.map',
+    Buffer.from('SOURCEMAP'),
+    'application/json',
+  );
 });
 
 describe('GET /api/bundle/[name]/[version]', () => {

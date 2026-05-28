@@ -4,7 +4,13 @@ import { createStore, createMemoryKv, createMemoryBlob } from '@perimeter/releas
 const memory = createStore(createMemoryKv(), createMemoryBlob());
 vi.mock('@/lib/store', () => ({ releaseStore: () => memory }));
 
-const build = (v: string) => ({ version: v, sha: 'x', sizeGz: 1, builtAt: 't', blobPath: `sermons/${v}/index.js` });
+const build = (v: string) => ({
+  version: v,
+  sha: 'x',
+  sizeGz: 1,
+  builtAt: 't',
+  blobPath: `sermons/${v}/index.js`,
+});
 
 describe('GET /api/latest/[name]', () => {
   beforeEach(async () => {
@@ -22,7 +28,9 @@ describe('GET /api/latest/[name]', () => {
     });
     expect(res.status).toBe(302);
     expect(res.headers.get('location')).toBe('/sermons/1.0.0/index.js');
-    expect(res.headers.get('cache-control')).toBe('public, s-maxage=300, stale-while-revalidate=86400');
+    expect(res.headers.get('cache-control')).toBe(
+      'public, s-maxage=300, stale-while-revalidate=86400',
+    );
   });
 
   it('404s when the widget was never promoted', async () => {
