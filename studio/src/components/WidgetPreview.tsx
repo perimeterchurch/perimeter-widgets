@@ -25,7 +25,7 @@ export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefini
       if (!alive) return;
       setDef(m.default);
       onDefinition?.(m.default);
-      setCss((c as unknown as { default: string }).default ?? (c as unknown as string));
+      setCss(c.default);
     });
     return () => {
       alive = false;

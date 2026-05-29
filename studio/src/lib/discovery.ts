@@ -21,7 +21,7 @@ export function toWidgetEntries(
     .map(([file, load]) => {
       const slug = file.split('/widgets/')[1]!.split('/')[0]!;
       const cssKey = `/widgets/${slug}/src/styles.css`;
-      const loadCss = css[cssKey] ?? (async () => ({ default: '' }));
+      const loadCss = css[cssKey] ?? (() => Promise.resolve({ default: '' }));
       return { slug, load, loadCss };
     })
     .sort((a, b) => a.slug.localeCompare(b.slug));
