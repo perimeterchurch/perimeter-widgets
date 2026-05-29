@@ -35,6 +35,7 @@ describe('GET /api/bundle/[name]/[version]', () => {
       params: Promise.resolve({ name: 'sermons', version: '9.9.9' }),
     });
     expect(res.status).toBe(404);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=60');
   });
 });
 
@@ -56,5 +57,6 @@ describe('GET /api/bundle-map/[name]/[version]', () => {
       params: Promise.resolve({ name: 'sermons', version: '9.9.9' }),
     });
     expect(res.status).toBe(404);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=60');
   });
 });

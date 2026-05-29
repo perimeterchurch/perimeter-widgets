@@ -39,5 +39,6 @@ describe('GET /api/latest/[name]', () => {
       params: Promise.resolve({ name: 'events' }),
     });
     expect(res.status).toBe(404);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=60');
   });
 });
