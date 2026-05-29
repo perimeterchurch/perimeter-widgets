@@ -5,7 +5,8 @@ import { resolveTokens } from '@perimeter/theme';
 import type { z } from 'zod';
 import type { WidgetDefinition } from './define-widget';
 import { parseDataAttrs } from './data-attrs';
-import { deregisterInstance, getCss, type InstanceHandle, registerInstance } from './registry';
+import { applyStyles } from './styling';
+import { deregisterInstance, registerInstance, type InstanceHandle } from './registry';
 import { AuthProviderProvider } from './providers/auth-provider';
 import { AuthGate } from './providers/auth-gate';
 import { ErrorBoundary } from './providers/error-boundary';
@@ -17,9 +18,8 @@ const DEFAULT_API_URL =
     (globalThis as { __PERIMETER_API_URL__?: string }).__PERIMETER_API_URL__) ||
   'https://api.perimeter.org';
 
-export interface MountOptions<S extends z.ZodTypeAny = z.ZodTypeAny> {
-  definition: WidgetDefinition<S>;
-  target: HTMLElement;
+/** Optional, rarely-needed mount inputs (the old options object, minus definition/target). */
+export interface MountExtras {
   configOverrides?: Record<string, unknown> | undefined;
   apiBaseUrl?: string | undefined;
   authFactory?: (() => AuthProvider) | undefined;
@@ -29,49 +29,44 @@ export interface MountedWidget extends InstanceHandle {
   unmount(): void;
 }
 
-/** AuthProvider implementations may optionally expose a dispose() to release listeners/timers. */
 interface DisposableAuth {
   dispose?: () => void;
 }
 
-export function mountWidget<S extends z.ZodTypeAny>(opts: MountOptions<S>): MountedWidget {
-  const { definition, target } = opts;
-
-  const parsed = parseDataAttrs(target, definition.schema);
-  const config = parsed.config as Record<string, unknown>;
+/**
+ * The single render path. Used identically by the production IIFE (via autoMount)
+ * and the studio dev harness. `css` is the widget's compiled Tailwind output,
+ * imported as a `?inline` string — the same string in dev and prod.
+ */
+export function mount<S extends z.ZodTypeAny>(
+  host: HTMLElement,
+  definition: WidgetDefinition<S>,
+  css: string,
+  extras: MountExtras = {},
+): MountedWidget {
+  const parsed = parseDataAttrs(host, definition.schema);
   const dataAttrThemeOverrides = parsed.themeOverrides;
-  const mergedConfig: Record<string, unknown> = { ...config, ...(opts.configOverrides ?? {}) };
-  let runtimeOverrides: Record<string, string> = {};
+  const mergedConfig: Record<string, unknown> = {
+    ...(parsed.config as Record<string, unknown>),
+    ...(extras.configOverrides ?? {}),
+  };
+  let runtimeOverrides: Partial<Record<string, string>> = {};
 
-  const shadow = target.shadowRoot ?? target.attachShadow({ mode: 'open' });
-  // Clear any previous mount in this shadow root.
-  while (shadow.firstChild) shadow.removeChild(shadow.firstChild);
-
-  // The theme <style> lives OUTSIDE the React tree. Token updates rewrite its
-  // textContent directly via applyCss(), avoiding a React re-render + the
-  // flushSync-from-lifecycle warning that triggers when `updateTokens` is
-  // called from inside a React effect (e.g. Studio's theme-overrides effect).
-  const styleEl = document.createElement('style');
-  styleEl.setAttribute('data-perimeter-theme', '');
-  shadow.appendChild(styleEl);
-
-  function buildCss(): string {
-    const { cssText } = resolveTokens({
+  function tokenCss(): string {
+    return resolveTokens({
       widgetOverrides: definition.themeOverrides,
       dataAttrOverrides: dataAttrThemeOverrides,
       runtimeOverrides,
-    });
-    const widgetCss = getCss(definition.name) ?? '';
-    return `${cssText}\n${widgetCss}`;
+    }).cssText;
   }
 
-  function applyCss(): void {
-    styleEl.textContent = buildCss();
-  }
-  applyCss();
+  const shadow = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
+  while (shadow.firstChild) shadow.removeChild(shadow.firstChild);
 
-  const auth = (opts.authFactory ?? (() => new MPLocalStorageAuth()))();
-  const apiClient = createApiClient({ baseUrl: opts.apiBaseUrl ?? DEFAULT_API_URL, auth });
+  const styles = applyStyles(shadow, definition.name, css, tokenCss());
+
+  const auth = (extras.authFactory ?? (() => new MPLocalStorageAuth()))();
+  const apiClient = createApiClient({ baseUrl: extras.apiBaseUrl ?? DEFAULT_API_URL, auth });
 
   const reactRoot = document.createElement('div');
   shadow.appendChild(reactRoot);
@@ -95,19 +90,16 @@ export function mountWidget<S extends z.ZodTypeAny>(opts: MountOptions<S>): Moun
 
   const handle: MountedWidget = {
     unmount() {
-      // Release auth listeners/timers BEFORE unmounting React, so any in-flight
-      // onChange callback doesn't fire against a tree that's being torn down.
       (auth as DisposableAuth).dispose?.();
       root.unmount();
+      styles.dispose();
       while (shadow.firstChild) shadow.removeChild(shadow.firstChild);
       deregisterInstance(definition.name, handle);
     },
     updateTokens(overrides) {
       runtimeOverrides = overrides;
-      // Direct DOM mutation — synchronous, no React re-render, no flushSync.
-      // Studio's applyOverrides callers can read the new CSS variables
-      // immediately after this call returns.
-      applyCss();
+      // Swap only the token layer; shared widget styles + React tree untouched.
+      styles.update(tokenCss());
     },
   };
   registerInstance(definition.name, handle);
