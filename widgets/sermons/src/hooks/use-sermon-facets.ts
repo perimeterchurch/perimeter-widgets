@@ -1,17 +1,20 @@
 import { useEffect, useMemo } from 'react';
+import {
+  useBooks,
+  useSeries,
+  useSeriesTypes,
+  useServiceTypes,
+  useSpeakers,
+} from '@perimeter/api-hooks';
 import type { SermonsConfig } from '../types';
-import { useBooks } from './use-books';
-import { useSeries } from './use-series';
-import { useSeriesTypes } from './use-series-types';
-import { useServiceTypes } from './use-service-types';
-import { useSpeakers } from './use-speakers';
+import { defined, idsParam } from '../lib/query-params';
 import type { FilterLabelCache } from './use-filter-label-cache';
 import type { useSermonFilters } from './use-sermon-filters';
 
 interface UseSermonFacetsParams {
-    config: SermonsConfig;
-    filters: ReturnType<typeof useSermonFilters>;
-    labelCache: FilterLabelCache;
+  config: SermonsConfig;
+  filters: ReturnType<typeof useSermonFilters>;
+  labelCache: FilterLabelCache;
 }
 
 /**
@@ -27,125 +30,158 @@ interface UseSermonFacetsParams {
  *
  * Returns only the narrowed results — the primer queries are observed only
  * by their absorb effects.
+ *
+ * This is a widget-internal composite over multiple `@perimeter/api-hooks`
+ * endpoints. Those hooks now take raw OpenAPI query params (e.g.
+ * `seriesId: '1,2'`) and return the full `{ success, data, meta }` envelope,
+ * so this hook (a) translates the widget's `selectedXIds: number[]` filter
+ * state into comma-joined string params and (b) unwraps `result.data?.data`
+ * to get the underlying arrays. `config.seriesTypeId` is forwarded as the
+ * default series-type pin when present.
  */
-export function useSermonFacets({
-    config,
-    filters,
-    labelCache,
-}: UseSermonFacetsParams) {
-    // --- Primer queries (unfiltered) ---
-    const { data: allSpeakers = [] } = useSpeakers({ config });
-    const { data: allBooks = [] } = useBooks({ config });
-    const { data: allServiceTypes = [] } = useServiceTypes({ config });
-    const { data: allSeriesTypes = [] } = useSeriesTypes({ config });
-    const { data: allSeriesPage } = useSeries({ config, perPage: 50 });
-    const allSeriesItems = useMemo(
-        () => allSeriesPage?.series ?? [],
-        [allSeriesPage?.series],
+export function useSermonFacets({ config, filters, labelCache }: UseSermonFacetsParams) {
+  // Config-pinned series type (e.g. the "Sunday Morning Sermon" default)
+  // applies to every facet query as a baseline narrowing.
+  const pinnedSeriesTypeId = config.seriesTypeId || undefined;
+
+  // --- Primer queries (unfiltered, aside from the config pin) ---
+  const allSpeakersQuery = useSpeakers(defined({ seriesTypeId: pinnedSeriesTypeId }));
+  const allBooksQuery = useBooks(defined({ seriesTypeId: pinnedSeriesTypeId }));
+  const allServiceTypesQuery = useServiceTypes(defined({ seriesTypeId: pinnedSeriesTypeId }));
+  const allSeriesTypesQuery = useSeriesTypes({});
+  const allSeriesQuery = useSeries(defined({ perPage: 50, seriesTypeId: pinnedSeriesTypeId }));
+
+  const allSpeakers = useMemo(() => allSpeakersQuery.data?.data ?? [], [allSpeakersQuery.data]);
+  const allBooks = useMemo(() => allBooksQuery.data?.data ?? [], [allBooksQuery.data]);
+  const allServiceTypes = useMemo(
+    () => allServiceTypesQuery.data?.data ?? [],
+    [allServiceTypesQuery.data],
+  );
+  const allSeriesTypes = useMemo(
+    () => allSeriesTypesQuery.data?.data ?? [],
+    [allSeriesTypesQuery.data],
+  );
+  const allSeriesItems = useMemo(
+    () => allSeriesQuery.data?.data.series ?? [],
+    [allSeriesQuery.data],
+  );
+
+  // Absorb primer results into the label cache via effects — inline absorb
+  // would fire twice under React StrictMode's double-render.
+  useEffect(() => {
+    labelCache.absorb(
+      'speaker',
+      allSpeakers.map((s) => ({ id: s.id, label: s.name })),
     );
+  }, [allSpeakers, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'book',
+      allBooks.map((b) => ({ id: b.id, label: b.name })),
+    );
+  }, [allBooks, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'series',
+      allSeriesItems.map((s) => ({
+        id: s.id,
+        label: s.displayTitle ?? s.title,
+      })),
+    );
+  }, [allSeriesItems, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'serviceType',
+      allServiceTypes.map((s) => ({ id: s.id, label: s.name })),
+    );
+  }, [allServiceTypes, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'seriesType',
+      allSeriesTypes.map((s) => ({ id: s.id, label: s.name })),
+    );
+  }, [allSeriesTypes, labelCache]);
 
-    // Absorb primer results into the label cache via effects — inline absorb
-    // would fire twice under React StrictMode's double-render.
-    useEffect(() => {
-        labelCache.absorb(
-            'speaker',
-            allSpeakers.map((s) => ({ id: s.id, label: s.name })),
-        );
-    }, [allSpeakers, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'book',
-            allBooks.map((b) => ({ id: b.id, label: b.name })),
-        );
-    }, [allBooks, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'series',
-            allSeriesItems.map((s) => ({
-                id: s.id,
-                label: s.displayTitle ?? s.title,
-            })),
-        );
-    }, [allSeriesItems, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'serviceType',
-            allServiceTypes.map((s) => ({ id: s.id, label: s.name })),
-        );
-    }, [allServiceTypes, labelCache]);
-    useEffect(() => {
-        labelCache.absorb(
-            'seriesType',
-            allSeriesTypes.map((s) => ({ id: s.id, label: s.name })),
-        );
-    }, [allSeriesTypes, labelCache]);
+  // Filter values shared across the narrowed queries.
+  const search = filters.search || undefined;
+  const from = filters.from ?? undefined;
+  const to = filters.to ?? undefined;
+  const seriesTypeId = idsParam(filters.selectedSeriesTypeIds) ?? pinnedSeriesTypeId;
 
-    // --- Narrowed queries (apply every other filter dimension) ---
-    const { data: speakers = [], isLoading: speakersLoading } = useSpeakers({
-        config,
-        search: filters.search || undefined,
-        selectedSeriesIds: filters.selectedSeriesIds,
-        selectedBookIds: filters.selectedBookIds,
-        selectedServiceTypeIds: filters.selectedServiceTypeIds,
-        selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-        from: filters.from ?? undefined,
-        to: filters.to ?? undefined,
-    });
-    const { data: books = [], isLoading: booksLoading } = useBooks({
-        config,
-        search: filters.search || undefined,
-        selectedSeriesIds: filters.selectedSeriesIds,
-        selectedSpeakerIds: filters.selectedSpeakerIds,
-        selectedServiceTypeIds: filters.selectedServiceTypeIds,
-        selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-        from: filters.from ?? undefined,
-        to: filters.to ?? undefined,
-    });
-    const { data: serviceTypes = [], isLoading: serviceTypesLoading } =
-        useServiceTypes({
-            config,
-            search: filters.search || undefined,
-            selectedSeriesIds: filters.selectedSeriesIds,
-            selectedSpeakerIds: filters.selectedSpeakerIds,
-            selectedBookIds: filters.selectedBookIds,
-            selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-            from: filters.from ?? undefined,
-            to: filters.to ?? undefined,
-        });
-    const { data: seriesTypes = [], isLoading: seriesTypesLoading } =
-        useSeriesTypes({
-            config,
-            search: filters.search || undefined,
-            selectedSeriesIds: filters.selectedSeriesIds,
-            selectedSpeakerIds: filters.selectedSpeakerIds,
-            selectedBookIds: filters.selectedBookIds,
-            selectedServiceTypeIds: filters.selectedServiceTypeIds,
-            from: filters.from ?? undefined,
-            to: filters.to ?? undefined,
-        });
-    const { data: seriesPage, isLoading: seriesLoading } = useSeries({
-        config,
-        perPage: 50,
-        search: filters.search || undefined,
-        selectedSpeakerIds: filters.selectedSpeakerIds,
-        selectedBookIds: filters.selectedBookIds,
-        selectedServiceTypeIds: filters.selectedServiceTypeIds,
-        selectedSeriesTypeIds: filters.selectedSeriesTypeIds,
-        from: filters.from ?? undefined,
-        to: filters.to ?? undefined,
-    });
-    const series = seriesPage?.series ?? [];
+  // --- Narrowed queries (apply every other filter dimension) ---
+  const speakersQuery = useSpeakers(
+    defined({
+      search,
+      seriesId: idsParam(filters.selectedSeriesIds),
+      bookId: idsParam(filters.selectedBookIds),
+      serviceTypeId: idsParam(filters.selectedServiceTypeIds),
+      seriesTypeId,
+      from,
+      to,
+    }),
+  );
+  const booksQuery = useBooks(
+    defined({
+      search,
+      seriesId: idsParam(filters.selectedSeriesIds),
+      speakerId: idsParam(filters.selectedSpeakerIds),
+      serviceTypeId: idsParam(filters.selectedServiceTypeIds),
+      seriesTypeId,
+      from,
+      to,
+    }),
+  );
+  const serviceTypesQuery = useServiceTypes(
+    defined({
+      search,
+      seriesId: idsParam(filters.selectedSeriesIds),
+      speakerId: idsParam(filters.selectedSpeakerIds),
+      bookId: idsParam(filters.selectedBookIds),
+      seriesTypeId,
+      from,
+      to,
+    }),
+  );
+  const seriesTypesQuery = useSeriesTypes(
+    defined({
+      search,
+      seriesId: idsParam(filters.selectedSeriesIds),
+      speakerId: idsParam(filters.selectedSpeakerIds),
+      bookId: idsParam(filters.selectedBookIds),
+      serviceTypeId: idsParam(filters.selectedServiceTypeIds),
+      from,
+      to,
+    }),
+  );
+  const seriesQuery = useSeries(
+    defined({
+      perPage: 50,
+      search,
+      speakerId: idsParam(filters.selectedSpeakerIds),
+      bookId: idsParam(filters.selectedBookIds),
+      serviceTypeId: idsParam(filters.selectedServiceTypeIds),
+      seriesTypeId,
+      from,
+      to,
+    }),
+  );
 
-    return {
-        speakers,
-        books,
-        serviceTypes,
-        seriesTypes,
-        series,
-        speakersLoading,
-        booksLoading,
-        serviceTypesLoading,
-        seriesTypesLoading,
-        seriesLoading,
-    };
+  const speakers = speakersQuery.data?.data ?? [];
+  const books = booksQuery.data?.data ?? [];
+  const serviceTypes = serviceTypesQuery.data?.data ?? [];
+  const seriesTypes = seriesTypesQuery.data?.data ?? [];
+  const series = seriesQuery.data?.data.series ?? [];
+
+  return {
+    speakers,
+    books,
+    serviceTypes,
+    seriesTypes,
+    series,
+    speakersLoading: speakersQuery.isLoading,
+    booksLoading: booksQuery.isLoading,
+    serviceTypesLoading: serviceTypesQuery.isLoading,
+    seriesTypesLoading: seriesTypesQuery.isLoading,
+    seriesLoading: seriesQuery.isLoading,
+  };
 }

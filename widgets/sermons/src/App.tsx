@@ -1,4 +1,4 @@
-import { useConfig } from '@perimeter-widgets/shared';
+import * as React from 'react';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { SermonsConfig } from './types';
@@ -11,111 +11,119 @@ import { SeriesView } from './components/series/SeriesView';
 import { SeriesDetail } from './components/series/SeriesDetail';
 
 const fadeSlide = {
-    initial: { opacity: 0, y: 8 },
-    animate: {
-        opacity: 1,
-        y: 0,
-        transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] as const },
-    },
-    exit: {
-        opacity: 0,
-        y: -8,
-        transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] as const },
-    },
+  initial: { opacity: 0, y: 8 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] as const },
+  },
+  exit: {
+    opacity: 0,
+    y: -8,
+    transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] as const },
+  },
 };
 
-function SermonsWidget() {
-    const rawConfig = useConfig<SermonsConfig>();
-    const config = applyWidgetDefaults(rawConfig);
-    const filters = useSermonFilters(config);
-
-    // Build a unique key for AnimatePresence based on the current "page"
-    const viewKey =
-        filters.screen === 'detail' && filters.id ?
-            `detail-${filters.tab}-${filters.id}`
-        :   `browse-${filters.tab}`;
-
-    // Determine which content to render
-    const renderContent = () => {
-        if (filters.screen === 'detail' && filters.id) {
-            // Viewing a series detail
-            if (filters.tab === 'series' && !filters.fromSeriesId) {
-                return (
-                    <SeriesDetail
-                        id={filters.id}
-                        config={config}
-                        onBack={() => filters.setScreen('browse')}
-                        onSermonClick={(sermonId) => {
-                            // Navigate to sermon detail, remembering which series we came from
-                            filters.setSermonFromSeries(sermonId, filters.id!);
-                        }}
-                    />
-                );
-            }
-            // Viewing a sermon detail
-            return (
-                <SermonDetail
-                    id={filters.id}
-                    config={config}
-                    onBack={() => {
-                        if (filters.fromSeriesId) {
-                            filters.setSeriesDetail(filters.fromSeriesId);
-                        } else {
-                            filters.setScreen('browse');
-                        }
-                    }}
-                    onSermonClick={(sermonId) =>
-                        filters.setScreen('detail', sermonId)
-                    }
-                />
-            );
-        }
-
-        const showTabs =
-            !config.tab && (config.display ?? 'full') !== 'headless';
-
-        return (
-            <>
-                {showTabs && (
-                    <SermonTabs
-                        activeTab={filters.tab}
-                        onTabChange={filters.setTab}
-                    />
-                )}
-                <div className={showTabs ? 'mt-4' : ''}>
-                    <AnimatePresence mode='wait'>
-                        <motion.div key={filters.tab} {...fadeSlide}>
-                            {filters.tab === 'sermons' && (
-                                <SermonsView
-                                    config={config}
-                                    filters={filters}
-                                />
-                            )}
-                            {filters.tab === 'series' && (
-                                <SeriesView config={config} filters={filters} />
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-            </>
-        );
-    };
-
-    return (
-        <div className='p-4'>
-            <AnimatePresence mode='wait'>
-                <motion.div key={viewKey} {...fadeSlide}>
-                    {renderContent()}
-                </motion.div>
-            </AnimatePresence>
-        </div>
-    );
+/**
+ * Stable per-embed identifier. nuqs v2's adapter has no global URL-key prefix,
+ * so we derive a unique prefix per mounted widget and feed it to
+ * `useSermonFilters` (which maps each query-state key to `<prefix>key`). Two
+ * sermons embeds on one page therefore never collide on URL params. The id is
+ * generated once per mount and held in a ref so it never changes between
+ * renders.
+ */
+function useStableTargetId(): string {
+  const idRef = React.useRef<string | null>(null);
+  if (idRef.current === null) idRef.current = `perimeter-sermons-${crypto.randomUUID()}`;
+  return idRef.current;
 }
 
-export function SermonsApp() {
+interface SermonsWidgetProps {
+  config: SermonsConfig;
+  prefix: string;
+}
+
+function SermonsWidget({ config, prefix }: SermonsWidgetProps): React.JSX.Element {
+  const filters = useSermonFilters(config, { prefix });
+
+  // Build a unique key for AnimatePresence based on the current "page"
+  const viewKey =
+    filters.screen === 'detail' && filters.id
+      ? `detail-${filters.tab}-${filters.id}`
+      : `browse-${filters.tab}`;
+
+  // Determine which content to render
+  const renderContent = () => {
+    if (filters.screen === 'detail' && filters.id) {
+      // Viewing a series detail
+      if (filters.tab === 'series' && !filters.fromSeriesId) {
+        return (
+          <SeriesDetail
+            id={filters.id}
+            config={config}
+            onBack={() => filters.setScreen('browse')}
+            onSermonClick={(sermonId) => {
+              // Navigate to sermon detail, remembering which series we came from
+              filters.setSermonFromSeries(sermonId, filters.id!);
+            }}
+          />
+        );
+      }
+      // Viewing a sermon detail
+      return (
+        <SermonDetail
+          id={filters.id}
+          config={config}
+          onBack={() => {
+            if (filters.fromSeriesId) {
+              filters.setSeriesDetail(filters.fromSeriesId);
+            } else {
+              filters.setScreen('browse');
+            }
+          }}
+          onSermonClick={(sermonId) => filters.setScreen('detail', sermonId)}
+        />
+      );
+    }
+
+    const showTabs = !config.tab && (config.display ?? 'full') !== 'headless';
+
     return (
-        <NuqsAdapter>
-            <SermonsWidget />
-        </NuqsAdapter>
+      <>
+        {showTabs && <SermonTabs activeTab={filters.tab} onTabChange={filters.setTab} />}
+        <div className={showTabs ? 'mt-4' : ''}>
+          <AnimatePresence mode="wait">
+            <motion.div key={filters.tab} {...fadeSlide}>
+              {filters.tab === 'sermons' && <SermonsView config={config} filters={filters} />}
+              {filters.tab === 'series' && <SeriesView config={config} filters={filters} />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </>
     );
+  };
+
+  return (
+    <div className="p-4">
+      <AnimatePresence mode="wait">
+        <motion.div key={viewKey} {...fadeSlide}>
+          {renderContent()}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export interface AppProps {
+  config: SermonsConfig;
+}
+
+export function App({ config: rawConfig }: AppProps): React.JSX.Element {
+  const config = applyWidgetDefaults(rawConfig);
+  const targetId = useStableTargetId();
+  return (
+    <NuqsAdapter>
+      <SermonsWidget config={config} prefix={`${targetId}.`} />
+    </NuqsAdapter>
+  );
 }

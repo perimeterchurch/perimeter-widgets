@@ -1,0 +1,31 @@
+{
+  "name": "@perimeter/theme",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./tailwind": {
+      "types": "./src/tailwind.ts",
+      "default": "./src/tailwind.ts"
+    }
+  },
+  "scripts": {
+    "build": "echo \"(no-op)\"",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "tailwindcss": "^3.4.17"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@vitest/coverage-v8": "^2.1.8",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
