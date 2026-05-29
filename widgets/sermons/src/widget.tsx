@@ -1,5 +1,4 @@
 import { defineWidget } from '@perimeter/widget-runtime';
-import './styles.css';
 import { App } from './App';
 import { SermonsConfigSchema } from './types';
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { operations } from '@perimeter/api-types';
+import type { operations } from '@perimeter/api-hooks';
 
 /* ------------------------------------------------------------------ */
 /*  Widget Configuration (from data-* attributes)                      */

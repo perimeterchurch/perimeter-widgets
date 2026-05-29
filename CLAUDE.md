@@ -10,11 +10,15 @@ Streamline design spec: `docs/superpowers/specs/2026-05-29-perimeter-widgets-str
 
 Phase 1 implementation plan: `docs/superpowers/plans/2026-05-29-perimeter-widgets-streamline-phase-1-foundation.md`
 
+Phase 2 (sermons port) implementation plan: `docs/superpowers/plans/2026-05-29-perimeter-widgets-streamline-phase-2-sermons-port.md`
+
 Read the active spec/plan before modifying the platform.
 
 **Building a widget:** see `docs/creating-a-widget.md` for the copy-the-example on-ramp. Run `pnpm dev` to open the Vite studio, which auto-discovers widgets and UI components and previews them through the real `mount()`.
 
-**Later phases:** Phase 2 ports the sermons widget onto the new contract (its source stays in the tree but is out of the pnpm workspace until then); Phase 3 adds hosting + a release CLI (there is no `publish-widget` script yet); Phase 4 cuts over to `widgets.perimeter.org`. Each gets its own plan.
+**Phase 2 (sermons port) is done:** the `sermons` widget is back in the workspace and runs on the new contract (`src/widget.tsx` + `src/entry.ts`, `widgetConfig`, `@perimeter/api-hooks` for types/hooks). react-pdf's stylesheets are routed through `src/styles.css` via `@import` so they reach the shadow root; the per-widget gz budget is **900 KiB** (sermons lands ~859 KiB — a self-hosted-pdf-worker optimization to shrink it is a tracked follow-up).
+
+**Later phases:** Phase 3 adds hosting + a release CLI (there is no `publish-widget` script yet); Phase 4 cuts over to `widgets.perimeter.org`. Each gets its own plan.
 
 ## Packages
 
@@ -28,7 +32,7 @@ Read the active spec/plan before modifying the platform.
 | `@perimeter/api-hooks`          | React Query hooks + generated operation types (absorbed api-types) |
 | `@perimeter/ui`                 | shadcn components + `cn` + hooks (carried over)                    |
 
-`studio/` is the Vite studio app; `widgets/example` is the reference widget. (`release-store`, `api-types`, `apps/cdn`, and the Next.js `apps/studio` were removed in this phase.)
+`studio/` is the Vite studio app; `widgets/example` is the reference widget and `widgets/sermons` is the first production widget on the new platform. (`release-store`, `api-types`, `apps/cdn`, and the Next.js `apps/studio` were removed in this phase.)
 
 ## Commands
 

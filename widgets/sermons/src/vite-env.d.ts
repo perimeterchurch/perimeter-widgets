@@ -13,3 +13,5 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare const __PERIMETER_WIDGET_VERSION__: string;

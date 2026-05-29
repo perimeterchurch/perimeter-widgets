@@ -5,8 +5,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.widget.d.ts",
-      "default": "./src/index.tsx"
+      "types": "./src/widget.tsx",
+      "default": "./src/widget.tsx"
     }
   },
   "scripts": {
@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@perimeter/api-hooks": "workspace:*",
-    "@perimeter/api-types": "workspace:*",
     "@perimeter/theme": "workspace:*",
     "@perimeter/ui": "workspace:*",
     "@perimeter/widget-runtime": "workspace:*",
