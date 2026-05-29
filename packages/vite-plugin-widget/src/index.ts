@@ -1,1 +1,1 @@
-export { widgetConfig, type WidgetConfigOptions } from './config';
+export { widgetConfig, type WidgetConfigOptions } from './config.ts';

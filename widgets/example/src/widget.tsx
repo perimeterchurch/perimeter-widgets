@@ -1,6 +1,5 @@
 import { defineWidget } from '@perimeter/widget-runtime';
 import { z } from 'zod';
-import './styles.css';
 import { App } from './app';
 
 export default defineWidget({
