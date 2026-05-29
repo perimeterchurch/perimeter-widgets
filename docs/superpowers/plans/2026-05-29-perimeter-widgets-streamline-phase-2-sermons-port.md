@@ -18,7 +18,7 @@
 1. **Execution branch:** `feat/widgets-streamline-sermons`. If Phase 1 (PR #62) has merged to `dev`, branch from `origin/dev`. If not yet merged, **stack** on `feat/widgets-streamline-foundation` (branch from it) and target that branch in the PR until Phase 1 lands, then retarget to `dev` (see superpowers:land-stacked-prs). Never commit to `dev`/`main`.
 2. **react-pdf CSS → `styles.css` via `@import`.** Remove the two side-effect CSS imports from `PdfViewer.tsx` and add `@import` lines at the **top** of `widgets/sermons/src/styles.css` (before the `@tailwind` directives). This is the single CSS source that `entry.ts` imports `?inline` and `mount()` injects into the shadow root. Vite resolves CSS `@import` from `node_modules` at build time.
 3. **No new lazy-loading work.** `PdfViewer`/`VideoPlayer` are already `React.lazy`-loaded via `MediaTabs.tsx`; the single-IIFE build inlines dynamic imports (defers init, not download) — this matches the spec's "self-contained now" decision. We do **not** restructure the players.
-4. **Bundle budget:** the spec sets **850 KB gz** per widget. The port must land at or under that. If it exceeds, record the measured size and surface it (do not silently pass); a follow-up optimization (self-hosted pdf worker) is out of scope for Phase 2.
+4. **Bundle budget: 900 KiB gz** per widget. (Originally 850 KiB, sized from the old platform's ~801 KiB sermons bundle. On the rebuilt platform the ported sermons bundle measures **~858.8 KiB gz** — ~58 KiB heavier; raised to 900 KiB by plan-owner decision on 2026-05-29 to land Phase 2, with headroom.) Two follow-ups are tracked, both **out of scope for Phase 2**: (a) the self-hosted-pdf-worker optimization the spec flags (could drop the bundle to ~500–600 KiB), and (b) investigating the ~58 KiB new-platform regression vs the old build.
 5. **Same widget contract as Phase 1's `example`:** `src/widget.tsx` (defineWidget default, no CSS import) + `src/entry.ts` (`import css from './styles.css?inline'; … ensureGlobal(widget, css); autoMount(widget, css)`); `vite.config.ts` = `widgetConfig({ name: 'sermons' })`; `package.json` `exports` → `src/widget.tsx`.
 6. **Test convention unchanged:** tests stay in `widgets/sermons/tests/`; `vitest.config.ts` keeps jsdom + setup + the `--no-experimental-webstorage` poolOptions (sermons doesn't use constructable stylesheets directly — it renders through `mount()` only in the built bundle / studio, not in unit tests, which mock the hooks and render components/`App` directly). Only `tests/bundle.test.ts` changes.
 
@@ -245,7 +245,7 @@ import path from 'node:path';
 const root = path.resolve(__dirname, '..');
 const distDir = path.join(root, 'dist');
 const bundle = path.join(distDir, 'index.js');
-const BUDGET_GZ = 850 * 1024; // spec per-widget budget
+const BUDGET_GZ = 900 * 1024; // spec per-widget budget
 
 beforeAll(() => {
   execSync('pnpm exec vite build', { cwd: root, stdio: 'inherit' });
@@ -263,7 +263,7 @@ describe('built sermons bundle', () => {
     expect(code).toContain('sermons');
     expect(code).toContain('PerimeterWidgets');
   });
-  it('stays within the 850 KB gz budget', () => {
+  it('stays within the 900 KB gz budget', () => {
     const gz = gzipSync(readFileSync(bundle)).length;
     // Surface the measured size in the test output regardless of pass/fail.
     console.log(`sermons bundle: ${(gz / 1024).toFixed(1)} KB gz (budget ${(BUDGET_GZ / 1024).toFixed(0)} KB)`);
@@ -281,7 +281,7 @@ Expected: PASS, including the budget check. If the budget assertion FAILS, do **
 
 ```bash
 git add widgets/sermons/tests/bundle.test.ts
-git commit -m "test(widget-sermons): assert single-IIFE build + 850KB gz budget"
+git commit -m "test(widget-sermons): assert single-IIFE build + 900KB gz budget"
 ```
 
 ### Task 4.2: Confirm the rest of the sermons suite passes on the new platform
@@ -332,7 +332,7 @@ git commit -am "chore(widget-sermons): quality gate green + docs after Phase 2 p
 
 ### Task 5.3: PR
 
-- [ ] **Step 1:** Push `feat/widgets-streamline-sermons`. Open a PR with `--body-file` (write the body with the Write tool). If stacked on Phase 1, target `feat/widgets-streamline-foundation` and note the stack; once Phase 1 merges, retarget to `dev` (superpowers:land-stacked-prs). Body: what ported, the react-pdf-CSS fix, the measured bundle gz size vs the 850 KB budget, the parity-check result, and that production embeds are still on the legacy URL (cutover is Phase 4).
+- [ ] **Step 1:** Push `feat/widgets-streamline-sermons`. Open a PR with `--body-file` (write the body with the Write tool). If stacked on Phase 1, target `feat/widgets-streamline-foundation` and note the stack; once Phase 1 merges, retarget to `dev` (superpowers:land-stacked-prs). Body: what ported, the react-pdf-CSS fix, the measured bundle gz size vs the 900 KiB budget, the parity-check result, and that production embeds are still on the legacy URL (cutover is Phase 4).
 - [ ] **Step 2:** Run superpowers:requesting-code-review before requesting human review.
 
 ---
@@ -340,7 +340,7 @@ git commit -am "chore(widget-sermons): quality gate green + docs after Phase 2 p
 ## Done-when (Phase 2 acceptance)
 
 - `pnpm quality` green across the workspace **including** `@perimeter/widget-sermons`.
-- Sermons builds to a single self-contained `dist/index.js` IIFE with **no separate CSS asset**, at or under **850 KB gz** (measured size recorded).
+- Sermons builds to a single self-contained `dist/index.js` IIFE with **no separate CSS asset**, at or under **900 KiB gz** (measured size recorded).
 - The studio previews sermons live through the real `mount()`, including PDF rendering with correct react-pdf layer styling inside the shadow root.
 - The built IIFE self-mounts on `data-perimeter-widget="sermons"` and renders identically to the studio preview.
 - `@perimeter/api-types` is referenced nowhere; sermons depends on `@perimeter/api-hooks`.
