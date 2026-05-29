@@ -27,7 +27,8 @@ These resolve ambiguities the spec left to planning. They are intentional and th
 7. **Version injection:** `widgetConfig` injects `define: { __PERIMETER_WIDGET_VERSION__: JSON.stringify(pkg.version) }`; `src/entry.ts` sets `definition.version = __PERIMETER_WIDGET_VERSION__` before `autoMount`. No virtual entry.
 8. **Studio discovery:** `import.meta.glob('/widgets/*/src/widget.tsx')` for widgets and `import.meta.glob('/packages/ui/src/*.tsx')` for components, with Vite `server.fs.allow` set to the workspace root. No hand-edited registry.
 9. **Widget source split:** each widget's `defineWidget(...)` default export moves to `src/widget.tsx` (importable by the studio with no CSS side-effects); the CSS-importing IIFE bootstrap lives in `src/entry.ts` (built by Vite). The studio imports `widget.tsx`; Vite builds `entry.ts`.
-10. **Sermons is set aside in Phase 1.** `widgets/sermons` depends on the old platform API (`perimeterWidget` plugin, `mountWidget`, `@perimeter/api-types`, `src/index.tsx` CSS side-effect) and is **not** ported until Phase 2. To keep `pnpm quality` green, Phase 1 **removes `widgets/sermons` from the pnpm workspace** (the `widgets/*` glob becomes `widgets/example`). The sermons source stays in the tree untouched (preserved by git + the `legacy/v1` branch); Phase 2 re-adds it to the workspace and ports it. Because it is out of the workspace, Turborepo never builds/typechecks it and its now-dangling `@perimeter/api-types` import does not fail the gate; `prettier --check` still formats it harmlessly.
+11. **Test-file convention (existing, must be followed):** every package keeps its tests in a `tests/` directory and imports sources via `../src/…`; each has a `vitest.config.ts` with `include: ['tests/**/*.test.{ts,tsx}']`. **New tests go in `tests/`, not colocated in `src/`.** Existing tests for code this plan changes are **rewritten in place**; existing tests for code this plan deletes are **removed** (`widget-runtime/tests/{mount,auto-mount,global,registry}` reference removed symbols; `vite-plugin-widget/tests/{plugin,virtual-entry}.test.ts` test deleted modules; `widget-runtime`'s `tests/setup.ts` + jest-dom + the `--no-experimental-webstorage` poolOptions are kept). The only `vitest.config.ts` change is flipping `widget-runtime`'s `environment` to `happy-dom`.
+12. **Sermons is set aside in Phase 1.** `widgets/sermons` depends on the old platform API (`perimeterWidget` plugin, `mountWidget`, `@perimeter/api-types`, `src/index.tsx` CSS side-effect) and is **not** ported until Phase 2. To keep `pnpm quality` green, Phase 1 **removes `widgets/sermons` from the pnpm workspace** (the `widgets/*` glob becomes `widgets/example`). The sermons source stays in the tree untouched (preserved by git + the `legacy/v1` branch); Phase 2 re-adds it to the workspace and ports it. Because it is out of the workspace, Turborepo never builds/typechecks it and its now-dangling `@perimeter/api-types` import does not fail the gate; `prettier --check` still formats it harmlessly.
 
 ---
 
@@ -97,6 +98,8 @@ packages:
   - 'widgets/example'
 ```
 
+(`studio/` does not exist until Chunk 7; pnpm 10 silently ignores a workspace entry that has no `package.json`, so listing it now is harmless and the install in Step 5 succeeds. Task 7.1 re-runs `pnpm install` once `studio/package.json` exists.)
+
 - [ ] **Step 4: Update root `package.json`** — remove the `publish-widget` script (its replacement is the Phase 3 release CLI) and keep everything else:
 
 Remove this line from `scripts`:
@@ -126,28 +129,22 @@ git commit -m "chore(widgets): remove release-store + Next.js apps; scope worksp
 
 **Files:**
 - Modify: `packages/theme/src/tokens.ts`
-- Test: `packages/theme/src/tokens.test.ts` (NEW)
+- Modify: `packages/theme/tests/tokens.test.ts` (augment the existing file)
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Add a failing assertion** to the existing `packages/theme/tests/tokens.test.ts` (which already imports `globalTokens` from `../src/tokens`). Append this `it` inside the existing `describe('globalTokens', …)`:
 
 ```ts
-// packages/theme/src/tokens.test.ts
-import { describe, it, expect } from 'vitest';
-import { globalTokens } from './tokens';
-
-describe('globalTokens', () => {
   it('uses px (not rem) for radius so host font-size cannot rescale widgets', () => {
     for (const [key, value] of Object.entries(globalTokens)) {
       if (key.startsWith('radius-')) expect(value).toMatch(/px$/);
     }
   });
-});
 ```
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `pnpm --filter @perimeter/theme test`
-Expected: FAIL — current radius values end in `rem`.
+Run: `pnpm exec turbo run test --filter=@perimeter/theme`
+Expected: FAIL — current radius values end in `rem`. (The existing "every value is a non-empty string" test still passes — px values are non-empty strings.)
 
 - [ ] **Step 3: Convert radius tokens to px** in `packages/theme/src/tokens.ts`:
 
@@ -161,13 +158,13 @@ Expected: FAIL — current radius values end in `rem`.
 
 - [ ] **Step 4: Run the test**
 
-Run: `pnpm --filter @perimeter/theme test`
-Expected: PASS.
+Run: `pnpm exec turbo run test --filter=@perimeter/theme`
+Expected: PASS (all theme tests, including the existing `tailwind.test.ts` which asserts radius maps to `var(--radius-md)` — unaffected by the rem→px value change).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/theme/src/tokens.ts packages/theme/src/tokens.test.ts
+git add packages/theme/src/tokens.ts packages/theme/tests/tokens.test.ts
 git commit -m "feat(theme): px-based radius tokens for shadow-DOM font-size immunity"
 ```
 
@@ -176,14 +173,14 @@ git commit -m "feat(theme): px-based radius tokens for shadow-DOM font-size immu
 **Files:**
 - Create: `packages/theme/src/css.ts`
 - Modify: `packages/theme/src/index.ts`
-- Test: `packages/theme/src/css.test.ts` (NEW)
+- Test: `packages/theme/tests/css.test.ts` (NEW)
 
 - [ ] **Step 1: Write the failing test**
 
 ```ts
-// packages/theme/src/css.test.ts
+// packages/theme/tests/css.test.ts
 import { describe, it, expect } from 'vitest';
-import { rewriteRootToHost } from './css';
+import { rewriteRootToHost } from '../src/css';
 
 describe('rewriteRootToHost', () => {
   it('rewrites :root selectors to :host so vars resolve inside a shadow root', () => {
@@ -200,7 +197,7 @@ describe('rewriteRootToHost', () => {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `pnpm --filter @perimeter/theme test`
+Run: `pnpm exec turbo run test --filter=@perimeter/theme`
 Expected: FAIL — `rewriteRootToHost` not exported.
 
 - [ ] **Step 3: Implement `packages/theme/src/css.ts`**
@@ -224,13 +221,13 @@ export { rewriteRootToHost } from './css';
 
 - [ ] **Step 5: Run the test**
 
-Run: `pnpm --filter @perimeter/theme test`
+Run: `pnpm exec turbo run test --filter=@perimeter/theme`
 Expected: PASS.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add packages/theme/src
+git add packages/theme/src packages/theme/tests/css.test.ts
 git commit -m "feat(theme): add :root->:host rewrite helper for shadow-root CSS injection"
 ```
 
@@ -245,46 +242,35 @@ git commit -m "feat(theme): add :root->:host rewrite helper for shadow-root CSS 
 jsdom 25/26 do **not** implement `CSSStyleSheet.replaceSync` or `ShadowRoot.adoptedStyleSheets`; happy-dom does. The styling module and `mount` tests below depend on them, so this package's tests run under happy-dom.
 
 **Files:**
-- Modify: `packages/widget-runtime/vitest.config.ts` (create if absent)
-- Modify: `packages/widget-runtime/package.json` (add `happy-dom` devDependency)
+- Modify: `packages/widget-runtime/vitest.config.ts` (flip `environment` only; keep `include`, `setupFiles`, `poolOptions`)
+- Modify: `packages/widget-runtime/package.json` (swap `jsdom` → `happy-dom` devDependency)
 
-- [ ] **Step 1:** Add `happy-dom` (`^15`) to `packages/widget-runtime/package.json` `devDependencies`; remove `jsdom` from this package if it was only used here. Run `pnpm install`.
-- [ ] **Step 2:** Ensure `packages/widget-runtime/vitest.config.ts` sets the environment:
+- [ ] **Step 1:** In `packages/widget-runtime/package.json` `devDependencies`, remove `jsdom` and add `happy-dom` (`^15`). Keep `@testing-library/jest-dom` and `@testing-library/react`. Run `pnpm install`.
+- [ ] **Step 2:** In the existing `packages/widget-runtime/vitest.config.ts`, change **only** the environment line from `environment: 'jsdom'` to `environment: 'happy-dom'`. Leave `include: ['tests/**/*.test.{ts,tsx}']`, `setupFiles: ['./tests/setup.ts']`, and the `--no-experimental-webstorage` `poolOptions` exactly as they are (the poolOptions still matter — `MPLocalStorageAuth` touches `localStorage`, and happy-dom provides its own).
 
-```ts
-import { defineConfig } from 'vitest/config';
+> NOTE: this step alone makes the suite RED, because the existing `tests/{mount,auto-mount,global,registry}.*` still import the soon-to-be-removed `mountWidget`/`nativeRender`/`registerCss`/`getCss`. They are rewritten/removed in Tasks 3.1–3.4. Do not try to get this package green until Task 3.4. Commit the config + dep change now; run the suite at the end of Chunk 3.
 
-export default defineConfig({
-  test: { environment: 'happy-dom', globals: false },
-});
-```
-
-- [ ] **Step 3:** Sanity-check the env exposes the APIs:
-
-Run: `pnpm exec turbo run test --filter=@perimeter/widget-runtime`
-Expected: existing runtime tests still pass under happy-dom (if any pre-existing test relied on a jsdom-only quirk, fix the test, not the source). If the package has no tests yet, the run is a no-op and that's fine.
-
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
 git add packages/widget-runtime/vitest.config.ts packages/widget-runtime/package.json pnpm-lock.yaml
-git commit -m "test(runtime): run widget-runtime tests under happy-dom (constructable stylesheets)"
+git commit -m "test(runtime): switch test env to happy-dom (constructable stylesheets)"
 ```
 
 ### Task 3.1: Shadow styling module (`styling.ts`) with constructable-sheet + `<style>` fallback
 
 **Files:**
 - Create: `packages/widget-runtime/src/styling.ts`
-- Test: `packages/widget-runtime/src/styling.test.ts` (NEW)
+- Test: `packages/widget-runtime/tests/styling.test.ts` (NEW)
 
 One module owns CSS injection. It feature-detects constructable stylesheets and falls back to `<style>` elements (older Safari). The shared widget sheet is parsed once per widget name; the token layer is per-instance and live-updatable.
 
 - [ ] **Step 1: Write the failing test** (assertions avoid `cssRules` text introspection so they hold across DOM impls)
 
 ```ts
-// packages/widget-runtime/src/styling.test.ts
+// packages/widget-runtime/tests/styling.test.ts
 import { describe, it, expect, beforeEach } from 'vitest';
-import { applyStyles, countAppliedSheets, clearStyleCache } from './styling';
+import { applyStyles, countAppliedSheets, clearStyleCache } from '../src/styling';
 
 beforeEach(() => clearStyleCache());
 
@@ -432,7 +418,7 @@ Expected: PASS (under happy-dom).
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/widget-runtime/src/styling.ts packages/widget-runtime/src/styling.test.ts
+git add packages/widget-runtime/src/styling.ts packages/widget-runtime/tests/styling.test.ts
 git commit -m "feat(runtime): styling module (shared constructable sheet + token layer, <style> fallback)"
 ```
 
@@ -440,45 +426,32 @@ git commit -m "feat(runtime): styling module (shared constructable sheet + token
 
 **Files:**
 - Modify: `packages/widget-runtime/src/data-attrs.ts`
-- Test: `packages/widget-runtime/src/data-attrs.test.ts` (NEW)
+- Modify: `packages/widget-runtime/tests/data-attrs.test.ts` (augment the existing file)
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Add failing tests** to the existing `packages/widget-runtime/tests/data-attrs.test.ts` (it imports `parseDataAttrs` from `../src/data-attrs` and has a `divWith(attrs)` helper). Append:
 
 ```ts
-// packages/widget-runtime/src/data-attrs.test.ts
-import { describe, it, expect } from 'vitest';
-import { z } from 'zod';
-import { parseDataAttrs } from './data-attrs';
-
-function el(attrs: Record<string, string>): HTMLElement {
-  const d = document.createElement('div');
-  for (const [k, v] of Object.entries(attrs)) d.setAttribute(k, v);
-  return d;
-}
-
 describe('parseDataAttrs booleans', () => {
-  const schema = z.object({ open: z.boolean().default(false), limit: z.coerce.number().default(1) });
+  const boolSchema = z.object({ open: z.boolean().default(false), limit: z.coerce.number().default(1) });
 
   it('parses data-open="false" as boolean false (not truthy string)', () => {
-    const { config } = parseDataAttrs(el({ 'data-open': 'false', 'data-limit': '5' }), schema);
+    const { config } = parseDataAttrs(divWith({ 'data-open': 'false', 'data-limit': '5' }), boolSchema);
     expect(config.open).toBe(false);
     expect(config.limit).toBe(5);
   });
   it('parses data-open="true" as boolean true', () => {
-    const { config } = parseDataAttrs(el({ 'data-open': 'true' }), schema);
+    const { config } = parseDataAttrs(divWith({ 'data-open': 'true' }), boolSchema);
     expect(config.open).toBe(true);
-  });
-  it('still separates data-theme-* overrides from config', () => {
-    const { themeOverrides } = parseDataAttrs(el({ 'data-theme-color-primary': 'red' }), schema);
-    expect(themeOverrides['data-theme-color-primary']).toBe('red');
   });
 });
 ```
 
+(The existing tests already cover `data-theme-*` separation and string/number config — keep them.)
+
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `pnpm --filter @perimeter/widget-runtime test`
-Expected: FAIL — `"false"` currently reaches the schema as a string; with `z.boolean()` it throws or with `z.coerce.boolean()` it would be `true`.
+Run: `pnpm exec turbo run test --filter=@perimeter/widget-runtime` (this package is RED overall until Task 3.4 — confirm specifically the new `data-open="false"` case fails, not just the unrelated stale tests)
+Expected: FAIL — `"false"` currently reaches the schema as a string; with `z.boolean()` it throws.
 
 - [ ] **Step 3: Coerce `"true"`/`"false"` to real booleans** in `packages/widget-runtime/src/data-attrs.ts`. Change the raw-config map type to `unknown` and convert before `schema.parse`:
 
@@ -516,13 +489,13 @@ export function parseDataAttrs<S extends z.ZodTypeAny>(
 
 - [ ] **Step 4: Run the test**
 
-Run: `pnpm --filter @perimeter/widget-runtime test`
-Expected: PASS.
+Run: `pnpm exec turbo run test --filter=@perimeter/widget-runtime` (the new boolean tests now PASS; the package is still RED on the stale `mount`/`auto-mount`/`global`/`registry` tests until Task 3.4)
+Expected: the `parseDataAttrs booleans` describe block PASSES.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/widget-runtime/src/data-attrs.ts packages/widget-runtime/src/data-attrs.test.ts
+git add packages/widget-runtime/src/data-attrs.ts packages/widget-runtime/tests/data-attrs.test.ts
 git commit -m "feat(runtime): boolean-safe data-* parsing (true/false -> real booleans)"
 ```
 
@@ -531,17 +504,17 @@ git commit -m "feat(runtime): boolean-safe data-* parsing (true/false -> real bo
 **Files:**
 - Modify: `packages/widget-runtime/src/mount.tsx`
 - Modify: `packages/widget-runtime/src/registry.ts` (drop CSS map; keep instance registry)
-- Test: `packages/widget-runtime/src/mount.test.tsx` (NEW)
+- Replace: `packages/widget-runtime/tests/mount.test.tsx` (the existing file tests `mountWidget`/`nativeRender` — overwrite it entirely with the below)
 
 - [ ] **Step 1: Write the failing test** (happy-dom env; uses `countAppliedSheets`, not `cssRules`)
 
 ```tsx
-// packages/widget-runtime/src/mount.test.tsx
+// packages/widget-runtime/tests/mount.test.tsx
 import { describe, it, expect, beforeEach } from 'vitest';
 import { z } from 'zod';
-import { defineWidget } from './define-widget';
-import { mount } from './mount';
-import { countAppliedSheets, clearStyleCache } from './styling';
+import { defineWidget } from '../src/define-widget';
+import { mount } from '../src/mount';
+import { countAppliedSheets, clearStyleCache } from '../src/styling';
 
 beforeEach(() => clearStyleCache());
 
@@ -756,7 +729,7 @@ Expected: PASS for `mount.test.tsx` and `styling.test.ts`. (`global.ts`, `auto-m
 - [ ] **Step 6: Commit**
 
 ```bash
-git add packages/widget-runtime/src/mount.tsx packages/widget-runtime/src/registry.ts packages/widget-runtime/src/mount.test.tsx
+git add packages/widget-runtime/src/mount.tsx packages/widget-runtime/src/registry.ts packages/widget-runtime/tests/mount.test.tsx
 git commit -m "feat(runtime): single mount(host,def,css,extras) via styling module"
 ```
 
@@ -767,17 +740,18 @@ git commit -m "feat(runtime): single mount(host,def,css,extras) via styling modu
 - Modify: `packages/widget-runtime/src/global.ts`
 - Modify: `packages/widget-runtime/src/index.ts`
 - Delete: `packages/widget-runtime/src/native-render.ts`
-- Test: `packages/widget-runtime/src/auto-mount.test.tsx` (NEW — `.tsx`, the test renders JSX)
+- Replace: `packages/widget-runtime/tests/auto-mount.test.tsx` (existing file references the old one-arg signature — overwrite entirely)
+- Rewrite: `packages/widget-runtime/tests/registry.test.ts` and `packages/widget-runtime/tests/global.test.tsx` (existing files test removed `registerCss`/`getCss` and the old `ensureGlobal(def)` — see Steps 6–7)
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Replace `packages/widget-runtime/tests/auto-mount.test.tsx`** with:
 
 ```tsx
-// packages/widget-runtime/src/auto-mount.test.tsx
+// packages/widget-runtime/tests/auto-mount.test.tsx
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { z } from 'zod';
-import { defineWidget } from './define-widget';
-import { autoMount, disposeAutoMount } from './auto-mount';
-import { clearStyleCache } from './styling';
+import { defineWidget } from '../src/define-widget';
+import { autoMount, disposeAutoMount } from '../src/auto-mount';
+import { clearStyleCache } from '../src/styling';
 
 const widget = defineWidget({
   name: 'am-test',
@@ -943,17 +917,99 @@ export { clearAll } from './registry';
 export { clearStyleCache } from './styling';
 ```
 
-- [ ] **Step 6: Confirm no source still imports the removed symbols**
+(`disposeAutoMount` stays available via `./auto-mount` for tests; re-export it from `index.ts` too if you want to preserve today's public surface — optional.)
 
-Run: `grep -rn "mountWidget\|registerCss\|getCss\|nativeRender\|from './sheets'" packages/widget-runtime/src`
+- [ ] **Step 6: Rewrite `packages/widget-runtime/tests/registry.test.ts`** — the existing file tests the removed `registerCss`/`getCss`. Overwrite it to cover only the surviving instance registry:
+
+```ts
+import { describe, it, expect, beforeEach } from 'vitest';
+import {
+  registerInstance,
+  deregisterInstance,
+  getInstances,
+  clearAll,
+} from '../src/registry';
+
+const stub = () => ({ unmount() {}, updateTokens() {} });
+
+describe('instance registry', () => {
+  beforeEach(() => clearAll());
+
+  it('registers and lists instances by widget name', () => {
+    const a = stub();
+    registerInstance('demo', a);
+    expect(getInstances('demo')).toContain(a);
+  });
+  it('deregisters an instance', () => {
+    const a = stub();
+    registerInstance('demo', a);
+    deregisterInstance('demo', a);
+    expect(getInstances('demo')).not.toContain(a);
+  });
+  it('clearAll empties the registry', () => {
+    registerInstance('demo', stub());
+    clearAll();
+    expect(getInstances('demo')).toHaveLength(0);
+  });
+});
+```
+
+- [ ] **Step 7: Rewrite `packages/widget-runtime/tests/global.test.tsx`** — the existing file calls the old one-arg `ensureGlobal(def)` + `registerCss`. Overwrite to the css-aware API:
+
+```tsx
+import { describe, it, expect, beforeEach } from 'vitest';
+import { z } from 'zod';
+import { defineWidget } from '../src/define-widget';
+import { ensureGlobal } from '../src/global';
+import { clearAll } from '../src/registry';
+import { clearStyleCache } from '../src/styling';
+
+const def = defineWidget({
+  name: 'g-test',
+  auth: 'none',
+  schema: z.object({}),
+  App: () => <div data-testid="x">ok</div>,
+});
+
+const tick = () => new Promise((r) => setTimeout(r, 0));
+
+describe('window.PerimeterWidgets', () => {
+  beforeEach(() => {
+    clearAll();
+    clearStyleCache();
+    (window as unknown as { PerimeterWidgets?: unknown }).PerimeterWidgets = undefined;
+    document.body.innerHTML = '';
+  });
+
+  it('registers a widget with its css and mounts via the global escape hatch', async () => {
+    ensureGlobal(def, ':host{}');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const handle = window.PerimeterWidgets.mount('g-test', host);
+    await tick();
+    expect(host.shadowRoot!.querySelector('[data-testid="x"]')).toBeTruthy();
+    handle.unmount();
+  });
+
+  it('throws for an unregistered widget name', () => {
+    ensureGlobal(def, ':host{}');
+    const host = document.createElement('div');
+    expect(() => window.PerimeterWidgets.mount('nope', host)).toThrow();
+  });
+});
+```
+
+- [ ] **Step 8: Confirm no source or test still imports the removed symbols**
+
+Run: `grep -rn "mountWidget\|registerCss\|getCss\|nativeRender\|from './sheets'\|from '../src/native-render'" packages/widget-runtime/src packages/widget-runtime/tests`
 Expected: no matches (all callers migrated). If any appear, fix them before continuing.
 
-- [ ] **Step 7: Run the full runtime suite + typecheck**
+- [ ] **Step 9: Run the full runtime suite + typecheck**
 
-Run: `pnpm exec turbo run test typecheck --filter=@perimeter/widget-runtime`
-Expected: PASS. (`autoMount` now requires `css`; `registerCss`/`getCss`/`nativeRender` are gone.)
+Run: `pnpm exec turbo run test typecheck lint --filter=@perimeter/widget-runtime`
+Expected: PASS — the whole package is now green under happy-dom. (`autoMount` requires `css`; `registerCss`/`getCss`/`nativeRender` are gone.)
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add packages/widget-runtime/src
@@ -970,15 +1026,16 @@ git commit -m "feat(runtime): autoMount(def,css) + css-aware global; drop native
 - Create: `packages/vite-plugin-widget/src/config.ts`
 - Modify: `packages/vite-plugin-widget/src/index.ts`
 - Delete: `packages/vite-plugin-widget/src/plugin.ts`, `packages/vite-plugin-widget/src/virtual-entry.ts`
-- Modify: `packages/vite-plugin-widget/package.json` (add `postcss-rem-to-px` dependency)
-- Test: `packages/vite-plugin-widget/src/config.test.ts` (NEW)
+- Delete: `packages/vite-plugin-widget/tests/plugin.test.ts`, `packages/vite-plugin-widget/tests/virtual-entry.test.ts` (they test the deleted modules)
+- Modify: `packages/vite-plugin-widget/package.json` (drop the `@perimeter/widget-runtime` dep)
+- Test: `packages/vite-plugin-widget/tests/config.test.ts` (NEW)
 
 - [ ] **Step 1: Write the failing test** (assert the shape of the returned config; pure function, no Vite run needed)
 
 ```ts
-// packages/vite-plugin-widget/src/config.test.ts
+// packages/vite-plugin-widget/tests/config.test.ts
 import { describe, it, expect } from 'vitest';
-import { widgetConfig } from './config';
+import { widgetConfig } from '../src/config';
 
 describe('widgetConfig', () => {
   const cfg = widgetConfig({ name: 'demo', version: '1.2.3' });
@@ -1005,9 +1062,9 @@ describe('widgetConfig', () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [ ] **Step 2: Delete the stale tests, then run** — `git rm packages/vite-plugin-widget/tests/plugin.test.ts packages/vite-plugin-widget/tests/virtual-entry.test.ts`, then:
 
-Run: `pnpm --filter @perimeter/vite-plugin-widget test`
+Run: `pnpm exec turbo run test --filter=@perimeter/vite-plugin-widget`
 Expected: FAIL — `widgetConfig` not exported.
 
 - [ ] **Step 3: Implement `packages/vite-plugin-widget/src/config.ts`**
@@ -1099,9 +1156,9 @@ git rm packages/vite-plugin-widget/src/plugin.ts packages/vite-plugin-widget/src
 
 In `packages/vite-plugin-widget/package.json`: **remove** the `@perimeter/widget-runtime` dependency (it was only needed by the deleted virtual entry). Ensure `vite` is present as a `peerDependency` (the helper imports only its `UserConfig` type). No new runtime dependency is added — the rem→px transform is the inline plugin above. Run `pnpm install`.
 
-- [ ] **Step 6: Run tests + typecheck**
+- [ ] **Step 6: Run tests + typecheck + lint**
 
-Run: `pnpm --filter @perimeter/vite-plugin-widget test && pnpm --filter @perimeter/vite-plugin-widget typecheck`
+Run: `pnpm exec turbo run test typecheck lint --filter=@perimeter/vite-plugin-widget`
 Expected: PASS.
 
 - [ ] **Step 7: Commit**
@@ -1142,7 +1199,7 @@ git commit -am "chore(widgets): adjust carry-over package imports after runtime 
 - [ ] **Step 1: Inventory the dependency and the codegen scripts**
 
 Run: `grep -rln "@perimeter/api-types" packages studio widgets/example` and `cat packages/api-types/package.json`
-Expected: the importers are inside `packages/api-hooks/src` (record them). `widgets/sermons` also imports it, but sermons is out of the workspace (decision #10) and is rewired in Phase 2 — **do not touch it here.** Note the `sync`/`generate` scripts and which file they run (`scripts/generate.ts`) and which deps they need (`openapi-typescript`, `tsx`).
+Expected: the importers are inside `packages/api-hooks/src` (record them). `widgets/sermons` also imports it, but sermons is out of the workspace (decision #12) and is rewired in Phase 2 — **do not touch it here.** Note the `sync`/`generate` scripts and which file they run (`scripts/generate.ts`) and which deps they need (`openapi-typescript`, `tsx`).
 
 - [ ] **Step 2: Move the generated types + spec + codegen script into api-hooks**
 
@@ -1153,7 +1210,7 @@ git mv packages/api-types/spec/spec.yaml packages/api-hooks/spec/spec.yaml
 git mv packages/api-types/scripts/generate.ts packages/api-hooks/scripts/generate.ts
 ```
 
-Copy the `sync` and `generate` npm scripts from `packages/api-types/package.json` into `packages/api-hooks/package.json`, retargeting paths: input `spec/spec.yaml`, output `src/generated/operations.ts`, script `scripts/generate.ts`. Edit `scripts/generate.ts` so its hardcoded input/output paths match the new locations. Add `openapi-typescript` and `tsx` to api-hooks `devDependencies` at the versions api-types used.
+Copy the `sync` and `generate` npm scripts from `packages/api-types/package.json` into `packages/api-hooks/package.json`, retargeting paths: input `spec/spec.yaml`, output `src/generated/operations.ts`, script `scripts/generate.ts`. Edit `scripts/generate.ts` so its hardcoded input/output paths match the new locations, and replace any `npx openapi-typescript` invocation with `pnpm exec openapi-typescript` (repo rule: never npx). Add `openapi-typescript` and `tsx` to api-hooks `devDependencies` at the versions api-types used.
 
 - [ ] **Step 3: Repoint imports** — in each api-hooks source from Step 1, replace `from '@perimeter/api-types'` with the relative `from '../generated/operations'` (adjust depth per file). Re-export the public types from `packages/api-hooks/src/index.ts`:
 
