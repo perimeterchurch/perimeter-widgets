@@ -53,7 +53,7 @@ This is a **scaffold rebuild**: a fresh, deliberately minimal structure into whi
 | 9 | **Self-contained bundles now**; lazy-load per-widget heavies (react-pdf, hls.js) via dynamic `import()`. Shared-React via import map is deferred. |
 | 10 | **Release via git + CLI:** `pnpm release <widget>` copies the built bundle to the immutable path, updates the manifest, and opens a PR. Promote = the manifest change; rollback = git revert or Vercel Instant Rollback. |
 | 11 | **Auth seam unchanged:** `AuthProvider` interface, default `MPLocalStorageAuth` reads `mpp-widgets_AuthToken` / `mpp-widgets_ExpiresAfter`. |
-| 12 | **Commit built bundles to git** so promote/rollback is a pure git operation; prune old versions periodically. |
+| 12 | **Commit built bundles to git** so promote/rollback is a pure git operation; keep the last 5 versions per widget, pruned by the release CLI. |
 | 13 | **Tailwind-in-shadow correctness baked into the runtime/build**: px-based token scale, `:root`→`:host` rewrite, `@property` hoisted to the document, one shared `CSSStyleSheet` via `adoptedStyleSheets`. |
 | 14 | **Port sermons** as the proof of the new platform; keep its components/UX, rewire its data layer and mount path. |
 
@@ -110,7 +110,7 @@ export default defineWidget({
 
 ### The single mount path
 
-One function is the source of truth for how a widget renders. It is used identically in dev and prod.
+One function is the source of truth for how a widget renders. It is used identically in dev and prod. The current runtime exports this as `mountWidget({ definition, target, configOverrides })` (options object); the rebuild renames it to **`mount(host, definition, css, overrides?)`** (the signature below is canonical, not merely illustrative) and the old name is dropped.
 
 ```ts
 // @perimeter/widget-runtime/mount.ts (illustrative)
@@ -197,7 +197,7 @@ A future `PostMessageAuth` (host hands the widget a short-lived, server-signed t
 
 ### API — `@perimeter/api-client` + `@perimeter/api-hooks`
 
-`api-client` is a typed `fetch` wrapper over perimeter-api that injects the bearer token. `api-hooks` exposes React Query hooks per endpoint, typed from generated OpenAPI types (the former `api-types` package's generated file lives here). Sermons consumes `useSermons`, `useSermonDetail`, `useSeries`, `useSeriesDetail`, `useSpeakers`, `useBooks`, `useServiceTypes`.
+`api-client` is a typed `fetch` wrapper over perimeter-api that injects the bearer token. `api-hooks` exposes React Query hooks per endpoint, typed from generated OpenAPI types (the former `api-types` package folds in whole — both its `index.ts` exports and the generated `operations.ts` move here, so no exports are dropped; the `pnpm sync`/`pnpm generate` codegen scripts move with them). Sermons consumes `useSermons`, `useSermonDetail`, `useSeries`, `useSeriesDetail`, `useSpeakers`, `useBooks`, `useServiceTypes`.
 
 ### Build pipeline — `@perimeter/vite-plugin-widget`
 
@@ -262,7 +262,7 @@ Scaffold rebuild. The existing code archives to a `legacy/` branch. Each phase e
 1. **Foundation** — Scaffold packages (`runtime`, `theme`, `auth`, `api-client`, `api-hooks`, `ui`, `vite-plugin-widget`) on the single mount path; Vite studio harness with component previews and theme editor; the `example` widget. `pnpm quality` passes. No production change.
 2. **Sermons port** — Port sermons end-to-end via `defineWidget`; keep components/UX, rewire data layer + mount path; lazy-load react-pdf/hls.js. Studio `/widgets/sermons` works (one render path). Local static `cdn/` serves the built bundle. WordPress still points at the legacy URL.
 3. **Hosting + release** — Deploy `cdn/` (static) and the gallery; `pnpm release` + manifest + cache/CORS headers + `latest` rewrite live.
-4. **Cutover** — Point the WordPress `<script>` for sermons at `widgets.perimeter.org`; monitor; retire the old jsDelivr bundle after a stable window (e.g. one week).
+4. **Cutover** — Point the WordPress `<script>` for sermons at `widgets.perimeter.org`; monitor; retire the old jsDelivr bundle after a stable window (e.g. one week). Note: there is parallel Phase 4 cutover work in flight on other branches (`feat/widgets-phase-4-cutover`) against the *old* architecture; this redesign supersedes those phase specs, so the planner should treat that work as reframed rather than additive.
 
 Adding a widget after the platform exists is single-task work (copy `example`, build, `pnpm release`), not a project.
 
