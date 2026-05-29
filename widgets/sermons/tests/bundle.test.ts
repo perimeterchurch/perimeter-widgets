@@ -4,15 +4,17 @@ import { gzipSync } from 'node:zlib';
 import path from 'node:path';
 
 const BUNDLE = path.resolve(__dirname, '../../../dist/sermons/sermons.iife.js');
-// Per-widget gzipped budget for the sermons IIFE. Set at 680 KB after measuring
-// the real port (~644 KB gz; the legacy production widget was already 554 KB gz).
-// The single-file IIFE bundles React, ReactDOM, TanStack Query, nuqs,
-// framer-motion, hls.js, and react-pdf (pdf.js) together, so this is the gate.
-// A follow-up optimization task tracks trimming the ~75 KB-gz growth over legacy.
-const BUDGET_BYTES = 680 * 1024;
+// Per-widget gzipped budget for the sermons IIFE. Raised to 850 KB after the
+// pdf.js worker was inlined into the bundle (Phase 3 follow-up #8) — previously
+// the worker was fetched from unpkg at runtime so it wasn't on the bundle's
+// books. The current bundle measures ~801 KB gz; the headroom covers small
+// future additions. A follow-up optimization could move the worker back to
+// a self-hosted same-origin URL with CORS once the CDN supports it, dropping
+// the bundle back into the 500-600 KB range.
+const BUDGET_BYTES = 850 * 1024;
 
 describe('sermons bundle', () => {
-  it('is under the 680 KB gzipped budget', async () => {
+  it('is under the 850 KB gzipped budget', async () => {
     const raw = await readFile(BUNDLE);
     const gz = gzipSync(raw);
     expect(gz.byteLength).toBeLessThanOrEqual(BUDGET_BYTES);

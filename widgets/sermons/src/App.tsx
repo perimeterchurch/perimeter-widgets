@@ -24,27 +24,21 @@ const fadeSlide = {
   },
 };
 
-/**
- * Stable per-embed identifier. nuqs v2's adapter has no global URL-key prefix,
- * so we derive a unique prefix per mounted widget and feed it to
- * `useSermonFilters` (which maps each query-state key to `<prefix>key`). Two
- * sermons embeds on one page therefore never collide on URL params. The id is
- * generated once per mount and held in a ref so it never changes between
- * renders.
- */
-function useStableTargetId(): string {
-  const idRef = React.useRef<string | null>(null);
-  if (idRef.current === null) idRef.current = `perimeter-sermons-${crypto.randomUUID()}`;
-  return idRef.current;
-}
+// Stable URL-param prefix. nuqs v2's adapter has no global prefix option, so
+// `useSermonFilters` namespaces every query-state key as `<NUQS_PREFIX><key>`.
+// A static prefix keeps bookmarkable URLs working across reloads; the
+// trade-off is that two sermons widgets on the same page would share params.
+// That is acceptable because there is no real-world use case for two sermons
+// instances on one page — a separate widget type would be created for any
+// "hero sermon" or "related sermons" embed.
+const NUQS_PREFIX = 'sermons-';
 
 interface SermonsWidgetProps {
   config: SermonsConfig;
-  prefix: string;
 }
 
-function SermonsWidget({ config, prefix }: SermonsWidgetProps): React.JSX.Element {
-  const filters = useSermonFilters(config, { prefix });
+function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
+  const filters = useSermonFilters(config, { prefix: NUQS_PREFIX });
 
   // Build a unique key for AnimatePresence based on the current "page"
   const viewKey =
@@ -120,10 +114,9 @@ export interface AppProps {
 
 export function App({ config: rawConfig }: AppProps): React.JSX.Element {
   const config = applyWidgetDefaults(rawConfig);
-  const targetId = useStableTargetId();
   return (
     <NuqsAdapter>
-      <SermonsWidget config={config} prefix={`${targetId}.`} />
+      <SermonsWidget config={config} />
     </NuqsAdapter>
   );
 }
