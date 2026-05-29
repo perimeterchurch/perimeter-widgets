@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { corsHeaders } from './src/lib/cors';
 
 const config: NextConfig = {
   async rewrites() {
@@ -9,6 +10,7 @@ const config: NextConfig = {
       { source: '/manifest.json', destination: '/api/manifest' },
     ];
   },
+  headers: corsHeaders,
 };
 
 export default config;
