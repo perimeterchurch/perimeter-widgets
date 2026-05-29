@@ -1,4 +1,4 @@
-import type { operations } from '@perimeter/api-types';
+import type { operations } from '../generated/operations';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useApiClient } from '@perimeter/widget-runtime';
 import { serializeQuery } from '../internal/serialize-query';
