@@ -4,6 +4,7 @@ import { gzipSync } from 'node:zlib';
 import path from 'node:path';
 
 const BUNDLE = path.resolve(__dirname, '../../../dist/sermons/sermons.iife.js');
+const PKG_JSON = path.resolve(__dirname, '../package.json');
 // Per-widget gzipped budget for the sermons IIFE. Raised to 850 KB after the
 // pdf.js worker was inlined into the bundle (Phase 3 follow-up #8) — previously
 // the worker was fetched from unpkg at runtime so it wasn't on the bundle's
@@ -22,7 +23,8 @@ describe('sermons bundle', () => {
 
   it('contains the package version', async () => {
     const text = await readFile(BUNDLE, 'utf8');
-    expect(text).toContain('0.0.0');
+    const pkg = JSON.parse(await readFile(PKG_JSON, 'utf8')) as { version: string };
+    expect(text).toContain(pkg.version);
   });
 
   // The minifier mangles named identifiers, but the global namespace string
