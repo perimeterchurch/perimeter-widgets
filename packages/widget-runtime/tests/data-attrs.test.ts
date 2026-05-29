@@ -52,3 +52,17 @@ describe('parseDataAttrs', () => {
     expect(Object.keys(config)).not.toContain('perimeterWidget');
   });
 });
+
+describe('parseDataAttrs booleans', () => {
+  const boolSchema = z.object({ open: z.boolean().default(false), limit: z.coerce.number().default(1) });
+
+  it('parses data-open="false" as boolean false (not truthy string)', () => {
+    const { config } = parseDataAttrs(divWith({ 'data-open': 'false', 'data-limit': '5' }), boolSchema);
+    expect(config.open).toBe(false);
+    expect(config.limit).toBe(5);
+  });
+  it('parses data-open="true" as boolean true', () => {
+    const { config } = parseDataAttrs(divWith({ 'data-open': 'true' }), boolSchema);
+    expect(config.open).toBe(true);
+  });
+});

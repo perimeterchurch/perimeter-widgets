@@ -16,7 +16,7 @@ export function parseDataAttrs<S extends z.ZodTypeAny>(
   el: HTMLElement,
   schema: S,
 ): ParsedAttrs<z.infer<S>> {
-  const rawConfig: Record<string, string> = {};
+  const rawConfig: Record<string, unknown> = {};
   const themeOverrides: Record<string, string> = {};
 
   for (const attr of Array.from(el.attributes)) {
@@ -28,7 +28,7 @@ export function parseDataAttrs<S extends z.ZodTypeAny>(
       continue;
     }
     const key = kebabToCamel(name.slice('data-'.length));
-    rawConfig[key] = attr.value;
+    rawConfig[key] = attr.value === 'true' ? true : attr.value === 'false' ? false : attr.value;
   }
 
   const config = schema.parse(rawConfig) as z.infer<S>;
