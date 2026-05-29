@@ -221,10 +221,6 @@ importers:
         version: 2.1.9(@types/node@22.19.19)(happy-dom@15.11.7)(jsdom@25.0.1)(terser@5.48.0)
 
   packages/vite-plugin-widget:
-    dependencies:
-      '@perimeter/widget-runtime':
-        specifier: workspace:*
-        version: link:../widget-runtime
     devDependencies:
       '@types/node':
         specifier: ^22.10.5

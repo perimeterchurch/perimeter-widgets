@@ -1,1 +1,1 @@
-export { perimeterWidget, type PerimeterWidgetPluginOptions } from './plugin.ts';
+export { widgetConfig, type WidgetConfigOptions } from './config';

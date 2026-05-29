@@ -15,9 +15,6 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@perimeter/widget-runtime": "workspace:*"
-  },
   "peerDependencies": {
     "vite": "^6.0.0"
   },
