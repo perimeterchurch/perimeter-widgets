@@ -34,6 +34,9 @@ Phase 3 implementation plan: `docs/superpowers/plans/2026-05-27-perimeter-widget
 - Never commit directly to `dev` or `main`. Use a feature branch and a PR.
 - Conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `test:`, `ci:`.
 - Read the active phase spec before modifying the platform.
+- Read a file before editing it — always read the current contents before an edit so you don't clobber unseen changes.
+- Run tests, lint, and typecheck from the root — `pnpm test`/`lint`/`typecheck` go through Turborepo. Packages delegate to `turbo test` and have no local vitest binary, so `pnpm vitest` inside a package fails; scope one package with `--filter=<pkg>`.
+- Run `pnpm format` before `pnpm quality` — the quality gate only runs `format:check` and fails on unformatted files; don't create separate formatting-only commits.
 
 ## Prior state
 
