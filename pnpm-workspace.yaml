@@ -1,7 +1,4 @@
 packages:
-    - packages/*
-    - apps/*
-    - widgets/*
-onlyBuiltDependencies:
-    - esbuild
-    - turbo
+  - 'apps/*'
+  - 'packages/*'
+  - 'widgets/*'

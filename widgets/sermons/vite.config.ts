@@ -1,6 +1,7 @@
-import { createWidgetConfig } from '@perimeter-widgets/vite-preset';
+import { defineConfig } from 'vite';
+import { perimeterWidget } from '@perimeter/vite-plugin-widget';
 
-export default createWidgetConfig({
-    name: 'sermons',
-    entry: 'src/index.tsx',
+export default defineConfig({
+  plugins: [perimeterWidget({ name: 'sermons', entry: 'src/index.tsx' })],
+  build: { outDir: '../../dist/sermons' },
 });
