@@ -45,7 +45,7 @@ export function applyStyles(
       update(next) {
         const t = new CSSStyleSheet();
         t.replaceSync(next);
-        shadow.adoptedStyleSheets = [widgetSheet!, t];
+        shadow.adoptedStyleSheets = [widgetSheet, t];
       },
       dispose() {
         shadow.adoptedStyleSheets = [];
