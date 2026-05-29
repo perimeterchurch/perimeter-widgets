@@ -30,7 +30,7 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@vitest/coverage-v8": "^2.1.8",
-    "jsdom": "^25.0.1",
+    "happy-dom": "^15",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8"
   },
