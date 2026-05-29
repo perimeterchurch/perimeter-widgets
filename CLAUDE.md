@@ -4,29 +4,43 @@ Guidance for Claude Code working in this repository.
 
 ## Status
 
-Phases 1 (foundation), 2 (sermons cutover prep), and 3 (hosting + release) are complete.
+**Phase 1 (streamline foundation) is the current shape.** The platform was rebuilt on a single mount path with a fast Vite studio: one `mount(host, definition, css, overrides?)` function drives both the production IIFE and the dev studio, CSS is imported as a `?inline` string and injected into the shadow root via a shared `CSSStyleSheet`, and there is no dual-render machinery and no build-time CSS codegen. A widget is built with the `widgetConfig({ name })` Vite-config helper plus an explicit per-widget `src/entry.ts`.
 
-Umbrella spec: `docs/superpowers/specs/2026-05-22-perimeter-widgets-rebuild-design.md`
+Streamline design spec: `docs/superpowers/specs/2026-05-29-perimeter-widgets-streamline-redesign-design.md`
 
-Phase 3 design spec: `docs/superpowers/specs/2026-05-27-perimeter-widgets-phase-3-hosting-release-design.md`
+Phase 1 implementation plan: `docs/superpowers/plans/2026-05-29-perimeter-widgets-streamline-phase-1-foundation.md`
 
-Phase 3 implementation plan: `docs/superpowers/plans/2026-05-27-perimeter-widgets-phase-3-hosting-release.md`
+Read the active spec/plan before modifying the platform.
 
-**Release workflow:** run `pnpm publish-widget <name>` to build, upload, and record a new version, then promote it at `/admin/releases` on the studio.
+**Building a widget:** see `docs/creating-a-widget.md` for the copy-the-example on-ramp. Run `pnpm dev` to open the Vite studio, which auto-discovers widgets and UI components and previews them through the real `mount()`.
 
-**Phase 4** is next: cutover from jsDelivr to `widgets.perimeter.org`.
+**Later phases:** Phase 2 ports the sermons widget onto the new contract (its source stays in the tree but is out of the pnpm workspace until then); Phase 3 adds hosting + a release CLI (there is no `publish-widget` script yet); Phase 4 cuts over to `widgets.perimeter.org`. Each gets its own plan.
+
+## Packages
+
+| Package                         | Role                                                               |
+| ------------------------------- | ------------------------------------------------------------------ |
+| `@perimeter/theme`              | Design tokens (px radii), `resolveTokens`, `rewriteRootToHost`     |
+| `@perimeter/widget-runtime`     | `mount`, `autoMount`, `defineWidget`, shadow `styling` module      |
+| `@perimeter/vite-plugin-widget` | `widgetConfig()` Vite-config helper (rem→px, IIFE build)           |
+| `@perimeter/auth`               | Auth providers (carried over)                                      |
+| `@perimeter/api-client`         | Typed API client (carried over)                                    |
+| `@perimeter/api-hooks`          | React Query hooks + generated operation types (absorbed api-types) |
+| `@perimeter/ui`                 | shadcn components + `cn` + hooks (carried over)                    |
+
+`studio/` is the Vite studio app; `widgets/example` is the reference widget. (`release-store`, `api-types`, `apps/cdn`, and the Next.js `apps/studio` were removed in this phase.)
 
 ## Commands
 
-| Command          | Description                                                  |
-| ---------------- | ------------------------------------------------------------ |
-| `pnpm install`   | Install dependencies                                         |
-| `pnpm dev`       | Run dev tasks across the workspace (Studio + widget watches) |
-| `pnpm build`     | Build every package via Turborepo                            |
-| `pnpm test`      | Run all tests                                                |
-| `pnpm lint`      | Lint all packages                                            |
-| `pnpm typecheck` | Type-check all packages                                      |
-| `pnpm quality`   | typecheck + lint + test + prettier check (gate before PR)    |
+| Command          | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `pnpm install`   | Install dependencies                                              |
+| `pnpm dev`       | Run dev tasks across the workspace (Vite studio + widget watches) |
+| `pnpm build`     | Build every package via Turborepo                                 |
+| `pnpm test`      | Run all tests                                                     |
+| `pnpm lint`      | Lint all packages                                                 |
+| `pnpm typecheck` | Type-check all packages                                           |
+| `pnpm quality`   | typecheck + lint + test + prettier check (gate before PR)         |
 
 ## Critical rules
 
