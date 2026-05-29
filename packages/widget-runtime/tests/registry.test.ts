@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  registerInstance,
-  deregisterInstance,
-  getInstances,
-  clearAll,
-} from '../src/registry';
+import { registerInstance, deregisterInstance, getInstances, clearAll } from '../src/registry';
 
 const stub = () => ({ unmount() {}, updateTokens() {} });
 

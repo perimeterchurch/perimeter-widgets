@@ -54,10 +54,16 @@ describe('parseDataAttrs', () => {
 });
 
 describe('parseDataAttrs booleans', () => {
-  const boolSchema = z.object({ open: z.boolean().default(false), limit: z.coerce.number().default(1) });
+  const boolSchema = z.object({
+    open: z.boolean().default(false),
+    limit: z.coerce.number().default(1),
+  });
 
   it('parses data-open="false" as boolean false (not truthy string)', () => {
-    const { config } = parseDataAttrs(divWith({ 'data-open': 'false', 'data-limit': '5' }), boolSchema);
+    const { config } = parseDataAttrs(
+      divWith({ 'data-open': 'false', 'data-limit': '5' }),
+      boolSchema,
+    );
     expect(config.open).toBe(false);
     expect(config.limit).toBe(5);
   });

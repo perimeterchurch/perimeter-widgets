@@ -8,7 +8,11 @@ const MOUNTED = '__perimeterMounted';
 type ObserverHandle = { observer: MutationObserver };
 const observers = new Map<string, ObserverHandle>();
 
-function mountIfMatch<S extends z.ZodTypeAny>(def: WidgetDefinition<S>, css: string, el: Element): void {
+function mountIfMatch<S extends z.ZodTypeAny>(
+  def: WidgetDefinition<S>,
+  css: string,
+  el: Element,
+): void {
   if (!(el instanceof HTMLElement)) return;
   if (el.getAttribute(MARKER) !== def.name) return;
   const node = el as HTMLElement & { [MOUNTED]?: boolean };

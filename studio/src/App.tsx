@@ -12,10 +12,7 @@ import { ThemeEditor } from './components/ThemeEditor';
 import { ConfigPanel } from './components/ConfigPanel';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 
-type Selection =
-  | { kind: 'widget'; slug: string }
-  | { kind: 'component'; name: string }
-  | null;
+type Selection = { kind: 'widget'; slug: string } | { kind: 'component'; name: string } | null;
 
 export function App() {
   const widgets = useMemo(() => toWidgetEntries(widgetDefGlob, widgetCssGlob), []);

@@ -29,7 +29,13 @@ export function toWidgetEntries(
 
 export function toComponentEntries(mods: GlobMap<Record<string, unknown>>): ComponentEntry[] {
   return Object.entries(mods)
-    .map(([file, load]) => ({ name: file.split('/').pop()!.replace(/\.tsx$/, ''), load }))
+    .map(([file, load]) => ({
+      name: file
+        .split('/')
+        .pop()!
+        .replace(/\.tsx$/, ''),
+      load,
+    }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

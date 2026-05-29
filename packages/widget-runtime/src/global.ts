@@ -12,7 +12,11 @@ interface RegisteredWidget {
 export interface PerimeterWidgetsGlobal {
   widgets: Record<string, RegisteredWidget>;
   applyOverrides(name: string, overrides: Partial<Record<ThemeToken, string>>): void;
-  mount(name: string, target: HTMLElement, configOverrides?: Record<string, unknown>): MountedWidget;
+  mount(
+    name: string,
+    target: HTMLElement,
+    configOverrides?: Record<string, unknown>,
+  ): MountedWidget;
 }
 
 declare global {

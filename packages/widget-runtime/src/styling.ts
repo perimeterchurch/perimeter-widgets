@@ -76,9 +76,8 @@ export function countAppliedSheets(shadow: ShadowRoot): number {
   if (shadow.adoptedStyleSheets && shadow.adoptedStyleSheets.length > 0) {
     return shadow.adoptedStyleSheets.length;
   }
-  return shadow.querySelectorAll(
-    'style[data-perimeter-widget-css], style[data-perimeter-tokens]',
-  ).length;
+  return shadow.querySelectorAll('style[data-perimeter-widget-css], style[data-perimeter-tokens]')
+    .length;
 }
 
 /** Test helper — drop the shared-sheet cache between tests. */
