@@ -1,12 +1,11 @@
-import { mountWidget } from '@perimeter-widgets/shared';
-import { SermonsApp } from './App';
-import styles from './styles.css?inline';
+import { defineWidget } from '@perimeter/widget-runtime';
+import './styles.css';
+import { App } from './App';
+import { SermonsConfigSchema } from './types';
 
-mountWidget({
-    elementId: 'perimeter-sermons',
-    component: SermonsApp,
-    styles,
-    defaults: {
-        perPage: 12,
-    },
+export default defineWidget({
+  name: 'sermons',
+  auth: 'none',
+  schema: SermonsConfigSchema,
+  App: ({ config }) => <App config={config} />,
 });

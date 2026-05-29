@@ -5,35 +5,35 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-    js.configs.recommended,
-    ...tseslint.configs.recommended,
-    {
-        files: ['**/*.{ts,tsx}'],
-        plugins: {
-            react,
-            'react-hooks': reactHooks,
-        },
-        settings: {
-            react: { version: 'detect' },
-        },
-        rules: {
-            ...react.configs['jsx-runtime'].rules,
-            ...reactHooks.configs.recommended.rules,
-            '@typescript-eslint/no-unused-vars': [
-                'error',
-                { argsIgnorePattern: '^_' },
-            ],
-            '@typescript-eslint/no-explicit-any': 'error',
-        },
+  js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
-    {
-        files: ['**/*.test.{ts,tsx}', '**/*.stories.{ts,tsx}'],
-        rules: {
-            '@typescript-eslint/no-explicit-any': 'off',
-        },
+    plugins: { react, 'react-hooks': reactHooks },
+    rules: {
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
-    prettier,
-    {
-        ignores: ['dist/', 'node_modules/', '.turbo/'],
+    settings: { react: { version: 'detect' } },
+  },
+  {
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/tests/**/*'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-implied-eval': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      'no-implied-eval': 'off',
     },
+  },
+  {
+    ignores: ['**/dist/**', '**/.next/**', '**/.turbo/**', '**/node_modules/**', '**/coverage/**'],
+  },
+  prettier,
 );

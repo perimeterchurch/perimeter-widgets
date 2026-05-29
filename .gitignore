@@ -1,12 +1,15 @@
-node_modules/
-.turbo/
+node_modules
+.turbo
+.next
+dist
+coverage
 *.tsbuildinfo
 .env
 .env.local
+.env.*.local
 .DS_Store
-# dist/ is NOT ignored — committed for jsDelivr CDN serving.
-# But internal package dist/ (e.g. vite-preset's tsc output) is a local build
-# artifact, not for CDN.
-packages/vite-preset/dist/
-.superpowers/
-.worktrees/
+
+# Next.js auto-generates next-env.d.ts; its contents flip between
+# `.next/dev/types` and `.next/types` depending on the last command.
+# CI runs `next build` before typecheck, so the file is always present.
+apps/*/next-env.d.ts
