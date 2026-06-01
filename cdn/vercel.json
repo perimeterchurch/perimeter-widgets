@@ -1,5 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": ".",
   "rewrites": [
     {
       "source": "/example/latest.js",
@@ -7,7 +11,7 @@
     },
     {
       "source": "/sermons/latest.js",
-      "destination": "/sermons/1.0.0/index.js"
+      "destination": "/sermons/1.0.1/index.js"
     }
   ],
   "headers": [
