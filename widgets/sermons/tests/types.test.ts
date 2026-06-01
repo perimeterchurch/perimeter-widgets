@@ -68,4 +68,8 @@ describe('SermonsConfigSchema — display modes', () => {
   it('rejects invalid date format', () => {
     expect(() => SermonsConfigSchema.parse({ from: '01-01-2025' })).toThrow();
   });
+
+  it('coerces perPage from a string (what a data-per-page attribute yields)', () => {
+    expect(SermonsConfigSchema.parse({ perPage: '12' }).perPage).toBe(12);
+  });
 });

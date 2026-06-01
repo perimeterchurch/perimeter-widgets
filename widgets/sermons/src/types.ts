@@ -8,7 +8,7 @@ import type { operations } from '@perimeter/api-hooks';
 export const SermonsConfigSchema = z
   .object({
     // Existing
-    perPage: z.number().default(12),
+    perPage: z.coerce.number().int().min(1).default(12),
     defaultTab: z.enum(['sermons', 'series']).default('sermons'),
     defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
     apiUrl: z.string().optional(),
