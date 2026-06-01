@@ -12,7 +12,16 @@ const def = defineWidget({
   App: () => <div data-testid="x">ok</div>,
 });
 
-const tick = () => new Promise((r) => setTimeout(r, 0));
+// React commits asynchronously under happy-dom; poll instead of a single tick
+// (a single setTimeout(0) is flaky in CI).
+async function waitForEl(root: ShadowRoot, selector: string): Promise<Element | null> {
+  for (let i = 0; i < 20; i++) {
+    const found = root.querySelector(selector);
+    if (found) return found;
+    await new Promise((r) => setTimeout(r, 0));
+  }
+  return root.querySelector(selector);
+}
 
 describe('window.PerimeterWidgets', () => {
   beforeEach(() => {
@@ -27,8 +36,8 @@ describe('window.PerimeterWidgets', () => {
     const host = document.createElement('div');
     document.body.appendChild(host);
     const handle = window.PerimeterWidgets.mount('g-test', host);
-    await tick();
-    expect(host.shadowRoot!.querySelector('[data-testid="x"]')).toBeTruthy();
+    const el = await waitForEl(host.shadowRoot!, '[data-testid="x"]');
+    expect(el).toBeTruthy();
     handle.unmount();
   });
 

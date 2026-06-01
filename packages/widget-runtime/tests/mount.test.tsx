@@ -7,7 +7,16 @@ import { countAppliedSheets, clearStyleCache } from '../src/styling';
 
 beforeEach(() => clearStyleCache());
 
-const tick = () => new Promise((r) => setTimeout(r, 0));
+// React commits asynchronously under happy-dom; poll instead of a single tick
+// (a single setTimeout(0) is flaky in CI).
+async function waitForEl(root: ShadowRoot, selector: string): Promise<Element | null> {
+  for (let i = 0; i < 20; i++) {
+    const found = root.querySelector(selector);
+    if (found) return found;
+    await new Promise((r) => setTimeout(r, 0));
+  }
+  return root.querySelector(selector);
+}
 
 const widget = defineWidget({
   name: 'm-test',
@@ -26,8 +35,8 @@ describe('mount', () => {
     const handle = mount(host, widget, CSS);
     const root = host.shadowRoot!;
     expect(root).toBeTruthy();
-    await tick();
-    expect(root.querySelector('[data-testid="lbl"]')!.textContent).toBe('world');
+    const el = await waitForEl(root, '[data-testid="lbl"]');
+    expect(el?.textContent).toBe('world');
     handle.unmount();
   });
 
