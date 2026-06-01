@@ -5,8 +5,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.widget.d.ts",
-      "default": "./src/index.tsx"
+      "types": "./src/widget.tsx",
+      "default": "./src/widget.tsx"
     }
   },
   "scripts": {

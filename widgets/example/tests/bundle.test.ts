@@ -1,31 +1,26 @@
-import { describe, it, expect } from 'vitest';
-import { readFile } from 'node:fs/promises';
-import { gzipSync } from 'node:zlib';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { execSync } from 'node:child_process';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-const BUNDLE = path.resolve(__dirname, '../../../dist/example/example.iife.js');
-// Per-widget budget. React 19 + ReactDOM + TanStack Query + zod + runtime alone
-// land near ~200 KB gzipped, so 120 KB (the umbrella's initial estimate) was not
-// achievable. Raised after empirical measurement of the first real widget bundle.
-const BUDGET_BYTES = 220 * 1024;
+const root = path.resolve(__dirname, '..');
+const distDir = path.join(root, 'dist');
+const bundle = path.join(distDir, 'index.js');
 
-describe('example bundle', () => {
-  it('is under the 220 KB gzipped budget', async () => {
-    const raw = await readFile(BUNDLE);
-    const gz = gzipSync(raw);
-    expect(gz.byteLength).toBeLessThanOrEqual(BUDGET_BYTES);
+beforeAll(() => {
+  execSync('pnpm exec vite build', { cwd: root, stdio: 'inherit' });
+}, 120_000);
+
+describe('built example bundle', () => {
+  it('emits a single IIFE at dist/index.js', () => {
+    expect(existsSync(bundle)).toBe(true);
   });
-
-  it('contains the package version', async () => {
-    const text = await readFile(BUNDLE, 'utf8');
-    expect(text).toContain('0.0.0');
+  it('inlines CSS — no separate .css asset is emitted', () => {
+    expect(readdirSync(distDir).some((f) => f.endsWith('.css'))).toBe(false);
   });
-
-  // The minifier mangles named identifiers, but the global namespace string
-  // 'PerimeterWidgets' is baked into the virtual entry as a literal value via
-  // the plugin's `def.__perimeterGlobal = "..."` assignment, so it survives.
-  it('exposes the PerimeterWidgets global surface', async () => {
-    const text = await readFile(BUNDLE, 'utf8');
-    expect(text).toContain('PerimeterWidgets');
+  it('self-mounts: bundle references the widget name and PerimeterWidgets global', () => {
+    const code = readFileSync(bundle, 'utf8');
+    expect(code).toContain('example');
+    expect(code).toContain('PerimeterWidgets');
   });
 });

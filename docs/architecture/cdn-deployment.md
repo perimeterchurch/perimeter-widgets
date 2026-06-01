@@ -1,102 +1,29 @@
 # CDN & Deployment
 
-> **Scope:** jsDelivr serving, cache purging, GitHub Action, rollback
-> **Key files:** `.github/workflows/build-and-purge.yml`, `scripts/generate-manifest.ts`, `dist/manifest.json`
-> **Last verified:** 2026-03-18
+> **Scope:** Static `cdn/` Vercel project, immutable versioned bundles, release CLI, promote/rollback
+> **Key files:** `cdn/`, `cdn/manifest.json`, `cdn/vercel.json`, `packages/release/`
+> **Canonical source:** [`docs/hosting-and-release.md`](../hosting-and-release.md)
 
 ---
 
-## CDN Serving
+## Model
 
-Built widget files in `dist/` are committed to the repo and served via jsDelivr directly from GitHub.
+Widgets are served from `cdn/` — a committed static directory deployed as its **own** Vercel static project at `widgets.perimeter.org` (separate from the showcase site at `style.perimeter.org`). There is no external CDN, no cache-invalidation step, and no GitHub Action build pipeline; the static project serves the committed files directly.
 
-### Widget URLs
+- Each widget builds to `widgets/<name>/dist/index.js` (via `widgetConfig`).
+- `cdn/<name>/<version>/index.js` (+ `.map`) is **immutable** once published — its `Cache-Control` is `public, max-age=31536000, immutable`.
+- `cdn/manifest.json` (`{ "<name>": "<version>" }`) is the single mutable pointer.
+- `cdn/vercel.json` holds the static cache/CORS `headers` plus the `/<name>/latest.js` → current-versioned-bundle `rewrites`, which are regenerated from the manifest on every release.
 
-```
-https://cdn.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/dist/sermons/sermons.js
-```
+## Release
 
-Pattern: `https://cdn.jsdelivr.net/gh/<org>/<repo>@latest/dist/<widget>/<widget>.js`
+`pnpm release <name>` (the `@perimeter/release` package) builds the widget, copies the bundle into the immutable `cdn/<name>/<version>/`, updates `manifest.json` + the `latest.js` rewrites, prunes each widget to its newest 5 versions, and commits `chore(release): <name>@<version>`. It does **not** push or open a PR.
 
-### jsDelivr Caching
+## Promote / roll back
 
-| Reference | Cache Duration     | Use Case                      |
-| --------- | ------------------ | ----------------------------- |
-| `@latest` | 7 days (purgeable) | Production — WordPress embeds |
-| `@v1.0.0` | Permanent (1 year) | Pinned version (optional)     |
-| `@main`   | 12 hours           | Development/testing           |
-
-WordPress embeds use `@latest` and never need to change their script tags. Cache is purged on every build via GitHub Action.
+- **Promote:** merge the manifest change. The edge picks it up within ~a minute (`s-maxage=60` + SWR).
+- **Roll back:** `git revert` the release commit (the prior immutable bundle still serves), or use Vercel Instant Rollback on the static project.
 
 ---
 
-## Build Manifest
-
-`scripts/generate-manifest.ts` runs as a `postbuild` hook after `pnpm build`. It scans `dist/` and writes `dist/manifest.json`:
-
-```json
-{
-    "widgets": {
-        "sermons": {
-            "file": "dist/sermons/sermons.js",
-            "sizeBytes": 230822
-        }
-    }
-}
-```
-
-The GitHub Action reads this to know which files to purge from jsDelivr.
-
----
-
-## GitHub Action: Build & Purge
-
-**File:** `.github/workflows/build-and-purge.yml`
-
-**Triggers:** Push to `main`
-
-### Pipeline
-
-1. **Install** — `pnpm install --frozen-lockfile`
-2. **Build** — `pnpm build` (Turborepo builds all widgets + generates manifest)
-3. **Check** — `git diff --quiet dist/` to detect changes
-4. **Commit** — If changed, commit `dist/` as `github-actions[bot]`
-5. **Push** — Push the dist commit
-6. **Purge** — Hit `https://purge.jsdelivr.net/gh/...` for each widget file in manifest
-
-The purge endpoint is public — no API key required.
-
----
-
-## Rollback Procedure
-
-Since WordPress embeds use `@latest`, a broken build affects production immediately. To roll back:
-
-1. `git revert <broken-commit>` — reverts the dist changes
-2. Push to `main`
-3. GitHub Action purges jsDelivr cache for affected files
-4. jsDelivr serves the reverted (known-good) dist files
-
-For extra safety, you can optionally pin WordPress embeds to a tagged version (`@v1.0.0`) and only update the tag after verifying.
-
----
-
-## WordPress Embed
-
-```html
-<div id="perimeter-sermons" data-campus="buckhead" data-per-page="12">
-    <div style="min-height:200px;background:#f5f5f4;border-radius:8px"></div>
-</div>
-<script src="https://cdn.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/dist/sermons/sermons.js"></script>
-```
-
-The inner `<div>` is an optional loading placeholder — replaced when the widget mounts.
-
-Set once, never change. Updates are delivered via the CDN automatically.
-
----
-
-## Related Docs
-
-- [Architecture Overview](overview.md) — Build pipeline context
-- [Widget Embed Guide](../reference/embed-guide.md) — Full embed reference
+Full flow, headers, and embed snippets: [`docs/hosting-and-release.md`](../hosting-and-release.md).

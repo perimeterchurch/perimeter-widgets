@@ -7,7 +7,7 @@ Turborepo monorepo of self-contained React widgets for embedding on perimeter.or
 - [Overview](architecture/overview.md) — Monorepo structure, build pipeline, shadow DOM mounting
 - [Shared Package](architecture/shared-package.md) — API client, auth, mount utility, components, design tokens
 - [Vite Preset](architecture/vite-preset.md) — `createWidgetConfig()`, `createWidgetTestConfig()`, build output
-- [CDN & Deployment](architecture/cdn-deployment.md) — jsDelivr serving, cache purging, GitHub Action pipeline
+- [CDN & Deployment](architecture/cdn-deployment.md) — static `cdn/` on Vercel (`widgets.perimeter.org`), `pnpm release`, manifest pointer
 
 ## Widgets
 

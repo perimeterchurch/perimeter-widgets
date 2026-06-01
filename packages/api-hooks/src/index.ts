@@ -18,3 +18,5 @@ export {
   type UseSeriesTypesParams,
   type UseSeriesTypesResponse,
 } from './sermons/use-series-types';
+
+export type { operations, components, paths } from './generated/operations';

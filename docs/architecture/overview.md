@@ -15,9 +15,9 @@ perimeter-widgets/
 │   ├── vite-preset/         ← @perimeter-widgets/vite-preset
 │   ├── storyboard/          ← @perimeter-widgets/storyboard
 │   └── widget-sermons/      ← @perimeter-widgets/widget-sermons
-├── dist/                    ← Committed build output (CDN-served)
-├── scripts/                 ← Build scripts (manifest generator)
-├── .github/workflows/       ← CI/CD
+├── cdn/                     ← Committed static hosting dir (Vercel static project)
+├── packages/release/        ← `pnpm release <name>` tooling
+├── .github/workflows/       ← CI/CD (ci.yml only)
 ├── turbo.json
 └── pnpm-workspace.yaml
 ```
@@ -36,7 +36,7 @@ perimeter-widgets/
 Each widget is a Vite library mode build that produces a single self-contained IIFE JavaScript file.
 
 ```
-Widget Source → Vite (library mode) → IIFE bundle → dist/<name>/<name>.js
+Widget Source → Vite (library mode) → IIFE bundle → widgets/<name>/dist/index.js
                                          ↑
                               React bundled in (WordPress doesn't provide it)
                               CSS inlined via ?inline imports (for shadow DOM)
@@ -44,9 +44,9 @@ Widget Source → Vite (library mode) → IIFE bundle → dist/<name>/<name>.js
                               tsconfig path aliases via vite-tsconfig-paths
 ```
 
-**Output:** `dist/<name>/<name>.js` — a single `<script>` tag loads everything the widget needs.
+**Output:** `widgets/<name>/dist/index.js` — a single `<script>` tag loads everything the widget needs. `pnpm release <name>` copies this immutable bundle into `cdn/<name>/<version>/index.js`, served by the static `cdn/` Vercel project at `widgets.perimeter.org`.
 
-**Size:** ~72KB gzipped per widget (includes React 19). CDN caching means repeat visits are instant.
+**Size:** ~72KB gzipped per widget (includes React 19). Immutable, year-cached versioned URLs mean repeat visits are instant.
 
 ## Shadow DOM Mounting
 
@@ -100,11 +100,11 @@ Each widget defines a Zod schema for its config — invalid attributes produce c
 }
 ```
 
-Build caching means unchanged widgets skip rebuilds. The `postbuild` script auto-generates `dist/manifest.json`.
+Build caching means unchanged widgets skip rebuilds. Hosting is decoupled from the build: `pnpm release <name>` copies a built bundle into the committed `cdn/` static directory and updates `cdn/manifest.json` (the single mutable pointer).
 
 ## Related Docs
 
 - [Shared Package](shared-package.md) — API client, auth, components, mount utility
 - [Vite Preset](vite-preset.md) — Build config factory
-- [CDN & Deployment](cdn-deployment.md) — jsDelivr, cache purging, GitHub Action
+- [CDN & Deployment](cdn-deployment.md) — static `cdn/` Vercel project, `pnpm release`, manifest pointer
 - [Adding a Widget](../guides/adding-a-widget.md) — Step-by-step new widget guide

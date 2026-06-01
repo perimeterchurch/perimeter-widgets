@@ -1,88 +1,69 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+// packages/widget-runtime/tests/mount.test.tsx
+import { describe, it, expect, beforeEach } from 'vitest';
 import { z } from 'zod';
-import { mountWidget } from '../src/mount';
-import { nativeRender } from '../src/native-render';
 import { defineWidget } from '../src/define-widget';
-import { clearAll, registerCss, getInstances } from '../src/registry';
+import { mount } from '../src/mount';
+import { countAppliedSheets, clearStyleCache } from '../src/styling';
 
-const schema = z.object({
-  greeting: z.string().default('Hello'),
-  count: z.coerce.number().default(1),
-});
+beforeEach(() => clearStyleCache());
 
-const definition = defineWidget({
-  name: 'example',
+// React commits asynchronously under happy-dom; poll instead of a single tick
+// (a single setTimeout(0) is flaky in CI).
+async function waitForEl(root: ShadowRoot, selector: string): Promise<Element | null> {
+  for (let i = 0; i < 20; i++) {
+    const found = root.querySelector(selector);
+    if (found) return found;
+    await new Promise((r) => setTimeout(r, 0));
+  }
+  return root.querySelector(selector);
+}
+
+const widget = defineWidget({
+  name: 'm-test',
   auth: 'none',
-  schema,
-  App({ config }) {
-    return (
-      <div data-testid="content">
-        {config.greeting} x{config.count}
-      </div>
-    );
-  },
+  schema: z.object({ label: z.string().default('hi') }),
+  App: ({ config }) => <p data-testid="lbl">{config.label}</p>,
 });
 
-describe('mountWidget', () => {
-  beforeEach(() => {
-    clearAll();
-    registerCss('example', ':host { --color-primary: red; }');
-    document.body.innerHTML = '';
-  });
+const CSS = '.box{color:rgb(1,2,3)}';
 
-  it('mounts the widget into a shadow root and renders the App', async () => {
-    const target = document.createElement('div');
-    target.setAttribute('data-greeting', 'Hi');
-    target.setAttribute('data-count', '3');
-    document.body.appendChild(target);
-
-    const handle = mountWidget({ definition, target });
-    await vi.waitFor(() => {
-      const root = target.shadowRoot;
-      expect(root).not.toBeNull();
-      expect(root!.querySelector('[data-testid="content"]')?.textContent).toBe('Hi x3');
-    });
-    expect(getInstances('example')).toHaveLength(1);
-    handle.unmount();
-  });
-
-  it('unmount removes the React tree and deregisters the instance', async () => {
-    const target = document.createElement('div');
-    document.body.appendChild(target);
-    const handle = mountWidget({ definition, target });
-    await vi.waitFor(() =>
-      expect(target.shadowRoot?.querySelector('[data-testid="content"]')).not.toBeNull(),
-    );
-    handle.unmount();
-    expect(getInstances('example')).toHaveLength(0);
-    // After unmount the shadow root no longer contains the testid node.
-    expect(target.shadowRoot?.querySelector('[data-testid="content"]')).toBeNull();
-  });
-
-  it('injects the resolved token CSS variables', async () => {
-    const target = document.createElement('div');
-    document.body.appendChild(target);
-    mountWidget({ definition, target });
-    await vi.waitFor(() => {
-      const styleEls = target.shadowRoot!.querySelectorAll('style');
-      const combined = Array.from(styleEls)
-        .map((s) => s.textContent ?? '')
-        .join('\n');
-      expect(combined).toContain('--color-primary');
-    });
-  });
-});
-
-describe('nativeRender', () => {
-  it('renders inside a shadow root attached to the provided target', async () => {
-    const target = document.createElement('div');
+describe('mount', () => {
+  it('attaches a shadow root and renders the App with parsed config', async () => {
     const host = document.createElement('div');
-    document.body.appendChild(target);
+    host.setAttribute('data-label', 'world');
     document.body.appendChild(host);
-    const handle = nativeRender({ definition, target, hostRoot: host });
-    await vi.waitFor(() => {
-      expect(target.shadowRoot?.querySelector('[data-testid="content"]')).not.toBeNull();
-    });
+    const handle = mount(host, widget, CSS);
+    const root = host.shadowRoot!;
+    expect(root).toBeTruthy();
+    const el = await waitForEl(root, '[data-testid="lbl"]');
+    expect(el?.textContent).toBe('world');
     handle.unmount();
+  });
+
+  it('applies a widget layer + token layer into the shadow root', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const handle = mount(host, widget, CSS);
+    expect(countAppliedSheets(host.shadowRoot!)).toBe(2);
+    handle.unmount();
+  });
+
+  it('updateTokens keeps the shared widget layer and refreshes the token layer', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const handle = mount(host, widget, CSS);
+    const widgetLayerBefore = host.shadowRoot!.adoptedStyleSheets[0];
+    handle.updateTokens({ 'color-primary': 'hsl(0 0% 0%)' });
+    expect(host.shadowRoot!.adoptedStyleSheets[0]).toBe(widgetLayerBefore);
+    expect(countAppliedSheets(host.shadowRoot!)).toBe(2);
+    handle.unmount();
+  });
+
+  it('unmount removes all applied styles', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const handle = mount(host, widget, CSS);
+    handle.unmount();
+    expect(countAppliedSheets(host.shadowRoot!)).toBe(0);
   });
 });

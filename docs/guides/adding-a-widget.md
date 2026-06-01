@@ -4,6 +4,8 @@
 > **Key files:** `packages/widget-sermons/` (reference implementation)
 > **Last verified:** 2026-03-18
 
+> **Start here:** for the current copy-the-example on-ramp (the `widgetConfig({ name })` Vite helper, the per-widget `src/entry.ts`, and Vite-studio auto-discovery), follow [`docs/creating-a-widget.md`](../creating-a-widget.md). The checklist below predates the streamline rebuild and is kept for context; the hosting/embed steps are corrected for the static `cdn/` model.
+
 ---
 
 ## Checklist
@@ -191,20 +193,24 @@ The storyboard will automatically pick it up with live config editing and embed 
 
 ```bash
 pnpm install
-pnpm build --filter=widget-<name>
-# Verify dist/<name>/<name>.js exists
+pnpm build --filter=@perimeter/widget-<name>
+# Verify widgets/<name>/dist/index.js exists
 ```
 
 ### 13. Add documentation
 
 Create `docs/widgets/<name>.md` with the widget's purpose, config options, and API endpoints.
 
-### 14. WordPress embed
+### 14. Release and embed
+
+Publish the built bundle to the static CDN with `pnpm release <name>` (copies it into the immutable `cdn/<name>/<version>/index.js`, updates `cdn/manifest.json` + the `latest.js` rewrites, commits). Then embed on WordPress:
 
 ```html
-<div id="perimeter-<name>" data-option="value"></div>
-<script src="https://cdn.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/dist/<name>/<name>.js"></script>
+<div data-option="value"></div>
+<script src="https://widgets.perimeter.org/<name>/latest.js" async></script>
 ```
+
+`…/latest.js` always resolves to the current released version; pin to an immutable build with `…/<name>/<version>/index.js`. Full flow and embed reference: [`docs/hosting-and-release.md`](../hosting-and-release.md).
 
 ---
 

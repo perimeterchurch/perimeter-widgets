@@ -115,11 +115,10 @@ pnpm build
 pnpm build --filter=widget-sermons
 
 # Output
-dist/sermons/sermons.js     # IIFE bundle
-dist/manifest.json           # Auto-generated metadata
+widgets/sermons/dist/index.js     # IIFE bundle (per widget)
 ```
 
-The `dist/` directory is committed to the repo for jsDelivr CDN serving.
+Each widget builds to its own `widgets/<name>/dist/index.js`. `pnpm release <name>` copies that immutable artifact into `cdn/<name>/<version>/index.js` (committed there) and updates `cdn/manifest.json`; the static `cdn/` Vercel project at `widgets.perimeter.org` serves it. The per-widget `dist/` is just a build artifact — it is no longer the serving source.
 
 ---
 

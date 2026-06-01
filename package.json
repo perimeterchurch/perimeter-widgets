@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "quality": "turbo typecheck lint test && pnpm format:check",
-    "publish-widget": "tsx packages/release-store/scripts/publish-widget.ts"
+    "release": "tsx packages/release/src/cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",

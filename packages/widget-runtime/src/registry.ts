@@ -1,19 +1,10 @@
 export interface InstanceHandle {
   unmount(): void;
-  /** Called by applyOverrides to re-resolve tokens on this instance. */
-  updateTokens(overrides: Record<string, string>): void;
+  /** Re-resolve tokens on this instance (used by the studio theme editor). */
+  updateTokens(overrides: Partial<Record<string, string>>): void;
 }
 
-const cssMap = new Map<string, string>();
 const instances = new Map<string, Set<InstanceHandle>>();
-
-export function registerCss(name: string, cssText: string): void {
-  cssMap.set(name, cssText);
-}
-
-export function getCss(name: string): string | undefined {
-  return cssMap.get(name);
-}
 
 export function registerInstance(name: string, handle: InstanceHandle): void {
   let set = instances.get(name);
@@ -33,6 +24,5 @@ export function getInstances(name: string): InstanceHandle[] {
 }
 
 export function clearAll(): void {
-  cssMap.clear();
   instances.clear();
 }

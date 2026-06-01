@@ -34,4 +34,10 @@ describe('globalTokens', () => {
       void key;
     }
   });
+
+  it('uses px (not rem) for radius so host font-size cannot rescale widgets', () => {
+    for (const [key, value] of Object.entries(globalTokens)) {
+      if (key.startsWith('radius-')) expect(value).toMatch(/px$/);
+    }
+  });
 });

@@ -13,9 +13,9 @@ export const globalTokens = {
   'color-destructive-fg': 'hsl(210 40% 98%)',
   'color-border': 'hsl(214 32% 91%)',
   'color-ring': 'hsl(221 83% 53%)',
-  'radius-sm': '0.25rem',
-  'radius-md': '0.5rem',
-  'radius-lg': '0.75rem',
+  'radius-sm': '4px',
+  'radius-md': '8px',
+  'radius-lg': '12px',
   'font-sans': 'Inter, system-ui, -apple-system, sans-serif',
   'font-mono': 'ui-monospace, SFMono-Regular, monospace',
 } as const;

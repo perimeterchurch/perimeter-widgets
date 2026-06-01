@@ -17,30 +17,42 @@ Public widget for searching and browsing sermons and sermon series on perimeter.
 
 ```html
 <div
-    id="perimeter-sermons"
-    data-campus="1"
+    data-perimeter-widget="sermons"
     data-per-page="12"
     data-default-tab="sermons"
     data-default-view="grid"
 ></div>
-<script src="https://cdn.jsdelivr.net/gh/PerimeterChurch/perimeter-widgets@latest/dist/sermons/sermons.js"></script>
+<script src="https://widgets.perimeter.org/sermons/latest.js" async></script>
 ```
 
-Backwards-compatible: `data-campus="buckhead"` (string slug) still works via `resolveCampusId()`.
+Use `…/sermons/latest.js` for auto-updating embeds, or pin an immutable build with `…/sermons/<version>/index.js`. Full hosting/embed reference: [`docs/hosting-and-release.md`](../hosting-and-release.md).
 
 ---
 
 ## Config (data attributes)
 
-| Attribute           | Type             | Default   | Description                                         |
-| ------------------- | ---------------- | --------- | --------------------------------------------------- |
-| `data-campus`       | number or string | _(none)_  | Filter by campus. Integer ID (1/2/3) or legacy slug |
-| `data-per-page`     | number           | `12`      | Number of sermons per page                          |
-| `data-default-tab`  | string           | `sermons` | Initial tab: `sermons` or `series`                  |
-| `data-default-view` | string           | `grid`    | Initial layout: `grid`, `list`, or `large`          |
-| `data-api-url`      | string           | _(none)_  | API base URL override (dev only)                    |
+Attributes below match `SermonsConfigSchema` in `widgets/sermons/src/types.ts`.
 
-Campus integer IDs: `1` = Buckhead, `2` = Brookhaven, `3` = Peachtree Corners.
+| Attribute            | Type    | Default   | Description                                       |
+| -------------------- | ------- | --------- | ------------------------------------------------- |
+| `data-per-page`      | number  | `12`      | Sermons per page                                  |
+| `data-default-tab`   | enum    | `sermons` | Initial tab: `sermons` or `series`                |
+| `data-default-view`  | enum    | `grid`    | Initial layout: `grid`, `list`, or `large`        |
+| `data-display`       | enum    | `full`    | Chrome level: `full`, `compact`, or `headless`    |
+| `data-tab`           | enum    | _(none)_  | Lock to a single tab: `sermons` or `series`       |
+| `data-series-id`     | string  | _(none)_  | Pin to a series (sermons tab only)                |
+| `data-speaker-id`    | string  | _(none)_  | Pin to a speaker (sermons tab only)               |
+| `data-book-id`       | string  | _(none)_  | Pin to a Bible book (sermons tab only)            |
+| `data-service-type-id` | string | _(none)_ | Pin to a service type                             |
+| `data-series-type-id`  | string | _(none)_ | Pin to a series type                              |
+| `data-hide-search`   | boolean | _(none)_  | Hide the search box (one `data-hide-*` per filter; also `data-hide-series`, `-speaker`, `-book`, `-service-type`, `-series-type`, `-date`, `-pagination`) |
+| `data-show-service-type` | boolean | _(none)_ | Opt in to the service-type dropdown            |
+| `data-show-series-type`  | boolean | _(none)_ | Opt in to the series-type dropdown             |
+| `data-from`          | string  | _(none)_  | Start date filter (`YYYY-MM-DD`)                  |
+| `data-to`            | string  | _(none)_  | End date filter (`YYYY-MM-DD`)                    |
+| `data-api-url`       | string  | _(none)_  | API base URL override (dev only)                  |
+
+There is no `data-campus` / `data-limit` / `data-initial-view` attribute. `data-per-page` arrives as a string and is coerced to a number by the schema.
 
 ---
 

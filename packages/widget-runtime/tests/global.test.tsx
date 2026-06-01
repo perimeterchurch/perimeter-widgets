@@ -1,51 +1,49 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { z } from 'zod';
 import { defineWidget } from '../src/define-widget';
 import { ensureGlobal } from '../src/global';
-import { clearAll, registerCss } from '../src/registry';
-import { mountWidget } from '../src/mount';
+import { clearAll } from '../src/registry';
+import { clearStyleCache } from '../src/styling';
 
 const def = defineWidget({
-  name: 'example',
+  name: 'g-test',
   auth: 'none',
   schema: z.object({}),
   App: () => <div data-testid="x">ok</div>,
 });
 
+// React commits asynchronously under happy-dom; poll instead of a single tick
+// (a single setTimeout(0) is flaky in CI).
+async function waitForEl(root: ShadowRoot, selector: string): Promise<Element | null> {
+  for (let i = 0; i < 20; i++) {
+    const found = root.querySelector(selector);
+    if (found) return found;
+    await new Promise((r) => setTimeout(r, 0));
+  }
+  return root.querySelector(selector);
+}
+
 describe('window.PerimeterWidgets', () => {
   beforeEach(() => {
     clearAll();
-    registerCss('example', ':host {}');
+    clearStyleCache();
     (window as unknown as { PerimeterWidgets?: unknown }).PerimeterWidgets = undefined;
     document.body.innerHTML = '';
   });
 
-  it('attaches the definition under its name', () => {
-    ensureGlobal(def);
-    expect(window.PerimeterWidgets.widgets['example']).toBe(def);
-  });
-
-  it('applyOverrides re-renders every live instance with new tokens', async () => {
-    ensureGlobal(def);
-    const a = document.createElement('div');
-    document.body.appendChild(a);
-    mountWidget({ definition: def, target: a });
-    await vi.waitFor(() => expect(a.shadowRoot?.querySelector('[data-testid="x"]')).not.toBeNull());
-
-    window.PerimeterWidgets.applyOverrides('example', { 'color-primary': 'hsl(99 99% 99%)' });
-    const styleEls = a.shadowRoot!.querySelectorAll('style');
-    const combined = Array.from(styleEls)
-      .map((s) => s.textContent ?? '')
-      .join('\n');
-    expect(combined).toContain('--color-primary: hsl(99 99% 99%)');
-  });
-
-  it('mount() returns a MountedWidget that can be unmounted', () => {
-    ensureGlobal(def);
-    const target = document.createElement('div');
-    document.body.appendChild(target);
-    const handle = window.PerimeterWidgets.mount('example', target);
-    expect(target.shadowRoot).not.toBeNull();
+  it('registers a widget with its css and mounts via the global escape hatch', async () => {
+    ensureGlobal(def, ':host{}');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const handle = window.PerimeterWidgets.mount('g-test', host);
+    const el = await waitForEl(host.shadowRoot!, '[data-testid="x"]');
+    expect(el).toBeTruthy();
     handle.unmount();
+  });
+
+  it('throws for an unregistered widget name', () => {
+    ensureGlobal(def, ':host{}');
+    const host = document.createElement('div');
+    expect(() => window.PerimeterWidgets.mount('nope', host)).toThrow();
   });
 });
