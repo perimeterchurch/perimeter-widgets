@@ -65,6 +65,25 @@ export function widgetConfig(options: WidgetConfigOptions): UserConfig {
       sourcemap: true,
       target: 'es2022',
       emptyOutDir: true,
+      rollupOptions: {
+        // Silence noise that's irrelevant to a self-contained IIFE build:
+        // - MODULE_LEVEL_DIRECTIVE: third-party React libs (framer-motion, react-query,
+        //   nuqs, react-pdf, @base-ui) ship "use client"/"use server" RSC directives that
+        //   Rollup strips when bundling — one warning per file, harmless here.
+        // - SOURCEMAP_ERROR / "Can't resolve original location": Rollup failing to map the
+        //   above warnings back to a sourcemap line. Real build errors are unaffected.
+        onwarn(warning, defaultHandler) {
+          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
+          if (warning.code === 'SOURCEMAP_ERROR') return;
+          if (
+            typeof warning.message === 'string' &&
+            warning.message.includes("Can't resolve original location")
+          ) {
+            return;
+          }
+          defaultHandler(warning);
+        },
+      },
     },
   };
 }
