@@ -8,6 +8,8 @@ Turborepo monorepo of self-contained React widgets for embedding on perimeter.or
 - [Shared Package](architecture/shared-package.md) — API client, auth, mount utility, components, design tokens
 - [Vite Preset](architecture/vite-preset.md) — `createWidgetConfig()`, `createWidgetTestConfig()`, build output
 - [CDN & Deployment](architecture/cdn-deployment.md) — static `cdn/` on Vercel (`widgets.perimeter.org`), `pnpm release`, manifest pointer
+- [Hosting & Release](hosting-and-release.md) — the `cdn/` model, `pnpm release`, promote/rollback, embed snippets
+- [Deploying](deploying.md) — step-by-step: deploy the CDN + studio, verify, WordPress embed, monitor
 
 ## Widgets
 
