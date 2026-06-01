@@ -1,10 +1,39 @@
-import { useEffect, useState, type ComponentType, type CSSProperties } from 'react';
+import {
+  Component,
+  useEffect,
+  useState,
+  type ComponentType,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import { globalTokens, type ThemeToken } from '@perimeter/theme';
 import type { ComponentEntry } from '../lib/discovery';
 
 const tokenStyle = Object.fromEntries(
   (Object.keys(globalTokens) as ThemeToken[]).map((t) => [`--${t}`, globalTokens[t]]),
 ) as CSSProperties;
+
+/**
+ * Isolates each previewed component. Many @perimeter/ui components require props
+ * (Combobox, Pagination, SortSelect, Tabs, …) and throw when rendered bare; without
+ * this boundary one throwing component would unmount the entire gallery view.
+ */
+class Isolate extends Component<{ name: string; children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError(): { failed: boolean } {
+    return { failed: true };
+  }
+  override render(): ReactNode {
+    if (this.state.failed) {
+      return (
+        <div className="text-xs text-amber-600">
+          Can&apos;t preview <code>{this.props.name}</code> standalone (it needs props).
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export function ComponentPreview({ entry }: { entry: ComponentEntry }) {
   const [exports, setExports] = useState<Record<string, unknown>>({});
@@ -27,7 +56,9 @@ export function ComponentPreview({ entry }: { entry: ComponentEntry }) {
       {components.map(([name, Comp]) => (
         <div key={name} className="rounded border p-4">
           <div className="mb-2 text-xs text-gray-500">{name}</div>
-          <Comp />
+          <Isolate name={name}>
+            <Comp />
+          </Isolate>
         </div>
       ))}
     </div>
