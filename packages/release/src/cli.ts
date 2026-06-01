@@ -1,5 +1,13 @@
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, copyFileSync, readFileSync, writeFileSync, readdirSync, rmSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  copyFileSync,
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  rmSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setManifestVersion, buildRewrites, versionsToPrune, type Manifest } from './release';
@@ -27,7 +35,9 @@ function main(): void {
 
   const destDir = path.join(CDN, name, version);
   if (existsSync(destDir) && !force) {
-    throw new Error(`${name}@${version} already published (immutable). Bump the version or pass --force.`);
+    throw new Error(
+      `${name}@${version} already published (immutable). Bump the version or pass --force.`,
+    );
   }
 
   // Build the widget.

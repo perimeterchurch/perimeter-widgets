@@ -6,12 +6,15 @@
   if (window.__perimeterLoader) return;
   window.__perimeterLoader = true;
 
-  var origin = (document.currentScript && document.currentScript.src
-    ? new URL('.', document.currentScript.src).href
-    : '/');
+  var origin =
+    document.currentScript && document.currentScript.src
+      ? new URL('.', document.currentScript.src).href
+      : '/';
 
   fetch(origin + 'manifest.json', { cache: 'no-cache' })
-    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      return r.json();
+    })
     .then(function (manifest) {
       var seen = {};
       var nodes = document.querySelectorAll('[data-perimeter-widget]');
@@ -27,5 +30,7 @@
         document.head.appendChild(s);
       }
     })
-    .catch(function () { /* fail silently — never break the host page */ });
+    .catch(function () {
+      /* fail silently — never break the host page */
+    });
 })();

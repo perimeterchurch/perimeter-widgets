@@ -18,33 +18,37 @@ Read the active spec/plan before modifying the platform.
 
 **Phase 2 (sermons port) is done:** the `sermons` widget is back in the workspace and runs on the new contract (`src/widget.tsx` + `src/entry.ts`, `widgetConfig`, `@perimeter/api-hooks` for types/hooks). react-pdf's stylesheets are routed through `src/styles.css` via `@import` so they reach the shadow root; the per-widget gz budget is **900 KiB** (sermons lands ~859 KiB — a self-hosted-pdf-worker optimization to shrink it is a tracked follow-up).
 
-**Later phases:** Phase 3 adds hosting + a release CLI (there is no `publish-widget` script yet); Phase 4 cuts over to `widgets.perimeter.org`. Each gets its own plan.
+**Phase 3 (hosting + release) is done:** `cdn/` is a committed static directory (immutable `cdn/<name>/<version>/index.js` + `.map`, a mutable `cdn/manifest.json` pointer, `cdn/vercel.json` cache/CORS headers with manifest-derived `latest.js` rewrites, and a manifest-driven `cdn/loader.js`) deployed as its **own** Vercel static project at `widgets.perimeter.org`. `pnpm release <name>` (the `@perimeter/release` package) builds a widget, copies it to the immutable path, updates the manifest + rewrites, prunes to the last 5 versions, and commits `chore(release): <name>@<version>`; it does not push or open a PR. Promote = merge the manifest change; rollback = revert the commit or Vercel Instant Rollback. The committed bundles are in `.prettierignore` (kept byte-for-byte). The actual Vercel deploy + DNS is a one-time manual step (not yet done). Full flow + embed snippets: `docs/hosting-and-release.md`.
+
+**Later phases:** Phase 4 cuts over WordPress to `widgets.perimeter.org`. It gets its own plan.
 
 ## Packages
 
-| Package                         | Role                                                               |
-| ------------------------------- | ------------------------------------------------------------------ |
-| `@perimeter/theme`              | Design tokens (px radii), `resolveTokens`, `rewriteRootToHost`     |
-| `@perimeter/widget-runtime`     | `mount`, `autoMount`, `defineWidget`, shadow `styling` module      |
-| `@perimeter/vite-plugin-widget` | `widgetConfig()` Vite-config helper (rem→px, IIFE build)           |
-| `@perimeter/auth`               | Auth providers (carried over)                                      |
-| `@perimeter/api-client`         | Typed API client (carried over)                                    |
-| `@perimeter/api-hooks`          | React Query hooks + generated operation types (absorbed api-types) |
-| `@perimeter/ui`                 | shadcn components + `cn` + hooks (carried over)                    |
+| Package                         | Role                                                                       |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| `@perimeter/theme`              | Design tokens (px radii), `resolveTokens`, `rewriteRootToHost`             |
+| `@perimeter/widget-runtime`     | `mount`, `autoMount`, `defineWidget`, shadow `styling` module              |
+| `@perimeter/vite-plugin-widget` | `widgetConfig()` Vite-config helper (rem→px, IIFE build)                   |
+| `@perimeter/auth`               | Auth providers (carried over)                                              |
+| `@perimeter/api-client`         | Typed API client (carried over)                                            |
+| `@perimeter/api-hooks`          | React Query hooks + generated operation types (absorbed api-types)         |
+| `@perimeter/ui`                 | shadcn components + `cn` + hooks (carried over)                            |
+| `@perimeter/release`            | Dev-only release tooling behind `pnpm release` (nothing ships in a widget) |
 
-`studio/` is the Vite studio app; `widgets/example` is the reference widget and `widgets/sermons` is the first production widget on the new platform. (`release-store`, `api-types`, `apps/cdn`, and the Next.js `apps/studio` were removed in this phase.)
+`studio/` is the Vite studio app; `widgets/example` is the reference widget and `widgets/sermons` is the first production widget on the new platform. `cdn/` is the committed static hosting directory (deployed separately — see Phase 3 above and `docs/hosting-and-release.md`). (`release-store`, `api-types`, `apps/cdn`, and the Next.js `apps/studio` were removed in the streamline rebuild.)
 
 ## Commands
 
-| Command          | Description                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| `pnpm install`   | Install dependencies                                              |
-| `pnpm dev`       | Run dev tasks across the workspace (Vite studio + widget watches) |
-| `pnpm build`     | Build every package via Turborepo                                 |
-| `pnpm test`      | Run all tests                                                     |
-| `pnpm lint`      | Lint all packages                                                 |
-| `pnpm typecheck` | Type-check all packages                                           |
-| `pnpm quality`   | typecheck + lint + test + prettier check (gate before PR)         |
+| Command               | Description                                                                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm install`        | Install dependencies                                                                                                                                                     |
+| `pnpm dev`            | Run dev tasks across the workspace (Vite studio + widget watches)                                                                                                        |
+| `pnpm build`          | Build every package via Turborepo                                                                                                                                        |
+| `pnpm test`           | Run all tests                                                                                                                                                            |
+| `pnpm lint`           | Lint all packages                                                                                                                                                        |
+| `pnpm typecheck`      | Type-check all packages                                                                                                                                                  |
+| `pnpm quality`        | typecheck + lint + test + prettier check (gate before PR)                                                                                                                |
+| `pnpm release <name>` | Build a widget, publish it to the immutable `cdn/<name>/<version>/`, update the manifest + rewrites, prune to the last 5, and commit (see `docs/hosting-and-release.md`) |
 
 ## Critical rules
 
