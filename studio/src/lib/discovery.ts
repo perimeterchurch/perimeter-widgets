@@ -49,9 +49,12 @@ export function toComponentEntries(mods: GlobMap<Record<string, unknown>>): Comp
 export const widgetDefGlob = import.meta.glob('../../../widgets/*/src/widget.tsx') as GlobMap<{
   default: WidgetDefinition;
 }>;
+// NOTE: `query: '?inline'` only (no `import: 'default'`). With `import: 'default'`
+// the importer resolves to the raw css string, so consumers reading `.default`
+// would get undefined; without it the importer returns the module `{ default: css }`,
+// matching `GlobMap<{ default: string }>` and how WidgetPreview reads it.
 export const widgetCssGlob = import.meta.glob('../../../widgets/*/src/styles.css', {
   query: '?inline',
-  import: 'default',
 }) as unknown as GlobMap<{ default: string }>;
 export const componentGlob = import.meta.glob('../../../packages/ui/src/*.tsx') as GlobMap<
   Record<string, unknown>
