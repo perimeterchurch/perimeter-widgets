@@ -36,7 +36,7 @@ export default createWidgetConfig({
 | Setting                | Value                                                              | Why                                                 |
 | ---------------------- | ------------------------------------------------------------------ | --------------------------------------------------- |
 | Format                 | IIFE                                                               | Single `<script>` tag embedding                     |
-| Output                 | `../../dist/<name>/<name>.js`                                      | Root `dist/` folder for CDN                         |
+| Output                 | `dist/index.js` (per widget)                                      | Copied into `cdn/<name>/<version>/` by `pnpm release` |
 | Global name            | `PerimeterWidget_<Name>`                                           | Avoids collisions between widgets                   |
 | Plugins                | `@vitejs/plugin-react`, `@tailwindcss/vite`, `vite-tsconfig-paths` | React JSX + Tailwind v4 CSS + tsconfig path aliases |
 | `envDir`               | Monorepo root (`../../`)                                           | Load `.env` files from monorepo root                |
