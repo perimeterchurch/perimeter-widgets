@@ -25,7 +25,7 @@ export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefini
       if (!alive) return;
       setDef(m.default);
       onDefinition?.(m.default);
-      setCss(c.default);
+      setCss(c.default ?? '');
     });
     return () => {
       alive = false;

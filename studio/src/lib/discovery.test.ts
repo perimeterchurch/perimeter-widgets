@@ -1,6 +1,12 @@
 // studio/src/lib/discovery.test.ts
 import { describe, it, expect } from 'vitest';
-import { toWidgetEntries, toComponentEntries, widgetDefGlob, componentGlob } from './discovery';
+import {
+  toWidgetEntries,
+  toComponentEntries,
+  widgetDefGlob,
+  widgetCssGlob,
+  componentGlob,
+} from './discovery';
 
 describe('discovery normalizers', () => {
   it('derives a widget slug from its path', () => {
@@ -25,9 +31,7 @@ describe('live import.meta.glob discovery (regression guard for glob base path)'
   // which is exactly the "no widgets/components listed" bug. typecheck/build do
   // NOT catch that, so assert the globs actually match files.
   it('discovers at least the sermons + example widgets', () => {
-    const slugs = toWidgetEntries(
-      widgetDefGlob as unknown as Parameters<typeof toWidgetEntries>[0],
-    ).map((e) => e.slug);
+    const slugs = toWidgetEntries(widgetDefGlob).map((e) => e.slug);
     expect(slugs).toContain('sermons');
     expect(slugs).toContain('example');
   });
@@ -35,5 +39,16 @@ describe('live import.meta.glob discovery (regression guard for glob base path)'
     const names = toComponentEntries(componentGlob).map((e) => e.name);
     expect(names).toContain('button');
     expect(names.length).toBeGreaterThan(5);
+  });
+
+  it('widget css entries resolve to { default: <string> } (not a bare string)', async () => {
+    // Guards against `import: 'default'` on the css glob, which makes the importer
+    // resolve to the raw string so `.default` is undefined → mount() crashes on
+    // rewriteRootToHost(undefined). The css string itself may be empty; only its shape matters.
+    const entries = toWidgetEntries(widgetDefGlob, widgetCssGlob);
+    const example = entries.find((e) => e.slug === 'example');
+    expect(example).toBeDefined();
+    const mod = await example!.loadCss();
+    expect(typeof mod.default).toBe('string');
   });
 });
