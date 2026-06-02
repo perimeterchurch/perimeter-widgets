@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --dir tests",
     "visual": "playwright test"
   },
   "dependencies": {
