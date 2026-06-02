@@ -1,18 +1,31 @@
 import { describe, expect, it } from 'vitest';
 import path from 'node:path';
+import postcss from 'postcss';
 import { compileDevCss, compileProdCss, repoRoot } from '../src/pipelines.ts';
 
 const example = path.join(repoRoot, 'widgets/example');
 
+/** rem found in actual declaration VALUES — what rem→px is meant to convert.
+ * (Tailwind arbitrary-value class names like `ml-[-0.3rem]` carry `rem` in the
+ * SELECTOR; that is a class-name token, not a length that scales against host
+ * font-size, so it is out of remToPxPlugin's scope and must be ignored here.) */
+function remInDeclarationValues(css: string): string[] {
+  const out: string[] = [];
+  postcss.parse(css).walkDecls((d) => {
+    if (/[\d.]rem\b/.test(d.value)) out.push(`${d.prop}: ${d.value}`);
+  });
+  return out;
+}
+
 describe('css pipelines', () => {
   it('prod pipeline emits px (rem→px applied)', async () => {
     const css = await compileProdCss(example);
-    expect(css).not.toMatch(/[\d.]rem\b/);
+    expect(remInDeclarationValues(css)).toEqual([]);
     // Assert on a utility the widget's OWN source guarantees (app.tsx uses p-4).
-    // Do NOT assert `--color-` here: the widget's tailwind content scans only its
-    // own src, and example's color utilities live inside @perimeter/ui — their
-    // absence from prod CSS is the H2 finding itself, not a harness bug.
     expect(css).toMatch(/\.p-4\s*\{[^}]*padding:\s*16px/);
+    // Since the H2 fix, the widget content scans packages/ui/src, so the color
+    // utilities used inside @perimeter/ui components ship in the prod bundle too.
+    expect(css).toContain('var(--color-');
   }, 60_000);
 
   it('dev pipeline compiles the same source through the studio config', async () => {

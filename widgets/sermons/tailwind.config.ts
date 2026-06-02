@@ -1,4 +1,4 @@
 import type { Config } from 'tailwindcss';
-import preset from '@perimeter/theme/tailwind';
-const config: Config = { presets: [preset], content: ['./src/**/*.{ts,tsx}'] };
+import preset, { widgetContent } from '@perimeter/theme/tailwind';
+const config: Config = { presets: [preset], content: widgetContent };
 export default config;
