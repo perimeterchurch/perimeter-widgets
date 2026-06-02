@@ -1,7 +1,8 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { compileDevCss, compileProdCss, compileUiOnlyCss, repoRoot } from './pipelines.ts';
+import { compileDevCss, compileProdCss, repoRoot } from './pipelines.ts';
 import { diffCss } from './diff.ts';
+import { uiAttributableSelectors } from './ui-selectors.ts';
 
 const widgets = process.argv.slice(2);
 if (widgets.length === 0) {
@@ -12,18 +13,11 @@ if (widgets.length === 0) {
 const reportsDir = path.join(repoRoot, 'packages/parity/reports');
 mkdirSync(reportsDir, { recursive: true });
 
-const uiCss = await compileUiOnlyCss();
-const uiSelectors = new Set(
-  [...uiCss.matchAll(/(?<=^|\})\s*([^@{}]+)\{/g)].flatMap((m) =>
-    m[1]!.split(',').map((s) => s.replace(/\s+/g, ' ').trim()),
-  ),
-);
-
 for (const name of widgets) {
   const dir = path.join(repoRoot, 'widgets', name);
   const [dev, prod] = await Promise.all([compileDevCss(dir), compileProdCss(dir)]);
   const d = diffCss(dev, prod);
-  const devOnlyUi = d.onlyInA.filter((s) => uiSelectors.has(s.split(' :: ').pop()!));
+  const devOnlyUi = await uiAttributableSelectors(d.onlyInA);
   const remPx = d.valueDiffs.filter((v) => v.kind === 'rem-px');
   const other = d.valueDiffs.filter((v) => v.kind === 'other');
 
