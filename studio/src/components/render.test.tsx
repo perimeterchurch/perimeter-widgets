@@ -1,11 +1,12 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, beforeAll } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeAll, afterEach } from 'vitest';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { z } from 'zod';
 import { ComponentPreview } from './ComponentPreview';
 import { ComponentStage } from './ComponentStage';
 import { ConfigPanel } from './ConfigPanel';
 import { WidgetPreview } from './WidgetPreview';
+import { HostFrame } from './HostFrame';
 import { countAppliedSheets, defineWidget } from '@perimeter/widget-runtime';
 import type { ComponentEntry, WidgetEntry } from '../lib/discovery';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
@@ -58,6 +59,48 @@ describe('ComponentStage', () => {
     // The button is inside the shadow root, NOT in the light DOM under the host.
     expect(shadow.querySelector('button')?.textContent).toBe('x');
     expect(host.querySelector('button')).toBeNull();
+  });
+});
+
+describe('HostFrame (host-page-sim canvas, H4)', () => {
+  // This suite has no global RTL auto-cleanup; unmount our render so the
+  // mounted WidgetPreview host does not leak into later tests' shared document.
+  afterEach(cleanup);
+
+  function entryFor(def: WidgetDefinition): WidgetEntry {
+    return {
+      slug: 'host-frame-test',
+      load: () => Promise.resolve({ default: def }),
+      loadCss: () => Promise.resolve({ default: '' }),
+    };
+  }
+
+  it('places [data-host-frame] with the host body font-size (19px) above the widget preview host', async () => {
+    const def = defineWidget({
+      name: 'host-frame-widget',
+      auth: 'none',
+      schema: z.object({}),
+      App: () => <p>inside</p>,
+    }) as unknown as WidgetDefinition;
+
+    const { container } = render(
+      <HostFrame>
+        <WidgetPreview entry={entryFor(def)} configOverrides={{}} tokenOverrides={{}} />
+      </HostFrame>,
+    );
+
+    // The widget preview host mounts after its module/css load.
+    const host = await waitFor(() => {
+      const el = container.querySelector<HTMLElement>('[data-perimeter-widget-preview]');
+      expect(el).toBeTruthy();
+      return el;
+    });
+
+    // Walk the ancestor chain up to the host-page-sim frame.
+    const frame = host?.closest<HTMLElement>('[data-host-frame]');
+    expect(frame).toBeTruthy();
+    expect(frame?.style.fontSize).toBe('19px');
+    expect(frame?.style.lineHeight).toBe('35px');
   });
 });
 
