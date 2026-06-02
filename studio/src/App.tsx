@@ -7,6 +7,7 @@ import {
   componentGlob,
 } from './lib/discovery';
 import { WidgetPreview } from './components/WidgetPreview';
+import { HostFrame } from './components/HostFrame';
 import { ComponentPreview } from './components/ComponentPreview';
 import { ThemeEditor } from './components/ThemeEditor';
 import { ConfigPanel } from './components/ConfigPanel';
@@ -60,12 +61,14 @@ export function App() {
       <main className="overflow-auto bg-gray-50 p-6">
         {widget && (
           <>
-            <WidgetPreview
-              entry={widget}
-              configOverrides={configOverrides}
-              tokenOverrides={tokenOverrides}
-              onDefinition={setDef}
-            />
+            <HostFrame>
+              <WidgetPreview
+                entry={widget}
+                configOverrides={configOverrides}
+                tokenOverrides={tokenOverrides}
+                onDefinition={setDef}
+              />
+            </HostFrame>
             <pre className="mt-6 rounded bg-gray-900 p-3 text-xs text-gray-100">{`<div data-perimeter-widget="${widget.slug}"></div>
 <script src="https://widgets.perimeter.org/${widget.slug}/latest.js" async></script>`}</pre>
           </>

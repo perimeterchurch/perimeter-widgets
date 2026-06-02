@@ -351,6 +351,9 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
+      '@perimeter/vite-plugin-widget':
+        specifier: workspace:*
+        version: link:../packages/vite-plugin-widget
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.1

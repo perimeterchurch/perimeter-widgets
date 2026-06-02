@@ -1,8 +1,8 @@
 import type { Config } from 'tailwindcss';
-import preset from '@perimeter/theme/tailwind';
+import preset, { widgetContent } from '@perimeter/theme/tailwind';
 
 const config: Config = {
   presets: [preset],
-  content: ['./src/**/*.{ts,tsx}'],
+  content: widgetContent,
 };
 export default config;
