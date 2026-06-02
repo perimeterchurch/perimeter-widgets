@@ -94,6 +94,36 @@ describe('WidgetPreview config gate (studio configOverrides exercise the prod zo
     expect(screen.getByText(/n:/)).toBeTruthy();
   });
 
+  it('recovers from the error state when overrides become valid (clear on next successful mount)', async () => {
+    const def = defineWidget({
+      name: 'gate-recover',
+      auth: 'none',
+      schema: z.object({ n: z.coerce.number().max(5).default(0) }),
+      App: ({ config }) => <p data-testid="n-value">{String(config.n)}</p>,
+    }) as unknown as WidgetDefinition;
+
+    const entry = entryFor(def);
+    // Scope queries to this render's own container — the suite has no RTL
+    // auto-cleanup (no test-globals config), so a prior test's identical alert
+    // would otherwise leak into the shared document and mask this assertion.
+    // Start invalid → error box, host hidden but still attached.
+    const { rerender, container } = render(
+      <WidgetPreview entry={entry} configOverrides={{ n: '99' }} tokenOverrides={{}} />,
+    );
+    const within = () => container.querySelector('[role="alert"]');
+    await waitFor(() => expect(within()).toBeTruthy());
+
+    // Correct the config → the effect must re-run against the still-attached host,
+    // clear the error, and render the valid App.
+    rerender(<WidgetPreview entry={entry} configOverrides={{ n: '3' }} tokenOverrides={{}} />);
+    await waitFor(() => expect(within()).toBeNull());
+    // The host is visible again (the App renders inside its shadow root, which
+    // testing-library's light-DOM `screen` queries cannot see).
+    const host = container.querySelector('[data-perimeter-widget-preview]') as HTMLElement;
+    expect(host).toBeTruthy();
+    expect(host.hidden).toBe(false);
+  });
+
   it('applies the "true"/"false" shorthand end-to-end: string "false" reaches the App as false', async () => {
     let received: boolean | undefined;
     const def = defineWidget({

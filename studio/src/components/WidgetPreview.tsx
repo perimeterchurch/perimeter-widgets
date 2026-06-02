@@ -72,14 +72,20 @@ export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefini
     handleRef.current?.updateTokens(tokenOverrides);
   }, [tokenOverrides]);
 
-  if (mountError) {
-    return (
-      <div role="alert" data-perimeter-widget-error>
-        <strong>Invalid widget config</strong>
-        <p>{mountError}</p>
-      </div>
-    );
-  }
-
-  return <div ref={hostRef} data-perimeter-widget-preview />;
+  // Keep the host div mounted at all times so hostRef stays attached to the DOM.
+  // If we returned the alert *instead* of the host, hostRef.current would become
+  // null and the mount effect would bail at `if (!host || !def) return` forever —
+  // the preview could never re-mount or clear the error on corrected input.
+  // Hide the host (rather than unmount it) while an error is shown.
+  return (
+    <>
+      {mountError && (
+        <div role="alert" data-perimeter-widget-error>
+          <strong>Invalid widget config</strong>
+          <p>{mountError}</p>
+        </div>
+      )}
+      <div ref={hostRef} data-perimeter-widget-preview hidden={mountError !== null} />
+    </>
+  );
 }
