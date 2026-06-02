@@ -18,10 +18,18 @@ async function loadTailwindConfig(dir: string): Promise<Config> {
     default: Config;
   };
   const config = mod.default;
-  const content = (config.content as string[]).map((g) =>
-    path.isAbsolute(g) ? g : path.resolve(dir, g),
-  );
-  return { ...config, content };
+  // Tailwind v3 `content` is either an array or the object form
+  // (`{ files: [...] }`, optionally with `relative`/extractors). Each entry is a
+  // glob string or a RawFile (`{ raw }`) object; resolve only the string globs
+  // against the config's own directory, in both shapes.
+  type ContentEntry = string | { raw: string; extension?: string };
+  const resolve = (entry: ContentEntry): ContentEntry =>
+    typeof entry === 'string' ? (path.isAbsolute(entry) ? entry : path.resolve(dir, entry)) : entry;
+  const raw = config.content;
+  if (Array.isArray(raw)) {
+    return { ...config, content: raw.map(resolve) };
+  }
+  return { ...config, content: { ...raw, files: raw.files.map(resolve) } };
 }
 
 async function run(plugins: postcss.AcceptedPlugin[], widgetDir: string): Promise<string> {

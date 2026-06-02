@@ -1,26 +1,9 @@
-// Ambient declarations for PostCSS plugins that ship no TypeScript types.
-// They are all PostCSS plugin factories; typing them as such keeps the
-// pipeline strictly typed without weakening the harness.
+// Ambient declaration for postcss-import, which ships no TypeScript types.
+// It is a PostCSS plugin factory; typing it as such keeps the pipeline strictly
+// typed without weakening the harness. (tailwindcss and autoprefixer ship their
+// own types and must not be shadowed here.)
 declare module 'postcss-import' {
   import type { PluginCreator } from 'postcss';
   const postcssImport: PluginCreator<unknown>;
   export default postcssImport;
-}
-
-declare module 'tailwindcss' {
-  import type { PluginCreator } from 'postcss';
-  export interface Config {
-    presets?: unknown[];
-    content?: string[] | { files: string[] } | Record<string, unknown>;
-    theme?: Record<string, unknown>;
-    plugins?: unknown[];
-  }
-  const tailwindcss: PluginCreator<Config>;
-  export default tailwindcss;
-}
-
-declare module 'autoprefixer' {
-  import type { PluginCreator } from 'postcss';
-  const autoprefixer: PluginCreator<unknown>;
-  export default autoprefixer;
 }
