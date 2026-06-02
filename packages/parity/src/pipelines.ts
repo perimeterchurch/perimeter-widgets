@@ -13,7 +13,7 @@ export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)
 /** Load a tailwind.config.ts and resolve its relative content globs against the
  * config's own directory (the build runs with cwd = that directory; the harness
  * does not, so globs must be made absolute to match). */
-async function loadTailwindConfig(dir: string): Promise<Config> {
+export async function loadTailwindConfig(dir: string): Promise<Config> {
   const mod = (await import(pathToFileURL(path.join(dir, 'tailwind.config.ts')).href)) as {
     default: Config;
   };
@@ -33,7 +33,13 @@ async function loadTailwindConfig(dir: string): Promise<Config> {
 }
 
 async function run(plugins: postcss.AcceptedPlugin[], widgetDir: string): Promise<string> {
-  const from = path.join(widgetDir, 'src/styles.css');
+  return runFrom(plugins, path.join(widgetDir, 'src/styles.css'));
+}
+
+/** Compile an arbitrary `@tailwind`-bearing CSS entry file through the given
+ * PostCSS plugin chain. `from` controls postcss-import resolution and the
+ * Tailwind base/components/utilities the file pulls in. */
+export async function runFrom(plugins: postcss.AcceptedPlugin[], from: string): Promise<string> {
   const source = readFileSync(from, 'utf8');
   const result = await postcss(plugins).process(source, { from });
   return result.css;
@@ -64,6 +70,33 @@ export async function compileUiOnlyCss(): Promise<string> {
   };
   return run(
     [postcssImport(), tailwindcss(config), autoprefixer()],
+    path.join(repoRoot, 'widgets/example'),
+  );
+}
+
+/** Components-path side (a): the STUDIO light-DOM pipeline as `ComponentPreview`
+ * runs it today — studio tailwind config (scans studio src + widgets + ui),
+ * processing the studio's own `src/styles.css`, no rem→px. This is the full
+ * studio sheet a `@perimeter/ui` component is styled by in the gallery. */
+export async function compileComponentDevCss(): Promise<string> {
+  const config = await loadTailwindConfig(path.join(repoRoot, 'studio'));
+  return runFrom(
+    [postcssImport(), tailwindcss(config), autoprefixer()],
+    path.join(repoRoot, 'studio/src/styles.css'),
+  );
+}
+
+/** Components-path side (b): what those same `@perimeter/ui` classes become
+ * inside a shipped widget — the widget (production) plugin chain (content =
+ * packages/ui/src only, + the real remToPxPlugin). */
+export async function compileComponentProdCss(): Promise<string> {
+  const base = await loadTailwindConfig(path.join(repoRoot, 'studio'));
+  const config: Config = {
+    ...base,
+    content: [path.join(repoRoot, 'packages/ui/src/**/*.{ts,tsx}')],
+  };
+  return run(
+    [postcssImport(), tailwindcss(config), autoprefixer(), remToPxPlugin],
     path.join(repoRoot, 'widgets/example'),
   );
 }

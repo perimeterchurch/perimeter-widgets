@@ -6,17 +6,21 @@ const PROPS = ['font-family', 'font-size', 'color', 'line-height'] as const;
 test('host-style inheritance through the shadow root', async ({ page }) => {
   await page.goto('http://localhost:4173/example.html');
   await page.waitForFunction(
-    () => !!document.querySelector('[data-perimeter-widget="example"]')?.shadowRoot?.firstElementChild,
+    () =>
+      !!document.querySelector('[data-perimeter-widget="example"]')?.shadowRoot?.firstElementChild,
   );
 
   const read = () =>
-    page.evaluate((props) => {
-      const shadow = document.querySelector('[data-perimeter-widget="example"]')!.shadowRoot!;
-      const el =
-        shadow.querySelector('p, h1, h2, h3, span, div div') ?? shadow.firstElementChild!;
-      const cs = getComputedStyle(el as Element);
-      return Object.fromEntries(props.map((p) => [p, cs.getPropertyValue(p)]));
-    }, [...PROPS]);
+    page.evaluate(
+      (props) => {
+        const shadow = document.querySelector('[data-perimeter-widget="example"]')!.shadowRoot!;
+        const el =
+          shadow.querySelector('p, h1, h2, h3, span, div div') ?? shadow.firstElementChild!;
+        const cs = getComputedStyle(el as Element);
+        return Object.fromEntries(props.map((p) => [p, cs.getPropertyValue(p)]));
+      },
+      [...PROPS],
+    );
 
   const before = await read();
   await page.addStyleTag({
