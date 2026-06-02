@@ -1,10 +1,12 @@
 // @vitest-environment happy-dom
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { z } from 'zod';
 import { ComponentPreview } from './ComponentPreview';
 import { ConfigPanel } from './ConfigPanel';
-import type { ComponentEntry } from '../lib/discovery';
+import { WidgetPreview } from './WidgetPreview';
+import { defineWidget } from '@perimeter/widget-runtime';
+import type { ComponentEntry, WidgetEntry } from '../lib/discovery';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 
 // Render-path regression guards. typecheck/build pass even when these crash at
@@ -42,5 +44,75 @@ describe('ConfigPanel', () => {
     } as unknown as WidgetDefinition;
     render(<ConfigPanel definition={def} overrides={{}} onChange={() => {}} />);
     expect(screen.getByText('perPage')).toBeTruthy();
+  });
+});
+
+describe('WidgetPreview config gate (studio configOverrides exercise the prod zod gate)', () => {
+  // mount() unconditionally constructs MPLocalStorageAuth, which reads localStorage.
+  // The studio test env (vite.config.ts, no --no-experimental-webstorage) leaves it
+  // undefined in the worker, so provide a minimal in-memory shim. The browser studio
+  // has real localStorage; this only fills the test-worker gap.
+  beforeAll(() => {
+    if (typeof globalThis.localStorage === 'undefined') {
+      const store = new Map<string, string>();
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: {
+          getItem: (k: string) => store.get(k) ?? null,
+          setItem: (k: string, v: string) => void store.set(k, v),
+          removeItem: (k: string) => void store.delete(k),
+          clear: () => store.clear(),
+          key: () => null,
+          get length() {
+            return store.size;
+          },
+        },
+      });
+    }
+  });
+
+  function entryFor(def: WidgetDefinition): WidgetEntry {
+    return {
+      slug: 'gate-test',
+      load: () => Promise.resolve({ default: def }),
+      loadCss: () => Promise.resolve({ default: '' }),
+    };
+  }
+
+  it('surfaces a visible error box (no white-screen) when configOverrides fail the schema', async () => {
+    const def = defineWidget({
+      name: 'gate-reject',
+      auth: 'none',
+      schema: z.object({ n: z.coerce.number().max(5).default(0) }),
+      App: ({ config }) => <p>{String(config.n)}</p>,
+    }) as unknown as WidgetDefinition;
+
+    render(
+      <WidgetPreview entry={entryFor(def)} configOverrides={{ n: '99' }} tokenOverrides={{}} />,
+    );
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy());
+    expect(screen.getByText(/n:/)).toBeTruthy();
+  });
+
+  it('applies the "true"/"false" shorthand end-to-end: string "false" reaches the App as false', async () => {
+    let received: boolean | undefined;
+    const def = defineWidget({
+      name: 'gate-bool',
+      auth: 'none',
+      schema: z.object({ hidden: z.coerce.boolean() }),
+      App: ({ config }) => {
+        received = config.hidden;
+        return <p data-testid="bool">{String(config.hidden)}</p>;
+      },
+    }) as unknown as WidgetDefinition;
+
+    render(
+      <WidgetPreview
+        entry={entryFor(def)}
+        configOverrides={{ hidden: 'false' }}
+        tokenOverrides={{}}
+      />,
+    );
+    await waitFor(() => expect(received).toBe(false));
   });
 });
