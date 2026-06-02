@@ -12,4 +12,4 @@ export { useApiClient } from './hooks/use-api-client';
 
 /** @internal Test helpers. */
 export { clearAll } from './registry';
-export { clearStyleCache } from './styling';
+export { applyStyles, type StyleHandle, countAppliedSheets, clearStyleCache } from './styling';

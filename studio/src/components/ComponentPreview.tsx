@@ -1,17 +1,6 @@
-import {
-  Component,
-  useEffect,
-  useState,
-  type ComponentType,
-  type CSSProperties,
-  type ReactNode,
-} from 'react';
-import { globalTokens, type ThemeToken } from '@perimeter/theme';
+import { Component, useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import type { ComponentEntry } from '../lib/discovery';
-
-const tokenStyle = Object.fromEntries(
-  (Object.keys(globalTokens) as ThemeToken[]).map((t) => [`--${t}`, globalTokens[t]]),
-) as CSSProperties;
+import { ComponentStage } from './ComponentStage';
 
 /**
  * Isolates each previewed component. Many @perimeter/ui components require props
@@ -52,15 +41,17 @@ export function ComponentPreview({ entry }: { entry: ComponentEntry }) {
   ) as [string, ComponentType][];
 
   return (
-    <div style={tokenStyle} className="flex flex-col gap-6 p-4">
-      {components.map(([name, Comp]) => (
-        <div key={name} className="rounded border p-4">
-          <div className="mb-2 text-xs text-gray-500">{name}</div>
-          <Isolate name={name}>
-            <Comp />
-          </Isolate>
-        </div>
-      ))}
-    </div>
+    <ComponentStage>
+      <div className="flex flex-col gap-6 p-4">
+        {components.map(([name, Comp]) => (
+          <div key={name} className="rounded border p-4">
+            <div className="mb-2 text-xs text-gray-500">{name}</div>
+            <Isolate name={name}>
+              <Comp />
+            </Isolate>
+          </div>
+        ))}
+      </div>
+    </ComponentStage>
   );
 }

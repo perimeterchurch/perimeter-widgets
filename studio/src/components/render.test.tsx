@@ -3,9 +3,10 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { z } from 'zod';
 import { ComponentPreview } from './ComponentPreview';
+import { ComponentStage } from './ComponentStage';
 import { ConfigPanel } from './ConfigPanel';
 import { WidgetPreview } from './WidgetPreview';
-import { defineWidget } from '@perimeter/widget-runtime';
+import { countAppliedSheets, defineWidget } from '@perimeter/widget-runtime';
 import type { ComponentEntry, WidgetEntry } from '../lib/discovery';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 
@@ -26,11 +27,37 @@ describe('ComponentPreview', () => {
       name: 'demo',
       load: () => Promise.resolve({ Good, Throws }),
     };
-    render(<ComponentPreview entry={entry} />);
+    const { container } = render(<ComponentPreview entry={entry} />);
+    // The gallery now renders inside the ComponentStage shadow root (H3), so
+    // testing-library's light-DOM `screen` cannot see it — query the shadow root.
+    const shadowText = () => container.querySelector('div')?.shadowRoot?.textContent ?? '';
     // Healthy component renders…
-    await waitFor(() => expect(screen.getByText('good-ok')).toBeTruthy());
+    await waitFor(() => expect(shadowText()).toContain('good-ok'));
     // …and the throwing one shows the isolated fallback instead of unmounting everything.
-    expect(screen.getByText(/standalone/i)).toBeTruthy();
+    expect(shadowText()).toMatch(/standalone/i);
+  });
+});
+
+describe('ComponentStage', () => {
+  it('renders children inside a shadow root with widget styling applied', async () => {
+    const { container } = render(
+      <ComponentStage>
+        <button className="p-4">x</button>
+      </ComponentStage>,
+    );
+    // Wait for the portal to mount its child into the shadow root.
+    await waitFor(() => {
+      const host = container.querySelector('div') as HTMLElement;
+      expect(host.shadowRoot).toBeTruthy();
+      expect(host.shadowRoot?.querySelector('button')).toBeTruthy();
+    });
+    const host = container.querySelector('div') as HTMLElement;
+    const shadow = host.shadowRoot as ShadowRoot;
+    // Widget sheet + token sheet — the same two layers a shipped widget applies.
+    expect(countAppliedSheets(shadow)).toBe(2);
+    // The button is inside the shadow root, NOT in the light DOM under the host.
+    expect(shadow.querySelector('button')?.textContent).toBe('x');
+    expect(host.querySelector('button')).toBeNull();
   });
 });
 
