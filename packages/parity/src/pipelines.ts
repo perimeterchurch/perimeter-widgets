@@ -53,11 +53,13 @@ export async function compileProdCss(widgetDir: string): Promise<string> {
 }
 
 /** Dev (studio) pipeline: the STUDIO's tailwind config (content also scans
- * widgets/* and packages/ui) + autoprefixer. No rem→px — exactly what the Vite
- * dev server applies to a widget's styles.css?inline import. */
+ * widgets/* and packages/ui) + autoprefixer + the real remToPxPlugin. Since the
+ * H1 fix the studio Vite config runs the same rem→px transform a shipped widget
+ * gets (studio/vite.config.ts), so this mirror must too — the dev pipeline
+ * definition must always equal what the studio actually runs. */
 export async function compileDevCss(widgetDir: string): Promise<string> {
   const config = await loadTailwindConfig(path.join(repoRoot, 'studio'));
-  return run([postcssImport(), tailwindcss(config), autoprefixer()], widgetDir);
+  return run([postcssImport(), tailwindcss(config), autoprefixer(), remToPxPlugin], widgetDir);
 }
 
 /** Classes generated for @perimeter/ui source alone — used to attribute
@@ -76,12 +78,14 @@ export async function compileUiOnlyCss(): Promise<string> {
 
 /** Components-path side (a): the STUDIO light-DOM pipeline as `ComponentPreview`
  * runs it today — studio tailwind config (scans studio src + widgets + ui),
- * processing the studio's own `src/styles.css`, no rem→px. This is the full
- * studio sheet a `@perimeter/ui` component is styled by in the gallery. */
+ * processing the studio's own `src/styles.css`, + the real remToPxPlugin. Since
+ * the H1 fix the studio Vite config applies rem→px to every sheet it serves
+ * (studio/vite.config.ts), so the gallery sheet gets it too — this mirror must
+ * match what the studio actually runs. */
 export async function compileComponentDevCss(): Promise<string> {
   const config = await loadTailwindConfig(path.join(repoRoot, 'studio'));
   return runFrom(
-    [postcssImport(), tailwindcss(config), autoprefixer()],
+    [postcssImport(), tailwindcss(config), autoprefixer(), remToPxPlugin],
     path.join(repoRoot, 'studio/src/styles.css'),
   );
 }

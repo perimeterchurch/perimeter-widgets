@@ -33,6 +33,12 @@ describe('css pipelines', () => {
     // The studio config scans packages/ui/src, so ui-component color utilities
     // (var(--color-…) references) ARE generated in dev — the other half of H2.
     expect(css).toContain('var(--color-');
-    expect(css).toMatch(/\.p-4\s*\{[^}]*padding:\s*1rem/); // and no rem→px in dev (H1)
+    // Since the H1 fix, the studio pipeline runs the same rem→px transform the
+    // shipped bundle gets, so dev values are px too — the studio no longer lies.
+    // (Like the prod test, scope the rem check to declaration VALUES: Tailwind
+    // arbitrary-value class names such as `ml-[-0.3rem]` carry `rem` in the
+    // SELECTOR, which is a class-name token out of remToPxPlugin's scope.)
+    expect(css).toMatch(/\.p-4\s*\{[^}]*padding:\s*16px/);
+    expect(remInDeclarationValues(css)).toEqual([]);
   }, 60_000);
 });

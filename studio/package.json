@@ -19,6 +19,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@perimeter/vite-plugin-widget": "workspace:*",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
     "@types/react": "^19.0.7",
