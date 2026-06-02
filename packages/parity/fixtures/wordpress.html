@@ -1,0 +1,54 @@
+<!doctype html>
+<!--
+  WordPress host-page fixture — the single source of truth for "production page"
+  styling in parity work (audit + the studio host-page-sim background).
+
+  provenance: derived from https://perimeter.org on 2026-06-02 via headless
+  Chromium (getComputedStyle on the live page; the page 403s plain curl, so a
+  Playwright scratch read was used). Measured values:
+    - document.documentElement font-size .... 16px
+    - body font-size ........................ 19px
+    - body font-family ...................... sweet-sans-pro (custom web font;
+        fixture uses a generic sans-serif stack as the local stand-in — the
+        actual face is not loaded here, only the inherited declaration matters)
+    - body color ............................ rgb(53, 53, 53)  -> #353535
+    - body line-height ...................... 35px (≈1.84 at 19px)
+    - body background-color ................. rgb(255, 255, 255) -> #ffffff
+    - main content container (.container):
+        max-width ........................... 1425px
+        padding-left / padding-right ........ 90px
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Widget parity fixture</title>
+    <style>
+      /* DERIVED VALUES — measured from https://perimeter.org on 2026-06-02 */
+      html {
+        font-size: 16px;
+      }
+      body {
+        margin: 0;
+        font-family: 'sweet-sans-pro', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 19px;
+        line-height: 35px;
+        color: #353535;
+        background: #ffffff;
+      }
+      .content {
+        max-width: 1425px;
+        margin: 0 auto;
+        padding: 0 90px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <h1>Fixture page</h1>
+      <p>Surrounding host copy, so inherited styles are realistic.</p>
+      <div data-perimeter-widget="__WIDGET__"></div>
+    </div>
+    <script src="/loader.js" async></script>
+  </body>
+</html>
