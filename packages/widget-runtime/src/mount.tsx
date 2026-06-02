@@ -4,7 +4,7 @@ import { createApiClient } from '@perimeter/api-client';
 import { resolveTokens } from '@perimeter/theme';
 import type { z } from 'zod';
 import type { WidgetDefinition } from './define-widget';
-import { parseDataAttrs } from './data-attrs';
+import { parseDataAttrs, applyBoolShorthand } from './data-attrs';
 import { applyStyles } from './styling';
 import { deregisterInstance, registerInstance, type InstanceHandle } from './registry';
 import { AuthProviderProvider } from './providers/auth-provider';
@@ -46,10 +46,18 @@ export function mount<S extends z.ZodTypeAny>(
 ): MountedWidget {
   const parsed = parseDataAttrs(host, definition.schema);
   const dataAttrThemeOverrides = parsed.themeOverrides;
-  const mergedConfig: Record<string, unknown> = {
+  // Studio `configOverrides` must clear the exact gates prod `data-*` attrs clear:
+  // the `"true"/"false"`→bool shorthand (which zod cannot replicate —
+  // `z.coerce.boolean()('false') === true`) and then full coercion/bounds/refinements
+  // via `schema.parse`. With no overrides this re-parses the already-parsed config
+  // (idempotent for this repo's schemas).
+  const overrides = Object.fromEntries(
+    Object.entries(extras.configOverrides ?? {}).map(([k, v]) => [k, applyBoolShorthand(v)]),
+  );
+  const mergedConfig: Record<string, unknown> = definition.schema.parse({
     ...(parsed.config as Record<string, unknown>),
-    ...(extras.configOverrides ?? {}),
-  };
+    ...overrides,
+  }) as Record<string, unknown>;
   let runtimeOverrides: Partial<Record<string, string>> = {};
 
   function tokenCss(): string {

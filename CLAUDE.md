@@ -4,6 +4,8 @@ Guidance for Claude Code working in this repository.
 
 ## Status
 
+**Picking this project up?** Start with the handoff: `docs/superpowers/2026-06-02-session-handoff.md` — current state, what's live, what's left, and the gotchas.
+
 **Phase 1 (streamline foundation) is the current shape.** The platform was rebuilt on a single mount path with a fast Vite studio: one `mount(host, definition, css, overrides?)` function drives both the production IIFE and the dev studio, CSS is imported as a `?inline` string and injected into the shadow root via a shared `CSSStyleSheet`, and there is no dual-render machinery and no build-time CSS codegen. A widget is built with the `widgetConfig({ name })` Vite-config helper plus an explicit per-widget `src/entry.ts`.
 
 Streamline design spec: `docs/superpowers/specs/2026-05-29-perimeter-widgets-streamline-redesign-design.md`

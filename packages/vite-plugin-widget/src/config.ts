@@ -1,6 +1,8 @@
-import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { UserConfig } from 'vite';
+import type { AcceptedPlugin } from 'postcss';
 
 /**
  * Self-contained PostCSS plugin: rewrite `<n>rem` lengths to `<n*16>px` so
@@ -8,7 +10,7 @@ import type { UserConfig } from 'vite';
  * once the widget renders inside a shadow root. No external dependency.
  */
 const REM_RE = /(-?[\d.]+)rem\b/g;
-const remToPxPlugin = {
+export const remToPxPlugin = {
   postcssPlugin: 'perimeter-rem-to-px',
   Declaration(decl: { value: string }) {
     if (decl.value.includes('rem')) {
@@ -28,6 +30,37 @@ export interface WidgetConfigOptions {
   version?: string | undefined;
   /** Package root. Defaults to process.cwd(). */
   root?: string | undefined;
+}
+
+/**
+ * Build the widget PostCSS chain explicitly.
+ *
+ * Vite 6 disables `postcss.config.js` auto-discovery the moment a config
+ * supplies inline `css.postcss.plugins`. Because `widgetConfig()` injects
+ * `remToPxPlugin` inline, the widget's `postcss.config.js` (tailwindcss +
+ * autoprefixer) silently never ran — the shipped bundle carried raw, uncompiled
+ * `@tailwind base/components/utilities` directives instead of compiled utility
+ * CSS, so NO Tailwind reached production (parity finding H2's real root cause,
+ * 2026-06-02). Declaring the full chain inline here (tailwindcss + autoprefixer
+ * + remToPxPlugin) is the single source of truth that actually ships.
+ *
+ * tailwindcss and autoprefixer are resolved from the widget `root` (each widget
+ * declares them), and tailwind is pointed at the widget's `tailwind.config.ts`.
+ */
+function widgetPostcssPlugins(root: string): AcceptedPlugin[] {
+  const require = createRequire(path.join(root, 'package.json'));
+  const tailwindcss = require('tailwindcss') as (opts?: unknown) => AcceptedPlugin;
+  const autoprefixer = require('autoprefixer') as (opts?: unknown) => AcceptedPlugin;
+
+  const tailwindConfig = ['tailwind.config.ts', 'tailwind.config.js']
+    .map((f) => path.join(root, f))
+    .find((p) => existsSync(p));
+
+  return [
+    tailwindcss(tailwindConfig ? { config: tailwindConfig } : undefined),
+    autoprefixer(),
+    remToPxPlugin,
+  ];
 }
 
 function readVersion(root: string): string {
@@ -58,7 +91,7 @@ export function widgetConfig(options: WidgetConfigOptions): UserConfig {
       'process.env.NODE_ENV': '"production"',
       __PERIMETER_WIDGET_VERSION__: JSON.stringify(version),
     },
-    css: { postcss: { plugins: [remToPxPlugin] } },
+    css: { postcss: { plugins: widgetPostcssPlugins(root) } },
     build: {
       lib: { entry, name: globalName, formats: ['iife'], fileName: () => 'index.js' },
       outDir: 'dist',

@@ -15,7 +15,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "quality": "turbo typecheck lint test && pnpm format:check",
-    "release": "tsx packages/release/src/cli.ts"
+    "release": "tsx packages/release/src/cli.ts",
+    "parity:css": "tsx packages/parity/src/report-css.ts",
+    "parity:components": "tsx packages/parity/src/report-components.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",

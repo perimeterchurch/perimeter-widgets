@@ -1,9 +1,19 @@
 // packages/vite-plugin-widget/tests/config.test.ts
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
-import { widgetConfig } from '../src/config';
+import { widgetConfig, remToPxPlugin } from '../src/config';
+
+// widgetConfig resolves tailwindcss + autoprefixer from the widget `root`, so
+// point it at a real widget dir (the reference `example` widget) where those
+// deps resolve — the plugin package itself does not declare them.
+const widgetRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../../widgets/example',
+);
 
 describe('widgetConfig', () => {
-  const cfg = widgetConfig({ name: 'demo', version: '1.2.3' });
+  const cfg = widgetConfig({ name: 'demo', version: '1.2.3', root: widgetRoot });
 
   it('builds src/entry.ts as a single IIFE named after the widget', () => {
     expect(cfg.build?.lib).toMatchObject({ formats: ['iife'] });
@@ -25,5 +35,23 @@ describe('widgetConfig', () => {
   it('outputs to dist with sourcemaps', () => {
     expect(cfg.build?.outDir).toBe('dist');
     expect(cfg.build?.sourcemap).toBe(true);
+  });
+
+  // Regression guard for parity finding H2's root cause: inline `css.postcss.plugins`
+  // disables Vite's postcss.config.js auto-discovery, so tailwindcss + autoprefixer
+  // MUST be declared inline here or NO Tailwind compiles into the shipped bundle.
+  it('runs the full PostCSS chain inline: tailwindcss + autoprefixer + remToPxPlugin', () => {
+    const postcss = cfg.css?.postcss;
+    const plugins =
+      postcss && typeof postcss !== 'string' && 'plugins' in postcss ? postcss.plugins : undefined;
+    expect(plugins).toBeDefined();
+    expect(plugins!.length).toBe(3);
+    const names = plugins!.map((p) =>
+      typeof p === 'function' ? p.name : (p as { postcssPlugin?: string }).postcssPlugin,
+    );
+    expect(names).toContain('tailwindcss');
+    expect(names).toContain('autoprefixer');
+    // remToPxPlugin must run LAST so it rewrites rem in the compiled utility CSS.
+    expect(plugins![plugins!.length - 1]).toBe(remToPxPlugin);
   });
 });

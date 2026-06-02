@@ -7,6 +7,16 @@ function kebabToCamel(s: string): string {
   return s.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 }
 
+/**
+ * The `"true"/"false"`→bool shorthand prod applies to string `data-*` values.
+ * zod's `z.coerce.boolean()` CANNOT replace this (`Boolean('false') === true`),
+ * so studio `configOverrides` must run it before re-validation to match prod.
+ * Returns the boolean for the exact strings `'true'`/`'false'`, the value untouched otherwise.
+ */
+export function applyBoolShorthand(value: unknown): unknown {
+  return value === 'true' ? true : value === 'false' ? false : value;
+}
+
 export interface ParsedAttrs<T> {
   config: T;
   themeOverrides: Record<string, string>;
@@ -28,7 +38,7 @@ export function parseDataAttrs<S extends z.ZodTypeAny>(
       continue;
     }
     const key = kebabToCamel(name.slice('data-'.length));
-    rawConfig[key] = attr.value === 'true' ? true : attr.value === 'false' ? false : attr.value;
+    rawConfig[key] = applyBoolShorthand(attr.value);
   }
 
   const config = schema.parse(rawConfig) as z.infer<S>;

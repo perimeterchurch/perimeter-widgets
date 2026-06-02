@@ -1,1 +1,1 @@
-export { widgetConfig, type WidgetConfigOptions } from './config.ts';
+export { widgetConfig, remToPxPlugin, type WidgetConfigOptions } from './config.ts';
