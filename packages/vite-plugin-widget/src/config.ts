@@ -8,7 +8,7 @@ import type { UserConfig } from 'vite';
  * once the widget renders inside a shadow root. No external dependency.
  */
 const REM_RE = /(-?[\d.]+)rem\b/g;
-const remToPxPlugin = {
+export const remToPxPlugin = {
   postcssPlugin: 'perimeter-rem-to-px',
   Declaration(decl: { value: string }) {
     if (decl.value.includes('rem')) {
