@@ -8,17 +8,17 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 
 ## Packages
 
-| Package                         | Role                                                                          |
-| ------------------------------- | ----------------------------------------------------------------------------- |
-| `@perimeter/theme`              | Design tokens (px radii), `resolveTokens`, `rewriteRootToHost`                |
-| `@perimeter/widget-runtime`     | `mount`, `autoMount`, `defineWidget`, shadow `styling` module                 |
-| `@perimeter/vite-plugin-widget` | `widgetConfig()` Vite-config helper (rem→px, IIFE build)                      |
-| `@perimeter/auth`               | Auth providers                                                                |
-| `@perimeter/api-client`         | Typed API client (`fetchJson`, `serializeQuery`, `useApiClient`)              |
-| `@perimeter/api-hooks`          | React Query hooks + generated perimeter-api operation types                   |
-| `@perimeter/ui`                 | shadcn-based component library + `cn` + hooks                                 |
-| `@perimeter/release`            | Dev-only tooling behind `pnpm release` + `pnpm create-widget` (nothing ships) |
-| `@perimeter/parity`             | Dev-only dev↔prod parity reports (`parity:css`, `parity:components`)          |
+| Package                         | Role                                                                                                       |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `@perimeter/theme`              | Design tokens (px radii), `resolveTokens`, `rewriteRootToHost`                                             |
+| `@perimeter/widget-runtime`     | `mount`, `autoMount`, `defineWidget`, shadow `styling` module, `useApiClient`                              |
+| `@perimeter/vite-plugin-widget` | `widgetConfig()` Vite-config helper (rem→px, IIFE build)                                                   |
+| `@perimeter/auth`               | Auth providers                                                                                             |
+| `@perimeter/api-client`         | Typed API client (`createApiClient`, `ApiClient`, `ApiClientConfig`)                                       |
+| `@perimeter/api-hooks`          | React Query hooks + generated perimeter-api operation types; internal `fetchJson`/`serializeQuery` helpers |
+| `@perimeter/ui`                 | shadcn-based component library + `cn` + hooks                                                              |
+| `@perimeter/release`            | Dev-only tooling behind `pnpm release` + `pnpm create-widget` (nothing ships)                              |
+| `@perimeter/parity`             | Dev-only dev↔prod parity reports (`parity:css`, `parity:components`)                                       |
 
 `studio/` is the Vite studio app (dev harness + deployed design-system site). `widgets/example` is the reference widget; `widgets/sermons` is the first production widget. `cdn/` is the committed static hosting directory, deployed as its own Vercel project (see `docs/hosting-and-release.md`).
 
@@ -49,7 +49,7 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 
 ## Building a widget
 
-Start at `docs/creating-a-widget.md` for the copy-the-example on-ramp; the **`creating-a-widget`** Claude skill (`.claude/skills/creating-a-widget/SKILL.md`) orchestrates the full path (MP data → perimeter-api endpoint → regenerated api-hooks types → scaffold → style → test → release).
+Start at `docs/creating-a-widget.md` for the copy-the-example on-ramp; it walks the full path (MP data → perimeter-api endpoint → regenerated api-hooks types → scaffold → style → test → release). A `creating-a-widget` Claude skill that orchestrates this end-to-end is planned; once it ships, invoke it when asked to build or add a widget.
 
 ## Doc pointers
 
@@ -61,4 +61,4 @@ Start at `docs/creating-a-widget.md` for the copy-the-example on-ramp; the **`cr
 
 ## History
 
-The phase-by-phase streamline + overhaul narrative (streamline rebuild, sermons port, hosting/release, cutover, the studio/DX overhaul) lives in `docs/superpowers/2026-06-02-session-handoff.md` and the plans/specs under `docs/superpowers/`. Pre-rebuild code is archived at the `legacy/v1` branch.
+The phase-by-phase streamline + overhaul narrative (streamline rebuild, sermons port, hosting/release, cutover, the studio/DX overhaul) lives in `docs/superpowers/2026-06-02-session-handoff.md` and the plans/specs under `docs/superpowers/`.
