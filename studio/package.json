@@ -11,17 +11,21 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@mdx-js/react": "^3.1.1",
     "@perimeter/theme": "workspace:*",
     "@perimeter/ui": "workspace:*",
     "@perimeter/widget-runtime": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router": "^7.16.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@mdx-js/rollup": "^3.1.1",
     "@perimeter/vite-plugin-widget": "workspace:*",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
+    "@types/mdx": "^2.0.13",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",

@@ -126,9 +126,6 @@ gh pr create --base dev   # then a dev → main release PR
 
 ## 7. Optional — deploy the studio gallery → `style.perimeter.org`
 
-The studio is a Vite app that depends on workspace packages, so it builds from the monorepo:
-
-- New Vercel project — **Root Directory: `studio`**, **Framework: Vite**, **Build Command: `pnpm build`** (or `vite build`), **Output Directory: `dist`**. Vercel detects the pnpm workspace and installs from the repo root.
-- Attach `style.perimeter.org`.
+The studio is a Vite app that imports workspace packages, so it **builds from the repo root** (not from `studio/`) and has its own runbook — including the dashboard-only Build/Output settings and a post-deploy smoke checklist: **[`deploying-studio.md`](./deploying-studio.md)**.
 
 > ⚠️ Confirm whether `style.perimeter.org` already points at an existing project before repointing the domain.

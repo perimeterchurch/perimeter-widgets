@@ -1,0 +1,36 @@
+# Badge
+
+A small, non-interactive label for status, counts, and categories. Renders a `<span>` by default and stays compact (a fixed pill height) so it sits inline with text and headings.
+
+<Example label="Variants">
+  <div className="flex flex-wrap items-center gap-3">
+    <Badge>Default</Badge>
+    <Badge variant="secondary">Secondary</Badge>
+    <Badge variant="destructive">Overdue</Badge>
+    <Badge variant="outline">Draft</Badge>
+    <Badge variant="ghost">Muted</Badge>
+  </div>
+</Example>
+
+## Usage
+
+```tsx
+import { Badge } from '@perimeter/ui/badge';
+
+<Badge variant="secondary">New</Badge>;
+```
+
+Because it is a label, not an action, prefer it for read-only context (a sermon series tag, an unread count, a status). For something clickable, use a Button with `variant="link"` instead. Render as a link only when the whole badge navigates:
+
+```tsx
+<Badge render={<a href="/series/advent" />}>Advent</Badge>
+```
+
+## Props
+
+| Prop      | Type                                                                  | Default     | Description                                                                       |
+| --------- | --------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------------- |
+| `variant` | `'default' \| 'secondary' \| 'destructive' \| 'outline' \| 'ghost' \| 'link'` | `'default'` | Visual style. `default` is the accent pill; `outline` is the quiet, bordered one. |
+| `render`  | `ReactElement`                                                        | —           | Render as a different element (e.g. an anchor) instead of the default `<span>`.   |
+
+All other native `<span>` attributes pass through.

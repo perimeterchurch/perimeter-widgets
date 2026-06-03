@@ -1,36 +1,10 @@
-import { z } from 'zod';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
+import { unwrapObject } from '../lib/schema-shape';
 
 interface Props {
   definition: WidgetDefinition;
   overrides: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
-}
-
-/**
- * Reach the underlying ZodObject through wrappers so refined schemas still get
- * per-field inputs. A `z.object({...}).refine(...)` (e.g. sermons) is a ZodEffects,
- * not a ZodObject — without unwrapping, the panel falls back to a useless JSON box.
- */
-function unwrapObject(schema: z.ZodTypeAny): z.ZodObject<z.ZodRawShape> | null {
-  let current: z.ZodTypeAny = schema;
-  for (let i = 0; i < 10; i++) {
-    if (current instanceof z.ZodObject) return current as z.ZodObject<z.ZodRawShape>;
-    // zod's wrapper unwrap methods are typed loosely (effectively `any`); the runtime
-    // values are ZodTypeAny, so this walk is safe.
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-    if (current instanceof z.ZodEffects) {
-      current = current.innerType();
-    } else if (current instanceof z.ZodDefault) {
-      current = current.removeDefault();
-    } else if (current instanceof z.ZodOptional || current instanceof z.ZodNullable) {
-      current = current.unwrap();
-    } else {
-      return null;
-    }
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment */
-  }
-  return null;
 }
 
 export function ConfigPanel({ definition, overrides, onChange }: Props) {
