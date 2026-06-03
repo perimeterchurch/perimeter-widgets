@@ -51,3 +51,51 @@ export function buildRewrites(manifest: Manifest): Rewrite[] {
       destination: `/${name}/${manifest[name]}/index.js`,
     }));
 }
+
+export type BumpLevel = 'patch' | 'minor' | 'major';
+
+/** Bump a semver core (drops any prerelease). Throws on a non-numeric version. */
+export function nextVersion(current: string, level: BumpLevel): string {
+  const core = current.split('-')[0]!;
+  const parts = core.split('.').map((n) => Number.parseInt(n, 10));
+  if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) {
+    throw new Error(`cannot bump non-semver version: "${current}"`);
+  }
+  let [maj, min, pat] = parts as [number, number, number];
+  if (level === 'major') {
+    maj += 1;
+    min = 0;
+    pat = 0;
+  } else if (level === 'minor') {
+    min += 1;
+    pat = 0;
+  } else {
+    pat += 1;
+  }
+  return `${maj}.${min}.${pat}`;
+}
+
+export function releaseBranch(name: string, version: string): string {
+  return `release/${name}-${version}`;
+}
+
+export interface ReleasePrInput {
+  name: string;
+  version: string;
+  gzBytes?: number | undefined;
+}
+
+export function releasePrBody(input: ReleasePrInput): string {
+  const size = input.gzBytes != null ? `${(input.gzBytes / 1024).toFixed(1)} KiB gz` : 'n/a';
+  return [
+    `## Release ${input.name}@${input.version}`,
+    '',
+    `Built widget bundle published to \`cdn/${input.name}/${input.version}/\`, manifest + \`latest.js\` rewrite updated, pruned to the last 5 versions.`,
+    '',
+    `- Bundle size: ${size}`,
+    '- Promote: merge this PR into `dev`; the batched `dev → main` release deploys it.',
+    '- Rollback: revert the release commit or use Vercel Instant Rollback.',
+    '',
+    '🤖 Generated with [Claude Code](https://claude.com/claude-code)',
+  ].join('\n');
+}
