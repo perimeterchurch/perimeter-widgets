@@ -63,15 +63,17 @@ Individual checks:
 
 ## Documentation Maintenance
 
-When creating or modifying widgets, shared components, or architecture, update the relevant doc in `docs/`:
+When creating or modifying widgets, components, or architecture, update the relevant doc in `docs/`:
 
-- New widget → add `docs/widgets/<name>.md`
-- New shared component → update `docs/architecture/shared-package.md`
+- New widget → the scaffolder stubs `docs/widgets/<name>.mdx`; fill it in
+- New `@perimeter/ui` component → add `docs/components/<name>.mdx` (renders live at `/components/:name`)
 - Architecture changes → update `docs/architecture/overview.md`
+
+Docs are single-sourced: humans read them at `style.perimeter.org`, and Claude reads the same markdown. The `docs/` tree is `.prettierignore`d, so `pnpm format` does not touch it — MDX validity is proven by the studio build (`pnpm --filter @perimeter/studio build`).
 
 ---
 
 ## Related Docs
 
 - [Developer Setup](developer-setup.md) — Environment, commands
-- [Adding a Widget](adding-a-widget.md) — Widget creation workflow
+- [Creating a widget](../creating-a-widget.md) — Widget creation workflow

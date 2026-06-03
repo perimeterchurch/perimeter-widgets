@@ -1,8 +1,7 @@
 # Authentication
 
-> **Scope:** MP OAuth token from WordPress, auth flow, localStorage keys, widget auth patterns
-> **Key files:** `packages/shared/src/auth/mp-token.tsx`
-> **Last verified:** 2026-03-18
+> **Scope:** MP OAuth token from WordPress, auth modes, localStorage keys, widget auth patterns
+> **Key files:** `packages/auth/src/mp-local-storage-auth.ts`, `packages/widget-runtime/src/hooks/use-auth.ts`
 
 ---
 
@@ -21,18 +20,7 @@ Widgets read the Ministry Platform OAuth token from `localStorage`, set by WordP
 
 These keys are set by the [MP Custom Widgets](https://github.com/MinistryPlatform-Community/MPCustomWidgets) authentication system (`forceLogin.js`).
 
----
-
-## Token Validation
-
-`getMPToken()` validates the token before use:
-
-1. Token must exist in localStorage
-2. Token must not be the string `"null"`
-3. Token must be at least 10 characters
-4. If `mpp-widgets_ExpiresAfter` exists, token must not be expired
-
-Returns `{ authenticated: true, token }` or `{ authenticated: false }`.
+`MPLocalStorageAuth` (in `@perimeter/auth`) reads these keys, validating that the token exists, is not the literal string `"null"`, and is not past the `mpp-widgets_ExpiresAfter` expiry before treating the user as authenticated.
 
 ---
 
@@ -48,49 +36,48 @@ Widget loads → getMPToken() → token exists & valid?
 
 ---
 
-## Public vs Authenticated Widgets
+## Auth modes
 
-### Public widgets (most widgets)
+`defineWidget({ auth })` takes an `AuthMode`:
+
+| Mode         | Behavior                                                                                  |
+| ------------ | ----------------------------------------------------------------------------------------- |
+| `'none'`     | Auth is skipped entirely. No token is read or attached. (Most widgets, e.g. `sermons`.)   |
+| `'optional'` | The token is read if present and attached to API requests, but the widget renders either way. |
+| `'required'` | The widget needs a signed-in user; render a sign-in prompt when no valid token is present. |
 
 ```tsx
-mountWidget({
-    elementId: 'perimeter-sermons',
-    component: SermonsApp,
-    styles,
-    requiresAuth: false, // default
+import { defineWidget } from '@perimeter/widget-runtime';
+import { z } from 'zod';
+import { App } from './app';
+
+export default defineWidget({
+    name: 'my-giving',
+    auth: 'required',
+    schema: z.object({ campaign: z.string().optional() }),
+    App: ({ config, auth }) => <App config={config} auth={auth} />,
 });
 ```
 
-Auth is skipped entirely. No token is read or attached.
-
-### Authenticated widgets
-
-```tsx
-mountWidget({
-    elementId: 'perimeter-my-giving',
-    component: MyGivingApp,
-    styles,
-    requiresAuth: true,
-});
-```
-
-The `AuthProvider` reads the token and exposes it via `useAuth()`. The API client attaches `Authorization: Bearer <token>` to requests.
+When `auth` is `'optional'` or `'required'`, the active `AuthProvider` reads the token and the API client attaches `Authorization: Bearer <token>` to requests.
 
 ### Using auth in components
 
 ```tsx
-import { useAuth } from '@perimeter-widgets/shared';
+import { useAuth } from '@perimeter/widget-runtime';
 
 function MyComponent() {
-    const { authenticated, token, refresh } = useAuth();
+    const auth = useAuth();
 
-    if (!authenticated) {
+    if (!auth.isAuthenticated()) {
         return <p>Please sign in to view this content.</p>;
     }
 
     return <div>Authenticated content here</div>;
 }
 ```
+
+The `App` component also receives the same provider directly via its `auth` prop (`App: ({ config, auth }) => …`).
 
 ---
 
@@ -108,13 +95,13 @@ If the token expires during an active session:
 
 ## Cross-Tab Sync
 
-The `AuthProvider` listens for `storage` events. If the user logs in or out in another tab, the auth state updates automatically without a page refresh.
+`MPLocalStorageAuth` listens for `storage` events and exposes `onChange(cb)`. If the user logs in or out in another tab, subscribers are notified and the auth state updates without a page refresh.
 
 ---
 
 ## API Request Auth
 
-The API client attaches the token when `requiresAuth: true`:
+For an `'optional'`/`'required'` widget, the API client attaches the token to requests:
 
 ```
 fetch('https://api.perimeter.org/api/endpoint', {
@@ -131,5 +118,5 @@ The perimeter-api `authenticate()` function accepts this as an OAuth JWT bearer 
 
 ## Related Docs
 
-- [Shared Package](../architecture/shared-package.md) — Auth utility implementation
+- [Architecture Overview](../architecture/overview.md) — the single mount path and auth seam
 - [perimeter-api Authentication](../../perimeter-api/docs/guides/authentication.md) — Server-side auth details

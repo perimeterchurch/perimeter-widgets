@@ -1,51 +1,35 @@
 # Testing Guide
 
-> **Scope:** Vitest setup, widget test patterns, mocking, jsdom quirks
-> **Key files:** `packages/vite-preset/src/test-setup.ts`, `packages/shared/vitest.config.ts`
-> **Last verified:** 2026-03-18
+> **Scope:** Vitest setup, widget test patterns, mocking API hooks, the bundle-budget guard
+> **Key files:** `widgets/<name>/vitest.config.ts`, `widgets/<name>/tests/setup.ts`
 
 ---
 
 ## Setup
 
-- **Framework:** Vitest with jsdom environment
-- **Globals:** Enabled — `describe`, `it`, `expect`, `vi`, `beforeEach` available without import
-- **DOM matchers:** `@testing-library/jest-dom/vitest` loaded via shared `test-setup.ts`
-- **React rendering:** `@testing-library/react` for component tests
+- **Framework:** Vitest with the `jsdom` environment.
+- **Per-widget config:** each widget owns a small `vitest.config.ts` (`environment: 'jsdom'`, `include: ['tests/**/*.test.{ts,tsx}']`, `setupFiles: ['./tests/setup.ts']`).
+- **Setup file:** `tests/setup.ts` imports `@testing-library/jest-dom/vitest` and calls Testing Library's `cleanup()` in `afterEach`.
+- **React rendering:** `@testing-library/react` (`render`, `screen`, `renderHook`) + `@testing-library/user-event`.
 
 ### Commands
 
+Tests run through Turborepo from the root:
+
 ```bash
-pnpm test                              # Run all tests (via Turborepo)
-pnpm test --filter=widget-sermons      # Run tests for a single widget
-pnpm test --filter=@perimeter-widgets/shared  # Run shared package tests
-
-# Inside a package directory:
-pnpm vitest run                        # Run all tests once
-pnpm vitest run src/__tests__/App.test.tsx  # Run a single file
-pnpm vitest --reporter verbose         # Verbose output
+pnpm test                                       # all tests
+pnpm test --filter=@perimeter/widget-sermons     # one widget
+pnpm test --filter=@perimeter/ui                 # one package
 ```
 
----
+Each widget/package also has a local `vitest run` script (`test`), so you can run a scoped suite directly:
 
-## Test Config
-
-### Widget tests
-
-Every widget uses `createWidgetTestConfig()` from the vite-preset:
-
-```typescript
-// packages/widget-sermons/vitest.config.ts
-import { createWidgetTestConfig } from '@perimeter-widgets/vite-preset';
-
-export default createWidgetTestConfig();
+```bash
+pnpm --filter @perimeter/widget-sermons exec vitest run
+pnpm --filter @perimeter/widget-sermons exec vitest run tests/App.test.tsx
 ```
 
-This configures jsdom, globals, React plugin, and jest-dom matchers.
-
-### Shared package tests
-
-The shared package has its own `vitest.config.ts` that references the same `test-setup.ts` for consistent matcher availability.
+> Packages with no local vitest binary delegate to `turbo test` — scope them with `--filter` rather than running `pnpm vitest` inside the directory.
 
 ---
 
@@ -53,79 +37,41 @@ The shared package has its own `vitest.config.ts` that references the same `test
 
 ### Testing widget components
 
-Wrap components in the same provider stack that `mountWidget()` uses:
+The new platform passes config in as a plain prop (the legacy `useConfig()`/`AuthProvider`/`ConfigProvider` stack is gone). Parse defaults from the widget's zod schema and render the component directly:
 
 ```tsx
 import { render, screen } from '@testing-library/react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import {
-    createQueryClient,
-    AuthProvider,
-    ConfigProvider,
-} from '@perimeter-widgets/shared';
+import { App } from '../src/App';
+import { SermonsConfigSchema } from '../src/types';
 
-function renderWithProviders(
-    ui: React.ReactElement,
-    config: Record<string, unknown> = {},
-) {
-    const queryClient = createQueryClient();
-    return render(
-        <QueryClientProvider client={queryClient}>
-            <AuthProvider requiresAuth={false}>
-                <ConfigProvider config={config}>{ui}</ConfigProvider>
-            </AuthProvider>
-        </QueryClientProvider>,
-    );
-}
-
-// Usage
-renderWithProviders(<SermonsApp />, { campus: 'buckhead', perPage: 12 });
-expect(screen.getByText('Sermons')).toBeInTheDocument();
+const config = SermonsConfigSchema.parse({}); // schema defaults
+render(<App config={config} />);
+expect(screen.getByRole('tab', { name: /sermons/i })).toBeInTheDocument();
 ```
 
-### Testing the API client
+### Mocking API hooks
 
-Mock `fetch` globally:
+Components that fetch through `@perimeter/api-hooks` need an `ApiClient` context the test doesn't provide. Mock the hooks with stable, query-result-shaped envelopes so the tree renders deterministically:
 
-```typescript
-global.fetch = vi.fn().mockResolvedValue({
-    ok: true,
-    status: 200,
-    json: () =>
-        Promise.resolve({
+```tsx
+vi.mock('@perimeter/api-hooks', () => ({
+    useSermons: () => ({
+        data: {
             success: true,
-            data: [{ id: 1, title: 'Test' }],
-        }),
-});
-
-const client = createApiClient({ baseUrl: 'https://api.test.com' });
-const result = await client.get('/api/endpoint');
-expect(result).toEqual([{ id: 1, title: 'Test' }]);
+            data: { sermons: [], pagination: { page: 1, perPage: 12, total: 0, totalPages: 0 } },
+        },
+        isLoading: false,
+        isError: false,
+        isSuccess: true,
+        error: null,
+    }),
+    // …mock the other hooks the component imports
+}));
 ```
 
-### Testing auth
+### The bundle-budget guard
 
-Mock localStorage with `vi.stubGlobal`:
-
-```typescript
-beforeEach(() => {
-    const store: Record<string, string> = {};
-    vi.stubGlobal('localStorage', {
-        getItem: (key: string) => store[key] ?? null,
-        setItem: (key: string, value: string) => {
-            store[key] = value;
-        },
-        removeItem: (key: string) => {
-            delete store[key];
-        },
-        clear: () => {
-            Object.keys(store).forEach((k) => delete store[k]);
-        },
-    });
-});
-```
-
-**Why not `localStorage.clear()`?** jsdom 26 on Node 25 has broken `localStorage` methods. The `vi.stubGlobal` approach works reliably.
+Every widget ships a `tests/bundle.test.ts` that builds the widget (`pnpm exec vite build`) and asserts the output: a single IIFE at `dist/index.js`, **no** separate `.css` asset (CSS is inlined), and that the bundle references the widget name and the `PerimeterWidgets` global. Per-widget gzipped size budgets are enforced here (sermons' budget is 900 KiB).
 
 ---
 
@@ -133,25 +79,18 @@ beforeEach(() => {
 
 ### Shadow DOM
 
-jsdom supports `attachShadow()` but with limitations. Shadow DOM tests focus on:
-
-- Shadow root creation
-- Style injection
-- Mount/unmount lifecycle
-- Re-mount safety (reusing existing shadow root)
-
-Content rendering inside shadow roots may not work fully in jsdom.
+jsdom supports `attachShadow()` but with limitations. Mount-path tests focus on shadow-root creation, style injection, and mount/unmount/re-mount lifecycle; full content rendering inside a shadow root may not work in jsdom, so component assertions render the React tree directly (as above) rather than through `mount()`.
 
 ### React async teardown
 
-Mount utility tests must call `destroy()` in `afterEach` to prevent React async rendering after jsdom has been torn down:
+Tests that exercise `mount()` must call the returned `destroy()` in `afterEach` to stop React from rendering after jsdom is torn down:
 
 ```typescript
-let mountResult: MountResult | null = null;
+let mounted: MountedWidget | null = null;
 
 afterEach(() => {
-    mountResult?.destroy();
-    mountResult = null;
+    mounted?.destroy();
+    mounted = null;
 });
 ```
 
@@ -159,15 +98,17 @@ afterEach(() => {
 
 ## Turborepo Caching
 
-Turborepo caches test results per package. Unchanged packages skip tests entirely on subsequent runs. To force a re-run:
+Turborepo caches test results per package — unchanged packages skip tests entirely on subsequent runs, which can mask a failure. Force a real re-run before trusting a CI-bound gate:
 
 ```bash
 pnpm test --force
+# or scoped:
+pnpm exec turbo run test --filter=@perimeter/studio --force
 ```
 
 ---
 
 ## Related Docs
 
-- [Vite Preset](../architecture/vite-preset.md) — Test config details
-- [Shared Package](../architecture/shared-package.md) — Utilities under test
+- [Developer Setup](developer-setup.md) — Commands and the studio
+- [Architecture Overview](../architecture/overview.md) — The mount path under test
