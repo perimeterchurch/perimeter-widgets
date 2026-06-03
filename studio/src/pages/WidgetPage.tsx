@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
 import { toWidgetEntries, widgetDefGlob, widgetCssGlob, type WidgetEntry } from '../lib/discovery';
 import { WidgetPreview } from '../components/WidgetPreview';
 import { HostFrame } from '../components/HostFrame';
+import { Canvas } from '../components/Canvas';
 import { ConfigPanel } from '../components/ConfigPanel';
 import { ThemeEditor } from '../components/ThemeEditor';
 import { NotFoundPage } from './NotFoundPage';
@@ -79,8 +80,9 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
       </header>
 
       <div className="grid flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[1fr_22rem]">
-        {/* Preview canvas — host-page-sim frame + the real mount(). */}
-        <div className="overflow-auto bg-muted/40 p-6">
+        {/* Preview canvas — viewport-preset toolbar around the host-page-sim
+            frame + the real mount(). Canvas owns the scroll/background. */}
+        <Canvas>
           <HostFrame>
             <WidgetPreview
               entry={entry}
@@ -89,7 +91,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
               onDefinition={setDef}
             />
           </HostFrame>
-        </div>
+        </Canvas>
 
         {/* Inspector — config / theme tabs + embed snippet. */}
         <aside className="overflow-y-auto border-t border-border p-4 xl:border-l xl:border-t-0">
