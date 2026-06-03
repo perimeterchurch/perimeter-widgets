@@ -83,13 +83,13 @@ jsdom supports `attachShadow()` but with limitations. Mount-path tests focus on 
 
 ### React async teardown
 
-Tests that exercise `mount()` must call the returned `destroy()` in `afterEach` to stop React from rendering after jsdom is torn down:
+Tests that exercise `mount()` must call the returned `unmount()` in `afterEach` to stop React from rendering after jsdom is torn down:
 
 ```typescript
 let mounted: MountedWidget | null = null;
 
 afterEach(() => {
-    mounted?.destroy();
+    mounted?.unmount();
     mounted = null;
 });
 ```

@@ -1,7 +1,7 @@
 # Architecture Overview
 
 > **Scope:** Monorepo structure, package roles, build pipeline, the single shadow-DOM mount path
-> **Key files:** `turbo.json`, `pnpm-workspace.yaml`, `packages/widget-runtime/src/mount.ts`
+> **Key files:** `turbo.json`, `pnpm-workspace.yaml`, `packages/widget-runtime/src/mount.tsx`
 
 ---
 
