@@ -83,7 +83,10 @@ export function widgetConfig(options: WidgetConfigOptions): UserConfig {
   const root = options.root ?? process.cwd();
   const version = options.version ?? readVersion(root);
   const entry = path.resolve(root, options.entry ?? 'src/entry.ts');
-  const globalName = options.globalName ?? `PerimeterWidget_${options.name}`;
+  // Widget names are kebab-case; an IIFE global must be a legal JS identifier,
+  // so map any non-identifier char (e.g. the hyphen in `event-list`) to `_`.
+  const safeName = options.name.replace(/[^A-Za-z0-9_$]/g, '_');
+  const globalName = options.globalName ?? `PerimeterWidget_${safeName}`;
 
   return {
     define: {

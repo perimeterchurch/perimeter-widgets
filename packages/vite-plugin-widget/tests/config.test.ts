@@ -26,6 +26,12 @@ describe('widgetConfig', () => {
     );
     expect(fileName).toBe('index.js');
   });
+  it('sanitizes the IIFE global name so a kebab-case widget name stays a legal identifier', () => {
+    const kebab = widgetConfig({ name: 'event-list', version: '1.0.0', root: widgetRoot });
+    expect((kebab.build!.lib as unknown as { name: string }).name).toBe(
+      'PerimeterWidget_event_list',
+    );
+  });
   it('pins NODE_ENV=production and injects the widget version', () => {
     expect(cfg.define).toMatchObject({
       'process.env.NODE_ENV': '"production"',
