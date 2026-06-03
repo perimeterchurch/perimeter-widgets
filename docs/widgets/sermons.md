@@ -218,7 +218,7 @@ The widget uses nuqs to sync state to the URL query string. Parameters:
 
 ## Auth
 
-Public widget — `requiresAuth: false`. No authentication needed.
+Public widget — `defineWidget({ auth: 'none' })`. No authentication needed.
 
 ---
 

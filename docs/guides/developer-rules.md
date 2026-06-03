@@ -2,7 +2,6 @@
 
 > **Scope:** Git workflow, pnpm, commit messages, quality checks
 > **Key files:** `CLAUDE.md`, `package.json`
-> **Last verified:** 2026-03-18
 
 ---
 

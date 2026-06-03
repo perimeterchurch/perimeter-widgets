@@ -82,7 +82,7 @@ WordPress Page
 3. `mount()` attaches an open shadow root (reused on re-mount for HMR).
 4. The `styling` module injects the compiled CSS via `adoptedStyleSheets` (with a `<style>` fallback) and rewrites `:root` → `:host`.
 5. A fresh, per-widget provider stack (QueryClient, auth, config) renders the React tree inside the shadow root.
-6. `mount()` returns a handle whose `destroy()` cleans up.
+6. `mount()` returns a handle whose `unmount()` cleans up.
 
 ### Config Resolution
 
