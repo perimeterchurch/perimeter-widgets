@@ -1,7 +1,9 @@
 import type { ReactNode, ComponentPropsWithoutRef } from 'react';
 import type { MDXComponents } from 'mdx/types.js';
 import { MDXProvider } from '@mdx-js/react';
-import { Card, CardContent } from '@perimeter/ui/card';
+import { Badge } from '@perimeter/ui/badge';
+import { Button } from '@perimeter/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@perimeter/ui/card';
 import { ComponentStage } from '../components/ComponentStage';
 
 /**
@@ -164,6 +166,17 @@ export const mdxComponents: MDXComponents = {
   // Live-doc building blocks authored directly in .mdx.
   ComponentStage,
   Example,
+  // @perimeter/ui components provided to MDX scope so component docs can render
+  // live examples WITHOUT per-file imports. Docs live at repo root (docs/*.mdx),
+  // outside any package, where bare workspace specifiers don't resolve — and
+  // import-free docs read more cleanly as plain markdown for Claude. Extend this
+  // map as docs land for more components (Phase 5).
+  Badge,
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
 };
 
 /**
