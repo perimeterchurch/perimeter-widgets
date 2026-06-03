@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState, type ComponentType } from 'react';
 import { useParams } from 'react-router';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
+import { Spinner } from '@perimeter/ui/spinner';
 import { toWidgetEntries, widgetDefGlob, widgetCssGlob, type WidgetEntry } from '../lib/discovery';
+import { widgetDoc } from '../lib/widget-docs';
+import { StudioMDXProvider } from '../lib/mdx';
 import { WidgetPreview } from '../components/WidgetPreview';
 import { Canvas } from '../components/Canvas';
 import { Inspector } from '../components/Inspector';
@@ -25,6 +28,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
   const [configOverrides, setConfigOverrides] = useState<Record<string, unknown>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [def, setDef] = useState<WidgetDefinition | null>(null);
+  const doc = widgetDoc(entry.slug);
 
   return (
     <div className="flex h-full flex-col">
@@ -33,7 +37,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
         <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-fg">{entry.slug}</h1>
       </header>
 
-      <div className="grid flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[1fr_22rem]">
+      <div className="grid min-h-[28rem] flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[1fr_22rem]">
         {/* Preview canvas — viewport-preset + background toolbar around the real
             mount(). Canvas owns the scroll/background and swaps in the host-page
             sim (HostFrame) when its host-sim background is selected (the default). */}
@@ -58,6 +62,38 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
           />
         </aside>
       </div>
+
+      {/* Optional widget doc: rendered below the canvas when docs/widgets/<slug>.mdx
+          exists — purpose, config reference, embed instructions. Nothing otherwise. */}
+      {doc ? (
+        <section className="border-t border-border">
+          <WidgetDoc loader={doc} />
+        </section>
+      ) : null}
     </div>
+  );
+}
+
+/**
+ * Renders the lazily-loaded per-widget MDX doc inside the studio's MDX provider,
+ * matching the guide/component doc treatment (own heading, comfortable measure,
+ * Suspense spinner while the async chunk streams in).
+ */
+function WidgetDoc({ loader }: { loader: () => Promise<{ default: ComponentType }> }) {
+  const Doc = useMemo(() => lazy(loader), [loader]);
+  return (
+    <StudioMDXProvider>
+      <article className="mx-auto max-w-3xl px-6 py-10">
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-16 text-muted-fg">
+              <Spinner />
+            </div>
+          }
+        >
+          <Doc />
+        </Suspense>
+      </article>
+    </StudioMDXProvider>
   );
 }

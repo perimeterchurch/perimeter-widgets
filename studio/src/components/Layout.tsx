@@ -2,6 +2,7 @@ import { Outlet } from 'react-router';
 import { useMemo } from 'react';
 import { Sidebar } from './Sidebar';
 import { buildNav } from '../lib/nav';
+import { listGuides } from '../lib/guide-docs';
 import {
   toWidgetEntries,
   toComponentEntries,
@@ -23,7 +24,8 @@ export function Layout() {
   const nav = useMemo(() => {
     const widgets = toWidgetEntries(widgetDefGlob, widgetCssGlob);
     const components = toComponentEntries(componentGlob);
-    return buildNav(widgets, components);
+    const guides = listGuides().map((g) => ({ slug: g.slug, label: g.title }));
+    return buildNav(widgets, components, guides);
   }, []);
 
   return (
