@@ -62,3 +62,67 @@ describe('Canvas viewport presets', () => {
     expect(frame().style.width).toBe('500px');
   });
 });
+
+describe('Canvas background toggle', () => {
+  function renderCanvas() {
+    const utils = render(
+      <Canvas>
+        <div data-testid="preview-child">preview content</div>
+      </Canvas>,
+    );
+    const ui = within(utils.container);
+    const surface = () => utils.container.querySelector('[data-canvas-surface]') as HTMLElement;
+    const frame = () => utils.container.querySelector(FRAME) as HTMLElement;
+    return { ...utils, ui, surface, frame };
+  }
+
+  it('offers White / Gray / Dark / Host-sim background options', () => {
+    const { ui } = renderCanvas();
+    const group = ui.getByRole('group', { name: /background/i });
+    const within_group = within(group);
+    expect(within_group.getByRole('button', { name: /white/i })).toBeTruthy();
+    expect(within_group.getByRole('button', { name: /gray/i })).toBeTruthy();
+    expect(within_group.getByRole('button', { name: /dark/i })).toBeTruthy();
+    expect(within_group.getByRole('button', { name: /host.?sim/i })).toBeTruthy();
+  });
+
+  it('selecting a background sets the canvas surface background', () => {
+    const { ui, surface } = renderCanvas();
+    const group = within(ui.getByRole('group', { name: /background/i }));
+
+    fireEvent.click(group.getByRole('button', { name: /white/i }));
+    expect(surface().style.background.toLowerCase()).toBe('#ffffff');
+
+    fireEvent.click(group.getByRole('button', { name: /dark/i }));
+    // A dark surface is distinctly not white.
+    expect(surface().style.background.toLowerCase()).not.toBe('#ffffff');
+    expect(surface().style.background).not.toBe('');
+  });
+
+  it('does NOT wrap children in a HostFrame unless host-sim is active', () => {
+    const { ui, getByTestId } = renderCanvas();
+    const group = within(ui.getByRole('group', { name: /background/i }));
+    fireEvent.click(group.getByRole('button', { name: /gray/i }));
+    const child = getByTestId('preview-child');
+    expect(child.closest('[data-host-frame]')).toBeNull();
+  });
+
+  it('selecting Host-sim wraps children in a HostFrame ancestor', () => {
+    const { ui, getByTestId } = renderCanvas();
+    const group = within(ui.getByRole('group', { name: /background/i }));
+    fireEvent.click(group.getByRole('button', { name: /host.?sim/i }));
+    const child = getByTestId('preview-child');
+    expect(child.closest('[data-host-frame]')).not.toBeNull();
+  });
+
+  it('keeps the width constraint working under any background', () => {
+    const { ui, frame } = renderCanvas();
+    fireEvent.click(
+      within(ui.getByRole('group', { name: /background/i })).getByRole('button', { name: /dark/i }),
+    );
+    fireEvent.click(
+      within(ui.getByRole('group', { name: /viewport/i })).getByRole('button', { name: /mobile/i }),
+    );
+    expect(frame().style.width).toBe('375px');
+  });
+});

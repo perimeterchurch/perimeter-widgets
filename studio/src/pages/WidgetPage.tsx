@@ -6,7 +6,6 @@ import { Button } from '@perimeter/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
 import { toWidgetEntries, widgetDefGlob, widgetCssGlob, type WidgetEntry } from '../lib/discovery';
 import { WidgetPreview } from '../components/WidgetPreview';
-import { HostFrame } from '../components/HostFrame';
 import { Canvas } from '../components/Canvas';
 import { ConfigPanel } from '../components/ConfigPanel';
 import { ThemeEditor } from '../components/ThemeEditor';
@@ -80,17 +79,16 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
       </header>
 
       <div className="grid flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[1fr_22rem]">
-        {/* Preview canvas — viewport-preset toolbar around the host-page-sim
-            frame + the real mount(). Canvas owns the scroll/background. */}
+        {/* Preview canvas — viewport-preset + background toolbar around the real
+            mount(). Canvas owns the scroll/background and swaps in the host-page
+            sim (HostFrame) when its host-sim background is selected (the default). */}
         <Canvas>
-          <HostFrame>
-            <WidgetPreview
-              entry={entry}
-              configOverrides={configOverrides}
-              tokenOverrides={tokenOverrides}
-              onDefinition={setDef}
-            />
-          </HostFrame>
+          <WidgetPreview
+            entry={entry}
+            configOverrides={configOverrides}
+            tokenOverrides={tokenOverrides}
+            onDefinition={setDef}
+          />
         </Canvas>
 
         {/* Inspector — config / theme tabs + embed snippet. */}
