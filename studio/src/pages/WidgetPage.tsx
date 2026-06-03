@@ -82,7 +82,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
         {/* Preview canvas — viewport-preset + background toolbar around the real
             mount(). Canvas owns the scroll/background and swaps in the host-page
             sim (HostFrame) when its host-sim background is selected (the default). */}
-        <Canvas>
+        <Canvas slug={entry.slug}>
           <WidgetPreview
             entry={entry}
             configOverrides={configOverrides}

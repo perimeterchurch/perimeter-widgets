@@ -3,6 +3,15 @@ import { Button } from '@perimeter/ui/button';
 import { Input } from '@perimeter/ui/input';
 import { cn } from '@perimeter/ui/utils/cn';
 import { HostFrame } from './HostFrame';
+import { BuiltBundlePreview } from './BuiltBundlePreview';
+
+/**
+ * The preview source: the live source-mounted widget (`mount()`, dev React + dev
+ * CSS) vs the shipped built IIFE in an iframe. "Built" is a DEV-only final
+ * pre-release check; the toggle and BuiltBundlePreview are gated behind
+ * `import.meta.env.DEV` so Rollup tree-shakes them out of the deployed site.
+ */
+type PreviewSource = 'source' | 'built';
 
 /**
  * Viewport-width presets for the preview canvas. `null` means fluid — the frame
@@ -47,11 +56,22 @@ type BackgroundId = (typeof BACKGROUNDS)[number]['id'];
  * The frame carries `data-canvas-frame` so the render test can read the resolved
  * inline width without coupling to the children's markup; the scroll surface
  * carries `data-canvas-surface` so the test can read the active background.
+ *
+ * `slug`, when present (the widget route), enables a DEV-only Source ⇄ Built
+ * toggle that swaps the source-mounted `children` for the shipped built IIFE
+ * (BuiltBundlePreview). The toggle never renders outside DEV.
  */
-export function Canvas({ children }: { children: ReactNode }) {
+export function Canvas({ children, slug }: { children: ReactNode; slug?: string }) {
   const [preset, setPreset] = useState<PresetId>('fluid');
   const [customPx, setCustomPx] = useState('');
   const [background, setBackground] = useState<BackgroundId>('host-sim');
+  const [source, setSource] = useState<PreviewSource>('source');
+
+  // DEV-only: the Built view requires a slug to resolve the on-disk bundle, and
+  // the whole feature must tree-shake out of the deployed build. import.meta.env.DEV
+  // is statically false in a prod build, so Rollup drops the toggle + iframe path.
+  const showBuiltToggle = import.meta.env.DEV && slug !== undefined;
+  const showBuilt = showBuiltToggle && source === 'built';
 
   const presetPx = PRESETS.find((p) => p.id === preset)?.px ?? null;
   const customActive = customPx.trim() !== '' && Number(customPx) > 0;
@@ -85,6 +105,42 @@ export function Canvas({ children }: { children: ReactNode }) {
             );
           })}
         </div>
+
+        {showBuiltToggle && (
+          <div className="flex items-center gap-2" role="group" aria-label="Preview source">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
+              Source
+            </span>
+            {/* Segmented control matching the background toggle: Source ⇄ Built. */}
+            <div className="flex items-center overflow-hidden rounded-md border border-border">
+              {(
+                [
+                  { id: 'source', label: 'Source' },
+                  { id: 'built', label: 'Built' },
+                ] as const
+              ).map((opt, i) => {
+                const isActive = source === opt.id;
+                return (
+                  <Button
+                    key={opt.id}
+                    type="button"
+                    size="sm"
+                    variant={isActive ? 'secondary' : 'ghost'}
+                    aria-pressed={isActive}
+                    onClick={() => setSource(opt.id)}
+                    className={cn(
+                      'rounded-none border-0',
+                      i > 0 && 'border-l border-border',
+                      !isActive && 'text-muted-fg',
+                    )}
+                  >
+                    {opt.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-2">
           <label
@@ -147,7 +203,16 @@ export function Canvas({ children }: { children: ReactNode }) {
 
       <div data-canvas-surface className="flex-1 overflow-auto p-6" style={{ background: surface }}>
         <div data-canvas-frame style={{ width, marginInline: 'auto' }}>
-          {hostSim ? <HostFrame>{children}</HostFrame> : children}
+          {/* Built view: the shipped IIFE in its own iframe document — it brings
+              its own host page, so it skips HostFrame. Source view keeps the
+              host-sim/background framing around the live mount. */}
+          {showBuilt && slug !== undefined ? (
+            <BuiltBundlePreview slug={slug} />
+          ) : hostSim ? (
+            <HostFrame>{children}</HostFrame>
+          ) : (
+            children
+          )}
         </div>
       </div>
     </div>
