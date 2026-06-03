@@ -33,15 +33,27 @@ cdn/
 
 Versioned bundles are cached for a year because their URL changes on every release. The manifest, the `latest.js` rewrites, and the loader are short-lived at the edge (`s-maxage=60` + SWR) so a manifest change propagates within ~a minute. `Access-Control-Allow-Origin: *` is set on every response because these load cross-origin from WordPress.
 
+## Creating a widget
+
+Scaffold a new widget with `pnpm create-widget <name>` (also in the `@perimeter/release` package). It renders `widgets/<name>/` from a real template (`package.json` at `0.0.0`, `vite.config.ts` with `widgetConfig({ name })`, the `src/` and `tests/` files), writes a stub `docs/widgets/<name>.mdx`, and runs `pnpm install` so the workspace graph picks up the new package. The workspace globs `widgets/*`, so there is no `pnpm-workspace.yaml` edit.
+
+> **Commit the updated `pnpm-lock.yaml`** the scaffold produces. The bump release below guards on a clean working tree, so an uncommitted lockfile would block it later.
+
+Full on-ramp + per-file walkthrough: [Creating a widget](./creating-a-widget.md).
+
 ## `pnpm release <name>`
 
-The release CLI lives in the `@perimeter/release` workspace package (`packages/release/`), so its logic is unit-tested inside the same `pnpm quality` gate as everything else. Pure helpers are in `src/release.ts`; the thin imperative entry is `src/cli.ts`. The root `package.json` wires `"release": "tsx packages/release/src/cli.ts"`.
+The release CLI lives in the `@perimeter/release` workspace package (`packages/release/`), so its logic is unit-tested inside the same `pnpm quality` gate as everything else. **Pure helpers** (version bump, branch name, PR body, manifest/rewrite/prune logic) are in `src/release.ts` and are fully unit-tested; the thin imperative **side-effect** entry (`fs` writes, `execSync` for `pnpm`/`git`/`gh`) is `src/cli.ts`. The root `package.json` wires `"release": "tsx packages/release/src/cli.ts"`.
+
+There are two modes.
+
+### Bare `pnpm release <name>` (unchanged — the batched/manual path)
 
 ```
 pnpm release <widget-name> [--force]
 ```
 
-What it does, in order:
+The original behavior, untouched. It uses the version **already in** `widgets/<name>/package.json` (set by hand), commits to the current branch, and does **not** push or open a PR. In order:
 
 1. Reads the widget version from `widgets/<name>/package.json`.
 2. Refuses if `cdn/<name>/<version>/` already exists (immutable) — bump the version, or pass `--force`.
@@ -52,13 +64,30 @@ What it does, in order:
 7. Prunes the widget's version directories to the newest 5.
 8. Commits everything under `cdn/` as `chore(release): <name>@<version>`.
 
-It does **not** push or open a PR — that's a human step. To ship a release: push the branch and open a PR into `dev`.
+To ship a bare release: push the branch and open a PR into `dev` yourself.
+
+### `pnpm release <name> --patch|--minor|--major` (one-command release)
+
+```
+pnpm release <widget-name> --patch | --minor | --major [--dry-run]
+```
+
+The one-command path. It does everything above **plus** owns the version bump and the branch/push/PR mechanics:
+
+1. Guards: the working tree must be clean (uncommitted changes abort), then `git fetch origin`.
+2. Branches off `origin/dev` as `release/<name>-<newVersion>`.
+3. Bumps `widgets/<name>/package.json` by the chosen level (`--patch`/`--minor`/`--major`).
+4. Runs the same shared core: build → copy to immutable `cdn/<name>/<version>/` → manifest + rewrites → prune to 5.
+5. Commits the bump + `cdn/` changes as `chore(release): <name>@<version>`.
+6. Pushes the branch and opens a PR into `dev` via `gh pr create --body-file` (generated body: version, gzipped bundle size, promote/rollback notes). You just review and merge.
+
+Add `--dry-run` to preview the planned version, branch, commit message, PR title, and PR body with **no** file writes, build, git, or `gh` side effects — useful in CI and before a real run. The bare form also accepts `--dry-run` to preview without committing.
 
 > The committed bundle artifacts (`cdn/*/*/index.js` and `.map`) are listed in `.prettierignore` — they are kept byte-for-byte as built and must never be reformatted.
 
 ## Promote
 
-A promotion is just the `manifest.json` change (and the regenerated `latest.js` rewrite) landing on the deployed branch. Run `pnpm release <name>` on a feature branch, open a PR, and merge. Once deployed, the edge picks up the new manifest within ~a minute and `loader.js` (and any `latest.js` consumers) resolve to the new version. Old direct-versioned `<script>` URLs keep working until pruned.
+A promotion is just the `manifest.json` change (and the regenerated `latest.js` rewrite) landing on `dev`. With `pnpm release <name> --patch|--minor|--major` the branch and PR are opened for you — just merge the PR into `dev`. (With the bare `pnpm release <name>`, push the branch and open the PR yourself.) Once merged and deployed, the edge picks up the new manifest within ~a minute and `loader.js` (and any `latest.js` consumers) resolve to the new version. Old direct-versioned `<script>` URLs keep working until pruned. The batched `dev → main` release-PR flow is unchanged.
 
 ## Roll back
 
