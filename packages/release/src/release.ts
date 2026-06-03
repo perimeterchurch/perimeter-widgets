@@ -85,6 +85,81 @@ export interface ReleasePrInput {
   gzBytes?: number | undefined;
 }
 
+export interface ReleaseArgs {
+  name: string;
+  bump?: BumpLevel;
+  force: boolean;
+  dryRun: boolean;
+}
+
+const BUMP_FLAGS: Record<string, BumpLevel> = {
+  '--patch': 'patch',
+  '--minor': 'minor',
+  '--major': 'major',
+};
+
+/**
+ * Parse the `pnpm release` argv (positional args after the script). Pure: no fs/git.
+ * The name is the first non-`--` token; a `--` token in the name slot throws. At most one
+ * bump flag is allowed. `--dry-run` is valid with or without a bump.
+ */
+export function parseReleaseArgs(argv: string[]): ReleaseArgs {
+  const name = argv[0];
+  if (!name || name.startsWith('--')) {
+    throw new Error(
+      'missing widget name: usage `pnpm release <name> [--patch|--minor|--major] [--dry-run] [--force]`',
+    );
+  }
+  let bump: BumpLevel | undefined;
+  let force = false;
+  let dryRun = false;
+  for (const token of argv.slice(1)) {
+    if (token === '--force') {
+      force = true;
+    } else if (token === '--dry-run') {
+      dryRun = true;
+    } else if (token in BUMP_FLAGS) {
+      if (bump) throw new Error(`only one bump flag allowed (got --${bump} and ${token})`);
+      bump = BUMP_FLAGS[token];
+    } else {
+      throw new Error(`unknown flag: ${token}`);
+    }
+  }
+  const result: ReleaseArgs = { name, force, dryRun };
+  if (bump) result.bump = bump;
+  return result;
+}
+
+export interface ReleasePlan {
+  newVersion: string;
+  branch: string;
+  commitMessage: string;
+  prTitle: string;
+  prBody: string;
+}
+
+/**
+ * Compute the full release plan from a widget's current version + bump level. Pure: no fs/git.
+ * Both the `--dry-run` printout and the real release path consume this so they cannot diverge.
+ * `gzBytes` is only known after the build, so the dry-run plan shows an n/a size.
+ */
+export function planRelease(
+  name: string,
+  currentVersion: string,
+  bump: BumpLevel,
+  gzBytes?: number,
+): ReleasePlan {
+  const newVersion = nextVersion(currentVersion, bump);
+  const commitMessage = `chore(release): ${name}@${newVersion}`;
+  return {
+    newVersion,
+    branch: releaseBranch(name, newVersion),
+    commitMessage,
+    prTitle: commitMessage,
+    prBody: releasePrBody({ name, version: newVersion, gzBytes }),
+  };
+}
+
 export function releasePrBody(input: ReleasePrInput): string {
   const size = input.gzBytes != null ? `${(input.gzBytes / 1024).toFixed(1)} KiB gz` : 'n/a';
   return [
