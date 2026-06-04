@@ -1,0 +1,46 @@
+# IconSelect
+
+A compact icon-led dropdown for switching a single option — a view mode, a layout, a filter preset. It shows a leading icon, a static `label`, and the active option's label; opening it reveals the choices. Fully controlled via `value` + `onChange`.
+
+<Example label="View switcher">
+  <IconSelect
+    label="View:"
+    icon={null}
+    value="grid"
+    options={[
+      { value: 'grid', label: 'Grid', icon: null },
+      { value: 'list', label: 'List', icon: null },
+    ]}
+    onChange={() => {}}
+  />
+</Example>
+
+## Usage
+
+```tsx
+import { IconSelect, type IconSelectOption } from '@perimeter/ui/icon-select';
+import { LayoutGrid, List, Rows } from 'lucide-react';
+
+const options: IconSelectOption[] = [
+  { value: 'grid', label: 'Grid', icon: <LayoutGrid className="size-3.5" /> },
+  { value: 'list', label: 'List', icon: <List className="size-3.5" /> },
+];
+
+<IconSelect
+  label="View:"
+  icon={<Rows className="size-3.5" />}
+  options={options}
+  value={view}
+  onChange={setView}
+/>;
+```
+
+## Props
+
+| Prop       | Type                       | Description                                            |
+| ---------- | -------------------------- | ------------------------------------------------------ |
+| `options`  | `IconSelectOption[]`       | `{ value, label, icon }` choices.                      |
+| `value`    | `string`                   | The selected option's `value` (controlled).            |
+| `onChange` | `(value: string) => void`  | Fires when an option is picked.                        |
+| `label`    | `string`                   | Static prefix shown before the active label.           |
+| `icon`     | `ReactNode`                | Leading icon on the trigger button.                    |

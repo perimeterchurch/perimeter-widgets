@@ -1,0 +1,26 @@
+# Textarea
+
+A multi-line text field. It auto-grows with its content (`field-sizing-content`) from a `min-h-16` floor, so the box expands as the user types instead of scrolling internally.
+
+<Example label="Multi-line field">
+  <Textarea className="w-72" placeholder="Share a prayer request…" />
+</Example>
+
+## Usage
+
+```tsx
+import { Textarea } from '@perimeter/ui/textarea';
+
+<Textarea placeholder="Share a prayer request…" value={value} onChange={(e) => setValue(e.target.value)} />;
+```
+
+Set `aria-invalid` to surface a validation error — the field switches to the destructive border and ring automatically.
+
+## Props
+
+| Prop          | Type      | Default | Description                                              |
+| ------------- | --------- | ------- | -------------------------------------------------------- |
+| `disabled`    | `boolean` | `false` | Dims the field and blocks input.                         |
+| `aria-invalid`| `boolean` | —       | Renders the destructive error treatment when `true`.     |
+
+All other native `<textarea>` attributes (`value`, `onChange`, `rows`, `placeholder`, …) pass through.

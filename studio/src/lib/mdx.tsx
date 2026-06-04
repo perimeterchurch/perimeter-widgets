@@ -4,6 +4,44 @@ import { MDXProvider } from '@mdx-js/react';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@perimeter/ui/card';
+import { Input } from '@perimeter/ui/input';
+import { Textarea } from '@perimeter/ui/textarea';
+import { Label } from '@perimeter/ui/label';
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxList,
+  ComboboxItem,
+} from '@perimeter/ui/combobox';
+import { MultiCombobox } from '@perimeter/ui/multi-combobox';
+import { SortSelect } from '@perimeter/ui/sort-select';
+import { IconSelect } from '@perimeter/ui/icon-select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@perimeter/ui/tabs';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '@perimeter/ui/pagination';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupInput,
+} from '@perimeter/ui/input-group';
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from '@perimeter/ui/empty';
 import { ComponentStage } from '../components/ComponentStage';
 
 /**
@@ -177,6 +215,39 @@ export const mdxComponents: MDXComponents = {
   CardHeader,
   CardTitle,
   CardContent,
+  Input,
+  Textarea,
+  Label,
+  Combobox,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxList,
+  ComboboxItem,
+  MultiCombobox,
+  SortSelect,
+  IconSelect,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupInput,
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
 };
 
 /**

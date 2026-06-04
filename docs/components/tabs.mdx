@@ -1,0 +1,40 @@
+# Tabs
+
+A set of layered sections where only one panel is visible at a time. Built on Base UI `Tabs`, composed from `TabsList` + `TabsTrigger` (the clickable headers) and `TabsContent` (the panels). Match each trigger's `value` to its content's `value`.
+
+<Example label="Two panels">
+  <Tabs defaultValue="latest" className="w-72">
+    <TabsList>
+      <TabsTrigger value="latest">Latest</TabsTrigger>
+      <TabsTrigger value="series">Series</TabsTrigger>
+    </TabsList>
+    <TabsContent value="latest">The most recent sermon.</TabsContent>
+    <TabsContent value="series">Browse by series.</TabsContent>
+  </Tabs>
+</Example>
+
+## Usage
+
+```tsx
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@perimeter/ui/tabs';
+
+<Tabs defaultValue="latest">
+  <TabsList>
+    <TabsTrigger value="latest">Latest</TabsTrigger>
+    <TabsTrigger value="series">Series</TabsTrigger>
+  </TabsList>
+  <TabsContent value="latest">…</TabsContent>
+  <TabsContent value="series">…</TabsContent>
+</Tabs>;
+```
+
+Pass `variant="line"` to `TabsList` for the underline style instead of the default pill background. Set `orientation="vertical"` on `Tabs` to stack the list beside the panels.
+
+## Parts
+
+| Component     | Description                                                                          |
+| ------------- | ------------------------------------------------------------------------------------ |
+| `Tabs`        | The root. Takes `defaultValue` (uncontrolled) or `value`/`onValueChange` (controlled) and `orientation`. |
+| `TabsList`    | The row of triggers. `variant` is `'default'` (pill) or `'line'` (animated underline).|
+| `TabsTrigger` | A clickable header; its `value` selects the matching content.                        |
+| `TabsContent` | A panel; shown when its `value` is active.                                            |

@@ -104,7 +104,7 @@ Any functional break → fix on a branch, `pnpm release sermons` a patch version
 ## 5. Monitor, then finalize (Gates E–F)
 
 - Watch the CDN project's **Vercel deployment logs** for ~a week: request volume to `sermons/*` + `manifest.json`, and 4xx/5xx rates. Spot-check the live page.
-- When stable, **archive `legacy/v1`** (keep as a branch or tag — reference only). Confirm `.github/workflows/` has only `ci.yml` (the jsDelivr pipeline is already removed). The migration is then complete.
+- When stable, **archive any pre-streamline legacy branch** (keep as a branch or tag — reference only). Confirm `.github/workflows/` has only `ci.yml` (the old external-CDN publish pipeline is already removed). The migration is then complete.
 
 ---
 

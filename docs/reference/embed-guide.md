@@ -1,25 +1,32 @@
 # Widget Embed Guide
 
 > **Scope:** WordPress embed patterns, data attributes, loading states, multiple widgets
-> **Last verified:** 2026-03-18
+> **Canonical source:** [`docs/hosting-and-release.md`](../hosting-and-release.md) (Embedding)
 
 ---
 
 ## Basic Embed
 
-Every widget embed follows the same two-element pattern:
+There are two embed shapes. The recommended one uses the global loader:
 
 ```html
-<!-- 1. Target element with config -->
-<div data-perimeter-widget="<name>" data-option="value"></div>
+<!-- Loader (once per page) — resolves and injects the current versioned bundle -->
+<script src="https://widgets.perimeter.org/loader.js" async></script>
 
-<!-- 2. Widget script (loads and auto-mounts) -->
-<script src="https://widgets.perimeter.org/<name>/latest.js" async></script>
+<!-- Target element with config (one per widget instance) -->
+<div data-perimeter-widget="<name>" data-option="value"></div>
 ```
 
-The widget script finds its target element, reads data attributes as config, and mounts a React app inside a shadow DOM. No manual initialization or config objects required.
+The loader fetches `manifest.json`, scans the page for `[data-perimeter-widget="<name>"]` targets, and injects each used widget's immutable versioned bundle once (deduped by name). Each widget reads its `data-*` attributes as config and mounts a React app inside a shadow root. Unknown widget names are skipped silently.
 
-`…/latest.js` always resolves (via the `cdn/manifest.json` pointer) to the current released version. To pin an immutable build, point the script straight at a versioned bundle: `https://widgets.perimeter.org/<name>/<version>/index.js`.
+To pin a single immutable build (no loader), point a script straight at a versioned bundle:
+
+```html
+<div data-perimeter-widget="<name>"></div>
+<script src="https://widgets.perimeter.org/<name>/<version>/index.js" async></script>
+```
+
+`…/<name>/latest.js` is also available (a manifest-derived rewrite that always resolves to the current released version) for an auto-updating single-script embed.
 
 ---
 
@@ -65,19 +72,16 @@ The placeholder is replaced when the widget mounts.
 
 ## Multiple Widgets on One Page
 
-Each widget bundles its own React and creates its own shadow DOM and QueryClient. Multiple widgets on the same page work independently with no conflicts:
+Each widget bundles its own React and creates its own shadow DOM and QueryClient. Multiple widgets on the same page work independently with no conflicts. With the loader, one `<script>` covers every widget on the page:
 
 ```html
-<!-- Sermons widget -->
-<div data-perimeter-widget="sermons"></div>
-<script src="https://widgets.perimeter.org/sermons/latest.js" async></script>
+<script src="https://widgets.perimeter.org/loader.js" async></script>
 
-<!-- Future: Giving widget -->
+<div data-perimeter-widget="sermons"></div>
 <div data-perimeter-widget="giving" data-campaign="general-fund"></div>
-<script src="https://widgets.perimeter.org/giving/latest.js" async></script>
 ```
 
-Each widget is ~72KB gzipped. Immutable, year-cached versioned bundles make repeat page visits instant.
+Immutable, year-cached versioned bundles make repeat page visits instant. Per-widget bundle sizes are enforced by each widget's `tests/bundle.test.ts` budget.
 
 ---
 

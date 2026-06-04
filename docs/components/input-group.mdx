@@ -1,0 +1,47 @@
+# InputGroup
+
+A wrapper that combines an input with addons — icons, text prefixes, or inline buttons — inside one bordered, focus-aware container. Place `InputGroupInput` (or `InputGroupTextarea`) alongside `InputGroupAddon`s; the group manages the shared border, focus ring, and disabled state.
+
+<Example label="Search field with icon">
+  <InputGroup className="w-72">
+    <InputGroupAddon>
+      <InputGroupText>Search</InputGroupText>
+    </InputGroupAddon>
+    <InputGroupInput placeholder="Sermons, series, speakers…" />
+  </InputGroup>
+</Example>
+
+## Usage
+
+```tsx
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@perimeter/ui/input-group';
+import { SearchIcon } from 'lucide-react';
+
+<InputGroup>
+  <InputGroupAddon>
+    <SearchIcon />
+  </InputGroupAddon>
+  <InputGroupInput placeholder="Search…" />
+  <InputGroupAddon align="inline-end">
+    <InputGroupButton>Go</InputGroupButton>
+  </InputGroupAddon>
+</InputGroup>;
+```
+
+Set an addon's `align` to position it: `inline-start` (default) / `inline-end` for left/right, or `block-start` / `block-end` to stack it above/below the field. This is the same primitive [Combobox](/components/combobox) builds its input on.
+
+## Parts
+
+| Component          | Description                                                                  |
+| ------------------ | ---------------------------------------------------------------------------- |
+| `InputGroup`       | The bordered container; owns the shared focus ring and disabled state.       |
+| `InputGroupInput`  | The borderless input that fills the group.                                   |
+| `InputGroupTextarea`| The borderless textarea variant.                                            |
+| `InputGroupAddon`  | A slot for icons/text/buttons; `align` controls its position.                |
+| `InputGroupText`   | Muted inline text (a prefix/suffix label).                                   |
+| `InputGroupButton` | A compact button sized to sit inside the group (`xs` / `icon-xs` / …).       |

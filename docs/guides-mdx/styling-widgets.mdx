@@ -36,10 +36,11 @@ overrides and drifts from the rest of the system; `bg-primary` tracks the token.
 ## `@perimeter/ui` vs. custom markup
 
 Before building a control from scratch, check whether the design system already
-ships it. The current `@perimeter/ui` set: `badge`, `button`, `card`, `combobox`,
-`empty`, `icon-select`, `input`, `input-group`, `label`, `multi-combobox`,
-`pagination`, `skeleton`, `skeleton-transition`, `sort-select`, `spinner`, `tabs`,
-`textarea`.
+ships it — the live reference, with usage and props, is at
+[`/components`](/components). The current `@perimeter/ui` set: `badge`, `button`,
+`card`, `combobox`, `empty`, `icon-select`, `input`, `input-group`, `label`,
+`multi-combobox`, `pagination`, `skeleton`, `skeleton-transition`, `sort-select`,
+`spinner`, `tabs`, `textarea`.
 
 - **Use a component** for anything it covers — buttons, inputs, cards, tabs,
   loading states. You get the right tokens, focus rings, and hover/active states
@@ -91,10 +92,35 @@ line-height 35px / color `#353535`). Set the type you want explicitly with token
 utilities (`font-sans`, `text-fg`) rather than relying on a default, and preview
 against the host-sim background before you ship.
 
+## Per-embed token overrides
+
+Because every utility resolves to a CSS variable, a host page can recolor a single
+embed without touching the widget. The runtime reserves `data-theme-*` attributes
+on the embed element for exactly this: each one maps to a token, so
+`data-theme-color-primary="#0f766e"` overrides `--color-primary` for that instance
+only. The studio's **Theme** tab is the same mechanism — it writes runtime token
+overrides live so you can preview them before a host page sets them. See
+[`/tokens`](/tokens) for the full override surface (every variable name and its
+default). This is why hard-coded hex values are a bug: a literal `#2563eb` ignores
+the override; `bg-primary` honors it.
+
+## Configuration is strings — coerce in the schema
+
+Styling and config meet at the widget's zod `schema`. Host-page configuration
+arrives as `data-*` attributes, and **HTML attributes are always strings** — a
+widget reading `data-count="3"` gets `"3"`, not `3`. Use `z.coerce.number()` /
+`z.coerce.boolean()` for every numeric or boolean field so the studio and
+production parse identical input the same way. The parity audit pinned this as the
+H6 lesson: a non-coercing schema that happens to work in the studio (where
+defaults fill in) breaks the moment a real host attribute arrives. (`data-theme-*`
+keys are stripped out as token overrides before the rest is parsed against the
+schema.)
+
 ## Checklist
 
 - [ ] Styled with token utilities, no hard-coded colors or radii.
 - [ ] Used `@perimeter/ui` for every control it covers.
 - [ ] Set `font-family` / `color` explicitly so nothing leaks in from the host.
 - [ ] Previewed against the host-page-sim background in the canvas.
-- [ ] Checked `/tokens` for the override surface a host page can change.
+- [ ] Checked `/tokens` for the per-embed `data-theme-*` override surface.
+- [ ] Used `z.coerce.*` for every numeric/boolean schema field.
