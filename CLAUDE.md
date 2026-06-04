@@ -49,7 +49,7 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 
 ## Building a widget
 
-Start at `docs/creating-a-widget.md` for the copy-the-example on-ramp; it walks the full path (MP data → perimeter-api endpoint → regenerated api-hooks types → scaffold → style → test → release). A `creating-a-widget` Claude skill that orchestrates this end-to-end is planned; once it ships, invoke it when asked to build or add a widget.
+Start at `docs/creating-a-widget.md` for the copy-the-example on-ramp; it walks the full path (MP data → perimeter-api endpoint → regenerated api-hooks types → scaffold → style → test → release). A `creating-a-widget` Claude skill (`.claude/skills/creating-a-widget/SKILL.md`) orchestrates this end-to-end; invoke it when asked to build or add a widget.
 
 ## Doc pointers
 

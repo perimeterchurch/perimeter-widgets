@@ -13,6 +13,8 @@ Docs are single-sourced: humans read them at **[style.perimeter.org](https://sty
 
 The MDX guides render live at `style.perimeter.org/guides` and are the Claude-facing docs.
 
+- [Building a widget end to end](guides-mdx/building-a-widget-end-to-end.mdx) — the narrative spine: scaffolder, widget anatomy, dev loop, and the deeper guides (live at `/guides/building-a-widget-end-to-end`).
+- [Data & API](guides-mdx/data-and-api.mdx) — wiring a widget to perimeter-api: the endpoint, regenerated api-hooks types, and the hook (live at `/guides/data-and-api`).
 - [Styling widgets](guides-mdx/styling-widgets.mdx) — tokens-first styling, `@perimeter/ui`, the design system (live at `/guides/styling-widgets`).
 - [Developer Setup](guides/developer-setup.md) — environment, pnpm, the studio, dev commands.
 - [Developer Rules](guides/developer-rules.md) — git workflow, conventions, quality checks.
