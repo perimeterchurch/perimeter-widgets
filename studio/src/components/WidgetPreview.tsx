@@ -68,7 +68,13 @@ export function WidgetPreview({
     const host = hostRef.current;
     if (!host || !def) return;
     try {
-      handleRef.current = mount(host, def, css, { configOverrides });
+      // DATA/hooks knob: in dev, point the runtime API client at the local
+      // perimeter-api so React Query hooks fetch from localhost:5500 instead of
+      // the prod default (api.perimeter.org). This is independent of the images
+      // knob (VITE_API_URL → format.ts); both must be set for dev parity. Left
+      // undefined in the deployed studio build so prod uses DEFAULT_API_URL.
+      const apiBaseUrl = import.meta.env.DEV ? 'http://localhost:5500' : undefined;
+      handleRef.current = mount(host, def, css, { configOverrides, apiBaseUrl });
       setMountError(null);
     } catch (err) {
       setMountError(describeMountError(err));
