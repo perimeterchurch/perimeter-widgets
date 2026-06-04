@@ -11,7 +11,7 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": ["^build", "^typecheck"],
       "outputs": ["coverage/**"]
     },
     "lint": {},

@@ -14,6 +14,8 @@
     "@perimeter/vite-plugin-widget": "workspace:*"
   },
   "devDependencies": {
+    "@perimeter/widget-example": "workspace:*",
+    "@perimeter/widget-sermons": "workspace:*",
     "@playwright/test": "^1.49.0",
     "@types/node": "^22.10.5",
     "autoprefixer": "^10.4.20",
