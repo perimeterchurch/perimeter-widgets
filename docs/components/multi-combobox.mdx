@@ -1,0 +1,49 @@
+# MultiCombobox
+
+A searchable select that takes a flat `options` array and works in single- or multiple-select mode. Unlike [Combobox](/components/combobox) (a low-level Base UI composition), this is a self-contained component driven by props — pass options in, get values out. Multiple mode shows a count label and keeps the menu open as you pick.
+
+<Example label="Single select">
+  <MultiCombobox
+    placeholder="Pick a campus"
+    options={[
+      { value: 'johns-creek', label: 'Johns Creek' },
+      { value: 'gwinnett', label: 'Gwinnett' },
+      { value: 'midtown', label: 'Midtown' },
+    ]}
+  />
+</Example>
+
+## Usage
+
+```tsx
+import { MultiCombobox, type MultiComboboxOption } from '@perimeter/ui/multi-combobox';
+
+const options: MultiComboboxOption[] = [
+  { value: 'johns-creek', label: 'Johns Creek' },
+  { value: 'gwinnett', label: 'Gwinnett' },
+];
+
+<MultiCombobox
+  multiple
+  options={options}
+  value={selected}
+  onValueChange={setSelected}
+  selectedLabel="Campuses"
+/>;
+```
+
+Inside a widget the dropdown must portal into the shadow root, not `document.body` — pass the widget's `environment` so the underlying `downshift` hooks register events in the right tree.
+
+## Props
+
+| Prop            | Type                                  | Default       | Description                                                                 |
+| --------------- | ------------------------------------- | ------------- | --------------------------------------------------------------------------- |
+| `options`       | `MultiComboboxOption[]`               | —             | `{ value, label, disabled? }` items to choose from.                         |
+| `multiple`      | `boolean`                             | `false`       | When `true`, allows multiple selections and emits a `string[]`.             |
+| `value`         | `string \| null` / `string[]`         | —             | Controlled selection (shape follows `multiple`). Omit for uncontrolled.     |
+| `defaultValue`  | `string \| null` / `string[]`         | —             | Initial uncontrolled selection.                                             |
+| `onValueChange` | `(value) => void`                     | —             | Fires on selection change; payload shape follows `multiple`.                |
+| `placeholder`   | `string`                              | `'Select...'` | Shown when nothing is selected.                                             |
+| `selectedLabel` | `string`                              | —             | Short label for the count chip in multiple mode (e.g. `"Campuses (3)"`).    |
+| `disabled`      | `boolean`                             | `false`       | Disables the whole control.                                                 |
+| `environment`   | `Environment`                         | —             | The shadow-root environment for `downshift` — required inside a widget.     |

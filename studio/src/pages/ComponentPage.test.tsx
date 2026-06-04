@@ -39,6 +39,39 @@ describe('ComponentPage (/components/:name)', () => {
     expect(container.querySelector('h1')?.textContent).toBe('Button');
   });
 
+  it('renders the input doc with a live Example (no unmapped-component throw)', async () => {
+    const { container } = renderAt('/components/input');
+    const scope = within(container);
+
+    // Text unique to docs/components/input.mdx — proves the MDX chunk rendered.
+    await waitFor(() => {
+      expect(scope.getByText(/A single-line text field\./)).toBeTruthy();
+    });
+    // The doc owns the page heading.
+    expect(container.querySelector('h1')?.textContent).toBe('Input');
+    // The <Example> mounts a ComponentStage shadow root — its presence proves the
+    // bare-JSX Input resolved from the scope map (an unmapped component would have
+    // thrown "Expected component `Input` to be defined" instead of rendering).
+    const hosts = Array.from(container.querySelectorAll<HTMLElement>('div')).filter(
+      (el) => el.shadowRoot,
+    );
+    expect(hosts.length).toBeGreaterThan(0);
+  });
+
+  it('renders the tabs doc with a live Example (no unmapped-component throw)', async () => {
+    const { container } = renderAt('/components/tabs');
+    const scope = within(container);
+
+    await waitFor(() => {
+      expect(scope.getByText(/A set of layered sections/)).toBeTruthy();
+    });
+    expect(container.querySelector('h1')?.textContent).toBe('Tabs');
+    const hosts = Array.from(container.querySelectorAll<HTMLElement>('div')).filter(
+      (el) => el.shadowRoot,
+    );
+    expect(hosts.length).toBeGreaterThan(0);
+  });
+
   it('falls back to the auto gallery for a component without a doc (spinner)', async () => {
     const { container } = renderAt('/components/spinner');
 

@@ -1,0 +1,28 @@
+# Label
+
+A form-field caption built on Radix `Label`. Clicking it focuses the associated control, so always tie it to a field with `htmlFor` (or by wrapping the control).
+
+<Example label="Labeled field">
+  <div className="flex w-64 flex-col gap-1.5">
+    <Label htmlFor="email">Email</Label>
+    <Input id="email" type="email" placeholder="you@example.com" />
+  </div>
+</Example>
+
+## Usage
+
+```tsx
+import { Label } from '@perimeter/ui/label';
+import { Input } from '@perimeter/ui/input';
+
+<Label htmlFor="email">Email</Label>
+<Input id="email" type="email" />;
+```
+
+## Props
+
+| Prop      | Type     | Default | Description                                                       |
+| --------- | -------- | ------- | ----------------------------------------------------------------- |
+| `htmlFor` | `string` | —       | The `id` of the control this label captions; enables click-to-focus. |
+
+All other native `<label>` attributes pass through, and the ref forwards to the underlying element.

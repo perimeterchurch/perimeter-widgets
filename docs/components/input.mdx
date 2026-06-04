@@ -1,0 +1,26 @@
+# Input
+
+A single-line text field. Renders a native `<input>` styled with the token palette, so it inherits focus rings, placeholder color, and disabled treatment from the design system.
+
+<Example label="Text input">
+  <Input className="w-64" placeholder="you@example.com" />
+</Example>
+
+## Usage
+
+```tsx
+import { Input } from '@perimeter/ui/input';
+
+<Input type="email" placeholder="you@example.com" value={value} onChange={(e) => setValue(e.target.value)} />;
+```
+
+Pair it with a [Label](/components/label) for an accessible field, and wrap it in an [InputGroup](/components/input-group) when you need an icon, prefix, or inline button alongside it.
+
+## Props
+
+| Prop      | Type     | Default  | Description                                                          |
+| --------- | -------- | -------- | -------------------------------------------------------------------- |
+| `type`    | `string` | `'text'` | Native input type (`email`, `search`, `number`, …).                  |
+| `disabled`| `boolean`| `false`  | Dims to 50% and blocks pointer events.                               |
+
+All other native `<input>` attributes (`value`, `onChange`, `placeholder`, `aria-*`, …) pass through, and the ref forwards to the underlying `<input>`.
