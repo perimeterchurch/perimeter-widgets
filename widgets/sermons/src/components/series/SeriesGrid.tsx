@@ -49,7 +49,7 @@ export function SeriesGrid({ series, viewMode = 'grid', onSeriesClick, config }:
       ? 'divide-y divide-border'
       : viewMode === 'large'
         ? 'space-y-4'
-        : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3';
+        : 'grid grid-cols-1 gap-4 @sm:grid-cols-2 @lg:grid-cols-3';
 
   return (
     <div className={wrapperClass}>

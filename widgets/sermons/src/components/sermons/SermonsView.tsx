@@ -182,7 +182,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
       <SkeletonTransition
         isLoading={isLoading}
         skeleton={
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 @sm:grid-cols-2 @lg:grid-cols-3">
             {Array.from({ length: config.perPage }, (_, i) => (
               <Skeleton key={i} className="h-48 w-full rounded-lg" />
             ))}
