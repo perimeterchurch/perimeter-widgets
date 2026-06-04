@@ -96,26 +96,22 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
         {sermon && (
           <div className="space-y-6">
             <div>
-              <h2
-                ref={titleRef}
-                tabIndex={-1}
-                className="text-xl font-bold text-stone-900 dark:text-stone-100 outline-none"
-              >
+              <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-none">
                 {sermon.title}
               </h2>
-              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
+              <p className="text-sm text-muted-fg mt-1">
                 {sermon.speaker.name} · {formatDate(sermon.date)} · {sermon.series.title}
               </p>
               {sermon.scriptureLinks && (
-                <p className="text-xs text-stone-400 mt-1">Scripture: {sermon.scriptureLinks}</p>
+                <p className="text-xs text-muted-fg mt-1">Scripture: {sermon.scriptureLinks}</p>
               )}
             </div>
             {sermon.links.length > 0 && <MediaTabs links={sermon.links} />}
             {sermon.description && (
-              <div className="rounded-lg bg-stone-50 p-4 dark:bg-stone-900">
+              <div className="rounded-lg bg-muted p-4">
                 <h3 className="font-semibold text-sm mb-2">About this sermon</h3>
                 <div
-                  className="text-sm text-stone-600 dark:text-stone-300 prose prose-sm"
+                  className="text-sm text-muted-fg prose prose-sm"
                   dangerouslySetInnerHTML={safeDescription}
                 />
               </div>

@@ -86,18 +86,18 @@ export function DatePicker({
             clearable && value && 'rounded-r-none border-r-0',
           )}
         >
-          <Calendar className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+          <Calendar className="h-3.5 w-3.5 shrink-0 text-muted-fg" />
           {displayText ? (
             <span className="flex-1 truncate text-left">{displayText}</span>
           ) : (
-            <span className="flex-1 truncate text-left text-stone-400">{effectivePlaceholder}</span>
+            <span className="flex-1 truncate text-left text-muted-fg">{effectivePlaceholder}</span>
           )}
         </button>
         {clearable && value && (
           <button
             type="button"
             onClick={handleClear}
-            className="flex h-10 items-center rounded-lg rounded-l-none border border-l-0 border-[var(--color-border)] bg-[var(--color-bg)] px-2 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:hover:bg-stone-700 dark:hover:text-stone-300"
+            className="flex h-10 items-center rounded-lg rounded-l-none border border-l-0 border-[var(--color-border)] bg-[var(--color-bg)] px-2 text-muted-fg transition-colors hover:bg-muted hover:text-fg"
             aria-label="Clear date"
           >
             <X className="h-3.5 w-3.5" />
@@ -213,14 +213,14 @@ function CalendarPanel({
         <button
           type="button"
           onClick={() => navigateMonth(-1)}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-300"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-fg transition-colors hover:bg-muted hover:text-fg"
           aria-label="Previous month"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+          <span className="text-sm font-semibold text-fg">
             {calendarView.toFormat('MMMM yyyy')}
           </span>
           {(calendarView.month !== today.month || calendarView.year !== today.year) && (
@@ -237,7 +237,7 @@ function CalendarPanel({
         <button
           type="button"
           onClick={() => navigateMonth(1)}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-300"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-fg transition-colors hover:bg-muted hover:text-fg"
           aria-label="Next month"
         >
           <ChevronRight className="h-4 w-4" />
@@ -249,7 +249,7 @@ function CalendarPanel({
         {WEEKDAY_LABELS.map((label) => (
           <div
             key={label}
-            className="py-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-400"
+            className="py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-fg"
           >
             {label}
           </div>
@@ -273,15 +273,12 @@ function CalendarPanel({
               className={cn(
                 'relative flex h-9 w-full items-center justify-center rounded-md text-sm',
                 'transition-colors duration-100',
-                !isCurrentMonth && 'text-stone-300 dark:text-stone-600',
-                isCurrentMonth &&
-                  !isSelected &&
-                  !isDisabled &&
-                  'text-stone-700 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-stone-800',
+                !isCurrentMonth && 'text-muted-fg opacity-60',
+                isCurrentMonth && !isSelected && !isDisabled && 'text-fg hover:bg-muted',
                 isToday &&
                   !isSelected &&
                   'font-semibold text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/40',
-                isSelected && 'bg-[var(--color-primary)] text-white font-medium',
+                isSelected && 'bg-[var(--color-primary)] text-primary-fg font-medium',
                 isDisabled && 'cursor-not-allowed opacity-30',
                 !isDisabled && 'cursor-pointer',
               )}
@@ -291,7 +288,7 @@ function CalendarPanel({
                 <span
                   className={cn(
                     'absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full',
-                    isSelected ? 'bg-white' : 'bg-[var(--color-primary)]',
+                    isSelected ? 'bg-primary-fg' : 'bg-[var(--color-primary)]',
                   )}
                 />
               )}
@@ -319,8 +316,8 @@ function CalendarPanel({
               'w-full rounded-lg px-4 py-2 text-sm font-medium',
               'transition-colors',
               value
-                ? 'bg-[var(--color-primary)] text-white hover:opacity-90'
-                : 'bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500',
+                ? 'bg-[var(--color-primary)] text-primary-fg hover:opacity-90'
+                : 'bg-muted text-muted-fg',
             )}
             disabled={!value}
           >
@@ -330,7 +327,7 @@ function CalendarPanel({
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-lg bg-stone-100 px-4 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+            className="w-full rounded-lg bg-muted px-4 py-2 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-fg"
           >
             Cancel
           </button>
@@ -380,11 +377,11 @@ function TimeInput({
   return (
     <div
       className={cn(
-        'mt-4 flex items-center justify-center gap-3 border-t border-stone-200 pt-4 dark:border-stone-700',
+        'mt-4 flex items-center justify-center gap-3 border-t border-border pt-4',
         disabled && 'pointer-events-none opacity-40',
       )}
     >
-      <Clock className="h-4 w-4 shrink-0 text-stone-400" />
+      <Clock className="h-4 w-4 shrink-0 text-muted-fg" />
       <input
         type="number"
         min={1}
@@ -397,7 +394,7 @@ function TimeInput({
         className="h-9 w-14 rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] px-1 text-center text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50"
         aria-label="Hour"
       />
-      <span className="text-sm font-bold text-stone-400">:</span>
+      <span className="text-sm font-bold text-muted-fg">:</span>
       <input
         type="number"
         min={0}
@@ -417,8 +414,8 @@ function TimeInput({
           className={cn(
             'px-3 transition-colors',
             !isPM
-              ? 'bg-[var(--color-primary)] text-white'
-              : 'bg-[var(--color-bg)] text-stone-500 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800',
+              ? 'bg-[var(--color-primary)] text-primary-fg'
+              : 'bg-[var(--color-bg)] text-muted-fg hover:bg-muted hover:text-fg',
           )}
         >
           AM
@@ -429,8 +426,8 @@ function TimeInput({
           className={cn(
             'px-3 transition-colors',
             isPM
-              ? 'bg-[var(--color-primary)] text-white'
-              : 'bg-[var(--color-bg)] text-stone-500 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800',
+              ? 'bg-[var(--color-primary)] text-primary-fg'
+              : 'bg-[var(--color-bg)] text-muted-fg hover:bg-muted hover:text-fg',
           )}
         >
           PM
