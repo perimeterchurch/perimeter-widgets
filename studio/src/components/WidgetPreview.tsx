@@ -22,11 +22,24 @@ interface Props {
   configOverrides: Record<string, unknown>;
   /** runtime theme token overrides from the ThemeEditor. */
   tokenOverrides: Record<string, string>;
+  /**
+   * Light/dark preview theme. 'dark' sets `data-theme="dark"` on the shadow host
+   * (the `[data-perimeter-widget-preview]` div), which is what
+   * `:host([data-theme="dark"])` matches — so the dark token block activates.
+   * Defaults to 'light' (attribute removed).
+   */
+  theme?: 'light' | 'dark';
   /** Lets the parent (App) feed the loaded definition to the ConfigPanel. */
   onDefinition?: (def: WidgetDefinition) => void;
 }
 
-export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefinition }: Props) {
+export function WidgetPreview({
+  entry,
+  configOverrides,
+  tokenOverrides,
+  theme = 'light',
+  onDefinition,
+}: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<MountedWidget | null>(null);
   const [def, setDef] = useState<WidgetDefinition | null>(null);
@@ -71,6 +84,18 @@ export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefini
   useEffect(() => {
     handleRef.current?.updateTokens(tokenOverrides);
   }, [tokenOverrides]);
+
+  // Light/dark toggle: set `data-theme="dark"` directly on the shadow host so
+  // `:host([data-theme="dark"])` (emitted by resolveTokens) activates the dark
+  // token block — exactly how a production embed activates dark mode. This is the
+  // host div itself (NOT the HostFrame wrapper); :host() only matches the shadow
+  // host. Setting it while the host is `hidden` on a mount error is harmless.
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    if (theme === 'dark') host.setAttribute('data-theme', 'dark');
+    else host.removeAttribute('data-theme');
+  }, [theme]);
 
   // Keep the host div mounted at all times so hostRef stays attached to the DOM.
   // If we returned the alert *instead* of the host, hostRef.current would become

@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeAll, afterEach } from 'vitest';
-import { render, waitFor, cleanup, within } from '@testing-library/react';
+import { render, waitFor, cleanup, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import { WidgetPage } from './WidgetPage';
 
@@ -53,6 +53,10 @@ describe('WidgetPage (/widgets/:slug)', () => {
     await waitFor(() => {
       expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
     });
+
+    // The inspector (which carries the embed snippet) is a closed-by-default
+    // slide-out drawer now — open it via its header toggle before asserting.
+    fireEvent.click(scope.getByRole('button', { name: /inspector/i }));
 
     // The embed snippet is the production CDN host/path — assert the exact string
     // carried over from the old App.tsx, not an invented one.

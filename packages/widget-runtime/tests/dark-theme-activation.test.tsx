@@ -41,6 +41,7 @@ function tokenCss(shadow: ShadowRoot): string {
   if (shadow.adoptedStyleSheets && shadow.adoptedStyleSheets.length > 0) {
     // [0] is the shared widget sheet; [1] is the per-instance token sheet.
     const tokenSheet = shadow.adoptedStyleSheets[shadow.adoptedStyleSheets.length - 1];
+    if (!tokenSheet) return '';
     return Array.from(tokenSheet.cssRules)
       .map((r) => r.cssText)
       .join('\n');
