@@ -128,6 +128,12 @@ importers:
         specifier: workspace:*
         version: link:../vite-plugin-widget
     devDependencies:
+      '@perimeter/widget-example':
+        specifier: workspace:*
+        version: link:../../widgets/example
+      '@perimeter/widget-sermons':
+        specifier: workspace:*
+        version: link:../../widgets/sermons
       '@playwright/test':
         specifier: ^1.49.0
         version: 1.60.0
