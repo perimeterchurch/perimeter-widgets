@@ -37,7 +37,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
         <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-fg">{entry.slug}</h1>
       </header>
 
-      <div className="grid min-h-[28rem] flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[1fr_22rem]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[1fr_22rem]">
         {/* Preview canvas — viewport-preset + background toolbar around the real
             mount(). Canvas owns the scroll/background and swaps in the host-page
             sim (HostFrame) when its host-sim background is selected (the default). */}
