@@ -115,6 +115,18 @@ The loader fetches `manifest.json`, scans the page for `[data-perimeter-widget="
 
 Each widget self-mounts into a shadow root on load.
 
+### Dark mode (`data-theme="dark"`)
+
+Widgets default to the light palette. Opt a single embed into dark mode with `data-theme="dark"` on the target element:
+
+```html
+<div data-perimeter-widget="sermons" data-theme="dark"></div>
+```
+
+Dark mode is a pure CSS-variable swap: `@perimeter/theme` ships a `darkTokens` set (the same token keys as the light defaults), and the per-instance token sheet emits both a `:host { … }` (light) block and a `:host([data-theme="dark"]) { … }` (dark) block. Setting `data-theme="dark"` on the shadow host activates the dark block with zero mount-time parsing — omit the attribute (or set any other value) for light. Every widget that styles with semantic token utilities (`bg-bg`, `text-fg`, `border-border`, …) cascades to dark automatically; hard-coded colors do not.
+
+> **Constraint: widget schemas must stay non-strict.** A bare `data-theme` is not a `data-theme-*` token override, so the data-attrs parser surfaces it as a `theme` config key. A non-strict zod object schema (the default — `z.object({...})` without `.strict()`) silently strips the unknown key during `schema.parse`, and the attribute itself is never removed from the host element, so activation still works. A `.strict()` schema would instead **reject** the embed. Keep widget schemas non-strict.
+
 ## One-time manual deploy (remaining step)
 
 `cdn/` is **not yet deployed**. This plan produced and verified the directory, the release CLI, and the first committed releases locally; standing up the live host is a manual step (needs the Vercel account):

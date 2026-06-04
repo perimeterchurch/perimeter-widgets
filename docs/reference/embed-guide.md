@@ -106,8 +106,21 @@ Data attributes on the target element configure the widget:
 | `data-per-page="12"`             | Number: `{ perPage: 12 }`                | Items per page     |
 | `data-hide-search="true"`        | Boolean: `{ hideSearch: true }`          | Toggle feature     |
 | `data-api-url="http://..."`      | String: `{ apiUrl: 'http://...' }`       | API override (dev) |
+| `data-theme="dark"`              | Activates the dark palette (see below)   | Light/dark         |
 
 Kebab-case attributes are auto-converted to camelCase. Numbers and booleans are auto-parsed.
+
+---
+
+## Dark Mode
+
+Widgets default to the light palette. Add `data-theme="dark"` to a target element to render that embed in dark mode:
+
+```html
+<div data-perimeter-widget="sermons" data-theme="dark"></div>
+```
+
+Dark mode is a CSS-variable swap — the widget's per-instance token sheet emits a `:host { … }` (light) block and a `:host([data-theme="dark"]) { … }` (dark) block, and the attribute activates the dark block on the shadow host. Any widget styled with semantic token utilities cascades automatically; no per-embed color attributes are needed. Omit `data-theme` (the default) for light. The canonical reference is [`docs/hosting-and-release.md`](../hosting-and-release.md) (Embedding → Dark mode).
 
 ---
 
