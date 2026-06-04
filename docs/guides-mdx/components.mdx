@@ -18,9 +18,8 @@ shadow-DOM path (the `ComponentStage`), so what you see on a `/components/<name>
 page is what a widget gets — no light-DOM divergence.
 
 One consequence to remember: components with **portaled overlays** (the dropdown
-menus on [Combobox](/components/combobox), [MultiCombobox](/components/multi-combobox),
-[SortSelect](/components/sort-select), [IconSelect](/components/icon-select)) must
-portal back into the widget's shadow root, not `document.body`, or their styles and
+menus on [Combobox](/components/combobox) and [MultiCombobox](/components/multi-combobox))
+must portal back into the widget's shadow root, not `document.body`, or their styles and
 event handling break. Each of those docs notes how — pass the `container` (Base UI)
 or `environment` (downshift) for the shadow root.
 
