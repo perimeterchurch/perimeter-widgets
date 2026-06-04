@@ -119,4 +119,4 @@ The perimeter-api `authenticate()` function accepts this as an OAuth JWT bearer 
 ## Related Docs
 
 - [Architecture Overview](../architecture/overview.md) — the single mount path and auth seam
-- [perimeter-api Authentication](../../perimeter-api/docs/guides/authentication.md) — Server-side auth details
+- [perimeter-api Authentication](../../../perimeter-api/docs/guides/authentication.md) — Server-side auth details
