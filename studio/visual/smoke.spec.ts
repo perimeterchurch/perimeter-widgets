@@ -70,4 +70,31 @@ test.describe('studio visual harness — sermons', () => {
 
     await snapshotPreview(page, 'sermons-dark-sort-open');
   });
+
+  test('dark theme: view dropdown (icon-select) option text is LIGHT', async ({ page }) => {
+    await setWidgetTheme(page, 'dark');
+    await waitForSermonCards(page, 3);
+
+    // The View control is the IconSelect — the LAST trigger button in the
+    // results-toolbar control group. Its popup is the `w-44` variant (the Sort
+    // popup is `w-48`), so we can target it unambiguously inside the shadow root.
+    await clickInShadow(page, '[data-slot="results-toolbar"] .relative:last-child > button');
+    await page.waitForFunction(
+      () => {
+        const host = document.querySelector('[data-perimeter-widget-preview]') as HTMLElement;
+        return !!host?.shadowRoot?.querySelector('.absolute.z-50.w-44');
+      },
+      undefined,
+      { timeout: 5000 },
+    );
+
+    // Option label text must read light on the dark popup background.
+    const optionColor = await readComputedColor(page, '.absolute.z-50.w-44 button span.flex-1');
+    expect(
+      luminance(optionColor),
+      `view option text color ${optionColor} should be light on dark`,
+    ).toBeGreaterThan(0.5);
+
+    await snapshotPreview(page, 'sermons-dark-view-open');
+  });
 });

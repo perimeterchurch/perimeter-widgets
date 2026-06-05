@@ -57,7 +57,7 @@ export function SortSelect({
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1 w-48 max-w-[calc(100vw-1rem)] rounded-lg bg-bg shadow-md ring-1 ring-fg/10">
+        <div className="absolute right-0 z-50 mt-1 w-48 max-w-[calc(100vw-1rem)] rounded-lg bg-bg text-fg shadow-md ring-1 ring-fg/10">
           {/* Sort field options */}
           <div className="px-3 pb-1 pt-2.5">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-fg">
