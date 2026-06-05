@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Skeleton } from '@perimeter/ui/skeleton';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { Calendar, Type, LayoutGrid, List, Rows3 } from 'lucide-react';
@@ -53,7 +52,7 @@ const SORT_FIELDS = [
 ];
 
 export function SermonsView({ config, filters }: SermonsViewProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>(config.defaultView ?? 'grid');
+  const viewMode = filters.view;
   const labelCache = useFilterLabelCache();
 
   // Both type filters are opt-in. The embedder shows them by setting
@@ -158,7 +157,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
           onSortDirectionChange={handleSortDirectionChange}
           viewMode={viewMode}
           viewOptions={VIEW_OPTIONS}
-          onViewModeChange={(v) => setViewMode(v as ViewMode)}
+          onViewModeChange={(v) => filters.setView(v as ViewMode)}
         />
       )}
       {error ? (

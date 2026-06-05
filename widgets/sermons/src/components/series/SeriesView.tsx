@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   InputGroup,
   InputGroupAddon,
@@ -65,7 +64,7 @@ const VIEW_OPTIONS = [
 ];
 
 export function SeriesView({ config, filters }: SeriesViewProps) {
-  const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
+  const viewMode = filters.view;
   const display = config.display ?? 'full';
   const showSearch = display === 'full';
   const showSortView = display !== 'headless';
@@ -178,7 +177,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
           onSortDirectionChange={(direction) => filters.setSort(filters.sort, direction)}
           viewMode={viewMode}
           viewOptions={VIEW_OPTIONS}
-          onViewModeChange={(v) => setViewMode(v as SeriesViewMode)}
+          onViewModeChange={(v) => filters.setView(v as SeriesViewMode)}
         />
       )}
 

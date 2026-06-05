@@ -6,7 +6,7 @@ import {
   parseAsStringLiteral,
   useQueryStates,
 } from 'nuqs';
-import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode } from '../types';
+import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode, ViewMode } from '../types';
 
 /**
  * Per-embed URL-key prefix. nuqs v2's adapter exposes no global prefix, so we
@@ -35,6 +35,7 @@ function serializeIds(ids: number[]): string | null {
 export function useSermonFilters(config: SermonsConfig, options: UseSermonFiltersOptions = {}) {
   const { prefix } = options;
   const defaultTab = config.defaultTab ?? 'sermons';
+  const defaultView = config.defaultView ?? 'grid';
   const sermonParams = useMemo(
     () => ({
       tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(defaultTab),
@@ -51,9 +52,12 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
       to: parseAsString,
       sort: parseAsStringLiteral(['date', 'title', 'count'] as const).withDefault('date'),
       order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault('desc'),
+      // Layout preference — persisted to the URL (like sort) so it survives a
+      // reload or a tab switch instead of resetting to the default each time.
+      view: parseAsStringLiteral(['grid', 'list', 'large'] as const).withDefault(defaultView),
       page: parseAsInteger.withDefault(1),
     }),
-    [defaultTab],
+    [defaultTab, defaultView],
   );
 
   // Map each state key to a prefixed URL param so multiple embeds don't
@@ -184,6 +188,13 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     void setParams({ sort, order, page: 1 });
   };
 
+  // View is a layout preference, not a content filter: changing it doesn't
+  // re-query or reset the page. `history: 'replace'` keeps it out of the back
+  // stack (toggling grid/list shouldn't add history entries).
+  const setView = (view: ViewMode) => {
+    void setParams({ view }, { history: 'replace' });
+  };
+
   const setPage = (page: number) => {
     void setParams({ page });
   };
@@ -253,6 +264,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     setSeriesTypeIds,
     setDateRange,
     setSort,
+    setView,
     setPage,
     clearFilters,
     hasActiveFilters,

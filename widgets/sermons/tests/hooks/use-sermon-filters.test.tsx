@@ -83,6 +83,35 @@ describe('useSermonFilters', () => {
     expect(result.current.selectedSeriesIds).toEqual([1, 2, 3]);
   });
 
+  describe('view-mode persistence', () => {
+    it('defaults the view to config.defaultView', () => {
+      const { result } = renderFilters({ defaultView: 'large' });
+      expect(result.current.view).toBe('large');
+    });
+
+    it('reads the view from the URL when present', () => {
+      const { result } = renderHook(() => useSermonFilters(baseConfig), {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <NuqsTestingAdapter searchParams="?view=list">{children}</NuqsTestingAdapter>
+        ),
+      });
+      expect(result.current.view).toBe('list');
+    });
+
+    it('setView updates the persisted view', () => {
+      const { result } = renderFilters();
+      act(() => result.current.setView('list'));
+      expect(result.current.view).toBe('list');
+    });
+
+    it('clearFilters does not reset the view (it is a layout preference, not a filter)', () => {
+      const { result } = renderFilters();
+      act(() => result.current.setView('large'));
+      act(() => result.current.clearFilters());
+      expect(result.current.view).toBe('large');
+    });
+  });
+
   const baseConfig: SermonsConfig = {
     perPage: 12,
     defaultTab: 'sermons',
