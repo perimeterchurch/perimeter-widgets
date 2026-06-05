@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
-import { globalTokens } from '@perimeter/theme';
+import { globalTokens, darkTokens } from '@perimeter/theme';
 import { installRootTokens, rootTokenCss } from './light-dom-tokens';
 
 describe('rootTokenCss', () => {
@@ -10,6 +10,20 @@ describe('rootTokenCss', () => {
     for (const [k, v] of Object.entries(globalTokens)) {
       expect(css).toContain(`--${k}: ${v};`);
     }
+  });
+
+  it('emits a :root[data-theme="dark"] block with every dark token', () => {
+    const css = rootTokenCss();
+    expect(css).toContain(':root[data-theme="dark"] {');
+    for (const [k, v] of Object.entries(darkTokens)) {
+      expect(css).toContain(`--${k}: ${v};`);
+    }
+  });
+
+  it('uses the dark color-bg value in the dark block', () => {
+    const css = rootTokenCss();
+    // The dark surface is the load-bearing flag that the dark layer is present.
+    expect(css).toContain(`--color-bg: ${darkTokens['color-bg']};`);
   });
 });
 
