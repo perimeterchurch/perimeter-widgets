@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { Button } from '@perimeter/ui/button';
-import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
+import { SegmentedTabs, segmentedTabId } from '@perimeter/ui/segmented-tabs';
 import { ConfigPanel } from './ConfigPanel';
 import { ThemeEditor } from './ThemeEditor';
 import { InfoPanel } from './InfoPanel';
@@ -95,9 +95,16 @@ export function Inspector({
         value={active}
         onChange={(id) => setActive(id as TabId)}
         aria-label="Inspector sections"
+        idBase={baseId}
+        panelId={panelId}
       />
 
-      <div role="tabpanel" id={panelId} className="min-w-0">
+      <div
+        role="tabpanel"
+        id={panelId}
+        aria-labelledby={segmentedTabId(baseId, active)}
+        className="min-w-0"
+      >
         {active === 'config' &&
           (definition ? (
             <ConfigPanel

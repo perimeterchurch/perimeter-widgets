@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SegmentedTabs } from '../src/segmented-tabs';
+import { SegmentedTabs, segmentedTabId } from '../src/segmented-tabs';
 
 const ITEMS = [
   { id: 'one', label: 'One' },
@@ -65,6 +65,42 @@ describe('SegmentedTabs', () => {
     render(<SegmentedTabs items={ITEMS} value="one" onChange={onChange} />);
     fireEvent.keyDown(screen.getByRole('tab', { name: 'One' }), { key: 'ArrowLeft' });
     expect(onChange).toHaveBeenCalledWith('three');
+  });
+
+  it('Home jumps to the first tab and End jumps to the last', () => {
+    const onChange = vi.fn();
+    render(<SegmentedTabs items={ITEMS} value="two" onChange={onChange} />);
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Two' }), { key: 'Home' });
+    expect(onChange).toHaveBeenCalledWith('one');
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Two' }), { key: 'End' });
+    expect(onChange).toHaveBeenCalledWith('three');
+  });
+
+  it('wires aria-controls + panel-labelling ids when panelId/idBase are given', () => {
+    // The single-panel association the studio inspector needs: every tab points at
+    // the shared panel via aria-controls, and segmentedTabId(idBase, value) yields
+    // the active tab's DOM id so the panel can set aria-labelledby back at it.
+    render(
+      <SegmentedTabs
+        items={ITEMS}
+        value="two"
+        onChange={() => {}}
+        idBase="insp"
+        panelId="insp-panel"
+      />,
+    );
+    for (const tab of screen.getAllByRole('tab')) {
+      expect(tab).toHaveAttribute('aria-controls', 'insp-panel');
+    }
+    const active = screen.getByRole('tab', { name: 'Two' });
+    expect(active.id).toBe(segmentedTabId('insp', 'two'));
+  });
+
+  it('omits aria-controls when no panelId is given (sibling-view tabs)', () => {
+    render(<SegmentedTabs items={ITEMS} value="one" onChange={() => {}} />);
+    for (const tab of screen.getAllByRole('tab')) {
+      expect(tab).not.toHaveAttribute('aria-controls');
+    }
   });
 
   it('moves DOM focus to the newly-selected tab on arrow nav', () => {

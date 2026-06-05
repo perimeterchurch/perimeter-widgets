@@ -94,6 +94,31 @@ describe('Inspector', () => {
     expect(scope.getByRole('tab', { name: 'Config' }).getAttribute('aria-selected')).toBe('false');
   });
 
+  it('associates the active tab with the panel (aria-controls + aria-labelledby)', () => {
+    const { container } = renderInspector();
+    const scope = within(container);
+
+    // WAI-ARIA tab↔panel wiring: each tab points at the single panel via
+    // aria-controls, and the panel labels itself by the *active* tab. This
+    // association survived as inline markup pre-extraction; the SegmentedTabs
+    // extraction must keep exposing it (panelId + idBase + segmentedTabId).
+    const panel = scope.getByRole('tabpanel');
+    const panelId = panel.getAttribute('id');
+    expect(panelId).toBeTruthy();
+
+    for (const name of ['Config', 'Theme', 'Info']) {
+      expect(scope.getByRole('tab', { name }).getAttribute('aria-controls')).toBe(panelId);
+    }
+
+    const config = scope.getByRole('tab', { name: 'Config' });
+    expect(panel.getAttribute('aria-labelledby')).toBe(config.id);
+
+    // Selection moves the panel's label to the newly-active tab.
+    fireEvent.click(scope.getByRole('tab', { name: 'Info' }));
+    const info = scope.getByRole('tab', { name: 'Info' });
+    expect(scope.getByRole('tabpanel').getAttribute('aria-labelledby')).toBe(info.id);
+  });
+
   it('shows the embed snippet exactly once (not duplicated across tabs)', () => {
     const { container } = renderInspector();
     const scope = within(container);

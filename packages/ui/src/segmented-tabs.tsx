@@ -18,16 +18,46 @@ export interface SegmentedTabsProps {
   onChange: (id: string) => void;
   /** Accessible label for the tablist. */
   'aria-label'?: string;
+  /**
+   * Optional base for the DOM ids assigned to each tab button. Pass this when a
+   * consumer renders an associated `role="tabpanel"` and needs to point its
+   * `aria-labelledby` at the active tab — derive the matching id with
+   * {@link segmentedTabId} from the same base. Defaults to an internal `useId`
+   * (sufficient when the tabs drive sibling views rather than a labelled panel).
+   */
+  idBase?: string;
+  /**
+   * The DOM id of the `role="tabpanel"` these tabs control. When set, every tab
+   * gets `aria-controls={panelId}`, completing the WAI-ARIA tab↔panel
+   * association (pair with the panel's `aria-labelledby`). Omit when the tabs
+   * have no single associated panel (e.g. they switch sibling views).
+   */
+  panelId?: string;
   /** Extra classes on the track. */
   className?: string;
 }
 
 /**
+ * The DOM id assigned to the tab button for `tabItemId` under `idBase`. Use this
+ * to wire a tabpanel's `aria-labelledby` to the active tab, passing the same
+ * `idBase` you gave {@link SegmentedTabs}.
+ */
+export function segmentedTabId(idBase: string, tabItemId: string): string {
+  return `${idBase}-tab-${tabItemId}`;
+}
+
+/**
  * A controlled segmented control rendered as a WAI-ARIA tablist: a rounded
  * `bg-muted` track of `role="tab"` buttons, the active one lifted with
- * `bg-bg text-fg shadow-sm`. Roving `tabIndex` keeps a single tab stop, and
- * ArrowLeft/ArrowRight wrap-around focus + select the adjacent tab (the
- * WAI-ARIA automatic-activation pattern).
+ * `bg-bg text-fg shadow-sm`. Roving `tabIndex` keeps a single tab stop, and the
+ * keyboard follows the WAI-ARIA automatic-activation pattern: ArrowLeft/Right
+ * wrap-around to the adjacent tab, Home/End jump to the first/last — each moving
+ * focus + selection together.
+ *
+ * For tabs that control a single panel (the studio inspector), pass `panelId`
+ * (→ `aria-controls` on every tab) and `idBase`, then point the panel's
+ * `aria-labelledby` at {@link segmentedTabId}(idBase, value) to complete the
+ * tab↔panel association. Omit both when the tabs switch sibling views (sermons).
  *
  * Token-correct in light + dark: inactive labels dim via `text-fg/60`, the
  * `dark:` nudges key off the widget/studio `data-theme` (the shared preset
@@ -39,10 +69,13 @@ export function SegmentedTabs({
   value,
   onChange,
   'aria-label': ariaLabel,
+  idBase,
+  panelId,
   className,
 }: SegmentedTabsProps) {
-  const baseId = useId();
-  const tabId = (id: string) => `${baseId}-tab-${id}`;
+  const generatedId = useId();
+  const baseId = idBase ?? generatedId;
+  const tabId = (id: string) => segmentedTabId(baseId, id);
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const focusAndSelect = (id: string) => {
@@ -51,11 +84,26 @@ export function SegmentedTabs({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    // WAI-ARIA tabs pattern: arrows move (with wrap), Home/End jump to the ends.
+    let nextIndex: number;
+    switch (event.key) {
+      case 'ArrowRight':
+        nextIndex = (index + 1) % items.length;
+        break;
+      case 'ArrowLeft':
+        nextIndex = (index - 1 + items.length) % items.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = items.length - 1;
+        break;
+      default:
+        return;
+    }
     event.preventDefault();
-    const delta = event.key === 'ArrowRight' ? 1 : -1;
-    // Wrap-around so the arrow keys cycle past either end.
-    const next = items[(index + delta + items.length) % items.length];
+    const next = items[nextIndex];
     if (next) focusAndSelect(next.id);
   };
 
@@ -77,6 +125,7 @@ export function SegmentedTabs({
             role="tab"
             id={tabId(id)}
             aria-selected={selected}
+            aria-controls={panelId}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(id)}
             onKeyDown={(event) => onKeyDown(event, index)}
