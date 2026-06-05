@@ -144,11 +144,15 @@ describe('Inspector', () => {
     fireEvent.click(scope.getByRole('tab', { name: 'Theme' }));
 
     // ThemeEditor rows previously clamped the input to 9rem; widen to a flexible
-    // 1fr input column so token values get room in the wider drawer.
+    // 1fr input column so token values get room in the wider drawer. The row is a
+    // plain div (not a wrapping label) so the color picker can't steal the text
+    // input's accessible name.
     const [firstColorToken] = scope.getAllByText(/^color-/);
-    const tokenLabel = firstColorToken?.closest('label') as HTMLElement;
-    expect(tokenLabel).toBeTruthy();
-    const classes = tokenLabel.className.split(/\s+/);
+    const tokenRow = firstColorToken?.closest(
+      'div.grid-cols-\\[minmax\\(6rem\\,auto\\)_1fr\\]',
+    ) as HTMLElement;
+    expect(tokenRow).toBeTruthy();
+    const classes = tokenRow.className.split(/\s+/);
     expect(classes).toContain('grid-cols-[minmax(6rem,auto)_1fr]');
     expect(classes).not.toContain('grid-cols-[1fr_minmax(0,9rem)]');
   });

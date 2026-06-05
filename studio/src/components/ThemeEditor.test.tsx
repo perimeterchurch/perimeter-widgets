@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { render, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup, fireEvent, within } from '@testing-library/react';
 import { globalTokens } from '@perimeter/theme';
 import { ThemeEditor } from './ThemeEditor';
 
@@ -42,6 +42,26 @@ describe('ThemeEditor color picker', () => {
     expect(onChange).toHaveBeenCalledTimes(1);
     const next = onChange.mock.calls[0]![0] as Record<string, string>;
     expect(next['color-primary']).toBe('#ff0000');
+  });
+
+  it('gives the value text input its own accessible name (not stolen by the color picker)', () => {
+    const { container } = render(<ThemeEditor overrides={{}} onChange={() => {}} />);
+    const scope = within(container);
+
+    // The text input — the control that owns the raw value, including hsl()/non-hex —
+    // must be reachable by its token name. With the color input also present, a
+    // wrapping <label> would name the picker instead, leaving this input unnamed.
+    const text = container.querySelector(
+      'input[data-text-token="color-primary"]',
+    ) as HTMLInputElement;
+    expect(text).toBeTruthy();
+    expect(scope.getByLabelText('color-primary')).toBe(text);
+
+    // And the picker keeps its own distinct name.
+    const picker = container.querySelector(
+      'input[type="color"][data-color-token="color-primary"]',
+    ) as HTMLInputElement;
+    expect(scope.getByLabelText('color-primary color')).toBe(picker);
   });
 
   it('keeps the text input writing the same override key', () => {

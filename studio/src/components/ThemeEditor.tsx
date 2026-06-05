@@ -90,8 +90,14 @@ export function ThemeEditor({ overrides, onChange }: Props) {
             </legend>
             {keys.map((token) => {
               const overridden = token in overrides;
+              const fieldId = `theme-token-${token}`;
               return (
-                <label
+                // A plain row, NOT a wrapping <label>: a <label> associates with its
+                // first labelable descendant, which (with the color input present)
+                // would steal the accessible name from the value text input and make
+                // a name click open the picker. Each control is named explicitly
+                // instead — the picker via aria-label, the text input via htmlFor.
+                <div
                   key={token}
                   className="grid grid-cols-[minmax(6rem,auto)_1fr] items-center gap-2"
                 >
@@ -108,16 +114,20 @@ export function ThemeEditor({ overrides, onChange }: Props) {
                         onChange={(e) => onChange({ ...overrides, [token]: e.target.value })}
                       />
                     )}
-                    <span className="truncate font-mono text-xs">{token}</span>
+                    <label htmlFor={fieldId} className="truncate font-mono text-xs">
+                      {token}
+                    </label>
                   </span>
                   <input
+                    id={fieldId}
+                    aria-label={token}
                     className="rounded-md border border-border bg-bg px-2 py-1 font-mono text-xs text-fg transition-colors hover:border-fg/30 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 data-[overridden=true]:border-primary/60"
                     data-overridden={overridden}
                     data-text-token={token}
                     value={overrides[token] ?? globalTokens[token]}
                     onChange={(e) => onChange({ ...overrides, [token]: e.target.value })}
                   />
-                </label>
+                </div>
               );
             })}
           </fieldset>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { globalTokens, type ThemeToken } from '@perimeter/theme';
 import { Badge } from '@perimeter/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@perimeter/ui/card';
@@ -21,10 +21,15 @@ function CopyButton({
   title: string;
 } & React.ComponentPropsWithoutRef<'button'>) {
   const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Clear a pending flash timer on unmount so the 1.5s "Copied" reset never
+  // fires setState after the control has gone away.
+  useEffect(() => () => clearTimeout(timer.current), []);
   const copy = () => {
     void navigator.clipboard?.writeText(text).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => setCopied(false), 1500);
     });
   };
   return (
