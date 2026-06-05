@@ -15,6 +15,51 @@ const GROUPS: { label: string; prefix: ThemeToken extends `${infer P}-${string}`
 
 const tokenKeys = Object.keys(globalTokens) as ThemeToken[];
 
+/**
+ * Coerce a token color value into the `#rrggbb` a native `<input type="color">`
+ * requires. Token defaults are space-separated `hsl(H S% L%)`; overrides may be
+ * hex or anything the text input accepts. Returns `#000000` for values that
+ * aren't a recognizable hex or `hsl()` (the picker can't represent them, but the
+ * text input still owns the real value) so the control never throws.
+ */
+function toHexColor(value: string): string {
+  const trimmed = value.trim();
+  const hex = trimmed.match(/^#([0-9a-f]{6}|[0-9a-f]{3})$/i);
+  if (hex) {
+    const h = hex[1] ?? '';
+    return `#${h.length === 3 ? h.replace(/./g, (c) => c + c) : h}`.toLowerCase();
+  }
+  const hsl = trimmed.match(/^hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%\s*\)$/i);
+  if (hsl) {
+    const hue = parseFloat(hsl[1] ?? '0');
+    const sat = parseFloat(hsl[2] ?? '0') / 100;
+    const light = parseFloat(hsl[3] ?? '0') / 100;
+    const c = (1 - Math.abs(2 * light - 1)) * sat;
+    const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
+    const m = light - c / 2;
+    const rgb =
+      hue < 60
+        ? [c, x, 0]
+        : hue < 120
+          ? [x, c, 0]
+          : hue < 180
+            ? [0, c, x]
+            : hue < 240
+              ? [0, x, c]
+              : hue < 300
+                ? [x, 0, c]
+                : [c, 0, x];
+    return `#${rgb
+      .map((v) =>
+        Math.round((v + m) * 255)
+          .toString(16)
+          .padStart(2, '0'),
+      )
+      .join('')}`;
+  }
+  return '#000000';
+}
+
 export function ThemeEditor({ overrides, onChange }: Props) {
   const hasOverrides = Object.keys(overrides).length > 0;
 
@@ -52,10 +97,15 @@ export function ThemeEditor({ overrides, onChange }: Props) {
                 >
                   <span className="flex items-center gap-1.5 truncate text-sm text-fg">
                     {prefix === 'color' && (
-                      <span
-                        aria-hidden
-                        className="size-3 shrink-0 rounded-full border border-border"
-                        style={{ background: overrides[token] ?? globalTokens[token] }}
+                      // Native picker doubles as the swatch: changing it writes the
+                      // same override key as the text input, so the two stay in sync.
+                      <input
+                        type="color"
+                        aria-label={`${token} color`}
+                        data-color-token={token}
+                        className="size-4 shrink-0 cursor-pointer rounded-full border border-border bg-transparent p-0"
+                        value={toHexColor(overrides[token] ?? globalTokens[token])}
+                        onChange={(e) => onChange({ ...overrides, [token]: e.target.value })}
                       />
                     )}
                     <span className="truncate font-mono text-xs">{token}</span>
@@ -63,6 +113,7 @@ export function ThemeEditor({ overrides, onChange }: Props) {
                   <input
                     className="rounded-md border border-border bg-bg px-2 py-1 font-mono text-xs text-fg transition-colors hover:border-fg/30 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 data-[overridden=true]:border-primary/60"
                     data-overridden={overridden}
+                    data-text-token={token}
                     value={overrides[token] ?? globalTokens[token]}
                     onChange={(e) => onChange({ ...overrides, [token]: e.target.value })}
                   />

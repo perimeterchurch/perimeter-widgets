@@ -1,9 +1,50 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { globalTokens, type ThemeToken } from '@perimeter/theme';
 import { Badge } from '@perimeter/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@perimeter/ui/card';
 
 type TokenRow = { token: ThemeToken; value: string };
+
+/**
+ * A click-to-copy affordance reusing the embed-snippet copy pattern: write the
+ * text to the clipboard and flash a brief "Copied" confirmation. Rendered as a
+ * button so it's keyboard-reachable; the visible label is supplied by children.
+ */
+function CopyButton({
+  text,
+  title,
+  className,
+  children,
+  ...rest
+}: {
+  text: string;
+  title: string;
+} & React.ComponentPropsWithoutRef<'button'>) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    void navigator.clipboard?.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      title={copied ? 'Copied' : title}
+      className={`group inline-flex items-center gap-1.5 rounded-sm text-left transition-colors hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 ${className ?? ''}`}
+      {...rest}
+    >
+      {children}
+      <span
+        aria-hidden
+        className="shrink-0 text-[0.65rem] uppercase tracking-wider text-muted-fg/60 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+      >
+        {copied ? 'Copied' : 'Copy'}
+      </span>
+    </button>
+  );
+}
 
 /** Split the flat token map into the three display groups, preserving source order. */
 function partitionTokens(): { color: TokenRow[]; radius: TokenRow[]; font: TokenRow[] } {
@@ -18,9 +59,29 @@ function partitionTokens(): { color: TokenRow[]; radius: TokenRow[]; font: Token
   return { color, radius, font };
 }
 
-/** The css custom-property name, shown verbatim so it can be copied into an override. */
+/** The css custom-property name as a click-to-copy control (copies `--token`). */
 function VarName({ token }: { token: ThemeToken }) {
-  return <code className="font-mono text-xs text-muted-fg">{`--${token}`}</code>;
+  return (
+    <CopyButton text={`--${token}`} title={`Copy --${token}`} data-copy-token-name={token}>
+      <code className="font-mono text-xs text-muted-fg group-hover:text-fg">{`--${token}`}</code>
+    </CopyButton>
+  );
+}
+
+/** The literal token value as a click-to-copy control (copies the raw value). */
+function ValueText({ token, value, className }: TokenRow & { className?: string }) {
+  return (
+    <CopyButton
+      text={value}
+      title={`Copy ${value}`}
+      data-copy-token-value={token}
+      className={className}
+    >
+      <span className="truncate font-mono text-xs text-muted-fg/80 group-hover:text-fg">
+        {value}
+      </span>
+    </CopyButton>
+  );
 }
 
 /** A swatch + var-name + literal value, painted from the live `:root` token layer. */
@@ -33,9 +94,9 @@ function ColorSwatch({ token, value }: TokenRow) {
         className="size-10 shrink-0 rounded-md border border-border shadow-sm"
         style={{ background: `var(--${token})` }}
       />
-      <span className="min-w-0 flex-1">
+      <span className="flex min-w-0 flex-1 flex-col items-start">
         <VarName token={token} />
-        <span className="block truncate font-mono text-xs text-muted-fg/80">{value}</span>
+        <ValueText token={token} value={value} className="max-w-full" />
       </span>
     </li>
   );
@@ -51,9 +112,9 @@ function RadiusSample({ token, value }: TokenRow) {
         className="size-10 shrink-0 border border-border bg-muted"
         style={{ borderRadius: `var(--${token})` }}
       />
-      <span className="min-w-0 flex-1">
+      <span className="flex min-w-0 flex-1 flex-col items-start">
         <VarName token={token} />
-        <span className="block font-mono text-xs text-muted-fg/80">{value}</span>
+        <ValueText token={token} value={value} />
       </span>
     </li>
   );
@@ -73,7 +134,7 @@ function FontSample({ token, value }: TokenRow) {
       >
         The quick brown fox jumps over the lazy dog
       </p>
-      <p className="font-mono text-xs leading-relaxed text-muted-fg/80">{value}</p>
+      <ValueText token={token} value={value} className="max-w-full" />
     </li>
   );
 }
