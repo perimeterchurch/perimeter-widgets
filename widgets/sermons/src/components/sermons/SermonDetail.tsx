@@ -47,7 +47,7 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
     if (sermon) titleRef.current?.focus();
   }, [sermon]);
 
-  const { data: seriesData } = useSermons(
+  const { data: seriesData, error: relatedError } = useSermons(
     defined({
       seriesId: sermon?.series.id ? String(sermon.series.id) : undefined,
       // Sermons sort only over date/title; 'count' is series-only.
@@ -117,8 +117,16 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
               </div>
             )}
 
+            {/* Related fetch failed: a quiet inline note, not a full error
+                block — the sermon itself loaded fine. */}
+            {showRelated && relatedError && (
+              <p data-slot="related-error" className="text-sm text-muted-fg">
+                Couldn&rsquo;t load more sermons from this series.
+              </p>
+            )}
+
             {/* More from this series */}
-            {showRelated && relatedSermons.length > 0 && (
+            {showRelated && !relatedError && relatedSermons.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-sm">More from this series</h3>

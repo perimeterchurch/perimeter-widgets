@@ -21,6 +21,7 @@ import { SermonFilters } from './SermonFilters';
 import { SermonGrid } from './SermonGrid';
 import { SermonSmallList } from './SermonSmallList';
 import { SermonLargeList } from './SermonLargeList';
+import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 import { getPageRange } from '../../lib/pagination';
 import { defined, idsParam } from '../../lib/query-params';
@@ -81,7 +82,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
   // narrows every sermon query as a baseline.
   const pinnedSeriesTypeId = config.seriesTypeId || undefined;
 
-  const { data, isLoading } = useSermons(
+  const { data, isLoading, error, refetch } = useSermons(
     defined({
       search: filters.search || undefined,
       seriesId: idsParam(filters.selectedSeriesIds),
@@ -158,8 +159,10 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
       {/* Results header: count + sort + view */}
       {showSortView && (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-[var(--color-muted-fg)]">
-            {pagination ? `${pagination.total} sermons` : ''}
+          <span data-slot="results-count" className="text-sm text-[var(--color-muted-fg)]">
+            {/* Reserve the line height even before the count loads so the
+                toolbar row doesn't reflow when results arrive. */}
+            {pagination ? `${pagination.total} sermons` : ' '}
           </span>
           <div className="flex items-center gap-2">
             <SortSelect
@@ -179,22 +182,41 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
           </div>
         </div>
       )}
-      <SkeletonTransition
-        isLoading={isLoading}
-        skeleton={
-          <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
-            {Array.from({ length: config.perPage }, (_, i) => (
-              <Skeleton key={i} className="h-48 w-full rounded-lg" />
-            ))}
-          </div>
-        }
-      >
-        <ViewComponent
-          sermons={sermons}
-          onSermonClick={(id: number) => filters.setScreen('detail', id)}
-          config={config}
+      {error ? (
+        // A failed query gets a distinct themed error block (not the empty
+        // state), so an API outage doesn't read as "no results".
+        <ResultsError
+          noun="sermons"
+          onRetry={() => {
+            void refetch();
+          }}
         />
-      </SkeletonTransition>
+      ) : (
+        <SkeletonTransition
+          isLoading={isLoading}
+          skeleton={
+            <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
+              {Array.from({ length: config.perPage }, (_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+        >
+          {sermons.length === 0 ? (
+            <ResultsEmpty
+              noun="sermons"
+              hasActiveFilters={filters.hasActiveFilters}
+              onClearFilters={filters.clearFilters}
+            />
+          ) : (
+            <ViewComponent
+              sermons={sermons}
+              onSermonClick={(id: number) => filters.setScreen('detail', id)}
+              config={config}
+            />
+          )}
+        </SkeletonTransition>
+      )}
       {!config.hidePagination && pagination && pagination.totalPages > 1 && (
         <Pagination aria-label="Sermon results pagination">
           <PaginationContent>

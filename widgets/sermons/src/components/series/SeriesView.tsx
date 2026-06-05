@@ -21,6 +21,7 @@ import { useSeries, useSeriesTypes } from '@perimeter/api-hooks';
 import type { SermonsConfig, SortField, SortOrder } from '../../types';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SeriesGrid } from './SeriesGrid';
+import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 import { getPageRange } from '../../lib/pagination';
 import { defined, idsParam } from '../../lib/query-params';
@@ -93,7 +94,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
     label: st.name,
   }));
 
-  const { data, isLoading } = useSeries(
+  const { data, isLoading, error, refetch } = useSeries(
     defined({
       search: filters.search || undefined,
       seriesTypeId,
@@ -162,8 +163,10 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
       {/* Results header: count + sort + view */}
       {showSortView && (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-[var(--color-muted-fg)]">
-            {pagination ? `${pagination.total} series` : ''}
+          <span data-slot="results-count" className="text-sm text-[var(--color-muted-fg)]">
+            {/* Reserve the line height even before the count loads so the
+                toolbar row doesn't reflow when results arrive. */}
+            {pagination ? `${pagination.total} series` : ' '}
           </span>
           <div className="flex items-center gap-2">
             <SortSelect
@@ -188,23 +191,42 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
         </div>
       )}
 
-      <SkeletonTransition
-        isLoading={isLoading}
-        skeleton={
-          <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
-            {Array.from({ length: config.perPage }, (_, i) => (
-              <Skeleton key={i} className="h-48 w-full rounded-lg" />
-            ))}
-          </div>
-        }
-      >
-        <SeriesGrid
-          series={seriesList}
-          viewMode={viewMode}
-          onSeriesClick={(id: number) => filters.setScreen('detail', id)}
-          config={config}
+      {error ? (
+        // A failed query gets a distinct themed error block (not the empty
+        // state), so an API outage doesn't read as "no results".
+        <ResultsError
+          noun="series"
+          onRetry={() => {
+            void refetch();
+          }}
         />
-      </SkeletonTransition>
+      ) : (
+        <SkeletonTransition
+          isLoading={isLoading}
+          skeleton={
+            <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
+              {Array.from({ length: config.perPage }, (_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+        >
+          {seriesList.length === 0 ? (
+            <ResultsEmpty
+              noun="series"
+              hasActiveFilters={filters.hasActiveFilters}
+              onClearFilters={filters.clearFilters}
+            />
+          ) : (
+            <SeriesGrid
+              series={seriesList}
+              viewMode={viewMode}
+              onSeriesClick={(id: number) => filters.setScreen('detail', id)}
+              config={config}
+            />
+          )}
+        </SkeletonTransition>
+      )}
 
       {!config.hidePagination && pagination && pagination.totalPages > 1 && (
         <Pagination aria-label="Series results pagination">

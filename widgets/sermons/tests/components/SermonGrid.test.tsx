@@ -52,10 +52,13 @@ describe('SermonGrid', () => {
     expect(screen.getByText('Jane Doe')).toBeInTheDocument();
   });
 
-  it('shows empty state when no sermons', () => {
-    render(<SermonGrid sermons={[]} onSermonClick={() => {}} config={config} />);
+  it('shows a themed empty state when no sermons', () => {
+    const { container } = render(
+      <SermonGrid sermons={[]} onSermonClick={() => {}} config={config} />,
+    );
 
-    expect(screen.getByText('No sermons found.')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="results-empty"]')).not.toBeNull();
+    expect(screen.getByText('No sermons found')).toBeInTheDocument();
   });
 
   it('calls onSermonClick with sermon ID', async () => {
