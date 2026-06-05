@@ -9,6 +9,8 @@ import { WidgetPreview } from '../components/WidgetPreview';
 import { Canvas } from '../components/Canvas';
 import { InspectorDrawer } from '../components/InspectorDrawer';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import { ShareLinkButton } from '../components/ShareLinkButton';
+import { usePreviewConfig } from '../hooks/use-preview-config';
 import { titleFromSlug } from '../lib/labels';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -27,9 +29,11 @@ export function WidgetPage() {
 }
 
 function WidgetView({ entry }: { entry: WidgetEntry }) {
-  const [configOverrides, setConfigOverrides] = useState<Record<string, unknown>>({});
-  const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  // The preview's tuned state (config overrides + token overrides + theme +
+  // viewport) lives in the URL so a dialed-in preview is shareable and survives
+  // reload — usePreviewConfig is the single source of truth, replacing local
+  // useState. The standalone /preview/:slug route reads the same params.
+  const { state, setConfig, setTokens, setTheme, setViewport, buildShareUrl } = usePreviewConfig();
   const [def, setDef] = useState<WidgetDefinition | null>(null);
   const doc = widgetDoc(entry.slug);
 
@@ -48,31 +52,45 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
             {titleFromSlug(entry.slug)}
           </h1>
         </div>
-        {/* Inspector — hand-rolled slide-out drawer (Config / Theme / Info tabs +
-            embed snippet), closed by default. Its toggle lives in the header; the
-            canvas keeps the full width when the drawer is closed. */}
-        <InspectorDrawer
-          definition={def}
-          slug={entry.slug}
-          configOverrides={configOverrides}
-          tokenOverrides={tokenOverrides}
-          onConfigChange={setConfigOverrides}
-          onThemeChange={setTokenOverrides}
-        />
+        <div className="flex items-center gap-2">
+          {/* Share / standalone — copy a deep link carrying the current preview
+              state, or open the full-bleed /preview/:slug route in a new tab. */}
+          <ShareLinkButton
+            copyUrl={() => buildShareUrl(window.location.pathname)}
+            standaloneUrl={buildShareUrl(`/preview/${entry.slug}`)}
+          />
+          {/* Inspector — hand-rolled slide-out drawer (Config / Theme / Info tabs +
+              embed snippet), closed by default. Its toggle lives in the header; the
+              canvas keeps the full width when the drawer is closed. */}
+          <InspectorDrawer
+            definition={def}
+            slug={entry.slug}
+            configOverrides={state.config}
+            tokenOverrides={state.tokens}
+            onConfigChange={setConfig}
+            onThemeChange={setTokens}
+          />
+        </div>
       </header>
 
       <div className="min-h-0 flex-1 overflow-hidden">
         {/* Preview canvas — viewport-preset + background + light/dark toolbar around
             the real mount(). Canvas owns the scroll/background and swaps in the
             host-page sim (HostFrame) when its host-sim background is selected
-            (the default). Theme is lifted here so it can drive both the toolbar
-            control (Canvas) and the host's data-theme attribute (WidgetPreview). */}
-        <Canvas slug={entry.slug} theme={theme} onThemeChange={setTheme}>
+            (the default). Theme + viewport are lifted into the URL here so they
+            drive both the toolbar controls and the shareable preview link. */}
+        <Canvas
+          slug={entry.slug}
+          theme={state.theme}
+          onThemeChange={setTheme}
+          viewport={state.viewport}
+          onViewportChange={setViewport}
+        >
           <WidgetPreview
             entry={entry}
-            configOverrides={configOverrides}
-            tokenOverrides={tokenOverrides}
-            theme={theme}
+            configOverrides={state.config}
+            tokenOverrides={state.tokens}
+            theme={state.theme}
             onDefinition={setDef}
           />
         </Canvas>

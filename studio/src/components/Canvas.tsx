@@ -4,6 +4,7 @@ import { Input } from '@perimeter/ui/input';
 import { cn } from '@perimeter/ui/utils/cn';
 import { HostFrame } from './HostFrame';
 import { BuiltBundlePreview } from './BuiltBundlePreview';
+import type { PreviewViewport } from '../lib/preview-link';
 
 /**
  * The preview source: the live source-mounted widget (`mount()`, dev React + dev
@@ -65,22 +66,62 @@ type BackgroundId = (typeof BACKGROUNDS)[number]['id'];
  * segmented control in the toolbar. Canvas takes the preview as opaque `children`,
  * so it can't set `data-theme` on the host itself — the parent lifts the state,
  * applies it to the WidgetPreview host, and drives this control here.
+ *
+ * `viewport` + `onViewportChange`, when provided (the widget route), make the
+ * viewport-width selection controlled so it can be persisted in the shareable
+ * preview URL. Absent both, Canvas falls back to its own internal preset/custom
+ * state (the design-system pages still embed Canvas uncontrolled).
  */
 export function Canvas({
   children,
   slug,
   theme,
   onThemeChange,
+  viewport: viewportProp,
+  onViewportChange,
 }: {
   children: ReactNode;
   slug?: string;
   theme?: 'light' | 'dark';
   onThemeChange?: (next: 'light' | 'dark') => void;
+  viewport?: PreviewViewport;
+  onViewportChange?: (next: PreviewViewport) => void;
 }) {
-  const [preset, setPreset] = useState<PresetId>('fluid');
-  const [customPx, setCustomPx] = useState('');
+  // Uncontrolled fallback state — used only when the parent does not pass a
+  // controlled `viewport`. The controlled path derives preset/customPx from the
+  // single `viewport` value so the URL stays the source of truth.
+  const [internalPreset, setInternalPreset] = useState<PresetId>('fluid');
+  const [internalCustomPx, setInternalCustomPx] = useState('');
   const [background, setBackground] = useState<BackgroundId>('host-sim');
   const [source, setSource] = useState<PreviewSource>('source');
+
+  const controlled = onViewportChange !== undefined;
+  const viewport: PreviewViewport = controlled
+    ? (viewportProp ?? 'fluid')
+    : typeof internalCustomPx === 'string' &&
+        internalCustomPx.trim() !== '' &&
+        Number(internalCustomPx) > 0
+      ? { custom: Number(internalCustomPx) }
+      : internalPreset;
+
+  const preset: PresetId = typeof viewport === 'object' ? internalPreset : viewport;
+  const customPx = typeof viewport === 'object' ? String(viewport.custom) : '';
+
+  const selectPreset = (id: PresetId) => {
+    if (controlled) onViewportChange?.(id);
+    else {
+      setInternalPreset(id);
+      setInternalCustomPx('');
+    }
+  };
+  const selectCustom = (raw: string) => {
+    if (controlled) {
+      const px = Number(raw);
+      onViewportChange?.(raw.trim() !== '' && px > 0 ? { custom: px } : preset);
+    } else {
+      setInternalCustomPx(raw);
+    }
+  };
 
   // DEV-only: the Built view requires a slug to resolve the on-disk bundle, and
   // the whole feature must tree-shake out of the deployed build. import.meta.env.DEV
@@ -89,8 +130,8 @@ export function Canvas({
   const showBuilt = showBuiltToggle && source === 'built';
 
   const presetPx = PRESETS.find((p) => p.id === preset)?.px ?? null;
-  const customActive = customPx.trim() !== '' && Number(customPx) > 0;
-  const resolvedPx = customActive ? Number(customPx) : presetPx;
+  const customActive = typeof viewport === 'object';
+  const resolvedPx = customActive ? viewport.custom : presetPx;
   const width = resolvedPx === null ? undefined : `${resolvedPx}px`;
 
   const surface = BACKGROUNDS.find((b) => b.id === background)?.surface;
@@ -113,10 +154,7 @@ export function Canvas({
                   size="sm"
                   variant={isActive ? 'secondary' : 'ghost'}
                   aria-pressed={isActive}
-                  onClick={() => {
-                    setPreset(p.id);
-                    setCustomPx('');
-                  }}
+                  onClick={() => selectPreset(p.id)}
                   className={cn(!isActive && 'text-muted-fg')}
                 >
                   {p.label}
@@ -138,7 +176,7 @@ export function Canvas({
             aria-label="Custom width in pixels"
             placeholder="px"
             value={customPx}
-            onChange={(e) => setCustomPx(e.target.value)}
+            onChange={(e) => selectCustom(e.target.value)}
             className={cn('h-8 w-24', customActive && 'border-primary ring-1 ring-primary')}
           />
           <span className="ml-1 text-xs tabular-nums text-muted-fg">
