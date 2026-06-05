@@ -104,6 +104,37 @@ overrides live so you can preview them before a host page sets them. See
 default). This is why hard-coded hex values are a bug: a literal `#2563eb` ignores
 the override; `bg-primary` honors it.
 
+## Dark mode
+
+Dark mode is **free if you style with tokens** and broken if you don't. The system
+ships two token sets with identical keys — a light default and a `darkTokens` set
+in `@perimeter/theme` — and the per-instance token sheet emits both a `:host { … }`
+(light) block and a `:host([data-theme="dark"]) { … }` (dark) block. So a utility
+like `bg-bg` / `text-fg` / `border-border` resolves to whichever palette is active.
+Style semantically and your widget renders correctly in both themes with **no
+`dark:` variants and no per-component dark styling** — the token swap does the
+work. A hard-coded `#fafaf9` (or a `stone-50` literal) stays the same color in
+dark mode and breaks the design; this is the deeper reason "never hard-code a
+color" matters.
+
+**Preview it in the studio.** The canvas has a **light/dark toggle**; flip it to
+render the preview against the dark palette before you ship, the same way you
+preview against the host-sim background. (Under the hood the toggle sets
+`data-theme="dark"` on the preview's shadow host — exactly what a production embed
+does.)
+
+**Activate it on an embed** with `data-theme="dark"` on the target element (default
+is light):
+
+```html
+<div data-perimeter-widget="sermons" data-theme="dark"></div>
+```
+
+The attribute lands on the shadow host, which is what `:host([data-theme="dark"])`
+matches — so the dark block activates with zero mount-time work. See
+[`docs/hosting-and-release.md`](../hosting-and-release.md) (Embedding → Dark mode)
+for the embed reference and the non-strict-schema constraint.
+
 ## Configuration is strings — coerce in the schema
 
 Styling and config meet at the widget's zod `schema`. Host-page configuration
@@ -122,5 +153,6 @@ schema.)
 - [ ] Used `@perimeter/ui` for every control it covers.
 - [ ] Set `font-family` / `color` explicitly so nothing leaks in from the host.
 - [ ] Previewed against the host-page-sim background in the canvas.
+- [ ] Previewed both light and dark via the canvas toggle (semantic tokens, no `dark:` variants).
 - [ ] Checked `/tokens` for the per-embed `data-theme-*` override surface.
 - [ ] Used `z.coerce.*` for every numeric/boolean schema field.

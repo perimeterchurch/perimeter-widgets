@@ -56,7 +56,21 @@ pnpm dev
 
 Routes: `/` (overview), `/widgets/:slug`, `/components/:name`, `/tokens`, `/guides/:slug`. The component, token, and guide pages render the single-sourced MDX under `docs/`. A dev-only **source ⇄ built-bundle** toggle (gated behind `import.meta.env.DEV`) mounts the actual `widgets/<name>/dist/index.js` for a final pre-release check; it is tree-shaken out of the deployed site.
 
-Source-mounted previews hit the **production** API (`https://api.perimeter.org`) by default — no mock server or environment variables are required to run the studio.
+### Data and images in dev
+
+For previews that need real data (and the images those records reference), run the local **perimeter-api** alongside the studio:
+
+```bash
+# In the sibling perimeter-api project
+cd perimeter-api && pnpm dev   # serves on :5500
+```
+
+In dev (`import.meta.env.DEV`) the studio targets `http://localhost:5500` automatically via two independent knobs, so no manual config is needed:
+
+- **Data** — `WidgetPreview` passes `apiBaseUrl: 'http://localhost:5500'` into `mount()`, so the React Query hooks fetch from the local API.
+- **Images** — `studio/.env.development` sets `VITE_API_URL=http://localhost:5500`, which `lib/format.ts` reads (`import.meta.env.VITE_API_URL`) to build absolute `<img>` URLs.
+
+Both are **dev-only**: Vite loads `.env.development` only in serve/dev mode, and the `apiBaseUrl` is gated behind `import.meta.env.DEV`, so the deployed `style.perimeter.org` build never bakes in `localhost:5500` — the production studio falls back to `https://api.perimeter.org`. The studio still launches without perimeter-api running; data-backed previews just error or stay empty until it is up.
 
 ---
 

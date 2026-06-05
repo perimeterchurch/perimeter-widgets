@@ -7,7 +7,7 @@ import { widgetDoc } from '../lib/widget-docs';
 import { StudioMDXProvider } from '../lib/mdx';
 import { WidgetPreview } from '../components/WidgetPreview';
 import { Canvas } from '../components/Canvas';
-import { Inspector } from '../components/Inspector';
+import { InspectorDrawer } from '../components/InspectorDrawer';
 import { NotFoundPage } from './NotFoundPage';
 
 /**
@@ -27,40 +27,45 @@ export function WidgetPage() {
 function WidgetView({ entry }: { entry: WidgetEntry }) {
   const [configOverrides, setConfigOverrides] = useState<Record<string, unknown>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [def, setDef] = useState<WidgetDefinition | null>(null);
   const doc = widgetDoc(entry.slug);
 
   return (
     <div className="flex h-full flex-col">
-      <header className="border-b border-border px-6 py-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-fg">Widget</p>
-        <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-fg">{entry.slug}</h1>
+      <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-fg">Widget</p>
+          <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-fg">{entry.slug}</h1>
+        </div>
+        {/* Inspector — hand-rolled slide-out drawer (Config / Theme / Info tabs +
+            embed snippet), closed by default. Its toggle lives in the header; the
+            canvas keeps the full width when the drawer is closed. */}
+        <InspectorDrawer
+          definition={def}
+          slug={entry.slug}
+          configOverrides={configOverrides}
+          tokenOverrides={tokenOverrides}
+          onConfigChange={setConfigOverrides}
+          onThemeChange={setTokenOverrides}
+        />
       </header>
 
-      <div className="grid min-h-[28rem] flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[1fr_22rem]">
-        {/* Preview canvas — viewport-preset + background toolbar around the real
-            mount(). Canvas owns the scroll/background and swaps in the host-page
-            sim (HostFrame) when its host-sim background is selected (the default). */}
-        <Canvas slug={entry.slug}>
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {/* Preview canvas — viewport-preset + background + light/dark toolbar around
+            the real mount(). Canvas owns the scroll/background and swaps in the
+            host-page sim (HostFrame) when its host-sim background is selected
+            (the default). Theme is lifted here so it can drive both the toolbar
+            control (Canvas) and the host's data-theme attribute (WidgetPreview). */}
+        <Canvas slug={entry.slug} theme={theme} onThemeChange={setTheme}>
           <WidgetPreview
             entry={entry}
             configOverrides={configOverrides}
             tokenOverrides={tokenOverrides}
+            theme={theme}
             onDefinition={setDef}
           />
         </Canvas>
-
-        {/* Inspector — config / theme / info tabs + embed snippet. */}
-        <aside className="overflow-y-auto border-t border-border p-4 xl:border-l xl:border-t-0">
-          <Inspector
-            definition={def}
-            slug={entry.slug}
-            configOverrides={configOverrides}
-            tokenOverrides={tokenOverrides}
-            onConfigChange={setConfigOverrides}
-            onThemeChange={setTokenOverrides}
-          />
-        </aside>
       </div>
 
       {/* Optional widget doc: rendered below the canvas when docs/widgets/<slug>.mdx

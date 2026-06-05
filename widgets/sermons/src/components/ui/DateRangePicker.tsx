@@ -215,14 +215,12 @@ function RangePanel({
   return (
     <div>
       {/* Header */}
-      <div className="mb-5 flex items-center justify-between border-b border-stone-200 py-5 dark:border-stone-700/60">
-        <span className="px-3 text-sm font-semibold text-stone-800 dark:text-stone-200">
-          Select date range
-        </span>
+      <div className="mb-5 flex items-center justify-between border-b border-border py-5">
+        <span className="px-3 text-sm font-semibold text-fg">Select date range</span>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg px-3 py-2 text-sm font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+          className="rounded-lg px-3 py-2 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-fg"
           aria-label="Close dialog"
         >
           <X className="h-4 w-4" />
@@ -233,8 +231,8 @@ function RangePanel({
       <div className={cn(hasPresets && 'flex gap-5')}>
         {/* Left panel — presets */}
         {hasPresets && (
-          <div className="flex w-36 shrink-0 flex-col gap-1.5 border-r border-stone-200 pr-5 dark:border-stone-700/60">
-            <span className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+          <div className="flex w-36 shrink-0 flex-col gap-1.5 border-r border-border pr-5">
+            <span className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-fg">
               Quick select
             </span>
             {presets.map((preset) => (
@@ -245,11 +243,9 @@ function RangePanel({
                 className={cn(
                   'rounded-lg px-3 py-2 text-left text-xs font-medium',
                   'transition-all duration-150',
-                  'text-stone-600',
+                  'text-muted-fg',
                   'hover:bg-[var(--color-primary)]/5 hover:text-[var(--color-primary)]',
                   'active:scale-[0.97]',
-                  'dark:text-stone-400',
-                  'dark:hover:bg-[var(--color-primary)]/5 dark:hover:text-[var(--color-primary)]',
                 )}
               >
                 {preset.label}
@@ -261,25 +257,21 @@ function RangePanel({
         {/* Right panel — date selection */}
         <div className="min-w-0 flex-1">
           {/* From / To segmented control */}
-          <div className="mb-3 flex items-stretch gap-0 rounded-xl bg-stone-100 p-1 dark:bg-stone-800">
+          <div className="mb-3 flex items-stretch gap-0 rounded-xl bg-muted p-1">
             {/* From pill */}
             <button
               type="button"
               onClick={() => setActiveSide('start')}
               className={cn(
                 'group relative flex flex-1 items-center gap-2 rounded-lg px-3 py-2 text-left transition-all duration-150',
-                activeSide === 'start'
-                  ? 'bg-white shadow-sm dark:bg-stone-700'
-                  : 'hover:bg-stone-200/50 dark:hover:bg-stone-700/50',
+                activeSide === 'start' ? 'bg-bg shadow-sm' : 'hover:bg-bg/50',
               )}
             >
               <div className="min-w-0 flex-1">
                 <span
                   className={cn(
                     'block text-[10px] font-semibold uppercase tracking-wider',
-                    activeSide === 'start'
-                      ? 'text-[var(--color-primary)]'
-                      : 'text-stone-400 dark:text-stone-500',
+                    activeSide === 'start' ? 'text-[var(--color-primary)]' : 'text-muted-fg',
                   )}
                 >
                   From
@@ -287,9 +279,7 @@ function RangePanel({
                 <span
                   className={cn(
                     'block truncate text-sm',
-                    draftStartDate
-                      ? 'font-medium text-stone-900 dark:text-stone-100'
-                      : 'text-stone-400 dark:text-stone-500',
+                    draftStartDate ? 'font-medium text-fg' : 'text-muted-fg',
                   )}
                 >
                   {formatPill(draftStartDate, 'Select start')}
@@ -311,7 +301,7 @@ function RangePanel({
                       setActiveSide('start');
                     }
                   }}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-600 dark:hover:bg-stone-600 dark:hover:text-stone-300"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-muted-fg transition-colors hover:bg-muted hover:text-fg"
                   aria-label="Clear start date"
                 >
                   <X className="h-3 w-3" />
@@ -321,7 +311,7 @@ function RangePanel({
 
             {/* Arrow separator */}
             <div className="flex items-center px-1">
-              <ArrowRight className="h-3.5 w-3.5 text-stone-300 dark:text-stone-600" />
+              <ArrowRight className="h-3.5 w-3.5 text-muted-fg" />
             </div>
 
             {/* To pill */}
@@ -330,18 +320,14 @@ function RangePanel({
               onClick={() => setActiveSide('end')}
               className={cn(
                 'group relative flex flex-1 items-center gap-2 rounded-lg px-3 py-2 text-left transition-all duration-150',
-                activeSide === 'end'
-                  ? 'bg-white shadow-sm dark:bg-stone-700'
-                  : 'hover:bg-stone-200/50 dark:hover:bg-stone-700/50',
+                activeSide === 'end' ? 'bg-bg shadow-sm' : 'hover:bg-bg/50',
               )}
             >
               <div className="min-w-0 flex-1">
                 <span
                   className={cn(
                     'block text-[10px] font-semibold uppercase tracking-wider',
-                    activeSide === 'end'
-                      ? 'text-[var(--color-primary)]'
-                      : 'text-stone-400 dark:text-stone-500',
+                    activeSide === 'end' ? 'text-[var(--color-primary)]' : 'text-muted-fg',
                   )}
                 >
                   To
@@ -349,9 +335,7 @@ function RangePanel({
                 <span
                   className={cn(
                     'block truncate text-sm',
-                    draftEndDate
-                      ? 'font-medium text-stone-900 dark:text-stone-100'
-                      : 'text-stone-400 dark:text-stone-500',
+                    draftEndDate ? 'font-medium text-fg' : 'text-muted-fg',
                   )}
                 >
                   {formatPill(draftEndDate, 'Now')}
@@ -373,7 +357,7 @@ function RangePanel({
                       setActiveSide('end');
                     }
                   }}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-600 dark:hover:bg-stone-600 dark:hover:text-stone-300"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-muted-fg transition-colors hover:bg-muted hover:text-fg"
                   aria-label="Clear end date"
                 >
                   <X className="h-3 w-3" />
@@ -399,7 +383,7 @@ function RangePanel({
       </div>
 
       {/* Footer */}
-      <div className="mt-5 flex items-center gap-3 border-t border-stone-200 pt-5 dark:border-stone-700/60">
+      <div className="mt-5 flex items-center gap-3 border-t border-border pt-5">
         <button
           type="button"
           onClick={() => {
@@ -409,8 +393,8 @@ function RangePanel({
           className={cn(
             'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
             hasSelection
-              ? 'text-stone-500 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200'
-              : 'pointer-events-none text-stone-300 dark:text-stone-600',
+              ? 'text-muted-fg hover:bg-muted hover:text-fg'
+              : 'pointer-events-none text-muted-fg opacity-50',
           )}
         >
           Clear
@@ -419,7 +403,7 @@ function RangePanel({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+          className="rounded-lg px-4 py-2 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-fg"
         >
           Close
         </button>
@@ -430,8 +414,8 @@ function RangePanel({
             'rounded-lg px-5 py-2 text-sm font-medium',
             'transition-all duration-150 active:scale-[0.98]',
             isDirty || hasSelection
-              ? 'bg-[var(--color-primary)] text-white shadow-sm hover:opacity-90'
-              : 'bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500',
+              ? 'bg-[var(--color-primary)] text-primary-fg shadow-sm hover:opacity-90'
+              : 'bg-muted text-muted-fg',
           )}
         >
           Apply
@@ -553,20 +537,20 @@ function CalendarGrid({
   );
 
   return (
-    <div className="rounded-xl bg-stone-50/50 p-4 dark:bg-stone-800/30">
+    <div className="rounded-xl bg-muted/50 p-4">
       {/* Month navigation */}
       <div className="mb-2 flex items-center justify-between">
         <button
           type="button"
           onClick={() => navigateMonth(-1)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-white hover:text-stone-600 hover:shadow-sm dark:hover:bg-stone-700 dark:hover:text-stone-300"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-fg transition-colors hover:bg-bg hover:text-fg hover:shadow-sm"
           aria-label="Previous month"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold tracking-tight text-stone-800 dark:text-stone-200">
+          <span className="text-sm font-semibold tracking-tight text-fg">
             {calendarView.toFormat('MMMM yyyy')}
           </span>
           {(calendarView.month !== today.month || calendarView.year !== today.year) && (
@@ -583,7 +567,7 @@ function CalendarGrid({
         <button
           type="button"
           onClick={() => navigateMonth(1)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-white hover:text-stone-600 hover:shadow-sm dark:hover:bg-stone-700 dark:hover:text-stone-300"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-fg transition-colors hover:bg-bg hover:text-fg hover:shadow-sm"
           aria-label="Next month"
         >
           <ChevronRight className="h-4 w-4" />
@@ -595,7 +579,7 @@ function CalendarGrid({
         {WEEKDAY_LABELS.map((label) => (
           <div
             key={label}
-            className="py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500"
+            className="py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-fg"
           >
             {label}
           </div>
@@ -629,14 +613,14 @@ function CalendarGrid({
                 isStart && isEnd && 'rounded-lg',
                 !inRange && !isStart && !isEnd && 'rounded-lg',
                 // Text & hover
-                !isCurrentMonth && 'text-stone-300 dark:text-stone-600',
+                !isCurrentMonth && 'text-muted-fg opacity-60',
                 isCurrentMonth &&
                   !isSelected &&
                   !isDisabled &&
-                  'text-stone-700 hover:bg-white hover:shadow-sm dark:text-stone-300 dark:hover:bg-stone-700',
+                  'text-fg hover:bg-bg hover:shadow-sm',
                 isToday && !isSelected && 'font-bold text-[var(--color-primary)]',
                 isSelected &&
-                  'rounded-lg bg-[var(--color-primary)] font-semibold text-white shadow-sm',
+                  'rounded-lg bg-[var(--color-primary)] font-semibold text-primary-fg shadow-sm',
                 isDisabled && 'cursor-not-allowed opacity-30',
                 !isDisabled && 'cursor-pointer',
               )}
@@ -646,7 +630,7 @@ function CalendarGrid({
                 <span
                   className={cn(
                     'absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full',
-                    isSelected ? 'bg-white' : 'bg-[var(--color-primary)]',
+                    isSelected ? 'bg-primary-fg' : 'bg-[var(--color-primary)]',
                   )}
                 />
               )}
@@ -711,12 +695,12 @@ function TimeInput({
   return (
     <div
       className={cn(
-        'mt-3 flex items-center justify-center gap-2 rounded-lg bg-white px-3 py-2.5 shadow-sm dark:bg-stone-700',
+        'mt-3 flex items-center justify-center gap-2 rounded-lg bg-bg px-3 py-2.5 shadow-sm',
         disabled && 'pointer-events-none opacity-40',
       )}
     >
-      <Clock className="h-3.5 w-3.5 shrink-0 text-stone-400" />
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+      <Clock className="h-3.5 w-3.5 shrink-0 text-muted-fg" />
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-fg">
         {label ?? 'Time'}
       </span>
       <div className="ml-auto flex items-center gap-1.5">
@@ -729,10 +713,10 @@ function TimeInput({
           onKeyDown={(e) => {
             if (e.key === 'Escape') e.currentTarget.blur();
           }}
-          className="h-8 w-12 rounded-md border border-stone-200 bg-stone-50 px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30 dark:border-stone-600 dark:bg-stone-800"
+          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
           aria-label={label ? `${label} hour` : 'Hour'}
         />
-        <span className="text-sm font-bold text-stone-300 dark:text-stone-500">:</span>
+        <span className="text-sm font-bold text-muted-fg">:</span>
         <input
           type="number"
           min={0}
@@ -742,18 +726,18 @@ function TimeInput({
           onKeyDown={(e) => {
             if (e.key === 'Escape') e.currentTarget.blur();
           }}
-          className="h-8 w-12 rounded-md border border-stone-200 bg-stone-50 px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30 dark:border-stone-600 dark:bg-stone-800"
+          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
           aria-label={label ? `${label} minute` : 'Minute'}
         />
-        <div className="flex h-8 overflow-hidden rounded-md border border-stone-200 text-[11px] font-semibold dark:border-stone-600">
+        <div className="flex h-8 overflow-hidden rounded-md border border-border text-[11px] font-semibold">
           <button
             type="button"
             onClick={!isPM ? undefined : togglePeriod}
             className={cn(
               'px-2.5 transition-colors',
               !isPM
-                ? 'bg-[var(--color-primary)] text-white'
-                : 'bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:bg-stone-800 dark:text-stone-500 dark:hover:bg-stone-700',
+                ? 'bg-[var(--color-primary)] text-primary-fg'
+                : 'bg-bg text-muted-fg hover:bg-muted hover:text-fg',
             )}
           >
             AM
@@ -764,8 +748,8 @@ function TimeInput({
             className={cn(
               'px-2.5 transition-colors',
               isPM
-                ? 'bg-[var(--color-primary)] text-white'
-                : 'bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:bg-stone-800 dark:text-stone-500 dark:hover:bg-stone-700',
+                ? 'bg-[var(--color-primary)] text-primary-fg'
+                : 'bg-bg text-muted-fg hover:bg-muted hover:text-fg',
             )}
           >
             PM

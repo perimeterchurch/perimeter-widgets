@@ -65,40 +65,32 @@ export function SeriesDetail({ id, onBack, onSermonClick }: SeriesDetailProps) {
         {series && (
           <div className="space-y-4">
             <div>
-              <h2
-                ref={titleRef}
-                tabIndex={-1}
-                className="text-xl font-bold text-stone-900 dark:text-stone-100 outline-none"
-              >
+              <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-none">
                 {series.displayTitle ?? series.title}
               </h2>
-              {series.subtitle && (
-                <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">{series.subtitle}</p>
-              )}
+              {series.subtitle && <p className="text-sm text-muted-fg mt-1">{series.subtitle}</p>}
               <div className="flex flex-wrap items-center gap-2 mt-2">
-                <span className="text-sm text-stone-500">
+                <span className="text-sm text-muted-fg">
                   {series.sermonCount} sermon{series.sermonCount !== 1 ? 's' : ''}
                 </span>
                 {series.book && <Badge variant="secondary">{series.book.name}</Badge>}
               </div>
             </div>
 
-            <div className="divide-y divide-stone-200 dark:divide-stone-700">
+            <div className="divide-y divide-border">
               {series.sermons.map((sermon, index) => (
                 <button
                   key={sermon.id}
                   type="button"
                   onClick={() => onSermonClick(sermon.id)}
-                  className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-stone-50 dark:hover:bg-stone-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded px-1"
+                  className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded px-1"
                 >
-                  <span className="flex-shrink-0 w-6 text-center text-xs font-medium text-stone-400">
+                  <span className="flex-shrink-0 w-6 text-center text-xs font-medium text-muted-fg">
                     {index + 1}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-sm text-stone-900 dark:text-stone-100">
-                      {sermon.title}
-                    </p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                    <p className="truncate font-medium text-sm text-fg">{sermon.title}</p>
+                    <p className="text-xs text-muted-fg">
                       {sermon.speaker.name} · {formatDate(sermon.date)}
                     </p>
                   </div>

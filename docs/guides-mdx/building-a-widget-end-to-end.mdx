@@ -95,8 +95,15 @@ pnpm --filter @perimeter/studio dev
 studio auto-discovers widgets via `import.meta.glob('/widgets/*/src/widget.tsx')`
 and lists yours automatically — no registry to hand-edit. Select it to preview
 through the real `mount()` on the studio canvas, with live `data-*` config editing,
-the theme editor, a host-page-sim background, and HMR. Edit `src/app.tsx` and the
-preview hot-reloads.
+the theme editor, a light/dark toggle, a host-page-sim background, and HMR. Edit
+`src/app.tsx` and the preview hot-reloads.
+
+> **Data-backed widgets need the local API.** If your widget pulls from
+> perimeter-api, run it alongside the studio (`cd perimeter-api && pnpm dev` →
+> `:5500`) so data and images load. In dev the studio targets `localhost:5500`
+> automatically (runtime `apiBaseUrl` for data + `VITE_API_URL` for image URLs);
+> both are dev-only and never bake into the deployed `style.perimeter.org` build.
+> See [Developer setup](../guides/developer-setup.md) for the details.
 
 ## 4. Getting data
 

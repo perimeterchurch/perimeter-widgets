@@ -60,8 +60,23 @@ type BackgroundId = (typeof BACKGROUNDS)[number]['id'];
  * `slug`, when present (the widget route), enables a DEV-only Source ⇄ Built
  * toggle that swaps the source-mounted `children` for the shipped built IIFE
  * (BuiltBundlePreview). The toggle never renders outside DEV.
+ *
+ * `theme` + `onThemeChange`, when provided (the widget route), render a Light/Dark
+ * segmented control in the toolbar. Canvas takes the preview as opaque `children`,
+ * so it can't set `data-theme` on the host itself — the parent lifts the state,
+ * applies it to the WidgetPreview host, and drives this control here.
  */
-export function Canvas({ children, slug }: { children: ReactNode; slug?: string }) {
+export function Canvas({
+  children,
+  slug,
+  theme,
+  onThemeChange,
+}: {
+  children: ReactNode;
+  slug?: string;
+  theme?: 'light' | 'dark';
+  onThemeChange?: (next: 'light' | 'dark') => void;
+}) {
   const [preset, setPreset] = useState<PresetId>('fluid');
   const [customPx, setCustomPx] = useState('');
   const [background, setBackground] = useState<BackgroundId>('host-sim');
@@ -82,7 +97,7 @@ export function Canvas({ children, slug }: { children: ReactNode; slug?: string 
   const hostSim = background === 'host-sim';
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border bg-bg px-4 py-2.5">
         <div className="flex items-center gap-1" role="group" aria-label="Viewport width presets">
           {PRESETS.map((p) => {
@@ -162,8 +177,47 @@ export function Canvas({ children, slug }: { children: ReactNode; slug?: string 
           />
         </div>
 
+        {onThemeChange && (
+          <div className="ml-auto flex items-center gap-2" role="group" aria-label="Preview theme">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
+              Theme
+            </span>
+            {/* Light/Dark segmented control — drives data-theme on the preview
+                host (via the lifted parent state). Distinct from the
+                background-surface buttons, which only paint the canvas behind
+                the frame. */}
+            <div className="flex items-center overflow-hidden rounded-md border border-border">
+              {(
+                [
+                  { id: 'light', label: 'Light' },
+                  { id: 'dark', label: 'Dark' },
+                ] as const
+              ).map((opt, i) => {
+                const isActive = theme === opt.id;
+                return (
+                  <Button
+                    key={opt.id}
+                    type="button"
+                    size="sm"
+                    variant={isActive ? 'secondary' : 'ghost'}
+                    aria-pressed={isActive}
+                    onClick={() => onThemeChange(opt.id)}
+                    className={cn(
+                      'rounded-none border-0',
+                      i > 0 && 'border-l border-border',
+                      !isActive && 'text-muted-fg',
+                    )}
+                  >
+                    {opt.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div
-          className="ml-auto flex items-center gap-2"
+          className={cn('flex items-center gap-2', !onThemeChange && 'ml-auto')}
           role="group"
           aria-label="Canvas background"
         >
@@ -201,7 +255,11 @@ export function Canvas({ children, slug }: { children: ReactNode; slug?: string 
         </span>
       </div>
 
-      <div data-canvas-surface className="flex-1 overflow-auto p-6" style={{ background: surface }}>
+      <div
+        data-canvas-surface
+        className="min-h-0 flex-1 overflow-auto p-6"
+        style={{ background: surface }}
+      >
         <div data-canvas-frame style={{ width, marginInline: 'auto' }}>
           {/* Built view: the shipped IIFE in its own iframe document — it brings
               its own host page, so it skips HostFrame. Source view keeps the

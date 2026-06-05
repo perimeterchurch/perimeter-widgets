@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import containerQueries from '@tailwindcss/container-queries';
 import { globalTokens, type ThemeToken } from './tokens';
 
 function cssVar(token: ThemeToken): string {
@@ -37,6 +38,7 @@ export const widgetContent: string[] = [
 
 export const tailwindPreset: Config = {
   content: [],
+  plugins: [containerQueries],
   theme: {
     extend: {
       colors,

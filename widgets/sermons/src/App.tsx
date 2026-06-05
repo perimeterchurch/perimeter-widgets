@@ -98,7 +98,7 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
   };
 
   return (
-    <div className="p-4">
+    <div className="@container p-4">
       <AnimatePresence mode="wait">
         <motion.div key={viewKey} {...fadeSlide}>
           {renderContent()}

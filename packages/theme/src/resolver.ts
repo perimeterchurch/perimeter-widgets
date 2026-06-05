@@ -1,4 +1,4 @@
-import { globalTokens, type ThemeToken } from './tokens';
+import { darkTokens, globalTokens, type ThemeToken } from './tokens';
 
 const DATA_THEME_PREFIX = 'data-theme-';
 
@@ -31,19 +31,31 @@ function parseDataAttrs(input: Record<string, string>): Partial<Record<ThemeToke
   return out;
 }
 
-export function resolveTokens(args: ResolveTokensArgs): ResolvedTokens {
-  const parsedDataAttrs = args.dataAttrOverrides ? parseDataAttrs(args.dataAttrOverrides) : {};
+function declBlock(
+  base: Record<ThemeToken, string>,
+  overrides: ResolveTokensArgs,
+  parsedDataAttrs: Partial<Record<ThemeToken, string>>,
+): { merged: Record<ThemeToken, string>; decls: string } {
   const merged = {
-    ...globalTokens,
-    ...args.widgetOverrides,
+    ...base,
+    ...overrides.widgetOverrides,
     ...parsedDataAttrs,
-    ...args.runtimeOverrides,
+    ...overrides.runtimeOverrides,
   } as Record<ThemeToken, string>;
 
   const decls = Object.entries(merged)
     .map(([key, value]) => `  --${key}: ${value};`)
     .join('\n');
-  const cssText = `:host {\n${decls}\n}`;
+  return { merged, decls };
+}
 
-  return { tokens: merged, cssText };
+export function resolveTokens(args: ResolveTokensArgs): ResolvedTokens {
+  const parsedDataAttrs = args.dataAttrOverrides ? parseDataAttrs(args.dataAttrOverrides) : {};
+  const light = declBlock(globalTokens, args, parsedDataAttrs);
+  const dark = declBlock(darkTokens, args, parsedDataAttrs);
+
+  const cssText = `:host {\n${light.decls}\n}\n:host([data-theme="dark"]) {\n${dark.decls}\n}`;
+
+  // `tokens` stays the light merged set for back-compat (only theme tests read it).
+  return { tokens: light.merged, cssText };
 }

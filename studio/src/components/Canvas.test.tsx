@@ -63,6 +63,35 @@ describe('Canvas viewport presets', () => {
   });
 });
 
+describe('Canvas scroll chain', () => {
+  // happy-dom can't measure real scrolling (no layout engine), so assert the
+  // class contract that makes the flex column shrink and the surface scroll
+  // instead of clipping under the grid's overflow-hidden. The root flex column
+  // and the scroll surface both need min-h-0; the surface needs overflow-auto.
+  function renderCanvas() {
+    const utils = render(
+      <Canvas>
+        <div>preview content</div>
+      </Canvas>,
+    );
+    const surface = () => utils.container.querySelector('[data-canvas-surface]') as HTMLElement;
+    const root = () => utils.container.firstElementChild as HTMLElement;
+    return { ...utils, surface, root };
+  }
+
+  it('the root flex column can shrink (min-h-0)', () => {
+    const { root } = renderCanvas();
+    expect(root().className).toContain('min-h-0');
+    expect(root().className).toContain('flex-col');
+  });
+
+  it('the scroll surface scrolls and can shrink (overflow-auto + min-h-0)', () => {
+    const { surface } = renderCanvas();
+    expect(surface().className).toContain('overflow-auto');
+    expect(surface().className).toContain('min-h-0');
+  });
+});
+
 describe('Canvas background toggle', () => {
   function renderCanvas() {
     const utils = render(

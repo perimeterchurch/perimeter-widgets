@@ -22,11 +22,24 @@ interface Props {
   configOverrides: Record<string, unknown>;
   /** runtime theme token overrides from the ThemeEditor. */
   tokenOverrides: Record<string, string>;
+  /**
+   * Light/dark preview theme. 'dark' sets `data-theme="dark"` on the shadow host
+   * (the `[data-perimeter-widget-preview]` div), which is what
+   * `:host([data-theme="dark"])` matches — so the dark token block activates.
+   * Defaults to 'light' (attribute removed).
+   */
+  theme?: 'light' | 'dark';
   /** Lets the parent (App) feed the loaded definition to the ConfigPanel. */
   onDefinition?: (def: WidgetDefinition) => void;
 }
 
-export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefinition }: Props) {
+export function WidgetPreview({
+  entry,
+  configOverrides,
+  tokenOverrides,
+  theme = 'light',
+  onDefinition,
+}: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<MountedWidget | null>(null);
   const [def, setDef] = useState<WidgetDefinition | null>(null);
@@ -55,7 +68,13 @@ export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefini
     const host = hostRef.current;
     if (!host || !def) return;
     try {
-      handleRef.current = mount(host, def, css, { configOverrides });
+      // DATA/hooks knob: in dev, point the runtime API client at the local
+      // perimeter-api so React Query hooks fetch from localhost:5500 instead of
+      // the prod default (api.perimeter.org). This is independent of the images
+      // knob (VITE_API_URL → format.ts); both must be set for dev parity. Left
+      // undefined in the deployed studio build so prod uses DEFAULT_API_URL.
+      const apiBaseUrl = import.meta.env.DEV ? 'http://localhost:5500' : undefined;
+      handleRef.current = mount(host, def, css, { configOverrides, apiBaseUrl });
       setMountError(null);
     } catch (err) {
       setMountError(describeMountError(err));
@@ -71,6 +90,18 @@ export function WidgetPreview({ entry, configOverrides, tokenOverrides, onDefini
   useEffect(() => {
     handleRef.current?.updateTokens(tokenOverrides);
   }, [tokenOverrides]);
+
+  // Light/dark toggle: set `data-theme="dark"` directly on the shadow host so
+  // `:host([data-theme="dark"])` (emitted by resolveTokens) activates the dark
+  // token block — exactly how a production embed activates dark mode. This is the
+  // host div itself (NOT the HostFrame wrapper); :host() only matches the shadow
+  // host. Setting it while the host is `hidden` on a mount error is harmless.
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    if (theme === 'dark') host.setAttribute('data-theme', 'dark');
+    else host.removeAttribute('data-theme');
+  }, [theme]);
 
   // Keep the host div mounted at all times so hostRef stays attached to the DOM.
   // If we returned the alert *instead* of the host, hostRef.current would become
