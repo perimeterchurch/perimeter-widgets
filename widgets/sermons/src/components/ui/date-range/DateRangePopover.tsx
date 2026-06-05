@@ -1,8 +1,11 @@
 /**
- * Lightweight Modal for widget-sermons.
- * Renders inline (not via portal) to stay inside the shadow DOM.
- * Uses a simple fixed overlay approach instead of Headless UI Dialog
- * which portals to document.body (outside shadow DOM).
+ * Self-contained popover shell for the DateRangePicker.
+ *
+ * Replaces the former dependency on the shared `Modal` component so the date
+ * range picker owns its overlay. Like `Modal` it renders inline (NOT via a
+ * portal) so it stays inside the widget shadow DOM, closes on Escape, focuses
+ * the panel on open, and keeps a hand-rolled Tab loop trapped inside the panel
+ * (jsdom does not run native Tab traversal, so the loop is intercepted here).
  */
 
 import {
@@ -12,7 +15,6 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from 'react';
-import { X } from 'lucide-react';
 import { cn } from '@perimeter/ui/utils/cn';
 
 const FOCUSABLE_SELECTOR = [
@@ -24,26 +26,22 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
-interface ModalProps {
+const sizeClasses = {
+  sm: 'max-w-[400px]',
+  lg: 'max-w-[640px]',
+} as const;
+
+interface DateRangePopoverProps {
   open: boolean;
   onClose: () => void;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  title?: string;
-  className?: string;
+  size?: keyof typeof sizeClasses;
   children?: ReactNode;
 }
 
-const sizeClasses = {
-  sm: 'max-w-[400px]',
-  md: 'max-w-[480px]',
-  lg: 'max-w-[640px]',
-  xl: 'max-w-[800px]',
-} as const;
-
-export function Modal({ open, onClose, size = 'md', title, className, children }: ModalProps) {
+export function DateRangePopover({ open, onClose, size = 'sm', children }: DateRangePopoverProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Close on Escape
+  // Close on Escape.
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -53,15 +51,14 @@ export function Modal({ open, onClose, size = 'md', title, className, children }
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  // Focus trap — focus the panel on open
+  // Focus the panel on open.
   useEffect(() => {
     if (open && panelRef.current) {
       panelRef.current.focus();
     }
   }, [open]);
 
-  // Hand-rolled Tab loop: keep focus inside the panel. jsdom doesn't run native
-  // Tab traversal, so we intercept Tab and wrap last→first / first→last.
+  // Hand-rolled Tab loop: keep focus inside the panel.
   const handleKeyDown = useCallback((e: ReactKeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Tab') return;
     const panel = panelRef.current;
@@ -104,50 +101,16 @@ export function Modal({ open, onClose, size = 'md', title, className, children }
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
         className={cn(
           'relative w-full rounded-xl border px-6 py-6 shadow-xl',
           'border-[var(--color-border)] bg-[var(--color-bg)]',
           sizeClasses[size],
-          className,
         )}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
-        {title && (
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-[var(--color-fg)]">{title}</h3>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md p-1 text-[var(--color-muted-fg)] hover:text-[var(--color-fg)]"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        )}
         {children}
       </div>
-    </div>
-  );
-}
-
-interface ModalFooterProps {
-  children: ReactNode;
-  className?: string;
-}
-
-export function ModalFooter({ children, className }: ModalFooterProps) {
-  return (
-    <div
-      className={cn(
-        'mt-6 flex items-center justify-end gap-3 border-t pt-6',
-        'border-[var(--color-border)]',
-        className,
-      )}
-    >
-      {children}
     </div>
   );
 }
