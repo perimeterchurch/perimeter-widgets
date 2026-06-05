@@ -35,7 +35,10 @@ export function ConfigPanel({ definition, overrides, onChange }: Props) {
     <div className="flex flex-col gap-2 p-3">
       <h3 className="font-semibold">Config (data-*)</h3>
       {keys.map((key) => (
-        <label key={key} className="grid grid-cols-2 items-center gap-2 text-sm">
+        <label
+          key={key}
+          className="grid grid-cols-[minmax(6rem,auto)_1fr] items-center gap-2 text-sm"
+        >
           <span className="truncate">{key}</span>
           <input
             className="rounded border px-2 py-1"

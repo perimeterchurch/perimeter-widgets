@@ -36,19 +36,19 @@ export function IconSelect({ value, onChange, options, label, icon, className }:
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          'inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-sm',
+          'inline-flex h-8 max-w-full items-center gap-1.5 rounded-lg border px-2.5 text-sm',
           'border-border bg-transparent text-muted-fg',
           'transition-colors hover:bg-muted/30',
         )}
       >
-        {icon}
-        <span>
+        <span className="flex shrink-0 items-center">{icon}</span>
+        <span className="min-w-0 truncate">
           {label} <span className="font-medium text-fg">{activeOption?.label ?? value}</span>
         </span>
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1 w-44 rounded-lg bg-bg shadow-md ring-1 ring-fg/10">
+        <div className="absolute right-0 z-50 mt-1 w-44 max-w-[calc(100vw-1rem)] rounded-lg bg-bg shadow-md ring-1 ring-fg/10">
           <div className="py-1">
             {options.map((opt) => (
               <button

@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 import { render, within, fireEvent, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { Sidebar } from './Sidebar';
@@ -8,6 +8,27 @@ import type { NavGroup } from '../lib/nav';
 // The studio suite has no global RTL auto-cleanup; scope queries to each render's
 // own container and unmount between tests so renders don't leak.
 afterEach(cleanup);
+
+// Sidebar now uses useStudioTheme, which persists to localStorage; happy-dom in
+// this worker leaves it undefined. Mirror the in-memory shim used elsewhere.
+beforeAll(() => {
+  if (typeof globalThis.localStorage === 'undefined') {
+    const store = new Map<string, string>();
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: (k: string) => store.get(k) ?? null,
+        setItem: (k: string, v: string) => void store.set(k, v),
+        removeItem: (k: string) => void store.delete(k),
+        clear: () => store.clear(),
+        key: () => null,
+        get length() {
+          return store.size;
+        },
+      },
+    });
+  }
+});
 
 const fixtureNav: NavGroup[] = [
   {
@@ -65,6 +86,22 @@ describe('Sidebar', () => {
     const ui = within(container);
     fireEvent.change(ui.getByRole('searchbox'), { target: { value: 'zzz-nomatch' } });
     expect(ui.getByText(/no matches/i)).toBeTruthy();
+  });
+
+  it('renders a chrome theme toggle that flips data-theme on the document element', () => {
+    document.documentElement.removeAttribute('data-theme');
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    const toggle = ui.getByRole('button', { name: /theme/i });
+    // Default-dark chrome: the hook applies dark on mount.
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    fireEvent.click(toggle);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    document.documentElement.removeAttribute('data-theme');
   });
 
   it('marks the link for the current route active via aria-current="page"', () => {

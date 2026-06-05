@@ -1,5 +1,17 @@
 @import 'react-pdf/dist/Page/AnnotationLayer.css';
 @import 'react-pdf/dist/Page/TextLayer.css';
+/*
+ * The react-pdf layer styles imported above ship light-mode literals (e.g.
+ * annotation popup/border colors; the transparent text-selection layer). They
+ * are intentionally left untokenized: they paint ONLY on the PDF page canvas —
+ * the document's own (light) media surface, akin to the always-dark VideoPlayer
+ * stage — never on the widget chrome. The text layer is color:transparent (a
+ * selection overlay), and the annotation layer renders only for interactive PDF
+ * form fields/links, which sit on the white page. The widget chrome around the
+ * viewer (toolbar, sidebar, inputs) uses design tokens and themes via the
+ * :host([data-theme="dark"]) layer, so the data-theme swap covers everything
+ * outside this media surface. No dark override needed.
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

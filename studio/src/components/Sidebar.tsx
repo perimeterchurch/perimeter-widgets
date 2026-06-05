@@ -4,6 +4,7 @@ import { Input } from '@perimeter/ui/input';
 import { Button } from '@perimeter/ui/button';
 import { cn } from '@perimeter/ui/utils/cn';
 import type { NavGroup } from '../lib/nav';
+import { useStudioTheme } from '../lib/use-studio-theme';
 
 interface SidebarProps {
   nav: NavGroup[];
@@ -19,6 +20,7 @@ interface SidebarProps {
 export function Sidebar({ nav }: SidebarProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const { theme, toggle } = useStudioTheme();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -59,11 +61,28 @@ export function Sidebar({ nav }: SidebarProps) {
         )}
       >
         <div className="border-b border-border px-4 pb-3 pt-4">
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm font-semibold tracking-tight text-fg">Perimeter</span>
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
-              Studio
-            </span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-sm font-semibold tracking-tight text-fg">Perimeter</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
+                Studio
+              </span>
+            </div>
+            {/* Chrome light/dark toggle — themes the studio shell only (via
+                data-theme on documentElement). Independent of the preview
+                canvas theme control. */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-pressed={theme === 'dark'}
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              title="Toggle theme"
+              onClick={toggle}
+              className="size-7 shrink-0 p-0 text-muted-fg"
+            >
+              {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+            </Button>
           </div>
           <div className="mt-3">
             <Input
@@ -115,5 +134,44 @@ export function Sidebar({ nav }: SidebarProps) {
         </nav>
       </aside>
     </>
+  );
+}
+
+/** Inline sun/moon glyphs — the studio carries no icon dependency, so these
+ * mirror the lucide sun/moon paths. `aria-hidden` (the Button owns the label). */
+function SunIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    </svg>
   );
 }

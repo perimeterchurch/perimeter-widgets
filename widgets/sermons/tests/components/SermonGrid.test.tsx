@@ -67,4 +67,18 @@ describe('SermonGrid', () => {
 
     expect(onClick).toHaveBeenCalledWith(1);
   });
+
+  // Container-query reflow: the grid must use explicit arbitrary container
+  // breakpoints (`@[<rem>]:`) the v0.1.1 @tailwindcss/container-queries plugin
+  // actually emits CSS for — `@min-[…]:` emits nothing. happy-dom can't do real
+  // CQ layout, so this only guards the class attribute; the 1/2/3-col reflow is
+  // a manual studio check.
+  it('reflows by container width via explicit @[…] breakpoints', () => {
+    const { container } = render(
+      <SermonGrid sermons={mockSermons} onSermonClick={() => {}} config={config} />,
+    );
+    const grid = container.querySelector('.grid');
+    expect(grid).not.toBeNull();
+    expect(grid).toHaveClass('grid-cols-1', '@[30rem]:grid-cols-2', '@[48rem]:grid-cols-3');
+  });
 });
