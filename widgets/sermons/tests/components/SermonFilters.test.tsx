@@ -265,6 +265,33 @@ describe('SermonFilters locked filter suppression', () => {
   });
 });
 
+describe('SermonFilters row layout', () => {
+  it('search InputGroup fills its row (w-full)', () => {
+    const { container } = render(<SermonFilters {...makeProps()} />);
+    const inputGroup = container.querySelector('[data-slot="input-group"]');
+    expect(inputGroup).not.toBeNull();
+    expect(inputGroup?.className).toContain('w-full');
+  });
+
+  it('filter row wraps and packs dropdowns at intrinsic width (no flex-1 spread)', () => {
+    const { container } = render(<SermonFilters {...makeProps()} />);
+    // The filter-row container wraps the multi-combobox dropdowns.
+    const dropdowns = container.querySelectorAll('[data-slot="multi-combobox"]');
+    expect(dropdowns.length).toBeGreaterThan(0);
+
+    // No dropdown should stretch with flex-1 (that produced the big equal gaps).
+    dropdowns.forEach((el) => {
+      expect(el.className).not.toContain('flex-1');
+    });
+
+    // The shared parent row should be a wrapping flex row so dropdowns pack left.
+    const row = dropdowns[0]?.parentElement;
+    expect(row).not.toBeNull();
+    expect(row?.className).toContain('flex');
+    expect(row?.className).toContain('flex-wrap');
+  });
+});
+
 describe('SermonFilters labelCache integration', () => {
   /**
    * Open the Nth dropdown (by its "toggle menu" aria-label). The filter row

@@ -145,7 +145,7 @@ export function SermonFilters(props: SermonFiltersProps) {
     <div className="space-y-3">
       {/* Row 1: Search */}
       {!props.lockedFilters.has('search') && (
-        <InputGroup>
+        <InputGroup className="w-full">
           <InputGroupAddon align="inline-start">
             <Search />
           </InputGroupAddon>
@@ -165,7 +165,7 @@ export function SermonFilters(props: SermonFiltersProps) {
         !props.lockedFilters.has('book') ||
         (props.showServiceTypeFilter && !props.lockedFilters.has('serviceTypes')) ||
         (props.showSeriesTypeFilter && !props.lockedFilters.has('seriesType'))) && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {!props.lockedFilters.has('series') && (
             <MultiCombobox
               options={seriesOptions}
@@ -174,7 +174,6 @@ export function SermonFilters(props: SermonFiltersProps) {
               placeholder="All Series"
               selectedLabel="Series"
               disabled={props.seriesLoading ?? false}
-              className="flex-1"
               multiple
               isOpen={openDropdown === 'series'}
               onOpenChange={(open: boolean) => setOpenDropdown(open ? 'series' : null)}
@@ -188,7 +187,6 @@ export function SermonFilters(props: SermonFiltersProps) {
               placeholder="All Speakers"
               selectedLabel="Speakers"
               disabled={props.speakersLoading ?? false}
-              className="flex-1"
               multiple
               isOpen={openDropdown === 'speaker'}
               onOpenChange={(open: boolean) => setOpenDropdown(open ? 'speaker' : null)}
@@ -204,7 +202,6 @@ export function SermonFilters(props: SermonFiltersProps) {
               placeholder="All Books"
               selectedLabel="Books"
               disabled={props.booksLoading ?? false}
-              className="flex-1"
               multiple
               isOpen={openDropdown === 'book'}
               onOpenChange={(open: boolean) => setOpenDropdown(open ? 'book' : null)}
@@ -218,7 +215,6 @@ export function SermonFilters(props: SermonFiltersProps) {
               placeholder="Service Types"
               selectedLabel="Service Types"
               disabled={props.serviceTypesLoading ?? false}
-              className="flex-1"
               multiple
               isOpen={openDropdown === 'serviceType'}
               onOpenChange={(open: boolean) => setOpenDropdown(open ? 'serviceType' : null)}
@@ -232,7 +228,6 @@ export function SermonFilters(props: SermonFiltersProps) {
               placeholder="Series Types"
               selectedLabel="Series Types"
               disabled={props.seriesTypesLoading ?? false}
-              className="flex-1"
               multiple
               isOpen={openDropdown === 'seriesType'}
               onOpenChange={(open: boolean) => setOpenDropdown(open ? 'seriesType' : null)}
