@@ -153,4 +153,21 @@ describe('PdfViewer', () => {
     expect(screen.getByLabelText('Hide thumbnails')).toBeInTheDocument();
     expect(screen.queryByLabelText('Show thumbnails')).toBeNull();
   });
+
+  // Theme contract: the viewer CHROME (toolbar, inputs) must read from design
+  // tokens so the data-theme swap on the shadow host themes it. The PDF page
+  // canvas itself is the document's own (light) media surface — out of scope.
+  it('renders its chrome from design tokens, not hardcoded grays', () => {
+    const { container } = renderViewer();
+    // The page-number input is representative toolbar chrome.
+    const pageInput = screen.getByLabelText<HTMLInputElement>('Current page');
+    expect(pageInput.className).toContain('bg-bg');
+    expect(pageInput.className).toContain('border-border');
+
+    // No widget-chrome element should carry a hardcoded gray-family palette
+    // class. (bg-black/text-white live only in the always-dark VideoPlayer
+    // media stage, which is a different component.)
+    const html = container.innerHTML;
+    expect(html).not.toMatch(/\b(?:bg|text|border|ring)-(?:gray|slate|zinc|neutral|stone)-\d/);
+  });
 });
