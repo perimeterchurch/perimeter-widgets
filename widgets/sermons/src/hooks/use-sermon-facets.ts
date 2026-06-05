@@ -166,11 +166,50 @@ export function useSermonFacets({ config, filters, labelCache }: UseSermonFacets
     }),
   );
 
-  const speakers = speakersQuery.data?.data ?? [];
-  const books = booksQuery.data?.data ?? [];
-  const serviceTypes = serviceTypesQuery.data?.data ?? [];
-  const seriesTypes = seriesTypesQuery.data?.data ?? [];
-  const series = seriesQuery.data?.data.series ?? [];
+  const speakers = useMemo(() => speakersQuery.data?.data ?? [], [speakersQuery.data]);
+  const books = useMemo(() => booksQuery.data?.data ?? [], [booksQuery.data]);
+  const serviceTypes = useMemo(() => serviceTypesQuery.data?.data ?? [], [serviceTypesQuery.data]);
+  const seriesTypes = useMemo(() => seriesTypesQuery.data?.data ?? [], [seriesTypesQuery.data]);
+  const series = useMemo(() => seriesQuery.data?.data.series ?? [], [seriesQuery.data]);
+
+  // Also absorb the *narrowed* facet results. A pinned/deep-linked filter
+  // (e.g. a series beyond the 50-item primer page, or a speaker the
+  // series-type pin filtered out of the primer) is otherwise never seen by
+  // the primer fetches, so its chip would fall back to the generic
+  // "Series <id>"/"Speaker <id>" label. The narrowed queries surface the
+  // selected entity's real label while it still satisfies the other
+  // dimensions; absorbing it here makes that label stick in the cache even
+  // after later re-narrowing drops it from the visible list.
+  useEffect(() => {
+    labelCache.absorb(
+      'speaker',
+      speakers.map((s) => ({ id: s.id, label: s.name })),
+    );
+  }, [speakers, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'book',
+      books.map((b) => ({ id: b.id, label: b.name })),
+    );
+  }, [books, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'series',
+      series.map((s) => ({ id: s.id, label: s.displayTitle ?? s.title })),
+    );
+  }, [series, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'serviceType',
+      serviceTypes.map((s) => ({ id: s.id, label: s.name })),
+    );
+  }, [serviceTypes, labelCache]);
+  useEffect(() => {
+    labelCache.absorb(
+      'seriesType',
+      seriesTypes.map((s) => ({ id: s.id, label: s.name })),
+    );
+  }, [seriesTypes, labelCache]);
 
   return {
     speakers,
