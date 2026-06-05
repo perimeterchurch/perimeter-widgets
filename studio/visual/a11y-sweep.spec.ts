@@ -132,6 +132,44 @@ test.describe('Pagination — keyboard reachable (shadow DOM)', () => {
   });
 });
 
+test.describe('MultiCombobox — shadow-DOM mount does not loop (regression)', () => {
+  // The shadow-DOM `Environment` derivation must run exactly once. A prior
+  // version recomputed a fresh object literal each render and fed the stored
+  // value back into the effect deps, so inside a real ShadowRoot it never
+  // converged → React "Maximum update depth exceeded". jsdom has no ShadowRoot,
+  // so that bug was invisible to unit tests; this loads the real sermons widget
+  // (whose SermonFilters render several MultiComboboxes in the shadow root) and
+  // asserts they mount without crashing.
+  test('SermonFilters comboboxes mount in the shadow root without a render loop', async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') errors.push(msg.text());
+    });
+    page.on('pageerror', (err) => errors.push(err.message));
+
+    await mockSermonsApi(page);
+    await routeSermonsList(page, multiPageSermons(2));
+    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await waitForShadowMount(page);
+    // If the comboboxes looped, render would throw before cards ever appear.
+    await waitForSermonCards(page, 1);
+
+    // The filter comboboxes actually rendered (each MultiCombobox emits a
+    // data-slot="multi-combobox" root + a "toggle menu" button).
+    const comboboxCount = await page.evaluate((sel) => {
+      const root = (document.querySelector(sel) as HTMLElement | null)?.shadowRoot;
+      return root?.querySelectorAll('[data-slot="multi-combobox"]').length ?? 0;
+    }, PREVIEW_HOST);
+    expect(comboboxCount, 'SermonFilters renders multiple filter comboboxes').toBeGreaterThan(0);
+
+    // The smoking-gun symptom of the loop is this exact React invariant.
+    const loopErrors = errors.filter((e) => /Maximum update depth exceeded/i.test(e));
+    expect(loopErrors, `unexpected render-loop errors:\n${loopErrors.join('\n')}`).toHaveLength(0);
+  });
+});
+
 test.describe('Empty results — dashed border renders', () => {
   for (const theme of ['light', 'dark'] as const) {
     test(`empty card shows a real dashed border (${theme})`, async ({ page }) => {

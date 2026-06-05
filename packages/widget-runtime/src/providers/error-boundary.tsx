@@ -23,9 +23,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
   override render(): React.ReactNode {
     if (this.state.error) {
       // A crashed React subtree may have lost its Tailwind classes, so the
-      // fallback is driven by inline styles referencing the theme tokens
-      // (`--color-destructive` / `--color-fg`), which live on the shadow host
-      // and stay valid regardless of class purging — and stay legible in dark.
+      // fallback is driven by inline styles referencing the `--color-destructive`
+      // theme token (with a hardcoded fallback), which lives on the shadow host
+      // and stays valid regardless of class purging — and stays legible in dark.
       return (
         <div
           role="alert"

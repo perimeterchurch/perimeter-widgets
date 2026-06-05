@@ -101,17 +101,23 @@ function MultiCombobox(props: MultiComboboxProps) {
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   // An explicit `environment` prop wins (lets callers override); otherwise
-  // derive it from our own root node so shadow-DOM mounts work with no plumbing.
-  // Recomputed on each render after mount picks up the ref; stored in state so a
-  // post-mount derivation triggers downshift to re-read the correct environment.
+  // derive it ONCE from our own root node so shadow-DOM mounts work with no
+  // plumbing. `deriveEnvironment` returns a fresh object literal each call, so we
+  // must NOT compare it by reference against the stored value or feed the stored
+  // value back into the effect deps — that would loop forever in a shadow root
+  // (new object !== old object on every render => setState => re-render => …).
+  // The root node identity is stable after mount, so a single post-mount
+  // derivation is correct; the `didDerive` ref makes it run exactly once.
+  const didDeriveRef = React.useRef(false);
   const [derivedEnvironment, setDerivedEnvironment] = React.useState<Environment | undefined>(
     undefined,
   );
   React.useEffect(() => {
-    if (environmentProp !== undefined) return;
+    if (environmentProp !== undefined || didDeriveRef.current) return;
+    didDeriveRef.current = true;
     const next = deriveEnvironment(containerRef.current);
-    if (next !== derivedEnvironment) setDerivedEnvironment(next);
-  }, [environmentProp, derivedEnvironment]);
+    if (next !== undefined) setDerivedEnvironment(next);
+  }, [environmentProp]);
   const environment = environmentProp ?? derivedEnvironment;
 
   // Controlled vs uncontrolled state
@@ -221,7 +227,11 @@ function MultiCombobox(props: MultiComboboxProps) {
     ...(environment !== undefined && { environment }),
     itemToString: (item) => item?.label ?? '',
     selectedItem: null, // We manage selection ourselves
-    isItemDisabled: (item) => !!item.disabled,
+    // Group headers are non-selectable dividers, so they must be skipped by
+    // keyboard nav and click selection even if the caller didn't also set
+    // `disabled` — enforce the documented `isGroupHeader` contract here rather
+    // than relying on every caller to remember to pair the two flags.
+    isItemDisabled: (item) => !!item.disabled || !!item.isGroupHeader,
     ...(props.isOpen !== undefined && { isOpen: props.isOpen }),
     onIsOpenChange: ({ isOpen: nextIsOpen }) => props.onOpenChange?.(nextIsOpen ?? false),
     stateReducer(_state, actionAndChanges) {
@@ -349,8 +359,9 @@ function MultiCombobox(props: MultiComboboxProps) {
             filteredOptions.map((option, index) => {
               // Group headers are non-interactive dividers (e.g. "Old Testament"):
               // render them as a header row, not a selectable/strikethrough item.
-              // They stay in downshift's `items` (so indices line up) but are
-              // `isItemDisabled` so keyboard nav and click selection skip them.
+              // They stay in downshift's `items` (so indices line up) but
+              // `isItemDisabled` returns true for `isGroupHeader`, so keyboard nav
+              // and click selection skip them.
               if (option.isGroupHeader) {
                 return (
                   <li
