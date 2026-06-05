@@ -57,10 +57,10 @@ describe('Inspector', () => {
     const { container } = renderInspector();
     const scope = within(container);
 
-    // The header tab bar is built directly (a role=tablist row of buttons), NOT
-    // the @perimeter/ui Tabs compound, so it doesn't fight that component's
-    // orientation handling. It must be a real flex row that spans the full
-    // inspector width so the flex-1 triggers distribute evenly across the top.
+    // The header tab bar is the shared @perimeter/ui SegmentedTabs (a role=tablist
+    // row of buttons), NOT the @perimeter/ui Tabs compound, so it doesn't fight
+    // that component's orientation handling. It must be a real flex row that spans
+    // the full inspector width so the flex-1 triggers distribute evenly across the top.
     const list = scope.getByRole('tablist');
     const listClasses = list.className.split(/\s+/);
     expect(listClasses).toContain('flex');
