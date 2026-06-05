@@ -53,6 +53,26 @@ describe('Inspector', () => {
     expect(scope.getByRole('tab', { name: 'Info' })).toBeTruthy();
   });
 
+  it('renders the category tabs as a full-width row above the active panel', () => {
+    const { container } = renderInspector();
+    const scope = within(container);
+
+    // The tab row must be a real flex row that spans the full inspector width so
+    // the flex-1 triggers distribute across the top (not pack tight/left from the
+    // default inline-flex w-fit list). Local Inspector override — NOT a global
+    // tabs.tsx change (that would stretch the sermons tab rows).
+    const list = scope.getByRole('tablist');
+    const listClasses = list.className.split(/\s+/);
+    // A standalone `flex` (block-level flex container), not the cva base
+    // `inline-flex` which sizes to content even with w-full present.
+    expect(listClasses).toContain('flex');
+    expect(listClasses).toContain('w-full');
+
+    // The list must precede the active panel so it reads as a top row.
+    const panel = scope.getByRole('tabpanel');
+    expect(list.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('defaults to the Config tab showing the schema field inputs', () => {
     const { container } = renderInspector();
     const scope = within(container);

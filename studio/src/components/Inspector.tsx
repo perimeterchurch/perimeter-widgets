@@ -75,7 +75,7 @@ export function Inspector({
 }: Props) {
   return (
     <Tabs defaultValue="config" className="gap-4">
-      <TabsList className="w-full">
+      <TabsList className="flex w-full">
         <TabsTrigger value="config">Config</TabsTrigger>
         <TabsTrigger value="theme">Theme</TabsTrigger>
         <TabsTrigger value="info">Info</TabsTrigger>
