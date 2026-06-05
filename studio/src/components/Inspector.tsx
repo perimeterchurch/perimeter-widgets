@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
-import { Card, CardContent } from '@perimeter/ui/card';
 import { Button } from '@perimeter/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
+import { cn } from '@perimeter/ui/utils/cn';
 import { ConfigPanel } from './ConfigPanel';
 import { ThemeEditor } from './ThemeEditor';
 import { InfoPanel } from './InfoPanel';
@@ -57,13 +56,24 @@ function EmbedSnippet({ slug }: { slug: string }) {
   );
 }
 
+type TabId = 'config' | 'theme' | 'info';
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'config', label: 'Config' },
+  { id: 'theme', label: 'Theme' },
+  { id: 'info', label: 'Info' },
+];
+
 /**
- * The widget inspector: three tabs built from the @perimeter/ui value-based Tabs
- * compound (Base UI — `defaultValue` + matching `value` per Trigger/Content, NOT
- * a Radix index/onChange API). Config = ConfigPanel + embed snippet; Theme =
- * ThemeEditor (with reset); Info = the read-only InfoPanel reference. ConfigPanel
- * and ThemeEditor own their heading + inset padding, so each Card supplies only
- * the surface (border/shadow), not extra padding.
+ * The widget inspector, laid out as a header tab bar over a single active panel.
+ *
+ * The tab bar is built directly here — a `role="tablist"` row of `role="tab"`
+ * buttons with `aria-selected`, evenly distributed via `flex` + per-trigger
+ * `flex-1` — rather than the `@perimeter/ui` Tabs compound, whose orientation
+ * handling (and content-sized `inline-flex w-fit` list) fights a full-width
+ * drawer header. Only the active panel mounts below the bar, filling the drawer
+ * width with comfortable padding (no per-panel Card nesting). The embed snippet
+ * sits in a persistent footer so it shows once regardless of the active tab.
  */
 export function Inspector({
   definition,
@@ -73,59 +83,69 @@ export function Inspector({
   onConfigChange,
   onThemeChange,
 }: Props) {
+  const [active, setActive] = useState<TabId>('config');
+  const baseId = useId();
+  const tabId = (id: TabId) => `${baseId}-tab-${id}`;
+  const panelId = `${baseId}-panel`;
+
   return (
-    <Tabs defaultValue="config" className="gap-4">
-      <TabsList className="flex w-full">
-        <TabsTrigger value="config">Config</TabsTrigger>
-        <TabsTrigger value="theme">Theme</TabsTrigger>
-        <TabsTrigger value="info">Info</TabsTrigger>
-      </TabsList>
+    <div className="flex flex-col gap-4">
+      <div
+        role="tablist"
+        aria-label="Inspector sections"
+        className="flex w-full gap-1 rounded-lg bg-muted p-[3px]"
+      >
+        {TABS.map(({ id, label }) => {
+          const selected = active === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              id={tabId(id)}
+              aria-selected={selected}
+              aria-controls={panelId}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => setActive(id)}
+              className={cn(
+                'flex-1 rounded-md px-2 py-1 text-sm font-medium whitespace-nowrap transition-colors',
+                'focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                selected
+                  ? 'bg-bg text-fg shadow-sm'
+                  : 'text-fg/60 hover:text-fg dark:text-muted-fg dark:hover:text-fg',
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
 
-      <TabsContent value="config" className="space-y-4">
-        <Card>
-          <CardContent className="p-0">
-            {definition ? (
-              <ConfigPanel
-                definition={definition}
-                overrides={configOverrides}
-                onChange={onConfigChange}
-              />
-            ) : (
-              <p className="p-3 text-sm text-muted-fg">Loading schema…</p>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <EmbedSnippet slug={slug} />
-          </CardContent>
-        </Card>
-      </TabsContent>
+      <div role="tabpanel" id={panelId} aria-labelledby={tabId(active)} className="min-w-0">
+        {active === 'config' &&
+          (definition ? (
+            <ConfigPanel
+              definition={definition}
+              overrides={configOverrides}
+              onChange={onConfigChange}
+            />
+          ) : (
+            <p className="p-3 text-sm text-muted-fg">Loading schema…</p>
+          ))}
 
-      <TabsContent value="theme">
-        <Card>
-          <CardContent className="p-0">
-            <ThemeEditor overrides={tokenOverrides} onChange={onThemeChange} />
-          </CardContent>
-        </Card>
-      </TabsContent>
+        {active === 'theme' && <ThemeEditor overrides={tokenOverrides} onChange={onThemeChange} />}
 
-      <TabsContent value="info" className="space-y-4">
-        <Card>
-          <CardContent className="p-0">
-            {definition ? (
-              <InfoPanel definition={definition} />
-            ) : (
-              <p className="p-3 text-sm text-muted-fg">Loading schema…</p>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <EmbedSnippet slug={slug} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+        {active === 'info' &&
+          (definition ? (
+            <InfoPanel definition={definition} />
+          ) : (
+            <p className="p-3 text-sm text-muted-fg">Loading schema…</p>
+          ))}
+      </div>
+
+      <div className="border-t border-border px-3 pt-4">
+        <EmbedSnippet slug={slug} />
+      </div>
+    </div>
   );
 }
