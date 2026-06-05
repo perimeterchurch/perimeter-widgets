@@ -1,5 +1,11 @@
 import { useMemo } from 'react';
-import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
+import {
+  debounce,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryStates,
+} from 'nuqs';
 import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode } from '../types';
 
 /**
@@ -123,8 +129,16 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     });
   };
 
+  // The input stays fully responsive (nuqs updates the returned `search` value
+  // optimistically on every keystroke); only the URL write is debounced so we
+  // don't push a history entry / query per character. `history: 'replace'`
+  // overrides the hook-global `history: 'push'` so typing never spams the back
+  // stack, and `shallow: false` is the documented pairing for `debounce`.
   const setSearch = (search: string) => {
-    void setParams({ search: search || null, page: 1 });
+    void setParams(
+      { search: search || null, page: 1 },
+      { history: 'replace', shallow: false, limitUrlUpdates: debounce(300) },
+    );
   };
 
   const setSeriesIds: (ids: number[]) => void = config.seriesId

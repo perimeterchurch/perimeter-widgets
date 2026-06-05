@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@perimeter/ui/input-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@perimeter/ui/input-group';
 import { Button } from '@perimeter/ui/button';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
@@ -123,6 +128,17 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => filters.setSearch(e.target.value)}
             placeholder="Search series..."
           />
+          {filters.search && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                aria-label="Clear search"
+                onClick={() => filters.setSearch('')}
+              >
+                <X />
+              </InputGroupButton>
+            </InputGroupAddon>
+          )}
         </InputGroup>
       )}
 

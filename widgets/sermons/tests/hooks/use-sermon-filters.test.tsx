@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
+import type { OnUrlUpdateFunction, UrlUpdateEvent } from 'nuqs/adapters/testing';
 import type { ReactNode } from 'react';
 import { useSermonFilters } from '../../src/hooks/use-sermon-filters';
 import type { SermonsConfig } from '../../src/types';
@@ -112,5 +113,82 @@ describe('useSermonFilters', () => {
   it('reads the bare URL key with no prefix (identity)', () => {
     const { result } = renderWithParams('?tab=series');
     expect(result.current.tab).toBe('series');
+  });
+
+  describe('search debounce', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    // Drain both nuqs timers: the per-key debounce window AND the global
+    // throttle queue's own follow-up flush (which schedules its own timer and
+    // resolves through a promise chain — hence the async timer advance).
+    async function flushUrlWrites() {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+    }
+
+    function renderWithSpy(onUrlUpdate: OnUrlUpdateFunction) {
+      return renderHook(() => useSermonFilters(baseConfig), {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          // `hasMemory` makes the adapter mutate its in-memory searchParams on
+          // each flush so successive writes (e.g. set then clear) see prior
+          // state; `rateLimitFactor: 1` keeps the debounce window honest.
+          <NuqsTestingAdapter onUrlUpdate={onUrlUpdate} rateLimitFactor={1} hasMemory>
+            {children}
+          </NuqsTestingAdapter>
+        ),
+      });
+    }
+
+    it('keeps the search value responsive immediately (no debounce on the returned value)', () => {
+      vi.useFakeTimers();
+      const onUrlUpdate = vi.fn();
+      const { result } = renderWithSpy(onUrlUpdate);
+      act(() => result.current.setSearch('grace'));
+      // The optimistic state reflects the typed value right away, even though
+      // the URL write is still pending behind the debounce timer.
+      expect(result.current.search).toBe('grace');
+    });
+
+    it('coalesces rapid keystrokes into a single URL update after the debounce window', async () => {
+      vi.useFakeTimers();
+      const events: UrlUpdateEvent[] = [];
+      const { result } = renderWithSpy((e) => events.push(e));
+
+      act(() => {
+        result.current.setSearch('g');
+        result.current.setSearch('gr');
+        result.current.setSearch('gra');
+        result.current.setSearch('grace');
+      });
+      // Nothing flushed before the debounce window elapses.
+      expect(events).toHaveLength(0);
+
+      await flushUrlWrites();
+
+      expect(events).toHaveLength(1);
+      expect(events[0]!.searchParams.get('search')).toBe('grace');
+      // History must be replace (not push) so typing doesn't spam the back stack.
+      expect(events[0]!.options.history).toBe('replace');
+    });
+
+    it('the in-field clear resets search to empty via the same debounced setter', async () => {
+      vi.useFakeTimers();
+      const events: UrlUpdateEvent[] = [];
+      const { result } = renderWithSpy((e) => events.push(e));
+
+      act(() => result.current.setSearch('grace'));
+      await flushUrlWrites();
+      events.length = 0;
+
+      act(() => result.current.setSearch(''));
+      expect(result.current.search).toBe('');
+      await flushUrlWrites();
+      expect(events).toHaveLength(1);
+      // Cleared to default ('') → param dropped from the URL.
+      expect(events[0]!.searchParams.get('search')).toBeNull();
+    });
   });
 });
