@@ -8,27 +8,17 @@ import {
 import { Button } from '@perimeter/ui/button';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from '@perimeter/ui/pagination';
 import { Skeleton } from '@perimeter/ui/skeleton';
-import { SortSelect } from '@perimeter/ui/sort-select';
-import { IconSelect } from '@perimeter/ui/icon-select';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
-import { Search, X, Calendar, Type, Hash, LayoutGrid, Eye, List, Rows3 } from 'lucide-react';
+import { Search, X, Calendar, Type, Hash, LayoutGrid, List, Rows3 } from 'lucide-react';
 import { useSeries, useSeriesTypes } from '@perimeter/api-hooks';
-import type { SermonsConfig, SortField, SortOrder } from '../../types';
+import type { SermonsConfig, SortField } from '../../types';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SeriesGrid } from './SeriesGrid';
 import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
+import { ResultsToolbar } from '../ui/ResultsToolbar';
+import { ResultsPagination } from '../ui/ResultsPagination';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
-import { getPageRange } from '../../lib/pagination';
 import { defined, idsParam } from '../../lib/query-params';
 
 interface SeriesViewProps {
@@ -176,35 +166,20 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
         </div>
       )}
 
-      {/* Results header: count + sort + view */}
+      {/* Results header: count + sort + view (shared extract) */}
       {showSortView && (
-        <div className="flex items-center justify-between">
-          <span data-slot="results-count" className="text-sm text-[var(--color-muted-fg)]">
-            {/* Reserve the line height even before the count loads so the
-                toolbar row doesn't reflow when results arrive. */}
-            {pagination ? `${pagination.total} series` : ' '}
-          </span>
-          <div className="flex items-center gap-2">
-            <SortSelect
-              sortField={filters.sort}
-              sortDirection={filters.order}
-              onSortFieldChange={(field: string) =>
-                filters.setSort(field as SortField, filters.order)
-              }
-              onSortDirectionChange={(direction: SortOrder) =>
-                filters.setSort(filters.sort, direction)
-              }
-              fields={SORT_FIELDS}
-            />
-            <IconSelect
-              value={viewMode}
-              onChange={(v: string) => setViewMode(v as SeriesViewMode)}
-              options={VIEW_OPTIONS}
-              label="View:"
-              icon={<Eye className="h-3.5 w-3.5 shrink-0" />}
-            />
-          </div>
-        </div>
+        <ResultsToolbar
+          count={pagination ? pagination.total : null}
+          noun="series"
+          sortField={filters.sort}
+          sortDirection={filters.order}
+          sortFields={SORT_FIELDS}
+          onSortFieldChange={(field) => filters.setSort(field as SortField, filters.order)}
+          onSortDirectionChange={(direction) => filters.setSort(filters.sort, direction)}
+          viewMode={viewMode}
+          viewOptions={VIEW_OPTIONS}
+          onViewModeChange={(v) => setViewMode(v as SeriesViewMode)}
+        />
       )}
 
       {error ? (
@@ -244,46 +219,13 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
         </SkeletonTransition>
       )}
 
-      {!config.hidePagination && pagination && pagination.totalPages > 1 && (
-        <Pagination aria-label="Series results pagination">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => filters.setPage(Math.max(1, filters.page - 1))}
-                aria-disabled={filters.page <= 1}
-                className={filters.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-              />
-            </PaginationItem>
-            {getPageRange(filters.page, pagination.totalPages).map((item, idx) =>
-              item === 'ellipsis' ? (
-                <PaginationItem key={`e-${idx}`}>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              ) : (
-                <PaginationItem key={item}>
-                  <PaginationLink
-                    isActive={item === filters.page}
-                    onClick={() => filters.setPage(item)}
-                    className="cursor-pointer"
-                  >
-                    {item}
-                  </PaginationLink>
-                </PaginationItem>
-              ),
-            )}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => filters.setPage(Math.min(pagination.totalPages, filters.page + 1))}
-                aria-disabled={filters.page >= pagination.totalPages}
-                className={
-                  filters.page >= pagination.totalPages
-                    ? 'pointer-events-none opacity-50'
-                    : 'cursor-pointer'
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      {!config.hidePagination && pagination && (
+        <ResultsPagination
+          page={filters.page}
+          totalPages={pagination.totalPages}
+          onPageChange={filters.setPage}
+          label="Series results pagination"
+        />
       )}
     </div>
   );
