@@ -1,4 +1,6 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
 import tailwindcss from 'tailwindcss';
@@ -33,4 +35,9 @@ export default defineConfig({
   css: { postcss: { plugins: [tailwindcss(), autoprefixer(), remToPxPlugin] } },
   resolve: { alias: { '@mdx-js/react': mdxReact } },
   server: { fs: { allow: [workspaceRoot] } },
+  // The Playwright visual harness lives in `visual/*.spec.ts`. Vitest has no
+  // `test` block here, so its default include (`**/*.{test,spec}.tsx?`) WOULD
+  // collect those Playwright specs and fail (no browser, wrong runner). Exclude
+  // the whole `visual/` tree from the vitest run; it is driven by `pnpm visual`.
+  test: { exclude: [...configDefaults.exclude, 'visual/**'] },
 });
