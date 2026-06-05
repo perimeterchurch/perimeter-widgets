@@ -57,6 +57,19 @@ describe('InspectorDrawer', () => {
     expect(within(dialog).getByRole('tab', { name: 'Config' })).toBeTruthy();
   });
 
+  it('uses a wide drawer panel (30rem) so config/theme fields fit comfortably', () => {
+    const { container } = renderDrawer();
+    const scope = within(container);
+    fireEvent.click(scope.getByRole('button', { name: /inspector/i }));
+
+    // The panel was 22rem, which squeezed long token labels against the inputs.
+    // It must be widened to 30rem (capped at 90vw so it never overflows a phone).
+    const dialog = scope.getByRole('dialog');
+    const classes = dialog.className.split(/\s+/);
+    expect(classes).toContain('w-[30rem]');
+    expect(classes).toContain('max-w-[90vw]');
+  });
+
   it('closes when the close button is clicked', () => {
     const { container } = renderDrawer();
     const scope = within(container);

@@ -81,6 +81,34 @@ describe('Inspector', () => {
     expect(scope.getByText('count')).toBeTruthy();
   });
 
+  it('lays out Config field rows with an auto-label / flexible-input grid', () => {
+    const { container } = renderInspector();
+    const scope = within(container);
+    // The old `grid-cols-2` split label/input 1:1 and squeezed inputs in the
+    // narrow drawer. The label column should size to content (min 6rem) and the
+    // input column take the remaining space.
+    const fieldLabel = scope.getByText('greeting').closest('label') as HTMLElement;
+    expect(fieldLabel).toBeTruthy();
+    const classes = fieldLabel.className.split(/\s+/);
+    expect(classes).toContain('grid-cols-[minmax(6rem,auto)_1fr]');
+    expect(classes).not.toContain('grid-cols-2');
+  });
+
+  it('lays out Theme token rows with the same auto-label / flexible-input grid', () => {
+    const { container } = renderInspector();
+    const scope = within(container);
+    fireEvent.click(scope.getByRole('tab', { name: 'Theme' }));
+
+    // ThemeEditor rows previously clamped the input to 9rem; widen to a flexible
+    // 1fr input column so token values get room in the wider drawer.
+    const [firstColorToken] = scope.getAllByText(/^color-/);
+    const tokenLabel = firstColorToken?.closest('label') as HTMLElement;
+    expect(tokenLabel).toBeTruthy();
+    const classes = tokenLabel.className.split(/\s+/);
+    expect(classes).toContain('grid-cols-[minmax(6rem,auto)_1fr]');
+    expect(classes).not.toContain('grid-cols-[1fr_minmax(0,9rem)]');
+  });
+
   it('switches to the Info tab and lists schema fields with type and default', () => {
     const { container } = renderInspector();
     const scope = within(container);

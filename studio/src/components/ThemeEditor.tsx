@@ -48,7 +48,7 @@ export function ThemeEditor({ overrides, onChange }: Props) {
               return (
                 <label
                   key={token}
-                  className="grid grid-cols-[1fr_minmax(0,9rem)] items-center gap-2"
+                  className="grid grid-cols-[minmax(6rem,auto)_1fr] items-center gap-2"
                 >
                   <span className="flex items-center gap-1.5 truncate text-sm text-fg">
                     {prefix === 'color' && (
