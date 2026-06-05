@@ -15,9 +15,21 @@ export interface SermonTabsProps {
 export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
   return (
     <Tabs value={activeTab} onValueChange={(value: string) => onTabChange(value as TabId)}>
-      <TabsList className="h-10">
+      {/*
+        Per-instance `line` variant: a clear underline indicator marks the
+        selected tab in both light and dark. This is local to SermonTabs and
+        deliberately does NOT change the shared tabs.tsx default (which would
+        restyle the studio inspector tabs). The active trigger also keeps a
+        token-based fg/text contrast so the selected label reads strongly in
+        dark, where the indicator alone can be subtle.
+      */}
+      <TabsList variant="line" className="h-10">
         {TAB_DEFS.map((tab) => (
-          <TabsTrigger key={tab.id} value={tab.id} className="gap-1.5 px-4 text-sm">
+          <TabsTrigger
+            key={tab.id}
+            value={tab.id}
+            className="gap-1.5 px-4 text-sm data-active:font-semibold data-active:text-fg dark:data-active:text-fg"
+          >
             {tab.icon}
             {tab.label}
           </TabsTrigger>
