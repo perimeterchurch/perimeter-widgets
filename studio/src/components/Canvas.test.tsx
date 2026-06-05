@@ -92,7 +92,7 @@ describe('Canvas scroll chain', () => {
   });
 });
 
-describe('Canvas background toggle', () => {
+describe('Canvas surface toggle', () => {
   function renderCanvas() {
     const utils = render(
       <Canvas>
@@ -105,9 +105,18 @@ describe('Canvas background toggle', () => {
     return { ...utils, ui, surface, frame };
   }
 
-  it('offers White / Gray / Dark / Host-sim background options', () => {
+  // The canvas-surface control is labelled "Surface" (distinct from the widget
+  // "Theme" toggle), so neither the group nor its options collide with Theme's
+  // Light/Dark by accessible name.
+  it('exposes the surface group under a "Surface" name, not "background"', () => {
     const { ui } = renderCanvas();
-    const group = ui.getByRole('group', { name: /background/i });
+    expect(ui.getByRole('group', { name: /surface/i })).toBeTruthy();
+    expect(ui.queryByRole('group', { name: /background/i })).toBeNull();
+  });
+
+  it('offers White / Gray / Dark / Host-sim surface options', () => {
+    const { ui } = renderCanvas();
+    const group = ui.getByRole('group', { name: /surface/i });
     const within_group = within(group);
     expect(within_group.getByRole('button', { name: /white/i })).toBeTruthy();
     expect(within_group.getByRole('button', { name: /gray/i })).toBeTruthy();
@@ -115,9 +124,9 @@ describe('Canvas background toggle', () => {
     expect(within_group.getByRole('button', { name: /host.?sim/i })).toBeTruthy();
   });
 
-  it('selecting a background sets the canvas surface background', () => {
+  it('selecting a surface sets the canvas surface background', () => {
     const { ui, surface } = renderCanvas();
-    const group = within(ui.getByRole('group', { name: /background/i }));
+    const group = within(ui.getByRole('group', { name: /surface/i }));
 
     fireEvent.click(group.getByRole('button', { name: /white/i }));
     expect(surface().style.background.toLowerCase()).toBe('#ffffff');
@@ -130,7 +139,7 @@ describe('Canvas background toggle', () => {
 
   it('does NOT wrap children in a HostFrame unless host-sim is active', () => {
     const { ui, getByTestId } = renderCanvas();
-    const group = within(ui.getByRole('group', { name: /background/i }));
+    const group = within(ui.getByRole('group', { name: /surface/i }));
     fireEvent.click(group.getByRole('button', { name: /gray/i }));
     const child = getByTestId('preview-child');
     expect(child.closest('[data-host-frame]')).toBeNull();
@@ -138,20 +147,45 @@ describe('Canvas background toggle', () => {
 
   it('selecting Host-sim wraps children in a HostFrame ancestor', () => {
     const { ui, getByTestId } = renderCanvas();
-    const group = within(ui.getByRole('group', { name: /background/i }));
+    const group = within(ui.getByRole('group', { name: /surface/i }));
     fireEvent.click(group.getByRole('button', { name: /host.?sim/i }));
     const child = getByTestId('preview-child');
     expect(child.closest('[data-host-frame]')).not.toBeNull();
   });
 
-  it('keeps the width constraint working under any background', () => {
+  it('keeps the width constraint working under any surface', () => {
     const { ui, frame } = renderCanvas();
     fireEvent.click(
-      within(ui.getByRole('group', { name: /background/i })).getByRole('button', { name: /dark/i }),
+      within(ui.getByRole('group', { name: /surface/i })).getByRole('button', { name: /dark/i }),
     );
     fireEvent.click(
       within(ui.getByRole('group', { name: /viewport/i })).getByRole('button', { name: /mobile/i }),
     );
     expect(frame().style.width).toBe('375px');
+  });
+});
+
+describe('Canvas theme vs surface disambiguation', () => {
+  function renderCanvas(props: Partial<Parameters<typeof Canvas>[0]> = {}) {
+    const utils = render(
+      <Canvas theme="light" onThemeChange={() => {}} {...props}>
+        <div>preview content</div>
+      </Canvas>,
+    );
+    const ui = within(utils.container);
+    return { ...utils, ui };
+  }
+
+  // The widget Theme toggle and the canvas Surface toggle both have a "Dark"
+  // option — they must be reachable by distinct group names so neither query is
+  // ambiguous and the two clusters read as separate controls.
+  it('exposes Theme and Surface as separate, unambiguous groups', () => {
+    const { ui } = renderCanvas();
+    const themeGroup = ui.getByRole('group', { name: /theme/i });
+    const surfaceGroup = ui.getByRole('group', { name: /surface/i });
+    expect(themeGroup).not.toBe(surfaceGroup);
+    // Each "Dark" resolves within exactly one group.
+    expect(within(themeGroup).getByRole('button', { name: /dark/i })).toBeTruthy();
+    expect(within(surfaceGroup).getByRole('button', { name: /dark/i })).toBeTruthy();
   });
 });

@@ -15,7 +15,7 @@ class Isolate extends Component<{ name: string; children: ReactNode }, { failed:
   override render(): ReactNode {
     if (this.state.failed) {
       return (
-        <div className="text-xs text-amber-600">
+        <div className="text-xs text-muted-fg">
           Can&apos;t preview <code>{this.props.name}</code> standalone (it needs props).
         </div>
       );
@@ -44,8 +44,8 @@ export function ComponentPreview({ entry }: { entry: ComponentEntry }) {
     <ComponentStage>
       <div className="flex flex-col gap-6 p-4">
         {components.map(([name, Comp]) => (
-          <div key={name} className="rounded border p-4">
-            <div className="mb-2 text-xs text-gray-500">{name}</div>
+          <div key={name} className="rounded-md border border-border p-4">
+            <div className="mb-2 text-xs text-muted-fg">{name}</div>
             <Isolate name={name}>
               <Comp />
             </Isolate>

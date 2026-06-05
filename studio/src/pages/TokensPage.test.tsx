@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, afterEach } from 'vitest';
-import { render, cleanup, within } from '@testing-library/react';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { render, cleanup, within, fireEvent } from '@testing-library/react';
 import { globalTokens } from '@perimeter/theme';
 import { TokensPage } from './TokensPage';
 
@@ -68,5 +68,43 @@ describe('TokensPage (/tokens)', () => {
       expect(sample).toBeTruthy();
       expect((sample as HTMLElement).style.fontFamily).toBe(`var(--${token})`);
     }
+  });
+
+  it('copies a token css-var name to the clipboard when its copy control is clicked', () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+
+    const { container } = render(<TokensPage />);
+    const token = colorTokens[0]!;
+
+    const control = container.querySelector(
+      `[data-copy-token-name="${token}"]`,
+    ) as HTMLButtonElement;
+    expect(control).toBeTruthy();
+    fireEvent.click(control);
+
+    expect(writeText).toHaveBeenCalledWith(`--${token}`);
+  });
+
+  it('copies a token literal value to the clipboard when its value copy control is clicked', () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+
+    const { container } = render(<TokensPage />);
+    const token = colorTokens[0]!;
+
+    const control = container.querySelector(
+      `[data-copy-token-value="${token}"]`,
+    ) as HTMLButtonElement;
+    expect(control).toBeTruthy();
+    fireEvent.click(control);
+
+    expect(writeText).toHaveBeenCalledWith(globalTokens[token]);
   });
 });

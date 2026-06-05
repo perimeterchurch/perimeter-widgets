@@ -81,7 +81,7 @@ export function InspectorDrawer({
             role="dialog"
             aria-modal="true"
             aria-label="Widget inspector"
-            className="fixed inset-y-0 right-0 z-50 flex w-[30rem] max-w-[90vw] flex-col border-l border-border bg-bg shadow-xl"
+            className="fixed inset-y-0 right-0 z-50 flex w-[36rem] max-w-[92vw] flex-col border-l border-border bg-bg shadow-xl"
           >
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <span className="text-sm font-semibold tracking-tight text-fg">Inspector</span>

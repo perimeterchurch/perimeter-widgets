@@ -88,6 +88,26 @@ describe('Sidebar', () => {
     expect(ui.getByText(/no matches/i)).toBeTruthy();
   });
 
+  it('offers a clear-search affordance from the empty state that restores all nav', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    const search = ui.getByRole('searchbox');
+    fireEvent.change(search, { target: { value: 'zzz-nomatch' } });
+
+    // The dead-end "No matches" state carries a button to clear the filter.
+    const clear = ui.getByRole('button', { name: /clear search/i });
+    fireEvent.click(clear);
+
+    // Search is reset and the full nav returns.
+    expect((search as HTMLInputElement).value).toBe('');
+    expect(ui.getByRole('link', { name: 'sermons' })).toBeTruthy();
+    expect(ui.getByRole('link', { name: 'example' })).toBeTruthy();
+  });
+
   it('renders a chrome theme toggle that flips data-theme on the document element', () => {
     document.documentElement.removeAttribute('data-theme');
     const { container } = render(

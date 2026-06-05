@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router';
 import { useMemo } from 'react';
 import { Sidebar } from './Sidebar';
+import { ErrorBoundary } from './ErrorBoundary';
 import { buildNav } from '../lib/nav';
 import { listGuides } from '../lib/guide-docs';
 import {
@@ -32,7 +33,9 @@ export function Layout() {
     <div className="grid h-screen grid-cols-1 bg-bg font-sans text-fg lg:grid-cols-[16rem_1fr]">
       <Sidebar nav={nav} />
       <main className="overflow-auto">
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
     </div>
   );

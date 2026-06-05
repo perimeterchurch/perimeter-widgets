@@ -1,5 +1,5 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SermonFilters, type SermonFiltersProps } from '../../src/components/sermons/SermonFilters';
@@ -289,6 +289,30 @@ describe('SermonFilters row layout', () => {
     expect(row).not.toBeNull();
     expect(row?.className).toContain('flex');
     expect(row?.className).toContain('flex-wrap');
+  });
+});
+
+describe('SermonFilters in-field search clear', () => {
+  it('shows no clear button when the search field is empty', () => {
+    render(<SermonFilters {...makeProps({ search: '' })} />);
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
+  });
+
+  it('shows an in-field clear button when search has a value and calls onSearchChange("") on click', async () => {
+    const onSearchChange = vi.fn();
+    render(<SermonFilters {...makeProps({ search: 'grace', onSearchChange })} />);
+
+    const clear = screen.getByRole('button', { name: 'Clear search' });
+    expect(clear).toBeInTheDocument();
+    await userEvent.click(clear);
+    expect(onSearchChange).toHaveBeenCalledWith('');
+  });
+
+  it('does not render the in-field clear when search is locked (field hidden)', () => {
+    render(
+      <SermonFilters {...makeProps({ search: 'grace', lockedFilters: new Set(['search']) })} />,
+    );
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
   });
 });
 

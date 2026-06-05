@@ -1,5 +1,5 @@
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
-import { unwrapObject } from '../lib/schema-shape';
+import { describeSchemaFields, unwrapObject, type SchemaField } from '../lib/schema-shape';
 
 interface Props {
   definition: WidgetDefinition;
@@ -7,46 +7,146 @@ interface Props {
   onChange: (next: Record<string, unknown>) => void;
 }
 
+const INPUT_CLASS =
+  'rounded-md border border-border bg-bg px-2 py-1 text-sm text-fg transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40';
+
+/**
+ * The small `text-muted-fg` line under each control: the field's description (what
+ * it affects), then the constraint that matters for that control — the enum's
+ * allowed values, a number's range — followed by the default and an optional flag.
+ * Built as discrete parts so we only show what applies to the field.
+ */
+function fieldHint(field: SchemaField): string {
+  const parts: string[] = [];
+  if (field.description) parts.push(field.description);
+  if (field.enumOptions) parts.push(`Options: ${field.enumOptions.join(' | ')}`);
+  if (field.min !== null || field.max !== null) {
+    const lo = field.min ?? '−∞';
+    const hi = field.max ?? '∞';
+    parts.push(`Range: ${lo}–${hi}`);
+  }
+  if (field.default !== null) parts.push(`Default: ${field.default}`);
+  if (field.optional) parts.push('Optional');
+  return parts.join(' · ');
+}
+
 export function ConfigPanel({ definition, overrides, onChange }: Props) {
   const objectSchema = unwrapObject(definition.schema);
+
+  // Non-object schemas (rare) have no per-field shape — keep the raw-JSON escape
+  // hatch, but tokenize it so it stays legible in dark mode like everything else.
   if (!objectSchema) {
     return (
-      <textarea
-        className="h-32 w-full rounded border p-2 font-mono text-xs"
-        defaultValue="{}"
+      <div className="p-3">
+        <textarea
+          className="h-32 w-full rounded-md border border-border bg-bg p-2 font-mono text-xs text-fg"
+          defaultValue="{}"
+          onChange={(e) => {
+            try {
+              onChange(JSON.parse(e.target.value) as Record<string, unknown>);
+            } catch {
+              /* ignore invalid json while typing */
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  const fields = describeSchemaFields(definition.schema);
+  const set = (key: string, value: unknown) => onChange({ ...overrides, [key]: value });
+
+  return (
+    <div className="flex flex-col gap-3 p-3">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-fg">
+        Config (data-*)
+      </h3>
+      {fields.map((field) => (
+        <label
+          key={field.key}
+          className="grid grid-cols-[minmax(6rem,auto)_1fr] items-baseline gap-x-2 gap-y-1 text-sm"
+        >
+          <span className="truncate pt-1 font-medium text-fg">{field.key}</span>
+          <FieldControl field={field} value={overrides[field.key]} onChange={set} />
+          {/* Hint spans the input column so it lines up under the control. */}
+          <span className="col-start-2 text-xs leading-snug text-muted-fg">{fieldHint(field)}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
+function FieldControl({
+  field,
+  value,
+  onChange,
+}: {
+  field: SchemaField;
+  value: unknown;
+  onChange: (key: string, value: unknown) => void;
+}) {
+  // Boolean → checkbox, emitting a real boolean.
+  if (field.type === 'boolean') {
+    return (
+      <input
+        type="checkbox"
+        className="size-4 justify-self-start rounded border border-border bg-bg accent-primary"
+        checked={value === true}
+        onChange={(e) => onChange(field.key, e.target.checked)}
+      />
+    );
+  }
+
+  // Enum → native select with exactly the allowed options.
+  if (field.enumOptions) {
+    return (
+      <select
+        className={INPUT_CLASS}
+        value={typeof value === 'string' ? value : (field.enumOptions[0] ?? '')}
+        onChange={(e) => onChange(field.key, e.target.value)}
+      >
+        {field.enumOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  // Number → number input with the schema's min/max, emitting a real number
+  // (empty input clears the override rather than emitting NaN).
+  if (field.type === 'number') {
+    return (
+      <input
+        type="number"
+        className={INPUT_CLASS}
+        min={field.min ?? undefined}
+        max={field.max ?? undefined}
+        value={typeof value === 'number' ? value : ''}
         onChange={(e) => {
-          try {
-            onChange(JSON.parse(e.target.value) as Record<string, unknown>);
-          } catch {
-            /* ignore invalid json while typing */
-          }
+          const raw = e.target.value;
+          onChange(field.key, raw === '' ? undefined : Number(raw));
         }}
       />
     );
   }
-  const keys = Object.keys(objectSchema.shape);
-  const display = (value: unknown): string => {
-    if (value == null) return '';
-    if (typeof value === 'string') return value;
-    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-    return JSON.stringify(value);
-  };
+
+  // Everything else → text input emitting a string. Only reflect a primitive
+  // back into the field; an unexpected object override stays invisible rather
+  // than rendering "[object Object]".
+  const text =
+    typeof value === 'string'
+      ? value
+      : typeof value === 'number' || typeof value === 'boolean'
+        ? String(value)
+        : '';
   return (
-    <div className="flex flex-col gap-2 p-3">
-      <h3 className="font-semibold">Config (data-*)</h3>
-      {keys.map((key) => (
-        <label
-          key={key}
-          className="grid grid-cols-[minmax(6rem,auto)_1fr] items-center gap-2 text-sm"
-        >
-          <span className="truncate">{key}</span>
-          <input
-            className="rounded border px-2 py-1"
-            value={display(overrides[key])}
-            onChange={(e) => onChange({ ...overrides, [key]: e.target.value })}
-          />
-        </label>
-      ))}
-    </div>
+    <input
+      type="text"
+      className={INPUT_CLASS}
+      value={text}
+      onChange={(e) => onChange(field.key, e.target.value)}
+    />
   );
 }

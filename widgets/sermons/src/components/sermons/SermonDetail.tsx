@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Calendar, Type } from 'lucide-react';
+import { ArrowLeft, Calendar, Type, Link2, Check } from 'lucide-react';
 import { Button } from '@perimeter/ui/button';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@perimeter/ui/empty';
 import { Skeleton } from '@perimeter/ui/skeleton';
@@ -41,13 +41,23 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
   const showRelated = (config.display ?? 'full') !== 'headless';
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
+  const [copied, setCopied] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
+
+  // The selected sermon is already encoded in the URL via nuqs (screen=detail,
+  // id=…), so the current href is a shareable deep link. Copy it to the
+  // clipboard and flash a confirmation.
+  const handleCopyLink = () => {
+    void navigator.clipboard?.writeText(window.location.href);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     if (sermon) titleRef.current?.focus();
   }, [sermon]);
 
-  const { data: seriesData } = useSermons(
+  const { data: seriesData, error: relatedError } = useSermons(
     defined({
       seriesId: sermon?.series.id ? String(sermon.series.id) : undefined,
       // Sermons sort only over date/title; 'count' is series-only.
@@ -96,9 +106,21 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
         {sermon && (
           <div className="space-y-6">
             <div>
-              <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-none">
-                {sermon.title}
-              </h2>
+              <div className="flex items-start justify-between gap-3">
+                <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-none">
+                  {sermon.title}
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  aria-label="Copy link to this sermon"
+                  className="shrink-0"
+                >
+                  {copied ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
+                  {copied ? 'Copied' : 'Copy link'}
+                </Button>
+              </div>
               <p className="text-sm text-muted-fg mt-1">
                 {sermon.speaker.name} · {formatDate(sermon.date)} · {sermon.series.title}
               </p>
@@ -106,7 +128,7 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
                 <p className="text-xs text-muted-fg mt-1">Scripture: {sermon.scriptureLinks}</p>
               )}
             </div>
-            {sermon.links.length > 0 && <MediaTabs links={sermon.links} />}
+            <MediaTabs links={sermon.links} />
             {sermon.description && (
               <div className="rounded-lg bg-muted p-4">
                 <h3 className="font-semibold text-sm mb-2">About this sermon</h3>
@@ -117,8 +139,16 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
               </div>
             )}
 
+            {/* Related fetch failed: a quiet inline note, not a full error
+                block — the sermon itself loaded fine. */}
+            {showRelated && relatedError && (
+              <p data-slot="related-error" className="text-sm text-muted-fg">
+                Couldn&rsquo;t load more sermons from this series.
+              </p>
+            )}
+
             {/* More from this series */}
-            {showRelated && relatedSermons.length > 0 && (
+            {showRelated && !relatedError && relatedSermons.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-sm">More from this series</h3>

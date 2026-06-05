@@ -1,18 +1,6 @@
-import { useState } from 'react';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from '@perimeter/ui/pagination';
 import { Skeleton } from '@perimeter/ui/skeleton';
-import { IconSelect } from '@perimeter/ui/icon-select';
-import { SortSelect } from '@perimeter/ui/sort-select';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
-import { Calendar, Type, LayoutGrid, Eye, List, Rows3 } from 'lucide-react';
+import { Calendar, Type, LayoutGrid, List, Rows3 } from 'lucide-react';
 import { useSermons } from '@perimeter/api-hooks';
 import type { SermonsConfig, ViewMode, SortField, SortOrder } from '../../types';
 import { useSermonFacets } from '../../hooks/use-sermon-facets';
@@ -21,8 +9,10 @@ import { SermonFilters } from './SermonFilters';
 import { SermonGrid } from './SermonGrid';
 import { SermonSmallList } from './SermonSmallList';
 import { SermonLargeList } from './SermonLargeList';
+import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
+import { ResultsToolbar } from '../ui/ResultsToolbar';
+import { ResultsPagination } from '../ui/ResultsPagination';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
-import { getPageRange } from '../../lib/pagination';
 import { defined, idsParam } from '../../lib/query-params';
 
 interface SermonsViewProps {
@@ -62,7 +52,7 @@ const SORT_FIELDS = [
 ];
 
 export function SermonsView({ config, filters }: SermonsViewProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>(config.defaultView ?? 'grid');
+  const viewMode = filters.view;
   const labelCache = useFilterLabelCache();
 
   // Both type filters are opt-in. The embedder shows them by setting
@@ -81,7 +71,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
   // narrows every sermon query as a baseline.
   const pinnedSeriesTypeId = config.seriesTypeId || undefined;
 
-  const { data, isLoading } = useSermons(
+  const { data, isLoading, error, refetch } = useSermons(
     defined({
       search: filters.search || undefined,
       seriesId: idsParam(filters.selectedSeriesIds),
@@ -155,90 +145,63 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
           lockedFilters={filters.lockedFilters}
         />
       )}
-      {/* Results header: count + sort + view */}
+      {/* Results header: count + sort + view (shared extract) */}
       {showSortView && (
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-[var(--color-muted-fg)]">
-            {pagination ? `${pagination.total} sermons` : ''}
-          </span>
-          <div className="flex items-center gap-2">
-            <SortSelect
-              sortField={filters.sort}
-              sortDirection={filters.order}
-              onSortFieldChange={handleSortFieldChange}
-              onSortDirectionChange={handleSortDirectionChange}
-              fields={SORT_FIELDS}
-            />
-            <IconSelect
-              value={viewMode}
-              onChange={(v: string) => setViewMode(v as ViewMode)}
-              options={VIEW_OPTIONS}
-              label="View:"
-              icon={<Eye className="h-3.5 w-3.5 shrink-0" />}
-            />
-          </div>
-        </div>
-      )}
-      <SkeletonTransition
-        isLoading={isLoading}
-        skeleton={
-          <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
-            {Array.from({ length: config.perPage }, (_, i) => (
-              <Skeleton key={i} className="h-48 w-full rounded-lg" />
-            ))}
-          </div>
-        }
-      >
-        <ViewComponent
-          sermons={sermons}
-          onSermonClick={(id: number) => filters.setScreen('detail', id)}
-          config={config}
+        <ResultsToolbar
+          count={pagination ? pagination.total : null}
+          noun="sermons"
+          sortField={filters.sort}
+          sortDirection={filters.order}
+          sortFields={SORT_FIELDS}
+          onSortFieldChange={handleSortFieldChange}
+          onSortDirectionChange={handleSortDirectionChange}
+          viewMode={viewMode}
+          viewOptions={VIEW_OPTIONS}
+          onViewModeChange={(v) => filters.setView(v as ViewMode)}
         />
-      </SkeletonTransition>
-      {!config.hidePagination && pagination && pagination.totalPages > 1 && (
-        <Pagination aria-label="Sermon results pagination">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => filters.setPage(Math.max(1, pagination.page - 1))}
-                aria-disabled={pagination.page <= 1}
-                className={
-                  pagination.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-                }
-              />
-            </PaginationItem>
-            {getPageRange(pagination.page, pagination.totalPages).map((item, idx) =>
-              item === 'ellipsis' ? (
-                <PaginationItem key={`e-${idx}`}>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              ) : (
-                <PaginationItem key={item}>
-                  <PaginationLink
-                    isActive={item === pagination.page}
-                    onClick={() => filters.setPage(item)}
-                    className="cursor-pointer"
-                  >
-                    {item}
-                  </PaginationLink>
-                </PaginationItem>
-              ),
-            )}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  filters.setPage(Math.min(pagination.totalPages, pagination.page + 1))
-                }
-                aria-disabled={pagination.page >= pagination.totalPages}
-                className={
-                  pagination.page >= pagination.totalPages
-                    ? 'pointer-events-none opacity-50'
-                    : 'cursor-pointer'
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      )}
+      {error ? (
+        // A failed query gets a distinct themed error block (not the empty
+        // state), so an API outage doesn't read as "no results".
+        <ResultsError
+          noun="sermons"
+          onRetry={() => {
+            void refetch();
+          }}
+        />
+      ) : (
+        <SkeletonTransition
+          isLoading={isLoading}
+          skeleton={
+            <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
+              {Array.from({ length: config.perPage }, (_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+        >
+          {sermons.length === 0 ? (
+            <ResultsEmpty
+              noun="sermons"
+              hasActiveFilters={filters.hasActiveFilters}
+              onClearFilters={filters.clearFilters}
+            />
+          ) : (
+            <ViewComponent
+              sermons={sermons}
+              onSermonClick={(id: number) => filters.setScreen('detail', id)}
+              config={config}
+            />
+          )}
+        </SkeletonTransition>
+      )}
+      {!config.hidePagination && pagination && (
+        <ResultsPagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={filters.setPage}
+          label="Sermon results pagination"
+        />
       )}
     </div>
   );

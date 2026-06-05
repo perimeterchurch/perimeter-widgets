@@ -1,5 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@perimeter/ui/input-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@perimeter/ui/input-group';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
@@ -156,6 +161,17 @@ export function SermonFilters(props: SermonFiltersProps) {
             }
             placeholder="Search sermons..."
           />
+          {props.search && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                aria-label="Clear search"
+                onClick={() => props.onSearchChange('')}
+              >
+                <X />
+              </InputGroupButton>
+            </InputGroupAddon>
+          )}
         </InputGroup>
       )}
 

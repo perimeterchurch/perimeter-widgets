@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
 import { Spinner } from '@perimeter/ui/spinner';
-import { Video, Headphones, FileText } from 'lucide-react';
+import { Video, Headphones, FileText, FileX } from 'lucide-react';
 import { AudioPlayer } from './AudioPlayer';
 import type { SermonLink } from '../../types';
 
@@ -62,7 +62,17 @@ export function MediaTabs({ links }: MediaTabsProps) {
 
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0]?.id ?? 'video');
 
-  if (availableTabs.length === 0) return null;
+  // Some sermons have no media uploaded yet. Rather than rendering nothing
+  // (which leaves a confusing gap), show a small affordance so visitors know
+  // media is expected but not yet available.
+  if (availableTabs.length === 0) {
+    return (
+      <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-muted p-4 text-sm text-muted-fg">
+        <FileX className="h-4 w-4 shrink-0" aria-hidden="true" />
+        No media available yet for this sermon.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">

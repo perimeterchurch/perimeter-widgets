@@ -2,6 +2,7 @@ import { Calendar, Layers, BookOpen } from 'lucide-react';
 import type { SeriesListItem, SermonsConfig } from '../../types';
 import { formatDate, seriesImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
+import { ResultsEmpty } from '../ui/ResultsState';
 
 interface SeriesGridProps {
   series: SeriesListItem[];
@@ -41,7 +42,7 @@ function BookLabel({ name }: { name: string }) {
 
 export function SeriesGrid({ series, viewMode = 'grid', onSeriesClick, config }: SeriesGridProps) {
   if (series.length === 0) {
-    return <div className="py-12 text-center text-muted-fg">No series found.</div>;
+    return <ResultsEmpty noun="series" />;
   }
 
   const wrapperClass =

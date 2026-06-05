@@ -3,6 +3,7 @@ import { useParams } from 'react-router';
 import { Spinner } from '@perimeter/ui/spinner';
 import { guideDoc } from '../lib/guide-docs';
 import { StudioMDXProvider } from '../lib/mdx';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 import { NotFoundPage } from './NotFoundPage';
 
 /**
@@ -16,7 +17,7 @@ export function GuidePage() {
   const guide = slug ? guideDoc(slug) : null;
 
   if (!guide) return <NotFoundPage />;
-  return <GuideDoc loader={guide.load} />;
+  return <GuideDoc title={guide.title} loader={guide.load} />;
 }
 
 /**
@@ -25,7 +26,13 @@ export function GuidePage() {
  * in. The MDX file owns its own heading; `mx-auto max-w-3xl` gives it a
  * comfortable reading measure rather than full-bleed.
  */
-function GuideDoc({ loader }: { loader: () => Promise<{ default: ComponentType }> }) {
+function GuideDoc({
+  title,
+  loader,
+}: {
+  title: string;
+  loader: () => Promise<{ default: ComponentType }>;
+}) {
   // `lazy` is keyed on the loader identity (one per guide slug) so React keeps a
   // stable element type across re-renders of the same guide.
   const Doc = useMemo(() => lazy(loader), [loader]);
@@ -33,6 +40,11 @@ function GuideDoc({ loader }: { loader: () => Promise<{ default: ComponentType }
     <div className="h-full overflow-auto">
       <StudioMDXProvider>
         <article className="mx-auto max-w-3xl px-6 py-10">
+          <div className="mb-4">
+            <Breadcrumbs
+              crumbs={[{ label: 'Home', to: '/' }, { label: 'Guides' }, { label: title }]}
+            />
+          </div>
           <Suspense
             fallback={
               <div className="flex justify-center py-16 text-muted-fg">

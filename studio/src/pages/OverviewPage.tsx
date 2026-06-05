@@ -8,6 +8,15 @@ import {
   widgetCssGlob,
   componentGlob,
 } from '../lib/discovery';
+import { titleFromSlug } from '../lib/labels';
+
+interface OverviewItem {
+  to: string;
+  /** Human-friendly title derived from the slug/name. */
+  title: string;
+  /** Raw slug/name, kept as a secondary code reference. */
+  slug: string;
+}
 
 /** One section card: a labelled count plus the discovered items as quick links. */
 function SectionCard({
@@ -18,7 +27,7 @@ function SectionCard({
 }: {
   title: string;
   count: number;
-  items: { to: string; label: string }[];
+  items: OverviewItem[];
   empty: string;
 }) {
   return (
@@ -34,9 +43,10 @@ function SectionCard({
               <li key={item.to}>
                 <Link
                   to={item.to}
-                  className="-mx-2 block rounded-md px-2 py-1.5 text-sm text-fg transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="-mx-2 flex items-baseline justify-between gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  {item.label}
+                  <span className="text-sm font-medium text-fg">{item.title}</span>
+                  <code className="font-mono text-xs text-muted-fg">{item.slug}</code>
                 </Link>
               </li>
             ))}
@@ -59,8 +69,16 @@ export function OverviewPage() {
     const w = toWidgetEntries(widgetDefGlob, widgetCssGlob);
     const c = toComponentEntries(componentGlob);
     return {
-      widgets: w.map((x) => ({ to: `/widgets/${x.slug}`, label: x.slug })),
-      components: c.map((x) => ({ to: `/components/${x.name}`, label: x.name })),
+      widgets: w.map((x) => ({
+        to: `/widgets/${x.slug}`,
+        title: titleFromSlug(x.slug),
+        slug: x.slug,
+      })),
+      components: c.map((x) => ({
+        to: `/components/${x.name}`,
+        title: titleFromSlug(x.name),
+        slug: x.name,
+      })),
     };
   }, []);
 

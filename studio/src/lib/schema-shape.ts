@@ -37,6 +37,18 @@ export interface SchemaField {
   default: string | null;
   /** Whether the field is optional (no value required). */
   optional: boolean;
+  /** Allowed values for a ZodEnum field, or null for non-enum fields. */
+  enumOptions: string[] | null;
+  /** Minimum from a ZodNumber `min` check, or null when unconstrained. */
+  min: number | null;
+  /** Maximum from a ZodNumber `max` check, or null when unconstrained. */
+  max: number | null;
+  /**
+   * The field's `.describe(...)` text (what the field affects), or null.
+   * Read from the OUTERMOST wrapper first — `ZodDefault`/`ZodOptional` don't
+   * reliably copy a description inward.
+   */
+  description: string | null;
 }
 
 function formatDefault(value: unknown): string {
@@ -56,6 +68,11 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
   let defaultValue: string | null = null;
   let optional = false;
 
+  // Capture the description from the OUTERMOST wrapper before peeling —
+  // ZodDefault/ZodOptional do not reliably copy `.describe()` to the inner
+  // type. Fall back to the inner type's description (set below) if absent.
+  let description: string | null = field.description ?? null;
+
   for (let i = 0; i < 10; i++) {
     if (current instanceof z.ZodDefault) {
       // defaultValue() is loosely typed (`any`); format defensively.
@@ -74,16 +91,33 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
     }
   }
 
+  // Fall back to the inner type's description if no outer wrapper carried one.
+  if (description === null && current.description) {
+    description = current.description;
+  }
+
   let type: string;
+  let enumOptions: string[] | null = null;
+  let min: number | null = null;
+  let max: number | null = null;
+
   if (current instanceof z.ZodEnum) {
-    type = `enum(${(current.options as string[]).join(' | ')})`;
+    enumOptions = current.options as string[];
+    type = `enum(${enumOptions.join(' | ')})`;
   } else {
+    if (current instanceof z.ZodNumber) {
+      // z.coerce.number().min(0).max(20) stores constraints as checks.
+      for (const check of current._def.checks) {
+        if (check.kind === 'min') min = check.value;
+        else if (check.kind === 'max') max = check.value;
+      }
+    }
     // ZodString → "string", ZodNumber → "number", ZodBoolean → "boolean", etc.
     const ctor = current.constructor.name; // e.g. "ZodString"
     type = ctor.replace(/^Zod/, '').toLowerCase();
   }
 
-  return { type, default: defaultValue, optional };
+  return { type, default: defaultValue, optional, enumOptions, min, max, description };
 }
 
 /**

@@ -57,20 +57,64 @@ describe('Inspector', () => {
     const { container } = renderInspector();
     const scope = within(container);
 
-    // The tab row must be a real flex row that spans the full inspector width so
-    // the flex-1 triggers distribute across the top (not pack tight/left from the
-    // default inline-flex w-fit list). Local Inspector override — NOT a global
-    // tabs.tsx change (that would stretch the sermons tab rows).
+    // The header tab bar is built directly (a role=tablist row of buttons), NOT
+    // the @perimeter/ui Tabs compound, so it doesn't fight that component's
+    // orientation handling. It must be a real flex row that spans the full
+    // inspector width so the flex-1 triggers distribute evenly across the top.
     const list = scope.getByRole('tablist');
     const listClasses = list.className.split(/\s+/);
-    // A standalone `flex` (block-level flex container), not the cva base
-    // `inline-flex` which sizes to content even with w-full present.
     expect(listClasses).toContain('flex');
     expect(listClasses).toContain('w-full');
 
     // The list must precede the active panel so it reads as a top row.
     const panel = scope.getByRole('tabpanel');
     expect(list.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('distributes the header tabs evenly with the active one marked aria-selected', () => {
+    const { container } = renderInspector();
+    const scope = within(container);
+
+    // Each trigger takes an equal share of the row (flex-1) so the three
+    // categories read as an evenly-distributed segmented control.
+    for (const name of ['Config', 'Theme', 'Info']) {
+      const tab = scope.getByRole('tab', { name });
+      expect(tab.className.split(/\s+/)).toContain('flex-1');
+    }
+
+    // Config is the default — exactly one tab is selected, and it is Config.
+    const tabs = scope.getAllByRole('tab');
+    const selected = tabs.filter((t) => t.getAttribute('aria-selected') === 'true');
+    expect(selected).toHaveLength(1);
+    expect(selected[0]?.textContent).toBe('Config');
+
+    // Clicking another tab moves the selection.
+    fireEvent.click(scope.getByRole('tab', { name: 'Theme' }));
+    expect(scope.getByRole('tab', { name: 'Theme' }).getAttribute('aria-selected')).toBe('true');
+    expect(scope.getByRole('tab', { name: 'Config' }).getAttribute('aria-selected')).toBe('false');
+  });
+
+  it('shows the embed snippet exactly once (not duplicated across tabs)', () => {
+    const { container } = renderInspector();
+    const scope = within(container);
+
+    // The snippet used to be rendered in both the Config and Info panels. It must
+    // now appear a single time regardless of which tab is active.
+    const matches = scope.getAllByText(
+      (_text, node) =>
+        node?.tagName === 'PRE' &&
+        (node.textContent ?? '').includes('widgets.perimeter.org/example/latest.js'),
+    );
+    expect(matches).toHaveLength(1);
+
+    // Still present after switching tabs (it lives outside the tab panels).
+    fireEvent.click(scope.getByRole('tab', { name: 'Info' }));
+    const afterSwitch = scope.getAllByText(
+      (_text, node) =>
+        node?.tagName === 'PRE' &&
+        (node.textContent ?? '').includes('widgets.perimeter.org/example/latest.js'),
+    );
+    expect(afterSwitch).toHaveLength(1);
   });
 
   it('defaults to the Config tab showing the schema field inputs', () => {
@@ -100,11 +144,15 @@ describe('Inspector', () => {
     fireEvent.click(scope.getByRole('tab', { name: 'Theme' }));
 
     // ThemeEditor rows previously clamped the input to 9rem; widen to a flexible
-    // 1fr input column so token values get room in the wider drawer.
+    // 1fr input column so token values get room in the wider drawer. The row is a
+    // plain div (not a wrapping label) so the color picker can't steal the text
+    // input's accessible name.
     const [firstColorToken] = scope.getAllByText(/^color-/);
-    const tokenLabel = firstColorToken?.closest('label') as HTMLElement;
-    expect(tokenLabel).toBeTruthy();
-    const classes = tokenLabel.className.split(/\s+/);
+    const tokenRow = firstColorToken?.closest(
+      'div.grid-cols-\\[minmax\\(6rem\\,auto\\)_1fr\\]',
+    ) as HTMLElement;
+    expect(tokenRow).toBeTruthy();
+    const classes = tokenRow.className.split(/\s+/);
     expect(classes).toContain('grid-cols-[minmax(6rem,auto)_1fr]');
     expect(classes).not.toContain('grid-cols-[1fr_minmax(0,9rem)]');
   });

@@ -5,9 +5,24 @@
  * which portals to document.body (outside shadow DOM).
  */
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
+} from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@perimeter/ui/utils/cn';
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'textarea:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
 
 interface ModalProps {
   open: boolean;
@@ -45,6 +60,34 @@ export function Modal({ open, onClose, size = 'md', title, className, children }
     }
   }, [open]);
 
+  // Hand-rolled Tab loop: keep focus inside the panel. jsdom doesn't run native
+  // Tab traversal, so we intercept Tab and wrap last→first / first→last.
+  const handleKeyDown = useCallback((e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Tab') return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+    if (focusable.length === 0) {
+      e.preventDefault();
+      panel.focus();
+      return;
+    }
+    const first = focusable[0]!;
+    const last = focusable[focusable.length - 1]!;
+    const active = document.activeElement;
+    if (e.shiftKey) {
+      if (active === first || active === panel) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }, []);
+
   if (!open) return null;
 
   return (
@@ -69,6 +112,7 @@ export function Modal({ open, onClose, size = 'md', title, className, children }
           className,
         )}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
       >
         {title && (
           <div className="mb-4 flex items-center justify-between">

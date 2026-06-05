@@ -1,28 +1,23 @@
-import { useState } from 'react';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@perimeter/ui/input-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@perimeter/ui/input-group';
 import { Button } from '@perimeter/ui/button';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from '@perimeter/ui/pagination';
 import { Skeleton } from '@perimeter/ui/skeleton';
-import { SortSelect } from '@perimeter/ui/sort-select';
-import { IconSelect } from '@perimeter/ui/icon-select';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
-import { Search, X, Calendar, Type, Hash, LayoutGrid, Eye, List, Rows3 } from 'lucide-react';
+import { Search, X, Calendar, Type, Hash, LayoutGrid, List, Rows3 } from 'lucide-react';
 import { useSeries, useSeriesTypes } from '@perimeter/api-hooks';
-import type { SermonsConfig, SortField, SortOrder } from '../../types';
+import type { SermonsConfig, SortField } from '../../types';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SeriesGrid } from './SeriesGrid';
+import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
+import { ResultsToolbar } from '../ui/ResultsToolbar';
+import { ResultsPagination } from '../ui/ResultsPagination';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
-import { getPageRange } from '../../lib/pagination';
 import { defined, idsParam } from '../../lib/query-params';
 
 interface SeriesViewProps {
@@ -69,7 +64,7 @@ const VIEW_OPTIONS = [
 ];
 
 export function SeriesView({ config, filters }: SeriesViewProps) {
-  const [viewMode, setViewMode] = useState<SeriesViewMode>('grid');
+  const viewMode = filters.view;
   const display = config.display ?? 'full';
   const showSearch = display === 'full';
   const showSortView = display !== 'headless';
@@ -93,7 +88,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
     label: st.name,
   }));
 
-  const { data, isLoading } = useSeries(
+  const { data, isLoading, error, refetch } = useSeries(
     defined({
       search: filters.search || undefined,
       seriesTypeId,
@@ -122,6 +117,17 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => filters.setSearch(e.target.value)}
             placeholder="Search series..."
           />
+          {filters.search && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                aria-label="Clear search"
+                onClick={() => filters.setSearch('')}
+              >
+                <X />
+              </InputGroupButton>
+            </InputGroupAddon>
+          )}
         </InputGroup>
       )}
 
@@ -159,93 +165,66 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
         </div>
       )}
 
-      {/* Results header: count + sort + view */}
+      {/* Results header: count + sort + view (shared extract) */}
       {showSortView && (
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-[var(--color-muted-fg)]">
-            {pagination ? `${pagination.total} series` : ''}
-          </span>
-          <div className="flex items-center gap-2">
-            <SortSelect
-              sortField={filters.sort}
-              sortDirection={filters.order}
-              onSortFieldChange={(field: string) =>
-                filters.setSort(field as SortField, filters.order)
-              }
-              onSortDirectionChange={(direction: SortOrder) =>
-                filters.setSort(filters.sort, direction)
-              }
-              fields={SORT_FIELDS}
-            />
-            <IconSelect
-              value={viewMode}
-              onChange={(v: string) => setViewMode(v as SeriesViewMode)}
-              options={VIEW_OPTIONS}
-              label="View:"
-              icon={<Eye className="h-3.5 w-3.5 shrink-0" />}
-            />
-          </div>
-        </div>
+        <ResultsToolbar
+          count={pagination ? pagination.total : null}
+          noun="series"
+          sortField={filters.sort}
+          sortDirection={filters.order}
+          sortFields={SORT_FIELDS}
+          onSortFieldChange={(field) => filters.setSort(field as SortField, filters.order)}
+          onSortDirectionChange={(direction) => filters.setSort(filters.sort, direction)}
+          viewMode={viewMode}
+          viewOptions={VIEW_OPTIONS}
+          onViewModeChange={(v) => filters.setView(v as SeriesViewMode)}
+        />
       )}
 
-      <SkeletonTransition
-        isLoading={isLoading}
-        skeleton={
-          <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
-            {Array.from({ length: config.perPage }, (_, i) => (
-              <Skeleton key={i} className="h-48 w-full rounded-lg" />
-            ))}
-          </div>
-        }
-      >
-        <SeriesGrid
-          series={seriesList}
-          viewMode={viewMode}
-          onSeriesClick={(id: number) => filters.setScreen('detail', id)}
-          config={config}
+      {error ? (
+        // A failed query gets a distinct themed error block (not the empty
+        // state), so an API outage doesn't read as "no results".
+        <ResultsError
+          noun="series"
+          onRetry={() => {
+            void refetch();
+          }}
         />
-      </SkeletonTransition>
+      ) : (
+        <SkeletonTransition
+          isLoading={isLoading}
+          skeleton={
+            <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
+              {Array.from({ length: config.perPage }, (_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-lg" />
+              ))}
+            </div>
+          }
+        >
+          {seriesList.length === 0 ? (
+            <ResultsEmpty
+              noun="series"
+              hasActiveFilters={filters.hasActiveFilters}
+              onClearFilters={filters.clearFilters}
+            />
+          ) : (
+            <SeriesGrid
+              series={seriesList}
+              viewMode={viewMode}
+              onSeriesClick={(id: number) => filters.setScreen('detail', id)}
+              config={config}
+            />
+          )}
+        </SkeletonTransition>
+      )}
 
-      {!config.hidePagination && pagination && pagination.totalPages > 1 && (
-        <Pagination aria-label="Series results pagination">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => filters.setPage(Math.max(1, filters.page - 1))}
-                aria-disabled={filters.page <= 1}
-                className={filters.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-              />
-            </PaginationItem>
-            {getPageRange(filters.page, pagination.totalPages).map((item, idx) =>
-              item === 'ellipsis' ? (
-                <PaginationItem key={`e-${idx}`}>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              ) : (
-                <PaginationItem key={item}>
-                  <PaginationLink
-                    isActive={item === filters.page}
-                    onClick={() => filters.setPage(item)}
-                    className="cursor-pointer"
-                  >
-                    {item}
-                  </PaginationLink>
-                </PaginationItem>
-              ),
-            )}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => filters.setPage(Math.min(pagination.totalPages, filters.page + 1))}
-                aria-disabled={filters.page >= pagination.totalPages}
-                className={
-                  filters.page >= pagination.totalPages
-                    ? 'pointer-events-none opacity-50'
-                    : 'cursor-pointer'
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      {!config.hidePagination && pagination && (
+        <ResultsPagination
+          page={filters.page}
+          totalPages={pagination.totalPages}
+          onPageChange={filters.setPage}
+          label="Series results pagination"
+        />
       )}
     </div>
   );
