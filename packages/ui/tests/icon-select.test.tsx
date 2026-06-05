@@ -22,4 +22,21 @@ describe('IconSelect', () => {
     fireEvent.click(screen.getAllByRole('button')[0]!);
     expect(screen.getByText('List')).toBeInTheDocument();
   });
+
+  it('caps the popup width so it cannot clip on narrow widths', () => {
+    const { container } = render(
+      <IconSelect value="grid" onChange={() => {}} options={options} label="View:" icon={null} />,
+    );
+    fireEvent.click(screen.getAllByRole('button')[0]!);
+    const popup = container.querySelector('.max-w-\\[calc\\(100vw-1rem\\)\\]');
+    expect(popup).not.toBeNull();
+    expect(popup).toHaveClass('right-0');
+  });
+
+  it('truncates the trigger label so it cannot overflow the row', () => {
+    const { container } = render(
+      <IconSelect value="grid" onChange={() => {}} options={options} label="View:" icon={null} />,
+    );
+    expect(container.querySelector('.truncate')).not.toBeNull();
+  });
 });
