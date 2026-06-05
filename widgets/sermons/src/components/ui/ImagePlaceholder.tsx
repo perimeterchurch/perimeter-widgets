@@ -10,6 +10,11 @@ interface ImagePlaceholderProps {
  * SVG mark (a simple cross/steeple glyph) that inherits the theme via
  * `currentColor`, so it adapts to light/dark instead of pulling a fixed-color
  * remote logo.
+ *
+ * Purely decorative: the wrapper is `aria-hidden`, so the SVG carries no
+ * `role="img"`/`aria-label` (an `aria-hidden` ancestor would hide that label
+ * anyway — and a missing-artwork glyph adds nothing for a screen reader). The
+ * accessible name for the media comes from the card's own text.
  */
 export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
   return (
@@ -26,8 +31,6 @@ export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
         strokeLinecap="round"
         strokeLinejoin="round"
         className="h-2/5 w-2/5 max-h-16 max-w-16 opacity-40"
-        role="img"
-        aria-label="Perimeter Church"
       >
         <path d="M12 3v18" />
         <path d="M7 8h10" />

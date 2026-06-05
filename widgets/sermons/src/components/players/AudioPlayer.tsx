@@ -75,7 +75,7 @@ export function AudioPlayer({ url }: { url: string }) {
           step={0.1}
           value={currentTime}
           onChange={(e) => seekTo(parseFloat(e.target.value))}
-          className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-border accent-primary"
+          className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-border accent-primary outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label="Seek"
         />
         <span className="whitespace-nowrap text-xs text-muted-fg">

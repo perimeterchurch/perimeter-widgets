@@ -22,9 +22,41 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   override render(): React.ReactNode {
     if (this.state.error) {
+      // A crashed React subtree may have lost its Tailwind classes, so the
+      // fallback is driven by inline styles referencing the theme tokens
+      // (`--color-destructive` / `--color-fg`), which live on the shadow host
+      // and stay valid regardless of class purging — and stay legible in dark.
       return (
-        <div role="alert" style={{ padding: '0.5rem', fontSize: '0.875rem', color: '#7a1a1a' }}>
-          This widget encountered an error.
+        <div
+          role="alert"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '0.75rem',
+            padding: '0.75rem',
+            fontSize: '0.875rem',
+            color: 'var(--color-destructive, #b91c1c)',
+          }}
+        >
+          <span>This widget encountered an error.</span>
+          <button
+            type="button"
+            onClick={() => {
+              this.setState({ error: null });
+            }}
+            style={{
+              cursor: 'pointer',
+              borderRadius: '0.375rem',
+              border: '1px solid var(--color-destructive, #b91c1c)',
+              background: 'transparent',
+              color: 'inherit',
+              padding: '0.25rem 0.625rem',
+              font: 'inherit',
+            }}
+          >
+            Reload
+          </button>
         </div>
       );
     }

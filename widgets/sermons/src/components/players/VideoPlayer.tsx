@@ -150,7 +150,7 @@ export function VideoPlayer({ url }: { url: string }) {
       <div
         className={`absolute bottom-6 inset-x-0 flex justify-center transition-opacity duration-300 ${controlsVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       >
-        <div className="flex w-max max-w-[90vw] items-center gap-3 rounded-xl bg-stone-900/60 px-4 py-2.5 backdrop-blur-md">
+        <div className="flex w-max max-w-[90vw] items-center gap-3 rounded-xl bg-black/60 px-4 py-2.5 backdrop-blur-md">
           <button
             type="button"
             onClick={togglePlay}
@@ -169,7 +169,7 @@ export function VideoPlayer({ url }: { url: string }) {
             step={0.1}
             value={currentTime}
             onChange={(e) => seekTo(parseFloat(e.target.value))}
-            className="h-1.5 w-40 min-w-24 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary"
+            className="h-1.5 w-40 min-w-24 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Seek"
           />
           <div className="flex items-center gap-2">
