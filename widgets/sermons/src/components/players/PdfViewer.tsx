@@ -51,6 +51,9 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
   const [scale, setScale] = useState<number>(1.0);
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [pageInputValue, setPageInputValue] = useState('1');
+  // Real natural page dimensions (points at scale 1), captured from the loaded
+  // page. Falls back to US-Letter until the first page reports its size.
+  const [pageDims, setPageDims] = useState<{ width: number; height: number } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -119,24 +122,31 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
     setScale(Number(e.target.value));
   }, []);
 
+  // US-Letter (612×792pt) is only the fallback before the real page size loads.
+  const pageWidth = pageDims?.width ?? 612;
+  const pageHeight = pageDims?.height ?? 792;
+
   const fitWidth = useCallback(() => {
     if (!containerRef.current) return;
-    // Approximate: PDF default width is ~612pt (US Letter)
     const containerWidth = containerRef.current.clientWidth - 48; // padding
-    const pdfDefaultWidth = 612;
-    setScale(containerWidth / pdfDefaultWidth);
-  }, []);
+    setScale(containerWidth / pageWidth);
+  }, [pageWidth]);
 
   const fitPage = useCallback(() => {
     if (!containerRef.current) return;
     const containerWidth = containerRef.current.clientWidth - 48;
     const containerHeight = containerRef.current.clientHeight - 48;
-    const pdfDefaultWidth = 612;
-    const pdfDefaultHeight = 792;
-    const scaleW = containerWidth / pdfDefaultWidth;
-    const scaleH = containerHeight / pdfDefaultHeight;
+    const scaleW = containerWidth / pageWidth;
+    const scaleH = containerHeight / pageHeight;
     setScale(Math.min(scaleW, scaleH));
-  }, []);
+  }, [pageWidth, pageHeight]);
+
+  const onPageLoadSuccess = useCallback(
+    (page: { originalWidth: number; originalHeight: number }) => {
+      setPageDims({ width: page.originalWidth, height: page.originalHeight });
+    },
+    [],
+  );
 
   /* ---- Scroll active thumbnail into view ---- */
 
@@ -334,6 +344,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
               <Page
                 pageNumber={currentPage}
                 scale={scale}
+                onLoadSuccess={onPageLoadSuccess}
                 renderTextLayer={true}
                 renderAnnotationLayer={true}
               />

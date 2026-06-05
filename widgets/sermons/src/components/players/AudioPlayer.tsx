@@ -14,6 +14,7 @@ export function AudioPlayer({ url }: { url: string }) {
     volume,
     playbackRate,
     togglePlay,
+    seek,
     seekTo,
     setVolume,
     setPlaybackRate,
@@ -25,8 +26,39 @@ export function AudioPlayer({ url }: { url: string }) {
     setPlaybackRate(SPEEDS[nextIndex]!);
   }, [playbackRate, setPlaybackRate]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT') return;
+      switch (e.key) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          togglePlay();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          seek(5);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          seek(-5);
+          break;
+        default:
+          break;
+      }
+    },
+    [togglePlay, seek],
+  );
+
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center p-4">
+    <div
+      className="flex h-full w-full flex-col items-center justify-center p-4 outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      tabIndex={0}
+      role="application"
+      aria-label="Audio player"
+      onKeyDown={handleKeyDown}
+    >
       <div className="flex w-full max-w-[500px] items-center gap-3 rounded-xl bg-muted px-5 py-3 shadow-lg">
         <button
           type="button"
