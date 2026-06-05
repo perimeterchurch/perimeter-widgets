@@ -129,7 +129,18 @@ export function Sidebar({ nav }: SidebarProps) {
               ))}
             </ul>
           ) : (
-            <p className="px-2 py-3 text-sm text-muted-fg">No matches</p>
+            <div className="px-2 py-3">
+              <p className="text-sm text-muted-fg">No matches for “{query.trim()}”.</p>
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                onClick={() => setQuery('')}
+                className="mt-1 h-auto p-0 text-sm"
+              >
+                Clear search
+              </Button>
+            </div>
           )}
         </nav>
       </aside>

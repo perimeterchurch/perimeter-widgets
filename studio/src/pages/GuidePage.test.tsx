@@ -37,6 +37,12 @@ describe('GuidePage (/guides/:slug)', () => {
     // The guide owns the page heading: the MDX `# Styling widgets` maps to the
     // single studio-styled h1.
     expect(container.querySelector('h1')?.textContent).toBe('Styling widgets');
+
+    // A breadcrumb trail sits above the guide: Home link + the guide title as the
+    // current page.
+    const crumbs = scope.getByRole('navigation', { name: /breadcrumb/i });
+    expect(within(crumbs).getByRole('link', { name: 'Home' })).toBeTruthy();
+    expect(within(crumbs).getByText('Styling Widgets').getAttribute('aria-current')).toBe('page');
   });
 
   it('renders the 404 page for an unknown guide slug', () => {

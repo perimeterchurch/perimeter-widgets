@@ -8,6 +8,8 @@ import { StudioMDXProvider } from '../lib/mdx';
 import { WidgetPreview } from '../components/WidgetPreview';
 import { Canvas } from '../components/Canvas';
 import { InspectorDrawer } from '../components/InspectorDrawer';
+import { Breadcrumbs } from '../components/Breadcrumbs';
+import { titleFromSlug } from '../lib/labels';
 import { NotFoundPage } from './NotFoundPage';
 
 /**
@@ -35,8 +37,16 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
     <div className="flex h-full flex-col">
       <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-fg">Widget</p>
-          <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-fg">{entry.slug}</h1>
+          <Breadcrumbs
+            crumbs={[
+              { label: 'Home', to: '/' },
+              { label: 'Widgets' },
+              { label: titleFromSlug(entry.slug) },
+            ]}
+          />
+          <h1 className="mt-1 text-xl font-semibold tracking-tight text-fg">
+            {titleFromSlug(entry.slug)}
+          </h1>
         </div>
         {/* Inspector — hand-rolled slide-out drawer (Config / Theme / Info tabs +
             embed snippet), closed by default. Its toggle lives in the header; the

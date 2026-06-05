@@ -5,6 +5,7 @@ import { toComponentEntries, componentGlob, type ComponentEntry } from '../lib/d
 import { componentDoc } from '../lib/component-docs';
 import { ComponentPreview } from '../components/ComponentPreview';
 import { StudioMDXProvider } from '../lib/mdx';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 import { NotFoundPage } from './NotFoundPage';
 
 /**
@@ -23,7 +24,7 @@ export function ComponentPage() {
   if (!entry) return <NotFoundPage />;
 
   const doc = componentDoc(entry.name);
-  return doc ? <ComponentDoc loader={doc} /> : <Gallery entry={entry} />;
+  return doc ? <ComponentDoc name={entry.name} loader={doc} /> : <Gallery entry={entry} />;
 }
 
 /**
@@ -32,7 +33,13 @@ export function ComponentPage() {
  * The MDX file owns its own heading; `mx-auto max-w-3xl` gives it a comfortable
  * reading measure rather than full-bleed.
  */
-function ComponentDoc({ loader }: { loader: () => Promise<{ default: ComponentType }> }) {
+function ComponentDoc({
+  name,
+  loader,
+}: {
+  name: string;
+  loader: () => Promise<{ default: ComponentType }>;
+}) {
   // `lazy` is keyed on the loader identity (one per component name) so React keeps
   // a stable element type across re-renders of the same doc.
   const Doc = useMemo(() => lazy(loader), [loader]);
@@ -40,6 +47,11 @@ function ComponentDoc({ loader }: { loader: () => Promise<{ default: ComponentTy
     <div className="h-full overflow-auto">
       <StudioMDXProvider>
         <article className="mx-auto max-w-3xl px-6 py-10">
+          <div className="mb-4">
+            <Breadcrumbs
+              crumbs={[{ label: 'Home', to: '/' }, { label: 'Components' }, { label: name }]}
+            />
+          </div>
           <Suspense
             fallback={
               <div className="flex justify-center py-16 text-muted-fg">
@@ -63,8 +75,10 @@ function Gallery({ entry }: { entry: ComponentEntry }) {
   return (
     <div className="flex h-full flex-col">
       <header className="border-b border-border px-6 py-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-fg">Component</p>
-        <h1 className="mt-0.5 font-mono text-xl font-semibold tracking-tight text-fg">
+        <Breadcrumbs
+          crumbs={[{ label: 'Home', to: '/' }, { label: 'Components' }, { label: entry.name }]}
+        />
+        <h1 className="mt-1 font-mono text-xl font-semibold tracking-tight text-fg">
           {entry.name}
         </h1>
       </header>
