@@ -70,11 +70,13 @@ function makeFilters(over: Partial<ReturnType<typeof useSermonFilters>> = {}) {
     sort: 'date',
     order: 'desc',
     page: 1,
+    view: 'grid',
     screen: 'browse',
     detailId: null,
     hasActiveFilters: false,
     lockedFilters: new Set<string>(),
     setSearch: vi.fn(),
+    setView: vi.fn(),
     setSeriesIds: vi.fn(),
     setSpeakerIds: vi.fn(),
     setBookIds: vi.fn(),
@@ -139,6 +141,45 @@ describe('SermonsView results states', () => {
     // Always occupies a line: rendered even with no pagination yet.
     expect(countLine).toBeInTheDocument();
   });
+
+  // The loading skeleton must mirror the LOADED layout per viewMode so the
+  // results region doesn't jump shape when data arrives. The skeleton wrapper
+  // carries the same container class the corresponding view component uses
+  // (grid → .grid with @[…] cols, list → stacked rows, large → space-y-4),
+  // and renders `perPage` placeholder items.
+  it('grid loading skeleton mirrors the grid layout with perPage items', () => {
+    useSermons.mockReturnValue(queryResult({ isLoading: true }));
+    const { container } = render(
+      <SermonsView config={config({ perPage: 6 })} filters={makeFilters({ view: 'grid' })} />,
+    );
+    const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
+    expect(sk).toBeTruthy();
+    expect(sk).toHaveClass('grid', '@[30rem]:grid-cols-2', '@[48rem]:grid-cols-3');
+    expect(sk.querySelectorAll('[data-slot="sermon-skeleton-item"]')).toHaveLength(6);
+  });
+
+  it('list loading skeleton uses a stacked (non-grid) layout', () => {
+    useSermons.mockReturnValue(queryResult({ isLoading: true }));
+    const { container } = render(
+      <SermonsView config={config({ perPage: 4 })} filters={makeFilters({ view: 'list' })} />,
+    );
+    const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
+    expect(sk).toBeTruthy();
+    expect(sk).not.toHaveClass('grid');
+    expect(sk.querySelectorAll('[data-slot="sermon-skeleton-item"]')).toHaveLength(4);
+  });
+
+  it('large loading skeleton uses the vertical-stack layout', () => {
+    useSermons.mockReturnValue(queryResult({ isLoading: true }));
+    const { container } = render(
+      <SermonsView config={config({ perPage: 3 })} filters={makeFilters({ view: 'large' })} />,
+    );
+    const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
+    expect(sk).toBeTruthy();
+    expect(sk).not.toHaveClass('grid');
+    expect(sk).toHaveClass('space-y-4');
+    expect(sk.querySelectorAll('[data-slot="sermon-skeleton-item"]')).toHaveLength(3);
+  });
 });
 
 describe('SeriesView results states', () => {
@@ -164,5 +205,16 @@ describe('SeriesView results states', () => {
     const empty = document.querySelector('[data-slot="results-empty"]') as HTMLElement;
     fireEvent.click(within(empty).getByRole('button', { name: /clear filters/i }));
     expect(clearFilters).toHaveBeenCalledTimes(1);
+  });
+
+  it('list loading skeleton mirrors the list layout (non-grid, perPage items)', () => {
+    useSeries.mockReturnValue(queryResult({ isLoading: true }));
+    const { container } = render(
+      <SeriesView config={config({ perPage: 5 })} filters={makeFilters({ view: 'list' })} />,
+    );
+    const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
+    expect(sk).toBeTruthy();
+    expect(sk).not.toHaveClass('grid');
+    expect(sk.querySelectorAll('[data-slot="sermon-skeleton-item"]')).toHaveLength(5);
   });
 });

@@ -7,7 +7,6 @@ import {
 import { Button } from '@perimeter/ui/button';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
-import { Skeleton } from '@perimeter/ui/skeleton';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { Search, X, Calendar, Type, Hash, LayoutGrid, List, Rows3 } from 'lucide-react';
 import { useSeries, useSeriesTypes } from '@perimeter/api-hooks';
@@ -17,6 +16,7 @@ import { SeriesGrid } from './SeriesGrid';
 import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
 import { ResultsToolbar } from '../ui/ResultsToolbar';
 import { ResultsPagination } from '../ui/ResultsPagination';
+import { SermonSkeleton } from '../ui/SermonSkeleton';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 import { defined, idsParam } from '../../lib/query-params';
 
@@ -193,13 +193,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
       ) : (
         <SkeletonTransition
           isLoading={isLoading}
-          skeleton={
-            <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
-              {Array.from({ length: config.perPage }, (_, i) => (
-                <Skeleton key={i} className="h-48 w-full rounded-lg" />
-              ))}
-            </div>
-          }
+          skeleton={<SermonSkeleton viewMode={viewMode} count={config.perPage} />}
         >
           {seriesList.length === 0 ? (
             <ResultsEmpty

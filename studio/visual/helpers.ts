@@ -19,15 +19,34 @@ const TINY_PNG = Buffer.from(
  *
  * MUST be registered before `page.goto` so the React Query mount sees the mock.
  */
-export async function mockSermonsApi(page: Page): Promise<void> {
-  // Image endpoint first (more specific) — `/api/sermons/<id>/image` → tiny PNG.
-  await page.route('**/api/sermons/**/image', (route: Route) =>
-    route.fulfill({ status: 200, contentType: 'image/png', body: TINY_PNG }),
-  );
+export async function mockSermonsApi(
+  page: Page,
+  opts: { listDelayMs?: number; imageDelayMs?: number } = {},
+): Promise<void> {
+  const { listDelayMs = 0, imageDelayMs = 0 } = opts;
+  const wait = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
 
-  await page.route('**/api/sermons**', (route: Route) => {
+  // Image endpoint first (more specific) — `/api/sermons/<id>/image` → tiny PNG.
+  // An optional delay keeps the image in its per-image Skeleton/blur-up state
+  // long enough for the harness to observe it before the real <img> loads.
+  await page.route('**/api/sermons/**/image', async (route: Route) => {
+    await wait(imageDelayMs);
+    await route.fulfill({ status: 200, contentType: 'image/png', body: TINY_PNG });
+  });
+
+  await page.route('**/api/sermons**', async (route: Route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
+    // Image requests also match `**/api/sermons**`. Playwright runs the
+    // most-recently-registered route first, so this list handler sees image URLs
+    // too — hand them back to the dedicated `/image` route (which applies the
+    // image delay + PNG body) instead of serving JSON (which would error the
+    // <img> into the ImagePlaceholder and skip the blur-up Skeleton).
+    if (/\/image\/?$/.test(path)) return route.fallback();
+
+    // An optional list delay holds the query in its loading state so the
+    // viewMode-aware results skeleton is observable before the data resolves.
+    await wait(listDelayMs);
     const json = (body: unknown) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 
@@ -71,6 +90,26 @@ export async function waitForSermonCards(page: Page, min = 1): Promise<void> {
       return (host?.shadowRoot?.querySelectorAll('.grid button').length ?? 0) >= want;
     },
     { sel: PREVIEW_HOST, want: min },
+    { timeout: 30_000 },
+  );
+}
+
+/**
+ * Wait until the loading skeleton has been replaced by loaded content — i.e. the
+ * `[data-slot="sermon-skeleton"]` wrapper is gone and at least one MediaCard
+ * thumbnail `<img>` is present. viewMode-agnostic (list/large don't use `.grid`).
+ */
+export async function waitForResultsLoaded(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () => {
+      const host = document.querySelector('[data-perimeter-widget-preview]') as HTMLElement | null;
+      const root = host?.shadowRoot;
+      if (!root) return false;
+      const stillLoading = !!root.querySelector('[data-slot="sermon-skeleton"]');
+      const hasCards = (root.querySelectorAll('img').length ?? 0) >= 1;
+      return !stillLoading && hasCards;
+    },
+    undefined,
     { timeout: 30_000 },
   );
 }
@@ -142,6 +181,22 @@ export async function shadowCount(page: Page, shadowSelector: string): Promise<n
       return host?.shadowRoot?.querySelectorAll(sel).length ?? 0;
     },
     { hostSel: PREVIEW_HOST, sel: shadowSelector },
+  );
+}
+
+/** Read an attribute (default `class`) of the first element matching the selector in the shadow root, or null if absent. */
+export async function shadowAttr(
+  page: Page,
+  shadowSelector: string,
+  attr = 'class',
+): Promise<string | null> {
+  return page.evaluate(
+    ({ hostSel, sel, a }) => {
+      const host = document.querySelector(hostSel) as HTMLElement | null;
+      const el = host?.shadowRoot?.querySelector(sel) as HTMLElement | null;
+      return el?.getAttribute(a) ?? null;
+    },
+    { hostSel: PREVIEW_HOST, sel: shadowSelector, a: attr },
   );
 }
 
