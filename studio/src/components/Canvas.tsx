@@ -98,69 +98,35 @@ export function Canvas({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border bg-bg px-4 py-2.5">
-        <div className="flex items-center gap-1" role="group" aria-label="Viewport width presets">
-          {PRESETS.map((p) => {
-            const isActive = !customActive && preset === p.id;
-            return (
-              <Button
-                key={p.id}
-                type="button"
-                size="sm"
-                variant={isActive ? 'secondary' : 'ghost'}
-                aria-pressed={isActive}
-                onClick={() => {
-                  setPreset(p.id);
-                  setCustomPx('');
-                }}
-                className={cn(!isActive && 'text-muted-fg')}
-              >
-                {p.label}
-              </Button>
-            );
-          })}
-        </div>
-
-        {showBuiltToggle && (
-          <div className="flex items-center gap-2" role="group" aria-label="Preview source">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
-              Source
-            </span>
-            {/* Segmented control matching the background toggle: Source ⇄ Built. */}
-            <div className="flex items-center overflow-hidden rounded-md border border-border">
-              {(
-                [
-                  { id: 'source', label: 'Source' },
-                  { id: 'built', label: 'Built' },
-                ] as const
-              ).map((opt, i) => {
-                const isActive = source === opt.id;
-                return (
-                  <Button
-                    key={opt.id}
-                    type="button"
-                    size="sm"
-                    variant={isActive ? 'secondary' : 'ghost'}
-                    aria-pressed={isActive}
-                    onClick={() => setSource(opt.id)}
-                    className={cn(
-                      'rounded-none border-0',
-                      i > 0 && 'border-l border-border',
-                      !isActive && 'text-muted-fg',
-                    )}
-                  >
-                    {opt.label}
-                  </Button>
-                );
-              })}
-            </div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-bg px-4 py-2.5">
+        <div className="flex items-center gap-2" role="group" aria-label="Viewport width presets">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
+            Viewport
+          </span>
+          <div className="flex items-center gap-1">
+            {PRESETS.map((p) => {
+              const isActive = !customActive && preset === p.id;
+              return (
+                <Button
+                  key={p.id}
+                  type="button"
+                  size="sm"
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  aria-pressed={isActive}
+                  onClick={() => {
+                    setPreset(p.id);
+                    setCustomPx('');
+                  }}
+                  className={cn(!isActive && 'text-muted-fg')}
+                >
+                  {p.label}
+                </Button>
+              );
+            })}
           </div>
-        )}
-
-        <div className="flex items-center gap-2">
           <label
             htmlFor="canvas-custom-width"
-            className="text-xs font-medium uppercase tracking-wider text-muted-fg"
+            className="ml-1 text-xs font-medium uppercase tracking-wider text-muted-fg"
           >
             Custom
           </label>
@@ -175,7 +141,49 @@ export function Canvas({
             onChange={(e) => setCustomPx(e.target.value)}
             className={cn('h-8 w-24', customActive && 'border-primary ring-1 ring-primary')}
           />
+          <span className="ml-1 text-xs tabular-nums text-muted-fg">
+            {width ? `${resolvedPx}px` : 'Fluid'}
+          </span>
         </div>
+
+        {showBuiltToggle && (
+          <>
+            <Divider />
+            <div className="flex items-center gap-2" role="group" aria-label="Preview source">
+              <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
+                [DEV] Source
+              </span>
+              {/* Segmented control matching the surface toggle: Source ⇄ Built. */}
+              <div className="flex items-center overflow-hidden rounded-md border border-border">
+                {(
+                  [
+                    { id: 'source', label: 'Source' },
+                    { id: 'built', label: 'Built' },
+                  ] as const
+                ).map((opt, i) => {
+                  const isActive = source === opt.id;
+                  return (
+                    <Button
+                      key={opt.id}
+                      type="button"
+                      size="sm"
+                      variant={isActive ? 'secondary' : 'ghost'}
+                      aria-pressed={isActive}
+                      onClick={() => setSource(opt.id)}
+                      className={cn(
+                        'rounded-none border-0',
+                        i > 0 && 'border-l border-border',
+                        !isActive && 'text-muted-fg',
+                      )}
+                    >
+                      {opt.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
 
         {onThemeChange && (
           <div className="ml-auto flex items-center gap-2" role="group" aria-label="Preview theme">
@@ -183,9 +191,10 @@ export function Canvas({
               Theme
             </span>
             {/* Light/Dark segmented control — drives data-theme on the preview
-                host (via the lifted parent state). Distinct from the
-                background-surface buttons, which only paint the canvas behind
-                the frame. */}
+                host (via the lifted parent state). This is the WIDGET theme; it
+                is deliberately separated from the canvas Surface buttons below
+                (own group + divider), which only paint the canvas behind the
+                frame and never touch the widget's theme. */}
             <div className="flex items-center overflow-hidden rounded-md border border-border">
               {(
                 [
@@ -216,13 +225,15 @@ export function Canvas({
           </div>
         )}
 
+        {onThemeChange && <Divider />}
+
         <div
           className={cn('flex items-center gap-2', !onThemeChange && 'ml-auto')}
           role="group"
-          aria-label="Canvas background"
+          aria-label="Canvas surface"
         >
           <span className="text-xs font-medium uppercase tracking-wider text-muted-fg">
-            Background
+            Surface
           </span>
           {/* Segmented control: one rounded shell with hairline dividers so the
               options read as a single switch rather than four loose buttons. */}
@@ -249,10 +260,6 @@ export function Canvas({
             })}
           </div>
         </div>
-
-        <span className="text-xs tabular-nums text-muted-fg">
-          {width ? `${resolvedPx}px` : 'Fluid'}
-        </span>
       </div>
 
       <div
@@ -275,4 +282,16 @@ export function Canvas({
       </div>
     </div>
   );
+}
+
+/**
+ * A thin vertical hairline that visually separates the toolbar's control
+ * clusters (Viewport · Source · Theme · Surface) so the strip reads as distinct
+ * groups rather than one undifferentiated run of buttons. Hidden from the
+ * accessibility tree — the `role="group"` + label on each cluster carries the
+ * semantics. `self-stretch` lets it match the toolbar row height, and it
+ * collapses gracefully when the toolbar wraps (it just ends a wrapped row).
+ */
+function Divider() {
+  return <span aria-hidden className="h-5 w-px shrink-0 self-center bg-border" />;
 }
