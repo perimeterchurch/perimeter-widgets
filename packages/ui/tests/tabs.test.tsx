@@ -63,7 +63,7 @@ describe('Tabs line-variant indicator', () => {
       x: left,
       y: 0,
       toJSON() {},
-    } as DOMRect;
+    };
   }
 
   /**
