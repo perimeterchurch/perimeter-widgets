@@ -39,7 +39,7 @@ function TabsList({
 }: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>) {
   const listRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
-  const prevTransform = useRef('');
+  const prevKey = useRef('');
   const [indicatorStyle, setIndicatorStyle] = useState<CSSProperties>({});
 
   const updateIndicator = useCallback(() => {
@@ -51,20 +51,27 @@ function TabsList({
 
     const isVertical = list.closest('[data-orientation=vertical]') !== null;
 
+    // Measure relative to the list (the indicator's containing block) rather
+    // than offsetLeft/offsetParent, and size the underline to the active
+    // trigger's full extent so it sits directly under the selected tab.
+    const listRect = list.getBoundingClientRect();
+    const tabRect = activeTab.getBoundingClientRect();
+    const offset = isVertical ? tabRect.top - listRect.top : tabRect.left - listRect.left;
+    const size = isVertical ? tabRect.height : tabRect.width;
+    const transform = isVertical ? `translateY(${offset}px)` : `translateX(${offset}px)`;
+
+    // Re-measure whenever the active tab's position OR size changes; never
+    // early-return on a real change (e.g. a tab-change moving the underline).
+    const key = `${transform}|${size}`;
+    if (key === prevKey.current && !isFirstRender.current) return;
+
     const skipTransition = isFirstRender.current;
     if (isFirstRender.current) isFirstRender.current = false;
+    prevKey.current = key;
 
     const transition = skipTransition
       ? 'none'
       : 'transform 200ms ease-out, width 200ms ease-out, height 200ms ease-out';
-
-    const size = isVertical ? activeTab.offsetHeight * 0.6 : activeTab.offsetWidth * 0.6;
-    const transform = isVertical
-      ? `translateY(${activeTab.offsetTop + activeTab.offsetHeight * 0.2}px)`
-      : `translateX(${activeTab.offsetLeft + activeTab.offsetWidth * 0.2}px)`;
-
-    if (transform === prevTransform.current && !skipTransition) return;
-    prevTransform.current = transform;
 
     setIndicatorStyle(
       isVertical
