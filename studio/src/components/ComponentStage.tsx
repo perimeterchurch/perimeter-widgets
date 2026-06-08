@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { resolveTokens } from '@perimeter/theme';
 import { applyStyles, type StyleHandle } from '@perimeter/widget-runtime';
+import { useChromeTheme } from '../lib/use-chrome-theme';
 import stageCss from '../stage.css?inline';
 
 /**
@@ -13,6 +14,7 @@ import stageCss from '../stage.css?inline';
 export function ComponentStage({ children }: { children: ReactNode }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [container, setContainer] = useState<HTMLElement | null>(null);
+  const chromeTheme = useChromeTheme();
 
   useLayoutEffect(() => {
     const host = hostRef.current;
@@ -33,6 +35,19 @@ export function ComponentStage({ children }: { children: ReactNode }) {
       setContainer(null);
     };
   }, []);
+
+  // Mirror the studio chrome theme onto the stage host so
+  // `:host([data-theme="dark"])` — emitted by resolveTokens — activates the dark
+  // token block, exactly as a shipped widget's host gets the attribute (see
+  // WidgetPreview). Without this the gallery always renders the light token layer
+  // on dark chrome, so `text-fg` content (e.g. Label) is invisible against the
+  // dark stage.
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    if (chromeTheme === 'dark') host.setAttribute('data-theme', 'dark');
+    else host.removeAttribute('data-theme');
+  }, [chromeTheme, container]);
 
   return <div ref={hostRef}>{container ? createPortal(children, container) : null}</div>;
 }

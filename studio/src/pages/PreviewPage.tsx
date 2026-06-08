@@ -5,6 +5,7 @@ import { toWidgetEntries, widgetDefGlob, widgetCssGlob } from '../lib/discovery'
 import { WidgetPreview } from '../components/WidgetPreview';
 import { HostFrame } from '../components/HostFrame';
 import { usePreviewConfig } from '../hooks/use-preview-config';
+import { useChromeTheme } from '../lib/use-chrome-theme';
 import { BACKGROUND_SURFACES } from '../lib/preview-link';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -28,6 +29,8 @@ export function PreviewPage() {
   const widgets = useMemo(() => toWidgetEntries(widgetDefGlob, widgetCssGlob), []);
   const entry = slug ? widgets.find((w) => w.slug === slug) : undefined;
   const { state } = usePreviewConfig();
+  const chromeTheme = useChromeTheme();
+  const previewTheme = state.theme ?? chromeTheme;
   const [, setDef] = useState<WidgetDefinition | null>(null);
 
   if (!entry) return <NotFoundPage />;
@@ -45,7 +48,7 @@ export function PreviewPage() {
       entry={entry}
       configOverrides={state.config}
       tokenOverrides={state.tokens}
-      theme={state.theme}
+      theme={previewTheme}
       onDefinition={setDef}
     />
   );

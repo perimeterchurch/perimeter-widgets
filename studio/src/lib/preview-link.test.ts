@@ -12,16 +12,38 @@ import {
 // hand-edited or stale link must never throw and white-screen the standalone
 // route).
 
+const baseState: PreviewState = {
+  config: {},
+  tokens: {},
+  theme: undefined,
+  viewport: 'fluid',
+  background: 'host-sim',
+};
+const stateWith = (overrides: Partial<PreviewState>): PreviewState => ({
+  ...baseState,
+  ...overrides,
+});
+
 describe('preview-link codec', () => {
   it('omits params for an empty/default state (clean URL)', () => {
     const params = encodePreviewState({
       config: {},
       tokens: {},
-      theme: 'light',
+      theme: undefined,
       viewport: 'fluid',
       background: 'host-sim',
     });
     expect(params.toString()).toBe('');
+  });
+
+  it('pins an explicit theme (both light and dark) so it survives over chrome', () => {
+    // An unpinned theme (undefined) stays out of the URL — the preview follows the
+    // studio chrome theme. A pinned theme is written for BOTH light and dark so a
+    // pinned-light preview wins even when the recipient's chrome is dark.
+    expect(encodePreviewState(stateWith({ theme: undefined })).has('theme')).toBe(false);
+    expect(encodePreviewState(stateWith({ theme: 'light' })).get('theme')).toBe('light');
+    expect(encodePreviewState(stateWith({ theme: 'dark' })).get('theme')).toBe('dark');
+    expect(decodePreviewState(new URLSearchParams('theme=light')).theme).toBe('light');
   });
 
   it('round-trips config, tokens, theme, viewport, and a non-default background', () => {
@@ -37,13 +59,7 @@ describe('preview-link codec', () => {
   });
 
   it('omits the background param at the host-sim default and restores it when absent', () => {
-    const params = encodePreviewState({
-      config: {},
-      tokens: {},
-      theme: 'light',
-      viewport: 'fluid',
-      background: 'host-sim',
-    });
+    const params = encodePreviewState(stateWith({ background: 'host-sim' }));
     expect(params.has('bg')).toBe(false);
     expect(decodePreviewState(params).background).toBe('host-sim');
   });
@@ -55,22 +71,16 @@ describe('preview-link codec', () => {
 
   it('round-trips a custom numeric viewport', () => {
     const viewport: PreviewViewport = { custom: 500 };
-    const params = encodePreviewState({
-      config: {},
-      tokens: {},
-      theme: 'light',
-      viewport,
-      background: 'host-sim',
-    });
+    const params = encodePreviewState(stateWith({ viewport }));
     expect(decodePreviewState(params).viewport).toEqual(viewport);
   });
 
-  it('defaults missing params to an empty/light/fluid state', () => {
+  it('defaults missing params to an empty/follow-chrome/fluid state', () => {
     const decoded = decodePreviewState(new URLSearchParams(''));
     expect(decoded).toEqual({
       config: {},
       tokens: {},
-      theme: 'light',
+      theme: undefined,
       viewport: 'fluid',
       background: 'host-sim',
     });
@@ -83,8 +93,9 @@ describe('preview-link codec', () => {
     const decoded = decodePreviewState(params);
     expect(decoded.config).toEqual({});
     expect(decoded.tokens).toEqual({});
-    // Unknown theme falls back to light; unparseable viewport falls back to fluid.
-    expect(decoded.theme).toBe('light');
+    // Unknown theme falls back to follow-chrome (undefined); unparseable viewport
+    // falls back to fluid.
+    expect(decoded.theme).toBeUndefined();
     expect(decoded.viewport).toBe('fluid');
   });
 });

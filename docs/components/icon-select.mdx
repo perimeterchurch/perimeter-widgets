@@ -5,11 +5,11 @@ A compact icon-led dropdown for switching a single option — a view mode, a lay
 <Example label="View switcher">
   <IconSelect
     label="View:"
-    icon={null}
+    icon={<Rows className="size-3.5" />}
     value="grid"
     options={[
-      { value: 'grid', label: 'Grid', icon: null },
-      { value: 'list', label: 'List', icon: null },
+      { value: 'grid', label: 'Grid', icon: <LayoutGrid className="size-3.5" /> },
+      { value: 'list', label: 'List', icon: <List className="size-3.5" /> },
     ]}
     onChange={() => {}}
   />

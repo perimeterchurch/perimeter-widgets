@@ -353,6 +353,9 @@ importers:
       '@perimeter/widget-runtime':
         specifier: workspace:*
         version: link:../packages/widget-runtime
+      lucide-react:
+        specifier: ^0.577.0
+        version: 0.577.0(react@19.2.6)
       react:
         specifier: ^19.0.0
         version: 19.2.6

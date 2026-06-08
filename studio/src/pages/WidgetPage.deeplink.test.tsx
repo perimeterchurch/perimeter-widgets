@@ -13,7 +13,10 @@ import { decodePreviewState } from '../lib/preview-link';
 // shims localStorage for the mount() path.
 
 describe('WidgetPage deep-linkable preview', () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    document.documentElement.removeAttribute('data-theme');
+  });
 
   beforeAll(() => {
     if (typeof globalThis.localStorage === 'undefined') {
@@ -102,6 +105,31 @@ describe('WidgetPage deep-linkable preview', () => {
       return within(dialog).getByRole<HTMLInputElement>('textbox');
     });
     expect(greeting.value).toBe('FromLink');
+  });
+
+  it('follows the studio chrome theme when no theme is pinned in the URL', async () => {
+    // The sidebar chrome toggle writes data-theme on <html>. With no `theme`
+    // param pinned, the preview canvas must inherit it — darkening the studio
+    // also darkens the widget preview (the fix for "the widget doesn't follow
+    // dark mode"). A pinned ?theme= would override this (asserted above).
+    document.documentElement.setAttribute('data-theme', 'dark');
+    const { container } = renderWidgetAt('/widgets/example');
+    const scope = within(container);
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+    });
+
+    const themeGroup = scope.getByRole('group', { name: /theme/i });
+    expect(
+      within(themeGroup).getByRole('button', { name: /dark/i }).getAttribute('aria-pressed'),
+    ).toBe('true');
+    // And the preview host itself carries the dark attribute (so the dark token
+    // block activates) without any URL param having been set.
+    expect(currentSearch).not.toContain('theme=');
+    expect(
+      container.querySelector('[data-perimeter-widget-preview]')?.getAttribute('data-theme'),
+    ).toBe('dark');
   });
 
   it('selecting a non-default canvas surface encodes bg into the URL', async () => {

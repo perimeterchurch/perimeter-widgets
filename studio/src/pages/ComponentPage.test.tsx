@@ -3,6 +3,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { render, waitFor, cleanup, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import { ComponentPage } from './ComponentPage';
+import { ComponentPreview } from '../components/ComponentPreview';
 
 // Render-path regression guard for the component route. typecheck/build pass even
 // when the page crashes at runtime, so exercise the actual render through the
@@ -72,12 +73,22 @@ describe('ComponentPage (/components/:name)', () => {
     expect(hosts.length).toBeGreaterThan(0);
   });
 
-  it('falls back to the auto gallery for a component without a doc (spinner)', async () => {
-    const { container } = renderAt('/components/spinner');
+  it('auto-gallery renders a docless component by mounting its exports in a shadow root', async () => {
+    // The doc→MDX routing is covered above (button/input/tabs). Every shipped
+    // component now has a doc, so the gallery fallback only fires for a freshly
+    // scaffolded component before its doc lands — exercise that path directly via
+    // ComponentPreview (what ComponentPage's `else` branch renders) with a
+    // synthetic docless entry. It must mount the discovered exports inside a
+    // ComponentStage shadow root, labelled by export name.
+    const { container } = render(
+      <ComponentPreview
+        entry={{
+          name: 'spinner',
+          load: () => import('@perimeter/ui/spinner') as Promise<Record<string, unknown>>,
+        }}
+      />,
+    );
 
-    // The gallery mounts the discovered exports inside a ComponentStage shadow
-    // root and labels each by export name. Find the stage host (the only element
-    // that gets a shadow root) and assert the export label landed inside it.
     await waitFor(() => {
       const hosts = Array.from(container.querySelectorAll<HTMLElement>('div')).filter(
         (el) => el.shadowRoot,
@@ -85,9 +96,6 @@ describe('ComponentPage (/components/:name)', () => {
       expect(hosts.length).toBeGreaterThan(0);
       expect(hosts.some((h) => h.shadowRoot?.textContent?.includes('Spinner'))).toBe(true);
     });
-    // No MDX doc rendered: the only h1 is the page header (the component basename),
-    // not a doc heading. The button doc, by contrast, sets the h1 to "Button".
-    expect(container.querySelector('h1')?.textContent).toBe('spinner');
   });
 
   it('renders the 404 page for an unknown component name', () => {

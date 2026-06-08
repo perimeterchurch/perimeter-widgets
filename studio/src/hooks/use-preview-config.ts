@@ -7,6 +7,7 @@ import {
   type PreviewState,
   type PreviewViewport,
 } from '../lib/preview-link';
+import { readChromeTheme } from '../lib/use-chrome-theme';
 
 /**
  * Bridges the shareable-preview codec (lib/preview-link) to the router's URL
@@ -53,7 +54,10 @@ export function usePreviewConfig() {
   /** Absolute, shareable URL for the given route path carrying the current state. */
   const buildShareUrl = useCallback(
     (pathname: string) => {
-      const params = encodePreviewState(state);
+      // Pin the EFFECTIVE theme into the link: when the preview is following the
+      // chrome theme (theme undefined), resolve it now so the recipient sees what
+      // the sharer saw rather than re-inheriting their own chrome theme.
+      const params = encodePreviewState({ ...state, theme: state.theme ?? readChromeTheme() });
       const query = params.toString();
       const url = new URL(pathname, window.location.origin);
       url.search = query;

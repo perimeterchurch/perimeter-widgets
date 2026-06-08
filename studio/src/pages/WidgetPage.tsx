@@ -11,6 +11,7 @@ import { InspectorDrawer } from '../components/InspectorDrawer';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { ShareLinkButton } from '../components/ShareLinkButton';
 import { usePreviewConfig } from '../hooks/use-preview-config';
+import { useChromeTheme } from '../lib/use-chrome-theme';
 import { titleFromSlug } from '../lib/labels';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -37,6 +38,13 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
     usePreviewConfig();
   const [def, setDef] = useState<WidgetDefinition | null>(null);
   const doc = widgetDoc(entry.slug);
+
+  // The preview theme follows the studio chrome (sidebar) toggle until the canvas
+  // Theme control pins one explicitly — so switching the studio to dark also
+  // darkens the widget preview, matching the gallery stage. `state.theme` (the
+  // pinned value from the URL) wins when set.
+  const chromeTheme = useChromeTheme();
+  const previewTheme = state.theme ?? chromeTheme;
 
   return (
     <div className="flex h-full flex-col">
@@ -82,7 +90,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
             drive both the toolbar controls and the shareable preview link. */}
         <Canvas
           slug={entry.slug}
-          theme={state.theme}
+          theme={previewTheme}
           onThemeChange={setTheme}
           viewport={state.viewport}
           onViewportChange={setViewport}
@@ -93,7 +101,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
             entry={entry}
             configOverrides={state.config}
             tokenOverrides={state.tokens}
-            theme={state.theme}
+            theme={previewTheme}
             onDefinition={setDef}
           />
         </Canvas>
