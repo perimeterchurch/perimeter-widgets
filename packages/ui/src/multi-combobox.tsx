@@ -12,6 +12,12 @@ export interface MultiComboboxOption {
   value: string;
   label: string;
   disabled?: boolean;
+  /**
+   * Render this option as a non-interactive group header (e.g. an OT/NT
+   * testament divider) rather than a selectable row. Headers are skipped by
+   * keyboard navigation and selection.
+   */
+  isGroupHeader?: boolean;
 }
 
 interface MultiComboboxBaseProps {
@@ -59,6 +65,29 @@ export type MultiComboboxProps = MultiComboboxSingleProps | MultiComboboxMultipl
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Derive a downshift `Environment` from the component's root node so its
+ * click-outside / blur listeners attach in the right context inside a shadow
+ * DOM. When the combobox is mounted in a shadow root, events retarget at the
+ * shadow boundary; downshift's `Environment` lets us hand it the owning window's
+ * listeners and document instead of assuming the top-level globals. Mirrors the
+ * established `getRootNode()` pattern in `use-click-outside.ts` and the sermons
+ * VideoPlayer. Returns `undefined` in the light DOM so downshift uses its
+ * defaults.
+ */
+function deriveEnvironment(node: HTMLElement | null): Environment | undefined {
+  const root = node?.getRootNode();
+  if (!root || !(root instanceof ShadowRoot)) return undefined;
+  const view = root.ownerDocument.defaultView;
+  if (!view) return undefined;
+  return {
+    addEventListener: view.addEventListener.bind(view),
+    removeEventListener: view.removeEventListener.bind(view),
+    document: root.ownerDocument,
+    Node: view.Node,
+  };
+}
+
 function MultiCombobox(props: MultiComboboxProps) {
   const {
     options,
@@ -66,9 +95,30 @@ function MultiCombobox(props: MultiComboboxProps) {
     selectedLabel,
     disabled = false,
     className,
-    environment,
+    environment: environmentProp,
   } = props;
   const isMultiple = props.multiple === true;
+
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  // An explicit `environment` prop wins (lets callers override); otherwise
+  // derive it ONCE from our own root node so shadow-DOM mounts work with no
+  // plumbing. `deriveEnvironment` returns a fresh object literal each call, so we
+  // must NOT compare it by reference against the stored value or feed the stored
+  // value back into the effect deps — that would loop forever in a shadow root
+  // (new object !== old object on every render => setState => re-render => …).
+  // The root node identity is stable after mount, so a single post-mount
+  // derivation is correct; the `didDerive` ref makes it run exactly once.
+  const didDeriveRef = React.useRef(false);
+  const [derivedEnvironment, setDerivedEnvironment] = React.useState<Environment | undefined>(
+    undefined,
+  );
+  React.useEffect(() => {
+    if (environmentProp !== undefined || didDeriveRef.current) return;
+    didDeriveRef.current = true;
+    const next = deriveEnvironment(containerRef.current);
+    if (next !== undefined) setDerivedEnvironment(next);
+  }, [environmentProp]);
+  const environment = environmentProp ?? derivedEnvironment;
 
   // Controlled vs uncontrolled state
   const isControlled = props.value !== undefined;
@@ -177,7 +227,11 @@ function MultiCombobox(props: MultiComboboxProps) {
     ...(environment !== undefined && { environment }),
     itemToString: (item) => item?.label ?? '',
     selectedItem: null, // We manage selection ourselves
-    isItemDisabled: (item) => !!item.disabled,
+    // Group headers are non-selectable dividers, so they must be skipped by
+    // keyboard nav and click selection even if the caller didn't also set
+    // `disabled` — enforce the documented `isGroupHeader` contract here rather
+    // than relying on every caller to remember to pair the two flags.
+    isItemDisabled: (item) => !!item.disabled || !!item.isGroupHeader,
     ...(props.isOpen !== undefined && { isOpen: props.isOpen }),
     onIsOpenChange: ({ isOpen: nextIsOpen }) => props.onOpenChange?.(nextIsOpen ?? false),
     stateReducer(_state, actionAndChanges) {
@@ -226,7 +280,6 @@ function MultiCombobox(props: MultiComboboxProps) {
     setInputValue('');
   }, [handleValueChange, isMultiple]);
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const [triggerWidth, setTriggerWidth] = React.useState<number | undefined>();
 
   // Measure trigger width when dropdown opens
@@ -304,6 +357,22 @@ function MultiCombobox(props: MultiComboboxProps) {
             </li>
           ) : (
             filteredOptions.map((option, index) => {
+              // Group headers are non-interactive dividers (e.g. "Old Testament"):
+              // render them as a header row, not a selectable/strikethrough item.
+              // They stay in downshift's `items` (so indices line up) but
+              // `isItemDisabled` returns true for `isGroupHeader`, so keyboard nav
+              // and click selection skip them.
+              if (option.isGroupHeader) {
+                return (
+                  <li
+                    key={option.value}
+                    role="presentation"
+                    className="px-1.5 pt-2 pb-1 text-xs font-medium tracking-wide text-muted-fg uppercase select-none first:pt-1"
+                  >
+                    {option.label}
+                  </li>
+                );
+              }
               const selected = isSelected(option.value);
               return (
                 <li
@@ -318,7 +387,7 @@ function MultiCombobox(props: MultiComboboxProps) {
                     'relative flex w-full cursor-default items-center gap-2 rounded-md py-1 pr-8 pl-1.5 text-sm outline-hidden select-none transition-colors duration-150',
                     'data-highlighted:bg-accent data-highlighted:text-accent-fg',
                     "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                    option.disabled && 'pointer-events-none opacity-40 line-through',
+                    option.disabled && 'pointer-events-none opacity-40',
                   )}
                 >
                   {option.label}

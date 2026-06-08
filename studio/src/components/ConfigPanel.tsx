@@ -7,8 +7,11 @@ interface Props {
   onChange: (next: Record<string, unknown>) => void;
 }
 
+// Every text/number/select control shares one height (`h-9`) and fills the
+// control column (`w-full`) so their left AND right edges line up down the panel,
+// regardless of field type. `py-1` is dropped — `h-9` owns the vertical size.
 const INPUT_CLASS =
-  'rounded-md border border-border bg-bg px-2 py-1 text-sm text-fg transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40';
+  'h-9 w-full rounded-md border border-border bg-bg px-2 text-sm text-fg transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40';
 
 /**
  * The small `text-muted-fg` line under each control: the field's description (what
@@ -64,9 +67,9 @@ export function ConfigPanel({ definition, overrides, onChange }: Props) {
       {fields.map((field) => (
         <label
           key={field.key}
-          className="grid grid-cols-[minmax(6rem,auto)_1fr] items-baseline gap-x-2 gap-y-1 text-sm"
+          className="grid grid-cols-[minmax(7rem,auto)_1fr] items-center gap-x-2 gap-y-1 text-sm"
         >
-          <span className="truncate pt-1 font-medium text-fg">{field.key}</span>
+          <span className="truncate font-medium text-fg">{field.key}</span>
           <FieldControl field={field} value={overrides[field.key]} onChange={set} />
           {/* Hint spans the input column so it lines up under the control. */}
           <span className="col-start-2 text-xs leading-snug text-muted-fg">{fieldHint(field)}</span>

@@ -20,4 +20,14 @@ describe('Empty', () => {
     const { container } = render(<Empty />);
     expect(container.querySelector('[data-slot="empty"]')).not.toBeNull();
   });
+
+  it('declares a full dashed border so the outline actually renders', () => {
+    const { container } = render(<Empty />);
+    const root = container.querySelector('[data-slot="empty"]');
+    // `border-dashed` alone draws nothing (no width/color); the visible empty-state
+    // outline needs `border` width + `border-border` color too.
+    expect(root?.className).toContain('border');
+    expect(root?.className).toContain('border-dashed');
+    expect(root?.className).toContain('border-border');
+  });
 });

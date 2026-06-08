@@ -48,7 +48,7 @@ export function IconSelect({ value, onChange, options, label, icon, className }:
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1 w-44 max-w-[calc(100vw-1rem)] rounded-lg bg-bg shadow-md ring-1 ring-fg/10">
+        <div className="absolute right-0 z-50 mt-1 w-44 max-w-[calc(100vw-1rem)] rounded-lg bg-bg text-fg shadow-md ring-1 ring-fg/10">
           <div className="py-1">
             {options.map((opt) => (
               <button

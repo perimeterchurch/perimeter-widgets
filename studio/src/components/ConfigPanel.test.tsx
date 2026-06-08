@@ -121,13 +121,45 @@ describe('ConfigPanel', () => {
     expect(classes).toContain('text-fg');
   });
 
-  it('keeps the auto-label / flexible-input grid on each field row', () => {
+  it('keeps the auto-label / flexible-input grid on each field row, vertically centered', () => {
     const { container } = renderPanel();
     const scope = within(container);
     const row = scope.getByText('greeting').closest('label') as HTMLElement;
     const classes = row.className.split(/\s+/);
-    expect(classes).toContain('grid-cols-[minmax(6rem,auto)_1fr]');
+    // A wider label column (7rem) keeps long keys on one line, and `items-center`
+    // (not the old `items-baseline`) puts every control on the same horizontal
+    // line as its label so the control column's left edges align.
+    expect(classes).toContain('grid-cols-[minmax(7rem,auto)_1fr]');
+    expect(classes).toContain('items-center');
+    expect(classes).not.toContain('items-baseline');
     expect(classes).not.toContain('grid-cols-2');
+  });
+
+  it('gives text/number/select controls a uniform full-width height so their edges align', () => {
+    const { container } = renderPanel();
+    const scope = within(container);
+    for (const key of ['greeting', 'count', 'layout'] as const) {
+      const row = scope.getByText(key).closest('label') as HTMLElement;
+      const control = within(row).getByRole(
+        key === 'count' ? 'spinbutton' : key === 'layout' ? 'combobox' : 'textbox',
+      );
+      const classes = control.className.split(/\s+/);
+      expect(classes, `${key} control should be h-9`).toContain('h-9');
+      expect(classes, `${key} control should be w-full`).toContain('w-full');
+    }
+  });
+
+  it('left-aligns the boolean checkbox in the control column instead of stretching it', () => {
+    const { container } = renderPanel();
+    const scope = within(container);
+    const row = scope.getByText('featured').closest('label') as HTMLElement;
+    const checkbox = within(row).getByRole('checkbox');
+    const classes = checkbox.className.split(/\s+/);
+    expect(classes).toContain('justify-self-start');
+    // The checkbox stays its intrinsic size — it must NOT inherit the controls'
+    // full-width height treatment.
+    expect(classes).not.toContain('w-full');
+    expect(classes).not.toContain('h-9');
   });
 
   it('falls back to a tokenized JSON textarea for a non-object schema', () => {

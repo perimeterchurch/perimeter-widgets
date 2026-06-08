@@ -1,4 +1,3 @@
-import { Skeleton } from '@perimeter/ui/skeleton';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { Calendar, Type, LayoutGrid, List, Rows3 } from 'lucide-react';
 import { useSermons } from '@perimeter/api-hooks';
@@ -12,6 +11,7 @@ import { SermonLargeList } from './SermonLargeList';
 import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
 import { ResultsToolbar } from '../ui/ResultsToolbar';
 import { ResultsPagination } from '../ui/ResultsPagination';
+import { SermonSkeleton } from '../ui/SermonSkeleton';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 import { defined, idsParam } from '../../lib/query-params';
 
@@ -172,13 +172,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
       ) : (
         <SkeletonTransition
           isLoading={isLoading}
-          skeleton={
-            <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
-              {Array.from({ length: config.perPage }, (_, i) => (
-                <Skeleton key={i} className="h-48 w-full rounded-lg" />
-              ))}
-            </div>
-          }
+          skeleton={<SermonSkeleton viewMode={viewMode} count={config.perPage} />}
         >
           {sermons.length === 0 ? (
             <ResultsEmpty

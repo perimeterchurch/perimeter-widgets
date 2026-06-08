@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { Button } from '@perimeter/ui/button';
-import { cn } from '@perimeter/ui/utils/cn';
+import { SegmentedTabs, segmentedTabId } from '@perimeter/ui/segmented-tabs';
 import { ConfigPanel } from './ConfigPanel';
 import { ThemeEditor } from './ThemeEditor';
 import { InfoPanel } from './InfoPanel';
@@ -67,13 +67,14 @@ const TABS: { id: TabId; label: string }[] = [
 /**
  * The widget inspector, laid out as a header tab bar over a single active panel.
  *
- * The tab bar is built directly here — a `role="tablist"` row of `role="tab"`
- * buttons with `aria-selected`, evenly distributed via `flex` + per-trigger
- * `flex-1` — rather than the `@perimeter/ui` Tabs compound, whose orientation
- * handling (and content-sized `inline-flex w-fit` list) fights a full-width
- * drawer header. Only the active panel mounts below the bar, filling the drawer
- * width with comfortable padding (no per-panel Card nesting). The embed snippet
- * sits in a persistent footer so it shows once regardless of the active tab.
+ * The tab bar is the shared `@perimeter/ui` SegmentedTabs control (rounded
+ * `bg-muted` track, lifted active segment, roving tabIndex + arrow-key focus) —
+ * the same control the sermons widget uses — rather than the `@perimeter/ui`
+ * Tabs compound, whose orientation handling (and content-sized
+ * `inline-flex w-fit` list) fights a full-width drawer header. Only the active
+ * panel mounts below the bar, filling the drawer width with comfortable padding
+ * (no per-panel Card nesting). The embed snippet sits in a persistent footer so
+ * it shows once regardless of the active tab.
  */
 export function Inspector({
   definition,
@@ -85,43 +86,25 @@ export function Inspector({
 }: Props) {
   const [active, setActive] = useState<TabId>('config');
   const baseId = useId();
-  const tabId = (id: TabId) => `${baseId}-tab-${id}`;
   const panelId = `${baseId}-panel`;
 
   return (
     <div className="flex flex-col gap-4">
-      <div
-        role="tablist"
+      <SegmentedTabs
+        items={TABS}
+        value={active}
+        onChange={(id) => setActive(id as TabId)}
         aria-label="Inspector sections"
-        className="flex w-full gap-1 rounded-lg bg-muted p-[3px]"
-      >
-        {TABS.map(({ id, label }) => {
-          const selected = active === id;
-          return (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              id={tabId(id)}
-              aria-selected={selected}
-              aria-controls={panelId}
-              tabIndex={selected ? 0 : -1}
-              onClick={() => setActive(id)}
-              className={cn(
-                'flex-1 rounded-md px-2 py-1 text-sm font-medium whitespace-nowrap transition-colors',
-                'focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-                selected
-                  ? 'bg-bg text-fg shadow-sm'
-                  : 'text-fg/60 hover:text-fg dark:text-muted-fg dark:hover:text-fg',
-              )}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+        idBase={baseId}
+        panelId={panelId}
+      />
 
-      <div role="tabpanel" id={panelId} aria-labelledby={tabId(active)} className="min-w-0">
+      <div
+        role="tabpanel"
+        id={panelId}
+        aria-labelledby={segmentedTabId(baseId, active)}
+        className="min-w-0"
+      >
         {active === 'config' &&
           (definition ? (
             <ConfigPanel

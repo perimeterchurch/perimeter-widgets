@@ -1,46 +1,44 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SermonTabs } from '../../src/components/SermonTabs';
 
 /**
- * The sermons/series tab row must read as clearly selected in both light and
- * dark. We use the `@perimeter/ui` Tabs `line` variant (a per-instance prop, so
- * the shared inspector tabs are untouched) which renders an underline indicator
- * and a `data-active` trigger. These tests assert the structural markers that
- * back the visible selected state; the actual contrast is a manual studio check.
+ * The sermons/series tab row uses the shared `@perimeter/ui` SegmentedTabs
+ * control (a `role="tablist"` of `role="tab"` buttons, the active one lifted to
+ * read clearly in both themes) — the same control as the studio inspector,
+ * replacing the visually-fragile Tabs `line` underline. These tests assert the
+ * selected-state markers and that clicking a tab reports the change; the actual
+ * contrast is covered by the Playwright visual harness.
  */
 describe('SermonTabs selected state', () => {
-  it('uses the line variant TabsList (renders the underline indicator)', () => {
-    const { container } = render(<SermonTabs activeTab="sermons" onTabChange={() => {}} />);
+  it('renders a tablist with both tabs and marks exactly the active one', () => {
+    render(<SermonTabs activeTab="sermons" onTabChange={() => {}} />);
 
-    const list = container.querySelector('[data-slot="tabs-list"]');
-    expect(list).not.toBeNull();
-    // The per-instance line variant — NOT the shared default — drives the
-    // underline indicator and avoids restyling the inspector tabs.
-    expect(list?.getAttribute('data-variant')).toBe('line');
+    expect(screen.getByRole('tablist', { name: 'Sermons and series' })).toBeInTheDocument();
 
-    const indicator = container.querySelector('[data-slot="tabs-indicator"]');
-    expect(indicator).not.toBeNull();
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs).toHaveLength(2);
+
+    const selected = tabs.filter((t) => t.getAttribute('aria-selected') === 'true');
+    expect(selected).toHaveLength(1);
+    expect(selected[0]).toHaveTextContent('Sermons');
   });
 
-  it('marks exactly the active trigger with data-active (selected-state hook)', () => {
-    const { container } = render(<SermonTabs activeTab="series" onTabChange={() => {}} />);
+  it('marks the series tab active when activeTab is "series"', () => {
+    render(<SermonTabs activeTab="series" onTabChange={() => {}} />);
 
-    const triggers = Array.from(
-      container.querySelectorAll<HTMLElement>('[data-slot="tabs-trigger"]'),
-    );
-    expect(triggers.length).toBe(2);
+    const active = screen
+      .getAllByRole('tab')
+      .filter((t) => t.getAttribute('aria-selected') === 'true');
+    expect(active).toHaveLength(1);
+    expect(active[0]).toHaveTextContent('Series');
+  });
 
-    const active = triggers.filter((t) => t.hasAttribute('data-active'));
-    const inactive = triggers.filter((t) => !t.hasAttribute('data-active'));
-    // Exactly one active, one inactive — the data-active marker is what the
-    // variant's active styling + underline indicator hang off of.
-    expect(active.length).toBe(1);
-    expect(inactive.length).toBe(1);
-
-    // The active trigger is the one matching the activeTab value ("series").
-    expect(active[0]?.textContent).toContain('Series');
-    expect(inactive[0]?.textContent).toContain('Sermons');
+  it('reports the tab id on click', () => {
+    const onTabChange = vi.fn();
+    render(<SermonTabs activeTab="sermons" onTabChange={onTabChange} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Series' }));
+    expect(onTabChange).toHaveBeenCalledWith('series');
   });
 });
