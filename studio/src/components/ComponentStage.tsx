@@ -1,9 +1,36 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { resolveTokens } from '@perimeter/theme';
 import { applyStyles, type StyleHandle } from '@perimeter/widget-runtime';
 import { useChromeTheme } from '../lib/use-chrome-theme';
 import stageCss from '../stage.css?inline';
+
+/**
+ * The stage's in-shadow portal target (the div gallery/example content renders
+ * into). Exposed so an example with a portaled popup (e.g. the low-level Combobox,
+ * which takes a `container`) can portal INTO the shadow root rather than to
+ * document.body — where it would lose the stage's token CSS. Null until the stage
+ * mounts, and outside any stage. Consume it via {@link StageContainer}.
+ */
+const StageContainerContext = createContext<HTMLElement | null>(null);
+
+/**
+ * Render-prop access to the {@link StageContainerContext} for MDX examples: gives
+ * the example the stage's shadow-DOM portal container so popups portal in-tree
+ * (themed). Renders nothing until the container exists.
+ */
+export function StageContainer({ children }: { children: (container: HTMLElement) => ReactNode }) {
+  const container = useContext(StageContainerContext);
+  return container ? <>{children(container)}</> : null;
+}
 
 /**
  * Mounts gallery content inside a shadow root through the SAME styling path a
@@ -49,5 +76,16 @@ export function ComponentStage({ children }: { children: ReactNode }) {
     else host.removeAttribute('data-theme');
   }, [chromeTheme, container]);
 
-  return <div ref={hostRef}>{container ? createPortal(children, container) : null}</div>;
+  return (
+    <div ref={hostRef}>
+      {container
+        ? createPortal(
+            <StageContainerContext.Provider value={container}>
+              {children}
+            </StageContainerContext.Provider>,
+            container,
+          )
+        : null}
+    </div>
+  );
 }

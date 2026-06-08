@@ -49,7 +49,7 @@ export function SermonSkeleton({ viewMode, count }: { viewMode: ViewMode; count:
             className="flex w-full flex-row overflow-hidden rounded-xl ring-1 ring-fg/10"
             data-slot="sermon-skeleton-item"
           >
-            <Skeleton className="aspect-video w-56 flex-shrink-0 rounded-none" />
+            <Skeleton className="aspect-video w-32 flex-shrink-0 rounded-none @[30rem]:w-56" />
             <div className="flex flex-1 flex-col gap-2 p-4">
               <Skeleton className="h-4 w-3/4 rounded" />
               <Skeleton className="h-3 w-1/2 rounded" />

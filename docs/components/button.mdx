@@ -43,7 +43,7 @@ Render as an anchor with the `render` prop (the computed button classes merge on
 | -------------- | --------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `variant`      | `'primary' \| 'secondary' \| 'ghost' \| 'outline' \| 'link' \| 'destructive'` | `'primary'` | Visual style. `primary` for the main action, `destructive` for irreversible ones.                                           |
 | `size`         | `'sm' \| 'md' \| 'lg' \| 'icon' \| 'icon-xs' \| 'default'`            | `'md'`      | Control height and padding. Use `icon` / `icon-xs` for square icon-only buttons.                                            |
-| `render`       | `ReactElement`                                                        | —           | Render as a different element (e.g. an anchor). The button's classes and remaining props merge onto it.                     |
+| `render`       | `ReactElement`                                                        | —           | Render as a different element (e.g. an anchor). The button's computed classes are composed with the element's own `className`, and the button's remaining props are spread onto it. |
 | `nativeButton` | `boolean`                                                             | `true`      | Pass `false` together with `render` to opt out of the native `<button>` element.                                            |
 | `disabled`     | `boolean`                                                             | `false`     | Standard button attribute; the button dims to 50% and ignores pointer events.                                              |
 

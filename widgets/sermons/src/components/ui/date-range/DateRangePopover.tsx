@@ -103,7 +103,7 @@ export function DateRangePopover({ open, onClose, size = 'sm', children }: DateR
         aria-modal="true"
         className={cn(
           'relative w-full rounded-xl border px-6 py-6 shadow-xl',
-          'border-[var(--color-border)] bg-[var(--color-bg)]',
+          'border-border bg-bg',
           sizeClasses[size],
         )}
         onClick={(e) => e.stopPropagation()}

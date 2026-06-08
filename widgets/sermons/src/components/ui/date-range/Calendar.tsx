@@ -143,7 +143,7 @@ export function Calendar({
             <button
               type="button"
               onClick={goToToday}
-              className="rounded-md bg-[var(--color-primary)]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary)]/20"
+              className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary transition-colors hover:bg-primary/20"
             >
               Today
             </button>
@@ -193,9 +193,9 @@ export function Calendar({
                 'relative flex h-9 w-full items-center justify-center text-sm',
                 'transition-all duration-100',
                 // Range highlight
-                inRange && !isStart && !isEnd && 'bg-[var(--color-primary)]/8',
-                isStart && 'rounded-l-lg bg-[var(--color-primary)]/8',
-                isEnd && 'rounded-r-lg bg-[var(--color-primary)]/8',
+                inRange && !isStart && !isEnd && 'bg-primary/8',
+                isStart && 'rounded-l-lg bg-primary/8',
+                isEnd && 'rounded-r-lg bg-primary/8',
                 isStart && isEnd && 'rounded-lg',
                 !inRange && !isStart && !isEnd && 'rounded-lg',
                 // Text & hover
@@ -204,9 +204,8 @@ export function Calendar({
                   !isSelected &&
                   !isDisabled &&
                   'text-fg hover:bg-bg hover:shadow-sm',
-                isToday && !isSelected && 'font-bold text-[var(--color-primary)]',
-                isSelected &&
-                  'rounded-lg bg-[var(--color-primary)] font-semibold text-primary-fg shadow-sm',
+                isToday && !isSelected && 'font-bold text-primary',
+                isSelected && 'rounded-lg bg-primary font-semibold text-primary-fg shadow-sm',
                 isDisabled && 'cursor-not-allowed opacity-30',
                 !isDisabled && 'cursor-pointer',
               )}
@@ -216,7 +215,7 @@ export function Calendar({
                 <span
                   className={cn(
                     'absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full',
-                    isSelected ? 'bg-primary-fg' : 'bg-[var(--color-primary)]',
+                    isSelected ? 'bg-primary-fg' : 'bg-primary',
                   )}
                 />
               )}
@@ -299,7 +298,7 @@ function TimeInput({
           onKeyDown={(e) => {
             if (e.key === 'Escape') e.currentTarget.blur();
           }}
-          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
+          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
           aria-label={label ? `${label} hour` : 'Hour'}
         />
         <span className="text-sm font-bold text-muted-fg">:</span>
@@ -312,7 +311,7 @@ function TimeInput({
           onKeyDown={(e) => {
             if (e.key === 'Escape') e.currentTarget.blur();
           }}
-          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
+          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
           aria-label={label ? `${label} minute` : 'Minute'}
         />
         <div className="flex h-8 overflow-hidden rounded-md border border-border text-[11px] font-semibold">
@@ -322,7 +321,7 @@ function TimeInput({
             className={cn(
               'px-2.5 transition-colors',
               !isPM
-                ? 'bg-[var(--color-primary)] text-primary-fg'
+                ? 'bg-primary text-primary-fg'
                 : 'bg-bg text-muted-fg hover:bg-muted hover:text-fg',
             )}
           >
@@ -334,7 +333,7 @@ function TimeInput({
             className={cn(
               'px-2.5 transition-colors',
               isPM
-                ? 'bg-[var(--color-primary)] text-primary-fg'
+                ? 'bg-primary text-primary-fg'
                 : 'bg-bg text-muted-fg hover:bg-muted hover:text-fg',
             )}
           >

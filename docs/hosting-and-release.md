@@ -1,4 +1,4 @@
-# Hosting & Release (Phase 3)
+# Hosting & Release
 
 How Perimeter widgets are hosted, versioned, released, promoted, and rolled back.
 
@@ -110,7 +110,8 @@ The loader fetches `manifest.json`, scans the page for `[data-perimeter-widget="
 **Pinned to a specific immutable version (no loader):** point a script tag straight at a versioned bundle.
 
 ```html
-<script src="https://widgets.perimeter.org/example/0.0.0/index.js" async></script>
+<!-- pin to a specific immutable version; the number here is illustrative -->
+<script src="https://widgets.perimeter.org/example/0.0.1/index.js" async></script>
 ```
 
 Each widget self-mounts into a shadow root on load.
@@ -127,18 +128,8 @@ Dark mode is a pure CSS-variable swap: `@perimeter/theme` ships a `darkTokens` s
 
 > **Constraint: widget schemas must stay non-strict.** A bare `data-theme` is not a `data-theme-*` token override, so the data-attrs parser surfaces it as a `theme` config key. A non-strict zod object schema (the default — `z.object({...})` without `.strict()`) silently strips the unknown key during `schema.parse`, and the attribute itself is never removed from the host element, so activation still works. A `.strict()` schema would instead **reject** the embed. Keep widget schemas non-strict.
 
-## One-time manual deploy (remaining step)
+## Deployment status
 
-`cdn/` is **not yet deployed**. This plan produced and verified the directory, the release CLI, and the first committed releases locally; standing up the live host is a manual step (needs the Vercel account):
+`cdn/` is **live in production**: it is deployed as a standalone Vercel static project (root directory = `cdn/`, no build command) serving `widgets.perimeter.org`, and the sermons widget is embedded on the WordPress site via the loader. New releases reach production through the normal `dev → main` release-PR flow — `pnpm release <name> --patch|--minor|--major` opens the PR, and merging it publishes the immutable bundle + updated manifest pointer.
 
-1. Create a new Vercel project linked to this repo, with **root directory = `cdn/`** and **no build command** (serve the directory as-is).
-2. Attach the `widgets.perimeter.org` domain to that project.
-
-No production embed has changed; the WordPress cutover to `widgets.perimeter.org` is a separate phase (Phase 4).
-
-### Deferred live-browser verification
-
-The local checks (a self-contained node server smoke test and the `vercel.json`-sync test) confirm the files serve and the bundle/loader contents are correct. Two checks can't run headlessly and are **deferred to a human** once `cdn/` is served:
-
-1. A direct `<script src=".../example/0.0.0/index.js">` renders cards inside a shadow root.
-2. `<script src=".../loader.js">` + `<div data-perimeter-widget="sermons">` mounts the sermons widget.
+The Vercel project settings for the static host live in `cdn/README.md`; deploying the showcase studio at `style.perimeter.org` is covered separately in [deploying-studio.md](./deploying-studio.md).

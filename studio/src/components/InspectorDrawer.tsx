@@ -20,7 +20,8 @@ interface Props {
  * behaviour is explicit here: closed by default; a toggle button (accessible name
  * "Inspector") opens a right-side panel that slides over the preview with a
  * semi-transparent backdrop; backdrop-click, a close button, and an Escape keydown
- * all dismiss it; focus returns to the toggle on close. The panel is
+ * all dismiss it; focus moves into the panel on open and is trapped within it
+ * while open (Tab/Shift+Tab wrap), returning to the toggle on close. The panel is
  * `role="dialog"` + `aria-modal` + `aria-label`, and scrolls its own content
  * (`overflow-y-auto`). Inside, the Config/Theme/Info tabs stack vertically with
  * comfortable width — the canvas owns the full width when the drawer is closed.
@@ -35,12 +36,48 @@ export function InspectorDrawer({
 }: Props) {
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   // Escape closes the drawer. Added explicitly because no primitive backs it.
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
+  // aria-modal contract: move focus INTO the panel on open and keep Tab within it
+  // while open (no @perimeter/ui Dialog primitive backs this, so the trap is
+  // explicit). Without this, focus stays on the toggle behind the backdrop and a
+  // keyboard/SR user can tab into the obscured page underneath.
+  useEffect(() => {
+    if (!open) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const focusables = () =>
+      Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+    // Initial focus: the first focusable in the panel (the Close button).
+    focusables()[0]?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !dialog.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !dialog.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
@@ -78,6 +115,7 @@ export function InspectorDrawer({
           />
           {/* Panel — fixed right-side drawer, full height, scrollable content. */}
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Widget inspector"

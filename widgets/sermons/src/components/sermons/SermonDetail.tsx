@@ -133,7 +133,7 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
               <div className="rounded-lg bg-muted p-4">
                 <h3 className="font-semibold text-sm mb-2">About this sermon</h3>
                 <div
-                  className="text-sm text-muted-fg prose prose-sm"
+                  className="text-sm text-muted-fg [&_a]:text-primary [&_a]:underline [&_li]:my-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
                   dangerouslySetInnerHTML={safeDescription}
                 />
               </div>

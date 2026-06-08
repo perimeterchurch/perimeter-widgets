@@ -24,19 +24,20 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 
 ## Commands
 
-| Command                                         | Description                                                                                                       |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `pnpm install`                                  | Install dependencies                                                                                              |
-| `pnpm dev`                                      | Run the Vite studio + widget watches (auto-discovers widgets and UI components)                                   |
-| `pnpm build`                                    | Build every package via Turborepo                                                                                 |
-| `pnpm test` / `lint` / `typecheck`              | Run the gate task across the workspace (via Turborepo)                                                            |
-| `pnpm format`                                   | Prettier write (run before `pnpm quality`)                                                                        |
-| `pnpm quality`                                  | typecheck + lint + test + `format:check` — the gate before a PR                                                   |
-| `pnpm create-widget <name>`                     | Scaffold `widgets/<name>/` from the template and print next steps                                                 |
-| `pnpm release <name>`                           | Build, publish to immutable `cdn/<name>/<version>/`, update manifest, prune to 5, commit (no push)                |
-| `pnpm release <name> --patch\|--minor\|--major` | Bump the version, then build + publish on a fresh `release/<name>-<version>` branch, push, and open the PR to dev |
-| `pnpm --filter @perimeter/api-hooks sync`       | Copy perimeter-api's `openapi/spec.yaml` and regenerate `src/generated/operations.ts`                             |
-| `pnpm parity:css` / `parity:components`         | Generate the dev↔prod parity reports                                                                              |
+| Command                                         | Description                                                                                                                                                                                               |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm install`                                  | Install dependencies                                                                                                                                                                                      |
+| `pnpm dev`                                      | Run the Vite studio + widget watches (auto-discovers widgets and UI components)                                                                                                                           |
+| `pnpm build`                                    | Build every package via Turborepo                                                                                                                                                                         |
+| `pnpm test` / `lint` / `typecheck`              | Run the gate task across the workspace (via Turborepo)                                                                                                                                                    |
+| `pnpm format`                                   | Prettier write (run before `pnpm quality`)                                                                                                                                                                |
+| `pnpm quality`                                  | typecheck + lint + test + `format:check` — the gate before a PR                                                                                                                                           |
+| `pnpm create-widget <name>`                     | Scaffold `widgets/<name>/` from the template and print next steps                                                                                                                                         |
+| `pnpm release <name>`                           | Build, publish to immutable `cdn/<name>/<version>/`, update manifest, prune to 5, commit (no push)                                                                                                        |
+| `pnpm release <name> --patch\|--minor\|--major` | Bump the version, then build + publish on a fresh `release/<name>-<version>` branch, push, and open the PR to dev                                                                                         |
+| `pnpm --filter @perimeter/api-hooks sync`       | Copy perimeter-api's `openapi/spec.yaml` and regenerate `src/generated/operations.ts`                                                                                                                     |
+| `pnpm parity:css` / `parity:components`         | Generate the dev↔prod parity reports                                                                                                                                                                      |
+| `pnpm --filter @perimeter/studio visual`        | Run the studio Playwright visual/a11y harness (`studio/visual/*.spec.ts` — computed-color theme checks, loading states, follow-chrome); needs Playwright browsers installed. Separate from `pnpm quality` |
 
 ## Critical rules
 
