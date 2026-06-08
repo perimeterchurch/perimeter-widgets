@@ -3,18 +3,10 @@ import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
 import { describeSchemaFields, type SchemaField } from '../lib/schema-shape';
+import { camelToKebab } from '../lib/data-attr';
 
 interface Props {
   definition: WidgetDefinition;
-}
-
-/**
- * camelCase config key → the kebab `data-*` attribute name the runtime parses
- * (`parseDataAttrs` does the inverse kebab→camel). Lossless for the simple
- * camelCase schema keys widgets use (`perPage` → `per-page`).
- */
-function camelToKebab(key: string): string {
-  return key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 }
 
 /**

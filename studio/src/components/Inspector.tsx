@@ -5,6 +5,7 @@ import { SegmentedTabs, segmentedTabId } from '@perimeter/ui/segmented-tabs';
 import { ConfigPanel } from './ConfigPanel';
 import { ThemeEditor } from './ThemeEditor';
 import { InfoPanel } from './InfoPanel';
+import { configToDataAttrs } from '../lib/data-attr';
 
 interface Props {
   /** The loaded widget definition (null while its module is still loading). */
@@ -18,20 +19,26 @@ interface Props {
 }
 
 /**
- * Build the production embed snippet for a widget. This is the canonical CDN
- * host/path a host page (WordPress) uses — keep it byte-for-byte in sync with
- * docs/hosting-and-release.md and the WidgetPage test, which asserts it exactly.
+ * Build the production embed snippet for a widget. The canonical CDN host/path a
+ * host page (WordPress) uses — kept in sync with docs/hosting-and-release.md. Any
+ * config the developer has set in the Config tab is reflected as `data-*`
+ * attributes on the widget div (`{ perPage: 20 }` → `data-per-page="20"`), so the
+ * snippet is paste-ready for the configured widget. With no config set it is the
+ * bare form (what the WidgetPage test asserts).
  */
-export function embedSnippet(slug: string): string {
+export function embedSnippet(slug: string, config: Record<string, unknown> = {}): string {
   return (
-    `<div data-perimeter-widget="${slug}"></div>\n` +
+    `<div data-perimeter-widget="${slug}"${configToDataAttrs(config)}></div>\n` +
     `<script src="https://widgets.perimeter.org/${slug}/latest.js" async></script>`
   );
 }
 
-/** The generated embed snippet with a copy-to-clipboard control. Dogfoods Button. */
-function EmbedSnippet({ slug }: { slug: string }) {
-  const code = embedSnippet(slug);
+/**
+ * The generated embed snippet with a copy-to-clipboard control. Dogfoods Button.
+ * Re-renders as `config` changes, so adjusting the Config tab updates the embed.
+ */
+function EmbedSnippet({ slug, config }: { slug: string; config: Record<string, unknown> }) {
+  const code = embedSnippet(slug, config);
   const [copied, setCopied] = useState(false);
 
   const copy = () => {
@@ -127,7 +134,7 @@ export function Inspector({
       </div>
 
       <div className="border-t border-border px-3 pt-4">
-        <EmbedSnippet slug={slug} />
+        <EmbedSnippet slug={slug} config={configOverrides} />
       </div>
     </div>
   );
