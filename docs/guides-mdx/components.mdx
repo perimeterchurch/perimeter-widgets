@@ -45,10 +45,10 @@ sidebar always lists every export; ones without an authored doc fall back to an
 auto-generated gallery (still rendered through the shadow-DOM stage).
 
 **Documented:** Badge, Button, Card, Input, Textarea, Label, Combobox,
-MultiCombobox, SortSelect, IconSelect, Tabs, Pagination, InputGroup, Empty.
+MultiCombobox, SortSelect, IconSelect, Tabs, SegmentedTabs, Pagination,
+InputGroup, Empty, Spinner, Skeleton, SkeletonTransition.
 
-**Gallery-only** (purely presentational — a live preview says it all):
-[Spinner](/components/spinner), [Skeleton](/components/skeleton), and
-[SkeletonTransition](/components/skeleton-transition). Use Spinner for a loading
-indicator and Skeleton / SkeletonTransition for content placeholders while data
-loads.
+Every `@perimeter/ui` export now has an authored doc; the auto-gallery fallback
+described above only appears for a freshly scaffolded component before its doc
+lands. Use Spinner for a loading indicator and Skeleton / SkeletonTransition for
+content placeholders while data loads.

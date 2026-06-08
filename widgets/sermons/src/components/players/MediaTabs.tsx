@@ -67,7 +67,7 @@ export function MediaTabs({ links }: MediaTabsProps) {
   // media is expected but not yet available.
   if (availableTabs.length === 0) {
     return (
-      <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-muted p-4 text-sm text-muted-fg">
+      <div className="flex items-center gap-2 rounded-lg border border-border bg-muted p-4 text-sm text-muted-fg">
         <FileX className="h-4 w-4 shrink-0" aria-hidden="true" />
         No media available yet for this sermon.
       </div>
@@ -86,7 +86,7 @@ export function MediaTabs({ links }: MediaTabsProps) {
           ))}
         </TabsList>
       </Tabs>
-      <div className="overflow-hidden rounded-lg border border-[var(--color-border)] min-h-[300px]">
+      <div className="overflow-hidden rounded-lg border border-border min-h-[300px]">
         <AnimatePresence mode="wait">
           {activeTab === 'video' && videoLink && (
             <motion.div key="video" {...fade} className="aspect-video">

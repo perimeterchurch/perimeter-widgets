@@ -7,7 +7,7 @@ import {
   setWidgetTheme,
   readComputedColor,
   shadowCount,
-  clickInShadow,
+  openShadowMenu,
   luminance,
   snapshotPreview,
 } from './helpers';
@@ -48,21 +48,13 @@ test.describe('studio visual harness — sermons', () => {
     );
 
     // Open the Sort dropdown (rendered inside the shadow root — light-DOM locators
-    // can't reach it). The trigger is the first button inside results-toolbar.
-    await clickInShadow(page, '[data-slot="results-toolbar"] button');
-    // The popup is absolutely-positioned with z-50 + rounded-lg bg-bg.
-    await page.waitForFunction(
-      () => {
-        const host = document.querySelector('[data-perimeter-widget-preview]') as HTMLElement;
-        return !!host?.shadowRoot?.querySelector('.absolute.z-50');
-      },
-      undefined,
-      { timeout: 5000 },
-    );
+    // can't reach it). The trigger is the first button inside results-toolbar; its
+    // popup is the `w-48` variant (the view/icon-select popup is `w-44`).
+    await openShadowMenu(page, '[data-slot="results-toolbar"] button', '.absolute.z-50.w-48');
 
     // The option <button> text color must be light on the dark popup background —
     // this is the dark-on-dark dropdown bug (Task 3). Read the first option label.
-    const optionColor = await readComputedColor(page, '.absolute.z-50 button span.flex-1');
+    const optionColor = await readComputedColor(page, '.absolute.z-50.w-48 button span.flex-1');
     expect(
       luminance(optionColor),
       `sort option text color ${optionColor} should be light on dark`,
@@ -78,14 +70,10 @@ test.describe('studio visual harness — sermons', () => {
     // The View control is the IconSelect — the LAST trigger button in the
     // results-toolbar control group. Its popup is the `w-44` variant (the Sort
     // popup is `w-48`), so we can target it unambiguously inside the shadow root.
-    await clickInShadow(page, '[data-slot="results-toolbar"] .relative:last-child > button');
-    await page.waitForFunction(
-      () => {
-        const host = document.querySelector('[data-perimeter-widget-preview]') as HTMLElement;
-        return !!host?.shadowRoot?.querySelector('.absolute.z-50.w-44');
-      },
-      undefined,
-      { timeout: 5000 },
+    await openShadowMenu(
+      page,
+      '[data-slot="results-toolbar"] .relative:last-child > button',
+      '.absolute.z-50.w-44',
     );
 
     // Option label text must read light on the dark popup background.

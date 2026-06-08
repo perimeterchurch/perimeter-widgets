@@ -213,6 +213,59 @@ export async function clickInShadow(page: Page, shadowSelector: string): Promise
   );
 }
 
+/** True when an element matching `shadowSelector` exists inside the widget shadow root. */
+async function existsInShadow(page: Page, shadowSelector: string): Promise<boolean> {
+  return page.evaluate(
+    ({ hostSel, sel }) =>
+      !!(document.querySelector(hostSel) as HTMLElement | null)?.shadowRoot?.querySelector(sel),
+    { hostSel: PREVIEW_HOST, sel: shadowSelector },
+  );
+}
+
+/**
+ * Robustly open a dropdown rendered inside the widget shadow root, then leave it
+ * open. Waits for the trigger to exist first (the toolbar can be transiently
+ * absent right after a theme toggle / data settle — observed in diagnostics),
+ * then clicks it and waits for `popupSelector`. If the click is dropped under
+ * suite contention it retries — but it only clicks while the menu is CLOSED, so
+ * a retry never toggles an already-open menu shut. Replaces a one-shot
+ * `clickInShadow` + single `waitForFunction(5s)`, which flaked under load.
+ *
+ * `popupSelector` MUST uniquely identify THIS dropdown's popup (e.g. the sort
+ * popup is `.w-48`, the view/icon-select popup `.w-44`) — a generic
+ * `.absolute.z-50` also matches always-present @perimeter/ui popups and would
+ * read as "already open".
+ */
+export async function openShadowMenu(
+  page: Page,
+  triggerSelector: string,
+  popupSelector: string,
+): Promise<void> {
+  await page.waitForFunction(
+    ({ hostSel, sel }) =>
+      !!(document.querySelector(hostSel) as HTMLElement | null)?.shadowRoot?.querySelector(sel),
+    { hostSel: PREVIEW_HOST, sel: triggerSelector },
+    { timeout: 10_000 },
+  );
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (await existsInShadow(page, popupSelector)) return;
+    await clickInShadow(page, triggerSelector);
+    try {
+      await page.waitForFunction(
+        ({ hostSel, sel }) =>
+          !!(document.querySelector(hostSel) as HTMLElement | null)?.shadowRoot?.querySelector(sel),
+        { hostSel: PREVIEW_HOST, sel: popupSelector },
+        { timeout: 3000 },
+      );
+      return;
+    } catch {
+      // Click likely dropped under load — loop and retry. The top-of-loop guard
+      // skips re-clicking if a delayed render has since opened the menu.
+    }
+  }
+  throw new Error(`shadow menu did not open: ${popupSelector}`);
+}
+
 /**
  * Parse an `rgb(r, g, b)` / `rgba(...)` string and return relative luminance
  * (0 = black, 1 = white) so assertions can say "this text is LIGHT" without

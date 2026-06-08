@@ -248,7 +248,7 @@ function RangePanel({
                 <span
                   className={cn(
                     'block text-[10px] font-semibold uppercase tracking-wider',
-                    activeSide === 'start' ? 'text-[var(--color-primary)]' : 'text-muted-fg',
+                    activeSide === 'start' ? 'text-primary' : 'text-muted-fg',
                   )}
                 >
                   From
@@ -304,7 +304,7 @@ function RangePanel({
                 <span
                   className={cn(
                     'block text-[10px] font-semibold uppercase tracking-wider',
-                    activeSide === 'end' ? 'text-[var(--color-primary)]' : 'text-muted-fg',
+                    activeSide === 'end' ? 'text-primary' : 'text-muted-fg',
                   )}
                 >
                   To
@@ -391,7 +391,7 @@ function RangePanel({
             'rounded-lg px-5 py-2 text-sm font-medium',
             'transition-all duration-150 active:scale-[0.98]',
             isDirty || hasSelection
-              ? 'bg-[var(--color-primary)] text-primary-fg shadow-sm hover:opacity-90'
+              ? 'bg-primary text-primary-fg shadow-sm hover:opacity-90'
               : 'bg-muted text-muted-fg',
           )}
         >

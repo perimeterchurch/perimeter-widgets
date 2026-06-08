@@ -57,7 +57,7 @@ export function ResultsToolbar({
       data-slot="results-toolbar"
       className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2"
     >
-      <span data-slot="results-count" className="text-sm text-[var(--color-muted-fg)]">
+      <span data-slot="results-count" className="text-sm text-muted-fg">
         {count != null ? `${count} ${noun}` : ' '}
       </span>
       <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
 import { Input } from '@perimeter/ui/input';
 import { Button } from '@perimeter/ui/button';
@@ -21,6 +21,13 @@ export function Sidebar({ nav }: SidebarProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const { theme, toggle } = useStudioTheme();
+
+  // Below lg the rail is off-canvas (translate-only) when closed; at lg it is
+  // always in-flow. When it is off-canvas-and-closed, take it out of the tab
+  // order + a11y tree so keyboard/SR users can't reach the hidden menu (a
+  // transform alone leaves it focusable). matchMedia is absent in tests → stays
+  // interactive there, matching the lg/in-flow case.
+  const offCanvasHidden = useBelowLg() && !open;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -52,6 +59,7 @@ export function Sidebar({ nav }: SidebarProps) {
 
       <aside
         id="studio-sidebar"
+        inert={offCanvasHidden || undefined}
         className={cn(
           'flex h-screen flex-col border-r border-border bg-bg font-sans',
           // Off-canvas on small screens, in-flow on lg.
@@ -146,6 +154,24 @@ export function Sidebar({ nav }: SidebarProps) {
       </aside>
     </>
   );
+}
+
+/**
+ * True when the viewport is below the `lg` breakpoint (1024px), where the rail is
+ * off-canvas. Returns false when `matchMedia` is unavailable (SSR / test env), so
+ * the rail stays interactive — the same as the always-visible lg/in-flow case.
+ */
+function useBelowLg(): boolean {
+  const [below, setBelow] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 1023.98px)');
+    const sync = () => setBelow(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  return below;
 }
 
 /** Inline sun/moon glyphs — the studio carries no icon dependency, so these

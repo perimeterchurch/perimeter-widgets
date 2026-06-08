@@ -80,6 +80,10 @@ pnpm dev
 
 The Vite studio auto-discovers widgets via `import.meta.glob('/widgets/*/src/widget.tsx')` and lists yours automatically — no registry to hand-edit. Select it to preview through the real `mount()`, with live config editing, the theme editor, and HMR. Edit `src/app.tsx` and the preview hot-reloads.
 
+### Theming the preview
+
+The studio has two theme layers. The **chrome** toggle in the sidebar sets the studio shell light/dark, and by default the widget preview and the component gallery **follow it** — darkening the studio darkens the preview (see `studio/src/lib/use-chrome-theme.ts`). The canvas toolbar above the preview has its own **Theme** toggle that can _pin_ an explicit light or dark for the widget only (`previewTheme = state.theme ?? chromeTheme`); a pinned value is stored in the share URL (`studio/src/lib/preview-link.ts`) so it travels with the link, while "follow chrome" stays out of the URL. This mirrors how a production embed opts into dark with `data-theme="dark"` on the host — so what you see in the preview is what a host page gets.
+
 ## 6. Build the shippable bundle
 
 ```bash
@@ -98,6 +102,12 @@ pnpm quality
 ```
 
 `pnpm quality` runs typecheck + lint + test + `format:check` across the workspace. Run `pnpm format` first — the gate only checks formatting and fails on unformatted files.
+
+Visual and accessibility coverage that jsdom can't see (computed theme colors, loading states, the preview's follow-chrome behavior) lives in the studio's Playwright harness under `studio/visual/`. It's run separately from `pnpm quality`:
+
+```bash
+pnpm --filter @perimeter/studio visual
+```
 
 ## 8. Release it
 

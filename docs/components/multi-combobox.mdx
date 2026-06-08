@@ -32,18 +32,23 @@ const options: MultiComboboxOption[] = [
 />;
 ```
 
-Inside a widget the dropdown must portal into the shadow root, not `document.body` — pass the widget's `environment` so the underlying `downshift` hooks register events in the right tree.
+Inside a widget the dropdown's click-outside / blur listeners auto-attach at the shadow root — no plumbing needed (the component derives the environment from its own root node). Pass `environment` only to override that derived value.
 
 ## Props
 
 | Prop            | Type                                  | Default       | Description                                                                 |
 | --------------- | ------------------------------------- | ------------- | --------------------------------------------------------------------------- |
-| `options`       | `MultiComboboxOption[]`               | —             | `{ value, label, disabled? }` items to choose from.                         |
+| `options`       | `MultiComboboxOption[]`               | —             | `{ value, label, disabled?, isGroupHeader? }` items to choose from.         |
 | `multiple`      | `boolean`                             | `false`       | When `true`, allows multiple selections and emits a `string[]`.             |
 | `value`         | `string \| null` / `string[]`         | —             | Controlled selection (shape follows `multiple`). Omit for uncontrolled.     |
 | `defaultValue`  | `string \| null` / `string[]`         | —             | Initial uncontrolled selection.                                             |
 | `onValueChange` | `(value) => void`                     | —             | Fires on selection change; payload shape follows `multiple`.                |
+| `isOpen`        | `boolean`                             | —             | Controlled open state. Omit for uncontrolled.                               |
+| `onOpenChange`  | `(isOpen: boolean) => void`           | —             | Fires when the menu open state changes.                                     |
 | `placeholder`   | `string`                              | `'Select...'` | Shown when nothing is selected.                                             |
 | `selectedLabel` | `string`                              | —             | Short label for the count chip in multiple mode (e.g. `"Campuses (3)"`).    |
 | `disabled`      | `boolean`                             | `false`       | Disables the whole control.                                                 |
-| `environment`   | `Environment`                         | —             | The shadow-root environment for `downshift` — required inside a widget.     |
+| `className`     | `string`                              | —             | Extra classes on the root container.                                        |
+| `environment`   | `Environment`                         | —             | Optional override for the auto-derived shadow-root environment for `downshift`. |
+
+Set `isGroupHeader: true` on an option to render a non-interactive divider row (e.g. an Old / New Testament header) that keyboard navigation and selection skip.

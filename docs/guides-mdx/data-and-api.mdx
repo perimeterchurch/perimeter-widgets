@@ -182,13 +182,21 @@ inside its `ApiClientContext` **and** a React Query `QueryProvider`, so the hook
 just works — no provider setup in the widget:
 
 ```tsx
+import { Spinner } from '@perimeter/ui/spinner';
+import { Empty, EmptyTitle } from '@perimeter/ui/empty';
 import { useBooks } from '@perimeter/api-hooks';
 
 export function App({ config }: { config: Config }) {
-  const { data, isLoading, isError } = useBooks({ top: config.count });
-  if (isLoading) return <Spinner />; // @perimeter/ui
-  if (isError) return <Empty title="Couldn't load books" />;
-  return <BookList books={data} />;
+  const { data, isLoading, isError } = useBooks();
+  if (isLoading) return <Spinner />;
+  if (isError)
+    return (
+      <Empty>
+        <EmptyTitle>Couldn't load books</EmptyTitle>
+      </Empty>
+    );
+  // The hook returns the response envelope; the list lives on `data.data`.
+  return <BookList books={data.data} />;
 }
 ```
 
@@ -216,8 +224,9 @@ override before the widget mounts:
 globalThis.__PERIMETER_API_URL__ = 'http://localhost:5500';
 ```
 
-(`mount()` also accepts an explicit `apiBaseUrl` via its `extras` argument, which
-the override falls back from.)
+(`mount()` also accepts an explicit `apiBaseUrl` in its `extras` argument; when
+present it takes precedence over the `__PERIMETER_API_URL__` global, which is
+otherwise the fallback before the production default.)
 
 ## Checklist
 

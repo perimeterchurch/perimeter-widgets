@@ -47,7 +47,7 @@ import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { Skeleton } from '@perimeter/ui/skeleton';
 import { Spinner } from '@perimeter/ui/spinner';
 import { LayoutGrid, List, Rows, Calendar, Type } from 'lucide-react';
-import { ComponentStage } from '../components/ComponentStage';
+import { ComponentStage, StageContainer } from '../components/ComponentStage';
 
 /**
  * The MDX rendering layer for the design-system site.
@@ -208,6 +208,7 @@ export const mdxComponents: MDXComponents = {
   td: Td,
   // Live-doc building blocks authored directly in .mdx.
   ComponentStage,
+  StageContainer,
   Example,
   // @perimeter/ui components provided to MDX scope so component docs can render
   // live examples WITHOUT per-file imports. Docs live at repo root (docs/*.mdx),

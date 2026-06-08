@@ -202,7 +202,7 @@ export function MediaCard({
           key={imageUrl}
           src={imageUrl}
           alt={imageAlt}
-          className="aspect-video w-56 flex-shrink-0"
+          className="aspect-video w-32 flex-shrink-0 @[30rem]:w-56"
         />
         <div className="flex flex-1 flex-col gap-1 p-4">
           {!hasCornersLayout && (

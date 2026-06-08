@@ -33,7 +33,7 @@ export function RangePresets({
             'rounded-lg px-3 py-2 text-left text-xs font-medium',
             'transition-all duration-150',
             'text-muted-fg',
-            'hover:bg-[var(--color-primary)]/5 hover:text-[var(--color-primary)]',
+            'hover:bg-primary/5 hover:text-primary',
             'active:scale-[0.97]',
           )}
         >
