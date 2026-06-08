@@ -205,6 +205,8 @@ git commit -m "feat(studio): ramp HostFrame gutter from the resolved frame width
 **Files:**
 - Create: `studio/visual/sermons-responsive.spec.ts` (first test only; more added in Task 13)
 
+- [ ] **Step 0: Verify the helper exports exist** — confirm `studio/visual/helpers.ts` exports `STUDIO_URL`, `mockSermonsApi`, `waitForShadowMount`, `waitForSermonCards` (and, for Task 14, `openShadowMenu`, `snapshotPreview`). They do today; this guards the whole Playwright chunk against a rename.
+
 - [ ] **Step 1: Write the visual test**
 
 ```ts
@@ -269,33 +271,24 @@ git commit -m "test(studio): assert presets yield realistic widget widths"
 
 **Files:**
 - Modify: `packages/ui/src/sort-select.tsx:43-58` (the trigger button)
-- Test: `packages/ui/tests/sort-select.test.tsx` (create if absent; otherwise add a case)
+- Test: `packages/ui/tests/sort-select.test.tsx` (EXISTS — append a `describe('SortSelect compact', …)` block in the file's existing style: `render`/`screen`/`fireEvent` imports, NO `@vitest-environment` directive, reuse the file's existing `fields`/`noop`)
 
-- [ ] **Step 1: Failing test**
+- [ ] **Step 1: Failing test** — append to the existing `packages/ui/tests/sort-select.test.tsx` (it already imports `render, screen, fireEvent` and defines `fields`):
 
 ```tsx
-// packages/ui/tests/sort-select.test.tsx
-// @vitest-environment happy-dom
-import { describe, it, expect } from 'vitest';
-import { render, within } from '@testing-library/react';
-import { SortSelect } from '../src/sort-select';
-
-const fields = [{ value: 'date', label: 'Date', icon: null }];
-const noop = () => {};
-
 describe('SortSelect compact', () => {
   it('shows the "Sort by:" prefix by default', () => {
-    const { container } = render(
-      <SortSelect sortField="date" sortDirection="desc" fields={fields} onSortFieldChange={noop} onSortDirectionChange={noop} />,
+    render(
+      <SortSelect sortField="date" sortDirection="desc" fields={fields} onSortFieldChange={() => {}} onSortDirectionChange={() => {}} />,
     );
-    expect(within(container).getByText(/Sort by:/)).toBeTruthy();
+    expect(screen.getByText(/Sort by:/)).toBeTruthy();
   });
   it('drops the prefix when compact (icon + value only)', () => {
-    const { container } = render(
-      <SortSelect compact sortField="date" sortDirection="desc" fields={fields} onSortFieldChange={noop} onSortDirectionChange={noop} />,
+    render(
+      <SortSelect compact sortField="date" sortDirection="desc" fields={fields} onSortFieldChange={() => {}} onSortDirectionChange={() => {}} />,
     );
-    expect(within(container).queryByText(/Sort by:/)).toBeNull();
-    expect(within(container).getByText('Date')).toBeTruthy();
+    expect(screen.queryByText(/Sort by:/)).toBeNull();
+    expect(screen.getByText('Date')).toBeTruthy();
   });
 });
 ```
@@ -332,29 +325,26 @@ git commit -m "feat(ui): SortSelect compact prop (icon + value, no prefix)"
 
 **Files:**
 - Modify: `packages/ui/src/icon-select.tsx:13-48`
-- Test: `packages/ui/tests/icon-select.test.tsx` (create/add)
+- Test: `packages/ui/tests/icon-select.test.tsx` (EXISTS — append a `describe` block in the file's existing style: `render`/`screen`, NO env directive)
 
-- [ ] **Step 1: Failing test** — render with `label="View:"` + an option; assert the `View:` text is present normally and absent when `compact`, while the active value (`Grid`) shows in both.
+- [ ] **Step 1: Failing test** — append to the existing `packages/ui/tests/icon-select.test.tsx`. Render with `label="View:"` + an option; assert `View:` is present by default and absent when `compact`, value (`Grid`) shown in both:
 
 ```tsx
-// @vitest-environment happy-dom
-import { describe, it, expect } from 'vitest';
-import { render, within } from '@testing-library/react';
-import { IconSelect } from '../src/icon-select';
-
-const options = [{ value: 'grid', label: 'Grid', icon: null }];
 describe('IconSelect compact', () => {
+  const options = [{ value: 'grid', label: 'Grid', icon: null }];
   it('shows the label prefix by default', () => {
-    const { container } = render(<IconSelect label="View:" icon={null} value="grid" options={options} onChange={() => {}} />);
-    expect(within(container).getByText(/View:/)).toBeTruthy();
+    render(<IconSelect label="View:" icon={null} value="grid" options={options} onChange={() => {}} />);
+    expect(screen.getByText(/View:/)).toBeTruthy();
   });
   it('hides the label prefix when compact (value still shows)', () => {
-    const { container } = render(<IconSelect compact label="View:" icon={null} value="grid" options={options} onChange={() => {}} />);
-    expect(within(container).queryByText(/View:/)).toBeNull();
-    expect(within(container).getByText('Grid')).toBeTruthy();
+    render(<IconSelect compact label="View:" icon={null} value="grid" options={options} onChange={() => {}} />);
+    expect(screen.queryByText(/View:/)).toBeNull();
+    expect(screen.getByText('Grid')).toBeTruthy();
   });
 });
 ```
+
+> Confirm the existing file imports `screen`; if it only imports `render`, add `screen` to the import.
 
 - [ ] **Step 2: Run; expect FAIL**
 
@@ -502,35 +492,56 @@ git commit -m "feat(sermons): container-breakpoint hook + pure bucketFor"
 - Modify: `widgets/sermons/src/hooks/use-sermon-filters.ts`
 - Test: `widgets/sermons/tests/hooks/use-sermon-filters.test.tsx` (add cases)
 
-- [ ] **Step 1: Add failing tests** (follow the existing test file's setup — it renders a component that calls the hook inside `NuqsAdapter`/`NuqsTestingAdapter`; mirror that harness). Add:
+- [ ] **Step 1: Add failing tests** — the real harness uses `renderHook` (read via `result.current.*`) and `NuqsTestingAdapter searchParams="?key=val"` with **bare** param keys (no `sermons-` prefix in tests, since `renderFilters`/`renderWithParams` pass no prefix). The hook takes `breakpoint` in its 2nd-arg options. Add a self-contained `describe` block at the end of the file using the same inline pattern as the existing `?view=list` test:
 
 ```tsx
-// effectiveView: unset + phone → 'list'; unset + tablet/desktop → defaultView; explicit preserved on phone.
-it('defaults view to list on phone when unset', () => {
-  const { result } = renderFilters({ config: {}, breakpoint: 'phone' }); // helper passes options.breakpoint
-  expect(result.view).toBe('list');
-});
-it('defaults view to grid (config default) on tablet/desktop when unset', () => {
-  expect(renderFilters({ config: {}, breakpoint: 'tablet' }).view).toBe('grid');
-  expect(renderFilters({ config: { defaultView: 'large' }, breakpoint: 'desktop' }).view).toBe('large');
-});
-it('preserves an explicit ?view= on phone', () => {
-  expect(renderFilters({ config: {}, breakpoint: 'phone', searchParams: 'sermons-view=grid' }).view).toBe('grid');
-});
-// activeFilterCount: counts collapsible dims (date range = 1), excludes search + locked.
-it('counts active collapsible filters, date range as one, excluding locked + search', () => {
-  const r = renderFilters({ config: {}, searchParams: 'sermons-series=1,2&sermons-from=2026-01-01&sermons-to=2026-02-01&sermons-search=x' });
-  expect(r.activeFilterCount).toBe(2); // series + date-range; search excluded
-  expect(r.hasActiveFilters).toBe(true);
-});
-it('activeFilterCount never exceeds and never contradicts hasActiveFilters', () => {
-  const r = renderFilters({ config: {}, searchParams: 'sermons-search=x' });
-  expect(r.activeFilterCount).toBe(0);
-  expect(r.hasActiveFilters).toBe(true); // search-only
+import type { ContainerBreakpoint } from '../../src/lib/breakpoint';
+
+describe('responsive default view + activeFilterCount', () => {
+  function renderResponsive(
+    config: Partial<SermonsConfig>,
+    opts: { breakpoint?: ContainerBreakpoint; searchParams?: string } = {},
+  ) {
+    const fullConfig: SermonsConfig = {
+      perPage: 12,
+      defaultTab: 'sermons',
+      defaultView: 'grid',
+      display: 'full',
+      ...config,
+    };
+    return renderHook(() => useSermonFilters(fullConfig, { breakpoint: opts.breakpoint }), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <NuqsTestingAdapter searchParams={opts.searchParams ?? ''}>{children}</NuqsTestingAdapter>
+      ),
+    });
+  }
+
+  it('defaults view to list on phone when unset', () => {
+    expect(renderResponsive({}, { breakpoint: 'phone' }).result.current.view).toBe('list');
+  });
+  it('defaults view to the config default on tablet/desktop when unset', () => {
+    expect(renderResponsive({}, { breakpoint: 'tablet' }).result.current.view).toBe('grid');
+    expect(renderResponsive({ defaultView: 'large' }, { breakpoint: 'desktop' }).result.current.view).toBe('large');
+  });
+  it('preserves an explicit ?view= even on phone', () => {
+    expect(renderResponsive({}, { breakpoint: 'phone', searchParams: '?view=grid' }).result.current.view).toBe('grid');
+  });
+  it('activeFilterCount counts collapsible dims (date range once), excludes search + locked', () => {
+    const r = renderResponsive({}, {
+      searchParams: '?series=1,2&from=2026-01-01&to=2026-02-01&search=x',
+    }).result.current;
+    expect(r.activeFilterCount).toBe(2); // series + date-range; search excluded
+    expect(r.hasActiveFilters).toBe(true);
+  });
+  it('activeFilterCount is 0 for a search-only state, but hasActiveFilters is true', () => {
+    const r = renderResponsive({}, { searchParams: '?search=x' }).result.current;
+    expect(r.activeFilterCount).toBe(0);
+    expect(r.hasActiveFilters).toBe(true);
+  });
 });
 ```
 
-> NOTE for the implementer: read the existing `use-sermon-filters.test.tsx` to reuse its exact render harness (how it provides nuqs search params and reads the returned object). Adapt `renderFilters` to that harness; add a `breakpoint` passthrough to the hook's options.
+> The existing `view-mode persistence` tests still pass after this change: `{ defaultView: 'large' }` with no breakpoint → `null ?? (undefined==='phone' ? … : 'large')` = `'large'`; `?view=list` → non-null param wins. Keep the `const defaultView` variable (line 38) — `effectiveView` still uses it; only its use *inside the `parseAsStringLiteral` parser* is removed, and the `sermonParams` memo dep drops to `[defaultTab]`.
 
 - [ ] **Step 2: Run; expect FAIL**
 
@@ -603,12 +614,14 @@ git add widgets/sermons/src/hooks/use-sermon-filters.ts widgets/sermons/tests/ho
 git commit -m "feat(sermons): nullable view + effectiveView default + activeFilterCount"
 ```
 
-### Task 9: Wire the breakpoint in `SermonsWidget`
+### Task 9: Derive the container breakpoint in `SermonsWidget`
+
+Scope is App-only: attach the ref, derive the breakpoint, and feed it to the hook (for `effectiveView`). The views are NOT touched here, so this commit stays green — the `breakpoint` *view prop* is added in Tasks 11/12 (where it's actually consumed), each updating that view's test renders in the same commit.
 
 **Files:**
 - Modify: `widgets/sermons/src/App.tsx:40-108`
 
-- [ ] **Step 1:** In `SermonsWidget`, add a ref to the `@container` div, derive the breakpoint, pass it to the hook and thread it to the views.
+- [ ] **Step 1:** In `SermonsWidget`, add a ref to the `@container` div, derive the breakpoint, and pass it to the hook. Do NOT pass it to the views yet.
 
 ```tsx
 import { useContainerBreakpoint } from './hooks/use-container-breakpoint';
@@ -617,11 +630,7 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const breakpoint = useContainerBreakpoint(containerRef);
   const filters = useSermonFilters(config, { prefix: NUQS_PREFIX, breakpoint });
-  // ...
-  // pass breakpoint to the views:
-  //   <SermonsView config={config} filters={filters} breakpoint={breakpoint} />
-  //   <SeriesView config={config} filters={filters} breakpoint={breakpoint} />
-  // ...
+  // ... renderContent unchanged ...
   return (
     <div ref={containerRef} className="@container p-4">
       {/* unchanged */}
@@ -630,25 +639,23 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
 }
 ```
 
-- [ ] **Step 2: Thread the prop type** — add `breakpoint: ContainerBreakpoint` to `SermonsViewProps` and `SeriesViewProps` (import the type). Leave usage to Chunk 4 tasks.
+> The `breakpoint` value is also needed by the views in Tasks 11–13; keep it in scope (it's already a `SermonsWidget` local) so those tasks can pass it to `<SermonsView>`/`<SeriesView>`.
 
-- [ ] **Step 3: Typecheck** (will fail until views accept the prop — acceptable mid-task; or add the prop as optional first). To keep each commit green, make the view prop **required** and update both view call sites + prop types in this step so typecheck passes.
+- [ ] **Step 2: Typecheck**
 
 Run: `pnpm exec turbo run typecheck --filter=@perimeter/widget-sermons --force`
-Expected: PASS.
+Expected: PASS (views unchanged; `effectiveView` now reflects the live breakpoint).
 
-- [ ] **Step 4: Run App tests**
+- [ ] **Step 3: Run App + view tests**
 
-Run: `pnpm --filter @perimeter/widget-sermons exec vitest run tests/App.test.tsx`
-Expected: PASS (App still renders; ResizeObserver may need a stub — see note).
+Run: `pnpm --filter @perimeter/widget-sermons exec vitest run tests/App.test.tsx tests/results-states.test.tsx`
+Expected: PASS. `ResizeObserver` is already stubbed in `widgets/sermons/tests/setup.ts` (lines 14+), so the hook sits at its `'desktop'` initial state in tests — the correct layout-blind default. No setup.ts change needed.
 
-> NOTE: jsdom/happy-dom may lack `ResizeObserver`. If `tests/App.test.tsx` or the per-view tests fail with `ResizeObserver is not defined`, add a minimal stub to `widgets/sermons/tests/setup.ts` (a class with `observe/unobserve/disconnect` no-ops). The hook falls back to the `'desktop'` initial state when the observer never fires, which is the correct default for layout-blind tests.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add widgets/sermons/src/App.tsx widgets/sermons/src/components/sermons/SermonsView.tsx widgets/sermons/src/components/series/SeriesView.tsx widgets/sermons/tests/setup.ts
-git commit -m "feat(sermons): derive container breakpoint and thread it to views"
+git add widgets/sermons/src/App.tsx
+git commit -m "feat(sermons): derive container breakpoint and feed it to useSermonFilters"
 ```
 
 ---
@@ -778,38 +785,48 @@ git commit -m "feat(sermons): CollapsibleFilters wrapper (phone-only collapse)"
 
 **Files:**
 - Modify: `widgets/sermons/src/components/sermons/SermonFilters.tsx`
-- Modify: `widgets/sermons/src/components/sermons/SermonsView.tsx` (pass `breakpoint` + `activeFilterCount`)
-- Test: `widgets/sermons/tests/components/SermonFilters.test.tsx` (add a phone-collapse case)
+- Modify: `widgets/sermons/src/components/sermons/SermonsView.tsx` (accept + thread `breakpoint`; pass `activeFilterCount`)
+- Modify: `widgets/sermons/src/App.tsx` (pass `breakpoint` to `<SermonsView>`)
+- Test: `widgets/sermons/tests/components/SermonFilters.test.tsx` (update `makeProps`; add a phone-collapse case)
+- Test: `widgets/sermons/tests/results-states.test.tsx` (add `breakpoint` to the `<SermonsView>` renders; add `activeFilterCount` to `makeFilters`)
 
-- [ ] **Step 1:** Add `breakpoint: ContainerBreakpoint` and `activeFilterCount: number` to `SermonFiltersProps`. Wrap **Row 2 (dropdowns) + Row 3 (date range + Clear All)** in `<CollapsibleFilters breakpoint={...} activeFilterCount={...} hasActive={props.hasActiveFilters} onClear={props.onClearFilters}>`. Keep **Row 1 (search)** and the **active-filter chips** OUTSIDE the collapsible (always visible). When `breakpoint === 'phone'`, drop the in-body "Clear All" button (the collapsible header owns Clear) to avoid duplication — i.e., render that button only when `breakpoint !== 'phone'`.
-- [ ] **Step 2:** In `SermonsView`, pass `breakpoint={breakpoint}` and `activeFilterCount={filters.activeFilterCount}` to `<SermonFilters .../>`.
-- [ ] **Step 3: Failing→passing test** — render `SermonFilters` with `breakpoint="phone"`, `activeFilterCount={1}`, unlocked filters; assert the series dropdown (`All Series`) is hidden until the `Filters` toggle is clicked, and the search box is always present.
-- [ ] **Step 4: Run**
+- [ ] **Step 1:** Add `breakpoint: ContainerBreakpoint` and `activeFilterCount: number` (both required) to `SermonFiltersProps`. Wrap **Row 2 (dropdowns) + Row 3 (date range + Clear All)** in `<CollapsibleFilters breakpoint={props.breakpoint} activeFilterCount={props.activeFilterCount} hasActive={props.hasActiveFilters} onClear={props.onClearFilters}>`. Keep **Row 1 (search)** and the **active-filter chips** OUTSIDE the collapsible (always visible). Render Row 3's in-body "Clear All" button only when `props.breakpoint !== 'phone'` (the collapsible header owns Clear on phone, avoiding duplication).
+- [ ] **Step 2:** Add `breakpoint: ContainerBreakpoint` (required) to `SermonsViewProps` (import the type). In `SermonsView`, pass `breakpoint={breakpoint}` and `activeFilterCount={filters.activeFilterCount}` to `<SermonFilters .../>`. In `App.tsx`, pass `breakpoint={breakpoint}` to `<SermonsView … />`.
+- [ ] **Step 3: Keep existing tests green (same commit):**
+  - In `tests/components/SermonFilters.test.tsx`, add `breakpoint: 'desktop'` and `activeFilterCount: 0` to the `makeProps` default object (lines ~23-40), so existing cases typecheck and still render inline (desktop = no collapse).
+  - In `tests/results-states.test.tsx`, add `breakpoint="desktop"` to every `<SermonsView … />` render (lines ~107, 117, 126, 138, 153, 164, 175), and add `activeFilterCount: 0` to the `makeFilters` default object (so the prop the view now reads is defined at runtime).
+- [ ] **Step 4: Add the phone-collapse test** — in `SermonFilters.test.tsx`, render with `makeProps({ breakpoint: 'phone', activeFilterCount: 1 })` (unlocked filters). Assert: the search box is present; `All Series` is NOT in the DOM until the `Filters` toggle (`getByRole('button', { name: /filters/i })`) is clicked; after click it appears. Also assert the badge text `1` shows.
+- [ ] **Step 5: Run**
 
-Run: `pnpm --filter @perimeter/widget-sermons exec vitest run tests/components/SermonFilters.test.tsx`
+Run: `pnpm --filter @perimeter/widget-sermons exec vitest run tests/components/SermonFilters.test.tsx tests/results-states.test.tsx`
+Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add widgets/sermons/src/components/sermons/SermonFilters.tsx widgets/sermons/src/components/sermons/SermonsView.tsx widgets/sermons/tests/components/SermonFilters.test.tsx
+git add widgets/sermons/src/components/sermons/SermonFilters.tsx widgets/sermons/src/components/sermons/SermonsView.tsx widgets/sermons/src/App.tsx widgets/sermons/tests/components/SermonFilters.test.tsx widgets/sermons/tests/results-states.test.tsx
 git commit -m "feat(sermons): collapse SermonFilters on phone"
 ```
 
 ### Task 12: `SeriesView` inline filters use `CollapsibleFilters`
 
 **Files:**
-- Modify: `widgets/sermons/src/components/series/SeriesView.tsx` (its inline filter rows, ~lines 120-170)
+- Modify: `widgets/sermons/src/components/series/SeriesView.tsx` (add `breakpoint` prop; wrap its inline filter rows, ~lines 120-170)
+- Modify: `widgets/sermons/src/App.tsx` (pass `breakpoint` to `<SeriesView>`)
+- Test: `widgets/sermons/tests/results-states.test.tsx` (add `breakpoint` to the `<SeriesView>` renders)
 
-- [ ] **Step 1:** Wrap `SeriesView`'s inline dropdown row + date-range/clear row in `<CollapsibleFilters breakpoint={breakpoint} activeFilterCount={filters.activeFilterCount} hasActive={filters.hasActiveFilters} onClear={filters.clearFilters}>`, keeping the search input + chips outside. Mirror the phone "Clear All" de-duplication from Task 11.
-- [ ] **Step 2: Run series-related tests** (results-states covers SeriesView):
+- [ ] **Step 1:** Add `breakpoint: ContainerBreakpoint` (required) to `SeriesViewProps` (import the type). Wrap `SeriesView`'s inline dropdown row + date-range/clear row in `<CollapsibleFilters breakpoint={breakpoint} activeFilterCount={filters.activeFilterCount} hasActive={filters.hasActiveFilters} onClear={filters.clearFilters}>`, keeping the search input + chips outside. Render the in-body "Clear All" only when `breakpoint !== 'phone'` (mirror Task 11). `SeriesView` reads `filters.clearFilters`/`filters.hasActiveFilters`/`filters.activeFilterCount` directly off the hook (it doesn't use `SermonFilters`).
+- [ ] **Step 2:** In `App.tsx`, pass `breakpoint={breakpoint}` to `<SeriesView … />`.
+- [ ] **Step 3: Keep tests green (same commit):** in `tests/results-states.test.tsx`, add `breakpoint="desktop"` to every `<SeriesView … />` render (lines ~189, 200, 213). (`makeFilters` already gained `activeFilterCount` in Task 11.)
+- [ ] **Step 4: Run**
 
 Run: `pnpm --filter @perimeter/widget-sermons exec vitest run tests/results-states.test.tsx`
-Expected: PASS (stub `filters.activeFilterCount` in that test's filters stub if it constructs one — search the file for the stub shape and add the field).
+Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add widgets/sermons/src/components/series/SeriesView.tsx widgets/sermons/tests/results-states.test.tsx
+git add widgets/sermons/src/components/series/SeriesView.tsx widgets/sermons/src/App.tsx widgets/sermons/tests/results-states.test.tsx
 git commit -m "feat(sermons): collapse SeriesView filters on phone"
 ```
 
@@ -820,14 +837,15 @@ git commit -m "feat(sermons): collapse SeriesView filters on phone"
 - Modify: `widgets/sermons/src/components/sermons/SermonsView.tsx` + `series/SeriesView.tsx` (pass `breakpoint` to `ResultsToolbar`)
 - Test: `widgets/sermons/tests/components/ResultsToolbar.test.tsx` (add)
 
-- [ ] **Step 1:** Add `breakpoint: ContainerBreakpoint` to `ResultsToolbarProps`; pass `compact={breakpoint === 'phone'}` to both `<SortSelect>` and `<IconSelect>`.
-- [ ] **Step 2:** Pass `breakpoint={breakpoint}` from `SermonsView`/`SeriesView` into `<ResultsToolbar .../>`.
-- [ ] **Step 3: Test** — render `ResultsToolbar` with `breakpoint="phone"`; assert `Sort by:` / `View:` text is absent but the active values (e.g. `Date`) show; render with `breakpoint="tablet"` and assert the prefixes are present.
-- [ ] **Step 4: Run**
+- [ ] **Step 1:** Add `breakpoint: ContainerBreakpoint` (required) to `ResultsToolbarProps` (import the type); pass `compact={breakpoint === 'phone'}` to both `<SortSelect>` and `<IconSelect>`.
+- [ ] **Step 2:** Pass `breakpoint={breakpoint}` from `SermonsView`/`SeriesView` into `<ResultsToolbar .../>` (both already receive `breakpoint` from Tasks 11/12).
+- [ ] **Step 3: Keep existing tests green (same commit):** in `tests/components/ResultsToolbar.test.tsx`, add `breakpoint="desktop"` to every existing `<ResultsToolbar … />` render (and to any `makeProps`/props factory the file uses), so they typecheck and keep the full labels.
+- [ ] **Step 4: Add the compact test** — render `ResultsToolbar` with `breakpoint="phone"`; assert `Sort by:` / `View:` text is absent but the active values (e.g. `Date`) show. Render with `breakpoint="tablet"` and assert the prefixes are present.
+- [ ] **Step 5: Run**
 
 Run: `pnpm --filter @perimeter/widget-sermons exec vitest run tests/components/ResultsToolbar.test.tsx`
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add widgets/sermons/src/components/ui/ResultsToolbar.tsx widgets/sermons/src/components/sermons/SermonsView.tsx widgets/sermons/src/components/series/SeriesView.tsx widgets/sermons/tests/components/ResultsToolbar.test.tsx
