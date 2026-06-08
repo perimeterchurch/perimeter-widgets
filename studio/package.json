@@ -16,6 +16,7 @@
     "@perimeter/theme": "workspace:*",
     "@perimeter/ui": "workspace:*",
     "@perimeter/widget-runtime": "workspace:*",
+    "lucide-react": "^0.577.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.16.0",

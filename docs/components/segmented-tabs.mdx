@@ -1,0 +1,52 @@
+# SegmentedTabs
+
+A controlled segmented control rendered as a WAI-ARIA tablist: a rounded `bg-muted` track of buttons with the active one lifted on a `bg-bg` chip. Reach for it to switch between a small, fixed set of sibling views inside a compact toolbar — the studio inspector (Config / Theme / Info) and the sermons widget both use it. For layered panels with their own content, use [Tabs](/components/tabs) instead.
+
+<Example label="View switcher">
+  <SegmentedTabs
+    aria-label="Example views"
+    value="overview"
+    onChange={() => {}}
+    items={[
+      { id: 'overview', label: 'Overview' },
+      { id: 'activity', label: 'Activity' },
+      { id: 'settings', label: 'Settings' },
+    ]}
+    className="w-72"
+  />
+</Example>
+
+## Usage
+
+It is fully controlled — own the active `id` in state and update it from `onChange`:
+
+```tsx
+import { SegmentedTabs, segmentedTabId } from '@perimeter/ui/segmented-tabs';
+
+const [view, setView] = useState('overview');
+
+<SegmentedTabs
+  aria-label="Views"
+  value={view}
+  onChange={setView}
+  items={[
+    { id: 'overview', label: 'Overview' },
+    { id: 'activity', label: 'Activity' },
+  ]}
+/>;
+```
+
+When the tabs drive a single panel (rather than sibling views), pass `idBase` + `panelId` and point the panel's `aria-labelledby` at `segmentedTabId(idBase, value)` to complete the tab↔panel association.
+
+## Props
+
+| Prop         | Type                            | Description                                                                  |
+| ------------ | ------------------------------- | ---------------------------------------------------------------------------- |
+| `items`      | `{ id, label }[]`               | The ordered tabs; `id` is reported to `onChange` and matched against `value`.|
+| `value`      | `string`                        | The selected tab `id` (controlled).                                          |
+| `onChange`   | `(id: string) => void`          | Fires with the newly-selected tab `id`.                                      |
+| `aria-label` | `string`                        | Accessible label for the tablist.                                            |
+| `idBase`     | `string`                        | Base for each tab's DOM id; pair with `panelId` to wire an associated panel. |
+| `panelId`    | `string`                        | The `role="tabpanel"` id these tabs control (adds `aria-controls`).          |
+
+Keyboard: ArrowLeft/ArrowRight wrap between tabs, Home/End jump to the first/last — each moving focus and selection together.

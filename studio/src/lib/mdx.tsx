@@ -42,6 +42,11 @@ import {
   EmptyDescription,
   EmptyContent,
 } from '@perimeter/ui/empty';
+import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
+import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
+import { Skeleton } from '@perimeter/ui/skeleton';
+import { Spinner } from '@perimeter/ui/spinner';
+import { LayoutGrid, List, Rows, Calendar, Type } from 'lucide-react';
 import { ComponentStage } from '../components/ComponentStage';
 
 /**
@@ -65,8 +70,8 @@ import { ComponentStage } from '../components/ComponentStage';
 export function Example({ label, children }: { label?: ReactNode; children: ReactNode }) {
   return (
     <figure className="my-6">
-      <Card className="overflow-hidden">
-        <CardContent className="flex min-h-[8rem] items-center justify-center gap-4 bg-muted/40 p-8">
+      <Card className="overflow-visible">
+        <CardContent className="flex min-h-[8rem] items-center justify-center gap-4 overflow-visible bg-muted/40 p-8">
           <ComponentStage>{children}</ComponentStage>
         </CardContent>
       </Card>
@@ -226,6 +231,17 @@ export const mdxComponents: MDXComponents = {
   MultiCombobox,
   SortSelect,
   IconSelect,
+  SegmentedTabs,
+  SkeletonTransition,
+  Skeleton,
+  Spinner,
+  // Curated lucide icons for component-doc examples (icon-led controls). Kept to
+  // the small set the docs actually use so the MDX scope stays legible.
+  LayoutGrid,
+  List,
+  Rows,
+  Calendar,
+  Type,
   Tabs,
   TabsList,
   TabsTrigger,

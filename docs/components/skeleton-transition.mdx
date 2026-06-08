@@ -1,0 +1,43 @@
+# SkeletonTransition
+
+Cross-fades between a skeleton placeholder and the loaded content as `isLoading` flips. It keeps a single slot in the layout and animates the swap (a quick fade out of the skeleton, a slightly slower fade in of the content) so data arriving doesn't snap or shift the page.
+
+<Example label="While loading">
+  <SkeletonTransition
+    isLoading
+    skeleton={
+      <div className="flex w-72 flex-col gap-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    }
+  >
+    <p className="text-fg">The sermon list.</p>
+  </SkeletonTransition>
+</Example>
+
+## Usage
+
+Pass the placeholder as `skeleton` and the real view as `children`; drive `isLoading` from your query state:
+
+```tsx
+import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
+import { Skeleton } from '@perimeter/ui/skeleton';
+
+<SkeletonTransition
+  isLoading={query.isLoading}
+  skeleton={<Skeleton className="h-24 w-full" />}
+>
+  <SermonList sermons={query.data} />
+</SkeletonTransition>;
+```
+
+Shape the `skeleton` to mirror the loaded content's footprint so the cross-fade stays in place. For a static placeholder with no transition, use [Skeleton](/components/skeleton) directly.
+
+## Props
+
+| Prop        | Type        | Description                                              |
+| ----------- | ----------- | -------------------------------------------------------- |
+| `isLoading` | `boolean`   | When `true`, shows `skeleton`; when `false`, `children`. |
+| `skeleton`  | `ReactNode` | The placeholder shown while loading.                     |
+| `children`  | `ReactNode` | The loaded content, faded in once `isLoading` is false.  |

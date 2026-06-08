@@ -40,7 +40,13 @@ export interface PreviewState {
   config: Record<string, unknown>;
   /** runtime theme token overrides (mirrors ThemeEditor output). */
   tokens: Record<string, string>;
-  theme: 'light' | 'dark';
+  /**
+   * The widget preview's light/dark theme, or `undefined` to FOLLOW the studio
+   * chrome theme. Absent from the URL until the canvas toggle pins one explicitly
+   * — so darkening the studio also darkens the preview by default, while a pinned
+   * value (either light or dark) travels in the share link and wins over chrome.
+   */
+  theme: 'light' | 'dark' | undefined;
   viewport: PreviewViewport;
   /** Canvas surface behind the frame (mirrors Canvas's Surface control). */
   background: PreviewBackground;
@@ -62,8 +68,11 @@ export function encodePreviewState(state: PreviewState): URLSearchParams {
   if (Object.keys(state.tokens).length > 0) {
     params.set('tokens', JSON.stringify(state.tokens));
   }
-  if (state.theme === 'dark') {
-    params.set('theme', 'dark');
+  // Only a pinned theme is written; `undefined` (follow chrome) stays out of the
+  // URL. Both light and dark are written when pinned so a pinned-light preview
+  // survives even when the recipient's chrome is dark.
+  if (state.theme) {
+    params.set('theme', state.theme);
   }
   if (state.viewport !== 'fluid') {
     const value =
@@ -113,7 +122,12 @@ export function decodePreviewState(params: URLSearchParams): PreviewState {
   return {
     config: parseRecord(params.get('config')),
     tokens,
-    theme: params.get('theme') === 'dark' ? 'dark' : 'light',
+    theme:
+      params.get('theme') === 'dark'
+        ? 'dark'
+        : params.get('theme') === 'light'
+          ? 'light'
+          : undefined,
     viewport: parseViewport(params.get('viewport')),
     background: parseBackground(params.get('bg')),
   };
