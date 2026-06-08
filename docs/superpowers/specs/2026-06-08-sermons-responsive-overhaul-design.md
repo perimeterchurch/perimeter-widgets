@@ -40,48 +40,64 @@ The widget mounts in a shadow root on a host page and can be embedded at **any**
 
 This is consistent with how the grids already behave and means the phone layout also kicks in for any narrow embed, not just the studio preset.
 
+**One JS exception — the default view mode.** Column counts within a view stay pure CSS container queries. But the *default view mode* (compact `list` on phone vs `grid` elsewhere) selects a different `MediaCard` render branch — different DOM, not stylable by a container query. Resolving it therefore needs the container width in JS. A small `useContainerBreakpoint` hook puts a `ResizeObserver` on the App `@container` root and returns `'phone' | 'tablet' | 'desktop'` (thresholds 30rem / 48rem). It sets state **only when the bucket changes** (compare to previous), so a stable width causes no re-render churn. This same breakpoint drives the toolbar's compact mode (below). Everything else remains CSS.
+
 ## Design
 
 ### 1. Studio preview fidelity — responsive `HostFrame` gutter
 
-`HostFrame` keeps its desktop content max-width but its **horizontal gutter becomes responsive to the frame width**: the full ~90px gutter at desktop frame widths ramps down toward a ~16px mobile gutter below ~640px, mimicking how a responsive WordPress theme collapses its gutter on phones. Net effect: the Mobile preset renders the widget at ~343px (375 − ~32) and the Tablet preset at ~720px+, both realistic, instead of crushing to 195px.
+`HostFrame` keeps its desktop content max-width but its **horizontal gutter becomes responsive to the frame width**, mimicking how a responsive WordPress theme collapses its gutter on phones.
 
-- Implementation keys off the frame width that `Canvas` already resolves (`studio/src/components/Canvas.tsx` — `resolvedPx`/`width`), passed into `HostFrame`, or via a container query on the frame. The exact mechanism is settled in the plan; the contract is: **gutter scales with frame width, never exceeding the content, ~16px floor on phones, ~90px at desktop.**
-- `hostProfile.contentPaddingX` stays the desktop value (single source of truth for the desktop gutter); the ramp is a `HostFrame` concern, not a new profile constant.
-- Rejected alternatives: a separate "mobile host profile" constant (two sources of truth); shrinking only the widget's own padding (doesn't recover the 180px the gutter steals).
+**Interface (settled):** `Canvas` already resolves the frame width (`resolvedPx` in `studio/src/components/Canvas.tsx`). It passes it to `HostFrame` as a new `frameWidth?: number` prop (today `HostFrame` takes only `children`). `HostFrame` computes the per-side gutter from it; when `frameWidth` is undefined (fluid, or any other caller) it falls back to the current `hostProfile.contentPaddingX` (90px), preserving existing behavior.
+
+**Gutter ramp (settled):** per-side gutter = `16px` when `frameWidth ≤ 640`, ramping **linearly** to `90px` at `frameWidth ≥ 1200`, clamped to `[16px, 90px]`. `hostProfile.contentPaddingX` stays the desktop value (single source of truth for the 90px endpoint); the ramp is a `HostFrame` concern, not a new profile constant.
+
+**Resulting widget widths + column counts (the visual test targets these):**
+
+| Preset  | Frame | Gutter (per side) | Widget container | Bucket  | Layout       |
+| ------- | ----- | ----------------- | ---------------- | ------- | ------------ |
+| Mobile  | 375   | 16                | ~343px (< 30rem) | phone   | `list`       |
+| Tablet  | 768   | ~33               | ~702px (30–48rem)| tablet  | grid, 2-col  |
+| Desktop | 1280  | 90                | ~1100px (≥ 48rem)| desktop | grid, 3-col  |
+
+Rejected alternatives: a separate "mobile host profile" constant (two sources of truth); a container-query ramp inside `HostFrame` (its gutter is an inline `padding` style and `Canvas` already has the number, so a prop is simpler); shrinking only the widget's own padding (doesn't recover the 180px the gutter steals).
 
 ### 2. Phone (container < 30rem)
 
-- **Compact list is the default view.** Phones default the view mode to the existing `list` layout (`MediaCard` `viewMode === 'list'` — 40px thumbnail + title + date·speaker, ~7/screen). Tablet/desktop keep `grid`. The default is applied only when the user has not explicitly chosen a view (the `View` switcher still works — see below); it must not override an explicit user/URL selection.
-- **Inline-collapsible filters.** The search field stays visible. Series / Speaker / Book / date-range collapse behind a `Filters` toggle showing an active-filter count badge and a `Clear` affordance; tapping it expands the four controls inline (no modal/sheet component). Tablet/desktop keep filters always-visible in their current row/stack.
-- **Compact Sort/View toolbar.** At phone width the Sort and View triggers drop their verbose `Sort by:` / `View:` prefixes (icon + current value only) so they stop truncating, and the toolbar wraps the controls onto their own row beneath the result count.
-- **Responsive date picker.** The date-range popover renders full-width (anchored within the widget container) on phone rather than a fixed-width popover that can overflow a narrow container.
-- **Single-column detail.** `SermonDetail` / `SeriesDetail` stack to one column on phone; media/player and related-sermons lists go full-width and stack.
+- **Compact list is the default view.** Phones default the view mode to the existing `list` layout (`MediaCard` `viewMode === 'list'` — 40px thumbnail + title + date·speaker, ~7/screen). Tablet/desktop keep `grid`. See the default-view contract below — the default applies only when the user has not explicitly chosen a view, and never clobbers an explicit user/URL selection.
+- **Inline-collapsible filters.** The search field stays visible. Series / Speaker / Book / date-range collapse behind a `Filters` toggle showing an active-filter count badge and a `Clear` affordance; tapping it expands the four controls inline (no modal/sheet component). Tablet/desktop keep filters always-visible in their current row/stack. The badge count is a new `activeFilterCount` derived in `useSermonFilters` — the number of *set* filters (series, speaker, book, from, to, …) **excluding locked ones** (`config.*Id` / `hide*`, already tracked in `lockedFilters`). Today the hook exposes only `hasActiveFilters` (boolean) + `lockedFilters` (Set); the count is added alongside them.
+- **Compact Sort/View toolbar.** `SortSelect` and `IconSelect` (`@perimeter/ui`) gain an optional `compact` prop that renders icon + current value only, dropping the textual prefix (`Sort by:` is hardcoded in `sort-select.tsx:54`; `View:` is the `label` prop passed from `ResultsToolbar`). `ResultsToolbar` passes `compact` when the breakpoint is `phone`, so the labels stop truncating; at tablet/desktop the full labels fit at realistic widths. `SortSelect` is also used standalone in `SermonDetail` — it keeps the full label there (the prop defaults to non-compact, so that consumer is unaffected). `ResultsToolbar` already uses `flex-wrap` + `gap-y-2` with a reserved count line, so the controls already wrap to their own row when space is tight — no new wrap logic, just the compact triggers.
+- **Date-range modal — verify only, likely no change.** `DateRangePopover` is NOT an anchored popover; it is a viewport-`fixed` centered modal (`fixed inset-0 … items-center justify-center`) whose panel is `w-full max-w-[400px]` (single-month) / `max-w-[640px]` (wide). Because the panel is `w-full` capped by a `max-w`, it already shrinks to fit a phone viewport and cannot overflow horizontally. Scope here is to **verify** it fits at phone width and uses the single-month (`max-w-[400px]`) layout on narrow widths; only force the single-month variant if the wide layout is reachable on a narrow screen. No anchored-popover or full-width-within-container work.
+- **Detail views — verify only, already single-column.** `SermonDetail` and `SeriesDetail` are already single-column vertical stacks (`space-y-6`, full-width `MediaTabs`, no multi-column/`grid`/`flex-row`). No layout collapse is needed; scope is to **verify** they fit at phone width with no fixed-width child overflowing (e.g., the title + Copy-link header row).
 
 ### 3. Tablet (≥ 30rem) / Desktop (≥ 48rem)
 
-- Keep the 2-column grid (tablet) / 3-column grid (desktop) with inline-row filters — already solid; verify the grid breakpoint so tablet-portrait reliably lands on 2 columns.
-- **Fix the Sort/View label truncation** at these widths too (the `truncate` + `max-w-full` triggers squeeze the labels when both dropdowns share the row).
+- Keep the 2-column grid (tablet, `@[30rem]:`) / 3-column grid (desktop, `@[48rem]:`) with inline-row filters — already solid. Verify against the resolved preset widths in the table above: a ~702px container (Tablet preset) is in `[30rem, 48rem)` → 2-col; a ~1100px container (Desktop preset) is `≥ 48rem` → 3-col.
+- The Sort/View label truncation seen in the *crushed* 588px tablet preview was a symptom of the 195/588px artifact; at the realistic ~702px tablet width the full labels fit. The `compact` prop is applied only at the `phone` breakpoint, so tablet/desktop keep the full `Sort by:` / `View:` labels.
 - The `View` switcher remains available at all widths; phone merely defaults it to `list`.
 
-### View-switcher / default-view contract
+### View-switcher / default-view contract (settled)
 
-The widget tracks the view mode in a nuqs query param (existing). The phone default must:
+The widget tracks the view mode in a nuqs query param. Today (`use-sermon-filters.ts:57`) it is `view: parseAsStringLiteral(['grid','list','large']).withDefault(defaultView)` where `defaultView = config.defaultView ?? 'grid'`. With `.withDefault`, absent and default are indistinguishable — `params.view` is never null — so there is no "unset" state to key the phone default on. The fix:
 
-- apply `list` when the container is narrow **and** no explicit view has been chosen;
-- never clobber an explicit choice (user click or `?sermons-view=` in the URL);
-- not thrash on resize (no churn between renders at a stable width).
+1. **Make the param nullable** — drop `.withDefault` on `view` so `params.view` is `'grid' | 'list' | 'large' | null`, where `null` means "user has not chosen." (Other params keep their defaults; only `view` changes.)
+2. **Resolve an effective view inside the hook** — `effectiveView = params.view ?? (breakpoint === 'phone' ? 'list' : (config.defaultView ?? 'grid'))`, using the `useContainerBreakpoint` value. The hook exposes this resolved `view` to consumers (so `App`, `ResultsToolbar`, the `View` switcher all keep reading `view` unchanged — it is just resolved now).
+3. **`setView` writes an explicit value** (`history: 'replace'`, as today), so a user click pins `grid`/`list`/`large` into the URL and the default no longer applies.
+4. **`?sermons-view=grid` is honored everywhere** — an explicit URL value is a non-null `params.view`, so it wins even on a phone.
 
-The exact state mechanism (e.g., treat "unset" distinctly from an explicit value, and resolve the effective view from container width when unset) is decided in the plan.
+This satisfies: phone defaults to `list`; explicit choices (click or URL) are preserved; and because `breakpoint` only changes when the bucket crosses 30rem/48rem, a stable width produces no view churn. The `config.defaultView` widget option continues to set the non-phone default.
 
 ## Components touched (initial map; the plan finalizes)
 
-- `studio/src/components/HostFrame.tsx`, `studio/src/components/Canvas.tsx` — responsive gutter.
-- `widgets/sermons/src/App.tsx` — container breakpoints, filter region, default-view wiring.
-- `widgets/sermons/src/components/ui/ResultsToolbar.tsx` — compact phone toolbar, label truncation fix, wrap behavior.
-- The filters region (search + the Series/Speaker/Book selects + `DateRangePicker`) — collapsible wrapper on phone; `DateRangePicker`/`DateRangePopover` full-width on phone.
-- `widgets/sermons/src/components/sermons/SermonDetail.tsx` / `SeriesDetail.tsx` — single-column phone layout.
-- `MediaCard.tsx` is reused as-is for the `list` layout (already exists); no new card component.
+- `studio/src/components/HostFrame.tsx` — new `frameWidth?` prop + gutter ramp; `studio/src/components/Canvas.tsx` — pass `resolvedPx` as `frameWidth`.
+- `widgets/sermons/src/hooks/use-sermon-filters.ts` — `view` param nullable; resolve `effectiveView` via breakpoint; add `activeFilterCount`.
+- New `useContainerBreakpoint` hook (ResizeObserver on the App `@container` root) under `widgets/sermons/src/hooks/`.
+- `widgets/sermons/src/App.tsx` — wire the breakpoint to the filter region (collapsible on phone) and pass it down; the `@container` root already exists.
+- `widgets/sermons/src/components/ui/ResultsToolbar.tsx` — pass `compact` (phone) to the Sort/View dropdowns; the `flex-wrap` row already exists.
+- `packages/ui/src/sort-select.tsx` + `packages/ui/src/icon-select.tsx` — optional `compact` prop (icon + value, no prefix); defaults to current behavior so the standalone `SortSelect` in `SermonDetail` is unaffected.
+- The filters region (search + Series/Speaker/Book selects + `DateRangePicker`) — collapsible wrapper on phone driven by the breakpoint.
+- `MediaCard.tsx` is reused as-is for the `list` layout (already exists) — no new card component.
+- **Verify-only (no expected change):** `DateRangePopover` (already a fit-to-viewport modal), `SermonDetail.tsx` / `SeriesDetail.tsx` (already single-column).
 
 ## Testing
 
@@ -94,7 +110,7 @@ Playwright visual specs in `studio/visual/` driven at phone/tablet/desktop **con
 - the studio **Mobile/Tablet presets** now yield realistic widget widths (regression for the `HostFrame` gutter fix);
 - the date-range popover fits within a phone-width container.
 
-Unit/behavior tests (vitest) cover the default-view resolution (unset-on-narrow → list; explicit choice preserved; no resize thrash) and the filter-collapse active-count logic.
+Unit/behavior tests (vitest) cover: the `effectiveView` resolution (`params.view` null + phone → `list`; null + tablet/desktop → `config.defaultView ?? 'grid'`; an explicit `params.view` or `?sermons-view=` preserved on phone); `activeFilterCount` (counts set filters, excludes `lockedFilters`); and `useContainerBreakpoint` only changing state on a bucket crossing (no churn at a stable width). The `HostFrame` gutter ramp is verified via the studio-preset visual regression above.
 
 The visual harness is run by the **main agent**, not workflow subagents (it has hung subagents before).
 
