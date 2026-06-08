@@ -11,7 +11,7 @@
     },
     {
       "source": "/sermons/latest.js",
-      "destination": "/sermons/1.1.0/index.js"
+      "destination": "/sermons/1.2.0/index.js"
     }
   ],
   "headers": [
