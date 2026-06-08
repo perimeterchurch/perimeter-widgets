@@ -45,16 +45,27 @@ export function WidgetPreview({
   const [def, setDef] = useState<WidgetDefinition | null>(null);
   const [css, setCss] = useState<string>('');
   const [mountError, setMountError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Load the widget module + its css whenever the selected widget changes.
+  // Load the widget module + its css whenever the selected widget changes. A
+  // rejected dynamic import (bad chunk, renamed entry, network blip) never
+  // reaches the runtime ErrorBoundary — that only catches RENDER crashes of an
+  // already-mounted widget — so surface the load failure here as a distinct
+  // canvas state rather than a silent blank frame.
   useEffect(() => {
     let alive = true;
-    void Promise.all([entry.load(), entry.loadCss()]).then(([m, c]) => {
-      if (!alive) return;
-      setDef(m.default);
-      onDefinition?.(m.default);
-      setCss(c.default ?? '');
-    });
+    setLoadError(null);
+    void Promise.all([entry.load(), entry.loadCss()])
+      .then(([m, c]) => {
+        if (!alive) return;
+        setDef(m.default);
+        onDefinition?.(m.default);
+        setCss(c.default ?? '');
+      })
+      .catch((err: unknown) => {
+        if (!alive) return;
+        setLoadError(err instanceof Error ? err.message : String(err));
+      });
     return () => {
       alive = false;
     };
@@ -110,13 +121,31 @@ export function WidgetPreview({
   // Hide the host (rather than unmount it) while an error is shown.
   return (
     <>
+      {loadError && (
+        <div
+          role="alert"
+          data-perimeter-widget-load-error
+          className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-fg"
+        >
+          <strong className="block font-semibold">Widget failed to load</strong>
+          <p className="mt-1 text-muted-fg">
+            The widget module could not be loaded. This is a load/build error, not a render crash —
+            check the entry and rebuild.
+          </p>
+          <p className="mt-2 font-mono text-xs text-muted-fg">{loadError}</p>
+        </div>
+      )}
       {mountError && (
         <div role="alert" data-perimeter-widget-error>
           <strong>Invalid widget config</strong>
           <p>{mountError}</p>
         </div>
       )}
-      <div ref={hostRef} data-perimeter-widget-preview hidden={mountError !== null} />
+      <div
+        ref={hostRef}
+        data-perimeter-widget-preview
+        hidden={mountError !== null || loadError !== null}
+      />
     </>
   );
 }

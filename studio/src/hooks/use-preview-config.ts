@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router';
 import {
   decodePreviewState,
   encodePreviewState,
+  type PreviewBackground,
   type PreviewState,
   type PreviewViewport,
 } from '../lib/preview-link';
@@ -44,6 +45,10 @@ export function usePreviewConfig() {
     (viewport: PreviewViewport) => commit({ ...state, viewport }),
     [commit, state],
   );
+  const setBackground = useCallback(
+    (background: PreviewBackground) => commit({ ...state, background }),
+    [commit, state],
+  );
 
   /** Absolute, shareable URL for the given route path carrying the current state. */
   const buildShareUrl = useCallback(
@@ -57,5 +62,5 @@ export function usePreviewConfig() {
     [state],
   );
 
-  return { state, setConfig, setTokens, setTheme, setViewport, buildShareUrl };
+  return { state, setConfig, setTokens, setTheme, setViewport, setBackground, buildShareUrl };
 }

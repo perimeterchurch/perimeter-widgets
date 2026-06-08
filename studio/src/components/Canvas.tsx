@@ -1,10 +1,14 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button } from '@perimeter/ui/button';
 import { Input } from '@perimeter/ui/input';
 import { cn } from '@perimeter/ui/utils/cn';
 import { HostFrame } from './HostFrame';
 import { BuiltBundlePreview } from './BuiltBundlePreview';
-import type { PreviewViewport } from '../lib/preview-link';
+import {
+  BACKGROUND_SURFACES,
+  type PreviewBackground,
+  type PreviewViewport,
+} from '../lib/preview-link';
 
 /**
  * The preview source: the live source-mounted widget (`mount()`, dev React + dev
@@ -35,17 +39,21 @@ type PresetId = (typeof PRESETS)[number]['id'];
  * widget edges, gray = a calm default). `host-sim` is the production-truth canvas:
  * it swaps the plain surface for the Phase-2 HostFrame, which supplies its own
  * 19px/35px typography + #fff background and the measured content-frame width
- * (parity finding H4). `surface` is the CSS background painted behind the frame;
+ * (parity finding H4). The CSS surface painted behind the frame comes from the
+ * shared BACKGROUND_SURFACES map (one source of truth with the /preview route);
  * for host-sim the surface stays neutral because HostFrame paints its own body.
  */
 const BACKGROUNDS = [
-  { id: 'white', label: 'White', surface: '#ffffff' },
-  { id: 'gray', label: 'Gray', surface: '#f3f4f6' },
-  { id: 'dark', label: 'Dark', surface: '#1e1e1e' },
-  { id: 'host-sim', label: 'Host-sim', surface: '#e9ebef' },
+  { id: 'white', label: 'White' },
+  { id: 'gray', label: 'Gray' },
+  { id: 'dark', label: 'Dark' },
+  { id: 'host-sim', label: 'Host-sim' },
 ] as const;
 
-type BackgroundId = (typeof BACKGROUNDS)[number]['id'];
+// The surface id IS the shareable PreviewBackground (single source of truth in
+// preview-link). Aliasing the table-derived ids to that codec union keeps the
+// BACKGROUNDS table and the codec from drifting apart — a mismatch is a type error.
+type BackgroundId = (typeof BACKGROUNDS)[number]['id'] & PreviewBackground;
 
 /**
  * The preview canvas: a toolbar of viewport-width presets + a custom-width
@@ -71,6 +79,14 @@ type BackgroundId = (typeof BACKGROUNDS)[number]['id'];
  * viewport-width selection controlled so it can be persisted in the shareable
  * preview URL. Absent both, Canvas falls back to its own internal preset/custom
  * state (the design-system pages still embed Canvas uncontrolled).
+ *
+ * `background` + `onBackgroundChange`, when provided (the widget route), make the
+ * surface selection controlled so it too persists in the shareable preview URL.
+ * Absent both, Canvas keeps its own internal surface state.
+ *
+ * Keyboard shortcuts (widget route): 1/2/3/4 pick the viewport presets, `t`
+ * toggles the widget theme (when `onThemeChange` is wired). They no-op while a
+ * form control is focused so typing a custom width never triggers a preset.
  */
 export function Canvas({
   children,
@@ -79,6 +95,8 @@ export function Canvas({
   onThemeChange,
   viewport: viewportProp,
   onViewportChange,
+  background: backgroundProp,
+  onBackgroundChange,
 }: {
   children: ReactNode;
   slug?: string;
@@ -86,14 +104,25 @@ export function Canvas({
   onThemeChange?: (next: 'light' | 'dark') => void;
   viewport?: PreviewViewport;
   onViewportChange?: (next: PreviewViewport) => void;
+  background?: PreviewBackground;
+  onBackgroundChange?: (next: PreviewBackground) => void;
 }) {
   // Uncontrolled fallback state — used only when the parent does not pass a
   // controlled `viewport`. The controlled path derives preset/customPx from the
   // single `viewport` value so the URL stays the source of truth.
   const [internalPreset, setInternalPreset] = useState<PresetId>('fluid');
   const [internalCustomPx, setInternalCustomPx] = useState('');
-  const [background, setBackground] = useState<BackgroundId>('host-sim');
+  const [internalBackground, setInternalBackground] = useState<BackgroundId>('host-sim');
   const [source, setSource] = useState<PreviewSource>('source');
+
+  const backgroundControlled = onBackgroundChange !== undefined;
+  const background: BackgroundId = backgroundControlled
+    ? (backgroundProp ?? 'host-sim')
+    : internalBackground;
+  const setBackground = (id: BackgroundId) => {
+    if (backgroundControlled) onBackgroundChange?.(id);
+    else setInternalBackground(id);
+  };
 
   const controlled = onViewportChange !== undefined;
   const viewport: PreviewViewport = controlled
@@ -123,6 +152,41 @@ export function Canvas({
     }
   };
 
+  // Canvas keyboard shortcuts (widget route only — gated on a wired theme toggle,
+  // which the design-system embeds don't pass): 1/2/3/4 select the viewport
+  // presets in toolbar order, `t` toggles the widget theme. Bail while a form
+  // control or contenteditable owns focus so typing a custom width or editing a
+  // token field never fires a shortcut, and ignore modified chords so browser/OS
+  // shortcuts (Cmd-1 tab switch, etc.) pass through untouched.
+  const shortcutsEnabled = onThemeChange !== undefined;
+  const onKeyRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  onKeyRef.current = (e: KeyboardEvent) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const el = document.activeElement as HTMLElement | null;
+    const tag = el?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el?.isContentEditable) return;
+    const presetByKey: Record<string, PresetId> = {
+      '1': 'mobile',
+      '2': 'tablet',
+      '3': 'desktop',
+      '4': 'fluid',
+    };
+    const next = presetByKey[e.key];
+    if (next) {
+      e.preventDefault();
+      selectPreset(next);
+    } else if (e.key.toLowerCase() === 't' && theme && onThemeChange) {
+      e.preventDefault();
+      onThemeChange(theme === 'dark' ? 'light' : 'dark');
+    }
+  };
+  useEffect(() => {
+    if (!shortcutsEnabled) return;
+    const handler = (e: KeyboardEvent) => onKeyRef.current(e);
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [shortcutsEnabled]);
+
   // DEV-only: the Built view requires a slug to resolve the on-disk bundle, and
   // the whole feature must tree-shake out of the deployed build. import.meta.env.DEV
   // is statically false in a prod build, so Rollup drops the toggle + iframe path.
@@ -134,7 +198,7 @@ export function Canvas({
   const resolvedPx = customActive ? viewport.custom : presetPx;
   const width = resolvedPx === null ? undefined : `${resolvedPx}px`;
 
-  const surface = BACKGROUNDS.find((b) => b.id === background)?.surface;
+  const surface = BACKGROUND_SURFACES[background];
   const hostSim = background === 'host-sim';
 
   return (
@@ -298,6 +362,8 @@ export function Canvas({
             })}
           </div>
         </div>
+
+        {shortcutsEnabled && <ShortcutsHint />}
       </div>
 
       <div
@@ -332,4 +398,38 @@ export function Canvas({
  */
 function Divider() {
   return <span aria-hidden className="h-5 w-px shrink-0 self-center bg-border" />;
+}
+
+/**
+ * A compact keyboard-shortcut hint for the canvas: a `?` chip that, on hover or
+ * focus, reveals the available shortcuts (1–4 viewport presets, `t` theme). The
+ * `title` makes the same legend reachable without hover (and to screen readers
+ * via the accessible name), so the hint is informational, not a control.
+ */
+function ShortcutsHint() {
+  return (
+    <span
+      tabIndex={0}
+      className="ml-auto inline-flex select-none items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-fg outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      title="Keyboard: 1–4 set viewport (Mobile/Tablet/Desktop/Fluid), t toggles theme"
+      aria-label="Keyboard shortcuts: 1 through 4 set the viewport; t toggles the theme"
+    >
+      <Kbd>1</Kbd>
+      <Kbd>4</Kbd>
+      <span aria-hidden>viewport</span>
+      <span aria-hidden className="opacity-50">
+        ·
+      </span>
+      <Kbd>t</Kbd>
+      <span aria-hidden>theme</span>
+    </span>
+  );
+}
+
+function Kbd({ children }: { children: ReactNode }) {
+  return (
+    <kbd className="rounded border border-border bg-muted px-1 font-mono text-[0.65rem] leading-4 text-fg">
+      {children}
+    </kbd>
+  );
 }
