@@ -142,6 +142,31 @@ describe('Inspector', () => {
     expect(afterSwitch).toHaveLength(1);
   });
 
+  it('reflects the set config as data-* attributes in the embed snippet', () => {
+    const { container } = renderInspector({ config: { count: 7, greeting: 'Hi' } });
+    const scope = within(container);
+    const embed = scope.getByText(
+      (_text, node) =>
+        node?.tagName === 'PRE' &&
+        (node.textContent ?? '').includes('widgets.perimeter.org/example/latest.js'),
+    );
+    // camelCase config → kebab data-* attrs on the widget div (sorted).
+    expect(embed.textContent).toContain(
+      '<div data-perimeter-widget="example" data-count="7" data-greeting="Hi">',
+    );
+  });
+
+  it('embed stays the bare form when no config is set', () => {
+    const { container } = renderInspector({ config: {} });
+    const scope = within(container);
+    const embed = scope.getByText(
+      (_text, node) =>
+        node?.tagName === 'PRE' &&
+        (node.textContent ?? '').includes('widgets.perimeter.org/example/latest.js'),
+    );
+    expect(embed.textContent).toContain('<div data-perimeter-widget="example"></div>');
+  });
+
   it('defaults to the Config tab showing the schema field inputs', () => {
     const { container } = renderInspector();
     const scope = within(container);
