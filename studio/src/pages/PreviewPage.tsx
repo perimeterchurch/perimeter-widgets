@@ -3,7 +3,9 @@ import { useParams } from 'react-router';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { toWidgetEntries, widgetDefGlob, widgetCssGlob } from '../lib/discovery';
 import { WidgetPreview } from '../components/WidgetPreview';
+import { HostFrame } from '../components/HostFrame';
 import { usePreviewConfig } from '../hooks/use-preview-config';
+import { BACKGROUND_SURFACES } from '../lib/preview-link';
 import { NotFoundPage } from './NotFoundPage';
 
 const PRESET_PX: Record<string, number | null> = {
@@ -34,16 +36,29 @@ export function PreviewPage() {
     typeof state.viewport === 'object' ? state.viewport.custom : PRESET_PX[state.viewport];
   const width = widthPx == null ? undefined : `${widthPx}px`;
 
+  // Hydrate the shared `bg=` surface so a standalone link matches what the studio
+  // canvas showed. host-sim wraps the mount in the production-truth HostFrame
+  // (matching Canvas); the other surfaces paint a flat background behind the frame.
+  const hostSim = state.background === 'host-sim';
+  const preview = (
+    <WidgetPreview
+      entry={entry}
+      configOverrides={state.config}
+      tokenOverrides={state.tokens}
+      theme={state.theme}
+      onDefinition={setDef}
+    />
+  );
+
   return (
-    <div className="min-h-screen w-full overflow-auto bg-bg p-6" data-standalone-preview>
+    <div
+      className="min-h-screen w-full overflow-auto p-6"
+      style={{ background: BACKGROUND_SURFACES[state.background] }}
+      data-standalone-preview
+      data-canvas-surface
+    >
       <div style={{ width, marginInline: 'auto' }} data-preview-frame>
-        <WidgetPreview
-          entry={entry}
-          configOverrides={state.config}
-          tokenOverrides={state.tokens}
-          theme={state.theme}
-          onDefinition={setDef}
-        />
+        {hostSim ? <HostFrame>{preview}</HostFrame> : preview}
       </div>
     </div>
   );

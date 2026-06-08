@@ -19,19 +19,38 @@ describe('preview-link codec', () => {
       tokens: {},
       theme: 'light',
       viewport: 'fluid',
+      background: 'host-sim',
     });
     expect(params.toString()).toBe('');
   });
 
-  it('round-trips config, tokens, theme, and a preset viewport', () => {
+  it('round-trips config, tokens, theme, viewport, and a non-default background', () => {
     const state: PreviewState = {
       config: { limit: 12, showImages: true, title: 'Recent' },
       tokens: { '--p-radius': '8px', '--p-color-primary': '#abcdef' },
       theme: 'dark',
       viewport: 'tablet',
+      background: 'dark',
     };
     const params = encodePreviewState(state);
     expect(decodePreviewState(params)).toEqual(state);
+  });
+
+  it('omits the background param at the host-sim default and restores it when absent', () => {
+    const params = encodePreviewState({
+      config: {},
+      tokens: {},
+      theme: 'light',
+      viewport: 'fluid',
+      background: 'host-sim',
+    });
+    expect(params.has('bg')).toBe(false);
+    expect(decodePreviewState(params).background).toBe('host-sim');
+  });
+
+  it('falls back to host-sim for an unknown background value', () => {
+    const params = new URLSearchParams('bg=chartreuse');
+    expect(decodePreviewState(params).background).toBe('host-sim');
   });
 
   it('round-trips a custom numeric viewport', () => {
@@ -41,13 +60,20 @@ describe('preview-link codec', () => {
       tokens: {},
       theme: 'light',
       viewport,
+      background: 'host-sim',
     });
     expect(decodePreviewState(params).viewport).toEqual(viewport);
   });
 
   it('defaults missing params to an empty/light/fluid state', () => {
     const decoded = decodePreviewState(new URLSearchParams(''));
-    expect(decoded).toEqual({ config: {}, tokens: {}, theme: 'light', viewport: 'fluid' });
+    expect(decoded).toEqual({
+      config: {},
+      tokens: {},
+      theme: 'light',
+      viewport: 'fluid',
+      background: 'host-sim',
+    });
   });
 
   it('never throws on malformed json — falls back to empty', () => {

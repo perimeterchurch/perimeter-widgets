@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, within, fireEvent, cleanup } from '@testing-library/react';
 import { Canvas } from './Canvas';
 
@@ -187,5 +187,90 @@ describe('Canvas theme vs surface disambiguation', () => {
     // Each "Dark" resolves within exactly one group.
     expect(within(themeGroup).getByRole('button', { name: /dark/i })).toBeTruthy();
     expect(within(surfaceGroup).getByRole('button', { name: /dark/i })).toBeTruthy();
+  });
+});
+
+describe('Canvas controlled background', () => {
+  function renderCanvas(props: Partial<Parameters<typeof Canvas>[0]> = {}) {
+    const utils = render(
+      <Canvas theme="light" onThemeChange={() => {}} {...props}>
+        <div>preview content</div>
+      </Canvas>,
+    );
+    const ui = within(utils.container);
+    const surface = () => utils.container.querySelector('[data-canvas-surface]') as HTMLElement;
+    return { ...utils, ui, surface };
+  }
+
+  it('reflects a controlled background prop and calls onBackgroundChange on click', () => {
+    const onBackgroundChange = vi.fn();
+    const { ui } = renderCanvas({ background: 'white', onBackgroundChange });
+    const group = within(ui.getByRole('group', { name: /surface/i }));
+    // The controlled value is reflected as the pressed option.
+    expect(group.getByRole('button', { name: /white/i }).getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(group.getByRole('button', { name: /dark/i }));
+    expect(onBackgroundChange).toHaveBeenCalledWith('dark');
+  });
+
+  it('paints the surface from the controlled background', () => {
+    const { surface } = renderCanvas({ background: 'white', onBackgroundChange: () => {} });
+    expect(surface().style.background.toLowerCase()).toBe('#ffffff');
+  });
+});
+
+describe('Canvas keyboard shortcuts', () => {
+  function renderCanvas(props: Partial<Parameters<typeof Canvas>[0]> = {}) {
+    const onViewportChange = vi.fn();
+    const onThemeChange = vi.fn();
+    const utils = render(
+      <Canvas
+        theme="light"
+        onThemeChange={onThemeChange}
+        viewport="fluid"
+        onViewportChange={onViewportChange}
+        {...props}
+      >
+        <div>preview content</div>
+      </Canvas>,
+    );
+    return { ...utils, ui: within(utils.container), onViewportChange, onThemeChange };
+  }
+
+  it('1/2/3/4 select the viewport presets', () => {
+    const { onViewportChange } = renderCanvas();
+    fireEvent.keyDown(window, { key: '1' });
+    expect(onViewportChange).toHaveBeenLastCalledWith('mobile');
+    fireEvent.keyDown(window, { key: '2' });
+    expect(onViewportChange).toHaveBeenLastCalledWith('tablet');
+    fireEvent.keyDown(window, { key: '3' });
+    expect(onViewportChange).toHaveBeenLastCalledWith('desktop');
+    fireEvent.keyDown(window, { key: '4' });
+    expect(onViewportChange).toHaveBeenLastCalledWith('fluid');
+  });
+
+  it('t toggles the widget theme', () => {
+    const { onThemeChange } = renderCanvas({ theme: 'light' });
+    fireEvent.keyDown(window, { key: 't' });
+    expect(onThemeChange).toHaveBeenCalledWith('dark');
+  });
+
+  it('ignores shortcuts while a form control is focused', () => {
+    const { ui, onViewportChange } = renderCanvas();
+    const custom = ui.getByRole('spinbutton', { name: /custom width/i });
+    custom.focus();
+    fireEvent.keyDown(window, { key: '1' });
+    expect(onViewportChange).not.toHaveBeenCalled();
+  });
+
+  it('ignores modified chords (Cmd-1 etc.) so OS/browser shortcuts pass through', () => {
+    const { onViewportChange } = renderCanvas();
+    fireEvent.keyDown(window, { key: '1', metaKey: true });
+    expect(onViewportChange).not.toHaveBeenCalled();
+  });
+
+  it('exposes a keyboard-shortcut hint when the theme toggle is wired', () => {
+    const { ui } = renderCanvas();
+    expect(ui.getByLabelText(/keyboard shortcuts/i)).toBeTruthy();
   });
 });

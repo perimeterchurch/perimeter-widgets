@@ -103,6 +103,37 @@ describe('WidgetPage deep-linkable preview', () => {
     });
     expect(greeting.value).toBe('FromLink');
   });
+
+  it('selecting a non-default canvas surface encodes bg into the URL', async () => {
+    const { container } = renderWidgetAt('/widgets/example');
+    const scope = within(container);
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+    });
+
+    const surfaceGroup = within(scope.getByRole('group', { name: /surface/i }));
+    fireEvent.click(surfaceGroup.getByRole('button', { name: /^white$/i }));
+
+    await waitFor(() => {
+      expect(decodePreviewState(new URLSearchParams(currentSearch)).background).toBe('white');
+    });
+  });
+
+  it('hydrates the canvas surface from a bg= param', async () => {
+    const { container } = renderWidgetAt('/widgets/example?bg=dark');
+    const scope = within(container);
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+    });
+
+    // The Surface group has a "Dark" option AND so does Theme — scope to the group.
+    const surfaceGroup = within(scope.getByRole('group', { name: /surface/i }));
+    expect(surfaceGroup.getByRole('button', { name: /^dark$/i }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+  });
 });
 
 describe('standalone preview route (/preview/:slug)', () => {

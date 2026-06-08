@@ -1,9 +1,30 @@
+import { useState } from 'react';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { Badge } from '@perimeter/ui/badge';
-import { describeSchemaFields } from '../lib/schema-shape';
+import { Button } from '@perimeter/ui/button';
+import { describeSchemaFields, type SchemaField } from '../lib/schema-shape';
 
 interface Props {
   definition: WidgetDefinition;
+}
+
+/**
+ * camelCase config key → the kebab `data-*` attribute name the runtime parses
+ * (`parseDataAttrs` does the inverse kebab→camel). Lossless for the simple
+ * camelCase schema keys widgets use (`perPage` → `per-page`).
+ */
+function camelToKebab(key: string): string {
+  return key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+}
+
+/**
+ * The exact `data-*` attribute (name + default value) a developer would paste
+ * into the embed div for a field, e.g. `data-per-page="12"`. A field with no
+ * schema default still yields the bare attr so the snippet is editable.
+ */
+function dataAttrSnippet(field: SchemaField): string {
+  const name = `data-${camelToKebab(field.key)}`;
+  return field.default === null ? `${name}=""` : `${name}="${field.default}"`;
 }
 
 /** Badge tone per auth mode — none is neutral, optional notable, required strict. */
@@ -71,6 +92,9 @@ export function InfoPanel({ definition }: Props) {
                   <th className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-fg">
                     Default
                   </th>
+                  <th className="px-3 py-1.5 text-right text-xs font-semibold uppercase tracking-wider text-muted-fg">
+                    <span className="sr-only">Copy data attribute</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -90,6 +114,9 @@ export function InfoPanel({ definition }: Props) {
                     <td className="px-3 py-1.5 align-top font-mono text-xs text-muted-fg">
                       {field.default ?? (field.optional ? '—' : '')}
                     </td>
+                    <td className="px-3 py-1.5 text-right align-top">
+                      <CopyAttrButton field={field} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -98,5 +125,37 @@ export function InfoPanel({ definition }: Props) {
         )}
       </section>
     </div>
+  );
+}
+
+/**
+ * Per-row "copy data-*" affordance: writes the field's ready-to-paste `data-*`
+ * attribute (e.g. `data-per-page="12"`) to the clipboard, mirroring the embed /
+ * share copy pattern (transient "Copied" state). The accessible name names the
+ * exact attribute so screen-reader users know which row each control copies.
+ */
+function CopyAttrButton({ field }: { field: SchemaField }) {
+  const [copied, setCopied] = useState(false);
+  const attr = `data-${camelToKebab(field.key)}`;
+
+  const copy = () => {
+    void navigator.clipboard?.writeText(dataAttrSnippet(field)).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={copy}
+      aria-label={`Copy ${attr} attribute`}
+      title={`Copy ${dataAttrSnippet(field)}`}
+      className="h-6 px-1.5 font-mono text-[0.65rem] text-muted-fg"
+    >
+      {copied ? 'Copied' : `Copy ${attr}`}
+    </Button>
   );
 }

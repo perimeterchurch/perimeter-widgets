@@ -33,7 +33,8 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
   // viewport) lives in the URL so a dialed-in preview is shareable and survives
   // reload — usePreviewConfig is the single source of truth, replacing local
   // useState. The standalone /preview/:slug route reads the same params.
-  const { state, setConfig, setTokens, setTheme, setViewport, buildShareUrl } = usePreviewConfig();
+  const { state, setConfig, setTokens, setTheme, setViewport, setBackground, buildShareUrl } =
+    usePreviewConfig();
   const [def, setDef] = useState<WidgetDefinition | null>(null);
   const doc = widgetDoc(entry.slug);
 
@@ -85,6 +86,8 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
           onThemeChange={setTheme}
           viewport={state.viewport}
           onViewportChange={setViewport}
+          background={state.background}
+          onBackgroundChange={setBackground}
         >
           <WidgetPreview
             entry={entry}
