@@ -1,28 +1,5 @@
 import type { Config } from 'tailwindcss';
-import containerQueries from '@tailwindcss/container-queries';
 import { globalTokens, type ThemeToken } from './tokens';
-
-/**
- * Re-target the `dark:` variant to our explicit `data-theme` flag instead of
- * Tailwind's default `darkMode: 'media'` (which compiles every `dark:` utility
- * to `@media (prefers-color-scheme: dark)` — keyed off the visitor's OS, not the
- * widget's theme). Two selectors cover both rendering contexts:
- *   - `:host([data-theme="dark"]) &` — widgets render inside a shadow root; the
- *     host is OUTSIDE the shadow tree, so a plain descendant selector can never
- *     reach it. `:host(...)` is the only selector that does.
- *   - `:where([data-theme="dark"]) &` — the studio chrome renders in the light
- *     DOM, where `data-theme` lives on an ancestor element. `:where()` keeps the
- *     specificity at zero so it matches the shadow case's weight.
- *
- * We use Tailwind v3's `darkMode: ['variant', [...]]` form (NOT `'media'` or
- * `'class'`): `'variant'` is the only mode that (a) disables the built-in
- * `prefers-color-scheme` emission AND (b) lets us supply arbitrary selectors,
- * including the `:host()` shadow-boundary case that `'class'` cannot express.
- * (A plugin `addVariant('dark', …)` does NOT work here — Tailwind's core
- * darkMode plugin still registers the built-in media-query `dark` variant, so
- * the override never wins.)
- */
-const darkVariantSelectors = [':host([data-theme="dark"]) &', ':where([data-theme="dark"]) &'];
 
 function cssVar(token: ThemeToken): string {
   return `var(--${token})`;
@@ -58,10 +35,19 @@ export const widgetContent: string[] = [
   '../../packages/ui/src/**/*.{ts,tsx}',
 ];
 
+/**
+ * Legacy-format Tailwind config preset, loaded by each entry's
+ * `tailwind.config.ts` via the v4 `@config` compatibility directive. Maps the
+ * semantic utility names (bg-primary, rounded-md, font-sans, …) onto the
+ * runtime CSS variables that `resolveTokens` injects per host.
+ *
+ * The `dark:` variant re-targeting lives in `src/tailwind.css`
+ * (`@custom-variant`), which every CSS entry imports — v4 has no JS-config
+ * equivalent for the `:host()` shadow-boundary selector this repo needs.
+ * Container queries are core in v4, so no plugin is registered.
+ */
 export const tailwindPreset: Config = {
   content: [],
-  darkMode: ['variant', darkVariantSelectors],
-  plugins: [containerQueries],
   theme: {
     extend: {
       colors,

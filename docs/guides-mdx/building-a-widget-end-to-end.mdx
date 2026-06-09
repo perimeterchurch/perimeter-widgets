@@ -79,7 +79,7 @@ and handed to your `App` as a typed `config`.
 - `entry.ts` — the production IIFE bootstrap. It imports the compiled CSS as a
   `?inline` string and self-mounts; you rarely touch it. `css` is the single CSS
   source for both dev and prod.
-- `styles.css` — the three `@tailwind` directives; add widget-specific CSS here
+- `styles.css` — the Tailwind v4 header (`@import 'tailwindcss'`, `tw-animate-css`, the shared `@perimeter/theme/tailwind.css`, and `@config './tailwind.config.ts'`); add widget-specific CSS here
   if you must, but prefer utilities.
 - `vite.config.ts` — `widgetConfig({ name })`, already filled in. It builds
   `entry.ts` into one self-contained `dist/index.js` IIFE, pins

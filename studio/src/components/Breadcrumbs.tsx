@@ -26,7 +26,7 @@ export function Breadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
                 {crumb.to && !isLast ? (
                   <Link
                     to={crumb.to}
-                    className="rounded-sm transition-colors hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="rounded-sm transition-colors hover:text-fg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {crumb.label}
                   </Link>

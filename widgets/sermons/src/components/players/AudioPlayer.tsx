@@ -53,7 +53,7 @@ export function AudioPlayer({ url }: { url: string }) {
 
   return (
     <div
-      className="flex h-full w-full flex-col items-center justify-center p-4 outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="flex h-full w-full flex-col items-center justify-center p-4 outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
       tabIndex={0}
       role="application"
       aria-label="Audio player"
@@ -75,7 +75,7 @@ export function AudioPlayer({ url }: { url: string }) {
           step={0.1}
           value={currentTime}
           onChange={(e) => seekTo(parseFloat(e.target.value))}
-          className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-border accent-primary outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-border accent-primary outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
           aria-label="Seek"
         />
         <span className="whitespace-nowrap text-xs text-muted-fg">
@@ -104,7 +104,7 @@ export function AudioPlayer({ url }: { url: string }) {
         <button
           type="button"
           onClick={cycleSpeed}
-          className="rounded px-1.5 py-0.5 text-xs font-medium text-muted-fg transition-colors hover:bg-muted hover:text-fg"
+          className="rounded-sm px-1.5 py-0.5 text-xs font-medium text-muted-fg transition-colors hover:bg-muted hover:text-fg"
           aria-label={`Playback speed ${playbackRate}x`}
         >
           {playbackRate}x

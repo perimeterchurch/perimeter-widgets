@@ -121,7 +121,7 @@ export function Sidebar({ nav }: SidebarProps) {
                           className={({ isActive }) =>
                             cn(
                               'block rounded-md px-2 py-1.5 text-sm transition-colors',
-                              'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              'hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                               isActive
                                 ? 'bg-primary font-medium text-primary-fg hover:bg-primary'
                                 : 'text-fg',

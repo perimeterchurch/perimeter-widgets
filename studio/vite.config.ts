@@ -3,8 +3,7 @@ import { defineConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
-import tailwindcss from 'tailwindcss';
-import autoprefixer from 'autoprefixer';
+import tailwindcss from '@tailwindcss/postcss';
 import { remToPxPlugin } from '@perimeter/vite-plugin-widget';
 import { devServerProxy } from './src/dev-proxy';
 import { fileURLToPath } from 'node:url';
@@ -32,8 +31,9 @@ export default defineConfig({
   ],
   // Same PostCSS chain a shipped widget gets (rem→px is the prod transform —
   // parity finding H1): with css.postcss inline, postcss.config.js is ignored,
-  // so it is deleted to leave exactly one source of truth.
-  css: { postcss: { plugins: [tailwindcss(), autoprefixer(), remToPxPlugin] } },
+  // so it is deleted to leave exactly one source of truth. Tailwind v4's
+  // postcss plugin handles imports + vendor prefixing itself (no autoprefixer).
+  css: { postcss: { plugins: [tailwindcss(), remToPxPlugin] } },
   resolve: { alias: { '@mdx-js/react': mdxReact } },
   // `proxy` forwards the sermons widget's `/s3-proxy/…` dev requests to S3 — see
   // src/dev-proxy.ts (extracted so it can be unit-tested without this config).

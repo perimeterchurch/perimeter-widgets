@@ -12,6 +12,7 @@
  * :host([data-theme="dark"]) layer, so the data-theme swap covers everything
  * outside this media surface. No dark override needed.
  */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@perimeter/theme/tailwind.css';
+@config '../tailwind.config.ts';

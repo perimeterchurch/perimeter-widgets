@@ -107,7 +107,11 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
           <div className="space-y-6">
             <div>
               <div className="flex items-start justify-between gap-3">
-                <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-none">
+                <h2
+                  ref={titleRef}
+                  tabIndex={-1}
+                  className="text-xl font-bold text-fg outline-hidden"
+                >
                   {sermon.title}
                 </h2>
                 <Button

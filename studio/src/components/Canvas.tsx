@@ -410,7 +410,7 @@ function ShortcutsHint() {
   return (
     <span
       tabIndex={0}
-      className="inline-flex select-none items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-fg outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="inline-flex select-none items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-fg outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
       title="Keyboard: 1–4 set viewport (Mobile/Tablet/Desktop/Fluid), t toggles theme"
       aria-label="Keyboard shortcuts: 1 through 4 set the viewport; t toggles the theme"
     >
@@ -428,7 +428,7 @@ function ShortcutsHint() {
 
 function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="rounded border border-border bg-muted px-1 font-mono text-[0.65rem] leading-4 text-fg">
+    <kbd className="rounded-sm border border-border bg-muted px-1 font-mono text-[0.65rem] leading-4 text-fg">
       {children}
     </kbd>
   );

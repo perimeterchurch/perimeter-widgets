@@ -1,0 +1,47 @@
+/*
+ * Shared Tailwind v4 CSS-layer config. Every CSS entry (studio + each widget)
+ * imports this AFTER `@import 'tailwindcss'` and alongside its own
+ * `@config './tailwind.config.ts'` (the @config path is relative to the entry
+ * file, so it cannot live here).
+ *
+ * Re-target the `dark:` variant to our explicit `data-theme` flag instead of
+ * Tailwind's default `prefers-color-scheme` media query (which keys off the
+ * visitor's OS, not the widget's theme). Two selectors cover both rendering
+ * contexts:
+ *   - `:host([data-theme="dark"]) &` — widgets render inside a shadow root; the
+ *     host is OUTSIDE the shadow tree, so a plain descendant selector can never
+ *     reach it. `:host(...)` is the only selector that does.
+ *   - `:where([data-theme="dark"]) &` — the studio chrome renders in the light
+ *     DOM, where `data-theme` lives on an ancestor element. `:where()` keeps the
+ *     specificity at zero so it matches the shadow case's weight.
+ */
+@custom-variant dark {
+  :host([data-theme='dark']) & {
+    @slot;
+  }
+  :where([data-theme='dark']) & {
+    @slot;
+  }
+}
+
+/*
+ * Tailwind v4 changed the default border/divide color from gray-200 to
+ * currentColor. Restore a token-driven default so bare `border` utilities keep
+ * painting the themed hairline instead of the text color (v4 upgrade guide's
+ * compatibility recommendation, pointed at our token).
+ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentColor);
+  }
+
+  /* v4 preflight switched buttons to cursor: default; keep the v3 pointer. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

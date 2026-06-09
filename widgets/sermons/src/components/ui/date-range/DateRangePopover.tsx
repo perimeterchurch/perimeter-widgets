@@ -93,7 +93,7 @@ export function DateRangePopover({ open, onClose, size = 'sm', children }: DateR
       style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
 
       {/* Panel */}
       <div
