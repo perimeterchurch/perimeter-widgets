@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Tabs, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
+import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
 import { Spinner } from '@perimeter/ui/spinner';
 import { Video, Headphones, FileText, FileX } from 'lucide-react';
 import { AudioPlayer } from './AudioPlayer';
@@ -76,16 +76,22 @@ export function MediaTabs({ links }: MediaTabsProps) {
 
   return (
     <div className="space-y-2">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="h-10">
-          {availableTabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id} className="gap-1.5 px-4 text-sm">
+      {/* Shared SegmentedTabs control — matches the sermons/series tab switcher
+          (SermonTabs) for a consistent look across the widget. */}
+      <SegmentedTabs
+        items={availableTabs.map((tab) => ({
+          id: tab.id,
+          label: (
+            <>
               {tab.icon}
               {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+            </>
+          ),
+        }))}
+        value={activeTab}
+        onChange={setActiveTab}
+        aria-label="Sermon media"
+      />
       <div className="overflow-hidden rounded-lg border border-border min-h-[300px]">
         <AnimatePresence mode="wait">
           {activeTab === 'video' && videoLink && (

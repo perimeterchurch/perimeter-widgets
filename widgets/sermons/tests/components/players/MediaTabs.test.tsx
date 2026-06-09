@@ -18,4 +18,19 @@ describe('MediaTabs no-media affordance', () => {
     expect(screen.queryByText(/no media available/i)).toBeNull();
     expect(screen.getByText('Listen')).toBeInTheDocument();
   });
+
+  it('renders the media switcher as the shared SegmentedTabs control (role=tablist + a tab per medium)', () => {
+    // Matches the sermons/series SermonTabs look — SegmentedTabs renders a
+    // role="tablist" of role="tab" buttons (not the old Tabs compound).
+    const links: SermonLink[] = [
+      { mediaType: 'video', url: 'https://example.com/v.m3u8' } as SermonLink,
+      { mediaType: 'audio', url: 'https://example.com/a.mp3' } as SermonLink,
+      { mediaType: 'document', url: 'https://example.com/notes.pdf' } as SermonLink,
+    ];
+    render(<MediaTabs links={links} />);
+    expect(screen.getByRole('tablist')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /watch/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /listen/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /pdf/i })).toBeInTheDocument();
+  });
 });
