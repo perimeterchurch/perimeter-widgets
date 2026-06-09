@@ -1,6 +1,6 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi } from 'vitest';
-import { render, renderHook, screen } from '@testing-library/react';
+import { render, renderHook, screen, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SermonFilters, type SermonFiltersProps } from '../../src/components/sermons/SermonFilters';
 import { useFilterLabelCache, type FilterLabelCache } from '../../src/hooks/use-filter-label-cache';
@@ -33,6 +33,8 @@ function makeProps(overrides: Partial<SermonFiltersProps> = {}): SermonFiltersPr
     sort: 'date',
     order: 'desc',
     hasActiveFilters: false,
+    breakpoint: 'desktop',
+    activeFilterCount: 0,
     seriesList: [
       {
         id: 10,
@@ -403,5 +405,28 @@ describe('SermonFilters labelCache integration', () => {
     // Chip for the narrowed-out speaker resolves to the cached label "B",
     // not the generic "Speaker" fallback.
     expect(screen.getByRole('button', { name: /Remove B filter/ })).toBeInTheDocument();
+  });
+});
+
+describe('SermonFilters phone collapse', () => {
+  it('hides the dropdowns behind a Filters toggle on phone and shows the badge count', () => {
+    const { container } = render(
+      <SermonFilters {...makeProps({ breakpoint: 'phone', activeFilterCount: 1 })} />,
+    );
+
+    // Search box (Row 1) is always visible.
+    expect(screen.getByPlaceholderText('Search sermons...')).toBeInTheDocument();
+
+    // The dropdowns are collapsed until the Filters toggle is pressed.
+    expect(container.querySelector('[data-slot="multi-combobox"]')).toBeNull();
+
+    const toggle = screen.getByRole('button', { name: /filters/i });
+    expect(toggle).toBeInTheDocument();
+    // Active-filter badge shows on the toggle.
+    expect(within(toggle).getByText('1')).toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    expect(container.querySelector('[data-slot="multi-combobox"]')).not.toBeNull();
+    expect(screen.getByPlaceholderText('All Series')).toBeInTheDocument();
   });
 });

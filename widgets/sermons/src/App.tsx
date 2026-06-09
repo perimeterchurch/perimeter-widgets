@@ -91,7 +91,9 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
         <div className={showTabs ? 'mt-4' : ''}>
           <AnimatePresence mode="wait">
             <motion.div key={filters.tab} {...fadeSlide}>
-              {filters.tab === 'sermons' && <SermonsView config={config} filters={filters} />}
+              {filters.tab === 'sermons' && (
+                <SermonsView config={config} filters={filters} breakpoint={breakpoint} />
+              )}
               {filters.tab === 'series' && <SeriesView config={config} filters={filters} />}
             </motion.div>
           </AnimatePresence>
