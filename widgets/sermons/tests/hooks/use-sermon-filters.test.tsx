@@ -5,6 +5,7 @@ import type { OnUrlUpdateFunction, UrlUpdateEvent } from 'nuqs/adapters/testing'
 import type { ReactNode } from 'react';
 import { useSermonFilters } from '../../src/hooks/use-sermon-filters';
 import type { SermonsConfig } from '../../src/types';
+import type { ContainerBreakpoint } from '../../src/lib/breakpoint';
 
 function renderFilters(config: Partial<SermonsConfig> = {}) {
   const fullConfig: SermonsConfig = {
@@ -218,6 +219,57 @@ describe('useSermonFilters', () => {
       expect(events).toHaveLength(1);
       // Cleared to default ('') → param dropped from the URL.
       expect(events[0]!.searchParams.get('search')).toBeNull();
+    });
+  });
+
+  describe('responsive default view + activeFilterCount', () => {
+    function renderResponsive(
+      config: Partial<SermonsConfig>,
+      opts: { breakpoint?: ContainerBreakpoint; searchParams?: string } = {},
+    ) {
+      const fullConfig: SermonsConfig = {
+        perPage: 12,
+        defaultTab: 'sermons',
+        defaultView: 'grid',
+        display: 'full',
+        ...config,
+      };
+      return renderHook(() => useSermonFilters(fullConfig, { breakpoint: opts.breakpoint }), {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <NuqsTestingAdapter searchParams={opts.searchParams ?? ''}>{children}</NuqsTestingAdapter>
+        ),
+      });
+    }
+
+    it('defaults view to list on phone when unset', () => {
+      expect(renderResponsive({}, { breakpoint: 'phone' }).result.current.view).toBe('list');
+    });
+    it('defaults view to the config default on tablet/desktop when unset', () => {
+      expect(renderResponsive({}, { breakpoint: 'tablet' }).result.current.view).toBe('grid');
+      expect(
+        renderResponsive({ defaultView: 'large' }, { breakpoint: 'desktop' }).result.current.view,
+      ).toBe('large');
+    });
+    it('preserves an explicit ?view= even on phone', () => {
+      expect(
+        renderResponsive({}, { breakpoint: 'phone', searchParams: '?view=grid' }).result.current
+          .view,
+      ).toBe('grid');
+    });
+    it('activeFilterCount counts collapsible dims (date range once), excludes search + locked', () => {
+      const r = renderResponsive(
+        {},
+        {
+          searchParams: '?series=1,2&from=2026-01-01&to=2026-02-01&search=x',
+        },
+      ).result.current;
+      expect(r.activeFilterCount).toBe(2); // series + date-range; search excluded
+      expect(r.hasActiveFilters).toBe(true);
+    });
+    it('activeFilterCount is 0 for a search-only state, but hasActiveFilters is true', () => {
+      const r = renderResponsive({}, { searchParams: '?search=x' }).result.current;
+      expect(r.activeFilterCount).toBe(0);
+      expect(r.hasActiveFilters).toBe(true);
     });
   });
 });
