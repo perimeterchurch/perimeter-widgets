@@ -189,6 +189,7 @@ export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
           viewMode={viewMode}
           viewOptions={VIEW_OPTIONS}
           onViewModeChange={(v) => filters.setView(v as SeriesViewMode)}
+          breakpoint={breakpoint}
         />
       )}
 

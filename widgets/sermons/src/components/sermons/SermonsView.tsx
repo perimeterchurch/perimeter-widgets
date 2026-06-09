@@ -162,6 +162,7 @@ export function SermonsView({ config, filters, breakpoint }: SermonsViewProps) {
           viewMode={viewMode}
           viewOptions={VIEW_OPTIONS}
           onViewModeChange={(v) => filters.setView(v as ViewMode)}
+          breakpoint={breakpoint}
         />
       )}
       {error ? (
