@@ -40,3 +40,27 @@ describe('IconSelect', () => {
     expect(container.querySelector('.truncate')).not.toBeNull();
   });
 });
+
+describe('IconSelect compact', () => {
+  const options = [{ value: 'grid', label: 'Grid', icon: null }];
+  it('shows the label prefix by default', () => {
+    render(
+      <IconSelect label="View:" icon={null} value="grid" options={options} onChange={() => {}} />,
+    );
+    expect(screen.getByText(/View:/)).toBeTruthy();
+  });
+  it('hides the label prefix when compact (value still shows)', () => {
+    render(
+      <IconSelect
+        compact
+        label="View:"
+        icon={null}
+        value="grid"
+        options={options}
+        onChange={() => {}}
+      />,
+    );
+    expect(screen.queryByText(/View:/)).toBeNull();
+    expect(screen.getByText('Grid')).toBeTruthy();
+  });
+});

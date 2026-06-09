@@ -74,6 +74,7 @@ function makeFilters(over: Partial<ReturnType<typeof useSermonFilters>> = {}) {
     screen: 'browse',
     detailId: null,
     hasActiveFilters: false,
+    activeFilterCount: 0,
     lockedFilters: new Set<string>(),
     setSearch: vi.fn(),
     setView: vi.fn(),
@@ -104,7 +105,9 @@ describe('SermonsView results states', () => {
   it('renders a distinct error block with a retry that refetches', () => {
     const refetch = vi.fn();
     useSermons.mockReturnValue(queryResult({ error: new Error('boom'), refetch }));
-    const { container } = render(<SermonsView config={config()} filters={makeFilters()} />);
+    const { container } = render(
+      <SermonsView config={config()} filters={makeFilters()} breakpoint="desktop" />,
+    );
     const errBlock = container.querySelector('[data-slot="results-error"]') as HTMLElement;
     expect(errBlock).toBeTruthy();
     // empty state must NOT also render — error is visually distinct
@@ -114,7 +117,13 @@ describe('SermonsView results states', () => {
   });
 
   it('renders a themed empty state without a clear-filters CTA when no filters active', () => {
-    render(<SermonsView config={config()} filters={makeFilters({ hasActiveFilters: false })} />);
+    render(
+      <SermonsView
+        config={config()}
+        filters={makeFilters({ hasActiveFilters: false })}
+        breakpoint="desktop"
+      />,
+    );
     const empty = document.querySelector('[data-slot="results-empty"]') as HTMLElement;
     expect(empty).toBeTruthy();
     expect(within(empty).queryByRole('button', { name: /clear filters/i })).toBeNull();
@@ -126,6 +135,7 @@ describe('SermonsView results states', () => {
       <SermonsView
         config={config()}
         filters={makeFilters({ hasActiveFilters: true, clearFilters })}
+        breakpoint="desktop"
       />,
     );
     const empty = document.querySelector('[data-slot="results-empty"]') as HTMLElement;
@@ -135,7 +145,9 @@ describe('SermonsView results states', () => {
 
   it('reserves the result-count line while loading so the toolbar does not reflow', () => {
     useSermons.mockReturnValue(queryResult({ isLoading: true }));
-    const { container } = render(<SermonsView config={config()} filters={makeFilters()} />);
+    const { container } = render(
+      <SermonsView config={config()} filters={makeFilters()} breakpoint="desktop" />,
+    );
     const countLine = container.querySelector('[data-slot="results-count"]') as HTMLElement;
     expect(countLine).toBeTruthy();
     // Always occupies a line: rendered even with no pagination yet.
@@ -150,7 +162,11 @@ describe('SermonsView results states', () => {
   it('grid loading skeleton mirrors the grid layout with perPage items', () => {
     useSermons.mockReturnValue(queryResult({ isLoading: true }));
     const { container } = render(
-      <SermonsView config={config({ perPage: 6 })} filters={makeFilters({ view: 'grid' })} />,
+      <SermonsView
+        config={config({ perPage: 6 })}
+        filters={makeFilters({ view: 'grid' })}
+        breakpoint="desktop"
+      />,
     );
     const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
     expect(sk).toBeTruthy();
@@ -161,7 +177,11 @@ describe('SermonsView results states', () => {
   it('list loading skeleton uses a stacked (non-grid) layout', () => {
     useSermons.mockReturnValue(queryResult({ isLoading: true }));
     const { container } = render(
-      <SermonsView config={config({ perPage: 4 })} filters={makeFilters({ view: 'list' })} />,
+      <SermonsView
+        config={config({ perPage: 4 })}
+        filters={makeFilters({ view: 'list' })}
+        breakpoint="desktop"
+      />,
     );
     const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
     expect(sk).toBeTruthy();
@@ -172,7 +192,11 @@ describe('SermonsView results states', () => {
   it('large loading skeleton uses the vertical-stack layout', () => {
     useSermons.mockReturnValue(queryResult({ isLoading: true }));
     const { container } = render(
-      <SermonsView config={config({ perPage: 3 })} filters={makeFilters({ view: 'large' })} />,
+      <SermonsView
+        config={config({ perPage: 3 })}
+        filters={makeFilters({ view: 'large' })}
+        breakpoint="desktop"
+      />,
     );
     const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
     expect(sk).toBeTruthy();
@@ -186,7 +210,9 @@ describe('SeriesView results states', () => {
   it('renders a distinct error block with a retry that refetches', () => {
     const refetch = vi.fn();
     useSeries.mockReturnValue(queryResult({ error: new Error('boom'), refetch }));
-    const { container } = render(<SeriesView config={config()} filters={makeFilters()} />);
+    const { container } = render(
+      <SeriesView config={config()} filters={makeFilters()} breakpoint="desktop" />,
+    );
     const errBlock = container.querySelector('[data-slot="results-error"]') as HTMLElement;
     expect(errBlock).toBeTruthy();
     expect(container.querySelector('[data-slot="results-empty"]')).toBeNull();
@@ -200,6 +226,7 @@ describe('SeriesView results states', () => {
       <SeriesView
         config={config()}
         filters={makeFilters({ hasActiveFilters: true, clearFilters })}
+        breakpoint="desktop"
       />,
     );
     const empty = document.querySelector('[data-slot="results-empty"]') as HTMLElement;
@@ -210,7 +237,11 @@ describe('SeriesView results states', () => {
   it('list loading skeleton mirrors the list layout (non-grid, perPage items)', () => {
     useSeries.mockReturnValue(queryResult({ isLoading: true }));
     const { container } = render(
-      <SeriesView config={config({ perPage: 5 })} filters={makeFilters({ view: 'list' })} />,
+      <SeriesView
+        config={config({ perPage: 5 })}
+        filters={makeFilters({ view: 'list' })}
+        breakpoint="desktop"
+      />,
     );
     const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
     expect(sk).toBeTruthy();

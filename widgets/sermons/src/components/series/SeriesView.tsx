@@ -11,7 +11,9 @@ import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { Search, X, Calendar, Type, Hash, LayoutGrid, List, Rows3 } from 'lucide-react';
 import { useSeries, useSeriesTypes } from '@perimeter/api-hooks';
 import type { SermonsConfig, SortField } from '../../types';
+import type { ContainerBreakpoint } from '../../lib/breakpoint';
 import { DateRangePicker } from '../ui/DateRangePicker';
+import { CollapsibleFilters } from '../ui/CollapsibleFilters';
 import { SeriesGrid } from './SeriesGrid';
 import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
 import { ResultsToolbar } from '../ui/ResultsToolbar';
@@ -23,6 +25,8 @@ import { defined, idsParam } from '../../lib/query-params';
 interface SeriesViewProps {
   config: SermonsConfig;
   filters: ReturnType<typeof useSermonFilters>;
+  /** Container breakpoint; on `phone` the inline filter rows collapse behind a toggle. */
+  breakpoint: ContainerBreakpoint;
 }
 
 type SeriesViewMode = 'grid' | 'list' | 'large';
@@ -63,7 +67,7 @@ const VIEW_OPTIONS = [
   },
 ];
 
-export function SeriesView({ config, filters }: SeriesViewProps) {
+export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
   const viewMode = filters.view;
   const display = config.display ?? 'full';
   const showSearch = display === 'full';
@@ -131,39 +135,46 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
         </InputGroup>
       )}
 
-      {/* Row 2: Series Type filter */}
-      {showSeriesTypeFilter && (
-        <div className="flex items-center gap-2">
-          <MultiCombobox
-            options={seriesTypeOptions}
-            value={filters.selectedSeriesTypeIds.map(String)}
-            onValueChange={(v: string[]) => filters.setSeriesTypeIds(v.map(Number))}
-            placeholder="All Series Types"
-            selectedLabel="Series Types"
-            disabled={seriesTypesLoading}
-            className="flex-1"
-            multiple
-          />
-        </div>
-      )}
+      <CollapsibleFilters
+        breakpoint={breakpoint}
+        activeFilterCount={filters.activeFilterCount}
+        hasActive={filters.hasActiveFilters}
+        onClear={filters.clearFilters}
+      >
+        {/* Row 2: Series Type filter */}
+        {showSeriesTypeFilter && (
+          <div className="flex items-center gap-2">
+            <MultiCombobox
+              options={seriesTypeOptions}
+              value={filters.selectedSeriesTypeIds.map(String)}
+              onValueChange={(v: string[]) => filters.setSeriesTypeIds(v.map(Number))}
+              placeholder="All Series Types"
+              selectedLabel="Series Types"
+              disabled={seriesTypesLoading}
+              className="flex-1"
+              multiple
+            />
+          </div>
+        )}
 
-      {/* Row 3: Date range + clear all */}
-      {showSearch && (
-        <div className="flex items-center gap-3">
-          <DateRangePicker
-            from={filters.from ?? ''}
-            to={filters.to ?? ''}
-            onRangeChange={(from, to) => filters.setDateRange(from || null, to || null)}
-          />
-          <div className="flex-1" />
-          {filters.hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={filters.clearFilters}>
-              <X className="h-3.5 w-3.5" />
-              Clear All
-            </Button>
-          )}
-        </div>
-      )}
+        {/* Row 3: Date range + clear all */}
+        {showSearch && (
+          <div className="flex items-center gap-3">
+            <DateRangePicker
+              from={filters.from ?? ''}
+              to={filters.to ?? ''}
+              onRangeChange={(from, to) => filters.setDateRange(from || null, to || null)}
+            />
+            <div className="flex-1" />
+            {breakpoint !== 'phone' && filters.hasActiveFilters && (
+              <Button variant="outline" size="sm" onClick={filters.clearFilters}>
+                <X className="h-3.5 w-3.5" />
+                Clear All
+              </Button>
+            )}
+          </div>
+        )}
+      </CollapsibleFilters>
 
       {/* Results header: count + sort + view (shared extract) */}
       {showSortView && (
@@ -178,6 +189,7 @@ export function SeriesView({ config, filters }: SeriesViewProps) {
           viewMode={viewMode}
           viewOptions={VIEW_OPTIONS}
           onViewModeChange={(v) => filters.setView(v as SeriesViewMode)}
+          breakpoint={breakpoint}
         />
       )}
 

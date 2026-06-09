@@ -17,9 +17,18 @@ interface IconSelectProps {
   label: string;
   icon: ReactNode;
   className?: string;
+  compact?: boolean;
 }
 
-export function IconSelect({ value, onChange, options, label, icon, className }: IconSelectProps) {
+export function IconSelect({
+  value,
+  onChange,
+  options,
+  label,
+  icon,
+  className,
+  compact = false,
+}: IconSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(
@@ -43,7 +52,8 @@ export function IconSelect({ value, onChange, options, label, icon, className }:
       >
         <span className="flex shrink-0 items-center">{icon}</span>
         <span className="min-w-0 truncate">
-          {label} <span className="font-medium text-fg">{activeOption?.label ?? value}</span>
+          {!compact && <>{label} </>}
+          <span className="font-medium text-fg">{activeOption?.label ?? value}</span>
         </span>
       </button>
 

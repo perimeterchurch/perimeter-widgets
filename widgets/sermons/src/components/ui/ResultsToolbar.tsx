@@ -2,6 +2,7 @@ import { Eye } from 'lucide-react';
 import { SortSelect } from '@perimeter/ui/sort-select';
 import { IconSelect } from '@perimeter/ui/icon-select';
 import type { ReactNode } from 'react';
+import type { ContainerBreakpoint } from '../../lib/breakpoint';
 
 interface SortFieldOption {
   value: string;
@@ -28,6 +29,8 @@ interface ResultsToolbarProps {
   viewMode: string;
   viewOptions: ViewOption[];
   onViewModeChange: (mode: string) => void;
+  /** Container breakpoint; on `phone` the Sort/View dropdowns render compactly (icon + value, no prefix). */
+  breakpoint: ContainerBreakpoint;
 }
 
 /**
@@ -51,7 +54,9 @@ export function ResultsToolbar({
   viewMode,
   viewOptions,
   onViewModeChange,
+  breakpoint,
 }: ResultsToolbarProps) {
+  const compact = breakpoint === 'phone';
   return (
     <div
       data-slot="results-toolbar"
@@ -62,6 +67,7 @@ export function ResultsToolbar({
       </span>
       <div className="flex items-center gap-2">
         <SortSelect
+          compact={compact}
           sortField={sortField}
           sortDirection={sortDirection}
           onSortFieldChange={onSortFieldChange}
@@ -69,6 +75,7 @@ export function ResultsToolbar({
           fields={sortFields}
         />
         <IconSelect
+          compact={compact}
           value={viewMode}
           onChange={onViewModeChange}
           options={viewOptions}

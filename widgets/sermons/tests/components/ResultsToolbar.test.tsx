@@ -34,6 +34,7 @@ function renderToolbar(over: Partial<Parameters<typeof ResultsToolbar>[0]> = {})
       viewMode="grid"
       viewOptions={VIEW_OPTIONS}
       onViewModeChange={vi.fn()}
+      breakpoint="desktop"
       {...over}
     />,
   );
@@ -69,6 +70,24 @@ describe('ResultsToolbar', () => {
     fireEvent.click(within(toolbar).getByText('View:'));
     fireEvent.click(within(toolbar).getByText('List'));
     expect(onViewModeChange).toHaveBeenCalledWith('list');
+  });
+
+  it('compact on phone: drops the "Sort by:"/"View:" prefixes but keeps the active values', () => {
+    const { container } = renderToolbar({ breakpoint: 'phone' });
+    const toolbar = container.querySelector('[data-slot="results-toolbar"]') as HTMLElement;
+    const scope = within(toolbar);
+    expect(scope.queryByText(/Sort by:/)).toBeNull();
+    expect(scope.queryByText('View:')).toBeNull();
+    expect(scope.getByText('Date')).toBeTruthy();
+    expect(scope.getByText('Grid')).toBeTruthy();
+  });
+
+  it('shows the full "Sort by:"/"View:" prefixes on tablet', () => {
+    const { container } = renderToolbar({ breakpoint: 'tablet' });
+    const toolbar = container.querySelector('[data-slot="results-toolbar"]') as HTMLElement;
+    const scope = within(toolbar);
+    expect(scope.getByText(/Sort by:/)).toBeTruthy();
+    expect(scope.getByText('View:')).toBeTruthy();
   });
 });
 

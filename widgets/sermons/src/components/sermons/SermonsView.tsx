@@ -13,11 +13,13 @@ import { ResultsToolbar } from '../ui/ResultsToolbar';
 import { ResultsPagination } from '../ui/ResultsPagination';
 import { SermonSkeleton } from '../ui/SermonSkeleton';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
+import type { ContainerBreakpoint } from '../../lib/breakpoint';
 import { defined, idsParam } from '../../lib/query-params';
 
 interface SermonsViewProps {
   config: SermonsConfig;
   filters: ReturnType<typeof useSermonFilters>;
+  breakpoint: ContainerBreakpoint;
 }
 
 const VIEW_OPTIONS = [
@@ -51,7 +53,7 @@ const SORT_FIELDS = [
   },
 ];
 
-export function SermonsView({ config, filters }: SermonsViewProps) {
+export function SermonsView({ config, filters, breakpoint }: SermonsViewProps) {
   const viewMode = filters.view;
   const labelCache = useFilterLabelCache();
 
@@ -120,6 +122,8 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
           sort={filters.sort}
           order={filters.order}
           hasActiveFilters={filters.hasActiveFilters}
+          breakpoint={breakpoint}
+          activeFilterCount={filters.activeFilterCount}
           seriesList={facets.series}
           speakers={facets.speakers}
           books={facets.books}
@@ -158,6 +162,7 @@ export function SermonsView({ config, filters }: SermonsViewProps) {
           viewMode={viewMode}
           viewOptions={VIEW_OPTIONS}
           onViewModeChange={(v) => filters.setView(v as ViewMode)}
+          breakpoint={breakpoint}
         />
       )}
       {error ? (
