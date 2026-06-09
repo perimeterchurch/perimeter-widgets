@@ -210,7 +210,9 @@ describe('SeriesView results states', () => {
   it('renders a distinct error block with a retry that refetches', () => {
     const refetch = vi.fn();
     useSeries.mockReturnValue(queryResult({ error: new Error('boom'), refetch }));
-    const { container } = render(<SeriesView config={config()} filters={makeFilters()} />);
+    const { container } = render(
+      <SeriesView config={config()} filters={makeFilters()} breakpoint="desktop" />,
+    );
     const errBlock = container.querySelector('[data-slot="results-error"]') as HTMLElement;
     expect(errBlock).toBeTruthy();
     expect(container.querySelector('[data-slot="results-empty"]')).toBeNull();
@@ -224,6 +226,7 @@ describe('SeriesView results states', () => {
       <SeriesView
         config={config()}
         filters={makeFilters({ hasActiveFilters: true, clearFilters })}
+        breakpoint="desktop"
       />,
     );
     const empty = document.querySelector('[data-slot="results-empty"]') as HTMLElement;
@@ -234,7 +237,11 @@ describe('SeriesView results states', () => {
   it('list loading skeleton mirrors the list layout (non-grid, perPage items)', () => {
     useSeries.mockReturnValue(queryResult({ isLoading: true }));
     const { container } = render(
-      <SeriesView config={config({ perPage: 5 })} filters={makeFilters({ view: 'list' })} />,
+      <SeriesView
+        config={config({ perPage: 5 })}
+        filters={makeFilters({ view: 'list' })}
+        breakpoint="desktop"
+      />,
     );
     const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
     expect(sk).toBeTruthy();

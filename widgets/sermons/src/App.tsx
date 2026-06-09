@@ -94,7 +94,9 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
               {filters.tab === 'sermons' && (
                 <SermonsView config={config} filters={filters} breakpoint={breakpoint} />
               )}
-              {filters.tab === 'series' && <SeriesView config={config} filters={filters} />}
+              {filters.tab === 'series' && (
+                <SeriesView config={config} filters={filters} breakpoint={breakpoint} />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
