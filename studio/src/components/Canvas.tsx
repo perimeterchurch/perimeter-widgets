@@ -378,7 +378,7 @@ export function Canvas({
           {showBuilt && slug !== undefined ? (
             <BuiltBundlePreview slug={slug} />
           ) : hostSim ? (
-            <HostFrame>{children}</HostFrame>
+            <HostFrame frameWidth={resolvedPx ?? undefined}>{children}</HostFrame>
           ) : (
             children
           )}
