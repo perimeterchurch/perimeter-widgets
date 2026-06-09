@@ -66,23 +66,70 @@ export type MultiComboboxProps = MultiComboboxSingleProps | MultiComboboxMultipl
 /* ------------------------------------------------------------------ */
 
 /**
- * Derive a downshift `Environment` from the component's root node so its
- * click-outside / blur listeners attach in the right context inside a shadow
- * DOM. When the combobox is mounted in a shadow root, events retarget at the
- * shadow boundary; downshift's `Environment` lets us hand it the owning window's
- * listeners and document instead of assuming the top-level globals. Mirrors the
- * established `getRootNode()` pattern in `use-click-outside.ts` and the sermons
- * VideoPlayer. Returns `undefined` in the light DOM so downshift uses its
- * defaults.
+ * Re-expose an event with its `target` resolved through the shadow boundary.
+ * A window-level listener sees events from inside a shadow tree with `target`
+ * retargeted to the shadow HOST element; `composedPath()[0]` is the real
+ * origin (available to any listener for composed events like mouseup).
+ */
+function retargetToComposedOrigin(event: Event): Event {
+  const composedTarget = event.composedPath()[0];
+  if (!composedTarget || composedTarget === event.target) return event;
+  return Object.create(event, {
+    target: { get: () => composedTarget },
+  }) as Event;
+}
+
+/**
+ * Derive a downshift `Environment` for a combobox mounted inside a shadow
+ * root. Downshift's mouse/touch tracker registers window-level `mouseup` /
+ * `touchend` listeners and classifies the event as inside-or-outside by
+ * checking `event.target` against its in-shadow input/menu/toggle refs — but
+ * at the window the target has retargeted to the shadow HOST, which those
+ * `contains()` checks can never match. Untreated, EVERY in-widget mouseup
+ * dispatches downshift's blur transition (menu closes between mouseup and
+ * click, so mouse selection silently fails in production embeds).
+ *
+ * The fix: listeners are registered on the window as downshift expects, but
+ * each handler receives a proxy of the event whose `target` getter resolves
+ * to `composedPath()[0]` — the true in-shadow origin — so the containment
+ * checks see the real element. Returns `undefined` in the light DOM so
+ * downshift uses its defaults.
  */
 function deriveEnvironment(node: HTMLElement | null): Environment | undefined {
   const root = node?.getRootNode();
   if (!root || !(root instanceof ShadowRoot)) return undefined;
   const view = root.ownerDocument.defaultView;
   if (!view) return undefined;
+  // removeEventListener must receive the same wrapper instance addEventListener
+  // registered, so wrappers are memoized per original listener.
+  const wrappers = new Map<EventListenerOrEventListenerObject, EventListener>();
+  const wrapperFor = (listener: EventListenerOrEventListenerObject): EventListener => {
+    let wrapped = wrappers.get(listener);
+    if (!wrapped) {
+      wrapped = (event: Event) => {
+        const retargeted = retargetToComposedOrigin(event);
+        if (typeof listener === 'function') listener(retargeted);
+        else listener.handleEvent(retargeted);
+      };
+      wrappers.set(listener, wrapped);
+    }
+    return wrapped;
+  };
   return {
-    addEventListener: view.addEventListener.bind(view),
-    removeEventListener: view.removeEventListener.bind(view),
+    addEventListener: (
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions,
+    ) => {
+      view.addEventListener(type, wrapperFor(listener), options);
+    },
+    removeEventListener: (
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions,
+    ) => {
+      view.removeEventListener(type, wrappers.get(listener) ?? listener, options);
+    },
     document: root.ownerDocument,
     Node: view.Node,
   };
