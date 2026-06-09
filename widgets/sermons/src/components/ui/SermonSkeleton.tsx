@@ -29,10 +29,10 @@ export function SermonSkeleton({ viewMode, count }: { viewMode: ViewMode; count:
             className="flex items-center gap-3 px-1 py-2"
             data-slot="sermon-skeleton-item"
           >
-            <Skeleton className="h-10 w-10 flex-shrink-0 rounded" />
+            <Skeleton className="h-10 w-10 shrink-0 rounded-sm" />
             <div className="min-w-0 flex-1 space-y-1.5">
-              <Skeleton className="h-3.5 w-3/5 rounded" />
-              <Skeleton className="h-3 w-2/5 rounded" />
+              <Skeleton className="h-3.5 w-3/5 rounded-sm" />
+              <Skeleton className="h-3 w-2/5 rounded-sm" />
             </div>
           </div>
         ))}
@@ -49,11 +49,11 @@ export function SermonSkeleton({ viewMode, count }: { viewMode: ViewMode; count:
             className="flex w-full flex-row overflow-hidden rounded-xl ring-1 ring-fg/10"
             data-slot="sermon-skeleton-item"
           >
-            <Skeleton className="aspect-video w-32 flex-shrink-0 rounded-none @[30rem]:w-56" />
+            <Skeleton className="aspect-video w-32 shrink-0 rounded-none @[30rem]:w-56" />
             <div className="flex flex-1 flex-col gap-2 p-4">
-              <Skeleton className="h-4 w-3/4 rounded" />
-              <Skeleton className="h-3 w-1/2 rounded" />
-              <Skeleton className="h-3 w-2/3 rounded" />
+              <Skeleton className="h-4 w-3/4 rounded-sm" />
+              <Skeleton className="h-3 w-1/2 rounded-sm" />
+              <Skeleton className="h-3 w-2/3 rounded-sm" />
             </div>
           </div>
         ))}
@@ -75,8 +75,8 @@ export function SermonSkeleton({ viewMode, count }: { viewMode: ViewMode; count:
         >
           <Skeleton className="aspect-video w-full rounded-none" />
           <div className="flex flex-col gap-2 p-3">
-            <Skeleton className="h-4 w-3/4 rounded" />
-            <Skeleton className="h-3 w-1/2 rounded" />
+            <Skeleton className="h-4 w-3/4 rounded-sm" />
+            <Skeleton className="h-3 w-1/2 rounded-sm" />
           </div>
         </div>
       ))}

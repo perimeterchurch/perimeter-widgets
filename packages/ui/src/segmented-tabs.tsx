@@ -49,7 +49,7 @@ export function segmentedTabId(idBase: string, tabItemId: string): string {
 /**
  * A controlled segmented control rendered as a WAI-ARIA tablist: a rounded
  * `bg-muted` track of `role="tab"` buttons, the active one lifted with
- * `bg-bg text-fg shadow-sm`. Roving `tabIndex` keeps a single tab stop, and the
+ * `bg-bg text-fg shadow-xs`. Roving `tabIndex` keeps a single tab stop, and the
  * keyboard follows the WAI-ARIA automatic-activation pattern: ArrowLeft/Right
  * wrap-around to the adjacent tab, Home/End jump to the first/last — each moving
  * focus + selection together.
@@ -133,7 +133,7 @@ export function SegmentedTabs({
               'flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium whitespace-nowrap transition-colors',
               'focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
               selected
-                ? 'bg-bg text-fg shadow-sm'
+                ? 'bg-bg text-fg shadow-xs'
                 : 'text-fg/60 hover:text-fg dark:text-muted-fg dark:hover:text-fg',
             )}
           >

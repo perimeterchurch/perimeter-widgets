@@ -65,7 +65,7 @@ export function SeriesDetail({ id, onBack, onSermonClick }: SeriesDetailProps) {
         {series && (
           <div className="space-y-4">
             <div>
-              <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-none">
+              <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-hidden">
                 {series.displayTitle ?? series.title}
               </h2>
               {series.subtitle && <p className="text-sm text-muted-fg mt-1">{series.subtitle}</p>}
@@ -83,9 +83,9 @@ export function SeriesDetail({ id, onBack, onSermonClick }: SeriesDetailProps) {
                   key={sermon.id}
                   type="button"
                   onClick={() => onSermonClick(sermon.id)}
-                  className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded px-1"
+                  className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/50 rounded-sm px-1"
                 >
-                  <span className="flex-shrink-0 w-6 text-center text-xs font-medium text-muted-fg">
+                  <span className="shrink-0 w-6 text-center text-xs font-medium text-muted-fg">
                     {index + 1}
                   </span>
                   <div className="min-w-0 flex-1">

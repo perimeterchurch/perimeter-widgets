@@ -21,7 +21,7 @@ interface MediaCardProps {
 }
 
 const CARD_BASE =
-  'overflow-hidden rounded-xl p-0 text-left ring-1 ring-fg/10 bg-bg text-fg cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:ring-fg/20 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
+  'overflow-hidden rounded-xl p-0 text-left ring-1 ring-fg/10 bg-bg text-fg cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:ring-fg/20 hover:shadow-lg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/50';
 
 function FallbackImage({
   src,
@@ -167,13 +167,13 @@ export function MediaCard({
     return (
       <CardButton
         onClick={onClick}
-        className="flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        className="flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/50"
       >
         <FallbackImage
           key={imageUrl}
           src={imageUrl}
           alt={imageAlt}
-          className="h-10 w-10 flex-shrink-0 rounded"
+          className="h-10 w-10 shrink-0 rounded-sm"
         />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{title}</p>
@@ -202,7 +202,7 @@ export function MediaCard({
           key={imageUrl}
           src={imageUrl}
           alt={imageAlt}
-          className="aspect-video w-32 flex-shrink-0 @[30rem]:w-56"
+          className="aspect-video w-32 shrink-0 @[30rem]:w-56"
         />
         <div className="flex flex-1 flex-col gap-1 p-4">
           {!hasCornersLayout && (
