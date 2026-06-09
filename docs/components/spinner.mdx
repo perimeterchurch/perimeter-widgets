@@ -1,0 +1,29 @@
+# Spinner
+
+A small, indeterminate loading indicator for transient waits — a button submitting, a panel fetching. It spins `currentColor`, so it inherits the surrounding text color; size it with the `size-*` utilities.
+
+<Example label="Sizes">
+  <div className="flex items-center gap-6 text-fg">
+    <Spinner className="size-4" />
+    <Spinner className="size-6" />
+    <Spinner className="size-8 text-primary" />
+  </div>
+</Example>
+
+## Usage
+
+```tsx
+import { Spinner } from '@perimeter/ui/spinner';
+
+<Spinner className="size-4" />;
+```
+
+Use it for short, indeterminate waits where you can't show progress. When you know the shape of the content that's loading, prefer a [Skeleton](/components/skeleton) so the layout stays stable.
+
+## Props
+
+| Prop        | Type     | Description                                                       |
+| ----------- | -------- | ---------------------------------------------------------------- |
+| `className` | `string` | Size (`size-*`) and color (`text-*`) utilities for the spinner.  |
+
+All other native SVG attributes pass through.

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { SermonsConfig } from './types';
 import { applyWidgetDefaults } from './types';
 import { useSermonFilters } from './hooks/use-sermon-filters';
+import { useContainerBreakpoint } from './hooks/use-container-breakpoint';
 import { SermonTabs } from './components/SermonTabs';
 import { SermonsView } from './components/sermons/SermonsView';
 import { SermonDetail } from './components/sermons/SermonDetail';
@@ -38,7 +39,9 @@ interface SermonsWidgetProps {
 }
 
 function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
-  const filters = useSermonFilters(config, { prefix: NUQS_PREFIX });
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const breakpoint = useContainerBreakpoint(containerRef);
+  const filters = useSermonFilters(config, { prefix: NUQS_PREFIX, breakpoint });
 
   // Build a unique key for AnimatePresence based on the current "page"
   const viewKey =
@@ -88,8 +91,12 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
         <div className={showTabs ? 'mt-4' : ''}>
           <AnimatePresence mode="wait">
             <motion.div key={filters.tab} {...fadeSlide}>
-              {filters.tab === 'sermons' && <SermonsView config={config} filters={filters} />}
-              {filters.tab === 'series' && <SeriesView config={config} filters={filters} />}
+              {filters.tab === 'sermons' && (
+                <SermonsView config={config} filters={filters} breakpoint={breakpoint} />
+              )}
+              {filters.tab === 'series' && (
+                <SeriesView config={config} filters={filters} breakpoint={breakpoint} />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -98,7 +105,7 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
   };
 
   return (
-    <div className="p-4">
+    <div ref={containerRef} className="@container p-4">
       <AnimatePresence mode="wait">
         <motion.div key={viewKey} {...fadeSlide}>
           {renderContent()}

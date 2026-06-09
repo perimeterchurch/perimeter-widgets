@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
-import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
-import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode } from '../types';
+import {
+  debounce,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryStates,
+} from 'nuqs';
+import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode, ViewMode } from '../types';
+import type { ContainerBreakpoint } from '../lib/breakpoint';
 
 /**
  * Per-embed URL-key prefix. nuqs v2's adapter exposes no global prefix, so we
@@ -10,6 +17,7 @@ import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode } from '../
  */
 export interface UseSermonFiltersOptions {
   prefix?: string | undefined;
+  breakpoint?: ContainerBreakpoint | undefined;
 }
 
 /** Parse comma-separated IDs string into number array */
@@ -27,8 +35,9 @@ function serializeIds(ids: number[]): string | null {
 }
 
 export function useSermonFilters(config: SermonsConfig, options: UseSermonFiltersOptions = {}) {
-  const { prefix } = options;
+  const { prefix, breakpoint } = options;
   const defaultTab = config.defaultTab ?? 'sermons';
+  const defaultView = config.defaultView ?? 'grid';
   const sermonParams = useMemo(
     () => ({
       tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(defaultTab),
@@ -45,6 +54,9 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
       to: parseAsString,
       sort: parseAsStringLiteral(['date', 'title', 'count'] as const).withDefault('date'),
       order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault('desc'),
+      // Layout preference — persisted to the URL (like sort) so it survives a
+      // reload or a tab switch instead of resetting to the default each time.
+      view: parseAsStringLiteral(['grid', 'list', 'large'] as const),
       page: parseAsInteger.withDefault(1),
     }),
     [defaultTab],
@@ -69,6 +81,11 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   const tab = config.tab || params.tab;
   const from = config.from || params.from;
   const to = config.to || params.to;
+
+  // Default view follows the container: phone → compact list, else the config
+  // default ('grid'). An explicit choice (user click or ?view=) is a non-null
+  // params.view and always wins, even on a phone.
+  const effectiveView: ViewMode = params.view ?? (breakpoint === 'phone' ? 'list' : defaultView);
 
   // Parse comma-separated IDs for multi-select filters, with config overrides.
   // Config values may be numbers (from parseDataAttributes coercion) — coerce to string.
@@ -123,8 +140,16 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     });
   };
 
+  // The input stays fully responsive (nuqs updates the returned `search` value
+  // optimistically on every keystroke); only the URL write is debounced so we
+  // don't push a history entry / query per character. `history: 'replace'`
+  // overrides the hook-global `history: 'push'` so typing never spams the back
+  // stack, and `shallow: false` is the documented pairing for `debounce`.
   const setSearch = (search: string) => {
-    void setParams({ search: search || null, page: 1 });
+    void setParams(
+      { search: search || null, page: 1 },
+      { history: 'replace', shallow: false, limitUrlUpdates: debounce(300) },
+    );
   };
 
   const setSeriesIds: (ids: number[]) => void = config.seriesId
@@ -170,6 +195,13 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     void setParams({ sort, order, page: 1 });
   };
 
+  // View is a layout preference, not a content filter: changing it doesn't
+  // re-query or reset the page. `history: 'replace'` keeps it out of the back
+  // stack (toggling grid/list shouldn't add history entries).
+  const setView = (view: ViewMode) => {
+    void setParams({ view }, { history: 'replace' });
+  };
+
   const setPage = (page: number) => {
     void setParams({ page });
   };
@@ -193,15 +225,16 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     void setParams(next);
   };
 
-  const hasActiveFilters =
-    !!params.search ||
-    (!config.seriesId && selectedSeriesIds.length > 0) ||
-    (!config.speakerId && selectedSpeakerIds.length > 0) ||
-    (!config.bookId && selectedBookIds.length > 0) ||
-    selectedServiceTypeIds.length > 0 ||
-    (!config.seriesTypeId && selectedSeriesTypeIds.length > 0) ||
-    (!config.from && params.from !== null) ||
-    (!config.to && params.to !== null);
+  const collapsibleFilterActive = [
+    !config.seriesId && selectedSeriesIds.length > 0,
+    !config.speakerId && selectedSpeakerIds.length > 0,
+    !config.bookId && selectedBookIds.length > 0,
+    selectedServiceTypeIds.length > 0,
+    !config.seriesTypeId && selectedSeriesTypeIds.length > 0,
+    (!config.from && params.from !== null) || (!config.to && params.to !== null),
+  ];
+  const activeFilterCount = collapsibleFilterActive.filter(Boolean).length;
+  const hasActiveFilters = activeFilterCount > 0 || !!params.search;
 
   // A filter is "locked" when the embedder either pinned it via a data-*
   // attribute (e.g. data-series-id) or hid it via data-hide-* — the
@@ -219,6 +252,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
 
   return {
     ...params,
+    view: effectiveView,
     tab,
     from,
     to,
@@ -239,9 +273,11 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     setSeriesTypeIds,
     setDateRange,
     setSort,
+    setView,
     setPage,
     clearFilters,
     hasActiveFilters,
+    activeFilterCount,
     lockedFilters,
   };
 }

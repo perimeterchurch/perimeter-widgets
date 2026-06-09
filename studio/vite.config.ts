@@ -1,18 +1,46 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import mdx from '@mdx-js/rollup';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import { remToPxPlugin } from '@perimeter/vite-plugin-widget';
+import { devServerProxy } from './src/dev-proxy';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 const workspaceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+// The MDX plugin injects `import { useMDXComponents } from '@mdx-js/react'` into
+// every compiled .mdx. Our docs live at repo root (docs/*.mdx), outside the studio
+// package dir, and pnpm's strict node_modules layout means a bare specifier can't
+// be resolved from there — dev, test, and build all fail to find @mdx-js/react.
+// Pin it to the copy hoisted under studio/node_modules so repo-root MDX resolves.
+const require = createRequire(import.meta.url);
+const mdxReact = require.resolve('@mdx-js/react');
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    // MDX must run BEFORE @vitejs/plugin-react so JSX in `.mdx` is emitted as JS
+    // that the React transform can then pick up (enforce: 'pre').
+    { enforce: 'pre', ...mdx({ providerImportSource: '@mdx-js/react' }) },
+    // include MDX/MD so the React transform + Fast Refresh apply to MDX-emitted JS;
+    // the bare react() will not handle MDX-emitted JS.
+    react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
+  ],
   // Same PostCSS chain a shipped widget gets (rem→px is the prod transform —
   // parity finding H1): with css.postcss inline, postcss.config.js is ignored,
   // so it is deleted to leave exactly one source of truth.
   css: { postcss: { plugins: [tailwindcss(), autoprefixer(), remToPxPlugin] } },
-  server: { fs: { allow: [workspaceRoot] } },
+  resolve: { alias: { '@mdx-js/react': mdxReact } },
+  // `proxy` forwards the sermons widget's `/s3-proxy/…` dev requests to S3 — see
+  // src/dev-proxy.ts (extracted so it can be unit-tested without this config).
+  server: { fs: { allow: [workspaceRoot] }, proxy: devServerProxy },
+  // The Playwright visual harness lives in `visual/*.spec.ts`. Vitest has no
+  // `test` block here, so its default include (`**/*.{test,spec}.tsx?`) WOULD
+  // collect those Playwright specs and fail (no browser, wrong runner). Exclude
+  // the whole `visual/` tree from the vitest run; it is driven by `pnpm visual`.
+  test: { exclude: [...configDefaults.exclude, 'visual/**'] },
 });

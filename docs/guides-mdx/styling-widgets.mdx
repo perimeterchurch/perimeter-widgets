@@ -1,0 +1,158 @@
+# Styling widgets
+
+Perimeter widgets render inside a **shadow root**, with their styles compiled
+through a shared Tailwind preset. Styling one is tokens-first: reach for design
+tokens and `@perimeter/ui` components before writing bespoke CSS, and the result
+looks right both here in the studio and on the production WordPress page. This
+guide covers the model, the rules, and the two facts that bite people who skip it.
+
+## Tokens first
+
+Every color, radius, and font in the system is a **CSS custom property** defined by
+`@perimeter/theme`. The Tailwind preset maps utility classes onto those variables —
+`bg-primary` is `var(--color-primary)`, `text-fg` is `var(--color-fg)`,
+`rounded-md` is `var(--radius-md)`. Style with the utilities and you inherit the
+palette automatically, including any per-embed overrides a host page sets.
+
+<Example label="The token palette in use">
+  <div className="flex flex-wrap items-center gap-3">
+    <Button variant="primary">Primary action</Button>
+    <Badge>Tagged</Badge>
+    <Card className="px-4 py-3 text-sm text-fg">Surface on the bg token</Card>
+  </div>
+</Example>
+
+The core tokens (see `/tokens` for the live reference and every default):
+
+| Token group | Examples                                            | Tailwind utilities                       |
+| ----------- | --------------------------------------------------- | ---------------------------------------- |
+| Color       | `--color-primary`, `--color-fg`, `--color-border`   | `bg-primary`, `text-fg`, `border-border` |
+| Radius      | `--radius-sm`, `--radius-md`, `--radius-lg`         | `rounded-sm`, `rounded-md`, `rounded-lg` |
+| Type        | `--font-sans`, `--font-mono`                        | `font-sans`, `font-mono`                 |
+
+Never hard-code a hex value or pixel radius. A literal `#2563eb` ignores host
+overrides and drifts from the rest of the system; `bg-primary` tracks the token.
+
+## `@perimeter/ui` vs. custom markup
+
+Before building a control from scratch, check whether the design system already
+ships it — the live reference, with usage and props, is at
+[`/components`](/components). The current `@perimeter/ui` set: `badge`, `button`,
+`card`, `combobox`, `empty`, `icon-select`, `input`, `input-group`, `label`,
+`multi-combobox`, `pagination`, `skeleton`, `skeleton-transition`, `sort-select`,
+`spinner`, `tabs`, `textarea`.
+
+- **Use a component** for anything it covers — buttons, inputs, cards, tabs,
+  loading states. You get the right tokens, focus rings, and hover/active states
+  for free, and your widget stays consistent with every other one.
+- **Write custom markup** only for widget-specific layout and composition. Even
+  then, style it with token utilities (`gap-4`, `text-muted-fg`, `border-border`)
+  so it sits in the same palette.
+
+```tsx
+import { Button } from '@perimeter/ui/button';
+import { Card, CardContent } from '@perimeter/ui/card';
+
+// Custom layout, system components + tokens inside it.
+<Card>
+  <CardContent className="flex items-center justify-between gap-4">
+    <p className="text-sm text-muted-fg">Next service</p>
+    <Button variant="primary" size="sm">
+      Add to calendar
+    </Button>
+  </CardContent>
+</Card>;
+```
+
+## Two facts the parity work pinned down
+
+These come straight from the dev-vs-production parity audit. Internalize them and
+your "looks fine in the studio, broken on the live page" surprises mostly vanish.
+
+### 1. Authors write `rem`; the build emits `px`
+
+Widget CSS is authored in `rem` (Tailwind's default — `p-4` is `1rem`), but a host
+page can set any root `font-size`, which would rescale every `rem` unpredictably.
+So the widget build runs a **rem→px conversion** at the end of the Tailwind chain:
+`1rem` becomes `16px` in the shipped bundle. You keep writing normal Tailwind
+utilities; the pipeline freezes the sizing so the widget renders identically no
+matter what the host's root font-size is. Don't reintroduce raw `rem` values in
+hand-written CSS expecting them to scale — they won't, by design.
+
+### 2. The shadow root isolates *most* styles, but inheritable properties leak in
+
+Each widget mounts into a **shadow root**, so the host page's stylesheet can't
+reach your elements and your styles can't escape — that isolation is why a widget
+looks the same across wildly different WordPress themes. The catch: a handful of
+CSS properties are **inherited** and cross the shadow boundary from the host —
+`font-family`, `color`, and `line-height` among them. A widget that leaves text
+unstyled inherits the host page's font and color, which is why the studio canvas
+has a **host-page simulation** background (the measured production values: 19px /
+line-height 35px / color `#353535`). Set the type you want explicitly with token
+utilities (`font-sans`, `text-fg`) rather than relying on a default, and preview
+against the host-sim background before you ship.
+
+## Per-embed token overrides
+
+Because every utility resolves to a CSS variable, a host page can recolor a single
+embed without touching the widget. The runtime reserves `data-theme-*` attributes
+on the embed element for exactly this: each one maps to a token, so
+`data-theme-color-primary="#0f766e"` overrides `--color-primary` for that instance
+only. The studio's **Theme** tab is the same mechanism — it writes runtime token
+overrides live so you can preview them before a host page sets them. See
+[`/tokens`](/tokens) for the full override surface (every variable name and its
+default). This is why hard-coded hex values are a bug: a literal `#2563eb` ignores
+the override; `bg-primary` honors it.
+
+## Dark mode
+
+Dark mode is **free if you style with tokens** and broken if you don't. The system
+ships two token sets with identical keys — a light default and a `darkTokens` set
+in `@perimeter/theme` — and the per-instance token sheet emits both a `:host { … }`
+(light) block and a `:host([data-theme="dark"]) { … }` (dark) block. So a utility
+like `bg-bg` / `text-fg` / `border-border` resolves to whichever palette is active.
+Style semantically and your widget renders correctly in both themes with **no
+`dark:` variants and no per-component dark styling** — the token swap does the
+work. A hard-coded `#fafaf9` (or a `stone-50` literal) stays the same color in
+dark mode and breaks the design; this is the deeper reason "never hard-code a
+color" matters.
+
+**Preview it in the studio.** The canvas has a **light/dark toggle**; flip it to
+render the preview against the dark palette before you ship, the same way you
+preview against the host-sim background. (Under the hood the toggle sets
+`data-theme="dark"` on the preview's shadow host — exactly what a production embed
+does.)
+
+**Activate it on an embed** with `data-theme="dark"` on the target element (default
+is light):
+
+```html
+<div data-perimeter-widget="sermons" data-theme="dark"></div>
+```
+
+The attribute lands on the shadow host, which is what `:host([data-theme="dark"])`
+matches — so the dark block activates with zero mount-time work. See
+[`docs/hosting-and-release.md`](../hosting-and-release.md) (Embedding → Dark mode)
+for the embed reference and the non-strict-schema constraint.
+
+## Configuration is strings — coerce in the schema
+
+Styling and config meet at the widget's zod `schema`. Host-page configuration
+arrives as `data-*` attributes, and **HTML attributes are always strings** — a
+widget reading `data-count="3"` gets `"3"`, not `3`. Use `z.coerce.number()` /
+`z.coerce.boolean()` for every numeric or boolean field so the studio and
+production parse identical input the same way. The parity audit pinned this as the
+H6 lesson: a non-coercing schema that happens to work in the studio (where
+defaults fill in) breaks the moment a real host attribute arrives. (`data-theme-*`
+keys are stripped out as token overrides before the rest is parsed against the
+schema.)
+
+## Checklist
+
+- [ ] Styled with token utilities, no hard-coded colors or radii.
+- [ ] Used `@perimeter/ui` for every control it covers.
+- [ ] Set `font-family` / `color` explicitly so nothing leaks in from the host.
+- [ ] Previewed against the host-page-sim background in the canvas.
+- [ ] Previewed both light and dark via the canvas toggle (semantic tokens, no `dark:` variants).
+- [ ] Checked `/tokens` for the per-embed `data-theme-*` override surface.
+- [ ] Used `z.coerce.*` for every numeric/boolean schema field.

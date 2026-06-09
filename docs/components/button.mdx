@@ -1,0 +1,50 @@
+# Button
+
+A clickable action. Use it for the primary action on a screen, secondary actions, and inline links styled as buttons. Built on a native `<button>` by default, with a `render` escape hatch for anchors and other elements.
+
+<Example label="Variants">
+  <div className="flex flex-wrap items-center gap-3">
+    <Button variant="primary">Primary</Button>
+    <Button variant="secondary">Secondary</Button>
+    <Button variant="outline">Outline</Button>
+    <Button variant="ghost">Ghost</Button>
+    <Button variant="destructive">Delete</Button>
+    <Button variant="link">Link</Button>
+  </div>
+</Example>
+
+## Usage
+
+```tsx
+import { Button } from '@perimeter/ui/button';
+
+<Button variant="primary" size="md" onClick={handleSave}>
+  Save changes
+</Button>;
+```
+
+Render as an anchor with the `render` prop (the computed button classes merge onto your element):
+
+```tsx
+<Button render={<a href="/give" />}>Give now</Button>
+```
+
+<Example label="Sizes">
+  <div className="flex flex-wrap items-center gap-3">
+    <Button size="sm">Small</Button>
+    <Button size="md">Medium</Button>
+    <Button size="lg">Large</Button>
+  </div>
+</Example>
+
+## Props
+
+| Prop           | Type                                                                  | Default     | Description                                                                                                                  |
+| -------------- | --------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `variant`      | `'primary' \| 'secondary' \| 'ghost' \| 'outline' \| 'link' \| 'destructive'` | `'primary'` | Visual style. `primary` for the main action, `destructive` for irreversible ones.                                           |
+| `size`         | `'sm' \| 'md' \| 'lg' \| 'icon' \| 'icon-xs' \| 'default'`            | `'md'`      | Control height and padding. Use `icon` / `icon-xs` for square icon-only buttons.                                            |
+| `render`       | `ReactElement`                                                        | —           | Render as a different element (e.g. an anchor). The button's computed classes are composed with the element's own `className`, and the button's remaining props are spread onto it. |
+| `nativeButton` | `boolean`                                                             | `true`      | Pass `false` together with `render` to opt out of the native `<button>` element.                                            |
+| `disabled`     | `boolean`                                                             | `false`     | Standard button attribute; the button dims to 50% and ignores pointer events.                                              |
+
+All other native `<button>` attributes (`onClick`, `type`, `aria-*`, …) pass through.

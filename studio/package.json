@@ -8,20 +8,27 @@
     "build": "vite build",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "visual": "playwright test"
   },
   "dependencies": {
+    "@mdx-js/react": "^3.1.1",
     "@perimeter/theme": "workspace:*",
     "@perimeter/ui": "workspace:*",
     "@perimeter/widget-runtime": "workspace:*",
+    "lucide-react": "^0.577.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router": "^7.16.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@mdx-js/rollup": "^3.1.1",
     "@perimeter/vite-plugin-widget": "workspace:*",
+    "@playwright/test": "^1.49.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
+    "@types/mdx": "^2.0.13",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",

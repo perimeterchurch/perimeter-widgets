@@ -1,14 +1,23 @@
 import type { ReactNode } from 'react';
 import { hostProfile } from '@perimeter/theme';
+import { hostFrameGutter } from '../lib/host-gutter';
 
 /**
  * Replicates the production host page around a widget preview: the inheritable
- * properties that pierce the shadow root (parity finding H4 — all four probed
- * properties inherit) plus the real content-frame width. Values from
- * hostProfile (single source of truth with the audit fixture).
- * Phase 3 adds the canvas toggle; in Phase 2 this is the default-and-only canvas.
+ * properties that pierce the shadow root plus the real content-frame width.
+ * The horizontal gutter ramps with `frameWidth` (the resolved canvas frame
+ * width) so the Mobile/Tablet presets simulate a realistic phone/tablet host
+ * instead of crushing the widget with the 90px desktop gutter. When `frameWidth`
+ * is undefined (fluid preset), the desktop gutter is kept.
  */
-export function HostFrame({ children }: { children: ReactNode }) {
+export function HostFrame({
+  children,
+  frameWidth,
+}: {
+  children: ReactNode;
+  frameWidth?: number | undefined;
+}) {
+  const gutter = hostFrameGutter(frameWidth);
   return (
     <div
       data-host-frame
@@ -24,7 +33,7 @@ export function HostFrame({ children }: { children: ReactNode }) {
         style={{
           maxWidth: hostProfile.contentMaxWidth,
           margin: '0 auto',
-          padding: `0 ${hostProfile.contentPaddingX}`,
+          padding: `0 ${gutter}px`,
         }}
       >
         {children}

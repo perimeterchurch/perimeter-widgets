@@ -1,0 +1,58 @@
+# Pagination
+
+Page navigation built from composable parts. You render the structure — a `Pagination` nav wrapping a `PaginationContent` list of `PaginationItem`s — and supply your own page numbers and `onClick` handlers. Each control is a real `<button>` (built on Button), so it's tab-focusable and Enter/Space-activatable out of the box; wire `onClick` to your router or query-param state.
+
+<Example label="Page navigation">
+  <Pagination>
+    <PaginationContent>
+      <PaginationItem>
+        <PaginationPrevious onClick={() => {}} />
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationLink onClick={() => {}}>1</PaginationLink>
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationLink onClick={() => {}} isActive>
+          2
+        </PaginationLink>
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationLink onClick={() => {}}>3</PaginationLink>
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationEllipsis />
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationNext onClick={() => {}} />
+      </PaginationItem>
+    </PaginationContent>
+  </Pagination>
+</Example>
+
+## Usage
+
+```tsx
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '@perimeter/ui/pagination';
+```
+
+Mark the current page with `isActive` on its `PaginationLink` (it renders the outline variant and sets `aria-current="page"`). Render `PaginationEllipsis` to stand in for skipped ranges. The Previous/Next labels are customizable via `text` and collapse to icon-only below the `sm` breakpoint. Disable the edge controls by passing `disabled` (or `aria-disabled` plus `pointer-events-none`) at the boundaries.
+
+## Parts
+
+| Component            | Description                                                            |
+| -------------------- | --------------------------------------------------------------------- |
+| `Pagination`         | The `<nav aria-label="pagination">` wrapper.                          |
+| `PaginationContent`  | The `<ul>` row of items.                                              |
+| `PaginationItem`     | A single `<li>`.                                                      |
+| `PaginationLink`     | A page `<button>`; `isActive` marks the current page.                 |
+| `PaginationPrevious` | Previous-page button with a chevron and a `text` label.               |
+| `PaginationNext`     | Next-page button with a chevron and a `text` label.                   |
+| `PaginationEllipsis` | A non-interactive "…" gap marker.                                     |

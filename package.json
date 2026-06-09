@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "quality": "turbo typecheck lint test && pnpm format:check",
     "release": "tsx packages/release/src/cli.ts",
+    "create-widget": "tsx packages/release/src/create-cli.ts",
     "parity:css": "tsx packages/parity/src/report-css.ts",
     "parity:components": "tsx packages/parity/src/report-components.ts"
   },

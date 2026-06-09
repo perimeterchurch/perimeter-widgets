@@ -51,6 +51,9 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
   const [scale, setScale] = useState<number>(1.0);
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [pageInputValue, setPageInputValue] = useState('1');
+  // Real natural page dimensions (points at scale 1), captured from the loaded
+  // page. Falls back to US-Letter until the first page reports its size.
+  const [pageDims, setPageDims] = useState<{ width: number; height: number } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -119,24 +122,31 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
     setScale(Number(e.target.value));
   }, []);
 
+  // US-Letter (612×792pt) is only the fallback before the real page size loads.
+  const pageWidth = pageDims?.width ?? 612;
+  const pageHeight = pageDims?.height ?? 792;
+
   const fitWidth = useCallback(() => {
     if (!containerRef.current) return;
-    // Approximate: PDF default width is ~612pt (US Letter)
     const containerWidth = containerRef.current.clientWidth - 48; // padding
-    const pdfDefaultWidth = 612;
-    setScale(containerWidth / pdfDefaultWidth);
-  }, []);
+    setScale(containerWidth / pageWidth);
+  }, [pageWidth]);
 
   const fitPage = useCallback(() => {
     if (!containerRef.current) return;
     const containerWidth = containerRef.current.clientWidth - 48;
     const containerHeight = containerRef.current.clientHeight - 48;
-    const pdfDefaultWidth = 612;
-    const pdfDefaultHeight = 792;
-    const scaleW = containerWidth / pdfDefaultWidth;
-    const scaleH = containerHeight / pdfDefaultHeight;
+    const scaleW = containerWidth / pageWidth;
+    const scaleH = containerHeight / pageHeight;
     setScale(Math.min(scaleW, scaleH));
-  }, []);
+  }, [pageWidth, pageHeight]);
+
+  const onPageLoadSuccess = useCallback(
+    (page: { originalWidth: number; originalHeight: number }) => {
+      setPageDims({ width: page.originalWidth, height: page.originalHeight });
+    },
+    [],
+  );
 
   /* ---- Scroll active thumbnail into view ---- */
 
@@ -152,7 +162,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
   return (
     <div className="flex h-full w-full flex-col">
       {/* Controls bar */}
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-stone-200 bg-stone-100 px-3 py-1.5 dark:border-stone-700 dark:bg-stone-800">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-muted px-3 py-1.5">
         {/* Left: thumbnail toggle */}
         <Button
           type="button"
@@ -182,7 +192,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-1 text-xs text-stone-700 dark:text-stone-300">
+          <div className="flex items-center gap-1 text-xs text-fg">
             <span className="sr-only">Page</span>
             <input
               type="text"
@@ -191,7 +201,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
               onChange={handlePageInputChange}
               onBlur={handlePageInputCommit}
               onKeyDown={handlePageInputKeyDown}
-              className="h-7 w-10 rounded border border-stone-300 bg-white text-center text-xs tabular-nums dark:border-stone-600 dark:bg-stone-700"
+              className="h-7 w-10 rounded border border-border bg-bg text-center text-xs tabular-nums"
               aria-label="Current page"
             />
             <span>/</span>
@@ -226,7 +236,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
           <select
             value={SCALE_PRESETS.includes(scale as (typeof SCALE_PRESETS)[number]) ? scale : ''}
             onChange={handleScaleSelect}
-            className="h-7 rounded border border-stone-300 bg-white px-1 text-xs dark:border-stone-600 dark:bg-stone-700 dark:text-stone-300"
+            className="h-7 rounded border border-border bg-bg px-1 text-xs text-fg"
             aria-label="Zoom level"
           >
             {!SCALE_PRESETS.includes(scale as (typeof SCALE_PRESETS)[number]) && (
@@ -249,7 +259,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
           >
             <ZoomIn className="h-4 w-4" />
           </Button>
-          <div className="ml-1 h-5 w-px bg-stone-300 dark:bg-stone-600" />
+          <div className="ml-1 h-5 w-px bg-border" />
           <Button
             type="button"
             variant="ghost"
@@ -277,7 +287,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
       <div className="flex min-h-0 flex-1">
         {/* Thumbnail sidebar */}
         {showThumbnails && (
-          <div className="flex w-[160px] shrink-0 flex-col overflow-y-auto border-r border-stone-200 bg-stone-50 p-3 dark:border-stone-700 dark:bg-stone-900">
+          <div className="flex w-[160px] shrink-0 flex-col overflow-y-auto border-r border-border bg-muted p-3">
             <Document file={url} loading={null}>
               {Array.from({ length: numPages }, (_, i) => {
                 const pageNum = i + 1;
@@ -295,9 +305,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
                     type="button"
                     onClick={() => goToPage(pageNum)}
                     className={`mb-2 flex flex-col items-center rounded p-1 transition-colors ${
-                      isActive
-                        ? 'ring-2 ring-primary'
-                        : 'hover:bg-stone-200 dark:hover:bg-stone-800'
+                      isActive ? 'ring-2 ring-primary' : 'hover:bg-bg'
                     }`}
                     aria-label={`Go to page ${pageNum}`}
                     aria-current={isActive ? 'page' : undefined}
@@ -308,9 +316,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
                     />
-                    <span className="mt-1 text-[10px] text-stone-500 dark:text-stone-400">
-                      {pageNum}
-                    </span>
+                    <span className="mt-1 text-[10px] text-muted-fg">{pageNum}</span>
                   </button>
                 );
               })}
@@ -330,7 +336,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
                 </div>
               }
               error={
-                <div className="flex h-full w-full items-center justify-center text-sm text-stone-500">
+                <div className="flex h-full w-full items-center justify-center text-sm text-muted-fg">
                   Failed to load PDF
                 </div>
               }
@@ -338,6 +344,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
               <Page
                 pageNumber={currentPage}
                 scale={scale}
+                onLoadSuccess={onPageLoadSuccess}
                 renderTextLayer={true}
                 renderAnnotationLayer={true}
               />

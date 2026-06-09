@@ -1,0 +1,4 @@
+# Playwright visual-verification harness artifacts (driven by `pnpm visual`).
+visual/__screenshots__/
+test-results/
+playwright-report/

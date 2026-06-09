@@ -1,6 +1,7 @@
 import type { SermonListViewProps, SermonsConfig } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
+import { ResultsEmpty } from '../ui/ResultsState';
 import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 
 export type { SermonListViewProps };
@@ -11,11 +12,11 @@ interface SermonGridProps extends SermonListViewProps {
 
 export function SermonGrid({ sermons, onSermonClick, config }: SermonGridProps) {
   if (sermons.length === 0) {
-    return <div className="py-12 text-center text-muted-fg">No sermons found.</div>;
+    return <ResultsEmpty noun="sermons" />;
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
       {sermons.map((sermon) => (
         <MediaCard
           key={sermon.id}

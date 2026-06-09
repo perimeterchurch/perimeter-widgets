@@ -1,6 +1,7 @@
 import type { SermonListViewProps, SermonsConfig } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
+import { ResultsEmpty } from '../ui/ResultsState';
 import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
 
 export type { SermonListViewProps };
@@ -11,7 +12,7 @@ interface SermonLargeListProps extends SermonListViewProps {
 
 export function SermonLargeList({ sermons, onSermonClick, config }: SermonLargeListProps) {
   if (sermons.length === 0) {
-    return <div className="py-12 text-center text-muted-fg">No sermons found.</div>;
+    return <ResultsEmpty noun="sermons" />;
   }
 
   return (

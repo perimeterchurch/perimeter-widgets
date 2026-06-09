@@ -1,13 +1,20 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@perimeter/ui/input-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@perimeter/ui/input-group';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
 import { X, Search } from 'lucide-react';
 import { DateRangePicker } from '../ui/DateRangePicker';
+import { CollapsibleFilters } from '../ui/CollapsibleFilters';
 import { groupBooksByTestament } from '../../lib/bible-books';
 import type { FilterLabelCache } from '../../hooks/use-filter-label-cache';
+import type { ContainerBreakpoint } from '../../lib/breakpoint';
 import type {
   Speaker,
   Book,
@@ -50,6 +57,10 @@ export interface SermonFiltersProps {
   sort: SortField;
   order: SortOrder;
   hasActiveFilters: boolean;
+  /** Container breakpoint; on `phone` rows 2–3 collapse behind a toggle. */
+  breakpoint: ContainerBreakpoint;
+  /** Count of active collapsible filters; shown as a badge on the phone toggle. */
+  activeFilterCount: number;
   seriesList: SeriesListItem[];
   speakers: Speaker[];
   books: Book[];
@@ -145,7 +156,7 @@ export function SermonFilters(props: SermonFiltersProps) {
     <div className="space-y-3">
       {/* Row 1: Search */}
       {!props.lockedFilters.has('search') && (
-        <InputGroup>
+        <InputGroup className="w-full">
           <InputGroupAddon align="inline-start">
             <Search />
           </InputGroupAddon>
@@ -156,110 +167,123 @@ export function SermonFilters(props: SermonFiltersProps) {
             }
             placeholder="Search sermons..."
           />
+          {props.search && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                aria-label="Clear search"
+                onClick={() => props.onSearchChange('')}
+              >
+                <X />
+              </InputGroupButton>
+            </InputGroupAddon>
+          )}
         </InputGroup>
       )}
 
-      {/* Row 2: Filter dropdowns */}
-      {(!props.lockedFilters.has('series') ||
-        !props.lockedFilters.has('speaker') ||
-        !props.lockedFilters.has('book') ||
-        (props.showServiceTypeFilter && !props.lockedFilters.has('serviceTypes')) ||
-        (props.showSeriesTypeFilter && !props.lockedFilters.has('seriesType'))) && (
-        <div className="flex items-center gap-2">
-          {!props.lockedFilters.has('series') && (
-            <MultiCombobox
-              options={seriesOptions}
-              value={props.selectedSeriesIds.map(String)}
-              onValueChange={(v: string[]) => props.onSeriesChange(v.map(Number))}
-              placeholder="All Series"
-              selectedLabel="Series"
-              disabled={props.seriesLoading ?? false}
-              className="flex-1"
-              multiple
-              isOpen={openDropdown === 'series'}
-              onOpenChange={(open: boolean) => setOpenDropdown(open ? 'series' : null)}
-            />
-          )}
-          {!props.lockedFilters.has('speaker') && (
-            <MultiCombobox
-              options={speakerOptions}
-              value={props.selectedSpeakerIds.map(String)}
-              onValueChange={(v: string[]) => props.onSpeakerChange(v.map(Number))}
-              placeholder="All Speakers"
-              selectedLabel="Speakers"
-              disabled={props.speakersLoading ?? false}
-              className="flex-1"
-              multiple
-              isOpen={openDropdown === 'speaker'}
-              onOpenChange={(open: boolean) => setOpenDropdown(open ? 'speaker' : null)}
-            />
-          )}
-          {!props.lockedFilters.has('book') && (
-            <MultiCombobox
-              options={bookOptions}
-              value={props.selectedBookIds.map(String)}
-              onValueChange={(v: string[]) =>
-                props.onBookChange(v.filter((val) => !val.startsWith('__group_')).map(Number))
-              }
-              placeholder="All Books"
-              selectedLabel="Books"
-              disabled={props.booksLoading ?? false}
-              className="flex-1"
-              multiple
-              isOpen={openDropdown === 'book'}
-              onOpenChange={(open: boolean) => setOpenDropdown(open ? 'book' : null)}
-            />
-          )}
-          {!props.lockedFilters.has('serviceTypes') && props.showServiceTypeFilter && (
-            <MultiCombobox
-              options={serviceTypeOptions}
-              value={props.selectedServiceTypeIds.map(String)}
-              onValueChange={(v: string[]) => props.onServiceTypesChange(v.map(Number))}
-              placeholder="Service Types"
-              selectedLabel="Service Types"
-              disabled={props.serviceTypesLoading ?? false}
-              className="flex-1"
-              multiple
-              isOpen={openDropdown === 'serviceType'}
-              onOpenChange={(open: boolean) => setOpenDropdown(open ? 'serviceType' : null)}
-            />
-          )}
-          {!props.lockedFilters.has('seriesType') && props.showSeriesTypeFilter && (
-            <MultiCombobox
-              options={seriesTypeOptions}
-              value={props.selectedSeriesTypeIds.map(String)}
-              onValueChange={(v: string[]) => props.onSeriesTypeChange(v.map(Number))}
-              placeholder="Series Types"
-              selectedLabel="Series Types"
-              disabled={props.seriesTypesLoading ?? false}
-              className="flex-1"
-              multiple
-              isOpen={openDropdown === 'seriesType'}
-              onOpenChange={(open: boolean) => setOpenDropdown(open ? 'seriesType' : null)}
-            />
-          )}
-        </div>
-      )}
+      <CollapsibleFilters
+        breakpoint={props.breakpoint}
+        activeFilterCount={props.activeFilterCount}
+        hasActive={props.hasActiveFilters}
+        onClear={props.onClearFilters}
+      >
+        {/* Row 2: Filter dropdowns */}
+        {(!props.lockedFilters.has('series') ||
+          !props.lockedFilters.has('speaker') ||
+          !props.lockedFilters.has('book') ||
+          (props.showServiceTypeFilter && !props.lockedFilters.has('serviceTypes')) ||
+          (props.showSeriesTypeFilter && !props.lockedFilters.has('seriesType'))) && (
+          <div className="flex flex-wrap items-center gap-2">
+            {!props.lockedFilters.has('series') && (
+              <MultiCombobox
+                options={seriesOptions}
+                value={props.selectedSeriesIds.map(String)}
+                onValueChange={(v: string[]) => props.onSeriesChange(v.map(Number))}
+                placeholder="All Series"
+                selectedLabel="Series"
+                disabled={props.seriesLoading ?? false}
+                multiple
+                isOpen={openDropdown === 'series'}
+                onOpenChange={(open: boolean) => setOpenDropdown(open ? 'series' : null)}
+              />
+            )}
+            {!props.lockedFilters.has('speaker') && (
+              <MultiCombobox
+                options={speakerOptions}
+                value={props.selectedSpeakerIds.map(String)}
+                onValueChange={(v: string[]) => props.onSpeakerChange(v.map(Number))}
+                placeholder="All Speakers"
+                selectedLabel="Speakers"
+                disabled={props.speakersLoading ?? false}
+                multiple
+                isOpen={openDropdown === 'speaker'}
+                onOpenChange={(open: boolean) => setOpenDropdown(open ? 'speaker' : null)}
+              />
+            )}
+            {!props.lockedFilters.has('book') && (
+              <MultiCombobox
+                options={bookOptions}
+                value={props.selectedBookIds.map(String)}
+                onValueChange={(v: string[]) =>
+                  props.onBookChange(v.filter((val) => !val.startsWith('__group_')).map(Number))
+                }
+                placeholder="All Books"
+                selectedLabel="Books"
+                disabled={props.booksLoading ?? false}
+                multiple
+                isOpen={openDropdown === 'book'}
+                onOpenChange={(open: boolean) => setOpenDropdown(open ? 'book' : null)}
+              />
+            )}
+            {!props.lockedFilters.has('serviceTypes') && props.showServiceTypeFilter && (
+              <MultiCombobox
+                options={serviceTypeOptions}
+                value={props.selectedServiceTypeIds.map(String)}
+                onValueChange={(v: string[]) => props.onServiceTypesChange(v.map(Number))}
+                placeholder="Service Types"
+                selectedLabel="Service Types"
+                disabled={props.serviceTypesLoading ?? false}
+                multiple
+                isOpen={openDropdown === 'serviceType'}
+                onOpenChange={(open: boolean) => setOpenDropdown(open ? 'serviceType' : null)}
+              />
+            )}
+            {!props.lockedFilters.has('seriesType') && props.showSeriesTypeFilter && (
+              <MultiCombobox
+                options={seriesTypeOptions}
+                value={props.selectedSeriesTypeIds.map(String)}
+                onValueChange={(v: string[]) => props.onSeriesTypeChange(v.map(Number))}
+                placeholder="Series Types"
+                selectedLabel="Series Types"
+                disabled={props.seriesTypesLoading ?? false}
+                multiple
+                isOpen={openDropdown === 'seriesType'}
+                onOpenChange={(open: boolean) => setOpenDropdown(open ? 'seriesType' : null)}
+              />
+            )}
+          </div>
+        )}
 
-      {/* Row 3: Date range + clear all */}
-      {!(props.lockedFilters.has('from') && props.lockedFilters.has('to')) && (
-        <div className="flex items-center gap-3">
-          {!props.lockedFilters.has('from') && (
-            <DateRangePicker
-              from={props.from}
-              to={props.to}
-              onRangeChange={(from, to) => props.onDateRangeChange(from || null, to || null)}
-            />
-          )}
-          <div className="flex-1" />
-          {props.hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={props.onClearFilters}>
-              <X className="h-3.5 w-3.5" />
-              Clear All
-            </Button>
-          )}
-        </div>
-      )}
+        {/* Row 3: Date range + clear all */}
+        {!(props.lockedFilters.has('from') && props.lockedFilters.has('to')) && (
+          <div className="flex items-center gap-3">
+            {!props.lockedFilters.has('from') && (
+              <DateRangePicker
+                from={props.from}
+                to={props.to}
+                onRangeChange={(from, to) => props.onDateRangeChange(from || null, to || null)}
+              />
+            )}
+            <div className="flex-1" />
+            {props.breakpoint !== 'phone' && props.hasActiveFilters && (
+              <Button variant="outline" size="sm" onClick={props.onClearFilters}>
+                <X className="h-3.5 w-3.5" />
+                Clear All
+              </Button>
+            )}
+          </div>
+        )}
+      </CollapsibleFilters>
 
       {/* Active filter chips */}
       {props.hasActiveFilters && (

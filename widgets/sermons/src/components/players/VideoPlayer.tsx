@@ -19,6 +19,7 @@ export function VideoPlayer({ url }: { url: string }) {
     volume,
     playbackRate,
     togglePlay,
+    seek,
     seekTo,
     setVolume,
     setPlaybackRate,
@@ -26,14 +27,45 @@ export function VideoPlayer({ url }: { url: string }) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showControls, setShowControls] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Controls auto-hide only while actively playing AND not hovered. When paused
+  // (or hovered) they stay pinned so a stopped frame never strands the user.
+  const controlsVisible = showControls || !isPlaying || isHovered;
 
   const handleMouseMove = useCallback(() => {
     setShowControls(true);
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
   }, []);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      // Ignore keys aimed at the inline range sliders (they have their own handling).
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT') return;
+      switch (e.key) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          togglePlay();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          seek(5);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          seek(-5);
+          break;
+        default:
+          break;
+      }
+    },
+    [togglePlay, seek],
+  );
 
   useEffect(() => {
     const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
@@ -96,9 +128,18 @@ export function VideoPlayer({ url }: { url: string }) {
   return (
     <div
       ref={containerRef}
-      className="relative flex h-full w-full items-center justify-center bg-black"
+      data-testid="video-stage"
+      tabIndex={0}
+      role="application"
+      aria-label="Video player"
+      className="relative flex h-full w-full items-center justify-center bg-black outline-none focus-visible:ring-2 focus-visible:ring-primary"
       onMouseMove={handleMouseMove}
-      onMouseLeave={() => setShowControls(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setShowControls(false);
+      }}
+      onKeyDown={handleKeyDown}
     >
       <video
         ref={mediaRef as React.RefObject<HTMLVideoElement>}
@@ -107,9 +148,9 @@ export function VideoPlayer({ url }: { url: string }) {
         onClick={togglePlay}
       />
       <div
-        className={`absolute bottom-6 inset-x-0 flex justify-center transition-opacity duration-300 ${showControls ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        className={`absolute bottom-6 inset-x-0 flex justify-center transition-opacity duration-300 ${controlsVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       >
-        <div className="flex w-max max-w-[90vw] items-center gap-3 rounded-xl bg-stone-900/60 px-4 py-2.5 backdrop-blur-md">
+        <div className="flex w-max max-w-[90vw] items-center gap-3 rounded-xl bg-black/60 px-4 py-2.5 backdrop-blur-md">
           <button
             type="button"
             onClick={togglePlay}
@@ -128,7 +169,7 @@ export function VideoPlayer({ url }: { url: string }) {
             step={0.1}
             value={currentTime}
             onChange={(e) => seekTo(parseFloat(e.target.value))}
-            className="h-1.5 w-40 min-w-24 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary"
+            className="h-1.5 w-40 min-w-24 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Seek"
           />
           <div className="flex items-center gap-2">

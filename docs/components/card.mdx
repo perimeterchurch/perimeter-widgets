@@ -1,0 +1,43 @@
+# Card
+
+A surface that groups related content into a bordered, slightly-raised panel. Compose it from its parts — `CardHeader`, `CardTitle`, and `CardContent` — rather than passing content as props, so each region keeps its own spacing.
+
+<Example label="Anatomy">
+  <Card className="w-72">
+    <CardHeader>
+      <CardTitle>This Sunday</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      <p className="text-sm text-muted-fg">
+        Worship at 9:00 and 11:00 in the Worship Center.
+      </p>
+      <Button size="sm">Plan your visit</Button>
+    </CardContent>
+  </Card>
+</Example>
+
+## Usage
+
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from '@perimeter/ui/card';
+
+<Card>
+  <CardHeader>
+    <CardTitle>This Sunday</CardTitle>
+  </CardHeader>
+  <CardContent>Worship at 9:00 and 11:00.</CardContent>
+</Card>;
+```
+
+`CardContent` is padded with its top padding removed (`p-6 pt-0`) so it sits flush under a `CardHeader`. When a card has no header, add your own top padding to the content.
+
+## Parts
+
+| Component     | Element | Description                                                                        |
+| ------------- | ------- | ---------------------------------------------------------------------------------- |
+| `Card`        | `div`   | The bordered, shadowed surface. The outer container for everything below.          |
+| `CardHeader`  | `div`   | Top region for the title (and any header actions); a vertical stack with `p-6`.    |
+| `CardTitle`   | `h3`    | The card's heading. Semibold, tight leading.                                       |
+| `CardContent` | `div`   | The body region. Padded `p-6 pt-0` to sit flush under the header.                  |
+
+Every part forwards its ref and accepts native `div` / `h3` attributes plus `className`.

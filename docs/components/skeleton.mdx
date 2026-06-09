@@ -1,0 +1,31 @@
+# Skeleton
+
+A muted, pulsing placeholder block that holds the shape of content while it loads. Size it with width/height utilities to mirror the real element (a line of text, an avatar, a thumbnail) so the layout doesn't shift when data arrives.
+
+<Example label="Loading card">
+  <div className="flex w-72 items-center gap-3">
+    <Skeleton className="size-12 rounded-full" />
+    <div className="flex flex-1 flex-col gap-2">
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+    </div>
+  </div>
+</Example>
+
+## Usage
+
+```tsx
+import { Skeleton } from '@perimeter/ui/skeleton';
+
+<Skeleton className="h-4 w-32" />;
+```
+
+Compose several to sketch a whole card or row. To cross-fade from the placeholder to the loaded content once data arrives, wrap both in [SkeletonTransition](/components/skeleton-transition).
+
+## Props
+
+| Prop        | Type     | Description                                                            |
+| ----------- | -------- | --------------------------------------------------------------------- |
+| `className` | `string` | Size + shape utilities (`h-*`, `w-*`, `rounded-*`) for the placeholder.|
+
+All other native `<div>` attributes pass through.

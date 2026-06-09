@@ -1,0 +1,61 @@
+# Combobox
+
+A low-level, composable searchable select built on Base UI `Combobox`. You assemble it from parts — `ComboboxInput`, `ComboboxContent`, `ComboboxList`, `ComboboxItem` — and feed the root an `items` array. Reach for it when you need full control over the menu's structure (groups, separators, custom items). For the common "pick one or many from a list" case, prefer the prop-driven [MultiCombobox](/components/multi-combobox) instead.
+
+<Example label="Search field">
+  <StageContainer>
+    {(container) => (
+      <Combobox items={['Johns Creek', 'Gwinnett', 'Midtown']}>
+        <ComboboxInput placeholder="Pick a campus" className="w-64" />
+        <ComboboxContent container={container}>
+          <ComboboxList>
+            {(item) => (
+              <ComboboxItem key={item} value={item}>
+                {item}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    )}
+  </StageContainer>
+</Example>
+
+> In a real widget you pass the shadow root as `container` (see Usage). This live
+> example uses the studio's `StageContainer` helper to hand the popup the stage's
+> shadow-root container so it renders themed and in-tree.
+
+## Usage
+
+The root provides the data and state; the input and popup are children. The popup must portal into the widget's shadow root, so pass `container` to `ComboboxContent`:
+
+```tsx
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxList,
+  ComboboxItem,
+} from '@perimeter/ui/combobox';
+
+<Combobox items={['Johns Creek', 'Gwinnett', 'Midtown']}>
+  <ComboboxInput placeholder="Pick a campus" />
+  <ComboboxContent container={shadowRoot}>
+    <ComboboxList>
+      {(item: string) => <ComboboxItem key={item} value={item}>{item}</ComboboxItem>}
+    </ComboboxList>
+  </ComboboxContent>
+</Combobox>;
+```
+
+## Parts
+
+| Component        | Description                                                                        |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `Combobox`       | The Base UI root. Takes `items` plus the usual `value`/`onValueChange` props.      |
+| `ComboboxInput`  | The text field; `showTrigger`/`showClear` toggle the inline chevron and clear button. |
+| `ComboboxContent`| The portaled popup. Pass `container` (the shadow root) so it renders in-tree.       |
+| `ComboboxList`   | The scroll container for items; accepts a render function over `items`.            |
+| `ComboboxItem`   | A selectable row with a check indicator when active.                               |
+
+The module also exports group, label, separator, empty-state, and chips parts (`ComboboxGroup`, `ComboboxLabel`, `ComboboxSeparator`, `ComboboxEmpty`, `ComboboxChips`, …) for richer menus.

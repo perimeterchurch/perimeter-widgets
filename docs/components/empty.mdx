@@ -1,0 +1,54 @@
+# Empty
+
+An empty-state panel for "no results", "nothing here yet", or first-run placeholders. Compose it from `EmptyHeader` (with an optional `EmptyMedia` icon, `EmptyTitle`, and `EmptyDescription`) and an optional `EmptyContent` for a call to action.
+
+<Example label="No results">
+  <Empty className="w-72 border">
+    <EmptyHeader>
+      <EmptyTitle>No sermons found</EmptyTitle>
+      <EmptyDescription>Try clearing your filters or searching a different term.</EmptyDescription>
+    </EmptyHeader>
+    <EmptyContent>
+      <Button variant="outline" size="sm">
+        Clear filters
+      </Button>
+    </EmptyContent>
+  </Empty>
+</Example>
+
+## Usage
+
+```tsx
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from '@perimeter/ui/empty';
+import { SearchX } from 'lucide-react';
+
+<Empty>
+  <EmptyHeader>
+    <EmptyMedia variant="icon">
+      <SearchX />
+    </EmptyMedia>
+    <EmptyTitle>No sermons found</EmptyTitle>
+    <EmptyDescription>Try a different search.</EmptyDescription>
+  </EmptyHeader>
+</Empty>;
+```
+
+The root is `border-dashed` but transparent — add a `border` (and width) where you place it. `EmptyMedia variant="icon"` renders the muted rounded icon chip.
+
+## Parts
+
+| Component          | Description                                                              |
+| ------------------ | ----------------------------------------------------------------------- |
+| `Empty`            | The centered, dashed-border container.                                  |
+| `EmptyHeader`      | Stacks the media, title, and description.                               |
+| `EmptyMedia`       | The icon slot; `variant="icon"` gives it the muted chip background.     |
+| `EmptyTitle`       | The heading line.                                                       |
+| `EmptyDescription` | The supporting text (styles nested links).                             |
+| `EmptyContent`     | A slot below the header for actions (buttons, links).                   |

@@ -1,9 +1,8 @@
 # Sermons Widget
 
 > **Scope:** Sermon search/browse, series listing, watch/listen view
-> **Key files:** `packages/widget-sermons/src/`
+> **Key files:** `widgets/sermons/src/`
 > **Status:** Ready
-> **Last verified:** 2026-03-19
 
 ---
 
@@ -217,26 +216,14 @@ The widget uses nuqs to sync state to the URL query string. Parameters:
 
 ---
 
-## Campus ID Mapping (Backwards Compat)
-
-`resolveCampusId()` in `types.ts` converts string slugs to congregation IDs:
-
-| Slug                | ID  |
-| ------------------- | --- |
-| `buckhead`          | 1   |
-| `brookhaven`        | 2   |
-| `peachtree-corners` | 3   |
-
----
-
 ## Auth
 
-Public widget — `requiresAuth: false`. No authentication needed.
+Public widget — `defineWidget({ auth: 'none' })`. No authentication needed.
 
 ---
 
 ## Related Docs
 
 - [Architecture Overview](../architecture/overview.md) — Widget lifecycle
-- [Adding a Widget](../guides/adding-a-widget.md) — How this widget was scaffolded
+- [Creating a widget](../creating-a-widget.md) — How a new widget is scaffolded
 - [Widget Embed Guide](../reference/embed-guide.md) — Embed patterns

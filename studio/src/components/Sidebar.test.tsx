@@ -1,0 +1,140 @@
+// @vitest-environment happy-dom
+import { describe, it, expect, afterEach, beforeAll } from 'vitest';
+import { render, within, fireEvent, cleanup } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
+import { Sidebar } from './Sidebar';
+import type { NavGroup } from '../lib/nav';
+
+// The studio suite has no global RTL auto-cleanup; scope queries to each render's
+// own container and unmount between tests so renders don't leak.
+afterEach(cleanup);
+
+// Sidebar now uses useStudioTheme, which persists to localStorage; happy-dom in
+// this worker leaves it undefined. Mirror the in-memory shim used elsewhere.
+beforeAll(() => {
+  if (typeof globalThis.localStorage === 'undefined') {
+    const store = new Map<string, string>();
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: (k: string) => store.get(k) ?? null,
+        setItem: (k: string, v: string) => void store.set(k, v),
+        removeItem: (k: string) => void store.delete(k),
+        clear: () => store.clear(),
+        key: () => null,
+        get length() {
+          return store.size;
+        },
+      },
+    });
+  }
+});
+
+const fixtureNav: NavGroup[] = [
+  {
+    label: 'Widgets',
+    items: [
+      { to: '/widgets/sermons', label: 'sermons' },
+      { to: '/widgets/example', label: 'example' },
+    ],
+  },
+  {
+    label: 'Components',
+    items: [{ to: '/components/button', label: 'button' }],
+  },
+  {
+    label: 'Reference',
+    items: [{ to: '/tokens', label: 'Tokens' }],
+  },
+];
+
+describe('Sidebar', () => {
+  it('renders each group label', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    expect(ui.getByText('Widgets')).toBeTruthy();
+    expect(ui.getByText('Components')).toBeTruthy();
+    expect(ui.getByText('Reference')).toBeTruthy();
+  });
+
+  it('filters items as you type in the search box (case-insensitive)', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    const search = ui.getByRole('searchbox');
+
+    fireEvent.change(search, { target: { value: 'serm' } });
+
+    expect(ui.getByRole('link', { name: 'sermons' })).toBeTruthy();
+    expect(ui.queryByRole('link', { name: 'example' })).toBeNull();
+    expect(ui.queryByRole('link', { name: 'button' })).toBeNull();
+  });
+
+  it('shows an empty state when nothing matches the filter', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    fireEvent.change(ui.getByRole('searchbox'), { target: { value: 'zzz-nomatch' } });
+    expect(ui.getByText(/no matches/i)).toBeTruthy();
+  });
+
+  it('offers a clear-search affordance from the empty state that restores all nav', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    const search = ui.getByRole('searchbox');
+    fireEvent.change(search, { target: { value: 'zzz-nomatch' } });
+
+    // The dead-end "No matches" state carries a button to clear the filter.
+    const clear = ui.getByRole('button', { name: /clear search/i });
+    fireEvent.click(clear);
+
+    // Search is reset and the full nav returns.
+    expect((search as HTMLInputElement).value).toBe('');
+    expect(ui.getByRole('link', { name: 'sermons' })).toBeTruthy();
+    expect(ui.getByRole('link', { name: 'example' })).toBeTruthy();
+  });
+
+  it('renders a chrome theme toggle that flips data-theme on the document element', () => {
+    document.documentElement.removeAttribute('data-theme');
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    const toggle = ui.getByRole('button', { name: /theme/i });
+    // Default-dark chrome: the hook applies dark on mount.
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    fireEvent.click(toggle);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    document.documentElement.removeAttribute('data-theme');
+  });
+
+  it('marks the link for the current route active via aria-current="page"', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/widgets/sermons']}>
+        <Sidebar nav={fixtureNav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    const active = ui.getByRole('link', { name: 'sermons' });
+    expect(active.getAttribute('aria-current')).toBe('page');
+    // A non-active link must not carry the marker.
+    const inactive = ui.getByRole('link', { name: 'example' });
+    expect(inactive.getAttribute('aria-current')).toBeNull();
+  });
+});

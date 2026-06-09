@@ -1,0 +1,54 @@
+# Components
+
+`@perimeter/ui` is the shared component library every widget builds on. The
+components are shadcn-derived, styled entirely with design tokens, and shipped as
+a workspace package — import them with the `@perimeter/ui/<name>` subpath
+(`import { Button } from '@perimeter/ui/button'`). Styling a widget is
+components-first: reach for one of these before writing bespoke markup, and see
+the [styling guide](/guides/styling-widgets) for the tokens-first philosophy.
+
+## How components render inside a widget
+
+A widget renders inside a **shadow root**, and these components render there too —
+not in the host page's light DOM. Because they style themselves with the token
+custom properties (`bg-primary`, `text-fg`, `rounded-md`, …) rather than
+hard-coded values, they automatically inherit the palette, including any per-embed
+overrides a host page sets. The studio previews each component through that *same*
+shadow-DOM path (the `ComponentStage`), so what you see on a `/components/<name>`
+page is what a widget gets — no light-DOM divergence.
+
+One consequence to remember: components with **portaled overlays** (the dropdown
+menus on [Combobox](/components/combobox) and [MultiCombobox](/components/multi-combobox))
+must portal back into the widget's shadow root, not `document.body`, or their styles and
+event handling break. Each of those docs notes how — pass the `container` (Base UI)
+or `environment` (downshift) for the shadow root.
+
+## Composing them
+
+Most components are either prop-driven (pass data in, render) or compound (you
+assemble named parts). [MultiCombobox](/components/multi-combobox),
+[SortSelect](/components/sort-select), and [IconSelect](/components/icon-select)
+are prop-driven. [Card](/components/card), [Tabs](/components/tabs),
+[Pagination](/components/pagination), [InputGroup](/components/input-group), and
+[Empty](/components/empty) are compound — compose them from their parts (e.g.
+`Card` + `CardHeader` + `CardTitle` + `CardContent`) so each region keeps its own
+spacing. Combine the form primitives — [Label](/components/label) +
+[Input](/components/input) / [Textarea](/components/textarea), or
+[InputGroup](/components/input-group) for an input with addons — for accessible
+fields.
+
+## Coverage
+
+Each documented component has a `/components/<name>` page with a live example,
+usage snippet, and props. Components are discovered from `packages/ui/src/`, so the
+sidebar always lists every export; ones without an authored doc fall back to an
+auto-generated gallery (still rendered through the shadow-DOM stage).
+
+**Documented:** Badge, Button, Card, Input, Textarea, Label, Combobox,
+MultiCombobox, SortSelect, IconSelect, Tabs, SegmentedTabs, Pagination,
+InputGroup, Empty, Spinner, Skeleton, SkeletonTransition.
+
+Every `@perimeter/ui` export now has an authored doc; the auto-gallery fallback
+described above only appears for a freshly scaffolded component before its doc
+lands. Use Spinner for a loading indicator and Skeleton / SkeletonTransition for
+content placeholders while data loads.

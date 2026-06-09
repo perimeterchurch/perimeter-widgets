@@ -1,17 +1,16 @@
 # Developer Setup
 
-> **Scope:** Local environment, pnpm, dev server, storyboard, Storybook
-> **Key files:** `package.json`, `turbo.json`, `pnpm-workspace.yaml`
-> **Last verified:** 2026-03-18
+> **Scope:** Local environment, pnpm, the Vite studio, dev commands
+> **Key files:** `package.json`, `turbo.json`, `pnpm-workspace.yaml`, `studio/`
 
 ---
 
 ## Prerequisites
 
-| Tool    | Version | Notes                                                      |
-| ------- | ------- | ---------------------------------------------------------- |
-| Node.js | 20+     | Project tested against v25                                 |
-| pnpm    | 10+     | Install: `corepack enable && corepack prepare pnpm@latest` |
+| Tool    | Version       | Notes                                                      |
+| ------- | ------------- | ---------------------------------------------------------- |
+| Node.js | 22+           | `engines.node` is `>=22`                                   |
+| pnpm    | 10 (`10.32.1`) | Pinned via `packageManager`; `corepack enable` picks it up |
 
 Always use `pnpm` — never `npm` or `npx`.
 
@@ -26,104 +25,73 @@ git clone <repo-url> && cd perimeter-widgets
 # Install dependencies
 pnpm install
 
-# Start the widget storyboard (dev preview)
+# Start the Vite studio (dev harness + design-system site)
 pnpm dev
-
-# Start Storybook for shared components
-pnpm storybook
 ```
 
 ---
 
 ## Dev Commands
 
-| Command                              | Description                                       |
-| ------------------------------------ | ------------------------------------------------- |
-| `pnpm dev`                           | Start widget storyboard on port 5180              |
-| `pnpm storybook`                     | Start shared component Storybook on port 6006     |
-| `pnpm build`                         | Build all widgets to `dist/`                      |
-| `pnpm build --filter=widget-sermons` | Build a single widget                             |
-| `pnpm test`                          | Run all tests via Turborepo                       |
-| `pnpm test --filter=widget-sermons`  | Run tests for a single widget                     |
-| `pnpm lint`                          | ESLint across all packages                        |
-| `pnpm typecheck`                     | TypeScript type checking                          |
-| `pnpm format`                        | Auto-format with Prettier                         |
-| `pnpm quality`                       | Run all checks (typecheck + lint + format + test) |
+| Command                                          | Description                                            |
+| ------------------------------------------------ | ------------------------------------------------------ |
+| `pnpm dev`                                        | Run dev tasks across the workspace (Vite studio + widget watches) |
+| `pnpm build`                                      | Build all packages and widgets via Turborepo           |
+| `pnpm --filter @perimeter/widget-sermons build`   | Build a single widget                                  |
+| `pnpm --filter @perimeter/studio build`           | Build the studio (the MDX validity gate for docs)      |
+| `pnpm test`                                       | Run all tests via Turborepo                            |
+| `pnpm test --filter=@perimeter/widget-sermons`    | Run tests for a single widget                          |
+| `pnpm lint`                                       | ESLint across all packages                             |
+| `pnpm typecheck`                                  | TypeScript type checking                               |
+| `pnpm format`                                     | Auto-format with Prettier                              |
+| `pnpm quality`                                    | Run all gates (typecheck + lint + test + `format:check`) |
+| `pnpm create-widget <name>`                       | Scaffold a new widget                                  |
+| `pnpm release <name> --patch\|--minor\|--major`   | Bump, build, publish to `cdn/`, and open a PR          |
 
 ---
 
-## Storyboard
+## The studio
 
-The storyboard (`packages/storyboard/`) is a custom Vite dev app for previewing full widgets in their shadow DOM containers.
+`pnpm dev` starts the Vite studio (`studio/`) — one app that is both the local dev harness and the deployed read-only design-system site at `style.perimeter.org`. It auto-discovers widgets via `import.meta.glob('/widgets/*/src/widget.tsx')` and `@perimeter/ui` components, and previews everything through the real `mount()` path inside a shadow root, so what you see is what production renders.
 
-- Runs on `http://localhost:5180`
-- Widget registry with `load()` functions and status indicators (ready/skeleton/planned)
-- Dark mode toggle for previewing widgets in light and dark contexts
-- Live config editor — change data attributes and see the widget re-mount instantly
-- Auto-generated embed code snippets for WordPress
-- MSW (Mock Service Worker) intercepts API calls — no real API needed
-- Widgets render inside shadow DOM exactly as they would on WordPress
+Routes: `/` (overview), `/widgets/:slug`, `/components/:name`, `/tokens`, `/guides/:slug`. The component, token, and guide pages render the single-sourced MDX under `docs/`. A dev-only **source ⇄ built-bundle** toggle (gated behind `import.meta.env.DEV`) mounts the actual `widgets/<name>/dist/index.js` for a final pre-release check; it is tree-shaken out of the deployed site.
 
-### Using a real local API
+### Data and images in dev
 
-By default the storyboard uses MSW mocks. To test against a real perimeter-api running locally:
+For previews that need real data (and the images those records reference), run the local **perimeter-api** alongside the studio:
 
 ```bash
-VITE_API_MODE=local pnpm dev
+# In the sibling perimeter-api project
+cd perimeter-api && pnpm dev   # serves on :5500
 ```
 
-Or add to `.env.local`:
+In dev (`import.meta.env.DEV`) the studio targets `http://localhost:5500` automatically via two independent knobs, so no manual config is needed:
 
-```
-VITE_API_MODE=local
-VITE_API_URL=http://localhost:5500
-```
+- **Data** — `WidgetPreview` passes `apiBaseUrl: 'http://localhost:5500'` into `mount()`, so the React Query hooks fetch from the local API.
+- **Images** — `studio/.env.development` sets `VITE_API_URL=http://localhost:5500`, which `lib/format.ts` reads (`import.meta.env.VITE_API_URL`) to build absolute `<img>` URLs.
 
----
-
-## Storybook
-
-Storybook v10 (`packages/shared/.storybook/`) is for developing and documenting shared UI components in isolation.
-
-- Runs on `http://localhost:6006`
-- Stories co-located with components (`Button.stories.tsx` next to `Button.tsx`)
-- Tailwind design tokens loaded in preview
-- Controls, viewport, and other essentials built into Storybook v10 core
-
----
-
-## Environment Variables
-
-Copy the example file: `cp .env.example .env.local`
-
-| Variable        | Default                                           | Description                         |
-| --------------- | ------------------------------------------------- | ----------------------------------- |
-| `VITE_API_URL`  | auto (localhost:5500 dev, api.perimeter.org prod) | API base URL                        |
-| `VITE_API_MODE` | `mock`                                            | `mock` or `local` — storyboard only |
-
-Convention: `VITE_<DOMAIN>_<NAME>`. See `env.d.ts` for type definitions.
+Both are **dev-only**: Vite loads `.env.development` only in serve/dev mode, and the `apiBaseUrl` is gated behind `import.meta.env.DEV`, so the deployed `style.perimeter.org` build never bakes in `localhost:5500` — the production studio falls back to `https://api.perimeter.org`. The studio still launches without perimeter-api running; data-backed previews just error or stay empty until it is up.
 
 ---
 
 ## Building Widgets
 
 ```bash
-# Build all widgets
+# Build all widgets + packages
 pnpm build
 
 # Build a specific widget
-pnpm build --filter=widget-sermons
+pnpm --filter @perimeter/widget-sermons build
 
-# Output
-widgets/sermons/dist/index.js     # IIFE bundle (per widget)
+# Output: widgets/<name>/dist/index.js — a single self-contained IIFE
 ```
 
-Each widget builds to its own `widgets/<name>/dist/index.js`. `pnpm release <name>` copies that immutable artifact into `cdn/<name>/<version>/index.js` (committed there) and updates `cdn/manifest.json`; the static `cdn/` Vercel project at `widgets.perimeter.org` serves it. The per-widget `dist/` is just a build artifact — it is no longer the serving source.
+Each widget builds to its own `widgets/<name>/dist/index.js`. `pnpm release <name> --patch|--minor|--major` copies that immutable artifact into `cdn/<name>/<version>/index.js` (committed there) and updates `cdn/manifest.json`; the static `cdn/` Vercel project at `widgets.perimeter.org` serves it. The per-widget `dist/` is just a build artifact — it is not the serving source.
 
 ---
 
 ## Related Docs
 
 - [Developer Rules](developer-rules.md) — Git workflow, conventions
-- [Adding a Widget](adding-a-widget.md) — Create a new widget
+- [Creating a widget](../creating-a-widget.md) — Scaffold and build a new widget
 - [Architecture Overview](../architecture/overview.md) — How it all fits together

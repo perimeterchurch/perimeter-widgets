@@ -39,9 +39,26 @@ vi.mock('react-pdf', () => {
       </div>
     );
   };
-  const Page = ({ pageNumber }: { pageNumber: number }) => (
-    <div data-testid={`pdf-page-${pageNumber}`}>page {pageNumber}</div>
-  );
+  const Page = ({
+    pageNumber,
+    scale,
+    onLoadSuccess,
+  }: {
+    pageNumber: number;
+    scale?: number;
+    onLoadSuccess?: (page: { originalWidth: number; originalHeight: number }) => void;
+  }) => {
+    useEffect(() => {
+      // Report a non-US-Letter (A4-ish landscape) natural size so tests can
+      // prove the viewer derives fit-scale from REAL page dimensions.
+      onLoadSuccess?.({ originalWidth: 1000, originalHeight: 500 });
+    }, [onLoadSuccess]);
+    return (
+      <div data-testid={`pdf-page-${pageNumber}`} data-scale={scale}>
+        page {pageNumber}
+      </div>
+    );
+  };
   return {
     Document,
     Page,
@@ -152,5 +169,35 @@ describe('PdfViewer', () => {
     // After opening, the same button is now labelled "Hide thumbnails"
     expect(screen.getByLabelText('Hide thumbnails')).toBeInTheDocument();
     expect(screen.queryByLabelText('Show thumbnails')).toBeNull();
+  });
+
+  it('fits width using the loaded page real dimensions, not the US-Letter constant', async () => {
+    const { container } = renderViewer();
+    // Give the scroll container a known width; jsdom reports 0 otherwise.
+    const scroll = container.querySelector('.overflow-auto') as HTMLElement;
+    Object.defineProperty(scroll, 'clientWidth', { value: 1048, configurable: true });
+
+    await userEvent.click(screen.getByLabelText('Fit width'));
+
+    // (1048 - 48 padding) / 1000 real width = 1.0 — NOT 1000/612 (the old constant).
+    const page = screen.getByTestId('pdf-page-1');
+    expect(Number(page.getAttribute('data-scale'))).toBeCloseTo(1.0, 2);
+  });
+
+  // Theme contract: the viewer CHROME (toolbar, inputs) must read from design
+  // tokens so the data-theme swap on the shadow host themes it. The PDF page
+  // canvas itself is the document's own (light) media surface — out of scope.
+  it('renders its chrome from design tokens, not hardcoded grays', () => {
+    const { container } = renderViewer();
+    // The page-number input is representative toolbar chrome.
+    const pageInput = screen.getByLabelText<HTMLInputElement>('Current page');
+    expect(pageInput.className).toContain('bg-bg');
+    expect(pageInput.className).toContain('border-border');
+
+    // No widget-chrome element should carry a hardcoded gray-family palette
+    // class. (bg-black/text-white live only in the always-dark VideoPlayer
+    // media stage, which is a different component.)
+    const html = container.innerHTML;
+    expect(html).not.toMatch(/\b(?:bg|text|border|ring)-(?:gray|slate|zinc|neutral|stone)-\d/);
   });
 });

@@ -1,8 +1,8 @@
 import { useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Tabs, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
+import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
 import { Spinner } from '@perimeter/ui/spinner';
-import { Video, Headphones, FileText } from 'lucide-react';
+import { Video, Headphones, FileText, FileX } from 'lucide-react';
 import { AudioPlayer } from './AudioPlayer';
 import type { SermonLink } from '../../types';
 
@@ -62,21 +62,37 @@ export function MediaTabs({ links }: MediaTabsProps) {
 
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0]?.id ?? 'video');
 
-  if (availableTabs.length === 0) return null;
+  // Some sermons have no media uploaded yet. Rather than rendering nothing
+  // (which leaves a confusing gap), show a small affordance so visitors know
+  // media is expected but not yet available.
+  if (availableTabs.length === 0) {
+    return (
+      <div className="flex items-center gap-2 rounded-lg border border-border bg-muted p-4 text-sm text-muted-fg">
+        <FileX className="h-4 w-4 shrink-0" aria-hidden="true" />
+        No media available yet for this sermon.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="h-10">
-          {availableTabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id} className="gap-1.5 px-4 text-sm">
+      {/* Shared SegmentedTabs control — matches the sermons/series tab switcher
+          (SermonTabs) for a consistent look across the widget. */}
+      <SegmentedTabs
+        items={availableTabs.map((tab) => ({
+          id: tab.id,
+          label: (
+            <>
               {tab.icon}
               {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-      <div className="overflow-hidden rounded-lg border border-[var(--color-border)] min-h-[300px]">
+            </>
+          ),
+        }))}
+        value={activeTab}
+        onChange={setActiveTab}
+        aria-label="Sermon media"
+      />
+      <div className="overflow-hidden rounded-lg border border-border min-h-[300px]">
         <AnimatePresence mode="wait">
           {activeTab === 'video' && videoLink && (
             <motion.div key="video" {...fade} className="aspect-video">

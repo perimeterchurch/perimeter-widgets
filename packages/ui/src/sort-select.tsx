@@ -17,6 +17,7 @@ interface SortSelectProps {
   onSortDirectionChange: (direction: 'asc' | 'desc') => void;
   fields: SortFieldOption[];
   className?: string;
+  compact?: boolean;
 }
 
 export function SortSelect({
@@ -26,6 +27,7 @@ export function SortSelect({
   onSortDirectionChange,
   fields,
   className,
+  compact = false,
 }: SortSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -44,20 +46,21 @@ export function SortSelect({
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          'inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-sm',
+          'inline-flex h-8 max-w-full items-center gap-1.5 rounded-lg border px-2.5 text-sm',
           'border-border bg-transparent text-muted-fg',
           'transition-colors hover:bg-muted/30',
         )}
       >
         <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />
-        <span>
-          Sort by: <span className="font-medium text-fg">{activeField?.label ?? sortField}</span>
+        <span className="min-w-0 truncate">
+          {!compact && 'Sort by: '}
+          <span className="font-medium text-fg">{activeField?.label ?? sortField}</span>
         </span>
         <DirectionIcon className="h-3 w-3 shrink-0" />
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1 w-48 rounded-lg bg-bg shadow-md ring-1 ring-fg/10">
+        <div className="absolute right-0 z-50 mt-1 w-48 max-w-[calc(100vw-1rem)] rounded-lg bg-bg text-fg shadow-md ring-1 ring-fg/10">
           {/* Sort field options */}
           <div className="px-3 pb-1 pt-2.5">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-fg">

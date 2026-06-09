@@ -99,7 +99,15 @@ export function mount<S extends z.ZodTypeAny>(
   const handle: MountedWidget = {
     unmount() {
       (auth as DisposableAuth).dispose?.();
-      root.unmount();
+      // Defer the React root teardown to a microtask. Calling root.unmount()
+      // synchronously while a parent React tree is rendering/committing — a studio
+      // re-mount on a dep change, or an RTL/test unmount — triggers React 19's
+      // "Attempted to synchronously unmount a root while React was already
+      // rendering" warning and an intermittent teardown race. The shadow is cleared
+      // synchronously below so a re-mount on the same host starts clean (mount()
+      // re-clears too); the deferred unmount then tears down the now-detached old
+      // fiber tree after the current commit completes.
+      queueMicrotask(() => root.unmount());
       styles.dispose();
       while (shadow.firstChild) shadow.removeChild(shadow.firstChild);
       deregisterInstance(definition.name, handle);

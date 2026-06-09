@@ -5,6 +5,9 @@ import {
   versionsToPrune,
   buildRewrites,
   compareVersions,
+  nextVersion,
+  releaseBranch,
+  releasePrBody,
 } from '../src/release';
 
 describe('setManifestVersion', () => {
@@ -44,5 +47,33 @@ describe('buildRewrites', () => {
       { source: '/example/latest.js', destination: '/example/0.0.0/index.js' },
       { source: '/sermons/latest.js', destination: '/sermons/1.1.0/index.js' },
     ]);
+  });
+});
+
+describe('nextVersion', () => {
+  it('bumps patch/minor/major and zeroes lower parts', () => {
+    expect(nextVersion('1.2.3', 'patch')).toBe('1.2.4');
+    expect(nextVersion('1.2.3', 'minor')).toBe('1.3.0');
+    expect(nextVersion('1.2.3', 'major')).toBe('2.0.0');
+  });
+  it('drops a prerelease suffix when bumping', () => {
+    expect(nextVersion('1.2.0-abc', 'patch')).toBe('1.2.1');
+  });
+  it('throws on a non-numeric version', () => {
+    expect(() => nextVersion('x.y.z', 'patch')).toThrow();
+  });
+});
+
+describe('releaseBranch', () => {
+  it('is deterministic and git-ref-safe', () => {
+    expect(releaseBranch('event-list', '1.3.0')).toBe('release/event-list-1.3.0');
+  });
+});
+
+describe('releasePrBody', () => {
+  it('includes name, version, and bundle size', () => {
+    const body = releasePrBody({ name: 'sermons', version: '1.0.2', gzBytes: 864400 });
+    expect(body).toContain('sermons@1.0.2');
+    expect(body).toMatch(/844(\.\d+)?\s*KiB|864400/); // size shown in some human form
   });
 });

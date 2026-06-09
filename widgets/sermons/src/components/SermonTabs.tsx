@@ -1,10 +1,26 @@
-import { Tabs, TabsList, TabsTrigger } from '@perimeter/ui/tabs';
+import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
 import { BookOpen, Library } from 'lucide-react';
 import type { TabId } from '../types';
 
-const TAB_DEFS: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: 'sermons', label: 'Sermons', icon: <BookOpen className="h-4 w-4" /> },
-  { id: 'series', label: 'Series', icon: <Library className="h-4 w-4" /> },
+const TAB_DEFS: { id: TabId; label: React.ReactNode }[] = [
+  {
+    id: 'sermons',
+    label: (
+      <>
+        <BookOpen className="h-4 w-4" />
+        Sermons
+      </>
+    ),
+  },
+  {
+    id: 'series',
+    label: (
+      <>
+        <Library className="h-4 w-4" />
+        Series
+      </>
+    ),
+  },
 ];
 
 export interface SermonTabsProps {
@@ -12,17 +28,20 @@ export interface SermonTabsProps {
   onTabChange: (tab: TabId) => void;
 }
 
+/**
+ * The sermons/series tab row. Uses the shared `@perimeter/ui` SegmentedTabs
+ * control (rounded `bg-muted` track, lifted active segment that reads clearly
+ * in both light and dark) — the same control as the studio inspector. This
+ * replaces the `@perimeter/ui` Tabs `line` variant, whose underline indicator
+ * was visually fragile across themes.
+ */
 export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
   return (
-    <Tabs value={activeTab} onValueChange={(value: string) => onTabChange(value as TabId)}>
-      <TabsList className="h-10">
-        {TAB_DEFS.map((tab) => (
-          <TabsTrigger key={tab.id} value={tab.id} className="gap-1.5 px-4 text-sm">
-            {tab.icon}
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </Tabs>
+    <SegmentedTabs
+      items={TAB_DEFS}
+      value={activeTab}
+      onChange={(id) => onTabChange(id as TabId)}
+      aria-label="Sermons and series"
+    />
   );
 }

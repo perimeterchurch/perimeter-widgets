@@ -50,10 +50,18 @@ describe('resolveTokens', () => {
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
-  it('produces cssText with one declaration per resolved token', () => {
+  it('produces a light :host block and a dark :host([data-theme="dark"]) block, each with one declaration per resolved token', () => {
     const { cssText } = resolveTokens({});
     expect(cssText.startsWith(':host')).toBe(true);
-    const declCount = cssText.split('--').length - 1;
-    expect(declCount).toBe(Object.keys(globalTokens).length);
+    // Two blocks: the light `:host` and the dark `:host([data-theme="dark"])`.
+    expect(cssText.match(/:host/g)!.length).toBe(2);
+    const tokenCount = Object.keys(globalTokens).length;
+    const darkIndex = cssText.indexOf(':host([data-theme="dark"])');
+    const light = cssText.slice(0, darkIndex);
+    const dark = cssText.slice(darkIndex);
+    expect(light.split('--').length - 1).toBe(tokenCount);
+    expect(dark.split('--').length - 1).toBe(tokenCount);
+    // Total declarations are one per token per block.
+    expect(cssText.split('--').length - 1).toBe(tokenCount * 2);
   });
 });

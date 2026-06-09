@@ -1,13 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, X, Clock, ArrowRight } from 'lucide-react';
-import { DateTime, Info, type DurationLike } from 'luxon';
+import { Calendar as CalendarIcon, X, ArrowRight } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { cn } from '@perimeter/ui/utils/cn';
-import { Modal } from './Modal';
+import { DateRangePopover } from './date-range/DateRangePopover';
+import { Calendar, type ActiveSide } from './date-range/Calendar';
+import { RangePresets, type DateRangePreset } from './date-range/RangePresets';
 
-export interface DateRangePreset {
-  label: string;
-  duration: DurationLike;
-}
+export type { DateRangePreset };
 
 export interface DateRangePickerProps {
   from: string;
@@ -27,14 +26,14 @@ export interface DateRangePickerProps {
   presets?: DateRangePreset[] | undefined;
 }
 
-const WEEKDAY_LABELS = Info.weekdays('short').map((d) => d.slice(0, 2));
-
-type ActiveSide = 'start' | 'end';
-
 /**
- * Date range picker with a single trigger button that opens a modal.
- * Shows two date "pills" (From / To) at the top of the modal, with
+ * Date range picker with a single trigger button that opens a popover.
+ * Shows two date "pills" (From / To) at the top of the popover, with
  * the calendar below editing whichever pill is active.
+ *
+ * Composed from the self-contained `DateRangePopover` shell, the `Calendar`
+ * month grid, and the `RangePresets` quick-select column (split out of the
+ * former 761-line monolith — no longer depends on the shared `Modal`).
  * Ported from perimeter-api helpdesk DateRangePicker.
  */
 export function DateRangePicker({
@@ -117,7 +116,7 @@ export function DateRangePicker({
             clearable && hasValue && 'rounded-r-none border-r-0',
           )}
         >
-          <Calendar className="h-3.5 w-3.5 shrink-0 text-muted-fg" />
+          <CalendarIcon className="h-3.5 w-3.5 shrink-0 text-muted-fg" />
           {displayText ? (
             <span className="flex-1 truncate text-left">{displayText}</span>
           ) : (
@@ -136,7 +135,7 @@ export function DateRangePicker({
         )}
       </div>
 
-      <Modal open={isOpen} onClose={handleClose} size={presets?.length ? 'lg' : 'sm'}>
+      <DateRangePopover open={isOpen} onClose={handleClose} size={presets?.length ? 'lg' : 'sm'}>
         <RangePanel
           startValue={from}
           endValue={to}
@@ -148,12 +147,12 @@ export function DateRangePicker({
           mode={mode}
           presets={presets}
         />
-      </Modal>
+      </DateRangePopover>
     </div>
   );
 }
 
-/* ─── Range Panel (modal body) ──────────────────────────────────────── */
+/* ─── Range Panel (popover body) ─────────────────────────────────────── */
 
 function RangePanel({
   startValue,
@@ -215,14 +214,12 @@ function RangePanel({
   return (
     <div>
       {/* Header */}
-      <div className="mb-5 flex items-center justify-between border-b border-stone-200 py-5 dark:border-stone-700/60">
-        <span className="px-3 text-sm font-semibold text-stone-800 dark:text-stone-200">
-          Select date range
-        </span>
+      <div className="mb-5 flex items-center justify-between border-b border-border py-5">
+        <span className="px-3 text-sm font-semibold text-fg">Select date range</span>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg px-3 py-2 text-sm font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+          className="rounded-lg px-3 py-2 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-fg"
           aria-label="Close dialog"
         >
           <X className="h-4 w-4" />
@@ -232,54 +229,26 @@ function RangePanel({
       {/* Two-column layout when presets exist, single column otherwise */}
       <div className={cn(hasPresets && 'flex gap-5')}>
         {/* Left panel — presets */}
-        {hasPresets && (
-          <div className="flex w-36 shrink-0 flex-col gap-1.5 border-r border-stone-200 pr-5 dark:border-stone-700/60">
-            <span className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
-              Quick select
-            </span>
-            {presets.map((preset) => (
-              <button
-                key={preset.label}
-                type="button"
-                onClick={() => handlePresetSelect(preset)}
-                className={cn(
-                  'rounded-lg px-3 py-2 text-left text-xs font-medium',
-                  'transition-all duration-150',
-                  'text-stone-600',
-                  'hover:bg-[var(--color-primary)]/5 hover:text-[var(--color-primary)]',
-                  'active:scale-[0.97]',
-                  'dark:text-stone-400',
-                  'dark:hover:bg-[var(--color-primary)]/5 dark:hover:text-[var(--color-primary)]',
-                )}
-              >
-                {preset.label}
-              </button>
-            ))}
-          </div>
-        )}
+        {hasPresets && <RangePresets presets={presets} onSelect={handlePresetSelect} />}
 
         {/* Right panel — date selection */}
         <div className="min-w-0 flex-1">
           {/* From / To segmented control */}
-          <div className="mb-3 flex items-stretch gap-0 rounded-xl bg-stone-100 p-1 dark:bg-stone-800">
+          <div className="mb-3 flex items-stretch gap-0 rounded-xl bg-muted p-1">
             {/* From pill */}
             <button
               type="button"
               onClick={() => setActiveSide('start')}
               className={cn(
                 'group relative flex flex-1 items-center gap-2 rounded-lg px-3 py-2 text-left transition-all duration-150',
-                activeSide === 'start'
-                  ? 'bg-white shadow-sm dark:bg-stone-700'
-                  : 'hover:bg-stone-200/50 dark:hover:bg-stone-700/50',
+                activeSide === 'start' ? 'bg-bg shadow-sm' : 'hover:bg-bg/50',
               )}
             >
               <div className="min-w-0 flex-1">
                 <span
                   className={cn(
                     'block text-[10px] font-semibold uppercase tracking-wider',
-                    activeSide === 'start'
-                      ? 'text-[var(--color-primary)]'
-                      : 'text-stone-400 dark:text-stone-500',
+                    activeSide === 'start' ? 'text-primary' : 'text-muted-fg',
                   )}
                 >
                   From
@@ -287,9 +256,7 @@ function RangePanel({
                 <span
                   className={cn(
                     'block truncate text-sm',
-                    draftStartDate
-                      ? 'font-medium text-stone-900 dark:text-stone-100'
-                      : 'text-stone-400 dark:text-stone-500',
+                    draftStartDate ? 'font-medium text-fg' : 'text-muted-fg',
                   )}
                 >
                   {formatPill(draftStartDate, 'Select start')}
@@ -311,7 +278,7 @@ function RangePanel({
                       setActiveSide('start');
                     }
                   }}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-600 dark:hover:bg-stone-600 dark:hover:text-stone-300"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-muted-fg transition-colors hover:bg-muted hover:text-fg"
                   aria-label="Clear start date"
                 >
                   <X className="h-3 w-3" />
@@ -321,7 +288,7 @@ function RangePanel({
 
             {/* Arrow separator */}
             <div className="flex items-center px-1">
-              <ArrowRight className="h-3.5 w-3.5 text-stone-300 dark:text-stone-600" />
+              <ArrowRight className="h-3.5 w-3.5 text-muted-fg" />
             </div>
 
             {/* To pill */}
@@ -330,18 +297,14 @@ function RangePanel({
               onClick={() => setActiveSide('end')}
               className={cn(
                 'group relative flex flex-1 items-center gap-2 rounded-lg px-3 py-2 text-left transition-all duration-150',
-                activeSide === 'end'
-                  ? 'bg-white shadow-sm dark:bg-stone-700'
-                  : 'hover:bg-stone-200/50 dark:hover:bg-stone-700/50',
+                activeSide === 'end' ? 'bg-bg shadow-sm' : 'hover:bg-bg/50',
               )}
             >
               <div className="min-w-0 flex-1">
                 <span
                   className={cn(
                     'block text-[10px] font-semibold uppercase tracking-wider',
-                    activeSide === 'end'
-                      ? 'text-[var(--color-primary)]'
-                      : 'text-stone-400 dark:text-stone-500',
+                    activeSide === 'end' ? 'text-primary' : 'text-muted-fg',
                   )}
                 >
                   To
@@ -349,9 +312,7 @@ function RangePanel({
                 <span
                   className={cn(
                     'block truncate text-sm',
-                    draftEndDate
-                      ? 'font-medium text-stone-900 dark:text-stone-100'
-                      : 'text-stone-400 dark:text-stone-500',
+                    draftEndDate ? 'font-medium text-fg' : 'text-muted-fg',
                   )}
                 >
                   {formatPill(draftEndDate, 'Now')}
@@ -373,7 +334,7 @@ function RangePanel({
                       setActiveSide('end');
                     }
                   }}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-600 dark:hover:bg-stone-600 dark:hover:text-stone-300"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-muted-fg transition-colors hover:bg-muted hover:text-fg"
                   aria-label="Clear end date"
                 >
                   <X className="h-3 w-3" />
@@ -383,7 +344,7 @@ function RangePanel({
           </div>
 
           {/* Calendar */}
-          <CalendarGrid
+          <Calendar
             value={activeValue}
             selectedDate={activeDate}
             onChange={activeOnChange}
@@ -399,7 +360,7 @@ function RangePanel({
       </div>
 
       {/* Footer */}
-      <div className="mt-5 flex items-center gap-3 border-t border-stone-200 pt-5 dark:border-stone-700/60">
+      <div className="mt-5 flex items-center gap-3 border-t border-border pt-5">
         <button
           type="button"
           onClick={() => {
@@ -409,8 +370,8 @@ function RangePanel({
           className={cn(
             'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
             hasSelection
-              ? 'text-stone-500 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200'
-              : 'pointer-events-none text-stone-300 dark:text-stone-600',
+              ? 'text-muted-fg hover:bg-muted hover:text-fg'
+              : 'pointer-events-none text-muted-fg opacity-50',
           )}
         >
           Clear
@@ -419,7 +380,7 @@ function RangePanel({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+          className="rounded-lg px-4 py-2 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-fg"
         >
           Close
         </button>
@@ -430,347 +391,12 @@ function RangePanel({
             'rounded-lg px-5 py-2 text-sm font-medium',
             'transition-all duration-150 active:scale-[0.98]',
             isDirty || hasSelection
-              ? 'bg-[var(--color-primary)] text-white shadow-sm hover:opacity-90'
-              : 'bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500',
+              ? 'bg-primary text-primary-fg shadow-sm hover:opacity-90'
+              : 'bg-muted text-muted-fg',
           )}
         >
           Apply
         </button>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Calendar Grid ─────────────────────────────────────────────────── */
-
-function CalendarGrid({
-  value,
-  selectedDate,
-  onChange,
-  mode,
-  min,
-  max,
-  rangeStart,
-  rangeEnd,
-  activeSide,
-  onSideSwitch,
-}: {
-  value: string;
-  selectedDate: DateTime | null;
-  onChange: (value: string) => void;
-  mode: 'date' | 'datetime';
-  min?: string | undefined;
-  max?: string | undefined;
-  rangeStart: DateTime | null;
-  rangeEnd: DateTime | null;
-  activeSide: ActiveSide;
-  onSideSwitch: () => void;
-}) {
-  const [calendarView, setCalendarView] = useState<DateTime>(
-    () => selectedDate?.startOf('month') ?? DateTime.now().startOf('month'),
-  );
-
-  const today = useMemo(() => DateTime.now().startOf('day'), []);
-
-  const minDate = useMemo(() => (min ? DateTime.fromISO(min) : null), [min]);
-  const maxDate = useMemo(() => (max ? DateTime.fromISO(max) : null), [max]);
-
-  const isDateDisabled = useCallback(
-    (day: DateTime) => {
-      if (minDate && day < minDate.startOf('day')) return true;
-      if (maxDate && day > maxDate.startOf('day')) return true;
-      return false;
-    },
-    [minDate, maxDate],
-  );
-
-  const calendarDays = useMemo(() => {
-    const startOfMonth = calendarView.startOf('month');
-    const startPad = startOfMonth.weekday - 1;
-    const gridStart = startOfMonth.minus({ days: startPad });
-
-    const days: DateTime[] = [];
-    for (let i = 0; i < 42; i++) {
-      days.push(gridStart.plus({ days: i }));
-    }
-
-    return days;
-  }, [calendarView]);
-
-  const handleDayClick = useCallback(
-    (day: DateTime) => {
-      if (isDateDisabled(day)) return;
-
-      if (mode === 'datetime') {
-        const time = selectedDate ?? DateTime.now();
-        const combined = day.set({
-          hour: time.hour,
-          minute: time.minute,
-        });
-        onChange(combined.toFormat("yyyy-MM-dd'T'HH:mm"));
-      } else {
-        onChange(day.toFormat('yyyy-MM-dd'));
-        onSideSwitch();
-      }
-    },
-    [mode, selectedDate, onChange, isDateDisabled, onSideSwitch],
-  );
-
-  const handleTimeChange = useCallback(
-    (hour: number, minute: number) => {
-      const base = selectedDate ?? DateTime.now();
-      const updated = base.set({ hour, minute });
-      onChange(updated.toFormat("yyyy-MM-dd'T'HH:mm"));
-    },
-    [selectedDate, onChange],
-  );
-
-  const navigateMonth = useCallback((delta: number) => {
-    setCalendarView((v) => v.plus({ months: delta }));
-  }, []);
-
-  const goToToday = useCallback(() => {
-    setCalendarView(DateTime.now().startOf('month'));
-  }, []);
-
-  const isInRange = useCallback(
-    (day: DateTime) => {
-      if (!rangeStart || !rangeEnd) return false;
-      const dayStart = day.startOf('day');
-      return dayStart >= rangeStart.startOf('day') && dayStart <= rangeEnd.startOf('day');
-    },
-    [rangeStart, rangeEnd],
-  );
-
-  const isRangeStart = useCallback(
-    (day: DateTime) => (rangeStart ? day.hasSame(rangeStart, 'day') : false),
-    [rangeStart],
-  );
-
-  const isRangeEnd = useCallback(
-    (day: DateTime) => (rangeEnd ? day.hasSame(rangeEnd, 'day') : false),
-    [rangeEnd],
-  );
-
-  return (
-    <div className="rounded-xl bg-stone-50/50 p-4 dark:bg-stone-800/30">
-      {/* Month navigation */}
-      <div className="mb-2 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => navigateMonth(-1)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-white hover:text-stone-600 hover:shadow-sm dark:hover:bg-stone-700 dark:hover:text-stone-300"
-          aria-label="Previous month"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold tracking-tight text-stone-800 dark:text-stone-200">
-            {calendarView.toFormat('MMMM yyyy')}
-          </span>
-          {(calendarView.month !== today.month || calendarView.year !== today.year) && (
-            <button
-              type="button"
-              onClick={goToToday}
-              className="rounded-md bg-[var(--color-primary)]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary)]/20"
-            >
-              Today
-            </button>
-          )}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => navigateMonth(1)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-white hover:text-stone-600 hover:shadow-sm dark:hover:bg-stone-700 dark:hover:text-stone-300"
-          aria-label="Next month"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Weekday headers */}
-      <div className="mb-0.5 grid grid-cols-7 text-center">
-        {WEEKDAY_LABELS.map((label) => (
-          <div
-            key={label}
-            className="py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500"
-          >
-            {label}
-          </div>
-        ))}
-      </div>
-
-      {/* Day cells */}
-      <div className="grid grid-cols-7">
-        {calendarDays.map((day) => {
-          const isCurrentMonth = day.month === calendarView.month;
-          const isSelected = selectedDate && day.hasSame(selectedDate, 'day');
-          const isToday = day.hasSame(today, 'day');
-          const isDisabled = isDateDisabled(day);
-          const inRange = isInRange(day);
-          const isStart = isRangeStart(day);
-          const isEnd = isRangeEnd(day);
-
-          return (
-            <button
-              key={day.toISODate()}
-              type="button"
-              disabled={isDisabled}
-              onClick={() => handleDayClick(day)}
-              className={cn(
-                'relative flex h-9 w-full items-center justify-center text-sm',
-                'transition-all duration-100',
-                // Range highlight
-                inRange && !isStart && !isEnd && 'bg-[var(--color-primary)]/8',
-                isStart && 'rounded-l-lg bg-[var(--color-primary)]/8',
-                isEnd && 'rounded-r-lg bg-[var(--color-primary)]/8',
-                isStart && isEnd && 'rounded-lg',
-                !inRange && !isStart && !isEnd && 'rounded-lg',
-                // Text & hover
-                !isCurrentMonth && 'text-stone-300 dark:text-stone-600',
-                isCurrentMonth &&
-                  !isSelected &&
-                  !isDisabled &&
-                  'text-stone-700 hover:bg-white hover:shadow-sm dark:text-stone-300 dark:hover:bg-stone-700',
-                isToday && !isSelected && 'font-bold text-[var(--color-primary)]',
-                isSelected &&
-                  'rounded-lg bg-[var(--color-primary)] font-semibold text-white shadow-sm',
-                isDisabled && 'cursor-not-allowed opacity-30',
-                !isDisabled && 'cursor-pointer',
-              )}
-            >
-              {day.day}
-              {isToday && (
-                <span
-                  className={cn(
-                    'absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full',
-                    isSelected ? 'bg-white' : 'bg-[var(--color-primary)]',
-                  )}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Time input */}
-      {mode === 'datetime' && (
-        <TimeInput
-          hour={selectedDate?.hour ?? DateTime.now().hour}
-          minute={selectedDate?.minute ?? DateTime.now().minute}
-          onTimeChange={handleTimeChange}
-          disabled={!value}
-          label={activeSide === 'start' ? 'Start time' : 'End time'}
-        />
-      )}
-    </div>
-  );
-}
-
-/* ─── Time Input (12-hour with AM/PM) ────────────────────────────────── */
-
-function TimeInput({
-  hour,
-  minute,
-  onTimeChange,
-  disabled,
-  label,
-}: {
-  hour: number;
-  minute: number;
-  onTimeChange: (hour: number, minute: number) => void;
-  disabled: boolean;
-  label?: string | undefined;
-}) {
-  const isPM = hour >= 12;
-  const display12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-
-  const handleHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = Math.max(1, Math.min(12, parseInt(e.target.value) || 1));
-    let h24: number;
-    if (isPM) {
-      h24 = raw === 12 ? 12 : raw + 12;
-    } else {
-      h24 = raw === 12 ? 0 : raw;
-    }
-    onTimeChange(h24, minute);
-  };
-
-  const handleMinuteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = Math.max(0, Math.min(59, parseInt(e.target.value) || 0));
-    onTimeChange(hour, raw);
-  };
-
-  const togglePeriod = () => {
-    const newHour = isPM ? hour - 12 : hour + 12;
-    onTimeChange(newHour, minute);
-  };
-
-  return (
-    <div
-      className={cn(
-        'mt-3 flex items-center justify-center gap-2 rounded-lg bg-white px-3 py-2.5 shadow-sm dark:bg-stone-700',
-        disabled && 'pointer-events-none opacity-40',
-      )}
-    >
-      <Clock className="h-3.5 w-3.5 shrink-0 text-stone-400" />
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
-        {label ?? 'Time'}
-      </span>
-      <div className="ml-auto flex items-center gap-1.5">
-        <input
-          type="number"
-          min={1}
-          max={12}
-          value={display12.toString().padStart(2, '0')}
-          onChange={handleHourChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') e.currentTarget.blur();
-          }}
-          className="h-8 w-12 rounded-md border border-stone-200 bg-stone-50 px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30 dark:border-stone-600 dark:bg-stone-800"
-          aria-label={label ? `${label} hour` : 'Hour'}
-        />
-        <span className="text-sm font-bold text-stone-300 dark:text-stone-500">:</span>
-        <input
-          type="number"
-          min={0}
-          max={59}
-          value={minute.toString().padStart(2, '0')}
-          onChange={handleMinuteChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') e.currentTarget.blur();
-          }}
-          className="h-8 w-12 rounded-md border border-stone-200 bg-stone-50 px-1 text-center text-sm tabular-nums focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30 dark:border-stone-600 dark:bg-stone-800"
-          aria-label={label ? `${label} minute` : 'Minute'}
-        />
-        <div className="flex h-8 overflow-hidden rounded-md border border-stone-200 text-[11px] font-semibold dark:border-stone-600">
-          <button
-            type="button"
-            onClick={!isPM ? undefined : togglePeriod}
-            className={cn(
-              'px-2.5 transition-colors',
-              !isPM
-                ? 'bg-[var(--color-primary)] text-white'
-                : 'bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:bg-stone-800 dark:text-stone-500 dark:hover:bg-stone-700',
-            )}
-          >
-            AM
-          </button>
-          <button
-            type="button"
-            onClick={isPM ? undefined : togglePeriod}
-            className={cn(
-              'px-2.5 transition-colors',
-              isPM
-                ? 'bg-[var(--color-primary)] text-white'
-                : 'bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:bg-stone-800 dark:text-stone-500 dark:hover:bg-stone-700',
-            )}
-          >
-            PM
-          </button>
-        </div>
       </div>
     </div>
   );

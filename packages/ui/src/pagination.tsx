@@ -33,23 +33,23 @@ function PaginationItem({ ...props }: React.ComponentProps<'li'>) {
 type PaginationLinkProps = {
   isActive?: boolean | undefined;
   size?: React.ComponentProps<typeof Button>['size'];
-} & React.ComponentProps<'a'>;
+} & React.ComponentProps<'button'>;
 
+// Pagination is onClick-driven (it mutates page state, it doesn't navigate), so
+// each control is a real <button>: implicitly tab-focusable and
+// Enter/Space-activatable, and announced as a button rather than a hrefless
+// link. `aria-current="page"` still marks the active page for screen readers.
 function PaginationLink({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) {
   return (
     <Button
+      type="button"
       variant={isActive ? 'outline' : 'ghost'}
       size={size}
       className={cn('cursor-pointer', className)}
-      nativeButton={false}
-      render={
-        <a
-          aria-current={isActive ? 'page' : undefined}
-          data-slot="pagination-link"
-          data-active={isActive}
-          {...props}
-        />
-      }
+      aria-current={isActive ? 'page' : undefined}
+      data-slot="pagination-link"
+      data-active={isActive}
+      {...props}
     />
   );
 }

@@ -28,6 +28,10 @@
       "types": "./src/tabs.tsx",
       "default": "./src/tabs.tsx"
     },
+    "./segmented-tabs": {
+      "types": "./src/segmented-tabs.tsx",
+      "default": "./src/segmented-tabs.tsx"
+    },
     "./combobox": {
       "types": "./src/combobox.tsx",
       "default": "./src/combobox.tsx"

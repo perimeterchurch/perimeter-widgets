@@ -98,18 +98,26 @@ function InfoSection({
   const hasCornersLayout = topLeft || topRight || bottomLeft || bottomRight;
 
   if (hasCornersLayout) {
+    // Coherent scan order: title first, then a single meta row
+    // (date · speaker · book), then the series pill pinned to the bottom.
+    // `topLeft` = date, `bottomLeft` = speaker, `bottomRight` = book,
+    // `topRight` = series pill.
+    const metaItems = [topLeft, bottomLeft, bottomRight].filter(Boolean);
     return (
       <div className="flex flex-1 flex-col gap-1.5">
-        {topLeft && <span className="text-xs text-muted-fg truncate">{topLeft}</span>}
         <p className="font-medium text-sm leading-snug line-clamp-2">{title}</p>
-        {topRight && <span className="text-xs text-muted-fg">{topRight}</span>}
-        {description && <p className="text-xs text-muted-fg line-clamp-2">{description}</p>}
-        {(bottomLeft || bottomRight) && (
-          <div className="mt-auto flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-fg truncate">{bottomLeft}</span>
-            <span className="text-xs text-muted-fg truncate text-right">{bottomRight}</span>
+        {metaItems.length > 0 && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-fg">
+            {metaItems.map((item, i) => (
+              <span key={i} className="flex items-center gap-2">
+                {i > 0 && <span aria-hidden="true">·</span>}
+                {item}
+              </span>
+            ))}
           </div>
         )}
+        {description && <p className="text-xs text-muted-fg line-clamp-2">{description}</p>}
+        {topRight && <div className="mt-auto pt-0.5">{topRight}</div>}
       </div>
     );
   }
@@ -152,6 +160,8 @@ export function MediaCard({
   };
 
   const hasCornersLayout = topLeft || topRight || bottomLeft || bottomRight;
+  // Compact list keeps only date (topLeft) + speaker (bottomLeft).
+  const compactMeta = [topLeft, bottomLeft].filter(Boolean);
 
   if (viewMode === 'list') {
     return (
@@ -167,11 +177,17 @@ export function MediaCard({
         />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{title}</p>
-          <div className="flex items-center gap-2 text-xs text-muted-fg">
-            {topLeft}
-            {topRight && <>{topRight}</>}
-            {bottomLeft}
-            {bottomRight && <>{bottomRight}</>}
+          <div className="flex min-w-0 items-center gap-x-2 text-xs text-muted-fg">
+            {/* Compact list trims to the two most scannable slots
+                (date · speaker) with a separator so they don't run together;
+                the series pill (topRight) and book (bottomRight) are dropped
+                to keep the single line legible. */}
+            {compactMeta.map((item, i) => (
+              <span key={i} className="flex min-w-0 items-center gap-2">
+                {i > 0 && <span aria-hidden="true">·</span>}
+                {item}
+              </span>
+            ))}
             {!hasCornersLayout && subtitle && <span className="truncate">{subtitle}</span>}
           </div>
         </div>
@@ -186,7 +202,7 @@ export function MediaCard({
           key={imageUrl}
           src={imageUrl}
           alt={imageAlt}
-          className="aspect-video w-56 flex-shrink-0"
+          className="aspect-video w-32 flex-shrink-0 @[30rem]:w-56"
         />
         <div className="flex flex-1 flex-col gap-1 p-4">
           {!hasCornersLayout && (

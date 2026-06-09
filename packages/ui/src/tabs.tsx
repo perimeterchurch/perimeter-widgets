@@ -39,7 +39,7 @@ function TabsList({
 }: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>) {
   const listRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
-  const prevTransform = useRef('');
+  const prevKey = useRef('');
   const [indicatorStyle, setIndicatorStyle] = useState<CSSProperties>({});
 
   const updateIndicator = useCallback(() => {
@@ -51,20 +51,27 @@ function TabsList({
 
     const isVertical = list.closest('[data-orientation=vertical]') !== null;
 
+    // Measure relative to the list (the indicator's containing block) rather
+    // than offsetLeft/offsetParent, and size the underline to the active
+    // trigger's full extent so it sits directly under the selected tab.
+    const listRect = list.getBoundingClientRect();
+    const tabRect = activeTab.getBoundingClientRect();
+    const offset = isVertical ? tabRect.top - listRect.top : tabRect.left - listRect.left;
+    const size = isVertical ? tabRect.height : tabRect.width;
+    const transform = isVertical ? `translateY(${offset}px)` : `translateX(${offset}px)`;
+
+    // Re-measure whenever the active tab's position OR size changes; never
+    // early-return on a real change (e.g. a tab-change moving the underline).
+    const key = `${transform}|${size}`;
+    if (key === prevKey.current && !isFirstRender.current) return;
+
     const skipTransition = isFirstRender.current;
     if (isFirstRender.current) isFirstRender.current = false;
+    prevKey.current = key;
 
     const transition = skipTransition
       ? 'none'
       : 'transform 200ms ease-out, width 200ms ease-out, height 200ms ease-out';
-
-    const size = isVertical ? activeTab.offsetHeight * 0.6 : activeTab.offsetWidth * 0.6;
-    const transform = isVertical
-      ? `translateY(${activeTab.offsetTop + activeTab.offsetHeight * 0.2}px)`
-      : `translateX(${activeTab.offsetLeft + activeTab.offsetWidth * 0.2}px)`;
-
-    if (transform === prevTransform.current && !skipTransition) return;
-    prevTransform.current = transform;
 
     setIndicatorStyle(
       isVertical
@@ -137,7 +144,7 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
       className={cn(
         "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-fg/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-fg focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-muted-fg dark:hover:text-fg group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         'group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent',
-        'data-active:bg-bg data-active:text-fg dark:data-active:border-border dark:data-active:bg-muted/30 dark:data-active:text-fg',
+        'data-active:bg-bg data-active:text-fg dark:data-active:border-border dark:data-active:bg-muted/30',
         className,
       )}
       {...props}

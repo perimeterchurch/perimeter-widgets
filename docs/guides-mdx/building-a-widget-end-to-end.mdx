@@ -1,0 +1,189 @@
+# Building a widget end to end
+
+This is the narrative spine for taking a widget from an empty directory to a
+released bundle on the streamlined platform. It ties together the scaffolder, the
+widget anatomy, the dev loop, and the four deeper guides — getting data, styling,
+testing, and releasing. Each step links the canonical reference rather than
+repeating it, so there is one source of truth for every detail.
+
+The whole path: **scaffold → wire up data → style → test → release**. A widget
+renders inside a shadow root through the single `mount()` path in
+`@perimeter/widget-runtime` — the same code runs in the studio (dev) and in the
+shipped IIFE (prod), so what you see in the studio is what production gets.
+
+## 1. Scaffold
+
+```bash
+pnpm create-widget <your-widget>
+```
+
+The name must be kebab-case and not already taken. The scaffolder renders
+`widgets/<your-widget>/` from the template, writes a stub doc at
+`docs/widgets/<your-widget>.mdx`, and runs `pnpm install` so the workspace graph
+picks up the new package. The workspace globs `widgets/*`, so there is **no
+`pnpm-workspace.yaml` edit** — registration is automatic.
+
+> **Commit the updated `pnpm-lock.yaml`.** The scaffold's `pnpm install` changes
+> the lockfile. Commit it before releasing — `pnpm release` with
+> `--patch`/`--minor`/`--major` guards on a clean working tree and will refuse
+> otherwise.
+
+See [Creating a widget](../creating-a-widget.md) for the field-by-field walkthrough.
+
+## 2. Widget anatomy
+
+The scaffold writes a small, fixed set of files under `widgets/<your-widget>/src/`.
+Only the first two normally need your attention.
+
+### `widget.tsx` — the definition
+
+The studio-importable definition (no CSS import here). You set the `name`, the
+auth mode, the config `schema`, and wire up your `App`:
+
+```tsx
+import { defineWidget } from '@perimeter/widget-runtime';
+import { z } from 'zod';
+import { App } from './app';
+
+export default defineWidget({
+  name: '<your-widget>', // MUST match widgetConfig({ name }) and data-perimeter-widget
+  auth: 'none', // or an auth mode if the widget needs a signed-in user
+  schema: z.object({
+    title: z.string().default('<your-widget>'),
+    count: z.coerce.number().int().min(0).max(20).default(3),
+  }),
+  App: ({ config }) => <App config={config} />,
+});
+```
+
+The `name` must match in **three** places: `defineWidget({ name })`,
+`widgetConfig({ name })` in `vite.config.ts`, and the host page's
+`data-perimeter-widget="<your-widget>"`. The scaffolder already wires all three.
+
+### The `data-*` config contract — coerce everything
+
+Host-page configuration arrives as `data-*` attributes, and HTML attributes are
+**always strings**. A widget reading `data-count="3"` gets the string `"3"`, not
+the number `3`. Use `z.coerce.number()` / `z.coerce.boolean()` for every numeric
+or boolean field in the schema so the studio and production parse identical input
+the same way. The parity audit pinned this as the H6 lesson: a non-coercing schema
+that happens to work in the studio (where defaults fill in) breaks the moment a
+host page supplies a real string attribute. The keys minus `data-theme-*` (which
+the runtime reserves for per-embed token overrides) are parsed against the schema
+and handed to your `App` as a typed `config`.
+
+### The rest
+
+- `app.tsx` — your UI. Build it with `@perimeter/ui` components and token
+  utilities (see [Styling widgets](/guides/styling-widgets)).
+- `entry.ts` — the production IIFE bootstrap. It imports the compiled CSS as a
+  `?inline` string and self-mounts; you rarely touch it. `css` is the single CSS
+  source for both dev and prod.
+- `styles.css` — the three `@tailwind` directives; add widget-specific CSS here
+  if you must, but prefer utilities.
+- `vite.config.ts` — `widgetConfig({ name })`, already filled in. It builds
+  `entry.ts` into one self-contained `dist/index.js` IIFE, pins
+  `NODE_ENV=production`, injects the version, and applies the rem→px transform.
+
+## 3. The dev loop
+
+```bash
+pnpm --filter @perimeter/studio dev
+```
+
+(`pnpm dev` from the root runs the same studio plus the widget watches.) The Vite
+studio auto-discovers widgets via `import.meta.glob('/widgets/*/src/widget.tsx')`
+and lists yours automatically — no registry to hand-edit. Select it to preview
+through the real `mount()` on the studio canvas, with live `data-*` config editing,
+the theme editor, a light/dark toggle, a host-page-sim background, and HMR. Edit
+`src/app.tsx` and the preview hot-reloads.
+
+> **Data-backed widgets need the local API.** If your widget pulls from
+> perimeter-api, run it alongside the studio (`cd perimeter-api && pnpm dev` →
+> `:5500`) so data and images load. In dev the studio targets `localhost:5500`
+> automatically (runtime `apiBaseUrl` for data + `VITE_API_URL` for image URLs);
+> both are dev-only and never bake into the deployed `style.perimeter.org` build.
+> See [Developer setup](../guides/developer-setup.md) for the details.
+
+## 4. Getting data
+
+Most widgets pull their data from **perimeter-api** through typed React Query
+hooks in `@perimeter/api-hooks`. That is the hardest part of building a widget —
+it can span both repos (discover the MP tables, add an endpoint, regenerate types,
+write a hook). The full path lives in its own guide:
+
+➡ **[Data & API](/guides/data-and-api)** — MP schema discovery, checking for an
+existing endpoint, building a new perimeter-api endpoint, regenerating types with
+`pnpm --filter @perimeter/api-hooks sync`, and consuming the hook in the widget.
+
+If the data your widget needs is static or host-supplied, skip this step.
+
+## 5. Styling
+
+Style tokens-first: reach for design tokens and `@perimeter/ui` components before
+writing bespoke CSS, and the widget looks right in the studio and on the
+production WordPress page alike.
+
+<Example label="System components, system tokens">
+  <div className="flex flex-wrap items-center gap-3">
+    <Button variant="primary">Primary action</Button>
+    <Badge>Tagged</Badge>
+    <Card className="px-4 py-3 text-sm text-fg">Surface on the bg token</Card>
+  </div>
+</Example>
+
+➡ **[Styling widgets](/guides/styling-widgets)** — the token model, `@perimeter/ui`
+vs. custom markup, the rem→px and shadow-DOM-inheritance facts from the parity
+work, and per-embed `data-theme-*` overrides. The live token reference is at
+[`/tokens`](/tokens) and the component docs at [`/components`](/components).
+
+## 6. Testing
+
+The scaffold ships two starter tests under `widgets/<your-widget>/tests/`:
+
+- **`app.test.tsx`** — a render guard: mounts `App` with a config and asserts the
+  output. Extend it as you build real UI.
+- **`bundle.test.ts`** — a build-output check: builds the widget and asserts a
+  single `dist/index.js` IIFE with inlined CSS (no separate `.css` asset) that
+  references the widget name and the `PerimeterWidgets` global.
+
+Before opening a PR, run the gate from the repo root:
+
+```bash
+pnpm format
+pnpm quality
+```
+
+`pnpm quality` runs typecheck + lint + test + `format:check` across the workspace.
+Run `pnpm format` first — the gate only checks formatting and fails on unformatted
+files; don't make a separate formatting-only commit. (Note: a local `pnpm quality`
+can be a turbo cache replay — if you need to prove tests actually ran for CI, use
+`pnpm exec turbo run test --force`.)
+
+## 7. Releasing
+
+When the widget is ready to ship:
+
+```bash
+pnpm release <your-widget> --patch
+```
+
+(`--minor` / `--major` for larger bumps.) This bumps the version, builds, publishes
+to an immutable `cdn/<your-widget>/<version>/`, updates the manifest, commits on a
+fresh `release/<name>-<version>` branch, pushes, and opens the PR into `dev`. Bare
+`pnpm release <your-widget>` (no flag) builds and commits without pushing or
+opening a PR.
+
+➡ **[Hosting & release](../hosting-and-release.md)** — the `cdn/` hosting model,
+the embed snippet, how production updates flow, and the batched `dev → main`
+release.
+
+## Checklist
+
+- [ ] Scaffolded with `pnpm create-widget`; committed the lockfile change.
+- [ ] `name` matches in `defineWidget`, `widgetConfig`, and `data-perimeter-widget`.
+- [ ] Every numeric/boolean schema field uses `z.coerce.*`.
+- [ ] Data wired through an `@perimeter/api-hooks` hook (if the widget needs data).
+- [ ] Styled tokens-first with `@perimeter/ui`; previewed against the host-sim.
+- [ ] `pnpm format` then `pnpm quality` pass.
+- [ ] Released with `pnpm release <name> --patch|--minor|--major`.

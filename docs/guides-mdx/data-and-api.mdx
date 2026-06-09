@@ -1,0 +1,242 @@
+# Data & API
+
+Most widgets pull their data from **perimeter-api** (a sibling Next.js project,
+prod `https://api.perimeter.org`) through typed React Query hooks in
+`@perimeter/api-hooks`. This is the hardest part of building a widget because it
+can span both repos: you discover the Ministry Platform (MP) tables, add an
+endpoint in perimeter-api, regenerate the widget's API types, write a hook, then
+consume it. This guide walks that path end to end. Each cross-repo step links the
+canonical reference rather than reproducing it.
+
+The shape of the seam:
+
+1. **Discover** the MP tables/columns that back the widget (`mp-explore`).
+2. **Check** whether perimeter-api already exposes that data.
+3. **Build** a new perimeter-api endpoint if it does not, then regenerate its spec.
+4. **Regenerate** the widget's operation types and write a hook.
+5. **Consume** the hook inside the widget.
+
+If the data your widget needs is static or host-supplied, skip this guide.
+
+## 1. Discover the data in MP
+
+Use the `mp-explorer` CLI to find the tables and columns behind the data. Run it
+from a sibling project (perimeter-api is the natural home) with the absolute path
+so the call is directory-independent:
+
+```bash
+(cd /Users/parkerb/dev/perimeter/claude/mp-explorer && pnpm mp-explore schema Sermons --json)
+```
+
+The flag gotchas matter — **unknown flags are silently ignored and return
+wrong-but-plausible results**:
+
+- The table name is a **positional** argument, never `--table`.
+- Record count is `--top N` (default 10 — raise it to fetch all rows).
+- The table filter is `--filter`, never `--search`.
+
+Lean on the existing skills instead of remembering this by hand: the
+**`discover-mp-schema`** skill drives `mp-explore` with the gotchas baked in, and
+**`verify-mp-columns-against-live-schema`** confirms a column actually exists and
+is populated before you trust it in a query. MP column names are case-sensitive
+Pascal_Case (`Contact.Email_Address`, `Sermon_Title`) — verify, don't guess.
+
+## 2. Does an endpoint already exist?
+
+Before building anything in perimeter-api, check whether the data is already
+served. Two places to look:
+
+- **The hooks already shipped.** Open `packages/api-hooks/src/index.ts` — every
+  exported hook is a ready-made data source (`useSermons`, `useSeries`,
+  `useSpeakers`, `useBooks`, …). If one fits, jump to step 5.
+- **The OpenAPI spec.** `packages/api-hooks/spec/spec.yaml` is a copy of
+  perimeter-api's `openapi/spec.yaml`. Search it for the path/operation you need.
+  If perimeter-api exposes the endpoint but no hook wraps it yet, skip step 3 and
+  go straight to step 4 (regenerate types + write the hook).
+
+## 3. Build a new perimeter-api endpoint
+
+This step happens in the **perimeter-api repo**
+(`/Users/parkerb/dev/perimeter/claude/perimeter-api`). perimeter-api uses a
+layered, dependency-injected request flow:
+
+```
+Route → Controller → Service → System → Provider → MP REST API
+```
+
+For a new domain you add a slice through each layer, mirroring an existing one
+(the `sermons` domain is a clean template):
+
+| Layer | Location | Role |
+| --- | --- | --- |
+| Route | `src/app/api/(public)/<domain>/route.ts` | HTTP entry, in a `(public)` or `(authenticated)` route group. Calls the controller only. |
+| Controller | `src/controllers/<domain>/` | Resolves the request, calls the service. Wired via DI: `DIContainer.getInstance().get(...)`. |
+| Service | `src/services/<domain>/` | Orchestration / business logic. |
+| System | `src/systems/mp/<domain>/` | The **only** layer that touches the MP provider. |
+| Models / transformers | `src/data/...` (zod schemas + transformers) | Validate and reshape the MP rows into the response. |
+| OpenAPI registry | `src/openapi/registry/<domain>.ts` | Registers the path + schemas so the spec (and thus the widget types) include it. |
+
+MP access in the System layer goes through the provider with OData query options:
+
+```ts
+this.provider.tables.list('Sermons', {
+  filter: "Cancelled = 0 AND Sermon_Title <> ''", // single quotes; Pascal_Case columns
+  select: 'Sermon_ID, Sermon_Title, Date_Created',
+  orderby: 'Date_Created DESC',
+  top: 25,
+});
+```
+
+A few of perimeter-api's critical rules bear on widget data specifically — but
+**read `perimeter-api/CLAUDE.md` for the authoritative depth**; do not work from
+this summary alone:
+
+- Never use `auth.sub` directly for an authenticated endpoint — use
+  `resolveUserId(auth)` / `auth.userId` from `@lib/auth` (`parseInt` truncates
+  GUIDs).
+- Never select `dp_Users.Display_Name` / `dp_Users.User_Email` — JOIN to
+  `Contact` and use `First_Name` / `Last_Name` / `Nickname` / `Email_Address`.
+- Never use raw JS `Date` for formatting/arithmetic — use the Luxon helpers in
+  `src/lib/datetime` (all datetimes are America/New_York).
+- OData filters use **single quotes** and **Pascal_Case** column names.
+
+➡ **`perimeter-api/CLAUDE.md`** and its `docs/architecture/overview.md` are the
+source of truth for the DI container, base classes, caching, and the full anatomy
+of a domain. Use the **`discover-mp-schema`** and
+**`verify-mp-columns-against-live-schema`** skills while you write the query.
+
+When the endpoint works, regenerate perimeter-api's spec and types **in the
+perimeter-api repo**:
+
+```bash
+pnpm generate:spec:types
+```
+
+This rebuilds `openapi/spec.yaml` from the registry (and perimeter-api's own
+types). Commit it — the widget side reads that file in the next step.
+
+## 4. Regenerate widget types and write a hook
+
+Back in **perimeter-widgets**, pull perimeter-api's spec and regenerate the typed
+operations:
+
+```bash
+pnpm --filter @perimeter/api-hooks sync
+```
+
+`sync` copies `../../../perimeter-api/openapi/spec.yaml` to
+`packages/api-hooks/spec/spec.yaml`, then runs `openapi-typescript` to regenerate
+`packages/api-hooks/src/generated/operations.ts`. Every endpoint becomes an entry
+in `operations['<operationId>']` with fully typed params and responses.
+
+Then hand-write a hook in `packages/api-hooks/src/<domain>/use-<thing>.ts`,
+following the existing pattern (this is the real `use-books.ts`):
+
+```ts
+import type { operations } from '../generated/operations';
+import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { useApiClient } from '@perimeter/widget-runtime';
+import { serializeQuery } from '../internal/serialize-query';
+import { fetchJson } from '../internal/fetch-json';
+
+export type UseBooksParams = NonNullable<operations['listBooks']['parameters']['query']>;
+export type UseBooksResponse =
+  operations['listBooks']['responses']['200']['content']['application/json'];
+
+export function useBooks(params: UseBooksParams = {}): UseQueryResult<UseBooksResponse> {
+  const client = useApiClient();
+  return useQuery({
+    queryKey: ['books', params],
+    queryFn: async () => {
+      const search = serializeQuery(params);
+      return fetchJson<UseBooksResponse>(
+        client,
+        `/api/sermons/books${search ? `?${search}` : ''}`,
+        'Books',
+      );
+    },
+  });
+}
+```
+
+The pieces, all already provided by the runtime/package:
+
+- **`operations['<operationId>']`** — the generated types. The `<operationId>` is
+  the one set in perimeter-api's `openapi/registry/<domain>.ts`; find it in the
+  regenerated `operations.ts`.
+- **`useApiClient()`** — returns the `ApiClient` from the widget's mount context
+  (always present inside a mounted widget). Its `fetch` already carries the base
+  URL and the auth header.
+- **`serializeQuery(params)`** — turns the typed query params into a query string
+  (handles arrays and `Date`).
+- **`fetchJson(client, path, label)`** — fetches, throws a labeled error on a
+  non-OK response, and returns the parsed JSON.
+
+Finally export the hook (and its types) from `packages/api-hooks/src/index.ts`,
+matching the existing export lines.
+
+## 5. Consume the hook in the widget
+
+Call the hook from inside your widget's `App`. The runtime mounts every widget
+inside its `ApiClientContext` **and** a React Query `QueryProvider`, so the hook
+just works — no provider setup in the widget:
+
+```tsx
+import { Spinner } from '@perimeter/ui/spinner';
+import { Empty, EmptyTitle } from '@perimeter/ui/empty';
+import { useBooks } from '@perimeter/api-hooks';
+
+export function App({ config }: { config: Config }) {
+  const { data, isLoading, isError } = useBooks();
+  if (isLoading) return <Spinner />;
+  if (isError)
+    return (
+      <Empty>
+        <EmptyTitle>Couldn't load books</EmptyTitle>
+      </Empty>
+    );
+  // The hook returns the response envelope; the list lives on `data.data`.
+  return <BookList books={data.data} />;
+}
+```
+
+Render loading and error states with `@perimeter/ui` (`Spinner`, `Skeleton`,
+`Empty`) so they match the rest of the system — see
+[Styling widgets](/guides/styling-widgets).
+
+### The auth seam
+
+By default a widget mounts with `MPLocalStorageAuth`, which reads the MP token
+from `localStorage` under the key **`mpp-widgets_AuthToken`** (set by the host
+WordPress page when a member is signed in) and sends it as a bearer token. A
+widget that only calls `(public)` endpoints needs no signed-in user; one that
+calls `(authenticated)` endpoints relies on that token being present. Set the
+widget's `auth` mode in `defineWidget({ auth })` accordingly.
+
+### Pointing dev at an API
+
+`mount()` defaults its API base URL to `https://api.perimeter.org`, so the studio
+and shipped bundle both hit production by default. To develop against a local
+perimeter-api (`pnpm dev` there serves `http://localhost:5500`), set the global
+override before the widget mounts:
+
+```js
+globalThis.__PERIMETER_API_URL__ = 'http://localhost:5500';
+```
+
+(`mount()` also accepts an explicit `apiBaseUrl` in its `extras` argument; when
+present it takes precedence over the `__PERIMETER_API_URL__` global, which is
+otherwise the fallback before the production default.)
+
+## Checklist
+
+- [ ] Verified the MP tables/columns with `discover-mp-schema` /
+      `verify-mp-columns-against-live-schema` before querying.
+- [ ] Checked `api-hooks` exports and `spec/spec.yaml` for an existing endpoint.
+- [ ] (If new) Added the endpoint through every perimeter-api layer per
+      `perimeter-api/CLAUDE.md`, then ran `pnpm generate:spec:types` and committed
+      the spec.
+- [ ] Ran `pnpm --filter @perimeter/api-hooks sync`; wrote the hook on the
+      `use-books.ts` pattern; exported it from the index.
+- [ ] Consumed the hook in the widget with `@perimeter/ui` loading/error states.
+- [ ] Set the right `auth` mode; confirmed the API base URL for dev vs prod.

@@ -8,44 +8,72 @@ import type { operations } from '@perimeter/api-hooks';
 export const SermonsConfigSchema = z
   .object({
     // Existing
-    perPage: z.coerce.number().int().min(1).default(12),
-    defaultTab: z.enum(['sermons', 'series']).default('sermons'),
-    defaultView: z.enum(['grid', 'list', 'large']).default('grid'),
-    apiUrl: z.string().optional(),
+    perPage: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .default(12)
+      .describe('Number of results shown per page.'),
+    defaultTab: z
+      .enum(['sermons', 'series'])
+      .default('sermons')
+      .describe('Which tab is selected on first load.'),
+    defaultView: z
+      .enum(['grid', 'list', 'large'])
+      .default('grid')
+      .describe('Initial layout of the results list.'),
+    apiUrl: z.string().optional().describe('Override the perimeter-api base URL (advanced).'),
     // Display and tab lock
-    tab: z.enum(['sermons', 'series']).optional(),
-    display: z.enum(['full', 'compact', 'headless']).default('full'),
+    tab: z
+      .enum(['sermons', 'series'])
+      .optional()
+      .describe('Lock the widget to a single tab and hide the tab bar.'),
+    display: z
+      .enum(['full', 'compact', 'headless'])
+      .default('full')
+      .describe('Overall density: full chrome, compact, or headless.'),
     // Locked filters (sermons tab only)
-    seriesId: z.coerce.string().optional(),
-    speakerId: z.coerce.string().optional(),
-    bookId: z.coerce.string().optional(),
-    serviceTypeId: z.coerce.string().optional(),
-    seriesTypeId: z.coerce.string().optional(),
+    seriesId: z.coerce.string().optional().describe('Pin results to one series by ID.'),
+    speakerId: z.coerce.string().optional().describe('Pin results to one speaker by ID.'),
+    bookId: z.coerce.string().optional().describe('Pin results to one Bible book by ID.'),
+    serviceTypeId: z.coerce.string().optional().describe('Pin results to one service type by ID.'),
+    seriesTypeId: z.coerce.string().optional().describe('Pin results to one series type by ID.'),
     // Hide individual filter dropdowns
-    hideSeries: z.coerce.boolean().optional(),
-    hideSpeaker: z.coerce.boolean().optional(),
-    hideBook: z.coerce.boolean().optional(),
-    hideServiceType: z.coerce.boolean().optional(),
-    hideSeriesType: z.coerce.boolean().optional(),
-    hideDate: z.coerce.boolean().optional(),
-    hideSearch: z.coerce.boolean().optional(),
-    hidePagination: z.coerce.boolean().optional(),
+    hideSeries: z.coerce.boolean().optional().describe('Hide the series filter dropdown.'),
+    hideSpeaker: z.coerce.boolean().optional().describe('Hide the speaker filter dropdown.'),
+    hideBook: z.coerce.boolean().optional().describe('Hide the Bible-book filter dropdown.'),
+    hideServiceType: z.coerce
+      .boolean()
+      .optional()
+      .describe('Hide the service-type filter dropdown.'),
+    hideSeriesType: z.coerce.boolean().optional().describe('Hide the series-type filter dropdown.'),
+    hideDate: z.coerce.boolean().optional().describe('Hide the date-range filter.'),
+    hideSearch: z.coerce.boolean().optional().describe('Hide the search input.'),
+    hidePagination: z.coerce.boolean().optional().describe('Hide the pagination controls.'),
     // Opt-in to show service-type / series-type dropdowns. Both default
     // to hidden because the embedded sermons widget is generally for
     // end-user consumption of one cohort (Sunday Morning), not internal
     // exploration. When showSeriesType is omitted the effective filter
     // pins to "Sunday Morning Sermon" (id=1) — see SermonsView /
     // SeriesView.
-    showServiceType: z.coerce.boolean().optional(),
-    showSeriesType: z.coerce.boolean().optional(),
+    showServiceType: z.coerce
+      .boolean()
+      .optional()
+      .describe('Opt in to show the service-type dropdown.'),
+    showSeriesType: z.coerce
+      .boolean()
+      .optional()
+      .describe('Opt in to show the series-type dropdown (otherwise pinned to Sunday Morning).'),
     from: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
-      .optional(),
+      .optional()
+      .describe('Earliest sermon date to include (YYYY-MM-DD).'),
     to: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD')
-      .optional(),
+      .optional()
+      .describe('Latest sermon date to include (YYYY-MM-DD).'),
   })
   .refine(
     (c) => {

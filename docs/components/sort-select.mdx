@@ -1,0 +1,47 @@
+# SortSelect
+
+A compact "Sort by" dropdown that controls both a sort *field* and a *direction* (ascending/descending) in one control. Fully controlled — you own the `sortField` and `sortDirection` state and update it from the two change handlers.
+
+<Example label="Sort control">
+  <SortSelect
+    sortField="date"
+    sortDirection="desc"
+    fields={[
+      { value: 'date', label: 'Date', icon: <Calendar className="size-3.5" /> },
+      { value: 'title', label: 'Title', icon: <Type className="size-3.5" /> },
+    ]}
+    onSortFieldChange={() => {}}
+    onSortDirectionChange={() => {}}
+  />
+</Example>
+
+## Usage
+
+```tsx
+import { SortSelect, type SortFieldOption } from '@perimeter/ui/sort-select';
+import { Calendar, Type } from 'lucide-react';
+
+const fields: SortFieldOption[] = [
+  { value: 'date', label: 'Date', icon: <Calendar className="size-3.5" /> },
+  { value: 'title', label: 'Title', icon: <Type className="size-3.5" /> },
+];
+
+<SortSelect
+  fields={fields}
+  sortField={sortField}
+  sortDirection={sortDirection}
+  onSortFieldChange={setSortField}
+  onSortDirectionChange={setSortDirection}
+/>;
+```
+
+## Props
+
+| Prop                    | Type                              | Description                                              |
+| ----------------------- | --------------------------------- | -------------------------------------------------------- |
+| `fields`                | `SortFieldOption[]`               | `{ value, label, icon }` sort options.                   |
+| `sortField`             | `string`                          | The currently selected field's `value` (controlled).    |
+| `sortDirection`         | `'asc' \| 'desc'`                 | The current direction (controlled).                      |
+| `onSortFieldChange`     | `(field: string) => void`         | Fires when a field is picked.                            |
+| `onSortDirectionChange` | `(dir: 'asc' \| 'desc') => void`  | Fires when the direction changes.                        |
+| `compact`               | `boolean`                         | Render icon + current value only (drop the `Sort by:` prefix); used by responsive toolbars. Defaults to `false`. |
