@@ -66,3 +66,32 @@ describe('SortSelect', () => {
     expect(container.querySelector('.truncate')).not.toBeNull();
   });
 });
+
+describe('SortSelect compact', () => {
+  it('shows the "Sort by:" prefix by default', () => {
+    render(
+      <SortSelect
+        sortField="date"
+        sortDirection="desc"
+        fields={fields}
+        onSortFieldChange={() => {}}
+        onSortDirectionChange={() => {}}
+      />,
+    );
+    expect(screen.getByText(/Sort by:/)).toBeTruthy();
+  });
+  it('drops the prefix when compact (icon + value only)', () => {
+    render(
+      <SortSelect
+        compact
+        sortField="date"
+        sortDirection="desc"
+        fields={fields}
+        onSortFieldChange={() => {}}
+        onSortDirectionChange={() => {}}
+      />,
+    );
+    expect(screen.queryByText(/Sort by:/)).toBeNull();
+    expect(screen.getByText('Date')).toBeTruthy();
+  });
+});

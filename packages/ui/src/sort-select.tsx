@@ -17,6 +17,7 @@ interface SortSelectProps {
   onSortDirectionChange: (direction: 'asc' | 'desc') => void;
   fields: SortFieldOption[];
   className?: string;
+  compact?: boolean;
 }
 
 export function SortSelect({
@@ -26,6 +27,7 @@ export function SortSelect({
   onSortDirectionChange,
   fields,
   className,
+  compact = false,
 }: SortSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -51,7 +53,8 @@ export function SortSelect({
       >
         <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />
         <span className="min-w-0 truncate">
-          Sort by: <span className="font-medium text-fg">{activeField?.label ?? sortField}</span>
+          {!compact && 'Sort by: '}
+          <span className="font-medium text-fg">{activeField?.label ?? sortField}</span>
         </span>
         <DirectionIcon className="h-3 w-3 shrink-0" />
       </button>
