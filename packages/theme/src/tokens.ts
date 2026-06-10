@@ -2,7 +2,10 @@ export const globalTokens = {
   'color-bg': 'hsl(0 0% 100%)',
   'color-fg': 'hsl(222 47% 11%)',
   'color-muted': 'hsl(210 40% 96%)',
-  'color-muted-fg': 'hsl(215 16% 47%)',
+  // 44% (was 47%): the lightest this can be and keep WCAG AA 4.5:1 for small
+  // text on the muted surfaces it actually renders on (bg-muted, bg-muted/60
+  // chips) — guarded by tests/contrast.test.ts.
+  'color-muted-fg': 'hsl(215 16% 44%)',
   'color-primary': 'hsl(221 83% 53%)',
   'color-primary-fg': 'hsl(210 40% 98%)',
   'color-secondary': 'hsl(210 40% 96%)',
