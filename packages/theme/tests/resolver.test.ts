@@ -59,9 +59,12 @@ describe('resolveTokens', () => {
     const darkIndex = cssText.indexOf(':host([data-theme="dark"])');
     const light = cssText.slice(0, darkIndex);
     const dark = cssText.slice(darkIndex);
-    expect(light.split('--').length - 1).toBe(tokenCount);
-    expect(dark.split('--').length - 1).toBe(tokenCount);
-    // Total declarations are one per token per block.
-    expect(cssText.split('--').length - 1).toBe(tokenCount * 2);
+    // Count custom-property declaration LINES (`  --key: value;`), not raw `--`
+    // occurrences — the :host surface declarations reference tokens via var().
+    const countVarDecls = (block: string) => (block.match(/^ {2}--[\w-]+:/gm) ?? []).length;
+    expect(countVarDecls(light)).toBe(tokenCount);
+    expect(countVarDecls(dark)).toBe(tokenCount);
+    // Total custom-property declarations are one per token per block.
+    expect(countVarDecls(cssText)).toBe(tokenCount * 2);
   });
 });
