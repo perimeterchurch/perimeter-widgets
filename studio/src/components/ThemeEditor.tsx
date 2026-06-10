@@ -11,6 +11,8 @@ const GROUPS: { label: string; prefix: ThemeToken extends `${infer P}-${string}`
   { label: 'Colors', prefix: 'color' },
   { label: 'Radii', prefix: 'radius' },
   { label: 'Fonts', prefix: 'font' },
+  { label: 'Shadows', prefix: 'shadow' },
+  { label: 'Type scale', prefix: 'text' },
 ];
 
 const tokenKeys = Object.keys(globalTokens) as ThemeToken[];

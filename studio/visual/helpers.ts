@@ -249,7 +249,20 @@ export async function openShadowMenu(
   );
   for (let attempt = 0; attempt < 4; attempt++) {
     if (await existsInShadow(page, popupSelector)) return;
-    await clickInShadow(page, triggerSelector);
+    try {
+      await clickInShadow(page, triggerSelector);
+    } catch {
+      // The trigger itself can vanish mid-attempt when a late preview remount
+      // swaps the shadow tree (the initial wait above only proves it existed
+      // once). Re-wait for the new tree's trigger and retry.
+      await page.waitForFunction(
+        ({ hostSel, sel }) =>
+          !!(document.querySelector(hostSel) as HTMLElement | null)?.shadowRoot?.querySelector(sel),
+        { hostSel: PREVIEW_HOST, sel: triggerSelector },
+        { timeout: 5000 },
+      );
+      continue;
+    }
     try {
       await page.waitForFunction(
         ({ hostSel, sel }) =>
@@ -264,6 +277,36 @@ export async function openShadowMenu(
     }
   }
   throw new Error(`shadow menu did not open: ${popupSelector}`);
+}
+
+/**
+ * Open a shadow-root dropdown and read a computed color from inside its popup,
+ * retrying the WHOLE open+read cycle. `openShadowMenu` already retries dropped
+ * clicks, but the subsequent read was one-shot — and a late widget remount
+ * (theme toggles remount the preview) can unmount an already-open popup between
+ * the open confirmation and the read, failing the read with "selector not
+ * found" under suite load. Re-opening is the only valid recovery (the popup
+ * never comes back on its own), so the retry lives at this level.
+ */
+export async function readMenuComputedColor(
+  page: Page,
+  triggerSelector: string,
+  popupSelector: string,
+  targetSelector: string,
+  property = 'color',
+): Promise<string> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await openShadowMenu(page, triggerSelector, popupSelector);
+    try {
+      return await readComputedColor(page, targetSelector, property);
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(`could not read ${targetSelector}: ${String(lastError)}`);
 }
 
 /**
