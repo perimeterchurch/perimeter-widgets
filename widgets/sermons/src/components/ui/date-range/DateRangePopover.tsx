@@ -71,7 +71,12 @@ export function DateRangePopover({ open, onClose, size = 'sm', children }: DateR
     }
     const first = focusable[0]!;
     const last = focusable[focusable.length - 1]!;
-    const active = document.activeElement;
+    // Resolve the active element through the panel's own root: when the
+    // widget renders inside a shadow root, `document.activeElement` retargets
+    // to the shadow HOST, so comparisons against in-shadow elements would
+    // never match and the trap would be inert in every real embed.
+    const root = panel.getRootNode() as Document | ShadowRoot;
+    const active = root.activeElement;
     if (e.shiftKey) {
       if (active === first || active === panel) {
         e.preventDefault();
