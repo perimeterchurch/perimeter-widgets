@@ -47,6 +47,36 @@ describe('toDtcg', () => {
       $value: { colorSpace: 'hsl', components: [222, 47, 11], alpha: 1 },
     });
   });
+
+  it('maps shadow tokens to DTCG shadow layer arrays', () => {
+    // 'shadow-xs': '0 1px 2px 0 rgb(0 0 0 / 0.05)' — single layer with spread
+    expect(doc.light.shadow['xs']).toEqual({
+      $type: 'shadow',
+      $value: [
+        {
+          color: { colorSpace: 'srgb', components: [0, 0, 0], alpha: 0.05 },
+          offsetX: { value: 0, unit: 'px' },
+          offsetY: { value: 1, unit: 'px' },
+          blur: { value: 2, unit: 'px' },
+          spread: { value: 0, unit: 'px' },
+        },
+      ],
+    });
+    // 'shadow-md' is two comma-separated layers with negative spreads
+    expect(doc.light.shadow['md']!.$value).toHaveLength(2);
+    expect(doc.light.shadow['md']!.$value[1]!.spread).toEqual({ value: -2, unit: 'px' });
+    // dark shadows share geometry at higher alpha
+    expect(doc.dark.shadow['xs']!.$value[0]!.color.alpha).toBeGreaterThan(
+      doc.light.shadow['xs']!.$value[0]!.color.alpha,
+    );
+  });
+
+  it('maps type-scale tokens to DTCG dimension values', () => {
+    expect(doc.light.text['base']).toEqual({
+      $type: 'dimension',
+      $value: { value: 16, unit: 'px' },
+    });
+  });
 });
 
 describe('committed tokens.dtcg.json', () => {

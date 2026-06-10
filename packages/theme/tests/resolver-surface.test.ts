@@ -21,7 +21,8 @@ describe('resolveTokens :host surface', () => {
   it('resets the inherited host color and type on the light :host block', () => {
     expect(light).toContain('color: var(--color-fg);');
     expect(light).toContain('font-family: var(--font-sans);');
-    expect(light).toContain('font-size: 16px;');
+    // Token-driven so a data-theme-text-base override scales unstyled text too.
+    expect(light).toContain('font-size: var(--text-base);');
     expect(light).toContain('line-height: 1.5;');
   });
 
