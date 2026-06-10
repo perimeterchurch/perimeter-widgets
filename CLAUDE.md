@@ -37,6 +37,7 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 | `pnpm release <name> --patch\|--minor\|--major` | Bump the version, then build + publish on a fresh `release/<name>-<version>` branch, push, and open the PR to dev                                                                                         |
 | `pnpm --filter @perimeter/api-hooks sync`       | Copy perimeter-api's `openapi/spec.yaml` and regenerate `src/generated/operations.ts`                                                                                                                     |
 | `pnpm parity:css` / `parity:components`         | Generate the dev↔prod parity reports                                                                                                                                                                      |
+| `pnpm tokens:dtcg`                              | Regenerate `packages/theme/tokens.dtcg.json` (DTCG 2025.10 interchange export of the tokens); a sync-guard test fails `pnpm quality` when it drifts from `src/tokens.ts`                                  |
 | `pnpm --filter @perimeter/studio visual`        | Run the studio Playwright visual/a11y harness (`studio/visual/*.spec.ts` — computed-color theme checks, loading states, follow-chrome); needs Playwright browsers installed. Separate from `pnpm quality` |
 
 ## Critical rules
