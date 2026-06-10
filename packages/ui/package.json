@@ -76,6 +76,10 @@
       "types": "./src/skeleton-transition.tsx",
       "default": "./src/skeleton-transition.tsx"
     },
+    "./hooks/use-copied-flash": {
+      "types": "./src/hooks/use-copied-flash.ts",
+      "default": "./src/hooks/use-copied-flash.ts"
+    },
     "./hooks/use-click-outside": {
       "types": "./src/hooks/use-click-outside.ts",
       "default": "./src/hooks/use-click-outside.ts"

@@ -1,6 +1,7 @@
 import { useId, useState } from 'react';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { Button } from '@perimeter/ui/button';
+import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import { SegmentedTabs, segmentedTabId } from '@perimeter/ui/segmented-tabs';
 import { ConfigPanel } from './ConfigPanel';
 import { ThemeEditor } from './ThemeEditor';
@@ -39,13 +40,10 @@ export function embedSnippet(slug: string, config: Record<string, unknown> = {})
  */
 function EmbedSnippet({ slug, config }: { slug: string; config: Record<string, unknown> }) {
   const code = embedSnippet(slug, config);
-  const [copied, setCopied] = useState(false);
+  const { copied, flash } = useCopiedFlash();
 
   const copy = () => {
-    void navigator.clipboard?.writeText(code).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+    void navigator.clipboard?.writeText(code).then(flash);
   };
 
   return (

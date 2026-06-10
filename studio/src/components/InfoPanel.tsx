@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
+import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import { describeSchemaFields, type SchemaField } from '../lib/schema-shape';
 import { camelToKebab } from '../lib/data-attr';
 
@@ -127,14 +127,11 @@ export function InfoPanel({ definition }: Props) {
  * exact attribute so screen-reader users know which row each control copies.
  */
 function CopyAttrButton({ field }: { field: SchemaField }) {
-  const [copied, setCopied] = useState(false);
+  const { copied, flash } = useCopiedFlash();
   const attr = `data-${camelToKebab(field.key)}`;
 
   const copy = () => {
-    void navigator.clipboard?.writeText(dataAttrSnippet(field)).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+    void navigator.clipboard?.writeText(dataAttrSnippet(field)).then(flash);
   };
 
   return (
