@@ -17,17 +17,28 @@
     })
     .then(function (manifest) {
       var seen = {};
-      var nodes = document.querySelectorAll('[data-perimeter-widget]');
-      for (var i = 0; i < nodes.length; i++) {
-        var name = nodes[i].getAttribute('data-perimeter-widget');
-        if (!name || seen[name]) continue;
-        var version = manifest[name];
-        if (!version) continue; // unknown widget — skip silently (guest on someone's page)
-        seen[name] = true;
-        var s = document.createElement('script');
-        s.async = true;
-        s.src = origin + name + '/' + version + '/index.js'; // immutable, 1yr-cached
-        document.head.appendChild(s);
+      function scan() {
+        var nodes = document.querySelectorAll('[data-perimeter-widget]');
+        for (var i = 0; i < nodes.length; i++) {
+          var name = nodes[i].getAttribute('data-perimeter-widget');
+          if (!name || seen[name]) continue;
+          var version = manifest[name];
+          if (!version) continue; // unknown widget — skip silently (guest on someone's page)
+          seen[name] = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = origin + name + '/' + version + '/index.js'; // immutable, 1yr-cached
+          document.head.appendChild(s);
+        }
+      }
+      // With an async <script> in <head>, the manifest fetch can resolve
+      // mid-parse — before placeholder divs lower in the body exist. Scan now
+      // for whatever has been parsed, and rescan once the DOM is complete
+      // (`seen` dedupes); each bundle's own MutationObserver covers anything
+      // added after that.
+      scan();
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', scan);
       }
     })
     .catch(function () {
