@@ -198,6 +198,7 @@ export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
         // state), so an API outage doesn't read as "no results".
         <ResultsError
           noun="series"
+          error={error}
           onRetry={() => {
             void refetch();
           }}

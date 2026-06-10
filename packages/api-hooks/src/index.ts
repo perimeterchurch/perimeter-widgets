@@ -20,3 +20,4 @@ export {
 } from './sermons/use-series-types';
 
 export type { operations, components, paths } from './generated/operations';
+export { ApiError } from './internal/fetch-json';
