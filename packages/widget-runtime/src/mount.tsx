@@ -34,6 +34,14 @@ interface DisposableAuth {
 }
 
 /**
+ * The live handle per host element. mount() on an already-mounted host must
+ * dispose the previous instance first — clearing the shadow DOM alone leaves
+ * the old React tree rendering into detached nodes, the QueryClient's timers
+ * running, and the auth provider's 1s localStorage poll alive forever.
+ */
+const liveHandles = new WeakMap<HTMLElement, MountedWidget>();
+
+/**
  * The single render path. Used identically by the production IIFE (via autoMount)
  * and the studio dev harness. `css` is the widget's compiled Tailwind output,
  * imported as a `?inline` string — the same string in dev and prod.
@@ -44,6 +52,9 @@ export function mount<S extends z.ZodTypeAny>(
   css: string,
   extras: MountExtras = {},
 ): MountedWidget {
+  // Re-mount: dispose the previous instance before building the new one.
+  liveHandles.get(host)?.unmount();
+
   const parsed = parseDataAttrs(host, definition.schema);
   const dataAttrThemeOverrides = parsed.themeOverrides;
   // Studio `configOverrides` must clear the exact gates prod `data-*` attrs clear:
@@ -74,7 +85,18 @@ export function mount<S extends z.ZodTypeAny>(
   const styles = applyStyles(shadow, definition.name, css, tokenCss());
 
   const auth = (extras.authFactory ?? (() => new MPLocalStorageAuth()))();
-  const apiClient = createApiClient({ baseUrl: extras.apiBaseUrl ?? DEFAULT_API_URL, auth });
+  // Base-URL precedence: programmatic extras > the widget's documented
+  // `data-api-url` attribute (parsed into config as `apiUrl`) > default.
+  // Without the config hop, `data-api-url` only affected <img> URLs while
+  // React Query data silently kept coming from prod.
+  const configApiUrl =
+    typeof mergedConfig.apiUrl === 'string' && mergedConfig.apiUrl
+      ? mergedConfig.apiUrl
+      : undefined;
+  const apiClient = createApiClient({
+    baseUrl: extras.apiBaseUrl ?? configApiUrl ?? DEFAULT_API_URL,
+    auth,
+  });
 
   const reactRoot = document.createElement('div');
   shadow.appendChild(reactRoot);
@@ -96,8 +118,14 @@ export function mount<S extends z.ZodTypeAny>(
     </ErrorBoundary>,
   );
 
+  let unmounted = false;
   const handle: MountedWidget = {
+    // Idempotent: both a host-page caller and the runtime's own re-mount /
+    // removal cleanup may race to dispose the same instance.
     unmount() {
+      if (unmounted) return;
+      unmounted = true;
+      if (liveHandles.get(host) === handle) liveHandles.delete(host);
       (auth as DisposableAuth).dispose?.();
       // Defer the React root teardown to a microtask. Calling root.unmount()
       // synchronously while a parent React tree is rendering/committing — a studio
@@ -119,5 +147,6 @@ export function mount<S extends z.ZodTypeAny>(
     },
   };
   registerInstance(definition.name, handle);
+  liveHandles.set(host, handle);
   return handle;
 }
