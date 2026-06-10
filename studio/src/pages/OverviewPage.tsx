@@ -43,7 +43,7 @@ function SectionCard({
               <li key={item.to}>
                 <Link
                   to={item.to}
-                  className="-mx-2 flex items-baseline justify-between gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="-mx-2 flex items-baseline justify-between gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="text-sm font-medium text-fg">{item.title}</span>
                   <code className="font-mono text-xs text-muted-fg">{item.slug}</code>

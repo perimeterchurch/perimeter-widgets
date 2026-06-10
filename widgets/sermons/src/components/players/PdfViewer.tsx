@@ -201,7 +201,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
               onChange={handlePageInputChange}
               onBlur={handlePageInputCommit}
               onKeyDown={handlePageInputKeyDown}
-              className="h-7 w-10 rounded border border-border bg-bg text-center text-xs tabular-nums"
+              className="h-7 w-10 rounded-sm border border-border bg-bg text-center text-xs tabular-nums"
               aria-label="Current page"
             />
             <span>/</span>
@@ -236,7 +236,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
           <select
             value={SCALE_PRESETS.includes(scale as (typeof SCALE_PRESETS)[number]) ? scale : ''}
             onChange={handleScaleSelect}
-            className="h-7 rounded border border-border bg-bg px-1 text-xs text-fg"
+            className="h-7 rounded-sm border border-border bg-bg px-1 text-xs text-fg"
             aria-label="Zoom level"
           >
             {!SCALE_PRESETS.includes(scale as (typeof SCALE_PRESETS)[number]) && (
@@ -304,7 +304,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
                     }}
                     type="button"
                     onClick={() => goToPage(pageNum)}
-                    className={`mb-2 flex flex-col items-center rounded p-1 transition-colors ${
+                    className={`mb-2 flex flex-col items-center rounded-sm p-1 transition-colors ${
                       isActive ? 'ring-2 ring-primary' : 'hover:bg-bg'
                     }`}
                     aria-label={`Go to page ${pageNum}`}

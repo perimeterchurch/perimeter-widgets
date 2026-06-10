@@ -34,6 +34,39 @@ describe('MPLocalStorageAuth', () => {
     expect(auth.isAuthenticated()).toBe(false);
   });
 
+  // The WordPress MP OAuth plugin writes mpp-widgets_ExpiresAfter as an ISO
+  // date string (docs/guides/authentication.md), NOT epoch ms — these pin the
+  // real-world format the producer actually writes.
+  it('accepts a future ISO-string expiry', () => {
+    localStorage.setItem(TOKEN_KEY, 'abc');
+    localStorage.setItem(EXP_KEY, new Date(Date.now() + 60_000).toISOString());
+    const auth = new MPLocalStorageAuth();
+    expect(auth.getToken()).toBe('abc');
+  });
+
+  it('treats a past ISO-string expiry as expired', () => {
+    localStorage.setItem(TOKEN_KEY, 'abc');
+    localStorage.setItem(EXP_KEY, new Date(Date.now() - 60_000).toISOString());
+    const auth = new MPLocalStorageAuth();
+    expect(auth.getToken()).toBeNull();
+    expect(auth.isAuthenticated()).toBe(false);
+  });
+
+  it('treats an unparseable expiry as expired, not valid forever', () => {
+    localStorage.setItem(TOKEN_KEY, 'abc');
+    localStorage.setItem(EXP_KEY, 'not-a-date');
+    const auth = new MPLocalStorageAuth();
+    expect(auth.getToken()).toBeNull();
+  });
+
+  it('treats the literal string "null" token (WP plugin sign-out) as signed out', () => {
+    localStorage.setItem(TOKEN_KEY, 'null');
+    localStorage.setItem(EXP_KEY, new Date(Date.now() + 60_000).toISOString());
+    const auth = new MPLocalStorageAuth();
+    expect(auth.getToken()).toBeNull();
+    expect(auth.isAuthenticated()).toBe(false);
+  });
+
   it('notifies onChange listeners when a "storage" event fires for the token key', () => {
     const auth = new MPLocalStorageAuth({ pollIntervalMs: 0 });
     const cb = vi.fn();

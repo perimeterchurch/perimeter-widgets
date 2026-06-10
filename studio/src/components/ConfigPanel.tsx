@@ -11,7 +11,7 @@ interface Props {
 // control column (`w-full`) so their left AND right edges line up down the panel,
 // regardless of field type. `py-1` is dropped — `h-9` owns the vertical size.
 const INPUT_CLASS =
-  'h-9 w-full rounded-md border border-border bg-bg px-2 text-sm text-fg transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40';
+  'h-9 w-full rounded-md border border-border bg-bg px-2 text-sm text-fg transition-colors focus:border-ring focus:outline-hidden focus:ring-2 focus:ring-ring/40';
 
 /**
  * The small `text-muted-fg` line under each control: the field's description (what
@@ -93,7 +93,7 @@ function FieldControl({
     return (
       <input
         type="checkbox"
-        className="size-4 justify-self-start rounded border border-border bg-bg accent-primary"
+        className="size-4 justify-self-start rounded-sm border border-border bg-bg accent-primary"
         checked={value === true}
         onChange={(e) => onChange(field.key, e.target.checked)}
       />

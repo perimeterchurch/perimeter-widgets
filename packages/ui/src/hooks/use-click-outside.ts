@@ -1,9 +1,14 @@
 import { useEffect, type RefObject } from 'react';
 
 /**
- * Closes a menu when the user clicks outside of `ref`. Subscribes via the
- * element's root node so it works inside a shadow DOM (where `document`-level
- * listeners would not see events that retarget at the shadow boundary).
+ * Closes a menu when the user clicks outside of `ref`. Listens at the
+ * document level and resolves the true click origin with
+ * `event.composedPath()[0]`, so it works on both sides of a shadow boundary:
+ * host-page clicks reach the document listener (they never propagate INTO a
+ * shadow root, so a shadow-root listener would miss them entirely), and
+ * in-shadow clicks — whose `event.target` retargets to the shadow host at the
+ * document level — are resolved back to the real inner element via the
+ * composed path before the containment check.
  *
  * Uses `mousedown` rather than `click` so the menu closes before any click
  * handler inside an unrelated element fires.
@@ -16,13 +21,14 @@ export function useClickOutside(
   useEffect(() => {
     if (!enabled || !ref.current) return;
     const node = ref.current;
-    const root = node.getRootNode() as Document | ShadowRoot;
+    const doc = node.ownerDocument;
     const handleClick = (e: Event) => {
-      if (!node.contains(e.target as Node)) {
+      const target = (e.composedPath()[0] ?? e.target) as Node;
+      if (!node.contains(target)) {
         onClickOutside();
       }
     };
-    root.addEventListener('mousedown', handleClick);
-    return () => root.removeEventListener('mousedown', handleClick);
+    doc.addEventListener('mousedown', handleClick);
+    return () => doc.removeEventListener('mousedown', handleClick);
   }, [ref, onClickOutside, enabled]);
 }

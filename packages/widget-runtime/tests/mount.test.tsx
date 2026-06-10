@@ -1,9 +1,10 @@
 // packages/widget-runtime/tests/mount.test.tsx
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { z } from 'zod';
 import { defineWidget } from '../src/define-widget';
 import { mount } from '../src/mount';
 import { countAppliedSheets, clearStyleCache } from '../src/styling';
+import { useApiClient } from '../src/hooks/use-api-client';
 
 beforeEach(() => clearStyleCache());
 
@@ -137,5 +138,109 @@ describe('mount config re-validation (studio configOverrides parity with prod da
     await waitForEl(host.shadowRoot!, '[data-testid="lbl"]');
     expect(received).toBe(6);
     handle.unmount();
+  });
+});
+
+describe('mount lifecycle on an already-mounted host (audit #27)', () => {
+  it('disposes the previous instance before re-mounting', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+
+    const makeAuth = () => {
+      let disposed = false;
+      return {
+        provider: {
+          getToken: () => null,
+          isAuthenticated: () => false,
+          onChange: () => () => {},
+          dispose: () => {
+            disposed = true;
+          },
+        },
+        wasDisposed: () => disposed,
+      };
+    };
+
+    const first = makeAuth();
+    mount(host, widget, CSS, { authFactory: () => first.provider });
+    expect(first.wasDisposed()).toBe(false);
+
+    const second = makeAuth();
+    mount(host, widget, CSS, { authFactory: () => second.provider });
+
+    // Re-mounting must tear down the old instance (auth poll, query client,
+    // React tree) — clearing the shadow DOM alone leaks all of them.
+    expect(first.wasDisposed()).toBe(true);
+    expect(second.wasDisposed()).toBe(false);
+    host.remove();
+  });
+
+  it('unmount is idempotent', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const handle = mount(host, widget, CSS);
+    handle.unmount();
+    expect(() => handle.unmount()).not.toThrow();
+    host.remove();
+  });
+});
+
+describe('data-api-url wiring (audit #25)', () => {
+  it('the API client fetches from the config apiUrl, not the prod default', async () => {
+    const fetchSpy = vi.fn().mockResolvedValue(new Response('{}'));
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const apiWidget = defineWidget({
+      name: 'api-url-test',
+      auth: 'none',
+      schema: z.object({ apiUrl: z.string().optional() }),
+      App: () => {
+        const client = useApiClient();
+        void client.fetch('/api/ping');
+        return <i data-testid="done" />;
+      },
+    });
+
+    const host = document.createElement('div');
+    host.setAttribute('data-api-url', 'https://staging.example.org');
+    document.body.appendChild(host);
+    const handle = mount(host, apiWidget, CSS);
+    await waitForEl(host.shadowRoot!, '[data-testid="done"]');
+
+    expect(fetchSpy).toHaveBeenCalled();
+    const url = String(fetchSpy.mock.calls[0]![0]);
+    expect(url).toBe('https://staging.example.org/api/ping');
+
+    handle.unmount();
+    host.remove();
+    vi.unstubAllGlobals();
+  });
+
+  it('programmatic extras.apiBaseUrl wins over the data attribute', async () => {
+    const fetchSpy = vi.fn().mockResolvedValue(new Response('{}'));
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const apiWidget = defineWidget({
+      name: 'api-url-test2',
+      auth: 'none',
+      schema: z.object({ apiUrl: z.string().optional() }),
+      App: () => {
+        const client = useApiClient();
+        void client.fetch('/api/ping');
+        return <i data-testid="done" />;
+      },
+    });
+
+    const host = document.createElement('div');
+    host.setAttribute('data-api-url', 'https://staging.example.org');
+    document.body.appendChild(host);
+    const handle = mount(host, apiWidget, CSS, { apiBaseUrl: 'https://extras.example.org' });
+    await waitForEl(host.shadowRoot!, '[data-testid="done"]');
+
+    expect(String(fetchSpy.mock.calls[0]![0])).toBe('https://extras.example.org/api/ping');
+
+    handle.unmount();
+    host.remove();
+    vi.unstubAllGlobals();
   });
 });

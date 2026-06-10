@@ -1,0 +1,7 @@
+/* The standard widget CSS header (see widgets/&ast;/src/styles.css), pointed at
+ * the ui-only config so the compiled sheet contains exactly the selectors
+ * @perimeter/ui source generates. */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@perimeter/theme/tailwind.css';
+@config './tailwind.config.ts';

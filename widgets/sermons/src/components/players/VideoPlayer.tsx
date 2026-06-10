@@ -41,6 +41,15 @@ export function VideoPlayer({ url }: { url: string }) {
     hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
   }, []);
 
+  // MediaTabs unmounts this player on every Watch/Listen/PDF switch — a
+  // mouse-move in the prior 3s would otherwise leave a live timer firing into
+  // the unmounted component.
+  useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, []);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       // Ignore keys aimed at the inline range sliders (they have their own handling).
@@ -77,9 +86,13 @@ export function VideoPlayer({ url }: { url: string }) {
     const el = containerRef.current;
     if (!el) return;
 
+    // No optimistic setIsFullscreen here: the fullscreenchange listener above
+    // is the single source of truth. requestFullscreen rejects in real embeds
+    // (iframes without allowfullscreen, non-gesture calls) and fires
+    // fullscreenERROR, not fullscreenchange — an optimistic write would leave
+    // the button permanently stuck on 'Exit fullscreen'.
     if (document.fullscreenElement) {
       void document.exitFullscreen();
-      setIsFullscreen(false);
     } else {
       // Try container first; fall back to shadow host for shadow DOM compat
       const target =
@@ -87,7 +100,6 @@ export function VideoPlayer({ url }: { url: string }) {
       target.requestFullscreen().catch(() => {
         // Fullscreen not supported in this context
       });
-      setIsFullscreen(true);
     }
   }, []);
 
@@ -132,7 +144,7 @@ export function VideoPlayer({ url }: { url: string }) {
       tabIndex={0}
       role="application"
       aria-label="Video player"
-      className="relative flex h-full w-full items-center justify-center bg-black outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="relative flex h-full w-full items-center justify-center bg-black outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -169,7 +181,7 @@ export function VideoPlayer({ url }: { url: string }) {
             step={0.1}
             value={currentTime}
             onChange={(e) => seekTo(parseFloat(e.target.value))}
-            className="h-1.5 w-40 min-w-24 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="h-1.5 w-40 min-w-24 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Seek"
           />
           <div className="flex items-center gap-2">
@@ -195,7 +207,7 @@ export function VideoPlayer({ url }: { url: string }) {
           <button
             type="button"
             onClick={cycleSpeed}
-            className="rounded px-1.5 py-0.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-sm px-1.5 py-0.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
             aria-label={`Playback speed ${playbackRate}x`}
           >
             {playbackRate}x

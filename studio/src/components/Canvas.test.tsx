@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { useState } from 'react';
 import { render, within, fireEvent, cleanup } from '@testing-library/react';
 import { Canvas } from './Canvas';
 
@@ -216,6 +217,34 @@ describe('Canvas controlled background', () => {
   it('paints the surface from the controlled background', () => {
     const { surface } = renderCanvas({ background: 'white', onBackgroundChange: () => {} });
     expect(surface().style.background.toLowerCase()).toBe('#ffffff');
+  });
+});
+
+describe('Canvas controlled viewport custom-width fallback (audit #44)', () => {
+  it('clearing the custom width returns to the previously selected preset, not fluid', () => {
+    // Controlled harness mirroring the widget route: the parent stores the
+    // viewport (URL state) and re-renders with whatever Canvas emits.
+    function Controlled() {
+      const [viewport, setViewport] =
+        useState<NonNullable<Parameters<typeof Canvas>[0]['viewport']>>('fluid');
+      return (
+        <Canvas viewport={viewport} onViewportChange={setViewport}>
+          <div>preview content</div>
+        </Canvas>
+      );
+    }
+    const utils = render(<Controlled />);
+    const ui = within(utils.container);
+    const custom = () => ui.getByRole('spinbutton', { name: /custom width/i });
+
+    fireEvent.click(ui.getByRole('button', { name: /tablet/i }));
+    fireEvent.change(custom(), { target: { value: '800' } });
+    // Clearing the field must fall back to Tablet — the previously selected
+    // preset — not the uncontrolled fallback's initial 'fluid'.
+    fireEvent.change(custom(), { target: { value: '' } });
+
+    const frame = utils.container.querySelector('[data-canvas-frame]') as HTMLElement;
+    expect(frame.style.width).toBe('768px');
   });
 });
 

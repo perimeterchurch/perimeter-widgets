@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { UserConfig } from 'vite';
 import type { AcceptedPlugin } from 'postcss';
@@ -37,30 +37,22 @@ export interface WidgetConfigOptions {
  *
  * Vite 6 disables `postcss.config.js` auto-discovery the moment a config
  * supplies inline `css.postcss.plugins`. Because `widgetConfig()` injects
- * `remToPxPlugin` inline, the widget's `postcss.config.js` (tailwindcss +
- * autoprefixer) silently never ran — the shipped bundle carried raw, uncompiled
- * `@tailwind base/components/utilities` directives instead of compiled utility
- * CSS, so NO Tailwind reached production (parity finding H2's real root cause,
- * 2026-06-02). Declaring the full chain inline here (tailwindcss + autoprefixer
- * + remToPxPlugin) is the single source of truth that actually ships.
+ * `remToPxPlugin` inline, a widget-local `postcss.config.js` silently never
+ * ran — the shipped bundle carried raw, uncompiled Tailwind directives instead
+ * of compiled utility CSS, so NO Tailwind reached production (parity finding
+ * H2's real root cause, 2026-06-02). Declaring the full chain inline here is
+ * the single source of truth that actually ships.
  *
- * tailwindcss and autoprefixer are resolved from the widget `root` (each widget
- * declares them), and tailwind is pointed at the widget's `tailwind.config.ts`.
+ * Tailwind v4: `@tailwindcss/postcss` is resolved from the widget `root` (each
+ * widget declares it), handles imports + vendor prefixing itself (no
+ * autoprefixer), and the widget's `tailwind.config.ts` is loaded by the
+ * `@config` directive in the widget's own styles.css — not passed here.
  */
 function widgetPostcssPlugins(root: string): AcceptedPlugin[] {
   const require = createRequire(path.join(root, 'package.json'));
-  const tailwindcss = require('tailwindcss') as (opts?: unknown) => AcceptedPlugin;
-  const autoprefixer = require('autoprefixer') as (opts?: unknown) => AcceptedPlugin;
+  const tailwindcss = require('@tailwindcss/postcss') as (opts?: unknown) => AcceptedPlugin;
 
-  const tailwindConfig = ['tailwind.config.ts', 'tailwind.config.js']
-    .map((f) => path.join(root, f))
-    .find((p) => existsSync(p));
-
-  return [
-    tailwindcss(tailwindConfig ? { config: tailwindConfig } : undefined),
-    autoprefixer(),
-    remToPxPlugin,
-  ];
+  return [tailwindcss(), remToPxPlugin];
 }
 
 function readVersion(root: string): string {

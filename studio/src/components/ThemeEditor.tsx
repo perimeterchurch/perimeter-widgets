@@ -121,7 +121,7 @@ export function ThemeEditor({ overrides, onChange }: Props) {
                   <input
                     id={fieldId}
                     aria-label={token}
-                    className="rounded-md border border-border bg-bg px-2 py-1 font-mono text-xs text-fg transition-colors hover:border-fg/30 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 data-[overridden=true]:border-primary/60"
+                    className="rounded-md border border-border bg-bg px-2 py-1 font-mono text-xs text-fg transition-colors hover:border-fg/30 focus:border-ring focus:outline-hidden focus:ring-2 focus:ring-ring/40 data-[overridden=true]:border-primary/60"
                     data-overridden={overridden}
                     data-text-token={token}
                     value={overrides[token] ?? globalTokens[token]}

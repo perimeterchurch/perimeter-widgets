@@ -164,11 +164,17 @@ function ComboboxCollection({ ...props }: ComboboxPrimitive.Collection.Props) {
 }
 
 function ComboboxEmpty({ className, ...props }: ComboboxPrimitive.Empty.Props) {
+  // Never `display:none` this element: Base UI's Empty is a role="status"
+  // aria-live="polite" region, and hiding the root suppresses the "no results"
+  // announcement for screen readers (its docs explicitly warn against it).
+  // Base UI renders the children only while the list is actually empty, so the
+  // element collapses to zero height on its own — `empty:p-0` drops the
+  // padding when it has no content instead of hiding the region.
   return (
     <ComboboxPrimitive.Empty
       data-slot="combobox-empty"
       className={cn(
-        'hidden w-full justify-center py-2 text-center text-sm text-muted-fg group-data-empty/combobox-content:flex',
+        'flex w-full justify-center py-2 text-center text-sm text-muted-fg empty:p-0',
         className,
       )}
       {...props}

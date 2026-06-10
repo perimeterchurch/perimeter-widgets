@@ -129,7 +129,7 @@ export function Calendar({
         <button
           type="button"
           onClick={() => navigateMonth(-1)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-fg transition-colors hover:bg-bg hover:text-fg hover:shadow-sm"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-fg transition-colors hover:bg-bg hover:text-fg hover:shadow-xs"
           aria-label="Previous month"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -153,7 +153,7 @@ export function Calendar({
         <button
           type="button"
           onClick={() => navigateMonth(1)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-fg transition-colors hover:bg-bg hover:text-fg hover:shadow-sm"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-fg transition-colors hover:bg-bg hover:text-fg hover:shadow-xs"
           aria-label="Next month"
         >
           <ChevronRight className="h-4 w-4" />
@@ -203,9 +203,9 @@ export function Calendar({
                 isCurrentMonth &&
                   !isSelected &&
                   !isDisabled &&
-                  'text-fg hover:bg-bg hover:shadow-sm',
+                  'text-fg hover:bg-bg hover:shadow-xs',
                 isToday && !isSelected && 'font-bold text-primary',
-                isSelected && 'rounded-lg bg-primary font-semibold text-primary-fg shadow-sm',
+                isSelected && 'rounded-lg bg-primary font-semibold text-primary-fg shadow-xs',
                 isDisabled && 'cursor-not-allowed opacity-30',
                 !isDisabled && 'cursor-pointer',
               )}
@@ -280,7 +280,7 @@ function TimeInput({
   return (
     <div
       className={cn(
-        'mt-3 flex items-center justify-center gap-2 rounded-lg bg-bg px-3 py-2.5 shadow-sm',
+        'mt-3 flex items-center justify-center gap-2 rounded-lg bg-bg px-3 py-2.5 shadow-xs',
         disabled && 'pointer-events-none opacity-40',
       )}
     >
@@ -298,7 +298,7 @@ function TimeInput({
           onKeyDown={(e) => {
             if (e.key === 'Escape') e.currentTarget.blur();
           }}
-          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
+          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary/30"
           aria-label={label ? `${label} hour` : 'Hour'}
         />
         <span className="text-sm font-bold text-muted-fg">:</span>
@@ -311,7 +311,7 @@ function TimeInput({
           onKeyDown={(e) => {
             if (e.key === 'Escape') e.currentTarget.blur();
           }}
-          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
+          className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary/30"
           aria-label={label ? `${label} minute` : 'Minute'}
         />
         <div className="flex h-8 overflow-hidden rounded-md border border-border text-[11px] font-semibold">

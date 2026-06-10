@@ -78,7 +78,14 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
               filters.setScreen('browse');
             }
           }}
-          onSermonClick={(sermonId) => filters.setScreen('detail', sermonId)}
+          onSermonClick={(sermonId) =>
+            // On the series tab the breadcrumb must survive: setScreen nulls
+            // fromSeriesId while tab stays 'series', and the next render would
+            // route the SERMON id into <SeriesDetail> ("Series not found").
+            filters.fromSeriesId
+              ? filters.setSermonFromSeries(sermonId, filters.fromSeriesId)
+              : filters.setScreen('detail', sermonId)
+          }
         />
       );
     }

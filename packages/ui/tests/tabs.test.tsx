@@ -18,6 +18,23 @@ describe('Tabs', () => {
     expect(screen.getByRole('tab', { name: 'Two' })).toBeInTheDocument();
     expect(screen.getByText('First panel')).toBeInTheDocument();
   });
+
+  it('forwards orientation to Base UI so vertical tabs get vertical aria + keyboard axis', () => {
+    render(
+      <Tabs defaultValue="one" orientation="vertical">
+        <TabsList>
+          <TabsTrigger value="one">One</TabsTrigger>
+          <TabsTrigger value="two">Two</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">First panel</TabsContent>
+        <TabsContent value="two">Second panel</TabsContent>
+      </Tabs>,
+    );
+    // Base UI derives aria-orientation (and the ArrowUp/Down key axis) from
+    // its own orientation prop — a manual data-orientation attribute alone
+    // leaves the tablist announced and navigated as horizontal.
+    expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical');
+  });
 });
 
 describe('Tabs line-variant indicator', () => {

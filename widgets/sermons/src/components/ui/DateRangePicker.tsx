@@ -111,7 +111,7 @@ export function DateRangePicker({
           className={cn(
             'flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-lg border border-border bg-transparent px-2.5 text-sm',
             'transition-colors hover:bg-muted/30',
-            'focus-visible:outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50',
+            'focus-visible:outline-hidden focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50',
             'disabled:cursor-not-allowed disabled:opacity-50',
             clearable && hasValue && 'rounded-r-none border-r-0',
           )}
@@ -241,7 +241,7 @@ function RangePanel({
               onClick={() => setActiveSide('start')}
               className={cn(
                 'group relative flex flex-1 items-center gap-2 rounded-lg px-3 py-2 text-left transition-all duration-150',
-                activeSide === 'start' ? 'bg-bg shadow-sm' : 'hover:bg-bg/50',
+                activeSide === 'start' ? 'bg-bg shadow-xs' : 'hover:bg-bg/50',
               )}
             >
               <div className="min-w-0 flex-1">
@@ -297,7 +297,7 @@ function RangePanel({
               onClick={() => setActiveSide('end')}
               className={cn(
                 'group relative flex flex-1 items-center gap-2 rounded-lg px-3 py-2 text-left transition-all duration-150',
-                activeSide === 'end' ? 'bg-bg shadow-sm' : 'hover:bg-bg/50',
+                activeSide === 'end' ? 'bg-bg shadow-xs' : 'hover:bg-bg/50',
               )}
             >
               <div className="min-w-0 flex-1">
@@ -391,7 +391,7 @@ function RangePanel({
             'rounded-lg px-5 py-2 text-sm font-medium',
             'transition-all duration-150 active:scale-[0.98]',
             isDirty || hasSelection
-              ? 'bg-primary text-primary-fg shadow-sm hover:opacity-90'
+              ? 'bg-primary text-primary-fg shadow-xs hover:opacity-90'
               : 'bg-muted text-muted-fg',
           )}
         >

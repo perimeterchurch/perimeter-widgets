@@ -37,7 +37,7 @@ function CopyButton({
       type="button"
       onClick={copy}
       title={copied ? 'Copied' : title}
-      className={`group inline-flex items-center gap-1.5 rounded-sm text-left transition-colors hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 ${className ?? ''}`}
+      className={`group inline-flex items-center gap-1.5 rounded-sm text-left transition-colors hover:text-fg focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring/40 ${className ?? ''}`}
       {...rest}
     >
       {children}
@@ -96,7 +96,7 @@ function ColorSwatch({ token, value }: TokenRow) {
       <span
         data-token-swatch={token}
         aria-hidden
-        className="size-10 shrink-0 rounded-md border border-border shadow-sm"
+        className="size-10 shrink-0 rounded-md border border-border shadow-xs"
         style={{ background: `var(--${token})` }}
       />
       <span className="flex min-w-0 flex-1 flex-col items-start">

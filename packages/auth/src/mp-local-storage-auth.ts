@@ -36,10 +36,17 @@ export class MPLocalStorageAuth implements AuthProvider {
   getToken(): string | null {
     const raw = localStorage.getItem(this.tokenKey);
     if (raw == null) return null;
+    // The WordPress MP OAuth plugin writes the literal string "null" on
+    // sign-out — that is a signed-out state, not a token.
+    if (raw === 'null') return null;
     const expStr = localStorage.getItem(this.expiresKey);
     if (expStr != null) {
-      const exp = Number(expStr);
-      if (Number.isFinite(exp) && Date.now() > exp) return null;
+      // The plugin writes an ISO date string (see docs/guides/authentication.md);
+      // epoch-ms is accepted as a fallback. An expiry that parses as neither is
+      // treated as EXPIRED — returning a token whose expiry we cannot read would
+      // hand out stale credentials forever.
+      const exp = Number.isFinite(Number(expStr)) ? Number(expStr) : Date.parse(expStr);
+      if (Number.isNaN(exp) || Date.now() > exp) return null;
     }
     return raw;
   }

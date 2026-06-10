@@ -6,6 +6,7 @@ import { Skeleton } from '@perimeter/ui/skeleton';
 import { SortSelect } from '@perimeter/ui/sort-select';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
+import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import { useSermonDetail, useSermons } from '@perimeter/api-hooks';
 import type { SermonsConfig, SortField, SortOrder } from '../../types';
 import { formatDate, sermonImageUrl } from '../../lib/format';
@@ -41,7 +42,7 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
   const showRelated = (config.display ?? 'full') !== 'headless';
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortOrder>('desc');
-  const [copied, setCopied] = useState(false);
+  const { copied, flash } = useCopiedFlash(2000);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   // The selected sermon is already encoded in the URL via nuqs (screen=detail,
@@ -49,22 +50,27 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
   // clipboard and flash a confirmation.
   const handleCopyLink = () => {
     void navigator.clipboard?.writeText(window.location.href);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
+    flash();
   };
 
   useEffect(() => {
     if (sermon) titleRef.current?.focus();
   }, [sermon]);
 
+  // Gated on the parent fetch: while the sermon is in flight, seriesId would
+  // be dropped and the hook would fire an unfiltered 50-row listing that is
+  // thrown away as soon as the real seriesId arrives. The config's pinned
+  // seriesTypeId keeps the related list consistent with the browse view.
   const { data: seriesData, error: relatedError } = useSermons(
     defined({
       seriesId: sermon?.series.id ? String(sermon.series.id) : undefined,
+      seriesTypeId: config.seriesTypeId || undefined,
       // Sermons sort only over date/title; 'count' is series-only.
       sort: sortField === 'count' ? 'date' : sortField,
       order: sortDirection,
       perPage: 50,
     }),
+    { enabled: !!sermon?.series.id },
   );
 
   const relatedSermons = (seriesData?.data.sermons ?? []).filter((s) => s.id !== id);
@@ -107,7 +113,11 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
           <div className="space-y-6">
             <div>
               <div className="flex items-start justify-between gap-3">
-                <h2 ref={titleRef} tabIndex={-1} className="text-xl font-bold text-fg outline-none">
+                <h2
+                  ref={titleRef}
+                  tabIndex={-1}
+                  className="text-xl font-bold text-fg outline-hidden"
+                >
                   {sermon.title}
                 </h2>
                 <Button

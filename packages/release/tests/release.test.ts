@@ -8,6 +8,8 @@ import {
   nextVersion,
   releaseBranch,
   releasePrBody,
+  versionAdvances,
+  isProtectedBranch,
 } from '../src/release';
 
 describe('setManifestVersion', () => {
@@ -75,5 +77,35 @@ describe('releasePrBody', () => {
     const body = releasePrBody({ name: 'sermons', version: '1.0.2', gzBytes: 864400 });
     expect(body).toContain('sermons@1.0.2');
     expect(body).toMatch(/844(\.\d+)?\s*KiB|864400/); // size shown in some human form
+  });
+});
+
+describe('versionAdvances', () => {
+  it('accepts a version strictly greater than the manifest pointer', () => {
+    expect(versionAdvances({ sermons: '1.3.0' }, 'sermons', '1.3.1')).toBe(true);
+    expect(versionAdvances({ sermons: '1.3.0' }, 'sermons', '2.0.0')).toBe(true);
+  });
+
+  it('rejects equal and backward versions (manifest pointer must never move backward)', () => {
+    // The audit-#15 failure: a checkout behind origin/dev plans 1.2.1 while the
+    // manifest already points at 1.3.0 — publishing would downgrade every embed.
+    expect(versionAdvances({ sermons: '1.3.0' }, 'sermons', '1.2.1')).toBe(false);
+    expect(versionAdvances({ sermons: '1.3.0' }, 'sermons', '1.3.0')).toBe(false);
+  });
+
+  it('accepts any version for a widget not yet in the manifest (first release)', () => {
+    expect(versionAdvances({ sermons: '1.3.0' }, 'events', '0.1.0')).toBe(true);
+  });
+});
+
+describe('isProtectedBranch', () => {
+  it('flags dev and main', () => {
+    expect(isProtectedBranch('dev')).toBe(true);
+    expect(isProtectedBranch('main')).toBe(true);
+  });
+
+  it('allows feature and release branches', () => {
+    expect(isProtectedBranch('release/sermons-1.3.1')).toBe(false);
+    expect(isProtectedBranch('feat/my-feature')).toBe(false);
   });
 });

@@ -51,6 +51,27 @@ describe('useSermonFilters', () => {
     expect(result.current.selectedSeriesIds).toEqual([945]);
   });
 
+  // Audit #11: data-service-type-id was parsed, documented, and locked the
+  // dropdown — but was never merged into the selection, so the pin silently
+  // served sermons from ALL service types. It must behave like every sibling
+  // pinned dimension.
+  it('returns pinned serviceTypeId from config as selectedServiceTypeIds', () => {
+    const { result } = renderFilters({ serviceTypeId: '3' });
+    expect(result.current.selectedServiceTypeIds).toEqual([3]);
+  });
+
+  it('setServiceTypes is a no-op when serviceTypeId is pinned', () => {
+    const { result } = renderFilters({ serviceTypeId: '3' });
+    act(() => result.current.setServiceTypes([7]));
+    expect(result.current.selectedServiceTypeIds).toEqual([3]);
+  });
+
+  it('clearFilters keeps a pinned serviceTypeId', () => {
+    const { result } = renderFilters({ serviceTypeId: '3' });
+    act(() => result.current.clearFilters());
+    expect(result.current.selectedServiceTypeIds).toEqual([3]);
+  });
+
   it('returns locked from/to from config', () => {
     const { result } = renderFilters({
       from: '2025-01-01',

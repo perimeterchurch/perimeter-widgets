@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { widgetConfig, remToPxPlugin } from '../src/config';
 
-// widgetConfig resolves tailwindcss + autoprefixer from the widget `root`, so
-// point it at a real widget dir (the reference `example` widget) where those
-// deps resolve — the plugin package itself does not declare them.
+// widgetConfig resolves @tailwindcss/postcss from the widget `root`, so point
+// it at a real widget dir (the reference `example` widget) where that dep
+// resolves — the plugin package itself does not declare it.
 const widgetRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../../../widgets/example',
@@ -44,19 +44,19 @@ describe('widgetConfig', () => {
   });
 
   // Regression guard for parity finding H2's root cause: inline `css.postcss.plugins`
-  // disables Vite's postcss.config.js auto-discovery, so tailwindcss + autoprefixer
-  // MUST be declared inline here or NO Tailwind compiles into the shipped bundle.
-  it('runs the full PostCSS chain inline: tailwindcss + autoprefixer + remToPxPlugin', () => {
+  // disables Vite's postcss.config.js auto-discovery, so the Tailwind postcss
+  // plugin MUST be declared inline here or NO Tailwind compiles into the bundle.
+  it('runs the full PostCSS chain inline: @tailwindcss/postcss + remToPxPlugin', () => {
     const postcss = cfg.css?.postcss;
     const plugins =
       postcss && typeof postcss !== 'string' && 'plugins' in postcss ? postcss.plugins : undefined;
     expect(plugins).toBeDefined();
-    expect(plugins!.length).toBe(3);
+    expect(plugins!.length).toBe(2);
     const names = plugins!.map((p) =>
       typeof p === 'function' ? p.name : (p as { postcssPlugin?: string }).postcssPlugin,
     );
-    expect(names).toContain('tailwindcss');
-    expect(names).toContain('autoprefixer');
+    // v4's postcss plugin handles imports + vendor prefixing itself.
+    expect(names).toContain('@tailwindcss/postcss');
     // remToPxPlugin must run LAST so it rewrites rem in the compiled utility CSS.
     expect(plugins![plugins!.length - 1]).toBe(remToPxPlugin);
   });
