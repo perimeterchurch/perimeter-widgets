@@ -49,12 +49,32 @@ function declBlock(
   return { merged, decls };
 }
 
+/**
+ * `:host` is a themed SURFACE, not just a variable bag. Tailwind preflight
+ * normalizes `font-family`/`line-height` on `:host`, but `color` and
+ * `font-size` still inherit from the host page through the shadow boundary,
+ * and nothing paints a background — so a dark-theme widget would render
+ * dark-token elements over the host's light backdrop with the host's text
+ * color. The var() references resolve per-theme, so only `color-scheme`
+ * (no var) needs a dark-block counterpart.
+ */
+const LIGHT_SURFACE_DECLS = [
+  '  background-color: var(--color-bg);',
+  '  color: var(--color-fg);',
+  '  font-family: var(--font-sans);',
+  '  font-size: 16px;',
+  '  line-height: 1.5;',
+  '  color-scheme: light;',
+].join('\n');
+
+const DARK_SURFACE_DECLS = '  color-scheme: dark;';
+
 export function resolveTokens(args: ResolveTokensArgs): ResolvedTokens {
   const parsedDataAttrs = args.dataAttrOverrides ? parseDataAttrs(args.dataAttrOverrides) : {};
   const light = declBlock(globalTokens, args, parsedDataAttrs);
   const dark = declBlock(darkTokens, args, parsedDataAttrs);
 
-  const cssText = `:host {\n${light.decls}\n}\n:host([data-theme="dark"]) {\n${dark.decls}\n}`;
+  const cssText = `:host {\n${light.decls}\n${LIGHT_SURFACE_DECLS}\n}\n:host([data-theme="dark"]) {\n${dark.decls}\n${DARK_SURFACE_DECLS}\n}`;
 
   // `tokens` stays the light merged set for back-compat (only theme tests read it).
   return { tokens: light.merged, cssText };
