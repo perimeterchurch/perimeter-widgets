@@ -104,17 +104,19 @@ Two options, both fast:
 **Direct (pin to a name; always current via the loader-resolved version):** use the global loader and a placeholder div.
 
 ```html
-<script src="https://widgets.perimeter.org/loader.js" async></script>
+<script src="https://widgets.perimeter.org/loader.js" data-nowprocket async></script>
 <div data-perimeter-widget="sermons"></div>
 ```
 
 The loader fetches `manifest.json`, scans the page for `[data-perimeter-widget="<name>"]`, and injects each used widget's immutable versioned bundle once (deduped by name). Unknown widget names are skipped silently so the loader never breaks a host page.
 
+`data-nowprocket` opts the tag out of WP Rocket's "Delay JavaScript Execution" — a WordPress optimization that otherwise holds every script until the visitor interacts with the page, so a delayed loader renders nothing for a visitor who loads the page and leaves. The attribute is inert on hosts without WP Rocket, and scripts the loader injects at runtime are not rewritten, so guarding the loader tag covers the chain. Cache-plugin symptoms and admin-side exclusions: [`docs/reference/embed-guide.md`](reference/embed-guide.md) (Caching & Optimization Plugins).
+
 **Pinned to a specific immutable version (no loader):** point a script tag straight at a versioned bundle.
 
 ```html
 <!-- pin to a specific immutable version; the number here is illustrative -->
-<script src="https://widgets.perimeter.org/example/0.0.1/index.js" async></script>
+<script src="https://widgets.perimeter.org/example/0.0.1/index.js" data-nowprocket async></script>
 ```
 
 Each widget self-mounts into a shadow root on load.

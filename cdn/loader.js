@@ -1,5 +1,7 @@
 /* Perimeter Widgets global loader.
- * Usage: <script src="https://widgets.perimeter.org/loader.js" async></script>
+ * Usage: <script src="https://widgets.perimeter.org/loader.js" data-nowprocket async></script>
+ * (data-nowprocket opts out of WP Rocket's Delay JS, which would otherwise hold
+ * this tag until user interaction; inert on hosts without WP Rocket.)
  * Mounts every <div data-perimeter-widget="<name>"> on the page by lazy-loading
  * only the bundles actually present, each once. */
 (function () {
