@@ -18,6 +18,8 @@ import {
   versionsToPrune,
   parseReleaseArgs,
   planRelease,
+  versionAdvances,
+  isProtectedBranch,
   type Manifest,
 } from './release';
 
@@ -75,6 +77,19 @@ function git(cmd: string): void {
   execSync(`git ${cmd}`, { cwd: REPO, stdio: 'inherit' });
 }
 
+function gitCapture(cmd: string): string {
+  return execSync(`git ${cmd}`, { cwd: REPO, encoding: 'utf8' }).trim();
+}
+
+function assertCleanTree(context: string): void {
+  const dirty = gitCapture('status --porcelain');
+  if (dirty) {
+    throw new Error(
+      `working tree is not clean — commit or stash changes before ${context}.\n${dirty}`,
+    );
+  }
+}
+
 function main(): void {
   const args = parseReleaseArgs(process.argv.slice(2));
   const { name, bump, force, dryRun } = args;
@@ -101,8 +116,24 @@ function main(): void {
         console.log(
           `[dry-run] note: ${name}@${currentVersion} already published — a real run needs --force`,
         );
+      const dryRunBranch = gitCapture('rev-parse --abbrev-ref HEAD');
+      if (isProtectedBranch(dryRunBranch))
+        console.log(
+          `[dry-run] note: currently on '${dryRunBranch}' — a real run refuses to commit here; switch to a feature branch first`,
+        );
       return;
     }
+    // Guards (audit #46): never commit a release on a protected branch, and
+    // never sweep unrelated changes into the release commit via `git add cdn`.
+    const branch = gitCapture('rev-parse --abbrev-ref HEAD');
+    if (isProtectedBranch(branch)) {
+      throw new Error(
+        `refusing to commit a release on '${branch}' — create a feature branch first ` +
+          `(the repo never takes direct commits on dev/main).`,
+      );
+    }
+    assertCleanTree('a no-bump release');
+
     const destDir = path.join(CDN, name, currentVersion);
     if (existsSync(destDir) && !force) {
       throw new Error(
@@ -117,10 +148,12 @@ function main(): void {
     return;
   }
 
-  // ── With a bump: compute the plan up front (pure). ──
-  const plan = planRelease(name, currentVersion, bump);
-
+  // ── With a bump. ──
   if (dryRun) {
+    // The dry-run plan is computed from the LOCAL checkout (no fetch); a real
+    // run re-derives the version from origin/dev, so the numbers can differ
+    // when the local checkout is behind.
+    const plan = planRelease(name, currentVersion, bump);
     console.log(`[dry-run] release ${name}: ${currentVersion} → ${plan.newVersion} (${bump})`);
     console.log(`[dry-run] branch:  ${plan.branch}`);
     console.log(`[dry-run] commit:  ${plan.commitMessage}`);
@@ -131,19 +164,45 @@ function main(): void {
   }
 
   // Guard: clean working tree, then sync with origin.
-  const dirty = execSync('git status --porcelain', { cwd: REPO, encoding: 'utf8' }).trim();
-  if (dirty) {
-    throw new Error(
-      'working tree is not clean — commit or stash changes before a bump release.\n' + dirty,
-    );
-  }
+  assertCleanTree('a bump release');
   git('fetch origin');
+
+  // Plan from the version on origin/dev — the branch the release is actually
+  // cut from. Planning from the local package.json (audit #15) publishes an
+  // old version when the checkout is behind and moves the manifest pointer
+  // BACKWARD, silently downgrading every embed via /<name>/latest.js.
+  const devPkg = JSON.parse(gitCapture(`show origin/dev:widgets/${name}/package.json`)) as {
+    version?: string;
+  };
+  const devVersion = devPkg.version;
+  if (!devVersion) throw new Error(`widgets/${name}/package.json on origin/dev has no version`);
+  const plan = planRelease(name, devVersion, bump);
 
   // Branch off origin/dev.
   git(`checkout -b ${JSON.stringify(plan.branch)} origin/dev`);
 
-  // Write the bumped version into the widget's package.json.
-  writeJson(pkgPath, { ...pkg, version: plan.newVersion });
+  // Write the bumped version into the widget's package.json, re-read from the
+  // freshly checked-out tree — spreading a pre-checkout copy would silently
+  // revert dependency/script changes that landed on dev.
+  const freshPkg = readJson<Record<string, unknown>>(pkgPath);
+  writeJson(pkgPath, { ...freshPkg, version: plan.newVersion });
+
+  // Install against origin/dev's lockfile so the bundle is not built with
+  // whatever node_modules the previous checkout left behind.
+  execSync('pnpm install --frozen-lockfile', { cwd: REPO, stdio: 'inherit' });
+
+  // Monotonicity + immutability guards: the manifest pointer drives
+  // /<name>/latest.js and must never move backward (or onto a reused dir).
+  const manifest = readJson<Manifest>(path.join(CDN, 'manifest.json'));
+  if (!versionAdvances(manifest, name, plan.newVersion)) {
+    throw new Error(
+      `computed version ${plan.newVersion} does not advance the manifest pointer ` +
+        `(${name}@${manifest[name]}) — releasing would downgrade every embed.`,
+    );
+  }
+  if (existsSync(path.join(CDN, name, plan.newVersion))) {
+    throw new Error(`${name}@${plan.newVersion} already exists in cdn/ (immutable).`);
+  }
 
   // Run the shared core (build → copy → manifest → rewrites → prune).
   const gzBytes = publishToCdn(name, plan.newVersion, widgetDir);
@@ -154,7 +213,7 @@ function main(): void {
 
   // Push and open the PR into dev. Recompute the body with the real bundle size.
   git(`push -u origin ${JSON.stringify(plan.branch)}`);
-  const body = planRelease(name, currentVersion, bump, gzBytes).prBody;
+  const body = planRelease(name, devVersion, bump, gzBytes).prBody;
   const bodyFile = path.join(os.tmpdir(), `release-${name}-${plan.newVersion}.md`);
   writeFileSync(bodyFile, body);
   execSync(
