@@ -35,9 +35,9 @@ describe('globalTokens', () => {
     }
   });
 
-  it('uses px (not rem) for radius so host font-size cannot rescale widgets', () => {
+  it('uses px (not rem) for radius and type scale so host font-size cannot rescale widgets', () => {
     for (const [key, value] of Object.entries(globalTokens)) {
-      if (key.startsWith('radius-')) expect(value).toMatch(/px$/);
+      if (key.startsWith('radius-') || key.startsWith('text-')) expect(value).toMatch(/px$/);
     }
   });
 });

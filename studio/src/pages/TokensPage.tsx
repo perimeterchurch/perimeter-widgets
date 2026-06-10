@@ -51,17 +51,27 @@ function CopyButton({
   );
 }
 
-/** Split the flat token map into the three display groups, preserving source order. */
-function partitionTokens(): { color: TokenRow[]; radius: TokenRow[]; font: TokenRow[] } {
+/** Split the flat token map into the display groups, preserving source order. */
+function partitionTokens(): {
+  color: TokenRow[];
+  radius: TokenRow[];
+  font: TokenRow[];
+  shadow: TokenRow[];
+  text: TokenRow[];
+} {
   const color: TokenRow[] = [];
   const radius: TokenRow[] = [];
   const font: TokenRow[] = [];
+  const shadow: TokenRow[] = [];
+  const text: TokenRow[] = [];
   for (const [key, value] of Object.entries(globalTokens) as [ThemeToken, string][]) {
     if (key.startsWith('color-')) color.push({ token: key, value });
     else if (key.startsWith('radius-')) radius.push({ token: key, value });
     else if (key.startsWith('font-')) font.push({ token: key, value });
+    else if (key.startsWith('shadow-')) shadow.push({ token: key, value });
+    else if (key.startsWith('text-')) text.push({ token: key, value });
   }
-  return { color, radius, font };
+  return { color, radius, font, shadow, text };
 }
 
 /** The css custom-property name as a click-to-copy control (copies `--token`). */
@@ -125,6 +135,44 @@ function RadiusSample({ token, value }: TokenRow) {
   );
 }
 
+/** A box elevated by the token's shadow, next to its name + value. */
+function ShadowSample({ token, value }: TokenRow) {
+  return (
+    <li className="flex items-center gap-3">
+      <span
+        data-token-shadow={token}
+        aria-hidden
+        className="size-10 shrink-0 rounded-md border border-border bg-bg"
+        style={{ boxShadow: `var(--${token})` }}
+      />
+      <span className="flex min-w-0 flex-1 flex-col items-start">
+        <VarName token={token} />
+        <ValueText token={token} value={value} className="max-w-full" />
+      </span>
+    </li>
+  );
+}
+
+/** A line of text set at the token's size, with its name + value. */
+function TextSample({ token, value }: TokenRow) {
+  return (
+    <li className="flex items-center gap-3">
+      <p
+        data-token-text={token}
+        aria-hidden
+        className="w-24 shrink-0 truncate text-fg"
+        style={{ fontSize: `var(--${token})` }}
+      >
+        Sermons
+      </p>
+      <span className="flex min-w-0 flex-1 flex-col items-start">
+        <VarName token={token} />
+        <ValueText token={token} value={value} />
+      </span>
+    </li>
+  );
+}
+
 /** A line of text set in the token's own stack, with its name + the full stack. */
 function FontSample({ token, value }: TokenRow) {
   return (
@@ -152,7 +200,7 @@ function FontSample({ token, value }: TokenRow) {
  * or token names are hard-coded.
  */
 export function TokensPage() {
-  const { color, radius, font } = useMemo(partitionTokens, []);
+  const { color, radius, font, shadow, text } = useMemo(partitionTokens, []);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -225,6 +273,46 @@ export function TokensPage() {
             <ul className="space-y-6">
               {font.map((row) => (
                 <FontSample key={row.token} {...row} />
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="mt-6" aria-labelledby="tokens-text">
+        <Card>
+          <CardHeader className="flex-row items-baseline justify-between gap-3">
+            <CardTitle id="tokens-text" className="text-base">
+              Type scale
+            </CardTitle>
+            <Badge variant="outline" className="tabular-nums">
+              {text.length}
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            <ul className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+              {text.map((row) => (
+                <TextSample key={row.token} {...row} />
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="mt-6" aria-labelledby="tokens-shadow">
+        <Card>
+          <CardHeader className="flex-row items-baseline justify-between gap-3">
+            <CardTitle id="tokens-shadow" className="text-base">
+              Shadows
+            </CardTitle>
+            <Badge variant="outline" className="tabular-nums">
+              {shadow.length}
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            <ul className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+              {shadow.map((row) => (
+                <ShadowSample key={row.token} {...row} />
               ))}
             </ul>
           </CardContent>

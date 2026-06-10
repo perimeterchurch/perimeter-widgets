@@ -105,11 +105,17 @@ test.describe('sermons responsive overhaul', () => {
       .poll(async () => (await widgetState(page)).hasGrid, { timeout: 10_000 })
       .toBe(true);
     await expect.poll(async () => (await widgetState(page)).gridCols, { timeout: 10_000 }).toBe(2);
+    // The breakpoint hook re-renders the filter row a beat after the grid
+    // settles (ResizeObserver tick) — poll the combobox presence too, then take
+    // ONE settled snapshot for the remaining assertions (flaked at baseline as
+    // a one-shot read under parallel suite load).
+    await expect
+      .poll(async () => (await widgetState(page)).hasMultiCombobox, { timeout: 10_000 })
+      .toBe(true);
     const s = await widgetState(page);
 
     expect(s.overflow, 'no overflow on tablet').toBe(false);
     expect(s.hasFiltersToggle, 'no Filters toggle on tablet (inline)').toBe(false);
-    expect(s.hasMultiCombobox, 'filter dropdowns inline on tablet').toBe(true);
     expect(s.toolbarText, 'full Sort label on tablet').toContain('Sort by:');
     expect(s.toolbarText, 'full View label on tablet').toContain('View:');
   });

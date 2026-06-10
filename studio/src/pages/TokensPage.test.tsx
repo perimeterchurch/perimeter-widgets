@@ -49,11 +49,37 @@ describe('TokensPage (/tokens)', () => {
 
     for (const token of radiusTokens) {
       expect(scope.getByText(`--${token}`)).toBeTruthy();
-      expect(scope.getByText(globalTokens[token])).toBeTruthy();
 
       const sample = container.querySelector(`[data-token-radius="${token}"]`);
       expect(sample).toBeTruthy();
       expect((sample as HTMLElement).style.borderRadius).toBe(`var(--${token})`);
+      // Value text scoped to this row — px values repeat across groups now
+      // (radius-lg and text-xs are both 12px).
+      const row = sample!.closest('li')!;
+      expect(within(row).getByText(globalTokens[token])).toBeTruthy();
+    }
+  });
+
+  it('renders type-scale and shadow samples driven by their tokens', () => {
+    const { container } = render(<TokensPage />);
+    const scope = within(container);
+
+    for (const token of (Object.keys(globalTokens) as (keyof typeof globalTokens)[]).filter((k) =>
+      k.startsWith('text-'),
+    )) {
+      expect(scope.getByText(`--${token}`)).toBeTruthy();
+      const sample = container.querySelector(`[data-token-text="${token}"]`);
+      expect(sample).toBeTruthy();
+      expect((sample as HTMLElement).style.fontSize).toBe(`var(--${token})`);
+    }
+
+    for (const token of (Object.keys(globalTokens) as (keyof typeof globalTokens)[]).filter((k) =>
+      k.startsWith('shadow-'),
+    )) {
+      expect(scope.getByText(`--${token}`)).toBeTruthy();
+      const sample = container.querySelector(`[data-token-shadow="${token}"]`);
+      expect(sample).toBeTruthy();
+      expect((sample as HTMLElement).style.boxShadow).toBe(`var(--${token})`);
     }
   });
 

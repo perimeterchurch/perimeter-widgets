@@ -62,7 +62,7 @@ const LIGHT_SURFACE_DECLS = [
   '  background-color: var(--color-bg);',
   '  color: var(--color-fg);',
   '  font-family: var(--font-sans);',
-  '  font-size: 16px;',
+  '  font-size: var(--text-base);',
   '  line-height: 1.5;',
   '  color-scheme: light;',
 ].join('\n');

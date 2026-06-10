@@ -1,0 +1,843 @@
+{
+  "$description": "Perimeter widget design tokens (DTCG 2025.10). Derived from @perimeter/theme src/tokens.ts — regenerate with `pnpm tokens:dtcg`; do not edit by hand.",
+  "light": {
+    "color": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [0, 0, 100],
+          "alpha": 1
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [222, 47, 11],
+          "alpha": 1
+        }
+      },
+      "muted": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 96],
+          "alpha": 1
+        }
+      },
+      "muted-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [215, 16, 44],
+          "alpha": 1
+        }
+      },
+      "primary": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [221, 83, 53],
+          "alpha": 1
+        }
+      },
+      "primary-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 98],
+          "alpha": 1
+        }
+      },
+      "secondary": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 96],
+          "alpha": 1
+        }
+      },
+      "secondary-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [222, 47, 11],
+          "alpha": 1
+        }
+      },
+      "accent": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [262, 83, 58],
+          "alpha": 1
+        }
+      },
+      "accent-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 98],
+          "alpha": 1
+        }
+      },
+      "destructive": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [0, 84, 60],
+          "alpha": 1
+        }
+      },
+      "destructive-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 98],
+          "alpha": 1
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [214, 32, 91],
+          "alpha": 1
+        }
+      },
+      "ring": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [221, 83, 53],
+          "alpha": 1
+        }
+      }
+    },
+    "radius": {
+      "sm": {
+        "$type": "dimension",
+        "$value": {
+          "value": 4,
+          "unit": "px"
+        }
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": {
+          "value": 8,
+          "unit": "px"
+        }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        }
+      }
+    },
+    "font": {
+      "sans": {
+        "$type": "fontFamily",
+        "$value": ["Inter", "system-ui", "-apple-system", "sans-serif"]
+      },
+      "mono": {
+        "$type": "fontFamily",
+        "$value": ["ui-monospace", "SFMono-Regular", "monospace"]
+      }
+    },
+    "shadow": {
+      "xs": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.05
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 1,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 2,
+              "unit": "px"
+            },
+            "spread": {
+              "value": 0,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "sm": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 1,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 3,
+              "unit": "px"
+            },
+            "spread": {
+              "value": 0,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 1,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 2,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -1,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "md": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 4,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 6,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -1,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 2,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 4,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -2,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "lg": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 10,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 15,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -3,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 4,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 6,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -4,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "xl": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 20,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 25,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -5,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.1
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 8,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 10,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -6,
+              "unit": "px"
+            }
+          }
+        ]
+      }
+    },
+    "text": {
+      "xs": {
+        "$type": "dimension",
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        }
+      },
+      "sm": {
+        "$type": "dimension",
+        "$value": {
+          "value": 14,
+          "unit": "px"
+        }
+      },
+      "base": {
+        "$type": "dimension",
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": {
+          "value": 18,
+          "unit": "px"
+        }
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": {
+          "value": 20,
+          "unit": "px"
+        }
+      }
+    }
+  },
+  "dark": {
+    "color": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [222, 47, 11],
+          "alpha": 1
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 98],
+          "alpha": 1
+        }
+      },
+      "muted": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [217, 33, 17],
+          "alpha": 1
+        }
+      },
+      "muted-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [215, 20, 65],
+          "alpha": 1
+        }
+      },
+      "primary": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [217, 91, 60],
+          "alpha": 1
+        }
+      },
+      "primary-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [222, 47, 11],
+          "alpha": 1
+        }
+      },
+      "secondary": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [217, 33, 17],
+          "alpha": 1
+        }
+      },
+      "secondary-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 98],
+          "alpha": 1
+        }
+      },
+      "accent": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [263, 70, 65],
+          "alpha": 1
+        }
+      },
+      "accent-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [222, 47, 11],
+          "alpha": 1
+        }
+      },
+      "destructive": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [0, 63, 51],
+          "alpha": 1
+        }
+      },
+      "destructive-fg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [210, 40, 98],
+          "alpha": 1
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [217, 33, 20],
+          "alpha": 1
+        }
+      },
+      "ring": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "hsl",
+          "components": [217, 91, 60],
+          "alpha": 1
+        }
+      }
+    },
+    "radius": {
+      "sm": {
+        "$type": "dimension",
+        "$value": {
+          "value": 4,
+          "unit": "px"
+        }
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": {
+          "value": 8,
+          "unit": "px"
+        }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        }
+      }
+    },
+    "font": {
+      "sans": {
+        "$type": "fontFamily",
+        "$value": ["Inter", "system-ui", "-apple-system", "sans-serif"]
+      },
+      "mono": {
+        "$type": "fontFamily",
+        "$value": ["ui-monospace", "SFMono-Regular", "monospace"]
+      }
+    },
+    "shadow": {
+      "xs": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.25
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 1,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 2,
+              "unit": "px"
+            },
+            "spread": {
+              "value": 0,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "sm": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 1,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 3,
+              "unit": "px"
+            },
+            "spread": {
+              "value": 0,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 1,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 2,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -1,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "md": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 4,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 6,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -1,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 2,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 4,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -2,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "lg": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 10,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 15,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -3,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 4,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 6,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -4,
+              "unit": "px"
+            }
+          }
+        ]
+      },
+      "xl": {
+        "$type": "shadow",
+        "$value": [
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 20,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 25,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -5,
+              "unit": "px"
+            }
+          },
+          {
+            "color": {
+              "colorSpace": "srgb",
+              "components": [0, 0, 0],
+              "alpha": 0.35
+            },
+            "offsetX": {
+              "value": 0,
+              "unit": "px"
+            },
+            "offsetY": {
+              "value": 8,
+              "unit": "px"
+            },
+            "blur": {
+              "value": 10,
+              "unit": "px"
+            },
+            "spread": {
+              "value": -6,
+              "unit": "px"
+            }
+          }
+        ]
+      }
+    },
+    "text": {
+      "xs": {
+        "$type": "dimension",
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        }
+      },
+      "sm": {
+        "$type": "dimension",
+        "$value": {
+          "value": 14,
+          "unit": "px"
+        }
+      },
+      "base": {
+        "$type": "dimension",
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": {
+          "value": 18,
+          "unit": "px"
+        }
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": {
+          "value": 20,
+          "unit": "px"
+        }
+      }
+    }
+  }
+}
