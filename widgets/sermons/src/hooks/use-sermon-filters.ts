@@ -96,7 +96,9 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     (config.speakerId ? String(config.speakerId) : null) || params.speaker,
   );
   const selectedBookIds = parseIds((config.bookId ? String(config.bookId) : null) || params.book);
-  const selectedServiceTypeIds = parseIds(params.serviceTypes);
+  const selectedServiceTypeIds = parseIds(
+    (config.serviceTypeId ? String(config.serviceTypeId) : null) || params.serviceTypes,
+  );
   const selectedSeriesTypeIds = parseIds(
     (config.seriesTypeId ? String(config.seriesTypeId) : null) || params.seriesType,
   );
@@ -170,9 +172,11 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
         void setParams({ book: serializeIds(ids), page: 1 });
       };
 
-  const setServiceTypes = (ids: number[]) => {
-    void setParams({ serviceTypes: serializeIds(ids), page: 1 });
-  };
+  const setServiceTypes: (ids: number[]) => void = config.serviceTypeId
+    ? noop
+    : (ids: number[]) => {
+        void setParams({ serviceTypes: serializeIds(ids), page: 1 });
+      };
 
   const setSeriesTypeIds: (ids: number[]) => void = config.seriesTypeId
     ? noop
@@ -211,12 +215,12 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     // pinned value); only unlocked dimensions are reset to `null`.
     const next: Parameters<typeof setParams>[0] = {
       search: null,
-      serviceTypes: null,
       sort: 'date',
       order: 'desc',
       page: 1,
     };
     if (!config.seriesId) next.series = null;
+    if (!config.serviceTypeId) next.serviceTypes = null;
     if (!config.speakerId) next.speaker = null;
     if (!config.bookId) next.book = null;
     if (!config.seriesTypeId) next.seriesType = null;
@@ -229,7 +233,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     !config.seriesId && selectedSeriesIds.length > 0,
     !config.speakerId && selectedSpeakerIds.length > 0,
     !config.bookId && selectedBookIds.length > 0,
-    selectedServiceTypeIds.length > 0,
+    !config.serviceTypeId && selectedServiceTypeIds.length > 0,
     !config.seriesTypeId && selectedSeriesTypeIds.length > 0,
     (!config.from && params.from !== null) || (!config.to && params.to !== null),
   ];
