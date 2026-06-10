@@ -170,6 +170,7 @@ export function SermonsView({ config, filters, breakpoint }: SermonsViewProps) {
         // state), so an API outage doesn't read as "no results".
         <ResultsError
           noun="sermons"
+          error={error}
           onRetry={() => {
             void refetch();
           }}

@@ -5,6 +5,7 @@ import { SermonsView } from '../src/components/sermons/SermonsView';
 import { SeriesView } from '../src/components/series/SeriesView';
 import { SermonsConfigSchema, type SermonsConfig } from '../src/types';
 import type { useSermonFilters } from '../src/hooks/use-sermon-filters';
+import { ApiError } from '@perimeter/api-hooks';
 
 /**
  * Error / empty / loading states (Task 10). jsdom can't simulate layout, so we
@@ -46,16 +47,23 @@ const emptySeries = {
 const useSermons = vi.fn(() => queryResult({ data: emptySermons }));
 const useSeries = vi.fn(() => queryResult({ data: emptySeries }));
 
-vi.mock('@perimeter/api-hooks', () => ({
-  useSermons: (...args: unknown[]) => useSermons(...(args as [])),
-  useSeries: (...args: unknown[]) => useSeries(...(args as [])),
-  useSermonDetail: () => queryResult({ data: { success: true, data: null } }),
-  useSeriesDetail: () => queryResult({ data: { success: true, data: null } }),
-  useSpeakers: () => queryResult({ data: { success: true, data: [] } }),
-  useBooks: () => queryResult({ data: { success: true, data: [] } }),
-  useServiceTypes: () => queryResult({ data: { success: true, data: [] } }),
-  useSeriesTypes: () => queryResult({ data: { success: true, data: [] } }),
-}));
+vi.mock('@perimeter/api-hooks', async () => {
+  // Keep the real exports (notably the ApiError class, so `instanceof` in
+  // ResultsError matches the errors these tests construct) and override only
+  // the data hooks.
+  const actual = await vi.importActual<Record<string, unknown>>('@perimeter/api-hooks');
+  return {
+    ...actual,
+    useSermons: (...args: unknown[]) => useSermons(...(args as [])),
+    useSeries: (...args: unknown[]) => useSeries(...(args as [])),
+    useSermonDetail: () => queryResult({ data: { success: true, data: null } }),
+    useSeriesDetail: () => queryResult({ data: { success: true, data: null } }),
+    useSpeakers: () => queryResult({ data: { success: true, data: [] } }),
+    useBooks: () => queryResult({ data: { success: true, data: [] } }),
+    useServiceTypes: () => queryResult({ data: { success: true, data: [] } }),
+    useSeriesTypes: () => queryResult({ data: { success: true, data: [] } }),
+  };
+});
 
 function makeFilters(over: Partial<ReturnType<typeof useSermonFilters>> = {}) {
   return {
@@ -114,6 +122,26 @@ describe('SermonsView results states', () => {
     expect(container.querySelector('[data-slot="results-empty"]')).toBeNull();
     fireEvent.click(within(errBlock).getByRole('button', { name: /retry/i }));
     expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a session-expired error block on a 401 (not a generic outage)', () => {
+    useSermons.mockReturnValue(
+      queryResult({ error: new ApiError(401, 'unauthorized'), refetch: vi.fn() }),
+    );
+    const { container, getByText } = render(
+      <SermonsView config={config()} filters={makeFilters()} breakpoint="desktop" />,
+    );
+    const errBlock = container.querySelector('[data-slot="results-error"]') as HTMLElement;
+    expect(errBlock).toBeTruthy();
+    expect(getByText('Session expired')).toBeInTheDocument();
+  });
+
+  it('shows the generic outage message on a non-401 error', () => {
+    useSermons.mockReturnValue(queryResult({ error: new ApiError(500, 'boom'), refetch: vi.fn() }));
+    const { getByText } = render(
+      <SermonsView config={config()} filters={makeFilters()} breakpoint="desktop" />,
+    );
+    expect(getByText(/Couldn.t load sermons/)).toBeInTheDocument();
   });
 
   it('renders a themed empty state without a clear-filters CTA when no filters active', () => {
