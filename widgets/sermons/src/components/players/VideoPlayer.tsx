@@ -41,6 +41,15 @@ export function VideoPlayer({ url }: { url: string }) {
     hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
   }, []);
 
+  // MediaTabs unmounts this player on every Watch/Listen/PDF switch — a
+  // mouse-move in the prior 3s would otherwise leave a live timer firing into
+  // the unmounted component.
+  useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, []);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       // Ignore keys aimed at the inline range sliders (they have their own handling).
@@ -77,9 +86,13 @@ export function VideoPlayer({ url }: { url: string }) {
     const el = containerRef.current;
     if (!el) return;
 
+    // No optimistic setIsFullscreen here: the fullscreenchange listener above
+    // is the single source of truth. requestFullscreen rejects in real embeds
+    // (iframes without allowfullscreen, non-gesture calls) and fires
+    // fullscreenERROR, not fullscreenchange — an optimistic write would leave
+    // the button permanently stuck on 'Exit fullscreen'.
     if (document.fullscreenElement) {
       void document.exitFullscreen();
-      setIsFullscreen(false);
     } else {
       // Try container first; fall back to shadow host for shadow DOM compat
       const target =
@@ -87,7 +100,6 @@ export function VideoPlayer({ url }: { url: string }) {
       target.requestFullscreen().catch(() => {
         // Fullscreen not supported in this context
       });
-      setIsFullscreen(true);
     }
   }, []);
 

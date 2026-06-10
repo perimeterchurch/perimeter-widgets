@@ -6,10 +6,14 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from './utils/cn';
 
 function Tabs({ className, orientation = 'horizontal', ...props }: TabsPrimitive.Root.Props) {
+  // `orientation` must reach TabsPrimitive.Root: Base UI derives the arrow-key
+  // navigation axis AND the tablist's aria-orientation from its own prop (and
+  // emits data-orientation itself), so a manual attribute alone leaves vertical
+  // tabs with horizontal keyboard behavior and a wrong aria-orientation.
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
-      data-orientation={orientation}
+      orientation={orientation}
       className={cn('group/tabs flex gap-2 data-horizontal:flex-col', className)}
       {...props}
     />

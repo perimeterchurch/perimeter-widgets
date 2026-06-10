@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Button } from '@perimeter/ui/button';
+import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 
 interface Props {
   /** Builds the shareable deep link for the current page at copy time (so it
@@ -16,13 +16,10 @@ interface Props {
  * new tab. Mirrors the embed-snippet copy affordance (transient "Copied" label).
  */
 export function ShareLinkButton({ copyUrl, standaloneUrl }: Props) {
-  const [copied, setCopied] = useState(false);
+  const { copied, flash } = useCopiedFlash();
 
   const copy = () => {
-    void navigator.clipboard?.writeText(copyUrl()).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+    void navigator.clipboard?.writeText(copyUrl()).then(flash);
   };
 
   return (

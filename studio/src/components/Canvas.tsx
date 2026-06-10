@@ -133,7 +133,22 @@ export function Canvas({
       ? { custom: Number(internalCustomPx) }
       : internalPreset;
 
-  const preset: PresetId = typeof viewport === 'object' ? internalPreset : viewport;
+  // Last non-custom CONTROLLED viewport — the fallback when the custom width
+  // is cleared. The uncontrolled internalPreset must not be consulted on the
+  // controlled path: it is never written there, so it would always read its
+  // initial 'fluid' and snap a cleared custom width away from the previously
+  // selected preset (and into the shared URL).
+  const lastControlledPresetRef = useRef<PresetId>('fluid');
+  useEffect(() => {
+    if (controlled && typeof viewport !== 'object') lastControlledPresetRef.current = viewport;
+  }, [controlled, viewport]);
+
+  const preset: PresetId =
+    typeof viewport === 'object'
+      ? controlled
+        ? lastControlledPresetRef.current
+        : internalPreset
+      : viewport;
   const customPx = typeof viewport === 'object' ? String(viewport.custom) : '';
 
   const selectPreset = (id: PresetId) => {

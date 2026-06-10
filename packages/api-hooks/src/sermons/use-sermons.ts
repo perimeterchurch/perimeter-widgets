@@ -8,10 +8,14 @@ export type UseSermonsParams = NonNullable<operations['listSermons']['parameters
 export type UseSermonsResponse =
   operations['listSermons']['responses']['200']['content']['application/json'];
 
-export function useSermons(params: UseSermonsParams): UseQueryResult<UseSermonsResponse> {
+export function useSermons(
+  params: UseSermonsParams,
+  options?: { enabled?: boolean },
+): UseQueryResult<UseSermonsResponse> {
   const client = useApiClient();
   return useQuery({
     queryKey: ['sermons', params],
+    enabled: options?.enabled ?? true,
     queryFn: async () => {
       const search = serializeQuery(params);
       return fetchJson<UseSermonsResponse>(
