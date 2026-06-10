@@ -52,6 +52,26 @@ export function buildRewrites(manifest: Manifest): Rewrite[] {
     }));
 }
 
+/**
+ * True when `newVersion` is strictly greater than the manifest's current
+ * pointer for `name` (or the widget has no pointer yet). The manifest drives
+ * `/<name>/latest.js`, so a non-advancing release would silently DOWNGRADE
+ * every embed — the audit-#15 failure mode when releasing from a checkout
+ * that is behind origin/dev.
+ */
+export function versionAdvances(manifest: Manifest, name: string, newVersion: string): boolean {
+  const current = manifest[name];
+  if (current === undefined) return true;
+  return compareVersions(newVersion, current) > 0;
+}
+
+const PROTECTED_BRANCHES = ['dev', 'main'];
+
+/** Branches the release CLI must never commit on (repo rule: PRs only). */
+export function isProtectedBranch(branch: string): boolean {
+  return PROTECTED_BRANCHES.includes(branch);
+}
+
 export type BumpLevel = 'patch' | 'minor' | 'major';
 
 /** Bump a semver core (drops any prerelease). Throws on a non-numeric version. */

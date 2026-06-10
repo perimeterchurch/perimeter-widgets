@@ -53,16 +53,17 @@ There are two modes.
 pnpm release <widget-name> [--force]
 ```
 
-The original behavior, untouched. It uses the version **already in** `widgets/<name>/package.json` (set by hand), commits to the current branch, and does **not** push or open a PR. In order:
+It uses the version **already in** `widgets/<name>/package.json` (set by hand), commits to the current branch, and does **not** push or open a PR. In order:
 
 1. Reads the widget version from `widgets/<name>/package.json`.
-2. Refuses if `cdn/<name>/<version>/` already exists (immutable) — bump the version, or pass `--force`.
-3. Builds the widget (`pnpm --filter @perimeter/widget-<name> build`).
-4. Copies `widgets/<name>/dist/index.js` (+ `.map`) to the immutable `cdn/<name>/<version>/`.
-5. Updates `cdn/manifest.json` to point `<name>` at `<version>`.
-6. Regenerates the `rewrites` in `cdn/vercel.json` from the manifest (headers untouched).
-7. Prunes the widget's version directories to the newest 5.
-8. Commits everything under `cdn/` as `chore(release): <name>@<version>`.
+2. Guards: refuses to run on `dev`/`main` (the repo never takes direct commits there) and requires a clean working tree (so `git add cdn` cannot sweep unrelated changes into the release commit).
+3. Refuses if `cdn/<name>/<version>/` already exists (immutable) — bump the version, or pass `--force`.
+4. Builds the widget (`pnpm --filter @perimeter/widget-<name> build`).
+5. Copies `widgets/<name>/dist/index.js` (+ `.map`) to the immutable `cdn/<name>/<version>/`.
+6. Updates `cdn/manifest.json` to point `<name>` at `<version>`.
+7. Regenerates the `rewrites` in `cdn/vercel.json` from the manifest (headers untouched).
+8. Prunes the widget's version directories to the newest 5.
+9. Commits everything under `cdn/` as `chore(release): <name>@<version>`.
 
 To ship a bare release: push the branch and open a PR into `dev` yourself.
 
@@ -75,13 +76,15 @@ pnpm release <widget-name> --patch | --minor | --major [--dry-run]
 The one-command path. It does everything above **plus** owns the version bump and the branch/push/PR mechanics:
 
 1. Guards: the working tree must be clean (uncommitted changes abort), then `git fetch origin`.
-2. Branches off `origin/dev` as `release/<name>-<newVersion>`.
-3. Bumps `widgets/<name>/package.json` by the chosen level (`--patch`/`--minor`/`--major`).
-4. Runs the same shared core: build → copy to immutable `cdn/<name>/<version>/` → manifest + rewrites → prune to 5.
-5. Commits the bump + `cdn/` changes as `chore(release): <name>@<version>`.
-6. Pushes the branch and opens a PR into `dev` via `gh pr create --body-file` (generated body: version, gzipped bundle size, promote/rollback notes). You just review and merge.
+2. Plans the bump from the version on **`origin/dev`** (`git show origin/dev:widgets/<name>/package.json`) — never from the possibly-stale local checkout, so a checkout that is behind can never publish an old version or move the manifest pointer backward.
+3. Branches off `origin/dev` as `release/<name>-<newVersion>`, re-reads the widget's `package.json` from the fresh tree, and writes only the bumped version into it.
+4. Runs `pnpm install --frozen-lockfile` so the bundle builds against `origin/dev`'s lockfile, not leftover `node_modules`.
+5. Refuses if the new version does not strictly advance `cdn/manifest.json`'s pointer for the widget (the pointer drives `/<name>/latest.js`; moving it backward would downgrade every embed) or if `cdn/<name>/<newVersion>/` already exists.
+6. Runs the same shared core: build → copy to immutable `cdn/<name>/<version>/` → manifest + rewrites → prune to 5.
+7. Commits the bump + `cdn/` changes as `chore(release): <name>@<version>`.
+8. Pushes the branch and opens a PR into `dev` via `gh pr create --body-file` (generated body: version, gzipped bundle size, promote/rollback notes). You just review and merge.
 
-Add `--dry-run` to preview the planned version, branch, commit message, PR title, and PR body with **no** file writes, build, git, or `gh` side effects — useful in CI and before a real run. The bare form also accepts `--dry-run` to preview without committing.
+Add `--dry-run` to preview the planned version, branch, commit message, PR title, and PR body with **no** file writes, build, git, or `gh` side effects — useful in CI and before a real run. (The dry-run plan is computed from the local checkout, no fetch; a real run re-derives the version from `origin/dev`, so the numbers can differ when the local checkout is behind.) The bare form also accepts `--dry-run` to preview without committing.
 
 > The committed bundle artifacts (`cdn/*/*/index.js` and `.map`) are listed in `.prettierignore` — they are kept byte-for-byte as built and must never be reformatted.
 
