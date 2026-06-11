@@ -12,7 +12,7 @@
  * the NEW root-resolved lookup works inside a shadow tree (and would catch a
  * regression to any lookup that fails there).
  */
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, within, fireEvent } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { DateRangePopover } from '../../../src/components/ui/date-range/DateRangePopover';
@@ -69,5 +69,21 @@ describe('DateRangePopover focus trap inside a shadow root', () => {
     fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
 
     expect((dialog.getRootNode() as ShadowRoot).activeElement).toBe(last);
+  });
+
+  // Escape listens on the panel (not `document`), so a host-page keydown
+  // handler that stops propagation cannot swallow it. The focus trap keeps
+  // focus inside the panel, so the panel always sees the keydown.
+  it('closes on Escape pressed inside the panel', () => {
+    const onClose = vi.fn();
+    const { queries } = renderInShadow(
+      <DateRangePopover open onClose={onClose}>
+        <button>only</button>
+      </DateRangePopover>,
+    );
+
+    fireEvent.keyDown(queries.getByRole('button', { name: 'only' }), { key: 'Escape' });
+
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
