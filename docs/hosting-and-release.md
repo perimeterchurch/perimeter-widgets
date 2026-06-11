@@ -14,10 +14,12 @@ cdn/
 ├── manifest.json                     # { "<name>": "<version>" } — the single mutable pointer
 ├── loader.js                         # global loader (manifest-driven, lazy-load + dedupe)
 ├── README.md                         # deploy notes for the static project
-└── <name>/<version>/index.js (+ .map)  # immutable, committed bundles
+└── <name>/<version>/…                  # immutable, committed artifacts: index.js (+ .map) plus
+                                        # any sibling files the widget build emits (e.g. sermons'
+                                        # pdf.worker.min.mjs, fetched at runtime on first PDF open)
 ```
 
-- **Versioned paths are immutable.** `cdn/<name>/<version>/index.js` (+ `.map`) is never overwritten once published. The release CLI refuses to republish an existing version unless `--force`.
+- **Versioned paths are immutable.** Nothing under `cdn/<name>/<version>/` is ever overwritten once published. The release CLI refuses to republish an existing version unless `--force`.
 - **Last-5 prune.** Each release prunes the widget's own version directories to the newest 5 (semver-ordered), so the committed history doesn't grow unbounded. Older immutable URLs are intentionally retired.
 - **`manifest.json` is the only mutable pointer.** It maps each widget name to its current version. `loader.js` reads it to resolve which immutable bundle URL to inject.
 - **`vercel.json` ownership.** The `headers` block is authored once (static). The `rewrites` array is **regenerated from `manifest.json`** by the release CLI on every release — one `/<name>/latest.js` → current-versioned-bundle rewrite per manifest entry. Never hand-edit `rewrites`; a test (`packages/release/tests/vercel-config.test.ts`) asserts it stays in sync with the manifest.
@@ -26,7 +28,7 @@ cdn/
 
 | Path                              | `Cache-Control`                                                | CORS |
 | --------------------------------- | -------------------------------------------------------------- | ---- |
-| `/<name>/<version>/index.js(.map)` | `public, max-age=31536000, immutable`                          | `*`  |
+| `/<name>/<version>/*` (any file)  | `public, max-age=31536000, immutable`                          | `*`  |
 | `/manifest.json`                  | `public, max-age=0, s-maxage=60, stale-while-revalidate=86400` | `*`  |
 | `/<name>/latest.js`               | `public, max-age=0, s-maxage=60, stale-while-revalidate=86400` | `*`  |
 | `/loader.js`                      | `public, max-age=0, s-maxage=60, stale-while-revalidate=86400` | `*`  |
@@ -59,7 +61,7 @@ It uses the version **already in** `widgets/<name>/package.json` (set by hand), 
 2. Guards: refuses to run on `dev`/`main` (the repo never takes direct commits there) and requires a clean working tree (so `git add cdn` cannot sweep unrelated changes into the release commit).
 3. Refuses if `cdn/<name>/<version>/` already exists (immutable) — bump the version, or pass `--force`.
 4. Builds the widget (`pnpm --filter @perimeter/widget-<name> build`).
-5. Copies `widgets/<name>/dist/index.js` (+ `.map`) to the immutable `cdn/<name>/<version>/`.
+5. Copies `widgets/<name>/dist/` **recursively** to the immutable `cdn/<name>/<version>/` — the bundle + sourcemap plus any sibling artifacts the widget build emits (sermons ships `pdf.worker.min.mjs` this way; the bundle resolves it at runtime from its own script URL).
 6. Updates `cdn/manifest.json` to point `<name>` at `<version>`.
 7. Regenerates the `rewrites` in `cdn/vercel.json` from the manifest (headers untouched).
 8. Prunes the widget's version directories to the newest 5.

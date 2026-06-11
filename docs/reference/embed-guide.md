@@ -161,6 +161,24 @@ Dark mode is a CSS-variable swap — the widget's per-instance token sheet emits
 
 ---
 
+## Pinning a Version (Canary)
+
+The loader normally resolves each widget to its current released version. To test a
+newly published version on one page (e.g. a staging page) before it is promoted for
+everyone, add `data-perimeter-version` to the placeholder:
+
+```html
+<div data-perimeter-widget="sermons" data-perimeter-version="1.4.0"></div>
+```
+
+That page — and only that page — loads the pinned immutable bundle while every other
+embed keeps following the released pointer. Remove the attribute after the version is
+promoted. If two placeholders for the same widget disagree, the first on the page wins
+(each widget's bundle loads once per page). A mistyped version fails silently, like
+every other loader error — the widget simply doesn't render.
+
+---
+
 ## Common Data Attributes (all widgets)
 
 | Attribute      | Type   | Default                     | Description                             |
@@ -191,6 +209,15 @@ Rocket's *Excluded JavaScript Files* (see "Caching & Optimization Plugins" above
 1. The widget uses shadow DOM — WordPress styles should not affect it
 2. Check that the widget script loaded (look for the `<style>` tag inside the shadow root)
 3. If using a content security policy, ensure `style-src 'unsafe-inline'` is allowed (shadow DOM injects `<style>` tags)
+
+### Sermon PDFs show "Failed to load PDF"
+
+The PDF viewer downloads its rendering engine (`pdf.worker.min.mjs`) from the widget's
+own `widgets.perimeter.org` directory the first time a visitor opens a PDF — it is not
+part of the main script. On sites with a strict Content Security Policy, allow
+`connect-src https://widgets.perimeter.org https://api.perimeter.org` and
+`worker-src blob:`. Closing and reopening the PDF retries the download after a
+transient network failure.
 
 ### Widget shows stale content
 
