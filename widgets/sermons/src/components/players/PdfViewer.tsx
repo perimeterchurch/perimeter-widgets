@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { Document, Page } from 'react-pdf';
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,15 +13,7 @@ import {
 import { Button } from '@perimeter/ui/button';
 import { Spinner } from '@perimeter/ui/spinner';
 import { proxyS3Url } from '../../lib/format';
-import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?raw';
-
-// Inline the pdf.js worker into the IIFE bundle to avoid a runtime dependency
-// on unpkg.com and to satisfy strict CSP script-src rules. A blob URL is
-// created once at module init and assigned to workerSrc; pdf.js spawns a Worker
-// from it for all document loads.
-pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(
-  new Blob([pdfWorkerSrc], { type: 'application/javascript' }),
-);
+import { ensurePdfWorker } from '../../lib/pdf-worker';
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -46,6 +38,9 @@ const THUMBNAIL_WIDTH = 120;
 
 export function PdfViewer({ url: rawUrl }: { url: string }) {
   const url = proxyS3Url(rawUrl);
+  // The worker is fetched on first open (see lib/pdf-worker.ts); react-pdf
+  // must not render a <Document> until workerSrc is installed.
+  const [workerState, setWorkerState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
@@ -147,6 +142,23 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
     },
     [],
   );
+
+  /* ---- Worker install (once per page; singleton in lib/pdf-worker) ---- */
+
+  useEffect(() => {
+    let active = true;
+    ensurePdfWorker().then(
+      () => {
+        if (active) setWorkerState('ready');
+      },
+      () => {
+        if (active) setWorkerState('error');
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
 
   /* ---- Scroll active thumbnail into view ---- */
 
@@ -285,75 +297,86 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
         </div>
       </div>
 
-      {/* Content area: optional sidebar + PDF page */}
-      <div className="flex min-h-0 flex-1">
-        {/* Thumbnail sidebar */}
-        {showThumbnails && (
-          <div className="hidden w-[160px] shrink-0 flex-col overflow-y-auto border-r border-border bg-muted p-3 @sm:flex">
-            <Document file={url} loading={null}>
-              {Array.from({ length: numPages }, (_, i) => {
-                const pageNum = i + 1;
-                const isActive = pageNum === currentPage;
-                return (
-                  <button
-                    key={pageNum}
-                    ref={(el) => {
-                      if (el) {
-                        thumbnailRefs.current.set(pageNum, el);
-                      } else {
-                        thumbnailRefs.current.delete(pageNum);
-                      }
-                    }}
-                    type="button"
-                    onClick={() => goToPage(pageNum)}
-                    className={`mb-2 flex flex-col items-center rounded-sm p-1 transition-colors ${
-                      isActive ? 'ring-2 ring-primary' : 'hover:bg-bg'
-                    }`}
-                    aria-label={`Go to page ${pageNum}`}
-                    aria-current={isActive ? 'page' : undefined}
-                  >
-                    <Page
-                      pageNumber={pageNum}
-                      width={THUMBNAIL_WIDTH}
-                      renderTextLayer={false}
-                      renderAnnotationLayer={false}
-                    />
-                    <span className="mt-1 text-2xs text-muted-fg">{pageNum}</span>
-                  </button>
-                );
-              })}
-            </Document>
-          </div>
-        )}
+      {/* Content area gated on the worker: react-pdf throws if a <Document>
+          renders before GlobalWorkerOptions.workerSrc is installed. */}
+      {workerState !== 'ready' ? (
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          {workerState === 'error' ? (
+            <div className="text-sm text-muted-fg">Failed to load PDF</div>
+          ) : (
+            <Spinner className="size-8" aria-label="Loading PDF" />
+          )}
+        </div>
+      ) : (
+        <div className="flex min-h-0 flex-1">
+          {/* Thumbnail sidebar */}
+          {showThumbnails && (
+            <div className="hidden w-[160px] shrink-0 flex-col overflow-y-auto border-r border-border bg-muted p-3 @sm:flex">
+              <Document file={url} loading={null}>
+                {Array.from({ length: numPages }, (_, i) => {
+                  const pageNum = i + 1;
+                  const isActive = pageNum === currentPage;
+                  return (
+                    <button
+                      key={pageNum}
+                      ref={(el) => {
+                        if (el) {
+                          thumbnailRefs.current.set(pageNum, el);
+                        } else {
+                          thumbnailRefs.current.delete(pageNum);
+                        }
+                      }}
+                      type="button"
+                      onClick={() => goToPage(pageNum)}
+                      className={`mb-2 flex flex-col items-center rounded-sm p-1 transition-colors ${
+                        isActive ? 'ring-2 ring-primary' : 'hover:bg-bg'
+                      }`}
+                      aria-label={`Go to page ${pageNum}`}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      <Page
+                        pageNumber={pageNum}
+                        width={THUMBNAIL_WIDTH}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                      />
+                      <span className="mt-1 text-2xs text-muted-fg">{pageNum}</span>
+                    </button>
+                  );
+                })}
+              </Document>
+            </div>
+          )}
 
-        {/* Main PDF view */}
-        <div ref={containerRef} className="flex min-h-0 flex-1 overflow-auto">
-          <div ref={pageRef} className="mx-auto p-6">
-            <Document
-              file={url}
-              onLoadSuccess={onDocumentLoadSuccess}
-              loading={
-                <div className="flex h-full w-full items-center justify-center">
-                  <Spinner className="size-8" aria-label="Loading PDF" />
-                </div>
-              }
-              error={
-                <div className="flex h-full w-full items-center justify-center text-sm text-muted-fg">
-                  Failed to load PDF
-                </div>
-              }
-            >
-              <Page
-                pageNumber={currentPage}
-                scale={scale}
-                onLoadSuccess={onPageLoadSuccess}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-              />
-            </Document>
+          {/* Main PDF view */}
+          <div ref={containerRef} className="flex min-h-0 flex-1 overflow-auto">
+            <div ref={pageRef} className="mx-auto p-6">
+              <Document
+                file={url}
+                onLoadSuccess={onDocumentLoadSuccess}
+                loading={
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Spinner className="size-8" aria-label="Loading PDF" />
+                  </div>
+                }
+                error={
+                  <div className="flex h-full w-full items-center justify-center text-sm text-muted-fg">
+                    Failed to load PDF
+                  </div>
+                }
+              >
+                <Page
+                  pageNumber={currentPage}
+                  scale={scale}
+                  onLoadSuccess={onPageLoadSuccess}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                />
+              </Document>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

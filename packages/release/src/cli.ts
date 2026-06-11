@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 import {
   existsSync,
   mkdirSync,
-  copyFileSync,
+  cpSync,
   readFileSync,
   writeFileSync,
   readdirSync,
@@ -43,12 +43,14 @@ function publishToCdn(name: string, version: string, widgetDir: string): number 
   // Build the widget.
   execSync(`pnpm --filter @perimeter/widget-${name} build`, { cwd: REPO, stdio: 'inherit' });
 
-  // Copy the immutable artifact + sourcemap.
+  // Copy dist/ wholesale: the bundle + sourcemap plus any sibling artifacts a
+  // widget's build emits (e.g. sermons' pdf.worker.min.mjs). Everything in the
+  // version dir is equally immutable and already covered by the
+  // /:name/:version/:file* cache/CORS headers.
   const dist = path.join(widgetDir, 'dist');
   const destDir = path.join(CDN, name, version);
   mkdirSync(destDir, { recursive: true });
-  copyFileSync(path.join(dist, 'index.js'), path.join(destDir, 'index.js'));
-  copyFileSync(path.join(dist, 'index.js.map'), path.join(destDir, 'index.js.map'));
+  cpSync(dist, destDir, { recursive: true });
 
   // Update the manifest pointer.
   const manifestPath = path.join(CDN, 'manifest.json');
