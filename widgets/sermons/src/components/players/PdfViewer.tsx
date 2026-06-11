@@ -163,13 +163,15 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
     <div className="flex h-full w-full flex-col">
       {/* Controls bar */}
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-muted px-3 py-1.5">
-        {/* Left: thumbnail toggle */}
+        {/* Left: thumbnail toggle. Hidden (with the sidebar) below the @sm
+            container breakpoint — a 160px sidebar would eat most of a narrow
+            embed's width, leaving an unusably thin page view. */}
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => setShowThumbnails((v) => !v)}
-          className="h-8 w-8 p-0"
+          className="hidden h-8 w-8 p-0 @sm:inline-flex"
           aria-label={showThumbnails ? 'Hide thumbnails' : 'Show thumbnails'}
         >
           {showThumbnails ? (
@@ -287,7 +289,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
       <div className="flex min-h-0 flex-1">
         {/* Thumbnail sidebar */}
         {showThumbnails && (
-          <div className="flex w-[160px] shrink-0 flex-col overflow-y-auto border-r border-border bg-muted p-3">
+          <div className="hidden w-[160px] shrink-0 flex-col overflow-y-auto border-r border-border bg-muted p-3 @sm:flex">
             <Document file={url} loading={null}>
               {Array.from({ length: numPages }, (_, i) => {
                 const pageNum = i + 1;
@@ -316,7 +318,7 @@ export function PdfViewer({ url: rawUrl }: { url: string }) {
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
                     />
-                    <span className="mt-1 text-[10px] text-muted-fg">{pageNum}</span>
+                    <span className="mt-1 text-2xs text-muted-fg">{pageNum}</span>
                   </button>
                 );
               })}

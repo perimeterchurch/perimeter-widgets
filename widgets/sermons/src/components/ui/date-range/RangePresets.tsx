@@ -21,7 +21,7 @@ export function RangePresets({
 }) {
   return (
     <div className="flex w-36 shrink-0 flex-col gap-1.5 border-r border-border pr-5">
-      <span className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-fg">
+      <span className="mb-1 text-2xs font-semibold uppercase tracking-wider text-muted-fg">
         Quick select
       </span>
       {presets.map((preset) => (

@@ -383,6 +383,13 @@
       }
     },
     "text": {
+      "2xs": {
+        "$type": "dimension",
+        "$value": {
+          "value": 10,
+          "unit": "px"
+        }
+      },
       "xs": {
         "$type": "dimension",
         "$value": {
@@ -803,6 +810,13 @@
       }
     },
     "text": {
+      "2xs": {
+        "$type": "dimension",
+        "$value": {
+          "value": 10,
+          "unit": "px"
+        }
+      },
       "xs": {
         "$type": "dimension",
         "$value": {

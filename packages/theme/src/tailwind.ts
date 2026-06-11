@@ -30,6 +30,7 @@ for (const t of tokensByPrefix('shadow')) {
  * `data-theme-text-*` override scales its leading proportionally.
  */
 const FONT_SIZE_LINE_HEIGHTS: Record<string, string> = {
+  '2xs': '1.4',
   xs: '1.3333',
   sm: '1.4286',
   base: '1.5',

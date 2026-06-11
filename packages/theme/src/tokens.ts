@@ -31,6 +31,8 @@ export const globalTokens = {
   // Type scale — px (not rem) so host font-size cannot rescale widgets, same
   // rule as radii. text-base also drives the :host surface font-size, so a
   // data-theme-text-base override scales a widget's unstyled text with it.
+  // 2xs is the micro-label size (uppercase eyebrows, thumbnail page numbers).
+  'text-2xs': '10px',
   'text-xs': '12px',
   'text-sm': '14px',
   'text-base': '16px',
@@ -73,6 +75,7 @@ export const darkTokens: Record<ThemeToken, string> = {
   'shadow-md': '0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.35)',
   'shadow-lg': '0 10px 15px -3px rgb(0 0 0 / 0.35), 0 4px 6px -4px rgb(0 0 0 / 0.35)',
   'shadow-xl': '0 20px 25px -5px rgb(0 0 0 / 0.35), 0 8px 10px -6px rgb(0 0 0 / 0.35)',
+  'text-2xs': globalTokens['text-2xs'],
   'text-xs': globalTokens['text-xs'],
   'text-sm': globalTokens['text-sm'],
   'text-base': globalTokens['text-base'],

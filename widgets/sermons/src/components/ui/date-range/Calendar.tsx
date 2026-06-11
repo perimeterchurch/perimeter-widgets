@@ -143,7 +143,7 @@ export function Calendar({
             <button
               type="button"
               onClick={goToToday}
-              className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary transition-colors hover:bg-primary/20"
+              className="rounded-md bg-primary/10 px-1.5 py-0.5 text-2xs font-semibold text-primary transition-colors hover:bg-primary/20"
             >
               Today
             </button>
@@ -165,7 +165,7 @@ export function Calendar({
         {WEEKDAY_LABELS.map((label) => (
           <div
             key={label}
-            className="py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-fg"
+            className="py-1 text-2xs font-semibold uppercase tracking-wider text-muted-fg"
           >
             {label}
           </div>
@@ -285,7 +285,7 @@ function TimeInput({
       )}
     >
       <Clock className="h-3.5 w-3.5 shrink-0 text-muted-fg" />
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-fg">
+      <span className="text-2xs font-semibold uppercase tracking-wider text-muted-fg">
         {label ?? 'Time'}
       </span>
       <div className="ml-auto flex items-center gap-1.5">
@@ -314,7 +314,7 @@ function TimeInput({
           className="h-8 w-12 rounded-md border border-border bg-bg px-1 text-center text-sm tabular-nums focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary/30"
           aria-label={label ? `${label} minute` : 'Minute'}
         />
-        <div className="flex h-8 overflow-hidden rounded-md border border-border text-[11px] font-semibold">
+        <div className="flex h-8 overflow-hidden rounded-md border border-border text-xs font-semibold">
           <button
             type="button"
             onClick={!isPM ? undefined : togglePeriod}
