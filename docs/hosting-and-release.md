@@ -112,6 +112,14 @@ The loader fetches `manifest.json`, scans the page for `[data-perimeter-widget="
 
 `data-nowprocket` opts the tag out of WP Rocket's "Delay JavaScript Execution" — a WordPress optimization that otherwise holds every script until the visitor interacts with the page, so a delayed loader renders nothing for a visitor who loads the page and leaves. The attribute is inert on hosts without WP Rocket, and scripts the loader injects at runtime are not rewritten, so guarding the loader tag covers the chain. Cache-plugin symptoms and admin-side exclusions: [`docs/reference/embed-guide.md`](reference/embed-guide.md) (Caching & Optimization Plugins).
 
+**Canary one embed (loader + version override):** `data-perimeter-version` on the placeholder pins that widget on that page to a specific immutable bundle, bypassing the manifest pointer — point a staging page (or one production page) at a freshly published version before promoting the manifest.
+
+```html
+<div data-perimeter-widget="sermons" data-perimeter-version="1.4.0"></div>
+```
+
+First placeholder per widget name wins (one bundle loads per name), and an explicit version works even for a widget not yet in the manifest. Contract details: [`docs/superpowers/decisions/2026-06-11-loader-evergreen-api.md`](superpowers/decisions/2026-06-11-loader-evergreen-api.md).
+
 **Pinned to a specific immutable version (no loader):** point a script tag straight at a versioned bundle.
 
 ```html
