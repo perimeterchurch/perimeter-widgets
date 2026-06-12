@@ -32,7 +32,9 @@ export function startFixtureServer(port = FIXTURE_PORT) {
     }
     const page = /^\/([\w-]+)\.html$/.exec(url);
     if (page) return send(200, 'text/html', fixture.replaceAll('__WIDGET__', page[1]!));
-    const bundle = /^\/([\w-]+)\/dev\/(index\.js(?:\.map)?)$/.exec(url);
+    // Any flat dist artifact: index.js(.map) plus build-emitted siblings like
+    // sermons' pdf.worker.min.mjs — mirroring the release CLI's recursive copy.
+    const bundle = /^\/([\w-]+)\/dev\/([\w.-]+\.(?:js|mjs)(?:\.map)?)$/.exec(url);
     if (bundle) {
       const file = path.join(widgetsDir, bundle[1]!, 'dist', bundle[2]!);
       if (existsSync(file)) {

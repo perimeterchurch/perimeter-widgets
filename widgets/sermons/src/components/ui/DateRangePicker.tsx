@@ -247,7 +247,7 @@ function RangePanel({
               <div className="min-w-0 flex-1">
                 <span
                   className={cn(
-                    'block text-[10px] font-semibold uppercase tracking-wider',
+                    'block text-2xs font-semibold uppercase tracking-wider',
                     activeSide === 'start' ? 'text-primary' : 'text-muted-fg',
                   )}
                 >
@@ -303,7 +303,7 @@ function RangePanel({
               <div className="min-w-0 flex-1">
                 <span
                   className={cn(
-                    'block text-[10px] font-semibold uppercase tracking-wider',
+                    'block text-2xs font-semibold uppercase tracking-wider',
                     activeSide === 'end' ? 'text-primary' : 'text-muted-fg',
                   )}
                 >

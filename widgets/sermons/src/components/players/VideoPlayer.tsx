@@ -200,7 +200,7 @@ export function VideoPlayer({ url }: { url: string }) {
               step={0.05}
               value={volume}
               onChange={(e) => setVolume(parseFloat(e.target.value))}
-              className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary"
+              className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/30 accent-primary outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
               aria-label="Volume"
             />
           </div>

@@ -1,7 +1,12 @@
 /* Perimeter Widgets global loader.
- * Usage: <script src="https://widgets.perimeter.org/loader.js" async></script>
+ * Usage: <script src="https://widgets.perimeter.org/loader.js" data-nowprocket async></script>
+ * (data-nowprocket opts out of WP Rocket's Delay JS, which would otherwise hold
+ * this tag until user interaction; inert on hosts without WP Rocket.)
  * Mounts every <div data-perimeter-widget="<name>"> on the page by lazy-loading
- * only the bundles actually present, each once. */
+ * only the bundles actually present, each once.
+ * Canary override: data-perimeter-version="<version>" on the placeholder div
+ * pins THAT widget to a specific immutable bundle instead of the manifest
+ * pointer (first div per widget name wins — bundles load once per name). */
 (function () {
   if (window.__perimeterLoader) return;
   window.__perimeterLoader = true;
@@ -22,7 +27,7 @@
         for (var i = 0; i < nodes.length; i++) {
           var name = nodes[i].getAttribute('data-perimeter-widget');
           if (!name || seen[name]) continue;
-          var version = manifest[name];
+          var version = nodes[i].getAttribute('data-perimeter-version') || manifest[name];
           if (!version) continue; // unknown widget — skip silently (guest on someone's page)
           seen[name] = true;
           var s = document.createElement('script');

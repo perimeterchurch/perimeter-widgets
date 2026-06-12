@@ -10,8 +10,10 @@
 There are two embed shapes. The recommended one uses the global loader:
 
 ```html
-<!-- Loader (once per page) — resolves and injects the current versioned bundle -->
-<script src="https://widgets.perimeter.org/loader.js" async></script>
+<!-- Loader (once per page) — resolves and injects the current versioned bundle.
+     data-nowprocket opts the tag out of WP Rocket's "Delay JavaScript Execution"
+     (harmless everywhere else) — see "Caching & optimization plugins" below. -->
+<script src="https://widgets.perimeter.org/loader.js" data-nowprocket async></script>
 
 <!-- Target element with config (one per widget instance) -->
 <div data-perimeter-widget="<name>" data-option="value"></div>
@@ -23,7 +25,7 @@ To pin a single immutable build (no loader), point a script straight at a versio
 
 ```html
 <div data-perimeter-widget="<name>"></div>
-<script src="https://widgets.perimeter.org/<name>/<version>/index.js" async></script>
+<script src="https://widgets.perimeter.org/<name>/<version>/index.js" data-nowprocket async></script>
 ```
 
 `…/<name>/latest.js` is also available (a manifest-derived rewrite that always resolves to the current released version) for an auto-updating single-script embed.
@@ -65,7 +67,7 @@ The placeholder is replaced when the widget mounts.
 >
     <div style="min-height:200px;background:#f5f5f4;border-radius:8px"></div>
 </div>
-<script src="https://widgets.perimeter.org/sermons/latest.js" async></script>
+<script src="https://widgets.perimeter.org/sermons/latest.js" data-nowprocket async></script>
 ```
 
 ---
@@ -75,7 +77,7 @@ The placeholder is replaced when the widget mounts.
 Each widget bundles its own React and creates its own shadow DOM and QueryClient. Multiple widgets on the same page work independently with no conflicts. With the loader, one `<script>` covers every widget on the page:
 
 ```html
-<script src="https://widgets.perimeter.org/loader.js" async></script>
+<script src="https://widgets.perimeter.org/loader.js" data-nowprocket async></script>
 
 <div data-perimeter-widget="sermons"></div>
 <div data-perimeter-widget="giving" data-campaign="general-fund"></div>
@@ -93,6 +95,41 @@ Widgets render inside a shadow DOM (`mode: 'open'`). This means:
 - Widget styles do **not** leak into the WordPress page
 - Each widget injects its own Tailwind CSS into its shadow root
 - The `:host` selector resets inherited styles (font, color, line-height)
+
+---
+
+## Caching & Optimization Plugins (WP Rocket, Autoptimize)
+
+WordPress performance plugins rewrite script tags, and one feature is a verified
+widget-killer:
+
+**WP Rocket "Delay JavaScript Execution"** defers **every** script — inline and external —
+until the visitor interacts with the page (mousemove, touch, scroll, keydown), with no
+timeout fallback. With the loader delayed, the widget renders nothing until interaction,
+and **never renders for a visitor who loads the page and leaves without interacting**. Our
+loader is not on WP Rocket's built-in exclusion list, so a default Delay JS rollout breaks
+the embed silently.
+
+Two layers of defense, both vendor-supported:
+
+1. **Ship the snippet with `data-nowprocket`** (already included in every snippet in this
+   guide). WP Rocket skips any script tag carrying the `nowprocket` keyword; the attribute
+   is inert everywhere else. Scripts the loader injects at runtime are not rewritten, so
+   guarding the loader tag (or the direct/`latest.js` tag) covers the whole chain.
+2. **Add an admin-side exclusion** in WP Rocket → File Optimization → *Excluded JavaScript
+   Files*, in case a page builder or copy-paste strips the attribute:
+
+   ```
+   widgets.perimeter.org
+   ```
+
+**Autoptimize caveat:** with WP Rocket Delay JS *and* Autoptimize's "Aggregate JS files"
+both enabled, delayed scripts (which WP Rocket rewrites to look empty) can be aggregated
+and stripped from the page entirely. Autoptimize ships with JS aggregation off — leave it
+off, or exclude `widgets.perimeter.org` there as well.
+
+Other common optimizations are safe: the embed scripts are already `async`, bundles are
+immutable and year-cached, and minify/defer settings don't change the loader's behavior.
 
 ---
 
@@ -124,6 +161,24 @@ Dark mode is a CSS-variable swap — the widget's per-instance token sheet emits
 
 ---
 
+## Pinning a Version (Canary)
+
+The loader normally resolves each widget to its current released version. To test a
+newly published version on one page (e.g. a staging page) before it is promoted for
+everyone, add `data-perimeter-version` to the placeholder:
+
+```html
+<div data-perimeter-widget="sermons" data-perimeter-version="1.4.0"></div>
+```
+
+That page — and only that page — loads the pinned immutable bundle while every other
+embed keeps following the released pointer. Remove the attribute after the version is
+promoted. If two placeholders for the same widget disagree, the first on the page wins
+(each widget's bundle loads once per page). A mistyped version fails silently, like
+every other loader error — the widget simply doesn't render.
+
+---
+
 ## Common Data Attributes (all widgets)
 
 | Attribute      | Type   | Default                     | Description                             |
@@ -141,11 +196,28 @@ Dark mode is a CSS-variable swap — the widget's per-instance token sheet emits
 3. Open browser DevTools → Console for errors
 4. Check DevTools → Elements to see if a shadow root was created
 
+### Widget appears only after moving the mouse / scrolling (or never)
+
+That is the WP Rocket "Delay JavaScript Execution" signature — the embed script is being
+held until user interaction. Confirm with DevTools → Elements: a delayed tag shows
+`type="rocketlazyloadscript"` with the real URL stashed in `data-rocket-src`. Fix: make
+sure the script tag carries `data-nowprocket` and/or add `widgets.perimeter.org` to WP
+Rocket's *Excluded JavaScript Files* (see "Caching & Optimization Plugins" above).
+
 ### Styles look wrong
 
 1. The widget uses shadow DOM — WordPress styles should not affect it
 2. Check that the widget script loaded (look for the `<style>` tag inside the shadow root)
 3. If using a content security policy, ensure `style-src 'unsafe-inline'` is allowed (shadow DOM injects `<style>` tags)
+
+### Sermon PDFs show "Failed to load PDF"
+
+The PDF viewer downloads its rendering engine (`pdf.worker.min.mjs`) from the widget's
+own `widgets.perimeter.org` directory the first time a visitor opens a PDF — it is not
+part of the main script. On sites with a strict Content Security Policy, allow
+`connect-src https://widgets.perimeter.org https://api.perimeter.org` and
+`worker-src blob:`. Closing and reopening the PDF retries the download after a
+transient network failure.
 
 ### Widget shows stale content
 

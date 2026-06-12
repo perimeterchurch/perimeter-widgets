@@ -5,22 +5,45 @@ function cssVar(token: ThemeToken): string {
   return `var(--${token})`;
 }
 
-const colorTokens = (Object.keys(globalTokens) as ThemeToken[]).filter((k) =>
-  k.startsWith('color-'),
-);
-const radiusTokens = (Object.keys(globalTokens) as ThemeToken[]).filter((k) =>
-  k.startsWith('radius-'),
-);
+function tokensByPrefix(prefix: 'color' | 'radius' | 'shadow' | 'text'): ThemeToken[] {
+  return (Object.keys(globalTokens) as ThemeToken[]).filter((k) => k.startsWith(`${prefix}-`));
+}
 
 const colors: Record<string, string> = {};
-for (const t of colorTokens) {
-  const name = t.slice('color-'.length);
-  colors[name] = cssVar(t);
+for (const t of tokensByPrefix('color')) {
+  colors[t.slice('color-'.length)] = cssVar(t);
 }
 
 const borderRadius: Record<string, string> = {};
-for (const t of radiusTokens) {
+for (const t of tokensByPrefix('radius')) {
   borderRadius[t.slice('radius-'.length)] = cssVar(t);
+}
+
+const boxShadow: Record<string, string> = {};
+for (const t of tokensByPrefix('shadow')) {
+  boxShadow[t.slice('shadow-'.length)] = cssVar(t);
+}
+
+/**
+ * Per-size unitless line-heights matching Tailwind's defaults at the token's
+ * default px size (e.g. text-sm 14px/20px → 1.4286). Unitless so a
+ * `data-theme-text-*` override scales its leading proportionally.
+ */
+const FONT_SIZE_LINE_HEIGHTS: Record<string, string> = {
+  '2xs': '1.4',
+  xs: '1.3333',
+  sm: '1.4286',
+  base: '1.5',
+  lg: '1.5556',
+  xl: '1.4',
+};
+
+const fontSize: Record<string, [string, { lineHeight: string }]> = {};
+for (const t of tokensByPrefix('text')) {
+  const name = t.slice('text-'.length);
+  const lineHeight = FONT_SIZE_LINE_HEIGHTS[name];
+  if (!lineHeight) throw new Error(`text token "${t}" has no line-height mapping`);
+  fontSize[name] = [cssVar(t), { lineHeight }];
 }
 
 /**
@@ -52,6 +75,8 @@ export const tailwindPreset: Config = {
     extend: {
       colors,
       borderRadius,
+      boxShadow,
+      fontSize,
       fontFamily: { sans: [cssVar('font-sans')], mono: [cssVar('font-mono')] },
     },
   },

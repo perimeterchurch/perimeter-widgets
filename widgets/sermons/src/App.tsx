@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NuqsAdapter } from 'nuqs/adapters/react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import type { SermonsConfig } from './types';
 import { applyWidgetDefaults } from './types';
 import { useSermonFilters } from './hooks/use-sermon-filters';
@@ -128,9 +128,13 @@ export interface AppProps {
 
 export function App({ config: rawConfig }: AppProps): React.JSX.Element {
   const config = applyWidgetDefaults(rawConfig);
+  // reducedMotion="user" drops transform animations (the y slides here and in
+  // MediaTabs) for prefers-reduced-motion visitors while keeping opacity fades.
   return (
-    <NuqsAdapter>
-      <SermonsWidget config={config} />
-    </NuqsAdapter>
+    <MotionConfig reducedMotion="user">
+      <NuqsAdapter>
+        <SermonsWidget config={config} />
+      </NuqsAdapter>
+    </MotionConfig>
   );
 }

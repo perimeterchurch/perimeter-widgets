@@ -14,10 +14,12 @@ cdn/
 ├── manifest.json                     # { "<name>": "<version>" } — the single mutable pointer
 ├── loader.js                         # global loader (manifest-driven, lazy-load + dedupe)
 ├── README.md                         # deploy notes for the static project
-└── <name>/<version>/index.js (+ .map)  # immutable, committed bundles
+└── <name>/<version>/…                  # immutable, committed artifacts: index.js (+ .map) plus
+                                        # any sibling files the widget build emits (e.g. sermons'
+                                        # pdf.worker.min.mjs, fetched at runtime on first PDF open)
 ```
 
-- **Versioned paths are immutable.** `cdn/<name>/<version>/index.js` (+ `.map`) is never overwritten once published. The release CLI refuses to republish an existing version unless `--force`.
+- **Versioned paths are immutable.** Nothing under `cdn/<name>/<version>/` is ever overwritten once published. The release CLI refuses to republish an existing version unless `--force`.
 - **Last-5 prune.** Each release prunes the widget's own version directories to the newest 5 (semver-ordered), so the committed history doesn't grow unbounded. Older immutable URLs are intentionally retired.
 - **`manifest.json` is the only mutable pointer.** It maps each widget name to its current version. `loader.js` reads it to resolve which immutable bundle URL to inject.
 - **`vercel.json` ownership.** The `headers` block is authored once (static). The `rewrites` array is **regenerated from `manifest.json`** by the release CLI on every release — one `/<name>/latest.js` → current-versioned-bundle rewrite per manifest entry. Never hand-edit `rewrites`; a test (`packages/release/tests/vercel-config.test.ts`) asserts it stays in sync with the manifest.
@@ -26,7 +28,7 @@ cdn/
 
 | Path                              | `Cache-Control`                                                | CORS |
 | --------------------------------- | -------------------------------------------------------------- | ---- |
-| `/<name>/<version>/index.js(.map)` | `public, max-age=31536000, immutable`                          | `*`  |
+| `/<name>/<version>/*` (any file)  | `public, max-age=31536000, immutable`                          | `*`  |
 | `/manifest.json`                  | `public, max-age=0, s-maxage=60, stale-while-revalidate=86400` | `*`  |
 | `/<name>/latest.js`               | `public, max-age=0, s-maxage=60, stale-while-revalidate=86400` | `*`  |
 | `/loader.js`                      | `public, max-age=0, s-maxage=60, stale-while-revalidate=86400` | `*`  |
@@ -59,7 +61,7 @@ It uses the version **already in** `widgets/<name>/package.json` (set by hand), 
 2. Guards: refuses to run on `dev`/`main` (the repo never takes direct commits there) and requires a clean working tree (so `git add cdn` cannot sweep unrelated changes into the release commit).
 3. Refuses if `cdn/<name>/<version>/` already exists (immutable) — bump the version, or pass `--force`.
 4. Builds the widget (`pnpm --filter @perimeter/widget-<name> build`).
-5. Copies `widgets/<name>/dist/index.js` (+ `.map`) to the immutable `cdn/<name>/<version>/`.
+5. Copies `widgets/<name>/dist/` **recursively** to the immutable `cdn/<name>/<version>/` — the bundle + sourcemap plus any sibling artifacts the widget build emits (sermons ships `pdf.worker.min.mjs` this way; the bundle resolves it at runtime from its own script URL).
 6. Updates `cdn/manifest.json` to point `<name>` at `<version>`.
 7. Regenerates the `rewrites` in `cdn/vercel.json` from the manifest (headers untouched).
 8. Prunes the widget's version directories to the newest 5.
@@ -86,7 +88,7 @@ The one-command path. It does everything above **plus** owns the version bump an
 
 Add `--dry-run` to preview the planned version, branch, commit message, PR title, and PR body with **no** file writes, build, git, or `gh` side effects — useful in CI and before a real run. (The dry-run plan is computed from the local checkout, no fetch; a real run re-derives the version from `origin/dev`, so the numbers can differ when the local checkout is behind.) The bare form also accepts `--dry-run` to preview without committing.
 
-> The committed bundle artifacts (`cdn/*/*/index.js` and `.map`) are listed in `.prettierignore` — they are kept byte-for-byte as built and must never be reformatted.
+> The committed version directories (`cdn/*/*/` — bundle, sourcemap, and any build-emitted siblings) are listed in `.prettierignore` — they are kept byte-for-byte as built and must never be reformatted.
 
 ## Promote
 
@@ -104,17 +106,27 @@ Two options, both fast:
 **Direct (pin to a name; always current via the loader-resolved version):** use the global loader and a placeholder div.
 
 ```html
-<script src="https://widgets.perimeter.org/loader.js" async></script>
+<script src="https://widgets.perimeter.org/loader.js" data-nowprocket async></script>
 <div data-perimeter-widget="sermons"></div>
 ```
 
 The loader fetches `manifest.json`, scans the page for `[data-perimeter-widget="<name>"]`, and injects each used widget's immutable versioned bundle once (deduped by name). Unknown widget names are skipped silently so the loader never breaks a host page.
 
+`data-nowprocket` opts the tag out of WP Rocket's "Delay JavaScript Execution" — a WordPress optimization that otherwise holds every script until the visitor interacts with the page, so a delayed loader renders nothing for a visitor who loads the page and leaves. The attribute is inert on hosts without WP Rocket, and scripts the loader injects at runtime are not rewritten, so guarding the loader tag covers the chain. Cache-plugin symptoms and admin-side exclusions: [`docs/reference/embed-guide.md`](reference/embed-guide.md) (Caching & Optimization Plugins).
+
+**Canary one embed (loader + version override):** `data-perimeter-version` on the placeholder pins that widget on that page to a specific immutable bundle, bypassing the manifest pointer — point a staging page (or one production page) at a freshly published version before promoting the manifest.
+
+```html
+<div data-perimeter-widget="sermons" data-perimeter-version="1.4.0"></div>
+```
+
+First placeholder per widget name wins (one bundle loads per name), and an explicit version works even for a widget not yet in the manifest. Contract details: [`docs/superpowers/decisions/2026-06-11-loader-evergreen-api.md`](superpowers/decisions/2026-06-11-loader-evergreen-api.md).
+
 **Pinned to a specific immutable version (no loader):** point a script tag straight at a versioned bundle.
 
 ```html
 <!-- pin to a specific immutable version; the number here is illustrative -->
-<script src="https://widgets.perimeter.org/example/0.0.1/index.js" async></script>
+<script src="https://widgets.perimeter.org/example/0.0.1/index.js" data-nowprocket async></script>
 ```
 
 Each widget self-mounts into a shadow root on load.

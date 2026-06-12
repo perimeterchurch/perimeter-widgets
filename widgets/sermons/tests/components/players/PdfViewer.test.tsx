@@ -10,10 +10,11 @@ beforeAll(() => {
   Element.prototype.scrollIntoView = vi.fn();
 });
 
-// The pdf.js worker source is bundled via ?raw (a Vite build feature).
-// Vitest returns an empty string for raw imports; mock it explicitly so
-// URL.createObjectURL (also mocked below) receives a predictable value.
-vi.mock('pdfjs-dist/build/pdf.worker.min.mjs?raw', () => ({ default: '' }));
+// The worker is fetched + blob-installed on mount (lib/pdf-worker); resolve it
+// immediately so the gated content area opens without network or blob plumbing.
+vi.mock('../../../src/lib/pdf-worker', () => ({
+  ensurePdfWorker: () => Promise.resolve(),
+}));
 
 // Mock react-pdf before the component imports it. The mock fires
 // onLoadSuccess synchronously with a fixed page count so tests can drive
@@ -76,18 +77,25 @@ import { PdfViewer } from '../../../src/components/players/PdfViewer';
 
 const TEST_URL = 'https://example.com/sermon.pdf';
 
-function renderViewer(url = TEST_URL) {
-  return render(<PdfViewer url={url} />);
+// The content area is gated until the (mocked) worker install resolves, and
+// the mock Document fires onLoadSuccess an effect-tick after it first renders.
+// Await BOTH settles (document mounted, page count rendered in the toolbar)
+// so no assertion races a pending state update.
+async function renderViewer(url = TEST_URL) {
+  const result = render(<PdfViewer url={url} />);
+  await screen.findByTestId('pdf-document');
+  await screen.findByText('5');
+  return result;
 }
 
 describe('PdfViewer', () => {
-  it('passes the URL through to react-pdf Document', () => {
-    renderViewer();
+  it('passes the URL through to react-pdf Document', async () => {
+    await renderViewer();
     expect(screen.getByTestId('pdf-document')).toHaveAttribute('data-file', TEST_URL);
   });
 
-  it('initializes on page 1 and shows the page count', () => {
-    renderViewer();
+  it('initializes on page 1 and shows the page count', async () => {
+    await renderViewer();
     const pageInput = screen.getByLabelText<HTMLInputElement>('Current page');
     expect(pageInput.value).toBe('1');
     // numPages is rendered as text in the toolbar
@@ -95,7 +103,7 @@ describe('PdfViewer', () => {
   });
 
   it('disables Previous on page 1 and Next on the last page', async () => {
-    renderViewer();
+    await renderViewer();
     const prev = screen.getByLabelText('Previous page');
     const next = screen.getByLabelText('Next page');
     expect(prev).toBeDisabled();
@@ -110,7 +118,7 @@ describe('PdfViewer', () => {
   });
 
   it('Next/Previous step the current page', async () => {
-    renderViewer();
+    await renderViewer();
     const next = screen.getByLabelText('Next page');
     const pageInput = screen.getByLabelText<HTMLInputElement>('Current page');
 
@@ -125,7 +133,7 @@ describe('PdfViewer', () => {
   });
 
   it('rejects out-of-range page input on commit (reverts to current page)', async () => {
-    renderViewer();
+    await renderViewer();
     const pageInput = screen.getByLabelText<HTMLInputElement>('Current page');
 
     await userEvent.clear(pageInput);
@@ -139,7 +147,7 @@ describe('PdfViewer', () => {
   });
 
   it('zoom out is disabled at MIN_SCALE; zoom in clamps at MAX_SCALE', async () => {
-    renderViewer();
+    await renderViewer();
     const zoomIn = screen.getByLabelText('Zoom in');
     const zoomOut = screen.getByLabelText('Zoom out');
 
@@ -163,7 +171,7 @@ describe('PdfViewer', () => {
   });
 
   it('toggles thumbnails panel via the toolbar button', async () => {
-    renderViewer();
+    await renderViewer();
     const toggle = screen.getByLabelText('Show thumbnails');
     await userEvent.click(toggle);
     // After opening, the same button is now labelled "Hide thumbnails"
@@ -172,7 +180,7 @@ describe('PdfViewer', () => {
   });
 
   it('fits width using the loaded page real dimensions, not the US-Letter constant', async () => {
-    const { container } = renderViewer();
+    const { container } = await renderViewer();
     // Give the scroll container a known width; jsdom reports 0 otherwise.
     const scroll = container.querySelector('.overflow-auto') as HTMLElement;
     Object.defineProperty(scroll, 'clientWidth', { value: 1048, configurable: true });
@@ -187,8 +195,8 @@ describe('PdfViewer', () => {
   // Theme contract: the viewer CHROME (toolbar, inputs) must read from design
   // tokens so the data-theme swap on the shadow host themes it. The PDF page
   // canvas itself is the document's own (light) media surface — out of scope.
-  it('renders its chrome from design tokens, not hardcoded grays', () => {
-    const { container } = renderViewer();
+  it('renders its chrome from design tokens, not hardcoded grays', async () => {
+    const { container } = await renderViewer();
     // The page-number input is representative toolbar chrome.
     const pageInput = screen.getByLabelText<HTMLInputElement>('Current page');
     expect(pageInput.className).toContain('bg-bg');

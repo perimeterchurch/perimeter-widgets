@@ -41,16 +41,6 @@ interface DateRangePopoverProps {
 export function DateRangePopover({ open, onClose, size = 'sm', children }: DateRangePopoverProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Close on Escape.
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [open, onClose]);
-
   // Focus the panel on open.
   useEffect(() => {
     if (open && panelRef.current) {
@@ -58,37 +48,47 @@ export function DateRangePopover({ open, onClose, size = 'sm', children }: DateR
     }
   }, [open]);
 
-  // Hand-rolled Tab loop: keep focus inside the panel.
-  const handleKeyDown = useCallback((e: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (e.key !== 'Tab') return;
-    const panel = panelRef.current;
-    if (!panel) return;
-    const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-    if (focusable.length === 0) {
-      e.preventDefault();
-      panel.focus();
-      return;
-    }
-    const first = focusable[0]!;
-    const last = focusable[focusable.length - 1]!;
-    // Resolve the active element through the panel's own root: when the
-    // widget renders inside a shadow root, `document.activeElement` retargets
-    // to the shadow HOST, so comparisons against in-shadow elements would
-    // never match and the trap would be inert in every real embed.
-    const root = panel.getRootNode() as Document | ShadowRoot;
-    const active = root.activeElement;
-    if (e.shiftKey) {
-      if (active === first || active === panel) {
-        e.preventDefault();
-        last.focus();
+  // Escape-to-close + hand-rolled Tab loop. Both listen on the panel rather
+  // than `document`: the focus trap guarantees the panel subtree holds focus,
+  // and a host-page keydown handler that stops propagation can never reach
+  // inside the shadow root to swallow our Escape.
+  const handleKeyDown = useCallback(
+    (e: ReactKeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
       }
-    } else {
-      if (active === last) {
+      if (e.key !== 'Tab') return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+      if (focusable.length === 0) {
         e.preventDefault();
-        first.focus();
+        panel.focus();
+        return;
       }
-    }
-  }, []);
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      // Resolve the active element through the panel's own root: when the
+      // widget renders inside a shadow root, `document.activeElement` retargets
+      // to the shadow HOST, so comparisons against in-shadow elements would
+      // never match and the trap would be inert in every real embed.
+      const root = panel.getRootNode() as Document | ShadowRoot;
+      const active = root.activeElement;
+      if (e.shiftKey) {
+        if (active === first || active === panel) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    },
+    [onClose],
+  );
 
   if (!open) return null;
 
