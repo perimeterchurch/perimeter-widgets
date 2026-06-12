@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — narrow sidebar</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+      }
+      .layout {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+      }
+      main {
+        flex: 1;
+        color: #475569;
+      }
+      aside {
+        width: 360px;
+        flex: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>narrow — widget in a 360px sidebar</h1>
+    <p><a href="/">← lab index</a></p>
+    <p>
+      Container queries should switch the widget to its compact presentation: single-column list,
+      collapsed filters, no overflow. (Below 384px the PDF viewer also hides its thumbnail sidebar.)
+    </p>
+
+    <div class="layout">
+      <main>
+        <p>
+          Imagine article content here — the widget lives in the sidebar, the layout most likely to
+          squeeze it on a real WordPress page.
+        </p>
+      </main>
+      <aside>
+        <script src="/loader.js" data-nowprocket async></script>
+        <div data-perimeter-widget="sermons"></div>
+      </aside>
+    </div>
+  </body>
+</html>

@@ -8,17 +8,18 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 
 ## Packages
 
-| Package                         | Role                                                                                                       |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `@perimeter/theme`              | Design tokens (px radii), `resolveTokens`, `rewriteRootToHost`                                             |
-| `@perimeter/widget-runtime`     | `mount`, `autoMount`, `defineWidget`, shadow `styling` module, `useApiClient`                              |
-| `@perimeter/vite-plugin-widget` | `widgetConfig()` Vite-config helper (rem→px, IIFE build)                                                   |
-| `@perimeter/auth`               | Auth providers                                                                                             |
-| `@perimeter/api-client`         | Typed API client (`createApiClient`, `ApiClient`, `ApiClientConfig`)                                       |
-| `@perimeter/api-hooks`          | React Query hooks + generated perimeter-api operation types; internal `fetchJson`/`serializeQuery` helpers |
-| `@perimeter/ui`                 | shadcn-based component library + `cn` + hooks                                                              |
-| `@perimeter/release`            | Dev-only tooling behind `pnpm release` + `pnpm create-widget` (nothing ships)                              |
-| `@perimeter/parity`             | Dev-only dev↔prod parity reports (`parity:css`, `parity:components`)                                       |
+| Package                         | Role                                                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `@perimeter/theme`              | Design tokens (px radii), `resolveTokens`, `rewriteRootToHost`                                                                        |
+| `@perimeter/widget-runtime`     | `mount`, `autoMount`, `defineWidget`, shadow `styling` module, `useApiClient`                                                         |
+| `@perimeter/vite-plugin-widget` | `widgetConfig()` Vite-config helper (rem→px, IIFE build)                                                                              |
+| `@perimeter/auth`               | Auth providers                                                                                                                        |
+| `@perimeter/api-client`         | Typed API client (`createApiClient`, `ApiClient`, `ApiClientConfig`)                                                                  |
+| `@perimeter/api-hooks`          | React Query hooks + generated perimeter-api operation types; internal `fetchJson`/`serializeQuery` helpers                            |
+| `@perimeter/ui`                 | shadcn-based component library + `cn` + hooks                                                                                         |
+| `@perimeter/release`            | Dev-only tooling behind `pnpm release` + `pnpm create-widget` (nothing ships)                                                         |
+| `@perimeter/parity`             | Dev-only dev↔prod parity reports (`parity:css`, `parity:components`)                                                                  |
+| `@perimeter/embed-lab`          | Dev-only local host-page playground (`pnpm embed-lab`) — HTML pages embedding the committed `cdn/` artifacts and local `dist/` builds |
 
 `studio/` is the Vite studio app (dev harness + deployed design-system site). `widgets/example` is the reference widget; `widgets/sermons` is the first production widget. `cdn/` is the committed static hosting directory, deployed as its own Vercel project (see `docs/hosting-and-release.md`).
 
@@ -37,6 +38,7 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 | `pnpm release <name> --patch\|--minor\|--major` | Bump the version, then build + publish on a fresh `release/<name>-<version>` branch, push, and open the PR to dev                                                                                                                                                                                                                                                                                                     |
 | `pnpm --filter @perimeter/api-hooks sync`       | Copy perimeter-api's `openapi/spec.yaml` and regenerate `src/generated/operations.ts`                                                                                                                                                                                                                                                                                                                                 |
 | `pnpm parity:css` / `parity:components`         | Generate the dev↔prod parity reports                                                                                                                                                                                                                                                                                                                                                                                  |
+| `pnpm embed-lab`                                | Serve the embed lab at `localhost:4400` — host-page test scenarios (basic/dark/hostile-host/theme-overrides/canary/narrow/multi/local) against the committed `cdn/` artifacts (real loader→manifest flow) or a local `dist/` build. See `packages/embed-lab/README.md`                                                                                                                                                |
 | `pnpm tokens:dtcg`                              | Regenerate `packages/theme/tokens.dtcg.json` (DTCG 2025.10 interchange export of the tokens); a sync-guard test fails `pnpm quality` when it drifts from `src/tokens.ts`                                                                                                                                                                                                                                              |
 | `pnpm --filter @perimeter/studio visual`        | Run the studio Playwright visual/a11y harness (`studio/visual/*.spec.ts` — computed-color theme checks, loading states, follow-chrome, axe sweep, pixel baselines). Baselines are committed per-platform; update intentional visual changes with `-- --update-snapshots`, and use absolute `maxDiffPixels` (never a ratio) in new screenshot specs. Needs Playwright browsers installed. Separate from `pnpm quality` |
 | `pnpm --filter @perimeter/parity visual`        | Playwright parity + e2e specs against the BUILT bundles via the real loader→manifest→fixture flow (`packages/parity/visual/` — incl. the pdf-worker e2e guard). Build widgets first                                                                                                                                                                                                                                   |

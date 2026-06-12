@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — local build</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+      }
+      .banner {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>local — the unreleased build from widgets/sermons/dist/</h1>
+    <p><a href="/">← lab index</a></p>
+    <p class="banner">
+      This page bypasses the loader and embeds <code>/local/sermons/index.js</code> directly (the
+      documented "pinned, no loader" embed shape). Build first:
+      <code>pnpm --filter @perimeter/widget-sermons build</code>. Sibling artifacts (the pdf worker)
+      are served from the same dist directory, so the PDF tab works here too.
+    </p>
+
+    <div data-perimeter-widget="sermons"></div>
+    <script src="/local/sermons/index.js" data-nowprocket async></script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — theme overrides</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>theme-overrides — per-embed data-theme-* tokens</h1>
+    <p><a href="/">← lab index</a></p>
+    <p>
+      Branded embed: green primary, pill radii, larger base type (the new
+      <code>text-*</code> tokens), flattened shadows. Every value below is a single
+      <code>data-theme-&lt;token&gt;</code> attribute — compare against
+      <a href="/pages/basic.html">basic</a>.
+    </p>
+
+    <script src="/loader.js" data-nowprocket async></script>
+    <div
+      data-perimeter-widget="sermons"
+      data-theme-color-primary="hsl(152 60% 36%)"
+      data-theme-color-ring="hsl(152 60% 36%)"
+      data-theme-radius-md="999px"
+      data-theme-radius-lg="999px"
+      data-theme-text-base="18px"
+      data-theme-text-2xs="11px"
+      data-theme-shadow-lg="none"
+    ></div>
+  </body>
+</html>

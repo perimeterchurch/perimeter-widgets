@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — dark</title>
+    <style>
+      /* A dark host page, so the widget's opaque dark surface can be judged in situ. */
+      body {
+        background: #111418;
+        color: #e2e8f0;
+        font-family: system-ui, sans-serif;
+      }
+      a {
+        color: #93c5fd;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>dark — data-theme="dark" on a dark host page</h1>
+    <p><a href="/">← lab index</a></p>
+
+    <script src="/loader.js" data-nowprocket async></script>
+    <div data-perimeter-widget="sermons" data-theme="dark"></div>
+  </body>
+</html>
