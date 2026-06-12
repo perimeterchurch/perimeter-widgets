@@ -14,7 +14,7 @@ describe('createApiClient', () => {
   let fetchSpy: ReturnType<typeof vi.fn>;
   beforeEach(() => {
     fetchSpy = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
-    globalThis.fetch = fetchSpy;
+    vi.stubGlobal('fetch', fetchSpy);
   });
 
   it('prefixes paths with baseUrl', async () => {
