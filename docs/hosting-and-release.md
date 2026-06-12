@@ -88,7 +88,7 @@ The one-command path. It does everything above **plus** owns the version bump an
 
 Add `--dry-run` to preview the planned version, branch, commit message, PR title, and PR body with **no** file writes, build, git, or `gh` side effects — useful in CI and before a real run. (The dry-run plan is computed from the local checkout, no fetch; a real run re-derives the version from `origin/dev`, so the numbers can differ when the local checkout is behind.) The bare form also accepts `--dry-run` to preview without committing.
 
-> The committed bundle artifacts (`cdn/*/*/index.js` and `.map`) are listed in `.prettierignore` — they are kept byte-for-byte as built and must never be reformatted.
+> The committed version directories (`cdn/*/*/` — bundle, sourcemap, and any build-emitted siblings) are listed in `.prettierignore` — they are kept byte-for-byte as built and must never be reformatted.
 
 ## Promote
 
