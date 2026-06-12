@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Perimeter Widgets — Embed Lab</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 720px;
+        margin: 3rem auto;
+        padding: 0 1.5rem;
+        color: #1a202c;
+        line-height: 1.6;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      li {
+        margin-bottom: 0.75rem;
+      }
+      a {
+        font-weight: 600;
+      }
+      code {
+        background: #f1f5f9;
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .note {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Perimeter Widgets — Embed Lab</h1>
+    <p>
+      Each page below embeds widgets exactly the way a host site does. Pages without
+      <code>local</code> in the name consume the repo's committed <code>cdn/</code> — byte-for-byte
+      what widgets.perimeter.org serves (loader → manifest → immutable bundle).
+    </p>
+    <ul>
+      <li><a href="/pages/basic.html">basic</a> — the documented snippet, light theme</li>
+      <li><a href="/pages/dark.html">dark</a> — <code>data-theme="dark"</code></li>
+      <li>
+        <a href="/pages/hostile-host.html">hostile-host</a> — perimeter.org's measured host styles +
+        aggressive global CSS; proves shadow isolation
+      </li>
+      <li>
+        <a href="/pages/theme-overrides.html">theme-overrides</a> — per-embed
+        <code>data-theme-*</code> token overrides (brand color, radius, type scale, shadows)
+      </li>
+      <li>
+        <a href="/pages/canary.html">canary</a> — <code>data-perimeter-version</code> pin next to
+        the manifest-resolved embed
+      </li>
+      <li><a href="/pages/narrow.html">narrow</a> — 360px sidebar container</li>
+      <li><a href="/pages/multi.html">multi</a> — two widgets, one loader (dedupe)</li>
+      <li>
+        <a href="/pages/local.html">local</a> — the NOT-yet-released local build from
+        <code>widgets/sermons/dist/</code> (build it first)
+      </li>
+    </ul>
+    <p class="note">
+      Widgets fetch live data from <code>https://api.perimeter.org</code> (the production API), so
+      these pages need internet access. To target a local perimeter-api instead, add
+      <code>data-api-url="http://localhost:5500"</code> to a placeholder div.
+    </p>
+  </body>
+</html>

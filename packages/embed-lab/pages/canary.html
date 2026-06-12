@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — canary pin</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+      }
+      h2 {
+        margin-top: 3rem;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>canary — data-perimeter-version pin</h1>
+    <p><a href="/">← lab index</a></p>
+    <p>
+      The loader resolves the first embed through <code>manifest.json</code> (<span
+        id="manifest-version"
+        >…</span
+      >) like every normal page. The second is pinned with <code>data-perimeter-version</code> —
+      edit the attribute below to point at any version directory present in
+      <code>cdn/sermons/</code>. NOTE: one page loads one bundle per widget name (first placeholder
+      wins), so to compare two versions side by side open this page twice with different pins, not
+      both at once.
+    </p>
+    <script>
+      fetch('/manifest.json')
+        .then((r) => r.json())
+        .then((m) => {
+          document.getElementById('manifest-version').textContent = 'currently ' + m.sermons;
+        });
+    </script>
+
+    <h2>pinned: <code>data-perimeter-version="1.4.0"</code></h2>
+    <script src="/loader.js" data-nowprocket async></script>
+    <div data-perimeter-widget="sermons" data-perimeter-version="1.4.0"></div>
+  </body>
+</html>

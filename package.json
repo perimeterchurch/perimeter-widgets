@@ -19,6 +19,7 @@
     "create-widget": "tsx packages/release/src/create-cli.ts",
     "parity:css": "tsx packages/parity/src/report-css.ts",
     "parity:components": "tsx packages/parity/src/report-components.ts",
+    "embed-lab": "tsx packages/embed-lab/src/serve.ts",
     "tokens:dtcg": "tsx packages/theme/scripts/write-dtcg.ts"
   },
   "devDependencies": {
