@@ -6,16 +6,22 @@ export const globalTokens = {
   // text on the muted surfaces it actually renders on (bg-muted, bg-muted/60
   // chips) — guarded by tests/contrast.test.ts.
   'color-muted-fg': 'hsl(215 16% 44%)',
-  'color-primary': 'hsl(221 83% 53%)',
-  'color-primary-fg': 'hsl(210 40% 98%)',
+  // Brand accent = #60bbe9 (hsl(200.1 75.7% 64.5%) round-trips to it exactly).
+  // It's a LIGHT sky-blue, so primary-fg is dark navy (8.3:1 on primary — the
+  // contrast.test.ts primary-fg/primary AA guard); near-white text would be ~2:1.
+  'color-primary': 'hsl(200.1 75.7% 64.5%)',
+  'color-primary-fg': 'hsl(222 47% 11%)',
   'color-secondary': 'hsl(210 40% 96%)',
   'color-secondary-fg': 'hsl(222 47% 11%)',
-  'color-accent': 'hsl(262 83% 58%)',
-  'color-accent-fg': 'hsl(210 40% 98%)',
+  // Accent is the menu/dropdown hover SURFACE — a soft tint of the brand blue
+  // (was purple) with dark text on it.
+  'color-accent': 'hsl(200 76% 90%)',
+  'color-accent-fg': 'hsl(222 47% 11%)',
   'color-destructive': 'hsl(0 84% 60%)',
   'color-destructive-fg': 'hsl(210 40% 98%)',
   'color-border': 'hsl(214 32% 91%)',
-  'color-ring': 'hsl(221 83% 53%)',
+  // Focus outline = the brand accent #60bbe9.
+  'color-ring': 'hsl(200.1 75.7% 64.5%)',
   'radius-sm': '4px',
   'radius-md': '8px',
   'radius-lg': '12px',
@@ -55,16 +61,18 @@ export const darkTokens: Record<ThemeToken, string> = {
   'color-fg': 'hsl(210 40% 98%)',
   'color-muted': 'hsl(217 33% 17%)',
   'color-muted-fg': 'hsl(215 20% 65%)',
-  'color-primary': 'hsl(217 91% 60%)',
+  // Brand accent #60bbe9 in dark mode too (dark navy text on it: 8.3:1).
+  'color-primary': 'hsl(200.1 75.7% 64.5%)',
   'color-primary-fg': 'hsl(222 47% 11%)',
   'color-secondary': 'hsl(217 33% 17%)',
   'color-secondary-fg': 'hsl(210 40% 98%)',
-  'color-accent': 'hsl(263 70% 65%)',
-  'color-accent-fg': 'hsl(222 47% 11%)',
+  // Hover surface: a soft DARK blue tint (light text on it: 9.6:1).
+  'color-accent': 'hsl(200 45% 24%)',
+  'color-accent-fg': 'hsl(210 40% 98%)',
   'color-destructive': 'hsl(0 63% 51%)',
   'color-destructive-fg': 'hsl(210 40% 98%)',
   'color-border': 'hsl(217 33% 20%)',
-  'color-ring': 'hsl(217 91% 60%)',
+  'color-ring': 'hsl(200.1 75.7% 64.5%)',
   'radius-sm': globalTokens['radius-sm'],
   'radius-md': globalTokens['radius-md'],
   'radius-lg': globalTokens['radius-lg'],
