@@ -20,10 +20,10 @@ describe('toDtcg', () => {
   });
 
   it('maps hsl color tokens to DTCG 2025.10 color values', () => {
-    // 'color-primary': 'hsl(221 83% 53%)'
+    // 'color-primary': 'hsl(200.1 75.7% 64.5%)' (#60bbe9, the brand accent)
     expect(doc.light.color['primary']).toEqual({
       $type: 'color',
-      $value: { colorSpace: 'hsl', components: [221, 83, 53], alpha: 1 },
+      $value: { colorSpace: 'hsl', components: [200.1, 75.7, 64.5], alpha: 1 },
     });
   });
 

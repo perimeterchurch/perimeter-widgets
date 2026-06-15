@@ -59,7 +59,9 @@ export function segmentedTabId(idBase: string, tabItemId: string): string {
  * `aria-labelledby` at {@link segmentedTabId}(idBase, value) to complete the
  * tab↔panel association. Omit both when the tabs switch sibling views (sermons).
  *
- * Token-correct in light + dark: inactive labels dim via `text-fg/60`, the
+ * Token-correct in light + dark: inactive labels dim via `text-fg/70` (70%, not
+ * 60% — at the brand-navy `--color-fg` #09243f, 60% drops to 4.2:1 on the muted
+ * tab strip, below WCAG AA; 70% is 5.7:1), the
  * `dark:` nudges key off the widget/studio `data-theme` (the shared preset
  * `dark` variant), not the visitor's OS preference. Controlled-only — both the
  * studio inspector and the sermons tab row drive selection from above.
@@ -134,7 +136,7 @@ export function SegmentedTabs({
               'focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
               selected
                 ? 'bg-bg text-fg shadow-xs'
-                : 'text-fg/60 hover:text-fg dark:text-muted-fg dark:hover:text-fg',
+                : 'text-fg/70 hover:text-fg dark:text-muted-fg dark:hover:text-fg',
             )}
           >
             {label}
