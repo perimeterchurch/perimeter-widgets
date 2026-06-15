@@ -22,6 +22,11 @@
     "embed-lab": "tsx packages/embed-lab/src/serve.ts",
     "tokens:dtcg": "tsx packages/theme/scripts/write-dtcg.ts"
   },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.28.1"
+    }
+  },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@types/node": "^22.10.5",

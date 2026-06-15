@@ -35,6 +35,11 @@ export default defineConfig({
   // postcss plugin handles imports + vendor prefixing itself (no autoprefixer).
   css: { postcss: { plugins: [tailwindcss(), remToPxPlugin] } },
   resolve: { alias: { '@mdx-js/react': mdxReact } },
+  // Align with the widget IIFE target (vite-plugin-widget sets es2022). Vite's
+  // default target (es2020) trips an esbuild 0.28 quirk: it tries — and fails —
+  // to downlevel function-param destructuring it does not need to touch. es2022
+  // is correct for this internal design-system site and what every widget ships.
+  build: { target: 'es2022' },
   // `proxy` forwards the sermons widget's `/s3-proxy/…` dev requests to S3 — see
   // src/dev-proxy.ts (extracted so it can be unit-tested without this config).
   server: { fs: { allow: [workspaceRoot] }, proxy: devServerProxy },
