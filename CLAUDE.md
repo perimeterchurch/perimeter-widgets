@@ -51,10 +51,21 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 - Read a file before editing it.
 - Run `pnpm test`/`lint`/`typecheck`/`quality` from the root — they go through Turborepo. Packages have no local vitest binary, so `pnpm vitest` inside a package fails; scope one package with `--filter=<pkg>`.
 - Run `pnpm format` before `pnpm quality` — the gate only runs `format:check` and fails on unformatted files; don't create separate formatting-only commits. (The entire `docs/` tree is `.prettierignore`'d, so authored `.md`/`.mdx` are validated by the studio build, not by prettier.)
+- **Never trust the studio as proof of embed rendering.** The studio shares page-level context (Tailwind CSS, a root font-size, `@property` registrations) that a real host page lacks, so styling can look perfect there and be broken on a bare embed. Any change to widget styling, the mount/styling path, `@perimeter/theme`'s CSS helpers, or the build toolchain (bundler/minifier bump) MUST be re-verified on a bare host page: `pnpm embed-lab` (manual) and the bare-host e2e specs `pnpm --filter @perimeter/parity visual` (build widgets first). See **Shadow-DOM style inheritance** below.
 
 ## Building a widget
 
 Start at `docs/creating-a-widget.md` for the copy-the-example on-ramp; it walks the full path (MP data → perimeter-api endpoint → regenerated api-hooks types → scaffold → style → test → release). A `creating-a-widget` Claude skill (`.claude/skills/creating-a-widget/SKILL.md`) orchestrates this end-to-end; invoke it when asked to build or add a widget.
+
+## Shadow-DOM style inheritance
+
+Widgets render in a shadow root, which isolates _most_ styles but breaks token/utility CSS in browser-specific ways. Three transforms make Tailwind v4 tokens work correctly on a real embed; all are applied automatically (you don't write them), but know they exist because the failure mode is always "looks fine in the studio, broken on the live page":
+
+1. **`rem` → `px`** (build-time, `remToPxPlugin` in `@perimeter/vite-plugin-widget`, end of the Tailwind/PostCSS chain): `1rem` → `16px` in the shipped bundle so a host page's `html { font-size }` can't rescale the widget. Don't hand-write raw `rem` expecting it to scale.
+2. **`:root` → `:host`** (mount-time, `rewriteRootToHost` in `@perimeter/theme`): inside a shadow root `:root` matches the host _document_, not the widget, so token declarations Tailwind emits under `:root` would never reach the widget. Rewritten so they land on the shadow host.
+3. **`@property` fallback inlining** (mount-time, `inlinePropertyFallbacks` in `@perimeter/theme`): `@property` rules are **inert in shadow stylesheets** (browsers honor them only in document sheets), so the `--tw-*` registered variables behind `border`/`ring`/`shadow`/`transition` utilities never get initial values and collapse. A prepended zero-specificity `@layer properties` universal rule supplies them, mirroring Tailwind's own no-`@property` fallback. Sharp edge: minifiers turn `initial-value: 0px` → `0`, but raw `0` in `calc(1px + var(--tw-…))` is invalid CSS — the fallback restores units for typed `<length>`/`<time>`/`<angle>` syntaxes.
+
+Transforms 2 and 3 live at the single mount path: `@perimeter/widget-runtime`'s `applyStyles` (`packages/widget-runtime/src/styling.ts`) calls `inlinePropertyFallbacks(rewriteRootToHost(widgetCss))`. The light/dark token sheet (`:host` + `:host([data-theme="dark"])`) comes from `resolveTokens`. Guarded by `packages/theme/tests/property-fallbacks.test.ts` and `packages/parity/visual/shadow-property-fallbacks-e2e.spec.ts`. Full author-facing treatment: `docs/guides-mdx/styling-widgets.mdx` ("Three facts the parity work pinned down").
 
 ## Doc pointers
 
