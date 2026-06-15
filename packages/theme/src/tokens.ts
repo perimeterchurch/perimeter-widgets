@@ -1,6 +1,8 @@
 export const globalTokens = {
   'color-bg': 'hsl(0 0% 100%)',
-  'color-fg': 'hsl(222 47% 11%)',
+  // Text/headings = Perimeter brand navy #09243f (hsl(210 75% 14.1%) round-trips
+  // exactly); 15.7:1 on white. Sourced from perimeter.org (--nectar-extra-color-1).
+  'color-fg': 'hsl(210 75% 14.1%)',
   'color-muted': 'hsl(210 40% 96%)',
   // 44% (was 47%): the lightest this can be and keep WCAG AA 4.5:1 for small
   // text on the muted surfaces it actually renders on (bg-muted, bg-muted/60
@@ -10,18 +12,24 @@ export const globalTokens = {
   // It's a LIGHT sky-blue, so primary-fg is dark navy (8.3:1 on primary — the
   // contrast.test.ts primary-fg/primary AA guard); near-white text would be ~2:1.
   'color-primary': 'hsl(200.1 75.7% 64.5%)',
-  'color-primary-fg': 'hsl(222 47% 11%)',
-  'color-secondary': 'hsl(210 40% 96%)',
-  'color-secondary-fg': 'hsl(222 47% 11%)',
+  // Dark text on the light accent = brand navy #09243f (7.3:1 on primary).
+  'color-primary-fg': 'hsl(210 75% 14.1%)',
+  // Secondary button/badge = solid brand navy with white text (15.7:1).
+  'color-secondary': 'hsl(210 75% 14.1%)',
+  'color-secondary-fg': 'hsl(0 0% 100%)',
   // Accent is the menu/dropdown hover SURFACE — a soft tint of the brand blue
-  // (was purple) with dark text on it.
+  // (was purple) with brand-navy text on it.
   'color-accent': 'hsl(200 76% 90%)',
-  'color-accent-fg': 'hsl(222 47% 11%)',
+  'color-accent-fg': 'hsl(210 75% 14.1%)',
   'color-destructive': 'hsl(0 84% 60%)',
   'color-destructive-fg': 'hsl(210 40% 98%)',
   'color-border': 'hsl(214 32% 91%)',
   // Focus outline = the brand accent #60bbe9.
   'color-ring': 'hsl(200.1 75.7% 64.5%)',
+  // Brand navy dark surface for deliberate dark bands/headers/CTA blocks
+  // (bg-surface-dark + text-surface-dark-fg); white text on it (15.7:1).
+  'color-surface-dark': 'hsl(210 75% 14.1%)',
+  'color-surface-dark-fg': 'hsl(0 0% 100%)',
   'radius-sm': '4px',
   'radius-md': '8px',
   'radius-lg': '12px',
@@ -61,9 +69,9 @@ export const darkTokens: Record<ThemeToken, string> = {
   'color-fg': 'hsl(210 40% 98%)',
   'color-muted': 'hsl(217 33% 17%)',
   'color-muted-fg': 'hsl(215 20% 65%)',
-  // Brand accent #60bbe9 in dark mode too (dark navy text on it: 8.3:1).
+  // Brand accent #60bbe9 in dark mode too (brand-navy #09243f text on it: 7.3:1).
   'color-primary': 'hsl(200.1 75.7% 64.5%)',
-  'color-primary-fg': 'hsl(222 47% 11%)',
+  'color-primary-fg': 'hsl(210 75% 14.1%)',
   'color-secondary': 'hsl(217 33% 17%)',
   'color-secondary-fg': 'hsl(210 40% 98%)',
   // Hover surface: a soft DARK blue tint (light text on it: 9.6:1).
@@ -73,6 +81,10 @@ export const darkTokens: Record<ThemeToken, string> = {
   'color-destructive-fg': 'hsl(210 40% 98%)',
   'color-border': 'hsl(217 33% 20%)',
   'color-ring': 'hsl(200.1 75.7% 64.5%)',
+  // Brand navy band — same color in both themes (secondary stays a lighter
+  // slate in dark mode so navy-on-navy buttons don't vanish).
+  'color-surface-dark': 'hsl(210 75% 14.1%)',
+  'color-surface-dark-fg': 'hsl(0 0% 100%)',
   'radius-sm': globalTokens['radius-sm'],
   'radius-md': globalTokens['radius-md'],
   'radius-lg': globalTokens['radius-lg'],
