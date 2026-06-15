@@ -4,7 +4,7 @@ Perimeter widgets render inside a **shadow root**, with their styles compiled
 through a shared Tailwind preset. Styling one is tokens-first: reach for design
 tokens and `@perimeter/ui` components before writing bespoke CSS, and the result
 looks right both here in the studio and on the production WordPress page. This
-guide covers the model, the rules, and the two facts that bite people who skip it.
+guide covers the model, the rules, and the three facts that bite people who skip it.
 
 ## Tokens first
 
@@ -64,10 +64,14 @@ import { Card, CardContent } from '@perimeter/ui/card';
 </Card>;
 ```
 
-## Two facts the parity work pinned down
+## Three facts the parity work pinned down
 
 These come straight from the dev-vs-production parity audit. Internalize them and
 your "looks fine in the studio, broken on the live page" surprises mostly vanish.
+All three are why the golden rule of widget styling is: **verify the built bundle
+on a bare host page (the embed lab or a parity fixture), never trust the studio's
+own rendering as proof** — the studio shares page-level context (Tailwind CSS, a
+root font-size, `@property` registrations) that a real WordPress embed does not.
 
 ### 1. Authors write `rem`; the build emits `px`
 
@@ -91,6 +95,36 @@ has a **host-page simulation** background (the measured production values: 19px 
 line-height 35px / color `#353535`). Set the type you want explicitly with token
 utilities (`font-sans`, `text-fg`) rather than relying on a default, and preview
 against the host-sim background before you ship.
+
+### 3. Custom properties need help crossing into the shadow root
+
+Tailwind v4 drives the whole token system through CSS custom properties, and two
+browser quirks mean those variables don't "just work" inside a shadow root. The
+runtime fixes both at the single mount path (`@perimeter/widget-runtime`'s
+`applyStyles` → `@perimeter/theme`'s `rewriteRootToHost` + `inlinePropertyFallbacks`),
+so you never write this by hand — but know it exists, because when it regresses the
+symptom is "every border/ring/shadow vanished on the live page but looks fine in the
+studio":
+
+- **`:root` doesn't match in a shadow tree.** Tailwind/preflight emit token
+  declarations under `:root`, which inside a shadow root resolves to the host
+  _document_, not the widget. We rewrite `:root` → `:host` so the variables land on
+  the shadow host where the widget can read them.
+- **`@property` registrations are inert in shadow stylesheets.** Browsers honor
+  `@property` rules only in _document_ stylesheets; in a shadow root's sheet they do
+  nothing, so the `--tw-*` variables that `border`, `ring`, `shadow`, and
+  `transition` utilities depend on never get their initial values and those
+  declarations collapse (invalid at computed-value time). We mirror Tailwind's own
+  no-`@property` fallback: a single zero-specificity universal rule in a prepended
+  `@layer properties` that assigns every registered initial value. The studio masks
+  this bug because its page-level Tailwind registers the same properties globally;
+  bare host pages do not. Sharp edge: minifiers collapse `initial-value: 0px` → `0`,
+  but a raw `0` substituted into `calc(1px + var(--tw-…))` is invalid CSS — the
+  fallback restores the unit for typed `<length>`/`<time>`/`<angle>` syntaxes.
+
+Both are covered by bare-host e2e specs (`packages/parity/visual/shadow-property-fallbacks-e2e.spec.ts`).
+Any change to the mount path, the theme CSS helpers, or the build toolchain (e.g. a
+bundler/minifier bump) must be re-verified there, not just in the studio.
 
 ## Per-embed token overrides
 
