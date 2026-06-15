@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — hostile host</title>
+    <style>
+      /* perimeter.org's measured host styles (provenance:
+         packages/parity/fixtures/wordpress.html, read from the live page
+         2026-06-02): 19px/35px body type, #353535 text, 1425px container. */
+      body {
+        font-size: 19px;
+        line-height: 35px;
+        color: #353535;
+        background: #ffffff;
+        font-family: sans-serif;
+        margin: 0;
+      }
+      .container {
+        max-width: 1425px;
+        padding: 0 90px;
+        margin: 0 auto;
+      }
+
+      /* …plus deliberately hostile global CSS a bad theme/plugin might ship.
+         None of it may reach inside the shadow root. */
+      * {
+        letter-spacing: 0.5px !important;
+      }
+      div {
+        border: 1px dashed rgba(255, 0, 0, 0.2);
+      }
+      p,
+      span,
+      h1,
+      h2,
+      h3,
+      button {
+        text-transform: uppercase;
+      }
+      img {
+        filter: grayscale(1);
+      }
+      button {
+        background: hotpink !important;
+        border-radius: 0 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>hostile host — global css must not leak in</h1>
+      <p><a href="/">← lab index</a></p>
+      <p>
+        This host text is 19px uppercase with letter-spacing; host buttons are hotpink. The widget
+        below must look identical to the <a href="/pages/basic.html">basic</a> page: 16px type, its
+        own colors and radii, no uppercase, color images, no dashed borders inside.
+      </p>
+
+      <script src="/loader.js" data-nowprocket async></script>
+      <div data-perimeter-widget="sermons"></div>
+    </div>
+  </body>
+</html>

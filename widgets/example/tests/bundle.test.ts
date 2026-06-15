@@ -8,7 +8,14 @@ const distDir = path.join(root, 'dist');
 const bundle = path.join(distDir, 'index.js');
 
 beforeAll(() => {
-  execSync('pnpm exec vite build', { cwd: root, stdio: 'inherit' });
+  // Vitest exports NODE_ENV=test, and Vite respects a pre-set NODE_ENV — the
+  // child build would silently use the DEV jsx transform and ship a bundle
+  // that crashes on real pages (_.jsxDEV is not a function). Pin production.
+  execSync('pnpm exec vite build', {
+    cwd: root,
+    stdio: 'inherit',
+    env: { ...process.env, NODE_ENV: 'production' },
+  });
 }, 120_000);
 
 describe('built example bundle', () => {
@@ -22,5 +29,10 @@ describe('built example bundle', () => {
     const code = readFileSync(bundle, 'utf8');
     expect(code).toContain('example');
     expect(code).toContain('PerimeterWidgets');
+  });
+  it('is a production-transform build (no dev JSX runtime)', () => {
+    // jsxDEV in the bundle means a non-production NODE_ENV leaked into the
+    // build — the artifact crashes at runtime under the production define.
+    expect(readFileSync(bundle, 'utf8')).not.toContain('jsxDEV');
   });
 });

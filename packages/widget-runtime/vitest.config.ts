@@ -4,9 +4,9 @@ export default defineConfig({
     environment: 'happy-dom',
     include: ['tests/**/*.test.{ts,tsx}'],
     setupFiles: ['./tests/setup.ts'],
-    poolOptions: {
-      threads: { execArgv: ['--no-experimental-webstorage'] },
-      forks: { execArgv: ['--no-experimental-webstorage'] },
-    },
+    // vitest 4: execArgv is top-level (poolOptions was removed in the pool rework).
+    // Node's experimental webstorage global would otherwise shadow jsdom's
+    // localStorage with undefined.
+    execArgv: ['--no-experimental-webstorage'],
   },
 });
