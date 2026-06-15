@@ -37,7 +37,7 @@ describe('toDtcg', () => {
   it('maps font stacks to DTCG fontFamily arrays', () => {
     expect(doc.light.font['sans']).toEqual({
       $type: 'fontFamily',
-      $value: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      $value: ['"sweet-sans-pro"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
     });
   });
 
