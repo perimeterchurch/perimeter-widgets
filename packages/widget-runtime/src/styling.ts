@@ -1,4 +1,4 @@
-import { rewriteRootToHost } from '@perimeter/theme';
+import { inlinePropertyFallbacks, rewriteRootToHost } from '@perimeter/theme';
 
 export interface StyleHandle {
   /** Replace the per-instance token layer (studio live theme edits). */
@@ -29,7 +29,10 @@ export function applyStyles(
   widgetCss: string,
   tokenCss: string,
 ): StyleHandle {
-  const rewritten = rewriteRootToHost(widgetCss);
+  // Shadow sheets ignore @property registration; inline the initial values
+  // (see inlinePropertyFallbacks) or border/ring/shadow utilities collapse on
+  // any host page that doesn't itself register Tailwind's --tw-* properties.
+  const rewritten = inlinePropertyFallbacks(rewriteRootToHost(widgetCss));
 
   if (supportsConstructable()) {
     let widgetSheet = widgetSheets.get(widgetName);
