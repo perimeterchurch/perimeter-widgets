@@ -3,6 +3,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useApiClient } from '@perimeter/widget-runtime';
 import { serializeQuery } from '../internal/serialize-query';
 import { fetchJson } from '../internal/fetch-json';
+import { FACET_STALE_TIME } from '../internal/stale-time';
 
 export type UseSeriesParams = NonNullable<operations['listSeries']['parameters']['query']>;
 export type UseSeriesResponse =
@@ -20,5 +21,6 @@ export function useSeries(params: UseSeriesParams): UseQueryResult<UseSeriesResp
         'Series',
       );
     },
+    staleTime: FACET_STALE_TIME,
   });
 }
