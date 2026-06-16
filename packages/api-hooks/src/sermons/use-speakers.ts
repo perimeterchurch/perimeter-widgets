@@ -3,6 +3,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useApiClient } from '@perimeter/widget-runtime';
 import { serializeQuery } from '../internal/serialize-query';
 import { fetchJson } from '../internal/fetch-json';
+import { FACET_STALE_TIME } from '../internal/stale-time';
 
 export type UseSpeakersParams = NonNullable<operations['listSpeakers']['parameters']['query']>;
 export type UseSpeakersResponse =
@@ -20,5 +21,6 @@ export function useSpeakers(params: UseSpeakersParams = {}): UseQueryResult<UseS
         'Speakers',
       );
     },
+    staleTime: FACET_STALE_TIME,
   });
 }
