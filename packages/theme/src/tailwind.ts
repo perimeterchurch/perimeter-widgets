@@ -77,7 +77,11 @@ export const tailwindPreset: Config = {
       borderRadius,
       boxShadow,
       fontSize,
-      fontFamily: { sans: [cssVar('font-sans')], mono: [cssVar('font-mono')] },
+      fontFamily: {
+        sans: [cssVar('font-sans')],
+        serif: [cssVar('font-serif')],
+        mono: [cssVar('font-mono')],
+      },
     },
   },
 };

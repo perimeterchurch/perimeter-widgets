@@ -33,7 +33,14 @@ export const globalTokens = {
   'radius-sm': '4px',
   'radius-md': '8px',
   'radius-lg': '12px',
-  'font-sans': 'Inter, system-ui, -apple-system, sans-serif',
+  // Brand sans = Sweet Sans Pro (Adobe Fonts, perimeter.org's body/UI face). Named
+  // FIRST so an embed on a page that already loads it (notably perimeter.org's own
+  // Typekit — font availability is document-scoped, not shadow-encapsulated) renders
+  // in the real brand font for free; Inter + system are the free fallbacks elsewhere.
+  'font-sans': '"sweet-sans-pro", Inter, system-ui, -apple-system, sans-serif',
+  // Brand display serif = Freight Display Pro (Adobe Fonts; perimeter.org H1/H2).
+  // Free fallbacks: Playfair Display, then the system serif. Use via `font-serif`.
+  'font-serif': '"freight-display-pro", "Playfair Display", Georgia, "Times New Roman", serif',
   'font-mono': 'ui-monospace, SFMono-Regular, monospace',
   // Elevation scale — Tailwind v4's default shadow values, tokenized so an
   // embed can flatten or elevate the whole widget (data-theme-shadow-md, …).
@@ -89,6 +96,7 @@ export const darkTokens: Record<ThemeToken, string> = {
   'radius-md': globalTokens['radius-md'],
   'radius-lg': globalTokens['radius-lg'],
   'font-sans': globalTokens['font-sans'],
+  'font-serif': globalTokens['font-serif'],
   'font-mono': globalTokens['font-mono'],
   'shadow-xs': '0 1px 2px 0 rgb(0 0 0 / 0.25)',
   'shadow-sm': '0 1px 3px 0 rgb(0 0 0 / 0.35), 0 1px 2px -1px rgb(0 0 0 / 0.35)',

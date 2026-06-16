@@ -157,7 +157,17 @@
     "font": {
       "sans": {
         "$type": "fontFamily",
-        "$value": ["Inter", "system-ui", "-apple-system", "sans-serif"]
+        "$value": ["\"sweet-sans-pro\"", "Inter", "system-ui", "-apple-system", "sans-serif"]
+      },
+      "serif": {
+        "$type": "fontFamily",
+        "$value": [
+          "\"freight-display-pro\"",
+          "\"Playfair Display\"",
+          "Georgia",
+          "\"Times New Roman\"",
+          "serif"
+        ]
       },
       "mono": {
         "$type": "fontFamily",
@@ -600,7 +610,17 @@
     "font": {
       "sans": {
         "$type": "fontFamily",
-        "$value": ["Inter", "system-ui", "-apple-system", "sans-serif"]
+        "$value": ["\"sweet-sans-pro\"", "Inter", "system-ui", "-apple-system", "sans-serif"]
+      },
+      "serif": {
+        "$type": "fontFamily",
+        "$value": [
+          "\"freight-display-pro\"",
+          "\"Playfair Display\"",
+          "Georgia",
+          "\"Times New Roman\"",
+          "serif"
+        ]
       },
       "mono": {
         "$type": "fontFamily",
