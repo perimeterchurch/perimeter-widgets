@@ -49,7 +49,12 @@ export function useSermonFacets({ config, filters, labelCache }: UseSermonFacets
   const allBooksQuery = useBooks(defined({ seriesTypeId: pinnedSeriesTypeId }));
   const allServiceTypesQuery = useServiceTypes(defined({ seriesTypeId: pinnedSeriesTypeId }));
   const allSeriesTypesQuery = useSeriesTypes({});
-  const allSeriesQuery = useSeries(defined({ perPage: 50, seriesTypeId: pinnedSeriesTypeId }));
+  // Series filter dropdown sorts alphabetically (A→Z). The API sorts before
+  // paginating, so `sort:'title'` makes the capped 50 the alphabetically-first
+  // series in order — not a client-side sort of an arbitrary page.
+  const allSeriesQuery = useSeries(
+    defined({ perPage: 50, seriesTypeId: pinnedSeriesTypeId, sort: 'title', order: 'asc' }),
+  );
 
   const allSpeakers = useMemo(() => allSpeakersQuery.data?.data ?? [], [allSpeakersQuery.data]);
   const allBooks = useMemo(() => allBooksQuery.data?.data ?? [], [allBooksQuery.data]);
