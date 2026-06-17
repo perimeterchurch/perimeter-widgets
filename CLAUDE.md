@@ -23,6 +23,14 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 
 `studio/` is the Vite studio app (dev harness + deployed design-system site). `widgets/example` is the reference widget; `widgets/sermons` is the first production widget. `cdn/` is the committed static hosting directory, deployed as its own Vercel project (see `docs/hosting-and-release.md`).
 
+## Local dev
+
+Prereq: Node 22+ and pnpm 10 (`packageManager` pins `10.32.1`; `corepack enable`). Run `pnpm install` once before anything else. Full walkthrough: `docs/guides/developer-setup.md`.
+
+- **Studio** — `pnpm dev` serves the Vite studio at `http://localhost:5173` (Vite default; tests pin it via `--port 5173 --strictPort`).
+- **Embed lab** — `pnpm embed-lab` serves bare-host test pages at `http://localhost:4400`.
+- **API** — in dev the studio targets a local perimeter-api at `http://localhost:5500` (run `pnpm dev` in the sibling perimeter-api). Data is wired by `WidgetPreview`'s `apiBaseUrl`; image `<img>` URLs by `studio/.env.development`'s `VITE_API_URL=http://localhost:5500`. Both are dev-only — the deployed studio falls back to `https://api.perimeter.org`.
+
 ## Commands
 
 | Command                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                           |
