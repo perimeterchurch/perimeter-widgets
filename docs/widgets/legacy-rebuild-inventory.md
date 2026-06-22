@@ -248,6 +248,8 @@ All MP custom-API procs are in the `dbo` schema: `[dbo].[api_custom_...]`. Event
 ### Sermons (already shipped — DO NOT rebuild, listed for reference)
 `api_custom_Sermon_Finder_Widget`, `api_custom_Sermon_Series_Finder_Widget`, `api_custom_Sermon_Detail_Widget`, `api_custom_Audio_Finder_Widget` — superseded by the live `sermons` widget.
 
+> The "latest card" output of `api_custom_Sermon_Series_Finder_Widget` is **not** covered by the sermons browse widget. It is being rebuilt as a separate small **Latest Sermon** card, already backed by the `GET /api/sermons/latest` endpoint (`getLatestSundaySermon`, api PR #163). See [`latest-sermon.md`](latest-sermon.md).
+
 ## Full per-repo widget → stored-proc inventory
 
 Every widget in each live source repo with the stored proc(s) it calls. (`MPCustomWidgets` is excluded — it is initial-design framework templates, not in use.) `api_customWidget` references are the core `customWidget.js` runtime, not a real proc, and are omitted.
