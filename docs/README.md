@@ -41,5 +41,6 @@ The MDX guides render live at `style.perimeter.org/guides` and are the Claude-fa
 ## Widgets
 
 - [Sermons](widgets/sermons.md) — search/browse sermons and series, watch/listen view.
+- [Latest Sermon](widgets/latest-sermon.md) — single "latest Sunday sermon" card (backend ready, not built).
 
 > History (streamline specs, phase plans, session handoffs) lives under `docs/superpowers/` and is reference-only.
