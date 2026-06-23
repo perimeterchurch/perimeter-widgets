@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perimeter Widget Studio</title>
+    <!--
+      Perimeter's Adobe Fonts (Typekit) kit — loads the brand faces
+      (freight-display-pro, sweet-sans-pro) so widget previews render the real
+      fonts instead of the token fallbacks. Dev/studio only: shipped widgets
+      rely on the embedding host page (perimeter.org) loading its own kit. Font
+      availability is document-scoped, so this reaches into shadow-root previews.
+    -->
+    <link rel="stylesheet" href="https://use.typekit.net/hpg7onr.css" />
   </head>
   <body>
     <div id="root"></div>
