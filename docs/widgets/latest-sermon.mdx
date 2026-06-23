@@ -1,0 +1,43 @@
+# latest-sermon
+
+Displays the single most recent sermon — artwork, title, series, date, short
+description, and a Play button linking to the watch URL. Replaces the legacy
+"Latest Sermon" embed with the perimeter-api backend.
+
+By default it pulls the latest **Sunday Morning Sermon** (series type `1`),
+matching the legacy widget — the newest raw sermon record is often a midweek
+Bible study or podcast.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="latest-sermon"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/widget.tsx` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute             | Type    | Default | Description                                              |
+| --------------------- | ------- | ------- | -------------------------------------------------------- |
+| `data-series-type-id` | string  | `1`     | Series type to pull from (default: Sunday Morning Sermon)|
+| `data-series-id`      | string  | —       | Pin to the latest sermon in one series                   |
+| `data-speaker-id`     | string  | —       | Pin to the latest sermon by one speaker                  |
+| `data-show-image`     | boolean | `true`  | Show the sermon artwork                                  |
+| `data-show-date`      | boolean | `true`  | Show the sermon date                                     |
+| `data-show-series`    | boolean | `true`  | Show the series name                                     |
+| `data-show-description` | boolean | `true` | Show the short description                              |
+| `data-show-play-button` | boolean | `true` | Show the Play button linking to the watch URL           |
+| `data-play-label`     | string  | `Play`  | Label for the Play button                                |
+| `data-api-url`        | string  | —       | Override the perimeter-api base URL (advanced)           |
+
+## Data
+
+Backed by perimeter-api's public sermons endpoints:
+
+- `GET /api/sermons?perPage=1&sort=date&order=desc&seriesTypeId=…` — the latest sermon
+- `GET /api/sermons/sermon/{id}` — full description + media (watch) links
+- `GET /api/sermons/sermon/{id}/image` — banner artwork (`bannerUrl` is usually null)
