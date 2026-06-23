@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { useSermons, useSermonDetail } from '@perimeter/api-hooks';
+import { useSermons } from '@perimeter/api-hooks';
 import { Skeleton } from '@perimeter/ui/skeleton';
 import { Button } from '@perimeter/ui/button';
 import { cn } from '@perimeter/ui/utils/cn';
 import type { LatestSermonConfig } from './types';
-import { seriesImageUrl, sermonDetailsUrl, formatDate, stripHtml } from './lib/format';
+import { seriesImageUrl, sermonDetailsUrl, formatDate } from './lib/format';
 
 export interface AppProps {
   config: LatestSermonConfig;
@@ -77,12 +77,10 @@ function PlayIcon(): React.JSX.Element {
 function LoadingState(): React.JSX.Element {
   return (
     <div className="grid gap-6 @md:grid-cols-2">
-      <div className="grid gap-3">
+      <div className="grid content-center gap-3">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-9 w-3/4" />
         <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
         <Skeleton className="h-10 w-24" />
       </div>
       <Skeleton className={cn(IMAGE_BOX, 'min-h-40')} />
@@ -110,15 +108,6 @@ export function App({ config }: AppProps): React.JSX.Element {
 
   const sermon = sermonsQuery.data?.data.sermons[0];
 
-  // The list response omits the full HTML description. Fetch the detail only as
-  // a fallback when the short description is missing — the common case (Sunday
-  // sermons) has it, so this usually stays idle (useSermonDetail is guarded to
-  // `id > 0`). The Play button links to the details page by ID, so it no longer
-  // needs the media links from this query.
-  const needsDetailForDescription = config.showDescription && !!sermon && !sermon.shortDescription;
-  const detailQuery = useSermonDetail(needsDetailForDescription ? sermon.id : 0);
-  const detail = detailQuery.data?.data;
-
   if (sermonsQuery.isLoading) {
     return (
       <div className="@container p-4">
@@ -143,13 +132,10 @@ export function App({ config }: AppProps): React.JSX.Element {
     );
   }
 
-  const description =
-    sermon.shortDescription ?? (detail?.description ? stripHtml(detail.description) : null);
-
   return (
     <div className="@container p-4 text-fg">
       <div className="grid gap-6 @md:grid-cols-2">
-        <div className="flex min-w-0 flex-col gap-2">
+        <div className="flex min-w-0 flex-col gap-2 @md:justify-center">
           {config.showDate && (
             <p className="font-sans text-sm text-muted-fg">{formatDate(sermon.date)}</p>
           )}
@@ -158,9 +144,6 @@ export function App({ config }: AppProps): React.JSX.Element {
           </h2>
           {config.showSeries && sermon.series?.title && (
             <p className="font-sans text-sm text-muted-fg">{sermon.series.title}</p>
-          )}
-          {config.showDescription && description && (
-            <p className="mt-1 font-sans text-base leading-relaxed text-fg/80">{description}</p>
           )}
           {config.showPlayButton && (
             <div className="mt-3">

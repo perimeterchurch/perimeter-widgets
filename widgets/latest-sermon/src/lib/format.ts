@@ -65,12 +65,3 @@ export function formatDate(iso: string): string {
   const monthName = MONTHS[Number(month) - 1] ?? month;
   return `${monthName} ${Number(day)}, ${year}`;
 }
-
-/** Strip HTML tags from MP's rich-text description, collapsing whitespace. */
-export function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
