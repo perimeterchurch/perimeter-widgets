@@ -30,25 +30,15 @@ const SERMON = {
   book: { id: 51, name: 'Colossians' },
 };
 
-const DETAIL = {
-  ...SERMON,
-  description: '<font face="Lato">Our lives should be described...</font>',
-  transcript: null,
-  scriptureLinks: null,
-  links: [{ id: 1, url: 'https://vimeo.com/123', type: 'Watch', mediaType: 'video', position: 1 }],
-};
-
 // The App pulls live data through @perimeter/api-hooks, which needs an
-// ApiClient context the test doesn't provide. Mock the hooks so the tree
+// ApiClient context the test doesn't provide. Mock the hook so the tree
 // renders deterministically against a known latest sermon.
-const hooks = vi.hoisted<{ sermonsResult: unknown; detailResult: unknown }>(() => ({
+const hooks = vi.hoisted<{ sermonsResult: unknown }>(() => ({
   sermonsResult: undefined,
-  detailResult: undefined,
 }));
 
 vi.mock('@perimeter/api-hooks', () => ({
   useSermons: () => hooks.sermonsResult,
-  useSermonDetail: () => hooks.detailResult,
 }));
 
 function renderApp(overrides: Record<string, unknown> = {}) {
@@ -57,19 +47,22 @@ function renderApp(overrides: Record<string, unknown> = {}) {
 }
 
 describe('latest-sermon App', () => {
-  it('renders the latest sermon title, series, and description', () => {
+  it('renders the latest sermon title, series, and date', () => {
     hooks.sermonsResult = queryResult({ success: true, data: { sermons: [SERMON] } });
-    hooks.detailResult = queryResult({ success: true, data: DETAIL });
     renderApp();
     expect(screen.getByText('Work on Purpose')).toBeInTheDocument();
     expect(screen.getByText('Work in Progress')).toBeInTheDocument();
-    expect(screen.getByText(/label before labor/)).toBeInTheDocument();
     expect(screen.getByText('Jun 14, 2026')).toBeInTheDocument();
+  });
+
+  it('does not render the short description', () => {
+    hooks.sermonsResult = queryResult({ success: true, data: { sermons: [SERMON] } });
+    renderApp();
+    expect(screen.queryByText(/label before labor/)).toBeNull();
   });
 
   it('links the Play button to the sermon-details page by ID', () => {
     hooks.sermonsResult = queryResult({ success: true, data: { sermons: [SERMON] } });
-    hooks.detailResult = queryResult({ success: true, data: DETAIL });
     renderApp();
     const link = screen.getByRole('link', { name: /play/i });
     expect(link).toHaveAttribute(
@@ -80,14 +73,12 @@ describe('latest-sermon App', () => {
 
   it('shows an empty state when there is no sermon', () => {
     hooks.sermonsResult = queryResult({ success: true, data: { sermons: [] } });
-    hooks.detailResult = queryResult({ success: true, data: null });
     renderApp();
     expect(screen.getByText(/no sermons available/i)).toBeInTheDocument();
   });
 
   it('shows a loading state while fetching', () => {
     hooks.sermonsResult = queryResult(undefined, { isLoading: true, isSuccess: false });
-    hooks.detailResult = queryResult(undefined, { isLoading: true, isSuccess: false });
     const { container } = renderApp();
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
