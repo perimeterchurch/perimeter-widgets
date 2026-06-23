@@ -133,7 +133,7 @@ export function App({ config }: AppProps): React.JSX.Element {
   }
 
   return (
-    <div className="@container p-4 text-fg">
+    <div className="@container p-4 text-left text-fg">
       <div className="grid gap-6 @md:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-2 @md:justify-center">
           {config.showDate && (
