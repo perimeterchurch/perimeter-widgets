@@ -25,7 +25,6 @@ export const LatestSermonConfigSchema = z.object({
   showImage: z.coerce.boolean().default(true).describe('Show the sermon artwork.'),
   showDate: z.coerce.boolean().default(true).describe('Show the sermon date.'),
   showSeries: z.coerce.boolean().default(true).describe('Show the series name.'),
-  showDescription: z.coerce.boolean().default(true).describe('Show the short description.'),
   showPlayButton: z.coerce
     .boolean()
     .default(true)
