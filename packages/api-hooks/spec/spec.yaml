@@ -386,6 +386,180 @@ paths:
             enum:
               - asc
               - desc
+  /api/sermons/latest:
+    get:
+      operationId: getLatestSundaySermon
+      summary: Get the latest Sunday worship-service sermon with series artwork
+      tags:
+        - Sermons
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      title:
+                        type: string
+                      subtitle:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      shortDescription:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      date:
+                        type: string
+                      bannerUrl:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      speaker:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                          name:
+                            type: string
+                          bio:
+                            anyOf:
+                              - type: string
+                              - type: 'null'
+                        required:
+                          - id
+                          - name
+                          - bio
+                        additionalProperties: false
+                      series:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                          title:
+                            type: string
+                        required:
+                          - id
+                          - title
+                        additionalProperties: false
+                      congregation:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                        required:
+                          - id
+                        additionalProperties: false
+                      book:
+                        anyOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: number
+                              name:
+                                type: string
+                            required:
+                              - id
+                              - name
+                            additionalProperties: false
+                          - type: 'null'
+                      description:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      transcript:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      scriptureLinks:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      links:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            url:
+                              type: string
+                            type:
+                              type: string
+                            mediaType:
+                              type: string
+                              enum:
+                                - video
+                                - audio
+                                - document
+                            duration:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            position:
+                              anyOf:
+                                - type: number
+                                - type: 'null'
+                          required:
+                            - id
+                            - url
+                            - type
+                            - mediaType
+                            - duration
+                            - position
+                          additionalProperties: false
+                      seriesImageUrl:
+                        type: string
+                    required:
+                      - id
+                      - title
+                      - subtitle
+                      - shortDescription
+                      - date
+                      - bannerUrl
+                      - speaker
+                      - series
+                      - congregation
+                      - book
+                      - description
+                      - transcript
+                      - scriptureLinks
+                      - links
+                      - seriesImageUrl
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /api/sermons/sermon/{id}:
     get:
       operationId: getSermon
@@ -2367,6 +2541,87 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/member-demographics/new-by-year:
+    get:
+      operationId: getMemberDemographicsNewByYear
+      summary:
+        Per-year member inflow/outflow (distinct Contact_ID diff vs the prior year-end snapshot) for the Member Flow
+        chart
+      tags:
+        - Demographics
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            year:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            newMembers:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            lostMembers:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            snapshotDate:
+                              type: string
+                          required:
+                            - year
+                            - newMembers
+                            - lostMembers
+                            - snapshotDate
+                          additionalProperties: false
+                    required:
+                      - rows
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: participantTypeIds
+          in: query
+          required: false
+          schema:
+            description: Comma-separated member participant type IDs (subset of 3,7,8,23); defaults to all four
+            type: string
   /api/contacts:
     get:
       operationId: searchContacts
@@ -4300,6 +4555,283 @@ paths:
             type: integer
             exclusiveMinimum: 0
             maximum: 9007199254740991
+  /api/assessments/{instrumentId}/answers/files:
+    get:
+      operationId: listAnswerFiles
+      summary:
+        List files attached to a (taker, question) answer. The taker is supplied via the x-taker-id header and the
+        question via x-question-id.
+      tags:
+        - Assessments
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      takerAnswerID:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      files:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            fileId:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            fileName:
+                              type: string
+                            sizeBytes:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            contentType:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                          required:
+                            - fileId
+                            - fileName
+                            - sizeBytes
+                            - contentType
+                          additionalProperties: false
+                    required:
+                      - takerAnswerID
+                      - files
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: instrumentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+    post:
+      operationId: uploadAnswerFiles
+      summary:
+        Upload one or more files to a (taker, question) answer (multipart/form-data). Ensures the answer row exists.
+        Taker via x-taker-id header, question via x-question-id.
+      tags:
+        - Assessments
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      takerAnswerID:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                      files:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            fileId:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            fileName:
+                              type: string
+                            sizeBytes:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            contentType:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                          required:
+                            - fileId
+                            - fileName
+                            - sizeBytes
+                            - contentType
+                          additionalProperties: false
+                    required:
+                      - takerAnswerID
+                      - files
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: instrumentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                  description: File uploads
+              required:
+                - files
+              additionalProperties: false
+  /api/assessments/{instrumentId}/answers/files/{fileId}:
+    delete:
+      operationId: deleteAnswerFile
+      summary:
+        Delete a file from a (taker, question) answer; deletes the answer row too if it is left empty. Taker via
+        x-taker-id header, question via x-question-id.
+      tags:
+        - Assessments
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      deletedAnswerRow:
+                        type: boolean
+                    required:
+                      - deletedAnswerRow
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: instrumentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
   /api/users:
     get:
       operationId: getCurrentUser
@@ -4635,6 +5167,90 @@ paths:
                 - phone
                 - pledge
               additionalProperties: false
+  /api/giving/history:
+    get:
+      operationId: getGivingHistory
+      summary: Get the authenticated user's household giving history
+      tags:
+        - Giving
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            distributionId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            donationId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            date:
+                              type: string
+                            amount:
+                              type: number
+                            donorName:
+                              type: string
+                            paymentType:
+                              type: string
+                            programName:
+                              type: string
+                          required:
+                            - distributionId
+                            - donationId
+                            - date
+                            - amount
+                            - donorName
+                            - paymentType
+                            - programName
+                          additionalProperties: false
+                    required:
+                      - items
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
   /api/invoices/{guid}:
     get:
       operationId: getInvoice
@@ -7032,6 +7648,8 @@ paths:
                                 - type: string
                                   format: date-time
                                 - type: 'null'
+                            inMentionScope:
+                              type: boolean
                           required:
                             - ticketID
                             - subject
@@ -7359,6 +7977,8 @@ paths:
                                   - type: string
                                     format: date-time
                                   - type: 'null'
+                              inMentionScope:
+                                type: boolean
                             required:
                               - ticketID
                               - subject
@@ -7701,6 +8321,8 @@ paths:
                               - type: string
                                 format: date-time
                               - type: 'null'
+                          inMentionScope:
+                            type: boolean
                         required:
                           - ticketID
                           - subject
@@ -8080,6 +8702,8 @@ paths:
                                 - type: string
                                   format: date-time
                                 - type: 'null'
+                            inMentionScope:
+                              type: boolean
                           required:
                             - ticketID
                             - subject
@@ -9222,6 +9846,8 @@ paths:
                                   - type: string
                                     format: date-time
                                   - type: 'null'
+                              inMentionScope:
+                                type: boolean
                             required:
                               - ticketID
                               - subject
@@ -9518,14 +10144,28 @@ paths:
                     type: string
                     format: email
                     pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+                cc:
+                  type: array
+                  items:
+                    type: string
+                    format: email
+                    pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+                bcc:
+                  type: array
+                  items:
+                    type: string
+                    format: email
+                    pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
                 comment:
                   type: string
-                  minLength: 1
                 includeHistory:
+                  type: boolean
+                includeAttachments:
+                  type: boolean
+                includeSignature:
                   type: boolean
               required:
                 - to
-                - comment
               additionalProperties: false
   /api/helpdesk/tickets/{id}/conversations/{conversationId}/actions/retry-send:
     post:
@@ -9939,6 +10579,8 @@ paths:
                                 - type: string
                                   format: date-time
                                 - type: 'null'
+                            inMentionScope:
+                              type: boolean
                           required:
                             - ticketID
                             - subject
@@ -11147,3 +11789,1608 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
       security: *a2
+  /api/kb/articles:
+    get:
+      operationId: listKbArticles
+      summary: Browse and keyword-search knowledge base articles
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                        title:
+                          type: string
+                        excerpt:
+                          anyOf:
+                            - type: string
+                            - type: 'null'
+                        category:
+                          anyOf:
+                            - type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                name:
+                                  type: string
+                              required:
+                                - id
+                                - name
+                              additionalProperties: false
+                            - type: 'null'
+                        tags:
+                          type: array
+                          items:
+                            type: string
+                        status:
+                          type: string
+                          enum:
+                            - draft
+                            - published
+                            - archived
+                        displayOrder:
+                          default: 0
+                          type: integer
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
+                        updatedAt:
+                          type: string
+                        updatedBy:
+                          anyOf:
+                            - type: string
+                            - type: 'null'
+                      required:
+                        - id
+                        - title
+                        - excerpt
+                        - category
+                        - tags
+                        - status
+                        - displayOrder
+                        - updatedAt
+                        - updatedBy
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - draft
+              - published
+              - archived
+        - name: top
+          in: query
+          required: false
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: skip
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 9007199254740991
+    post:
+      operationId: createKbArticle
+      summary: Create a knowledge base article
+      tags:
+        - Knowledge Base
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                    required:
+                      - id
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                body:
+                  type: string
+                categoryId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+                tags:
+                  default: []
+                  type: array
+                  items:
+                    type: string
+                status:
+                  default: draft
+                  type: string
+                  enum:
+                    - draft
+                    - published
+                    - archived
+              required:
+                - title
+                - body
+                - tags
+                - status
+              additionalProperties: false
+  /api/kb/articles/{id}:
+    get:
+      operationId: getKbArticle
+      summary: Get a single knowledge base article (Markdown body)
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      title:
+                        type: string
+                      excerpt:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      category:
+                        anyOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                exclusiveMinimum: 0
+                                maximum: 9007199254740991
+                              name:
+                                type: string
+                            required:
+                              - id
+                              - name
+                            additionalProperties: false
+                          - type: 'null'
+                      tags:
+                        type: array
+                        items:
+                          type: string
+                      status:
+                        type: string
+                        enum:
+                          - draft
+                          - published
+                          - archived
+                      displayOrder:
+                        default: 0
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                      updatedAt:
+                        type: string
+                      updatedBy:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      body:
+                        type: string
+                      createdAt:
+                        type: string
+                      createdBy:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                    required:
+                      - id
+                      - title
+                      - excerpt
+                      - category
+                      - tags
+                      - status
+                      - displayOrder
+                      - updatedAt
+                      - updatedBy
+                      - body
+                      - createdAt
+                      - createdBy
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+    patch:
+      operationId: updateKbArticle
+      summary: Edit, publish, or archive an article
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                body:
+                  type: string
+                categoryId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                status:
+                  type: string
+                  enum:
+                    - draft
+                    - published
+                    - archived
+              additionalProperties: false
+  /api/kb/me/capabilities:
+    get:
+      operationId: getKbCapabilities
+      summary: Resolve the current user's KB capabilities
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum:
+                          - viewer
+                          - author
+                          - admin
+                      isAdmin:
+                        type: boolean
+                      scopedCategoryIds:
+                        type: array
+                        items:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                      canManageCategories:
+                        type: boolean
+                      canManagePermissions:
+                        type: boolean
+                    required:
+                      - role
+                      - isAdmin
+                      - scopedCategoryIds
+                      - canManageCategories
+                      - canManagePermissions
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+  /api/kb/categories:
+    get:
+      operationId: listKbCategories
+      summary: List knowledge base categories
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                        name:
+                          type: string
+                        parentId:
+                          anyOf:
+                            - type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            - type: 'null'
+                        ministryId:
+                          anyOf:
+                            - type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            - type: 'null'
+                        displayOrder:
+                          default: 0
+                          type: integer
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
+                        articleCount:
+                          type: integer
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
+                      required:
+                        - id
+                        - name
+                        - parentId
+                        - ministryId
+                        - displayOrder
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+    post:
+      operationId: createKbCategory
+      summary: Create a category (admin only)
+      tags:
+        - Knowledge Base
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                    required:
+                      - id
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                parentId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+                ministryId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+                description:
+                  type: string
+                  maxLength: 500
+                displayOrder:
+                  type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+              required:
+                - name
+              additionalProperties: false
+  /api/kb/categories/{id}:
+    patch:
+      operationId: updateKbCategory
+      summary: Update a category (admin only)
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                parentId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+                ministryId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+                description:
+                  type: string
+                  maxLength: 500
+                displayOrder:
+                  type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+                archived:
+                  type: boolean
+              additionalProperties: false
+  /api/kb/permissions:
+    get:
+      operationId: listKbPermissions
+      summary: List KB role assignments (admin only)
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                        contactId:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                        contactName:
+                          anyOf:
+                            - type: string
+                            - type: 'null'
+                        role:
+                          type: string
+                          enum:
+                            - viewer
+                            - author
+                            - admin
+                        categoryId:
+                          anyOf:
+                            - type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            - type: 'null'
+                        categoryName:
+                          anyOf:
+                            - type: string
+                            - type: 'null'
+                        grantedBy:
+                          anyOf:
+                            - type: string
+                            - type: 'null'
+                        grantedDate:
+                          anyOf:
+                            - type: string
+                            - type: 'null'
+                      required:
+                        - id
+                        - contactId
+                        - contactName
+                        - role
+                        - categoryId
+                        - categoryName
+                        - grantedBy
+                        - grantedDate
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+    post:
+      operationId: createKbPermission
+      summary: Grant a KB role to a contact (admin only)
+      tags:
+        - Knowledge Base
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                    required:
+                      - id
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contactId:
+                  type: integer
+                  exclusiveMinimum: 0
+                  maximum: 9007199254740991
+                role:
+                  type: string
+                  enum:
+                    - viewer
+                    - author
+                    - admin
+                categoryId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+              required:
+                - contactId
+                - role
+              additionalProperties: false
+  /api/kb/intake:
+    post:
+      operationId: submitKbCapture
+      summary: Submit a knowledge capture session from any channel (queued for AI processing)
+      tags:
+        - Knowledge Base
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      draftId:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      finishUrl:
+                        type: string
+                      deduplicated:
+                        type: boolean
+                      attachments:
+                        default: []
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            fileName:
+                              type: string
+                          required:
+                            - id
+                            - fileName
+                          additionalProperties: false
+                    required:
+                      - draftId
+                      - finishUrl
+                      - deduplicated
+                      - attachments
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channel:
+                  type: string
+                  enum:
+                    - email
+                    - extension
+                    - voice
+                    - interview
+                    - drop
+                    - teams
+                    - ticket
+                    - document
+                    - legacy
+                submittedBy:
+                  type: object
+                  properties:
+                    contactId:
+                      type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    email:
+                      type: string
+                      format: email
+                      pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+                  additionalProperties: false
+                rawText:
+                  type: string
+                  maxLength: 2000000
+                media:
+                  default: []
+                  maxItems: 20
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      filename:
+                        type: string
+                        minLength: 1
+                        maxLength: 255
+                      contentType:
+                        type: string
+                        minLength: 1
+                        maxLength: 100
+                      attachmentType:
+                        type: string
+                        enum:
+                          - inline_image
+                          - video
+                          - audio
+                          - transcript
+                          - resource
+                      contentBase64:
+                        type: string
+                        maxLength: 1400000
+                      anchorStep:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      caption:
+                        type: string
+                        maxLength: 500
+                    required:
+                      - filename
+                      - contentType
+                      - attachmentType
+                    additionalProperties: false
+                steps:
+                  default: []
+                  maxItems: 500
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      seq:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      action:
+                        type: string
+                        enum:
+                          - click
+                          - input
+                          - navigate
+                          - tab_switch
+                          - note
+                      elementName:
+                        type: string
+                        maxLength: 500
+                      elementRole:
+                        type: string
+                        maxLength: 100
+                      url:
+                        type: string
+                        maxLength: 2000
+                      pageTitle:
+                        type: string
+                        maxLength: 500
+                      screenshotRef:
+                        type: string
+                        maxLength: 255
+                      typedValueMasked:
+                        anyOf:
+                          - type: string
+                            maxLength: 500
+                          - type: 'null'
+                      userNote:
+                        anyOf:
+                          - type: string
+                            maxLength: 2000
+                          - type: 'null'
+                    required:
+                      - seq
+                      - action
+                    additionalProperties: false
+                targetArticleId:
+                  type: integer
+                  exclusiveMinimum: 0
+                  maximum: 9007199254740991
+                dedupeKey:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                metadata:
+                  type: object
+                  propertyNames:
+                    type: string
+                  additionalProperties: {}
+              required:
+                - channel
+                - media
+                - steps
+              additionalProperties: false
+  /api/kb/intake/{draftId}:
+    get:
+      operationId: getKbDraft
+      summary: Get a capture draft (submitter, assigned steward, or admin only)
+      tags:
+        - Knowledge Base
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      channel:
+                        type: string
+                        enum:
+                          - email
+                          - extension
+                          - voice
+                          - interview
+                          - drop
+                          - teams
+                          - ticket
+                          - document
+                          - legacy
+                      submittedByContactId:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      submittedByEmail:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      submittedAt:
+                        type: string
+                      rawContent:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      draftTitle:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      draftBody:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      suggestedCategoryId:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      classification:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - new
+                              - duplicate
+                              - update
+                              - contradiction
+                          - type: 'null'
+                      classificationArticleId:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      gapQuestions:
+                        type: array
+                        items:
+                          type: string
+                      processingStatus:
+                        type: string
+                        enum:
+                          - queued
+                          - processing
+                          - ready_for_review
+                          - failed
+                      stewardReviewStatus:
+                        type: string
+                        enum:
+                          - pending
+                          - in_review
+                          - approved
+                          - rejected
+                          - published
+                          - archived
+                      redactionStatus:
+                        type: string
+                        enum:
+                          - pending
+                          - flagged
+                          - cleared
+                      assignedStewardId:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      targetArticleId:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      publishedArticleId:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      attachments:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            fileName:
+                              type: string
+                            contentType:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            sizeBytes:
+                              anyOf:
+                                - type: integer
+                                  minimum: -9007199254740991
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            attachmentType:
+                              type: string
+                              enum:
+                                - inline_image
+                                - video
+                                - audio
+                                - transcript
+                                - resource
+                            anchorStep:
+                              anyOf:
+                                - type: integer
+                                  minimum: -9007199254740991
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            displayOrder:
+                              type: integer
+                              minimum: -9007199254740991
+                              maximum: 9007199254740991
+                            redactionStatus:
+                              type: string
+                              enum:
+                                - pending
+                                - flagged
+                                - cleared
+                            visionDescription:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            redactionRegions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                  bbox:
+                                    type: object
+                                    properties:
+                                      x:
+                                        type: number
+                                      y:
+                                        type: number
+                                      w:
+                                        type: number
+                                      h:
+                                        type: number
+                                    required:
+                                      - x
+                                      - y
+                                      - w
+                                      - h
+                                    additionalProperties: false
+                                  category:
+                                    type: string
+                                  confidence:
+                                    type: number
+                                  label:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                  source:
+                                    type: string
+                                  action:
+                                    type: string
+                                    enum:
+                                      - blur
+                                      - reveal
+                                  overridden:
+                                    type: boolean
+                                  overridden_by:
+                                    anyOf:
+                                      - type: number
+                                      - type: 'null'
+                                  overridden_at:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                required:
+                                  - id
+                                  - bbox
+                                  - category
+                                  - confidence
+                                  - source
+                                  - action
+                                  - overridden
+                                  - overridden_by
+                                  - overridden_at
+                                additionalProperties: false
+                          required:
+                            - id
+                            - fileName
+                            - contentType
+                            - sizeBytes
+                            - attachmentType
+                            - anchorStep
+                            - displayOrder
+                            - redactionStatus
+                            - visionDescription
+                            - redactionRegions
+                          additionalProperties: false
+                    required:
+                      - id
+                      - channel
+                      - submittedByContactId
+                      - submittedByEmail
+                      - submittedAt
+                      - rawContent
+                      - draftTitle
+                      - draftBody
+                      - suggestedCategoryId
+                      - classification
+                      - classificationArticleId
+                      - gapQuestions
+                      - processingStatus
+                      - stewardReviewStatus
+                      - redactionStatus
+                      - assignedStewardId
+                      - targetArticleId
+                      - publishedArticleId
+                      - attachments
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: draftId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+  /api/kb/intake/{draftId}/attachments:
+    post:
+      operationId: uploadKbCaptureMedia
+      summary: Upload media binaries for a capture draft (filename-matched to declared media)
+      tags:
+        - Knowledge Base
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                        fileName:
+                          type: string
+                        fileUrl:
+                          type: string
+                        sizeBytes:
+                          type: integer
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
+                        attachmentType:
+                          type: string
+                          enum:
+                            - inline_image
+                            - video
+                            - audio
+                            - transcript
+                            - resource
+                      required:
+                        - id
+                        - fileName
+                        - fileUrl
+                        - sizeBytes
+                        - attachmentType
+                      additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: draftId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                  description: File uploads
+              required:
+                - files
+              additionalProperties: false

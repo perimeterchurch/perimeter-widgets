@@ -19,5 +19,11 @@ export {
   type UseSeriesTypesResponse,
 } from './sermons/use-series-types';
 
+export {
+  useGivingHistory,
+  type UseGivingHistoryResponse,
+  type GivingHistoryItem,
+} from './giving/use-giving-history';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';
