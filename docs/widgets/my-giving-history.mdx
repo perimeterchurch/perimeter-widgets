@@ -1,0 +1,43 @@
+# my-giving-history
+
+Shows the signed-in user's **household giving history** — a chart of giving by
+year, plus a filterable, downloadable table of every gift. It is the
+new-architecture rebuild of the legacy `MyGivingHistory` React widget.
+
+Each row is one **donation distribution** (a single program split of a gift), so
+a gift spread across multiple programs appears as multiple rows. Columns: date,
+donor, program, payment type, and amount. The user can filter by year, donor,
+payment type, and program, and download the filtered rows as CSV.
+
+## Authentication
+
+This widget requires a signed-in Ministry Platform user (`auth: 'required'`).
+The host page must already hold the user's MP session — the runtime reads the
+token from `localStorage` (`mpp-widgets_AuthToken`) and the API client forwards
+it as a bearer token to `GET /api/giving/history`. Until a token is present the
+widget shows a "Please sign in to use this widget." prompt; the endpoint derives
+the household entirely from that token, so a user only ever sees their own
+household's giving.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="my-giving-history"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div. See
+`src/widget.tsx` for the zod schema (the source of truth for available options
+and defaults).
+
+| Attribute    | Type   | Default              | Description                  |
+| ------------ | ------ | -------------------- | ---------------------------- |
+| `data-title` | string | `My Giving History`  | Heading shown above the data |
+
+## Data
+
+Backed by `GET /api/giving/history` in perimeter-api (authenticated, giving
+domain). The widget consumes it through the `useGivingHistory` hook in
+`@perimeter/api-hooks`.

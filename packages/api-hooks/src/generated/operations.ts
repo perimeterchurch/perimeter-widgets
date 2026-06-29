@@ -38,6 +38,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/sermons/latest': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the latest Sunday worship-service sermon with series artwork */
+    get: operations['getLatestSundaySermon'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/sermons/sermon/{id}': {
     parameters: {
       query?: never;
@@ -310,6 +327,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/member-demographics/new-by-year': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Per-year member inflow/outflow (distinct Contact_ID diff vs the prior year-end snapshot) for the Member Flow chart */
+    get: operations['getMemberDemographicsNewByYear'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/contacts': {
     parameters: {
       query?: never;
@@ -520,6 +554,41 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/assessments/{instrumentId}/answers/files': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List files attached to a (taker, question) answer. The taker is supplied via the x-taker-id header and the question via x-question-id. */
+    get: operations['listAnswerFiles'];
+    put?: never;
+    /** Upload one or more files to a (taker, question) answer (multipart/form-data). Ensures the answer row exists. Taker via x-taker-id header, question via x-question-id. */
+    post: operations['uploadAnswerFiles'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/{instrumentId}/answers/files/{fileId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete a file from a (taker, question) answer; deletes the answer row too if it is left empty. Taker via x-taker-id header, question via x-question-id. */
+    delete: operations['deleteAnswerFile'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/users': {
     parameters: {
       query?: never;
@@ -566,6 +635,23 @@ export interface paths {
     put?: never;
     /** Create a new giving pledge */
     post: operations['createPledge'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/giving/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the authenticated user's household giving history */
+    get: operations['getGivingHistory'];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -1343,6 +1429,163 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/kb/articles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Browse and keyword-search knowledge base articles */
+    get: operations['listKbArticles'];
+    put?: never;
+    /** Create a knowledge base article */
+    post: operations['createKbArticle'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/kb/articles/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a single knowledge base article (Markdown body) */
+    get: operations['getKbArticle'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Edit, publish, or archive an article */
+    patch: operations['updateKbArticle'];
+    trace?: never;
+  };
+  '/api/kb/me/capabilities': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Resolve the current user's KB capabilities */
+    get: operations['getKbCapabilities'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/kb/categories': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List knowledge base categories */
+    get: operations['listKbCategories'];
+    put?: never;
+    /** Create a category (admin only) */
+    post: operations['createKbCategory'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/kb/categories/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update a category (admin only) */
+    patch: operations['updateKbCategory'];
+    trace?: never;
+  };
+  '/api/kb/permissions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List KB role assignments (admin only) */
+    get: operations['listKbPermissions'];
+    put?: never;
+    /** Grant a KB role to a contact (admin only) */
+    post: operations['createKbPermission'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/kb/intake': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Submit a knowledge capture session from any channel (queued for AI processing) */
+    post: operations['submitKbCapture'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/kb/intake/{draftId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a capture draft (submitter, assigned steward, or admin only) */
+    get: operations['getKbDraft'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/kb/intake/{draftId}/attachments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Upload media binaries for a capture draft (filename-matched to declared media) */
+    post: operations['uploadKbCaptureMedia'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1523,6 +1766,78 @@ export interface operations {
                 total: number;
                 totalPages: number;
               };
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getLatestSundaySermon: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              title: string;
+              subtitle: string | null;
+              shortDescription: string | null;
+              date: string;
+              bannerUrl: string | null;
+              speaker: {
+                id: number;
+                name: string;
+                bio: string | null;
+              };
+              series: {
+                id: number;
+                title: string;
+              };
+              congregation: {
+                id: number;
+              };
+              book: {
+                id: number;
+                name: string;
+              } | null;
+              description: string | null;
+              transcript: string | null;
+              scriptureLinks: string | null;
+              links: {
+                id: number;
+                url: string;
+                type: string;
+                /** @enum {string} */
+                mediaType: 'video' | 'audio' | 'document';
+                duration: string | null;
+                position: number | null;
+              }[];
+              seriesImageUrl: string;
             };
             meta?: {
               count?: number;
@@ -2400,6 +2715,51 @@ export interface operations {
                 genZ: number[];
                 genAlpha: number[];
               };
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getMemberDemographicsNewByYear: {
+    parameters: {
+      query?: {
+        participantTypeIds?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              rows: {
+                year: number;
+                newMembers: number;
+                lostMembers: number;
+                snapshotDate: string;
+              }[];
             };
             meta?: {
               count?: number;
@@ -3409,6 +3769,155 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  listAnswerFiles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        instrumentId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              takerAnswerID: number | null;
+              files: {
+                fileId: number;
+                fileName: string;
+                sizeBytes: number;
+                contentType: string | null;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  uploadAnswerFiles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        instrumentId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** @description File uploads */
+          files: string[];
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              takerAnswerID: number;
+              files: {
+                fileId: number;
+                fileName: string;
+                sizeBytes: number;
+                contentType: string | null;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  deleteAnswerFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        instrumentId: number;
+        fileId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              deletedAnswerRow: boolean;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
   getCurrentUser: {
     parameters: {
       query?: never;
@@ -3593,6 +4102,54 @@ export interface operations {
             data: {
               pledgeId: number;
               amount: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getGivingHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              items: {
+                distributionId: number;
+                donationId: number;
+                date: string;
+                amount: number;
+                donorName: string;
+                paymentType: string;
+                programName: string;
+              }[];
             };
             meta?: {
               count?: number;
@@ -4920,6 +5477,7 @@ export interface operations {
                 resolveDueDate: string | null;
                 /** @default null */
                 lastActivityAt: string | null;
+                inMentionScope?: boolean;
               }[];
               count: number;
             };
@@ -5013,6 +5571,7 @@ export interface operations {
                 resolveDueDate: string | null;
                 /** @default null */
                 lastActivityAt: string | null;
+                inMentionScope?: boolean;
               } | null;
               conversations: {
                 conversationID: number;
@@ -5207,6 +5766,7 @@ export interface operations {
                 resolveDueDate: string | null;
                 /** @default null */
                 lastActivityAt: string | null;
+                inMentionScope?: boolean;
               };
             };
             meta?: {
@@ -5327,6 +5887,7 @@ export interface operations {
                 resolveDueDate: string | null;
                 /** @default null */
                 lastActivityAt: string | null;
+                inMentionScope?: boolean;
               }[];
               query: string | null;
               filters?: {
@@ -5813,6 +6374,7 @@ export interface operations {
                 resolveDueDate: string | null;
                 /** @default null */
                 lastActivityAt: string | null;
+                inMentionScope?: boolean;
               } | null;
               assignedContact: {
                 contactID: number;
@@ -5889,8 +6451,12 @@ export interface operations {
       content: {
         'application/json': {
           to: string[];
-          comment: string;
+          cc?: string[];
+          bcc?: string[];
+          comment?: string;
           includeHistory?: boolean;
+          includeAttachments?: boolean;
+          includeSignature?: boolean;
         };
       };
     };
@@ -6113,6 +6679,7 @@ export interface operations {
                 resolveDueDate: string | null;
                 /** @default null */
                 lastActivityAt: string | null;
+                inMentionScope?: boolean;
               };
               ageInDays: number;
               /** @enum {string} */
@@ -6756,6 +7323,787 @@ export interface operations {
       400: components['responses']['BadRequest'];
       401: components['responses']['Unauthorized'];
       403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listKbArticles: {
+    parameters: {
+      query?: {
+        q?: string;
+        category?: number;
+        status?: 'draft' | 'published' | 'archived';
+        top?: number;
+        skip?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              title: string;
+              excerpt: string | null;
+              category: {
+                id: number;
+                name: string;
+              } | null;
+              tags: string[];
+              /** @enum {string} */
+              status: 'draft' | 'published' | 'archived';
+              /** @default 0 */
+              displayOrder: number;
+              updatedAt: string;
+              updatedBy: string | null;
+            }[];
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  createKbArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          title: string;
+          body: string;
+          categoryId?: number | null;
+          /** @default [] */
+          tags: string[];
+          /**
+           * @default draft
+           * @enum {string}
+           */
+          status: 'draft' | 'published' | 'archived';
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getKbArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              title: string;
+              excerpt: string | null;
+              category: {
+                id: number;
+                name: string;
+              } | null;
+              tags: string[];
+              /** @enum {string} */
+              status: 'draft' | 'published' | 'archived';
+              /** @default 0 */
+              displayOrder: number;
+              updatedAt: string;
+              updatedBy: string | null;
+              body: string;
+              createdAt: string;
+              createdBy: string | null;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  updateKbArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          title?: string;
+          body?: string;
+          categoryId?: number | null;
+          tags?: string[];
+          /** @enum {string} */
+          status?: 'draft' | 'published' | 'archived';
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              message: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getKbCapabilities: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              /** @enum {string} */
+              role: 'viewer' | 'author' | 'admin';
+              isAdmin: boolean;
+              scopedCategoryIds: number[];
+              canManageCategories: boolean;
+              canManagePermissions: boolean;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listKbCategories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              name: string;
+              parentId: number | null;
+              ministryId: number | null;
+              /** @default 0 */
+              displayOrder: number;
+              articleCount?: number;
+            }[];
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  createKbCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          name: string;
+          parentId?: number | null;
+          ministryId?: number | null;
+          description?: string;
+          displayOrder?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  updateKbCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          name?: string;
+          parentId?: number | null;
+          ministryId?: number | null;
+          description?: string;
+          displayOrder?: number;
+          archived?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              message: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listKbPermissions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              contactId: number;
+              contactName: string | null;
+              /** @enum {string} */
+              role: 'viewer' | 'author' | 'admin';
+              categoryId: number | null;
+              categoryName: string | null;
+              grantedBy: string | null;
+              grantedDate: string | null;
+            }[];
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  createKbPermission: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          contactId: number;
+          /** @enum {string} */
+          role: 'viewer' | 'author' | 'admin';
+          categoryId?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  submitKbCapture: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          channel:
+            | 'email'
+            | 'extension'
+            | 'voice'
+            | 'interview'
+            | 'drop'
+            | 'teams'
+            | 'ticket'
+            | 'document'
+            | 'legacy';
+          submittedBy?: {
+            contactId?: number;
+            /** Format: email */
+            email?: string;
+          };
+          rawText?: string;
+          /** @default [] */
+          media: {
+            filename: string;
+            contentType: string;
+            /** @enum {string} */
+            attachmentType: 'inline_image' | 'video' | 'audio' | 'transcript' | 'resource';
+            contentBase64?: string;
+            anchorStep?: number;
+            caption?: string;
+          }[];
+          /** @default [] */
+          steps: {
+            seq: number;
+            /** @enum {string} */
+            action: 'click' | 'input' | 'navigate' | 'tab_switch' | 'note';
+            elementName?: string;
+            elementRole?: string;
+            url?: string;
+            pageTitle?: string;
+            screenshotRef?: string;
+            typedValueMasked?: string | null;
+            userNote?: string | null;
+          }[];
+          targetArticleId?: number;
+          dedupeKey?: string;
+          metadata?: {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              draftId: number;
+              finishUrl: string;
+              deduplicated: boolean;
+              /** @default [] */
+              attachments: {
+                id: number;
+                fileName: string;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getKbDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              /** @enum {string} */
+              channel:
+                | 'email'
+                | 'extension'
+                | 'voice'
+                | 'interview'
+                | 'drop'
+                | 'teams'
+                | 'ticket'
+                | 'document'
+                | 'legacy';
+              submittedByContactId: number | null;
+              submittedByEmail: string | null;
+              submittedAt: string;
+              rawContent: string | null;
+              draftTitle: string | null;
+              draftBody: string | null;
+              suggestedCategoryId: number | null;
+              classification: ('new' | 'duplicate' | 'update' | 'contradiction') | null;
+              classificationArticleId: number | null;
+              gapQuestions: string[];
+              /** @enum {string} */
+              processingStatus: 'queued' | 'processing' | 'ready_for_review' | 'failed';
+              /** @enum {string} */
+              stewardReviewStatus:
+                | 'pending'
+                | 'in_review'
+                | 'approved'
+                | 'rejected'
+                | 'published'
+                | 'archived';
+              /** @enum {string} */
+              redactionStatus: 'pending' | 'flagged' | 'cleared';
+              assignedStewardId: number | null;
+              targetArticleId: number | null;
+              publishedArticleId: number | null;
+              attachments: {
+                id: number;
+                fileName: string;
+                contentType: string | null;
+                sizeBytes: number | null;
+                /** @enum {string} */
+                attachmentType: 'inline_image' | 'video' | 'audio' | 'transcript' | 'resource';
+                anchorStep: number | null;
+                displayOrder: number;
+                /** @enum {string} */
+                redactionStatus: 'pending' | 'flagged' | 'cleared';
+                visionDescription: string | null;
+                redactionRegions: {
+                  id: string;
+                  bbox: {
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                  };
+                  category: string;
+                  confidence: number;
+                  label?: string | null;
+                  source: string;
+                  /** @enum {string} */
+                  action: 'blur' | 'reveal';
+                  overridden: boolean;
+                  overridden_by: number | null;
+                  overridden_at: string | null;
+                }[];
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  uploadKbCaptureMedia: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** @description File uploads */
+          files: string[];
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              fileName: string;
+              fileUrl: string;
+              sizeBytes: number;
+              /** @enum {string} */
+              attachmentType: 'inline_image' | 'video' | 'audio' | 'transcript' | 'resource';
+            }[];
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
       500: components['responses']['InternalError'];
     };
   };
