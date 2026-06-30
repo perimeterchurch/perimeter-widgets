@@ -658,6 +658,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/shepherds': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Returns the authenticated user's currently assigned shepherds/elders (ported from the legacy api_custom_My_Elder_Widget proc) */
+    get: operations['getShepherds'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/invoices/{guid}': {
     parameters: {
       query?: never;
@@ -4149,6 +4166,53 @@ export interface operations {
                 donorName: string;
                 paymentType: string;
                 programName: string;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getShepherds: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              shepherds: {
+                Elder_Name: string;
+                Mobile_Phone: string | null;
+                Email_Address: string | null;
+                /** @enum {string} */
+                Elder_Type: 'Shepherd' | 'Deacon' | 'Shepherdess';
+                Elder_Photo_URL: string;
               }[];
             };
             meta?: {

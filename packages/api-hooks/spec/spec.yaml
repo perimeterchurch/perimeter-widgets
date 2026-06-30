@@ -5251,6 +5251,90 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
       security: *a2
+  /api/shepherds:
+    get:
+      operationId: getShepherds
+      summary:
+        Returns the authenticated user's currently assigned shepherds/elders (ported from the legacy
+        api_custom_My_Elder_Widget proc)
+      tags:
+        - Shepherds
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      shepherds:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            Elder_Name:
+                              type: string
+                            Mobile_Phone:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            Email_Address:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            Elder_Type:
+                              type: string
+                              enum:
+                                - Shepherd
+                                - Deacon
+                                - Shepherdess
+                            Elder_Photo_URL:
+                              type: string
+                          required:
+                            - Elder_Name
+                            - Mobile_Phone
+                            - Email_Address
+                            - Elder_Type
+                            - Elder_Photo_URL
+                          additionalProperties: false
+                    required:
+                      - shepherds
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
   /api/invoices/{guid}:
     get:
       operationId: getInvoice
