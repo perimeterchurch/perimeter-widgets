@@ -14,6 +14,10 @@
       "destination": "/latest-sermon/0.1.2/index.js"
     },
     {
+      "source": "/my-giving-history/latest.js",
+      "destination": "/my-giving-history/0.1.0/index.js"
+    },
+    {
       "source": "/sermons/latest.js",
       "destination": "/sermons/1.4.2/index.js"
     }
