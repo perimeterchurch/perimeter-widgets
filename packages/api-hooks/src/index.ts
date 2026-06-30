@@ -18,6 +18,7 @@ export {
   type UseSeriesTypesParams,
   type UseSeriesTypesResponse,
 } from './sermons/use-series-types';
+export { useShepherds, type UseShepherdsResponse, type Shepherd } from './shepherds/use-shepherds';
 
 export {
   useGivingHistory,

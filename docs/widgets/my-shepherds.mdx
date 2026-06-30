@@ -1,0 +1,41 @@
+# my-shepherds
+
+Shows the signed-in member their currently assigned shepherds/elders — a card
+per shepherd with a circular photo, name, role (Shepherd / Deacon /
+Shepherdess), phone, and email, plus **Call**, **Text**, and **Email** quick
+actions. Replaces the legacy "My Elder" embed with the perimeter-api backend.
+
+This is a **user-authenticated** widget: it renders a sign-in prompt until an
+MinistryPlatform session exists, then loads the caller's own assignments. It is
+meant to live behind login on perimeter.org.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="my-shepherds"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/widget.tsx` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute     | Type   | Default        | Description                                     |
+| ------------- | ------ | -------------- | ----------------------------------------------- |
+| `data-title`  | string | `My Shepherds` | Heading shown above the shepherd cards          |
+| `data-api-url`| string | —              | Override the perimeter-api base URL (advanced)  |
+
+## Data
+
+Backed by perimeter-api's authenticated shepherds endpoint:
+
+- `GET /api/shepherds` — the caller's assigned shepherds/elders (ports the
+  legacy `api_custom_My_Elder_Widget` stored proc). Requires a user session;
+  returns `{ shepherds: [{ Elder_Name, Mobile_Phone, Email_Address, Elder_Type,
+  Elder_Photo_URL }] }`.
+
+The contact actions are plain `tel:` / `sms:` / `mailto:` links so the host
+device's native dialer, messaging, and mail apps handle them; an action that has
+no underlying phone/email renders as a disabled button.
