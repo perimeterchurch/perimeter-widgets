@@ -208,6 +208,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/events': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List events by Events List for the event-finder widget */
+    get: operations['listEvents'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/event-image/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the default image for an event */
+    get: operations['getEventImage'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/event-metrics': {
     parameters: {
       query?: never;
@@ -665,7 +699,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Returns the authenticated user's currently assigned shepherds/elders (ported from the legacy api_custom_My_Elder_Widget proc) */
+    /** Returns the authenticated user's currently assigned shepherds/elders (active Shepherd_Household_Assignments rows plus the household's deacon/shepherdess) */
     get: operations['getShepherds'];
     put?: never;
     post?: never;
@@ -2338,6 +2372,98 @@ export interface operations {
         };
       };
       400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listEvents: {
+    parameters: {
+      query: {
+        listId: string;
+        from?: string;
+        to?: string;
+        includePast?: 'true' | 'false';
+        page?: number;
+        perPage?: number;
+        order?: 'asc' | 'desc';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              events: {
+                id: number;
+                title: string;
+                /** @description HTML description, or null. */
+                description: string | null;
+                /** @description Location name (from Locations.Location_Name), or null. */
+                location: string | null;
+                /** @description Event start, ISO 8601. */
+                startDate: string;
+                /** @description Event end, ISO 8601. */
+                endDate: string;
+                /** @description Event detail type label, e.g. "Free"/"Paid"/"Tickets". */
+                detailType: string | null;
+                /** @description Public "see details" URL (Event_Detail_Types.URL + event id), or null when the event has no detail type. */
+                detailsUrl: string | null;
+              }[];
+              pagination: {
+                page: number;
+                perPage: number;
+                total: number;
+                totalPages: number;
+              };
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getEventImage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string;
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
       500: components['responses']['InternalError'];
     };
   };
@@ -4212,7 +4338,7 @@ export interface operations {
                 Email_Address: string | null;
                 /** @enum {string} */
                 Elder_Type: 'Shepherd' | 'Deacon' | 'Shepherdess';
-                Elder_Photo_URL: string;
+                Elder_Photo_URL: string | null;
               }[];
             };
             meta?: {
@@ -7640,6 +7766,7 @@ export interface operations {
               role: 'viewer' | 'author' | 'admin';
               isAdmin: boolean;
               scopedCategoryIds: number[];
+              grantedCategoryIds: number[];
               canManageCategories: boolean;
               canManagePermissions: boolean;
             };
@@ -7687,6 +7814,8 @@ export interface operations {
               ministryId: number | null;
               /** @default 0 */
               displayOrder: number;
+              /** @default false */
+              isRestricted: boolean;
               articleCount?: number;
             }[];
             meta?: {
@@ -7723,6 +7852,7 @@ export interface operations {
           ministryId?: number | null;
           description?: string;
           displayOrder?: number;
+          isRestricted?: boolean;
         };
       };
     };
@@ -7775,6 +7905,7 @@ export interface operations {
           ministryId?: number | null;
           description?: string;
           displayOrder?: number;
+          isRestricted?: boolean;
           archived?: boolean;
         };
       };

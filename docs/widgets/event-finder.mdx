@@ -1,0 +1,42 @@
+# event-finder
+
+A responsive grid of upcoming events pulled from one or more Ministry Platform
+**Events Lists**. Each card shows the title, date/time, location, an optional
+image and description, and an optional "See Details" link. Rebuild of the legacy
+`reactwidgets` EventFinder (which called the `api_custom_Event_Finder` stored
+proc) on the perimeter-api backend.
+
+Events are filtered to the configured list(s) and, by default, to **upcoming**
+events only (sorted by start date). Set `data-include-past` to show past events.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="event-finder" data-list-id="18,208"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/widget.tsx` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute               | Type    | Default               | Description                                                                |
+| ----------------------- | ------- | --------------------- | -------------------------------------------------------------------------- |
+| `data-list-id`          | string  | —                     | One or more MP Events List IDs, comma-separated (e.g. `18,208`). Required. |
+| `data-show-images`      | boolean | `false`               | Show each event's image (falls back to a placeholder when none).           |
+| `data-show-details`     | boolean | `true`                | Show the "See Details" link (only when the event has one).                 |
+| `data-show-description` | boolean | `false`               | Show the event description (rendered as HTML from MP).                      |
+| `data-alt-date`         | boolean | `false`               | Use the compact date format (weekday, month day, time).                    |
+| `data-include-past`     | boolean | `false`               | Include past events (default shows upcoming only).                         |
+| `data-details-label`    | string  | `See Details`         | Text for the details link.                                                 |
+| `data-empty-message`    | string  | `No upcoming events.` | Message shown when the list has no events.                                 |
+| `data-api-url`          | string  | —                     | Override the perimeter-api base URL (advanced).                            |
+
+## Data source
+
+`GET /api/events?listId=…` (perimeter-api). The endpoint resolves events from the
+`Events_Lists_Events` join table, then reads the `Events` records with their
+location and detail-type. Images are served from `GET /api/event-image/{id}`
+(the event's default MP image).
