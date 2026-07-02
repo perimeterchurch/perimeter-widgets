@@ -17,9 +17,32 @@ const IMAGE_BOX = 'w-full overflow-hidden aspect-video bg-muted';
  * endpoint 404s (the event has no default image in MP). Mirrors the
  * FallbackImage pattern in the sermons/latest-sermon widgets.
  */
-function EventImage({ src, alt }: { src: string; alt: string }): React.JSX.Element {
+function EventImage({
+  src,
+  fallbackSrc,
+  alt,
+}: {
+  src: string;
+  fallbackSrc?: string | undefined;
+  alt: string;
+}): React.JSX.Element {
   const [loaded, setLoaded] = React.useState(false);
+  const [currentSrc, setCurrentSrc] = React.useState(src);
   const [failed, setFailed] = React.useState(false);
+  const triedFallback = React.useRef(false);
+
+  // On error, try the configured default image once before giving up on the
+  // icon placeholder. Each card is keyed by event id, so this state resets per
+  // event without needing to sync the `src` prop.
+  const handleError = () => {
+    if (fallbackSrc && !triedFallback.current && currentSrc !== fallbackSrc) {
+      triedFallback.current = true;
+      setCurrentSrc(fallbackSrc);
+      setLoaded(false);
+    } else {
+      setFailed(true);
+    }
+  };
 
   if (failed) {
     return (
@@ -36,7 +59,7 @@ function EventImage({ src, alt }: { src: string; alt: string }): React.JSX.Eleme
     <div className={cn('relative', IMAGE_BOX)}>
       {!loaded && <Skeleton className="absolute inset-0 h-full w-full rounded-none" />}
       <img
-        src={src}
+        src={currentSrc}
         alt={alt}
         loading="lazy"
         className={cn(
@@ -44,7 +67,7 @@ function EventImage({ src, alt }: { src: string; alt: string }): React.JSX.Eleme
           loaded ? 'opacity-100' : 'opacity-0',
         )}
         onLoad={() => setLoaded(true)}
-        onError={() => setFailed(true)}
+        onError={handleError}
       />
     </div>
   );
@@ -82,7 +105,11 @@ function EventCard({
   return (
     <li className="flex flex-col overflow-hidden rounded-none border border-border bg-bg text-fg shadow-xs transition-shadow hover:shadow-md">
       {config.showImages && (
-        <EventImage src={eventImageUrl(event.id, config.apiUrl)} alt={event.title} />
+        <EventImage
+          src={eventImageUrl(event.id, config.apiUrl)}
+          fallbackSrc={config.defaultImageUrl}
+          alt={event.title}
+        />
       )}
 
       <div className="flex flex-1 flex-col gap-2 p-4">
@@ -148,6 +175,16 @@ export function App({ config }: AppProps): React.JSX.Element {
     {
       listId: config.listId,
       ...(config.includePast ? { includePast: 'true' } : {}),
+      ...(config.featured ? { featured: 'true' } : {}),
+      ...(config.congregationId ? { congregationId: config.congregationId } : {}),
+      ...(config.programId ? { programId: config.programId } : {}),
+      ...(config.tierId ? { tierId: config.tierId } : {}),
+      ...(config.signupType ? { signupType: config.signupType } : {}),
+      ...(config.month ? { month: config.month } : {}),
+      ...(config.keyword ? { keyword: config.keyword } : {}),
+      ...(config.maxEvents ? { maxEvents: config.maxEvents } : {}),
+      // No pagination UI: request the max page size and let maxEvents (if set)
+      // cap the total server-side.
       perPage: 100,
     },
     { enabled: hasList },

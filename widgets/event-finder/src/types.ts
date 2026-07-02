@@ -29,11 +29,50 @@ export const EventFinderConfigSchema = z.object({
     .boolean()
     .default(false)
     .describe('Include past events. By default only upcoming events are shown.'),
+  congregationId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Filter to one congregation (MP Congregation ID).'),
+  programId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Filter to one program (MP Program ID).'),
+  tierId: z.string().optional().describe('Filter to one or more Tier IDs, comma-separated.'),
+  featured: z.coerce
+    .boolean()
+    .default(false)
+    .describe('Only show events featured on the calendar.'),
+  signupType: z
+    .enum(['1', '2'])
+    .optional()
+    .describe('Filter by signup kind: "1" = open registration, "2" = volunteer opportunity.'),
+  month: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(12)
+    .optional()
+    .describe('Only show events starting in this month (1-12).'),
+  keyword: z.string().optional().describe('Search event titles and descriptions.'),
+  maxEvents: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Cap the total number of events shown.'),
   detailsLabel: z.string().default('See Details').describe('Text for the details link.'),
   emptyMessage: z
     .string()
     .default('No upcoming events.')
     .describe('Message shown when the list has no events.'),
+  defaultImageUrl: z
+    .string()
+    .optional()
+    .describe('Fallback image URL for events without their own image.'),
   apiUrl: z.string().optional().describe('Override the perimeter-api base URL (advanced).'),
 });
 

@@ -2379,6 +2379,14 @@ export interface operations {
     parameters: {
       query: {
         listId: string;
+        congregationId?: number;
+        programId?: number;
+        tierId?: string;
+        featured?: 'true' | 'false';
+        signupType?: '1' | '2';
+        month?: number;
+        keyword?: string;
+        maxEvents?: number;
         from?: string;
         to?: string;
         includePast?: 'true' | 'false';

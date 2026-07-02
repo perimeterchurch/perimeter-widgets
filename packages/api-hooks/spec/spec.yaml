@@ -1732,6 +1732,70 @@ paths:
             type: string
             pattern: ^\d+(,\d+)*$
             description: One or more Events_List IDs (MP Events_Lists.Events_List_ID), comma-separated, e.g. "18,208".
+        - name: congregationId
+          in: query
+          required: false
+          schema:
+            description: Filter to one congregation (Events.Congregation_ID).
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: programId
+          in: query
+          required: false
+          schema:
+            description: Filter to one program (Events.Program_ID).
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: tierId
+          in: query
+          required: false
+          schema:
+            description: One or more Tier IDs (Events.Tier), comma-separated.
+            type: string
+            pattern: ^\d+(,\d+)*$
+        - name: featured
+          in: query
+          required: false
+          schema:
+            description: When "true", only events Featured_On_Calendar.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: signupType
+          in: query
+          required: false
+          schema:
+            description: 'Filter by signup kind: "1" = open online registration, "2" = active volunteer opportunity.'
+            type: string
+            enum:
+              - '1'
+              - '2'
+        - name: month
+          in: query
+          required: false
+          schema:
+            description: Filter to events whose start month is this (1-12).
+            type: integer
+            minimum: 1
+            maximum: 12
+        - name: keyword
+          in: query
+          required: false
+          schema:
+            description: Case-insensitive search over event title and description.
+            type: string
+            maxLength: 100
+        - name: maxEvents
+          in: query
+          required: false
+          schema:
+            description: Cap the total number of events returned (legacy @MaxEvents).
+            type: integer
+            minimum: 1
+            maximum: 1000
         - name: from
           in: query
           required: false
@@ -1751,7 +1815,7 @@ paths:
           required: false
           schema:
             description:
-              When "true", past events are included. By default (absent/"false") only events starting now or later are
+              When "true", past events are included. By default (absent/"false") only events that have not yet ended are
               returned.
             type: string
             enum:
