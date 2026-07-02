@@ -80,7 +80,7 @@ function EventCard({
     : formatEventDate(event.startDate, event.endDate);
 
   return (
-    <li className="flex flex-col overflow-hidden rounded-lg border border-border bg-bg text-fg shadow-xs transition-shadow hover:shadow-md">
+    <li className="flex flex-col overflow-hidden rounded-none border border-border bg-bg text-fg shadow-xs transition-shadow hover:shadow-md">
       {config.showImages && (
         <EventImage src={eventImageUrl(event.id, config.apiUrl)} alt={event.title} />
       )}
@@ -123,7 +123,7 @@ function LoadingState(): React.JSX.Element {
       {Array.from({ length: 3 }, (_, i) => (
         <li
           key={i}
-          className="flex flex-col gap-2 overflow-hidden rounded-lg border border-border p-4"
+          className="flex flex-col gap-2 overflow-hidden rounded-none border border-border p-4"
         >
           <Skeleton className="h-6 w-3/4" />
           <Skeleton className="h-4 w-1/2" />
