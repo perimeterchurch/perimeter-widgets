@@ -86,7 +86,7 @@ function EventCard({
       )}
 
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="font-serif text-xl leading-snug text-balance">{event.title}</h3>
+        <h3 className="font-sans text-xl leading-snug font-bold text-balance">{event.title}</h3>
         <p className="font-sans text-sm font-medium text-muted-fg">{dateText}</p>
         {event.location && <p className="font-sans text-sm text-muted-fg">{event.location}</p>}
 
@@ -99,11 +99,11 @@ function EventCard({
         )}
 
         {config.showDetails && event.detailsUrl && (
-          <div className="mt-auto pt-3">
+          <div className="mt-auto flex justify-end pt-3">
             <Button
               size="sm"
               nativeButton={false}
-              className="text-white"
+              className="rounded-none text-white"
               render={<a href={event.detailsUrl} />}
             >
               {config.detailsLabel}
