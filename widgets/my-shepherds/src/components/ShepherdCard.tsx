@@ -58,7 +58,7 @@ export function ShepherdCard({ shepherd }: { shepherd: Shepherd }): React.JSX.El
     <Card className="p-6 shadow-md">
       <div className="flex items-center gap-5">
         <img
-          src={Elder_Photo_URL}
+          src={Elder_Photo_URL ?? undefined}
           alt={Elder_Name}
           loading="lazy"
           className="size-24 shrink-0 rounded-full bg-muted object-cover"

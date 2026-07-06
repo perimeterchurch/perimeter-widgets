@@ -26,5 +26,12 @@ export {
   type GivingHistoryItem,
 } from './giving/use-giving-history';
 
+export {
+  useEvents,
+  type UseEventsParams,
+  type UseEventsResponse,
+  type EventListItem,
+} from './events/use-events';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';

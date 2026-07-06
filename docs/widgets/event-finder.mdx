@@ -1,0 +1,55 @@
+# event-finder
+
+A responsive grid of upcoming events pulled from one or more Ministry Platform
+**Events Lists**. Each card shows the title, date/time, location, an optional
+image and description, and an optional "See Details" link. Rebuild of the legacy
+`reactwidgets` EventFinder (which called the `api_custom_Event_Finder` stored
+proc) on the perimeter-api backend.
+
+Events are filtered to the configured list(s) and, by default, to **upcoming**
+events only (sorted by start date). Set `data-include-past` to show past events.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="event-finder" data-list-id="18,208"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/widget.tsx` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute               | Type    | Default               | Description                                                                |
+| ----------------------- | ------- | --------------------- | -------------------------------------------------------------------------- |
+| `data-list-id`          | string  | —                     | One or more MP Events List IDs, comma-separated (e.g. `18,208`). Required. |
+| `data-show-images`      | boolean | `false`               | Show each event's image (falls back to a placeholder when none).           |
+| `data-show-details`     | boolean | `true`                | Show the "See Details" link (only when the event has one).                 |
+| `data-show-description` | boolean | `false`               | Show the event description (rendered as HTML from MP).                      |
+| `data-alt-date`         | boolean | `false`               | Use the compact date format (weekday, month day, time).                    |
+| `data-include-past`     | boolean | `false`               | Include past events (default shows upcoming only).                         |
+| `data-congregation-id`  | number  | —                     | Filter to one congregation (MP Congregation ID).                           |
+| `data-program-id`       | number  | —                     | Filter to one program (MP Program ID).                                     |
+| `data-tier-id`          | string  | —                     | Filter to one or more Tier IDs, comma-separated.                           |
+| `data-featured`         | boolean | `false`               | Only show events featured on the calendar.                                 |
+| `data-signup-type`      | `1`\|`2`| —                     | `1` = open online registration, `2` = active volunteer opportunity.        |
+| `data-month`            | number  | —                     | Only show events starting in this month (1-12).                            |
+| `data-keyword`          | string  | —                     | Search event titles and descriptions.                                      |
+| `data-max-events`       | number  | —                     | Cap the total number of events shown.                                      |
+| `data-details-label`    | string  | `See Details`         | Text for the details link.                                                 |
+| `data-empty-message`    | string  | `No upcoming events.` | Message shown when the list has no events.                                 |
+| `data-default-image-url`| string  | —                     | Fallback image URL for events without their own image.                     |
+| `data-api-url`          | string  | —                     | Override the perimeter-api base URL (advanced).                            |
+
+Beyond these filters, the endpoint always restricts to **public** (`Visibility_Level_ID = 4`), non-cancelled events, and — unless `data-include-past` is set — events that have not yet ended.
+
+> **Not ported:** the legacy `@ShowFullSeries` param (collapse a recurring series to its first upcoming event) is not available — it relied on MP's `dp_Sequence_Records` table, which the REST layer does not expose. Tracked as a follow-up requiring a direct-DB path in perimeter-api.
+
+## Data source
+
+`GET /api/events?listId=…` (perimeter-api). The endpoint resolves events from the
+`Events_Lists_Events` join table, then reads the `Events` records with their
+location and detail-type. Images are served from `GET /api/event-image/{id}`
+(the event's default MP image).
