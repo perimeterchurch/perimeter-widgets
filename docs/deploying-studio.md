@@ -18,7 +18,7 @@ The widgets-cdn gotchas about Root Directory and the "Include files outside the 
 
 ## Build settings (these are DASHBOARD-ONLY for a monorepo subpackage)
 
-`vercel.json` **cannot** express Root Directory, Build Command, Output Directory, or Install Command for a subpackage of a Turbo monorepo — those four are project settings configured in the Vercel dashboard (or via the CLI's project config), not in a committed file. `studio/vercel.json` only carries the SPA-fallback rewrite (see below). So you **must** set the following in the dashboard:
+`vercel.json` **cannot** express Root Directory, Build Command, Output Directory, or Install Command for a subpackage of a Turbo monorepo — those four are project settings configured in the Vercel dashboard (or via the CLI's project config), not in a committed file. The repo-root `vercel.json` only carries the SPA-fallback rewrite (see below). So you **must** set the following in the dashboard:
 
 | Setting | Value | Why |
 | --- | --- | --- |
@@ -30,7 +30,9 @@ The widgets-cdn gotchas about Root Directory and the "Include files outside the 
 
 > **"Include files outside the Root Directory in the Build Step" is moot here** — when Root Directory = repo root there are no files "outside" it, so the toggle doesn't matter. (Contrast the CDN, where Root Directory = `cdn` and that toggle must be **off**.)
 
-### `studio/vercel.json` (committed — SPA fallback only)
+### Repo-root `vercel.json` (committed — SPA fallback only)
+
+> **Why the repo root, not `studio/`:** Vercel reads `vercel.json` from the project's **Root Directory**. This project's Root Directory is the repo root, so a `studio/vercel.json` is silently ignored — deep links 404 in production even though the file is committed (this happened on the first real deploy). The cdn project is unaffected: its Root Directory is `cdn`, so it reads only `cdn/vercel.json`.
 
 ```json
 {
