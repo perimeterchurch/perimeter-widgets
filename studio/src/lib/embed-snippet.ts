@@ -27,7 +27,13 @@ export function serializeWidgetAttrs(
   for (const key of Object.keys(overrides).sort()) {
     const value = overrides[key];
     if (value === undefined || value === null || value === '') continue;
-    attrs.push(`data-${camelToKebab(key)}="${escapeAttribute(String(value))}"`);
+    // ConfigPanel only emits primitives; JSON-encode anything else rather than
+    // letting Object's default stringification leak "[object Object]".
+    const text =
+      typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+        ? String(value)
+        : JSON.stringify(value);
+    attrs.push(`data-${camelToKebab(key)}="${escapeAttribute(text)}"`);
   }
   if (theme === 'dark') attrs.push('data-theme="dark"');
   return attrs.join(' ');
