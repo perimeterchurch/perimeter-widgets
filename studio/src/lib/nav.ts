@@ -28,6 +28,10 @@ export function buildNav(
 ): NavGroup[] {
   return [
     {
+      label: 'Catalog',
+      items: [{ to: '/catalog', label: 'Widget catalog' }],
+    },
+    {
       label: 'Widgets',
       items: widgets.map((w) => ({ to: `/widgets/${w.slug}`, label: w.slug })),
     },
