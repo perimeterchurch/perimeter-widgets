@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in — Perimeter</title>
+    <style>
+      body {
+        margin: 0;
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        background: #fafafa;
+        color: #1f2937;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+      }
+      main {
+        text-align: center;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+      }
+      p {
+        font-size: 0.875rem;
+      }
+      a {
+        color: #2563eb;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Perimeter sign-in</h1>
+      <mpp-user-login></mpp-user-login>
+      <p id="mp-fallback" hidden>
+        The sign-in widget couldn&rsquo;t load.
+        <a href="https://www.perimeter.org/my-perimeter/">Sign in at perimeter.org</a> instead.
+      </p>
+      <p id="mp-done" hidden>You&rsquo;re signed in &mdash; you can close this window.</p>
+    </main>
+    <!-- The MP widget loader. MUST be a plain blocking script with this exact id:
+         MPWidgets.js bootstraps exclusively from DOMContentLoaded (no readyState
+         fallback) and resolves its app root from getElementById('MPWidgets').src.
+         `async` would let DOMContentLoaded fire before evaluation — dead widget.
+         Placed at the END of body (still evaluates before DOMContentLoaded) so
+         the onerror fallback's #mp-fallback target is guaranteed to exist — in
+         <head>, the error task can fire before the body is parsed. -->
+    <script
+      id="MPWidgets"
+      src="https://ministryplatform.perimeter.org/widgets/dist/MPWidgets.js"
+      onerror="document.getElementById('mp-fallback').hidden = false"
+    ></script>
+    <script>
+      // After the OAuth round-trip MP redirects back here with ?cacheKey=<guid>;
+      // MPWidgets exchanges it and writes mpp-widgets_AuthToken to localStorage.
+      // Poll for the token (250ms, ~10s cap) and self-close; if the browser
+      // refuses window.close(), show the "you can close this" line instead.
+      (function () {
+        if (!/[?&]cacheKey=/.test(window.location.search)) return;
+        var tries = 0;
+        var timer = setInterval(function () {
+          tries += 1;
+          var token = null;
+          try {
+            token = window.localStorage.getItem('mpp-widgets_AuthToken');
+          } catch (e) {
+            /* storage blocked — fall through to the cap */
+          }
+          if (token && token !== 'null') {
+            clearInterval(timer);
+            window.close();
+            document.getElementById('mp-done').hidden = false;
+          } else if (tries >= 40) {
+            clearInterval(timer);
+          }
+        }, 250);
+      })();
+    </script>
+  </body>
+</html>
