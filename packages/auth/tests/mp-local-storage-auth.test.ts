@@ -52,6 +52,26 @@ describe('MPLocalStorageAuth', () => {
     expect(auth.isAuthenticated()).toBe(false);
   });
 
+  // MPWidgets itself writes ExpiresAfter via String(new Date(...)) — the native
+  // Date.prototype.toString() format (e.g. "Wed Jul 09 2026 12:00:00 GMT-0400
+  // (Eastern Daylight Time)"), NOT ISO. Date.parse accepts it in every engine
+  // we target — pin that so it can never silently regress.
+  it("accepts MPWidgets' native Date.toString() ExpiresAfter format", () => {
+    const future = new Date(Date.now() + 3_600_000).toString(); // e.g. "Wed Jul 09 2026 …"
+    localStorage.setItem(TOKEN_KEY, 'tok');
+    localStorage.setItem(EXP_KEY, future);
+    const auth = new MPLocalStorageAuth();
+    expect(auth.getToken()).toBe('tok');
+  });
+
+  it('treats an expired native-format ExpiresAfter as signed out', () => {
+    const past = new Date(Date.now() - 3_600_000).toString();
+    localStorage.setItem(TOKEN_KEY, 'tok');
+    localStorage.setItem(EXP_KEY, past);
+    const auth = new MPLocalStorageAuth();
+    expect(auth.getToken()).toBeNull();
+  });
+
   it('treats an unparseable expiry as expired, not valid forever', () => {
     localStorage.setItem(TOKEN_KEY, 'abc');
     localStorage.setItem(EXP_KEY, 'not-a-date');
