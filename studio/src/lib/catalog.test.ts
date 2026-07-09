@@ -55,7 +55,9 @@ describe('useCatalog', () => {
     stubManifest({ 'my-shepherds': '0.1.0', ghost: '9.9.9', example: '0.0.1' });
     const { result } = renderHook(() => useCatalog());
     expect(result.current.isLoading).toBe(true);
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    // First real widget-module import goes through vitest's transform pipeline;
+    // under a fully parallel workspace run that can exceed the 1s default.
+    await waitFor(() => expect(result.current.isLoading).toBe(false), { timeout: 10_000 });
     expect(result.current.error).toBeNull();
     const slugs = result.current.entries.map((e) => e.slug);
     expect(slugs).toEqual(['ghost', 'my-shepherds']); // example filtered, sorted
