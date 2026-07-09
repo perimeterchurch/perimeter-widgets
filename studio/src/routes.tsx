@@ -7,6 +7,8 @@ import { ComponentPage } from './pages/ComponentPage';
 import { TokensPage } from './pages/TokensPage';
 import { GuidePage } from './pages/GuidePage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { CatalogPage } from './pages/CatalogPage';
+import { CatalogWidgetPage } from './pages/CatalogWidgetPage';
 
 /**
  * Single source of truth for the studio's routes. The persistent shell (Layout)
@@ -28,6 +30,8 @@ export const router = createBrowserRouter([
       { path: 'components/:name', element: <ComponentPage /> },
       { path: 'tokens', element: <TokensPage /> },
       { path: 'guides/:slug', element: <GuidePage /> },
+      { path: 'catalog', element: <CatalogPage /> },
+      { path: 'catalog/:slug', element: <CatalogWidgetPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

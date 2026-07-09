@@ -71,7 +71,11 @@ describe('useCatalog', () => {
     stubManifest({ 'my-shepherds': '0.1.0' });
     act(() => result.current.retry());
     await waitFor(() => expect(result.current.error).toBeNull());
-    expect(result.current.entries.map((e) => e.slug)).toEqual(['my-shepherds']);
+    // error clears synchronously on retry, but entries fill only after the
+    // async fetch/definition chain settles — wait for them too (deflake).
+    await waitFor(() =>
+      expect(result.current.entries.map((e) => e.slug)).toEqual(['my-shepherds']),
+    );
   });
 
   it('treats a non-ok response as an error', async () => {
