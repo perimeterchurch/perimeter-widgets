@@ -60,17 +60,24 @@ test.describe('sermons responsive overhaul', () => {
   });
 
   test('studio presets yield realistic widget widths (HostFrame gutter ramp)', async ({ page }) => {
+    // Poll each preset's full width BAND as one predicate. The width starts at
+    // ~796 (fluid/desktop), so a lower-bound-only poll is satisfied BEFORE the
+    // preset click applies, and the one-shot upper bound then raced the resize
+    // (observed under full-suite load: 'mobile container' read 796).
+    const widthInBand = (lo: number, hi: number) => async () => {
+      const w = (await widgetState(page)).containerWidth;
+      return w >= lo && w < hi;
+    };
+
     await selectPreset(page, 'Mobile');
     await expect
-      .poll(async () => (await widgetState(page)).containerWidth, { timeout: 10_000 })
-      .toBeGreaterThan(320);
-    expect((await widgetState(page)).containerWidth, 'mobile container').toBeLessThan(480);
+      .poll(widthInBand(321, 480), { message: 'mobile container in [321, 480)', timeout: 10_000 })
+      .toBe(true);
 
     await selectPreset(page, 'Tablet');
     await expect
-      .poll(async () => (await widgetState(page)).containerWidth, { timeout: 10_000 })
-      .toBeGreaterThanOrEqual(480);
-    expect((await widgetState(page)).containerWidth, 'tablet container').toBeLessThan(768);
+      .poll(widthInBand(480, 768), { message: 'tablet container in [480, 768)', timeout: 10_000 })
+      .toBe(true);
 
     await selectPreset(page, 'Desktop');
     await expect
@@ -106,18 +113,25 @@ test.describe('sermons responsive overhaul', () => {
       .toBe(true);
     await expect.poll(async () => (await widgetState(page)).gridCols, { timeout: 10_000 }).toBe(2);
     // The breakpoint hook re-renders the filter row a beat after the grid
-    // settles (ResizeObserver tick) — poll the combobox presence too, then take
-    // ONE settled snapshot for the remaining assertions (flaked at baseline as
-    // a one-shot read under parallel suite load).
+    // settles (ResizeObserver tick), and the preview can transiently REMOUNT
+    // after that (observed under full-suite load: toolbarText polled to
+    // 'Sort by: …' and then read '' again at a one-shot snapshot). Poll the
+    // whole settled state as ONE atomic predicate — any transient remount just
+    // retries; the diagnostic string names whichever check was still unsettled.
     await expect
-      .poll(async () => (await widgetState(page)).hasMultiCombobox, { timeout: 10_000 })
-      .toBe(true);
-    const s = await widgetState(page);
-
-    expect(s.overflow, 'no overflow on tablet').toBe(false);
-    expect(s.hasFiltersToggle, 'no Filters toggle on tablet (inline)').toBe(false);
-    expect(s.toolbarText, 'full Sort label on tablet').toContain('Sort by:');
-    expect(s.toolbarText, 'full View label on tablet').toContain('View:');
+      .poll(
+        async () => {
+          const s = await widgetState(page);
+          if (!s.hasMultiCombobox) return 'filter dropdowns (multi-combobox) absent';
+          if (s.overflow) return `horizontal overflow at width ${s.containerWidth}`;
+          if (s.hasFiltersToggle) return 'Filters toggle present (filters should be inline)';
+          if (!s.toolbarText.includes('Sort by:')) return `toolbar: "${s.toolbarText}"`;
+          if (!s.toolbarText.includes('View:')) return `toolbar: "${s.toolbarText}"`;
+          return 'settled';
+        },
+        { message: 'tablet layout settled', timeout: 10_000 },
+      )
+      .toBe('settled');
   });
 
   test('desktop: 3-col grid, no overflow', async ({ page }) => {

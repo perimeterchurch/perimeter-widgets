@@ -3,6 +3,8 @@ import { defineConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import tailwindcss from '@tailwindcss/postcss';
 import { remToPxPlugin } from '@perimeter/vite-plugin-widget';
 import { devServerProxy } from './src/dev-proxy';
@@ -24,7 +26,15 @@ export default defineConfig({
   plugins: [
     // MDX must run BEFORE @vitejs/plugin-react so JSX in `.mdx` is emitted as JS
     // that the React transform can then pick up (enforce: 'pre').
-    { enforce: 'pre', ...mdx({ providerImportSource: '@mdx-js/react' }) },
+    // Frontmatter: strip `---` blocks from rendered output and expose them as a
+    // `frontmatter` named export (catalog card descriptions read it).
+    {
+      enforce: 'pre',
+      ...mdx({
+        providerImportSource: '@mdx-js/react',
+        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+      }),
+    },
     // include MDX/MD so the React transform + Fast Refresh apply to MDX-emitted JS;
     // the bare react() will not handle MDX-emitted JS.
     react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
@@ -51,5 +61,11 @@ export default defineConfig({
   // `test` block here, so its default include (`**/*.{test,spec}.tsx?`) WOULD
   // collect those Playwright specs and fail (no browser, wrong runner). Exclude
   // the whole `visual/` tree from the vitest run; it is driven by `pnpm visual`.
-  test: { exclude: [...configDefaults.exclude, 'visual/**'] },
+  test: {
+    exclude: [...configDefaults.exclude, 'visual/**'],
+    // Node's experimental webstorage global would otherwise shadow happy-dom's
+    // localStorage with undefined (same fix as packages/auth/vitest.config.ts) —
+    // MpLoginPanel's MPLocalStorageAuth reads localStorage in tests.
+    execArgv: ['--no-experimental-webstorage'],
+  },
 });

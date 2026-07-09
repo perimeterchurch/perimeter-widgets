@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.1",
+    "@perimeter/auth": "workspace:*",
     "@perimeter/theme": "workspace:*",
     "@perimeter/ui": "workspace:*",
     "@perimeter/widget-runtime": "workspace:*",
@@ -36,6 +37,8 @@
     "@vitejs/plugin-react": "^4.3.4",
     "happy-dom": "^15.11.7",
     "postcss": "^8.5.1",
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx-frontmatter": "^5.2.0",
     "tailwindcss": "^4.1.0",
     "tw-animate-css": "^1.3.0",
     "typescript": "^5.7.3",

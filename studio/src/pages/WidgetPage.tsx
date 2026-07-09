@@ -47,64 +47,72 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
   const previewTheme = state.theme ?? chromeTheme;
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
-        <div>
-          <Breadcrumbs
-            crumbs={[
-              { label: 'Home', to: '/' },
-              { label: 'Widgets' },
-              { label: titleFromSlug(entry.slug) },
-            ]}
-          />
-          <h1 className="mt-1 text-xl font-semibold tracking-tight text-fg">
-            {titleFromSlug(entry.slug)}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Share / standalone — copy a deep link carrying the current preview
+    // Fragment, not one h-full column: `main` (the Layout scroll region) has a
+    // definite height, so the first child's h-full fills exactly one viewport of
+    // it (header + canvas) and the doc section flows BELOW, reachable by
+    // scrolling `main`. Putting the section inside the h-full column starved the
+    // canvas instead — a doc taller than the viewport can't shrink below its
+    // content (min-height:auto), so the flex-1 min-h-0 canvas collapsed to 0px.
+    <>
+      <div className="flex h-full flex-col">
+        <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
+          <div>
+            <Breadcrumbs
+              crumbs={[
+                { label: 'Home', to: '/' },
+                { label: 'Widgets' },
+                { label: titleFromSlug(entry.slug) },
+              ]}
+            />
+            <h1 className="mt-1 text-xl font-semibold tracking-tight text-fg">
+              {titleFromSlug(entry.slug)}
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Share / standalone — copy a deep link carrying the current preview
               state, or open the full-bleed /preview/:slug route in a new tab. */}
-          <ShareLinkButton
-            copyUrl={() => buildShareUrl(window.location.pathname)}
-            standaloneUrl={buildShareUrl(`/preview/${entry.slug}`)}
-          />
-          {/* Inspector — hand-rolled slide-out drawer (Config / Theme / Info tabs +
+            <ShareLinkButton
+              copyUrl={() => buildShareUrl(window.location.pathname)}
+              standaloneUrl={buildShareUrl(`/preview/${entry.slug}`)}
+            />
+            {/* Inspector — hand-rolled slide-out drawer (Config / Theme / Info tabs +
               embed snippet), closed by default. Its toggle lives in the header; the
               canvas keeps the full width when the drawer is closed. */}
-          <InspectorDrawer
-            definition={def}
-            slug={entry.slug}
-            configOverrides={state.config}
-            tokenOverrides={state.tokens}
-            onConfigChange={setConfig}
-            onThemeChange={setTokens}
-          />
-        </div>
-      </header>
+            <InspectorDrawer
+              definition={def}
+              slug={entry.slug}
+              configOverrides={state.config}
+              tokenOverrides={state.tokens}
+              onConfigChange={setConfig}
+              onThemeChange={setTokens}
+            />
+          </div>
+        </header>
 
-      <div className="min-h-0 flex-1 overflow-hidden">
-        {/* Preview canvas — viewport-preset + background + light/dark toolbar around
+        <div className="min-h-0 flex-1 overflow-hidden">
+          {/* Preview canvas — viewport-preset + background + light/dark toolbar around
             the real mount(). Canvas owns the scroll/background and swaps in the
             host-page sim (HostFrame) when its host-sim background is selected
             (the default). Theme + viewport are lifted into the URL here so they
             drive both the toolbar controls and the shareable preview link. */}
-        <Canvas
-          slug={entry.slug}
-          theme={previewTheme}
-          onThemeChange={setTheme}
-          viewport={state.viewport}
-          onViewportChange={setViewport}
-          background={state.background}
-          onBackgroundChange={setBackground}
-        >
-          <WidgetPreview
-            entry={entry}
-            configOverrides={state.config}
-            tokenOverrides={state.tokens}
+          <Canvas
+            slug={entry.slug}
             theme={previewTheme}
-            onDefinition={setDef}
-          />
-        </Canvas>
+            onThemeChange={setTheme}
+            viewport={state.viewport}
+            onViewportChange={setViewport}
+            background={state.background}
+            onBackgroundChange={setBackground}
+          >
+            <WidgetPreview
+              entry={entry}
+              configOverrides={state.config}
+              tokenOverrides={state.tokens}
+              theme={previewTheme}
+              onDefinition={setDef}
+            />
+          </Canvas>
+        </div>
       </div>
 
       {/* Optional widget doc: rendered below the canvas when docs/widgets/<slug>.mdx
@@ -114,7 +122,7 @@ function WidgetView({ entry }: { entry: WidgetEntry }) {
           <WidgetDoc loader={doc} />
         </section>
       ) : null}
-    </div>
+    </>
   );
 }
 
