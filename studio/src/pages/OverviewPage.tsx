@@ -9,6 +9,7 @@ import {
   componentGlob,
 } from '../lib/discovery';
 import { titleFromSlug } from '../lib/labels';
+import { useCatalog } from '../lib/catalog';
 
 interface OverviewItem {
   to: string;
@@ -65,12 +66,17 @@ function SectionCard({
  * from the same discovery globs the sidebar uses — never hard-coded.
  */
 export function OverviewPage() {
+  // Released widgets get the catalog viewer as their canonical page (same rule
+  // as the sidebar); unreleased ones only exist as source previews.
+  const { entries } = useCatalog();
+  const released = useMemo(() => new Set(entries.map((e) => e.slug)), [entries]);
+
   const { widgets, components } = useMemo(() => {
     const w = toWidgetEntries(widgetDefGlob, widgetCssGlob);
     const c = toComponentEntries(componentGlob);
     return {
       widgets: w.map((x) => ({
-        to: `/widgets/${x.slug}`,
+        to: released.has(x.slug) ? `/catalog/${x.slug}` : `/widgets/${x.slug}`,
         title: titleFromSlug(x.slug),
         slug: x.slug,
       })),
@@ -80,7 +86,7 @@ export function OverviewPage() {
         slug: x.name,
       })),
     };
-  }, []);
+  }, [released]);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">

@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar';
 import { ErrorBoundary } from './ErrorBoundary';
 import { buildNav } from '../lib/nav';
 import { listGuides } from '../lib/guide-docs';
+import { useCatalog } from '../lib/catalog';
 import {
   toWidgetEntries,
   toComponentEntries,
@@ -17,17 +18,29 @@ import {
  * fed by the matched route via <Outlet/>. The inspector (config/theme) is NOT here —
  * it lives inside the widget route, since only widget pages have config/theme.
  *
+ * The sidebar's Catalog group is the canonical widget list, so it is fed by the
+ * runtime catalog (live CDN manifest ∩ definitions) rather than raw discovery:
+ * released widgets link to /catalog/<slug> with an auth lock where sign-in is
+ * required. Until the manifest resolves, buildNav falls back to the single
+ * catalog landing link. The source-preview pages keep a nav group only in local
+ * dev — deployed visitors reach them through each catalog page's docs link.
+ *
  * Below `lg` the grid collapses to a single column and the Sidebar becomes an
  * off-canvas drawer (it manages its own toggle), so content gets full width.
  */
 export function Layout() {
-  // Discovery is module-level/stable for the app's lifetime; memoize once.
+  const { entries } = useCatalog();
+
   const nav = useMemo(() => {
-    const widgets = toWidgetEntries(widgetDefGlob, widgetCssGlob);
+    const catalog = entries.map((e) => ({
+      slug: e.slug,
+      authRequired: e.definition?.auth === 'required',
+    }));
     const components = toComponentEntries(componentGlob);
     const guides = listGuides().map((g) => ({ slug: g.slug, label: g.title }));
-    return buildNav(widgets, components, guides);
-  }, []);
+    const devWidgets = import.meta.env.DEV ? toWidgetEntries(widgetDefGlob, widgetCssGlob) : null;
+    return buildNav(catalog, components, guides, devWidgets);
+  }, [entries]);
 
   return (
     <div className="grid h-screen grid-cols-1 bg-bg font-sans text-fg lg:grid-cols-[16rem_1fr]">
