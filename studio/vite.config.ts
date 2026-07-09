@@ -61,5 +61,11 @@ export default defineConfig({
   // `test` block here, so its default include (`**/*.{test,spec}.tsx?`) WOULD
   // collect those Playwright specs and fail (no browser, wrong runner). Exclude
   // the whole `visual/` tree from the vitest run; it is driven by `pnpm visual`.
-  test: { exclude: [...configDefaults.exclude, 'visual/**'] },
+  test: {
+    exclude: [...configDefaults.exclude, 'visual/**'],
+    // Node's experimental webstorage global would otherwise shadow happy-dom's
+    // localStorage with undefined (same fix as packages/auth/vitest.config.ts) —
+    // MpLoginPanel's MPLocalStorageAuth reads localStorage in tests.
+    execArgv: ['--no-experimental-webstorage'],
+  },
 });

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.1",
+    "@perimeter/auth": "workspace:*",
     "@perimeter/theme": "workspace:*",
     "@perimeter/ui": "workspace:*",
     "@perimeter/widget-runtime": "workspace:*",

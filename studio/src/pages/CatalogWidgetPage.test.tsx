@@ -58,4 +58,19 @@ describe('CatalogWidgetPage', () => {
     await ui.findByTitle('Live widget: ghost');
     expect(container.querySelector('[data-testid="config-playground"]')).toBeNull();
   });
+
+  it('shows the sign-in panel for an auth-required widget', async () => {
+    stubManifest({ 'my-shepherds': '0.1.0' });
+    const { container } = renderAt('my-shepherds');
+    const ui = within(container);
+    const region = await ui.findByRole('region', { name: /sign-in status/i });
+    expect(region.textContent).toMatch(/requires a signed-in perimeter account/i);
+  });
+
+  it('shows no sign-in panel for an anonymous widget', async () => {
+    stubManifest({ sermons: '1.4.2' });
+    const { container } = renderAt('sermons');
+    await within(container).findByTitle('Live widget: sermons');
+    expect(within(container).queryByRole('region', { name: /sign-in status/i })).toBeNull();
+  });
 });

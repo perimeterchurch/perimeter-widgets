@@ -7,6 +7,7 @@ import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import { useCatalog, type CatalogEntry } from '../lib/catalog';
 import { buildEmbedSnippet, type PreviewTheme } from '../lib/embed-snippet';
 import { CdnBundlePreview } from '../components/CdnBundlePreview';
+import { MpLoginPanel } from '../components/MpLoginPanel';
 import { ConfigPanel } from '../components/ConfigPanel';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { useChromeTheme } from '../lib/use-chrome-theme';
@@ -77,8 +78,9 @@ function ViewerView({ entry }: { entry: CatalogEntry }) {
         {entry.description && <p className="mt-1 text-sm text-muted-fg">{entry.description}</p>}
       </header>
 
-      {/* Sign-in panel slot — Chunk 3 (MpLoginPanel) replaces this null. */}
-      {null}
+      {entry.definition && entry.definition.auth !== 'none' && (
+        <MpLoginPanel mode={entry.definition.auth} />
+      )}
 
       <CdnBundlePreview slug={entry.slug} overrides={overrides} theme={theme} />
 

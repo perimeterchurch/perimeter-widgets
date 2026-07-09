@@ -359,6 +359,9 @@ importers:
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.2.15)(react@19.2.6)
+      '@perimeter/auth':
+        specifier: workspace:*
+        version: link:../packages/auth
       '@perimeter/theme':
         specifier: workspace:*
         version: link:../packages/theme
