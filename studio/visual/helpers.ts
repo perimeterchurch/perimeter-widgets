@@ -1,6 +1,12 @@
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import type { Page, Route } from '@playwright/test';
 import { sermonsResponse, seriesResponse, facetResponse } from './fixtures/sermons';
+
+// studio is `"type": "module"` — Playwright loads this file as ESM, so
+// `__dirname` does not exist (it would kill the WHOLE visual suite at load).
+const CDN_DIR = fileURLToPath(new URL('../../cdn', import.meta.url));
 
 export const STUDIO_URL = 'http://localhost:5173';
 export const PREVIEW_HOST = '[data-perimeter-widget-preview]';
@@ -10,6 +16,49 @@ const TINY_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
   'base64',
 );
+
+/**
+ * Serve the CDN hermetically from the committed cdn/ directory: a PINNED
+ * fixture manifest (fake versions — card text never churns with releases)
+ * with loader.js and each bundle read from disk. Register before page.goto.
+ */
+export async function mockCdn(page: Page): Promise<void> {
+  const realManifest = JSON.parse(
+    readFileSync(path.join(CDN_DIR, 'manifest.json'), 'utf8'),
+  ) as Record<string, string>;
+  const fixtureManifest = { sermons: '9.9.9', 'my-shepherds': '9.9.8' };
+  await page.route('https://widgets.perimeter.org/**', async (route: Route) => {
+    const { pathname } = new URL(route.request().url());
+    if (pathname === '/manifest.json') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(fixtureManifest),
+      });
+    }
+    if (pathname === '/loader.js') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'text/javascript',
+        body: readFileSync(path.join(CDN_DIR, 'loader.js'), 'utf8'),
+      });
+    }
+    // /<slug>/9.9.x/index.js → serve the committed current bundle for that slug.
+    const match = /^\/([^/]+)\/[^/]+\/index\.js$/.exec(pathname);
+    if (match) {
+      const slug = match[1]!;
+      const version = realManifest[slug];
+      if (version) {
+        return route.fulfill({
+          status: 200,
+          contentType: 'text/javascript',
+          body: readFileSync(path.join(CDN_DIR, slug, version, 'index.js'), 'utf8'),
+        });
+      }
+    }
+    return route.fulfill({ status: 404, body: 'not mocked' });
+  });
+}
 
 /**
  * Route-mock the sermons API so the widget renders WITHOUT a running
