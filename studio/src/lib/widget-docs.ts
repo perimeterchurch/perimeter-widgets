@@ -1,6 +1,11 @@
 import type { ComponentType } from 'react';
 
-type DocLoader = () => Promise<{ default: ComponentType }>;
+interface DocModule {
+  default: ComponentType;
+  /** Exposed by remark-mdx-frontmatter; absent for docs without frontmatter. */
+  frontmatter?: { description?: string };
+}
+type DocLoader = () => Promise<DocModule>;
 
 // Optional per-widget MDX docs, single-sourced under `docs/widgets/<slug>.mdx`. The
 // glob is LAZY (eager:false) so each doc is a separate async chunk — WidgetPage
@@ -27,4 +32,16 @@ const docsBySlug: Record<string, DocLoader> = Object.fromEntries(
  */
 export function widgetDoc(slug: string): DocLoader | null {
   return docsBySlug[slug] ?? null;
+}
+
+/**
+ * The widget doc's `description:` frontmatter, or null when the widget has no
+ * doc or the doc has no description. Loads the MDX chunk (small; catalog cards
+ * are the only consumer).
+ */
+export async function widgetDescription(slug: string): Promise<string | null> {
+  const load = docsBySlug[slug];
+  if (!load) return null;
+  const mod = await load();
+  return mod.frontmatter?.description ?? null;
 }
