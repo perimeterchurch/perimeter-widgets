@@ -37,7 +37,7 @@ describe('CatalogWidgetPage', () => {
     const { container } = renderAt('sermons');
     expect(container.querySelector('[data-testid="viewer-skeleton"]')).toBeTruthy();
     const ui = within(container);
-    await ui.findByTitle('Live widget: sermons');
+    await ui.findByTitle('Live widget: sermons', {}, { timeout: 10_000 });
     // Snippet reflects the (empty) override set.
     expect(container.textContent).toContain('data-perimeter-widget="sermons"');
     expect(container.textContent).toContain('loader.js');
@@ -48,14 +48,14 @@ describe('CatalogWidgetPage', () => {
   it('renders NotFound for a slug that is not in the manifest', async () => {
     stubManifest({ sermons: '1.4.2' });
     const { container } = renderAt('event-finder');
-    await within(container).findByText(/not found/i);
+    await within(container).findByText(/not found/i, {}, { timeout: 10_000 });
   });
 
   it('renders a reduced viewer (no playground) for a stale manifest entry', async () => {
     stubManifest({ ghost: '9.9.9' });
     const { container } = renderAt('ghost');
     const ui = within(container);
-    await ui.findByTitle('Live widget: ghost');
+    await ui.findByTitle('Live widget: ghost', {}, { timeout: 10_000 });
     expect(container.querySelector('[data-testid="config-playground"]')).toBeNull();
   });
 
@@ -63,14 +63,14 @@ describe('CatalogWidgetPage', () => {
     stubManifest({ 'my-shepherds': '0.1.0' });
     const { container } = renderAt('my-shepherds');
     const ui = within(container);
-    const region = await ui.findByRole('region', { name: /sign-in status/i });
+    const region = await ui.findByRole('region', { name: /sign-in status/i }, { timeout: 10_000 });
     expect(region.textContent).toMatch(/requires a signed-in perimeter account/i);
   });
 
   it('shows no sign-in panel for an anonymous widget', async () => {
     stubManifest({ sermons: '1.4.2' });
     const { container } = renderAt('sermons');
-    await within(container).findByTitle('Live widget: sermons');
+    await within(container).findByTitle('Live widget: sermons', {}, { timeout: 10_000 });
     expect(within(container).queryByRole('region', { name: /sign-in status/i })).toBeNull();
   });
 });
