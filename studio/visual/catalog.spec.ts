@@ -6,9 +6,17 @@ test.describe('catalog', () => {
   test('landing lists released widgets with auth badges (axe clean)', async ({ page }) => {
     await mockCdn(page);
     await page.goto(`${STUDIO_URL}/catalog`);
-    await expect(page.getByRole('link', { name: /sermons/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /my shepherds/i })).toBeVisible();
-    await expect(page.getByText('Sign-in required')).toBeVisible();
+    // Scope to the content region: the sidebar's Catalog group now lists the
+    // same widgets (with an sr-only "Sign-in required"), so page-wide queries
+    // would resolve to two elements and trip strict mode.
+    const main = page.getByRole('main');
+    await expect(main.getByRole('link', { name: /sermons/i })).toBeVisible();
+    await expect(main.getByRole('link', { name: /my shepherds/i })).toBeVisible();
+    await expect(main.getByText('Sign-in required')).toBeVisible();
+    // The sidebar carries the canonical widget list + lock indicator too —
+    // asserting it also settles the nav before the full-page capture.
+    const sidebar = page.locator('#studio-sidebar');
+    await expect(sidebar.getByRole('link', { name: /my shepherds/i })).toBeVisible();
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
     // The pinned fixture manifest (9.9.9/9.9.8) exists exactly so this baseline
