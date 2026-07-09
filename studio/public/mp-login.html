@@ -58,8 +58,19 @@
       // MPWidgets exchanges it and writes mpp-widgets_AuthToken to localStorage.
       // Poll for the token (250ms, ~10s cap) and self-close; if the browser
       // refuses window.close(), show the "you can close this" line instead.
+      // The token is snapshotted at page load: a stale token string from a
+      // prior session can linger in storage (expiry never clears it — see
+      // MPLocalStorageAuth.getToken), so "any token exists" would close the
+      // popup before MPWidgets' cacheKey exchange writes the fresh one. Only
+      // a token that CHANGED from the load-time snapshot counts as success.
       (function () {
         if (!/[?&]cacheKey=/.test(window.location.search)) return;
+        var initial = null;
+        try {
+          initial = window.localStorage.getItem('mpp-widgets_AuthToken');
+        } catch (e) {
+          /* storage blocked — the poll below hits the same cap */
+        }
         var tries = 0;
         var timer = setInterval(function () {
           tries += 1;
@@ -69,7 +80,7 @@
           } catch (e) {
             /* storage blocked — fall through to the cap */
           }
-          if (token && token !== 'null') {
+          if (token && token !== 'null' && token !== initial) {
             clearInterval(timer);
             window.close();
             document.getElementById('mp-done').hidden = false;
