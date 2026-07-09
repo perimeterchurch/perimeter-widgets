@@ -67,5 +67,11 @@ export default defineConfig({
     // localStorage with undefined (same fix as packages/auth/vitest.config.ts) —
     // MpLoginPanel's MPLocalStorageAuth reads localStorage in tests.
     execArgv: ['--no-experimental-webstorage'],
+    // Catalog page tests import REAL widget modules through the vite transform;
+    // under CI's parallel `turbo … test` load that alone can exceed vitest's 5s
+    // default, and several assertions already wait up to 10s (findBy timeouts) —
+    // a 10s wait inside a 5s test budget trips the test timeout first. 20s keeps
+    // the budget above the longest individual wait.
+    testTimeout: 20_000,
   },
 });
