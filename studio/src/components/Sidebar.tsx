@@ -128,7 +128,15 @@ export function Sidebar({ nav }: SidebarProps) {
                             )
                           }
                         >
-                          {item.label}
+                          <span className="flex items-center gap-1.5">
+                            {item.label}
+                            {item.authRequired && (
+                              <>
+                                <LockIcon />
+                                <span className="sr-only">Sign-in required</span>
+                              </>
+                            )}
+                          </span>
                         </NavLink>
                       </li>
                     ))}
@@ -191,6 +199,28 @@ function SunIcon() {
     >
       <circle cx="12" cy="12" r="4" />
       <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
+
+/** Sign-in-required indicator on catalog items — the sibling sr-only text owns
+ * the accessible name; the glyph mirrors the lucide lock paths. */
+function LockIcon() {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="shrink-0 opacity-70"
+    >
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
   );
 }

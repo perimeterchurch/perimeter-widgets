@@ -61,6 +61,28 @@ describe('Sidebar', () => {
     expect(ui.getByText('Reference')).toBeTruthy();
   });
 
+  it('shows a sign-in-required lock only on auth-flagged items', () => {
+    const nav: NavGroup[] = [
+      {
+        label: 'Catalog',
+        items: [
+          { to: '/catalog/my-shepherds', label: 'My Shepherds', authRequired: true },
+          { to: '/catalog/sermons', label: 'Sermons', authRequired: false },
+        ],
+      },
+    ];
+    const { container } = render(
+      <MemoryRouter>
+        <Sidebar nav={nav} />
+      </MemoryRouter>,
+    );
+    const ui = within(container);
+    const locked = ui.getByRole('link', { name: /my shepherds/i });
+    expect(within(locked).getByText('Sign-in required')).toBeTruthy();
+    const open = ui.getByRole('link', { name: 'Sermons' });
+    expect(within(open).queryByText('Sign-in required')).toBeNull();
+  });
+
   it('filters items as you type in the search box (case-insensitive)', () => {
     const { container } = render(
       <MemoryRouter>
