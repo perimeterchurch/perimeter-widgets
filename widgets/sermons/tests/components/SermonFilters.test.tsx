@@ -318,6 +318,56 @@ describe('SermonFilters in-field search clear', () => {
   });
 });
 
+describe('SermonFilters alphabetical option sorting', () => {
+  async function openDropdown(index: number) {
+    const toggles = screen.getAllByRole('button', { name: /toggle menu/i });
+    const toggle = toggles[index];
+    if (!toggle) throw new Error(`No dropdown at index ${index}`);
+    await userEvent.click(toggle);
+  }
+
+  it('sorts series options alphabetically regardless of API order', async () => {
+    // makeProps lists "Grace Series" (id 10) before "Faith Series" (id 11).
+    render(<SermonFilters {...makeProps()} />);
+
+    await openDropdown(0);
+
+    const labels = screen.getAllByRole('option').map((o) => o.textContent);
+    expect(labels).toEqual(['Faith Series', 'Grace Series']);
+  });
+
+  it('sorts speaker options alphabetically regardless of API order', async () => {
+    // makeProps lists "John Smith" (id 5) before "Jane Doe" (id 6).
+    render(<SermonFilters {...makeProps()} />);
+
+    await openDropdown(1);
+
+    const labels = screen.getAllByRole('option').map((o) => o.textContent);
+    expect(labels).toEqual(['Jane Doe', 'John Smith']);
+  });
+
+  it('sorts cache-rehydrated selections into the list, not appended at the end', async () => {
+    const { result } = renderHook(() => useFilterLabelCache());
+    result.current.absorb('speaker', [{ id: 2, label: 'Aaron First' }]);
+
+    render(
+      <SermonFilters
+        {...makeProps({
+          speakers: [{ id: 1, name: 'Zed Last', bio: null }],
+          selectedSpeakerIds: [1, 2],
+          hasActiveFilters: true,
+          labelCache: result.current,
+        })}
+      />,
+    );
+
+    await openDropdown(1);
+
+    const labels = screen.getAllByRole('option').map((o) => o.textContent);
+    expect(labels).toEqual(['Aaron First', 'Zed Last']);
+  });
+});
+
 describe('SermonFilters labelCache integration', () => {
   /**
    * Open the Nth dropdown (by its "toggle menu" aria-label). The filter row

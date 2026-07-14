@@ -158,6 +158,8 @@ export function useSermonFacets({ config, filters, labelCache }: UseSermonFacets
       to,
     }),
   );
+  // Same alphabetical API-side sort as the primer: the 50-item cap must be
+  // the alphabetically-first page, not a client-side sort of an arbitrary one.
   const seriesQuery = useSeries(
     defined({
       perPage: 50,
@@ -168,6 +170,8 @@ export function useSermonFacets({ config, filters, labelCache }: UseSermonFacets
       seriesTypeId,
       from,
       to,
+      sort: 'title',
+      order: 'asc',
     }),
   );
 

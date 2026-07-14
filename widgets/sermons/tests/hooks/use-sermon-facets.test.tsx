@@ -145,6 +145,17 @@ describe('useSermonFacets', () => {
     expect(narrowed?.seriesId).toBe('100,101');
   });
 
+  it('sorts the narrowed series query by title so the capped page is the alphabetically-first 50', () => {
+    renderFacets({ selectedSpeakerIds: [1] });
+
+    const narrowed = seriesCalls.find(
+      (p) => (p as { speakerId?: string }).speakerId !== undefined,
+    ) as { sort?: string; order?: string } | undefined;
+    expect(narrowed).toBeDefined();
+    expect(narrowed?.sort).toBe('title');
+    expect(narrowed?.order).toBe('asc');
+  });
+
   it('does not narrow the primer speaker query by sibling filters', () => {
     renderFacets({ selectedBookIds: [10] });
 
