@@ -92,6 +92,8 @@ export interface SermonFiltersProps {
 
 type OpenDropdown = 'series' | 'speaker' | 'book' | 'serviceType' | 'seriesType';
 
+const byLabel = (a: MultiComboboxOption, b: MultiComboboxOption) => a.label.localeCompare(b.label);
+
 export function SermonFilters(props: SermonFiltersProps) {
   // Only one filter dropdown open at a time
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown | null>(null);
@@ -99,21 +101,19 @@ export function SermonFilters(props: SermonFiltersProps) {
     value: String(s.id),
     label: s.displayTitle ?? s.title,
   }));
-  const seriesOptions: MultiComboboxOption[] = props.labelCache.mergeSelectedIntoOptions(
-    'series',
-    seriesOptionsRaw,
-    props.selectedSeriesIds,
-  );
+  // Sorted after the merge so cache-rehydrated selections land in
+  // alphabetical position instead of appended at the end.
+  const seriesOptions: MultiComboboxOption[] = props.labelCache
+    .mergeSelectedIntoOptions('series', seriesOptionsRaw, props.selectedSeriesIds)
+    .sort(byLabel);
 
   const speakerOptionsRaw: MultiComboboxOption[] = props.speakers.map((s) => ({
     value: String(s.id),
     label: s.name,
   }));
-  const speakerOptions: MultiComboboxOption[] = props.labelCache.mergeSelectedIntoOptions(
-    'speaker',
-    speakerOptionsRaw,
-    props.selectedSpeakerIds,
-  );
+  const speakerOptions: MultiComboboxOption[] = props.labelCache
+    .mergeSelectedIntoOptions('speaker', speakerOptionsRaw, props.selectedSpeakerIds)
+    .sort(byLabel);
 
   // Bible books: sorted in canonical order with OT/NT group headers.
   // Selected books that narrowed out of props.books are appended after the
