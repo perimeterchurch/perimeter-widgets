@@ -23,7 +23,7 @@
     },
     {
       "source": "/sermons/latest.js",
-      "destination": "/sermons/1.4.2/index.js"
+      "destination": "/sermons/1.4.3/index.js"
     }
   ],
   "headers": [
