@@ -33,5 +33,12 @@ export {
   type EventListItem,
 } from './events/use-events';
 
+export {
+  useMissionTrips,
+  type UseMissionTripsParams,
+  type UseMissionTripsResponse,
+  type MissionTrip,
+} from './missions/use-mission-trips';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';
