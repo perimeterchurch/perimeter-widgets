@@ -78,10 +78,13 @@ describe('mission-trip-finder App', () => {
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.org/trip/948');
   });
 
-  it('badges a full trip', () => {
-    hooks.result = queryResult([{ ...TRIP, registrationFull: true }]);
+  it('badges a full trip in the attention colour, distinct from the info badge', () => {
+    hooks.result = queryResult([{ ...TRIP, registrationFull: true, invitationOnly: true }]);
     renderApp();
-    expect(screen.getByText('Registration Full')).toBeInTheDocument();
+    // "Full" is a closed door and gets the amber warning pill; "Invitation
+    // Only" is informational, so the two must not read as the same status.
+    expect(screen.getByText('Registration Full').className).toContain('bg-warning');
+    expect(screen.getByText('Invitation Only').className).not.toContain('bg-warning');
   });
 
   it('badges an invitation-only trip', () => {

@@ -205,7 +205,7 @@ function TripCard({
 
         {(trip.registrationFull || trip.invitationOnly) && (
           <div className="absolute top-2 right-2 flex flex-col items-end gap-2">
-            {trip.registrationFull && <Badge>Registration Full</Badge>}
+            {trip.registrationFull && <Badge variant="warning">Registration Full</Badge>}
             {trip.invitationOnly && <Badge variant="secondary">Invitation Only</Badge>}
           </div>
         )}
