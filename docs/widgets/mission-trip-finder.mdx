@@ -1,0 +1,65 @@
+---
+description: Browse open Perimeter GO Journey mission trips.
+---
+
+# mission-trip-finder
+
+A responsive card grid of open **GO Journey** mission trips. Each card shows the
+destination banner, trip name, destination, travel dates, the per-participant
+fundraising goal, and an optional description, and links to that trip's
+go-journey-details page. Trips at capacity and invitation-only trips are badged.
+Rebuild of the legacy `reactwidgets` MissionTripFinder (which called the
+`api_custom_Mission_Trip_Finder_Widget` stored proc) on the perimeter-api
+backend.
+
+Trips are sorted by travel date and, by default, limited to campaigns that are
+still open and marked for the website in Ministry Platform.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="mission-trip-finder"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/types.ts` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute                | Type    | Default                                    | Description                                                            |
+| ------------------------ | ------- | ------------------------------------------ | ------------------------------------------------------------------------ |
+| `data-show-description`  | boolean | `true`                                     | Show the trip's description text on the card.                          |
+| `data-show-cost`         | boolean | `true`                                     | Show the per-participant fundraising goal.                             |
+| `data-show-spots`        | boolean | `false`                                    | Show remaining spots (e.g. "3 spots left") on trips that have a cap.   |
+| `data-hide-full`         | boolean | `false`                                    | Hide trips at capacity instead of badging them "Registration Full".    |
+| `data-include-past`      | boolean | `false`                                    | Include closed trips (default shows open GO Journeys only).            |
+| `data-destination-id`    | number  | —                                          | Filter to one destination (MP Journey Destination ID).                 |
+| `data-keyword`           | string  | —                                          | Search trip names, destinations, and descriptions.                     |
+| `data-max-trips`         | number  | —                                          | Cap the total number of trips shown.                                   |
+| `data-details-url-base`  | string  | perimeter.org go-journey-details           | Base URL each card links to; the trip ID is appended.                  |
+| `data-empty-message`     | string  | `No mission trips are open right now.`     | Message shown when the list has no trips.                              |
+| `data-default-image-url` | string  | —                                          | Fallback banner for trips whose destination has no artwork.            |
+| `data-api-url`           | string  | —                                          | Override the perimeter-api base URL (advanced).                        |
+
+Beyond these filters, the endpoint always restricts to GO Journey pledge
+campaigns (`Pledge_Campaign_Type_ID = 2`) that are marked `Display_On_Website`
+and — unless `data-include-past` is set — have not closed.
+
+## Data source
+
+`GET /api/mission-trips` (perimeter-api). Each trip is an MP `Pledge_Campaigns`
+row of type 2, joined to `Journey_Destinations` for the destination name and
+banner image. The "registration full" state comes from a roll-up of the
+campaign's `Pledges` against `Maximum_Registrants` — MP has no registrant-count
+column, so the API counts pledges in a seat-holding status (Active or
+Completed). See `docs/domains/missions.md` in perimeter-api.
+
+Banner images are absolute URLs on the destination record (an external CDN), not
+served by perimeter-api. A trip whose destination has no banner falls back to
+`data-default-image-url`, then to a globe placeholder.
+
+> **Not ported:** the legacy widget hard-coded the go-journey-details link and
+> always showed every open trip. Both are now configurable
+> (`data-details-url-base`, `data-hide-full`, `data-max-trips`).

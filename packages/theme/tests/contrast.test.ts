@@ -115,5 +115,12 @@ describe('primary foreground pairings stay AA', () => {
         contrast(rgb(tokens['color-primary-fg']), rgb(tokens['color-primary'])),
       ).toBeGreaterThanOrEqual(4.5);
     });
+    // The warning pair renders at text-xs (12px) inside Badge, so it needs the
+    // 4.5:1 normal-text ratio — the 3:1 large-text allowance does not apply.
+    it(`${name}: warning-fg on warning`, () => {
+      expect(
+        contrast(rgb(tokens['color-warning-fg']), rgb(tokens['color-warning'])),
+      ).toBeGreaterThanOrEqual(4.5);
+    });
   }
 });
