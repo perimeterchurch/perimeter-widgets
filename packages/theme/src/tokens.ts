@@ -23,6 +23,13 @@ export const globalTokens = {
   'color-accent-fg': 'hsl(210 75% 14.1%)',
   'color-destructive': 'hsl(0 84% 60%)',
   'color-destructive-fg': 'hsl(210 40% 98%)',
+  // Attention/caution — a status that should stop the reader without reading as
+  // an error ("Registration Full", "Closing soon"). Amber #f59e0b, and like
+  // `primary` it's a LIGHT color, so warning-fg is brand navy (7.8:1). Solid
+  // rather than a tint because these render as pills over photography, where a
+  // low-alpha fill lets the image through and the label stops being legible.
+  'color-warning': 'hsl(38 92% 50%)',
+  'color-warning-fg': 'hsl(210 75% 14.1%)',
   'color-border': 'hsl(214 32% 91%)',
   // Focus outline = the brand accent #60bbe9.
   'color-ring': 'hsl(200.1 75.7% 64.5%)',
@@ -86,6 +93,11 @@ export const darkTokens: Record<ThemeToken, string> = {
   'color-accent-fg': 'hsl(210 40% 98%)',
   'color-destructive': 'hsl(0 63% 51%)',
   'color-destructive-fg': 'hsl(210 40% 98%)',
+  // Same amber in both themes for the same reason `primary` is: it's already a
+  // mid-luminance accent that carries navy text at AA on either surface, and a
+  // caution pill that shifts hue between themes reads as a different status.
+  'color-warning': 'hsl(38 92% 50%)',
+  'color-warning-fg': 'hsl(210 75% 14.1%)',
   'color-border': 'hsl(217 33% 20%)',
   'color-ring': 'hsl(200.1 75.7% 64.5%)',
   // Brand navy band — same color in both themes (secondary stays a lighter

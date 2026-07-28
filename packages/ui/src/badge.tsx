@@ -13,6 +13,9 @@ const badgeVariants = cva(
         secondary: 'bg-secondary text-secondary-fg [a]:hover:bg-secondary/80',
         destructive:
           'bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20',
+        // Solid, unlike `destructive`'s tint: warning pills are used as overlays
+        // on imagery, where a low-alpha fill stops being legible.
+        warning: 'bg-warning text-warning-fg [a]:hover:bg-warning/80',
         outline: 'border-border text-fg [a]:hover:bg-muted [a]:hover:text-muted-fg',
         ghost: 'hover:bg-muted hover:text-muted-fg dark:hover:bg-muted/50',
         link: 'text-primary underline-offset-4 hover:underline',

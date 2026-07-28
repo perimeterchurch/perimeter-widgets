@@ -623,6 +623,227 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/assessments/admin/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Admin gate check: 200 when the caller holds the MP assessment-admin role, 403 otherwise */
+    get: operations['getAssessmentAdminMe'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Dashboard aggregates: per-instrument completed/in-progress counts, completion rates, distinct people, and active assessments */
+    get: operations['getAssessmentAdminOverview'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/people': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Respondent browser: everyone with at least one non-archived taker, name-sorted. `q` searches only within the respondent set; paging applies after filtering. */
+    get: operations['listAssessmentAdminPeople'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/people/{contactId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** One respondent's full picture: every attempt across instruments, Archived included (so archived attempts can be Restored). 404 when the contact has no takers at all, archived included. */
+    get: operations['getAssessmentAdminPerson'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/instruments/{id}/takers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Paginated roster of attempts for one instrument, enriched with contact name/email. `q` filters the full attempt set before paging; totalCount is then the post-filter match total. */
+    get: operations['getAssessmentAdminInstrumentRoster'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/instruments/{id}/gift-distribution': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Dominant-gift distribution for a scored instrument: each completed taker's top dimension, tallied */
+    get: operations['getAssessmentAdminGiftDistribution'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/instruments/{id}/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Stream the roster or flattened-answers CSV for one instrument (text/csv attachment). The answers export omits non-reviewable questions (Assessment_Questions.Reviewable = false) entirely. Rate-limited; 429 when another export is already running for this admin. */
+    get: operations['exportAssessmentAdminCsv'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/takers/{takerId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Submission viewer payload: the taker plus its dimensions, answers, and question metadata. Non-reviewable questions (Assessment_Questions.Reviewable = false) and their answers are omitted, and groups left empty are dropped. Reading answers emits an admin audit record. */
+    get: operations['getAssessmentAdminTakerDetail'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/takers/{takerId}/reset': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reset a taker back to Incomplete (clears End_Date) so the person can retake. Returns the updated taker. */
+    post: operations['resetAssessmentAdminTaker'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/takers/{takerId}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Archive a taker (status 3, reversible soft-delete), removing it from admin aggregates and the taking-app active-taker lookup. Returns the updated taker. */
+    post: operations['archiveAssessmentAdminTaker'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/takers/{takerId}/restore': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Restore an archived taker to Complete/Incomplete (by End_Date). Returns the updated taker. */
+    post: operations['restoreAssessmentAdminTaker'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/takers/{takerId}/files': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Admin override of the owner file-list route: lists the files attached to a (taker, question) answer for any taker. The question id is supplied via the x-question-id header. */
+    get: operations['listAssessmentAdminAnswerFiles'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/assessments/admin/takers/{takerId}/files/{fileId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Admin override of the owner file-download route: downloads a single file from a (taker, question) answer for any taker. The question id is supplied via the x-question-id header. */
+    get: operations['downloadAssessmentAdminAnswerFile'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/users': {
     parameters: {
       query?: never;
@@ -701,6 +922,23 @@ export interface paths {
     };
     /** Returns the authenticated user's currently assigned shepherds/elders (active Shepherd_Household_Assignments rows plus the household's deacon/shepherdess) */
     get: operations['getShepherds'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/mission-trips': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List GO Journey mission trips for the mission-trip-finder widget */
+    get: operations['listMissionTrips'];
     put?: never;
     post?: never;
     delete?: never;
@@ -3516,6 +3754,8 @@ export interface operations {
                   title: string | null;
                   text: string;
                   required: boolean;
+                  reviewable: boolean;
+                  allowMergeTags: boolean;
                   choiceOptions?: {
                     ID: number;
                     sortOrder: number;
@@ -4069,6 +4309,646 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  getAssessmentAdminMe: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            isAssessmentAdmin: boolean;
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getAssessmentAdminOverview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              instruments: {
+                instrumentId: number;
+                /** @description Null when the instrument row is missing from MP */
+                name: string | null;
+                completed: number;
+                inProgress: number;
+                total: number;
+                /** @description completed / total, 0 when there are no takers */
+                completionRate: number;
+              }[];
+              /** @description Distinct contacts with at least one non-archived taker, across all instruments */
+              distinctPeople: number;
+              /** @description Instruments with at least one non-archived taker */
+              activeAssessments: number;
+              /** @description ISO timestamp of when this overview was computed */
+              lastUpdated: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listAssessmentAdminPeople: {
+    parameters: {
+      query?: {
+        q?: string;
+        skip?: number;
+        take?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              people: {
+                contactId: number;
+                displayName: string;
+                email: string | null;
+              }[];
+              /** @description Respondents matching q (before paging) */
+              totalCount: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getAssessmentAdminPerson: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        contactId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              contactId: number;
+              displayName: string | null;
+              email: string | null;
+              takers: {
+                ID: number;
+                GUID: string;
+                contactID: number;
+                statusID: number;
+                instrumentID: number;
+                startDate: string;
+                endDate?: string;
+                instrumentName: string | null;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getAssessmentAdminInstrumentRoster: {
+    parameters: {
+      query?: {
+        skip?: number;
+        take?: number;
+        status?: number;
+        q?: string;
+      };
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              entries: {
+                takerId: number;
+                contactId: number;
+                /** @description Nickname-lastname when a nickname exists; null when the contact is missing from MP */
+                displayName: string | null;
+                email: string | null;
+                statusId: number;
+                startDate: string;
+                endDate: string | null;
+              }[];
+              /** @description Total attempts matching instrument + status — and, when q is supplied, the post-filter match total */
+              totalCount: number;
+              /** @description Present only when q was supplied: legacy alias equal to totalCount */
+              filteredCount?: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getAssessmentAdminGiftDistribution: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dimensionId: number;
+              name: string;
+              count: number;
+            }[];
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  exportAssessmentAdminCsv: {
+    parameters: {
+      query?: {
+        type?: 'roster' | 'answers';
+      };
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string;
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getAssessmentAdminTakerDetail: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        takerId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              takerId: number;
+              instrumentId: number;
+              taker: {
+                ID: number;
+                GUID: string;
+                contactID: number;
+                statusID: number;
+                instrumentID: number;
+                startDate: string;
+                endDate?: string;
+              };
+              dimensions: {
+                ID: number;
+                takerID: number;
+                dimensionID: number;
+                name: string;
+                description: string;
+                score: number;
+              }[];
+              answers: {
+                ID?: number;
+                takerID: number;
+                questionID: number;
+                textResponse?: string;
+                choiceOptionIDs?: number[];
+              }[];
+              questions: {
+                groups: {
+                  ID: number;
+                  title: string | null;
+                  sortOrder: number;
+                  parentID: number | null;
+                  questions: {
+                    ID: number;
+                    typeID: number;
+                    sortOrder: number;
+                    number: number;
+                    title: string | null;
+                    text: string;
+                    required: boolean;
+                    reviewable: boolean;
+                    allowMergeTags: boolean;
+                    choiceOptions?: {
+                      ID: number;
+                      sortOrder: number;
+                      text: string;
+                      value: number;
+                    }[];
+                  }[];
+                }[];
+              };
+              /** @description Status-keyed caching: true for Complete takers (immutable answers); false means the response was served fresh with Cache-Control: no-store */
+              cacheable: boolean;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  resetAssessmentAdminTaker: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        takerId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              ID: number;
+              GUID: string;
+              contactID: number;
+              statusID: number;
+              instrumentID: number;
+              startDate: string;
+              endDate?: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  archiveAssessmentAdminTaker: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        takerId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              ID: number;
+              GUID: string;
+              contactID: number;
+              statusID: number;
+              instrumentID: number;
+              startDate: string;
+              endDate?: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  restoreAssessmentAdminTaker: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        takerId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              ID: number;
+              GUID: string;
+              contactID: number;
+              statusID: number;
+              instrumentID: number;
+              startDate: string;
+              endDate?: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listAssessmentAdminAnswerFiles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        takerId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              takerAnswerID: number | null;
+              files: {
+                fileId: number;
+                fileName: string;
+                sizeBytes: number;
+                contentType: string | null;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  downloadAssessmentAdminAnswerFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        takerId: number;
+        fileId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string;
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
   getCurrentUser: {
     parameters: {
       query?: never;
@@ -4365,6 +5245,84 @@ export interface operations {
       400: components['responses']['BadRequest'];
       401: components['responses']['Unauthorized'];
       403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listMissionTrips: {
+    parameters: {
+      query?: {
+        destinationId?: number;
+        keyword?: string;
+        includePast?: 'true' | 'false';
+        includeHidden?: 'true' | 'false';
+        includeFull?: 'true' | 'false';
+        page?: number;
+        perPage?: number;
+        order?: 'asc' | 'desc';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              trips: {
+                /** @description Pledge_Campaigns.Pledge_Campaign_ID. */
+                id: number;
+                /** @description Public trip name (Pledge_Campaigns.Nickname, falling back to Campaign_Name). */
+                name: string;
+                /** @description Journey_Destinations.Destination_Name, or null. */
+                destination: string | null;
+                destinationId: number | null;
+                description: string | null;
+                /** @description Journey_Destinations.Website_Banner, or null. */
+                bannerUrl: string | null;
+                /** @description Trip start (Trip_Start_Date), ISO 8601, or null when unset. */
+                startDate: string | null;
+                /** @description Trip end (Trip_End_Date), ISO 8601, or null when unset. */
+                endDate: string | null;
+                /** @description Campaign close (End_Date), ISO 8601, or null. */
+                registrationEndDate: string | null;
+                /** @description Per-participant fundraising target (Fundraising_Goal), or null. */
+                cost: number | null;
+                /** @description Active or completed pledges on the campaign (Pledge_Status_ID <= 2). */
+                registrantCount: number;
+                maximumRegistrants: number | null;
+                /** @description True when the campaign has a cap and registrantCount has reached it. */
+                registrationFull: boolean;
+                invitationOnly: boolean;
+              }[];
+              pagination: {
+                page: number;
+                perPage: number;
+                total: number;
+                totalPages: number;
+              };
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
       500: components['responses']['InternalError'];
     };
   };
@@ -8187,7 +9145,10 @@ export interface operations {
               suggestedCategoryId: number | null;
               classification: ('new' | 'duplicate' | 'update' | 'contradiction') | null;
               classificationArticleId: number | null;
-              gapQuestions: string[];
+              gapQuestions: {
+                question: string;
+                answer: string | null;
+              }[];
               /** @enum {string} */
               processingStatus: 'queued' | 'processing' | 'ready_for_review' | 'failed';
               /** @enum {string} */
@@ -8233,6 +9194,7 @@ export interface operations {
                   overridden_by: number | null;
                   overridden_at: string | null;
                 }[];
+                redactionRenderMode: ('full' | 'regions') | null;
               }[];
             };
             meta?: {
