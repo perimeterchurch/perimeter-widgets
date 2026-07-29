@@ -947,6 +947,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/community-groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List community groups for the community-group-finder widget */
+    get: operations['listCommunityGroups'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/community-groups/facets': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List filter options for the community-group-finder widget */
+    get: operations['listCommunityGroupFacets'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/group-image/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the default image for a group */
+    get: operations['getGroupImage'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/invoices/{guid}': {
     parameters: {
       query?: never;
@@ -971,7 +1022,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get API version and deployment information */
+    /** Get the running build's version and deployment identity */
     get: operations['getInfo'];
     put?: never;
     post?: never;
@@ -5326,6 +5377,192 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  listCommunityGroups: {
+    parameters: {
+      query?: {
+        groupTypeId?: number;
+        neighborhoodIds?: string;
+        focusIds?: string;
+        lifeStageIds?: string;
+        meetingDayIds?: string;
+        meetingTimes?: string;
+        location?: string;
+        keyword?: string;
+        meetsOnline?: 'true' | 'false';
+        includeFull?: 'true' | 'false';
+        includeHidden?: 'true' | 'false';
+        includeEnded?: 'true' | 'false';
+        page?: number;
+        perPage?: number;
+        sort?: 'name' | 'neighborhood' | 'startDate';
+        order?: 'asc' | 'desc';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              groups: {
+                /** @description Groups.Group_ID. */
+                id: number;
+                /** @description Groups.Group_Name. */
+                name: string;
+                description: string | null;
+                /** @description City_Ministries.City_Ministry, or null. */
+                neighborhood: string | null;
+                neighborhoodId: number | null;
+                /** @description Group_Focuses.Group_Focus, or null. */
+                groupFocus: string | null;
+                groupFocusId: number | null;
+                /** @description Life_Stages.Life_Stage. */
+                lifeStage: string | null;
+                lifeStageId: number | null;
+                /** @description Meeting_Days.Meeting_Day. */
+                meetingDay: string | null;
+                meetingDayId: number | null;
+                /** @description Groups.Meeting_Time as "HH:mm:ss", or null. Midnight is treated as unset — staff enter 00:00:00 as a placeholder. */
+                meetingTime: string | null;
+                /** @description Bucket derived from meetingTime, or null when there is no time. */
+                meetingTimeOfDay: ('morning' | 'lunchtime' | 'afternoon' | 'evening') | null;
+                /** @description Meeting_Frequencies.Meeting_Frequency. */
+                meetingFrequency: string | null;
+                meetingFrequencyId: number | null;
+                /** @description Meeting address city. The street line is never returned. */
+                city: string | null;
+                /** @description Meeting address state or region. */
+                state: string | null;
+                meetsOnline: boolean;
+                /** @description Groups.Group_Is_Full. */
+                isFull: boolean;
+                /** @description Groups.Start_Date, ISO 8601, or null. */
+                startDate: string | null;
+                /** @description Groups.Current_Group_Participants, or null. */
+                participantCount: number | null;
+                /** @description Groups.Target_Size. */
+                targetSize: number | null;
+              }[];
+              pagination: {
+                page: number;
+                perPage: number;
+                total: number;
+                totalPages: number;
+              };
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listCommunityGroupFacets: {
+    parameters: {
+      query?: {
+        groupTypeId?: number;
+        includeHidden?: 'true' | 'false';
+        includeEnded?: 'true' | 'false';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              neighborhoods: {
+                id: number;
+                name: string;
+              }[];
+              focuses: {
+                id: number;
+                name: string;
+              }[];
+              lifeStages: {
+                id: number;
+                name: string;
+              }[];
+              meetingDays: {
+                id: number;
+                name: string;
+              }[];
+              meetingTimes: {
+                /** @enum {string} */
+                id: 'morning' | 'lunchtime' | 'afternoon' | 'evening';
+                name: string;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getGroupImage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string;
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
   getInvoice: {
     parameters: {
       query?: never;
@@ -5391,8 +5628,17 @@ export interface operations {
         };
         content: {
           'application/json': {
-            version?: string;
-            lastDeployment: string;
+            version: string | null;
+            /** @description Vercel environment ("production" | "preview" | "development"); "development" off Vercel. */
+            environment: string;
+            /** @description Git commit the running deployment was built from. Compare against origin/main to confirm a deploy actually landed. */
+            commitSha: string | null;
+            /** @description Git branch the running deployment was built from. */
+            branch: string | null;
+            /** @description Vercel deployment ID serving this request. */
+            deploymentId: string | null;
+            /** @description Current server time, ISO 8601. Not a deployment timestamp. */
+            serverTime: string;
           };
         };
       };
@@ -8729,10 +8975,15 @@ export interface operations {
             success: true;
             data: {
               /** @enum {string} */
-              role: 'viewer' | 'author' | 'admin';
+              role: 'viewer' | 'restricted_viewer' | 'unrestricted_viewer' | 'author' | 'admin';
               isAdmin: boolean;
+              isStaff: boolean;
+              canReadUnrestricted: boolean;
+              canReadAllRestricted: boolean;
+              isRestrictedToGrants: boolean;
               scopedCategoryIds: number[];
               grantedCategoryIds: number[];
+              grantedArticleIds: number[];
               canManageCategories: boolean;
               canManagePermissions: boolean;
             };
@@ -8932,9 +9183,11 @@ export interface operations {
               contactId: number;
               contactName: string | null;
               /** @enum {string} */
-              role: 'viewer' | 'author' | 'admin';
+              role: 'viewer' | 'restricted_viewer' | 'unrestricted_viewer' | 'author' | 'admin';
               categoryId: number | null;
               categoryName: string | null;
+              articleId: number | null;
+              articleTitle: string | null;
               grantedBy: string | null;
               grantedDate: string | null;
             }[];
@@ -8969,8 +9222,9 @@ export interface operations {
         'application/json': {
           contactId: number;
           /** @enum {string} */
-          role: 'viewer' | 'author' | 'admin';
+          role: 'viewer' | 'restricted_viewer' | 'unrestricted_viewer' | 'author' | 'admin';
           categoryId?: number | null;
+          articleId?: number | null;
         };
       };
     };

@@ -40,5 +40,19 @@ export {
   type MissionTrip,
 } from './missions/use-mission-trips';
 
+export {
+  useCommunityGroups,
+  type UseCommunityGroupsParams,
+  type UseCommunityGroupsResponse,
+  type CommunityGroup,
+} from './community-groups/use-community-groups';
+
+export {
+  useCommunityGroupFacets,
+  type UseCommunityGroupFacetsParams,
+  type UseCommunityGroupFacetsResponse,
+  type CommunityGroupFacetOption,
+} from './community-groups/use-community-group-facets';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';
