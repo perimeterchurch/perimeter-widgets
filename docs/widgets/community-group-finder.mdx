@@ -72,7 +72,9 @@ defaults).
 | `data-show-filters`      | boolean | `true`                                    | Show the filter panel above the results.                                     |
 | `data-show-search`       | boolean | `true`                                    | Show the keyword search box above the filters.                               |
 | `data-advanced-open`     | boolean | `false`                                   | Start with the advanced filters expanded instead of collapsed.               |
-| `data-hide-full`         | boolean | `false`                                   | Hide groups at capacity instead of badging them "Group Is Full".             |
+| `data-show-full-groups`  | boolean | `true`                                    | Show groups at capacity, badged "Group Is Full". False hides them.           |
+| `data-count-group-inquiries` | boolean | `false`                               | Let pending inquiries count toward a group's target size when judging full.  |
+| `data-show-future-groups` | boolean | `true`                                   | Show groups whose start date has not arrived yet.                            |
 | `data-group-type-id`     | number  | `13`                                      | MP Group Type. 13 = Community Group; 1, 3, and 10 are the other finder types. |
 | `data-neighborhood-ids`  | string  | —                                         | Lock to one or more cities (comma-separated MP City Ministry IDs).            |
 | `data-max-groups`        | number  | —                                         | Cap the total number of groups shown.                                        |
@@ -81,6 +83,35 @@ defaults).
 | `data-empty-message`     | string  | `No community groups match your filters.` | Message shown when the list has no groups.                                   |
 | `data-default-image-url` | string  | —                                         | Fallback banner URL for groups with no artwork in MP.                        |
 | `data-api-url`           | string  | —                                         | Override the perimeter-api base URL (advanced).                              |
+
+### Parity with the MP group-finder widget
+
+The stock `<mpp-group-finder>` widget this replaces documented four attributes.
+All four are accounted for:
+
+| MP attribute               | MP default | Here                                                                        |
+| -------------------------- | ---------- | --------------------------------------------------------------------------- |
+| `targeturl`                | —          | `data-details-url-base` (takes a full base URL; the group ID is appended)    |
+| `countgroupinquiries`      | `false`    | `data-count-group-inquiries`, same default                                   |
+| `showfullgroups`           | `false`    | `data-show-full-groups`, but defaulting to **`true`** — see below            |
+| `showsuggestagroupbutton`  | `false`    | **Not built.** Needs an authenticated write to MP; tracked as a follow-up    |
+
+Two deliberate differences:
+
+- **`showFullGroups` defaults to `true`**, where MP hides full groups by default.
+  A full group still tells a reader the group exists and is worth asking about,
+  so it stays listed with a badge. Set the attribute to `false` for MP's
+  behaviour.
+- **"Full" means the same thing as in MP** — the `Group Is Full` flag is set, *or*
+  the group's target size has been reached. Turning on
+  `data-count-group-inquiries` lets pending inquiries occupy provisional seats
+  against that target, so a group can read as full before anyone has formally
+  joined.
+
+The **Suggest a Group** button is the one piece not carried over. It needs a
+logged-in visitor and a write to MP's `Group_Inquiries` table, which is a
+feature rather than a display option — a form, an authenticated endpoint, and
+spam handling. Everything else on this page is read-only and public.
 
 ## Data source
 

@@ -5390,6 +5390,8 @@ export interface operations {
         keyword?: string;
         meetsOnline?: 'true' | 'false';
         includeFull?: 'true' | 'false';
+        countGroupInquiries?: 'true' | 'false';
+        showFutureGroups?: 'true' | 'false';
         includeHidden?: 'true' | 'false';
         includeEnded?: 'true' | 'false';
         page?: number;
@@ -5443,7 +5445,7 @@ export interface operations {
                 /** @description Meeting address state or region. */
                 state: string | null;
                 meetsOnline: boolean;
-                /** @description Groups.Group_Is_Full. */
+                /** @description True when Groups.Group_Is_Full is set, OR the group has a Target_Size that its participants have reached. Matches how the MP group-finder widget defines full. */
                 isFull: boolean;
                 /** @description Groups.Start_Date, ISO 8601, or null. */
                 startDate: string | null;
@@ -5451,6 +5453,8 @@ export interface operations {
                 participantCount: number | null;
                 /** @description Groups.Target_Size. */
                 targetSize: number | null;
+                /** @description Group_Inquiries on this group that have not been Placed, or null when countGroupInquiries is off. Exposed so the `isFull` decision is reproducible from the response. */
+                pendingInquiryCount: number | null;
               }[];
               pagination: {
                 page: number;

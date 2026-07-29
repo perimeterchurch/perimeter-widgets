@@ -113,10 +113,36 @@ describe('community-group-finder App', () => {
     expect(screen.getByText(GROUP.name)).toBeInTheDocument();
   });
 
-  it('asks the endpoint to drop full groups when hideFull is set', () => {
+  it('keeps full groups by default, sending no includeFull override', () => {
     hooks.groups = groupsResult([GROUP]);
-    renderApp({ hideFull: true });
+    renderApp();
+    expect(hooks.params).not.toHaveProperty('includeFull');
+  });
+
+  it('asks the endpoint to drop full groups when showFullGroups is off', () => {
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ showFullGroups: false });
     expect(hooks.params).toMatchObject({ includeFull: 'false' });
+  });
+
+  it('asks the endpoint to count pending inquiries only when configured', () => {
+    hooks.groups = groupsResult([GROUP]);
+    const first = renderApp();
+    expect(hooks.params).not.toHaveProperty('countGroupInquiries');
+    first.unmount();
+
+    renderApp({ countGroupInquiries: true });
+    expect(hooks.params).toMatchObject({ countGroupInquiries: 'true' });
+  });
+
+  it('asks the endpoint to drop future groups when showFutureGroups is off', () => {
+    hooks.groups = groupsResult([GROUP]);
+    const first = renderApp();
+    expect(hooks.params).not.toHaveProperty('showFutureGroups');
+    first.unmount();
+
+    renderApp({ showFutureGroups: false });
+    expect(hooks.params).toMatchObject({ showFutureGroups: 'false' });
   });
 
   it('requests the configured group type', () => {

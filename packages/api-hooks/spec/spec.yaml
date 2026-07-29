@@ -7285,7 +7285,9 @@ paths:
                               type: boolean
                             isFull:
                               type: boolean
-                              description: Groups.Group_Is_Full.
+                              description:
+                                True when Groups.Group_Is_Full is set, OR the group has a Target_Size that its participants have reached.
+                                Matches how the MP group-finder widget defines full.
                             startDate:
                               anyOf:
                                 - type: string
@@ -7305,6 +7307,15 @@ paths:
                                   maximum: 9007199254740991
                                 - type: 'null'
                               description: Groups.Target_Size.
+                            pendingInquiryCount:
+                              anyOf:
+                                - type: integer
+                                  minimum: -9007199254740991
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                              description:
+                                Group_Inquiries on this group that have not been Placed, or null when countGroupInquiries is off. Exposed
+                                so the `isFull` decision is reproducible from the response.
                           required:
                             - id
                             - name
@@ -7328,6 +7339,7 @@ paths:
                             - startDate
                             - participantCount
                             - targetSize
+                            - pendingInquiryCount
                           additionalProperties: false
                       pagination:
                         type: object
@@ -7456,8 +7468,32 @@ paths:
           schema:
             default: 'true'
             description:
-              When "false", groups flagged Group_Is_Full are omitted. Defaults to "true" so the widget can render its own
-              "Group Is Full" badge.
+              When "false", full groups are omitted. Defaults to "true" so the widget can render its own "Group Is Full"
+              badge. See `isFull` for what counts as full.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: countGroupInquiries
+          in: query
+          required: false
+          schema:
+            default: 'false'
+            description:
+              When "true", pending Group_Inquiries count toward Target_Size when deciding whether a group is full.
+              Mirrors the MP group-finder widget's `countgroupinquiries`. Off by default.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: showFutureGroups
+          in: query
+          required: false
+          schema:
+            default: 'true'
+            description:
+              When "false", groups whose Start_Date has not arrived yet are omitted. Mirrors the MP group-finder widget's
+              `showfuturegroups`. On by default.
             type: string
             enum:
               - 'true'

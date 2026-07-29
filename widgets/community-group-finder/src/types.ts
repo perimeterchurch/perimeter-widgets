@@ -11,7 +11,7 @@ export const CommunityGroupFinderConfigSchema = z.object({
   showImages: z.coerce
     .boolean()
     .default(true)
-    .describe("Show the group's neighborhood banner on the card."),
+    .describe("Show the group's city banner on the card."),
   showDescription: z.coerce
     .boolean()
     .default(true)
@@ -34,10 +34,25 @@ export const CommunityGroupFinderConfigSchema = z.object({
     .boolean()
     .default(false)
     .describe('Start with the advanced filters expanded instead of collapsed.'),
-  hideFull: z.coerce
+  // MP's `showfullgroups` defaults to false (hide them). Perimeter's default is
+  // the opposite by choice: full groups stay listed with a badge, so someone
+  // scanning the page can see that a group exists and is worth asking about.
+  showFullGroups: z.coerce
+    .boolean()
+    .default(true)
+    .describe(
+      'Show groups at capacity, badged "Group Is Full". Set false to hide them. A group is full when Group Is Full is set in MP, or its target size has been reached. (MP: showfullgroups)',
+    ),
+  countGroupInquiries: z.coerce
     .boolean()
     .default(false)
-    .describe('Hide groups at capacity instead of badging them "Group Is Full".'),
+    .describe(
+      "Let pending group inquiries count toward a group's target size when deciding whether it is full. (MP: countgroupinquiries)",
+    ),
+  showFutureGroups: z.coerce
+    .boolean()
+    .default(true)
+    .describe('Show groups whose start date has not arrived yet. (MP: showfuturegroups)'),
   groupTypeId: z.coerce
     .number()
     .int()

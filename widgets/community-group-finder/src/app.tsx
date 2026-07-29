@@ -58,7 +58,9 @@ export function App({ config }: AppProps): React.JSX.Element {
     ...toQueryParams(filters),
     // A locked city wins over the (hidden) filter value.
     ...(neighborhoodLocked ? { neighborhoodIds: lockedNeighborhoodIds.join(',') } : {}),
-    ...(config.hideFull ? { includeFull: 'false' as const } : {}),
+    ...(config.showFullGroups ? {} : { includeFull: 'false' as const }),
+    ...(config.countGroupInquiries ? { countGroupInquiries: 'true' as const } : {}),
+    ...(config.showFutureGroups ? {} : { showFutureGroups: 'false' as const }),
     // No pagination UI: request the max page size. maxGroups caps the list
     // client-side — the endpoint has no equivalent parameter.
     perPage: 100,

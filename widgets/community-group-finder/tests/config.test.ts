@@ -9,7 +9,9 @@ describe('CommunityGroupFinderConfigSchema', () => {
       showFilters: true,
       showSearch: true,
       advancedOpen: false,
-      hideFull: false,
+      showFullGroups: true,
+      countGroupInquiries: false,
+      showFutureGroups: true,
       groupTypeId: 13,
       detailsUrlBase: 'https://www.perimeter.org/group-details/?id=',
       detailsLabel: 'See Details',
@@ -27,18 +29,28 @@ describe('CommunityGroupFinderConfigSchema', () => {
   it('coerces data-* attribute strings into booleans and numbers', () => {
     const config = CommunityGroupFinderConfigSchema.parse({
       showImages: '',
-      hideFull: 'true',
+      showFullGroups: '',
+      countGroupInquiries: 'true',
       advancedOpen: 'true',
       groupTypeId: '10',
       descriptionLimit: '120',
       maxGroups: '6',
     });
     expect(config.showImages).toBe(false);
-    expect(config.hideFull).toBe(true);
+    expect(config.showFullGroups).toBe(false);
+    expect(config.countGroupInquiries).toBe(true);
     expect(config.advancedOpen).toBe(true);
     expect(config.groupTypeId).toBe(10);
     expect(config.descriptionLimit).toBe(120);
     expect(config.maxGroups).toBe(6);
+  });
+
+  it('defaults the MP-parity flags the way MP documents them, except showFullGroups', () => {
+    const config = CommunityGroupFinderConfigSchema.parse({});
+    // MP defaults showfullgroups to false; Perimeter shows them badged instead.
+    expect(config.showFullGroups).toBe(true);
+    expect(config.countGroupInquiries).toBe(false);
+    expect(config.showFutureGroups).toBe(true);
   });
 
   it('keeps neighborhoodIds as a raw string — the app parses the comma list', () => {
