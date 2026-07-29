@@ -72,9 +72,16 @@ function GroupBanner({
   );
 }
 
-/** One fact line on the card. Plain text — the finder uses no leading icons. */
+/**
+ * One fact line on the card. Plain text — the finder uses no leading icons.
+ *
+ * `text-fg` rather than `text-muted-fg`: these lines are the answer the reader
+ * came for (where and when the group meets), and the muted token sits near 7:1
+ * on the dark surface — legible by the numbers, dim in the eye. The card's
+ * hierarchy comes from size and weight instead.
+ */
 function GroupFact({ children }: { children: React.ReactNode }): React.JSX.Element {
-  return <p className="font-sans text-sm font-medium text-muted-fg">{children}</p>;
+  return <p className="font-sans text-sm font-medium text-fg">{children}</p>;
 }
 
 export function GroupCard({
@@ -104,11 +111,11 @@ export function GroupCard({
         />
       )}
 
+      {/* The one deliberately round thing on an otherwise square card: a status
+          pill reads as a pill, and squaring it made it look like a button. */}
       {group.isFull && (
         <div className="absolute top-2 right-2">
-          <Badge variant="warning" className="rounded-none">
-            Group Is Full
-          </Badge>
+          <Badge variant="warning">Group Is Full</Badge>
         </div>
       )}
 

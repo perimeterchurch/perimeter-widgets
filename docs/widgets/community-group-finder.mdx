@@ -1,11 +1,11 @@
 ---
-description: Find a Perimeter community group by neighborhood, focus, life stage, and meeting time.
+description: Find a Perimeter community group by city, focus, age range, and meeting time.
 ---
 
 # community-group-finder
 
 A responsive card grid of **community groups**, with a filter panel above it.
-Each card shows the group's neighborhood banner, its name, the city and state it
+Each card shows the group's city banner, its name, the city and state it
 meets in, its meeting day and time, and an optional description, and links to
 that group's group-details page. Groups at capacity are badged "Group Is Full".
 
@@ -23,8 +23,8 @@ Ministry Platform that have not ended.
 <div data-perimeter-widget="community-group-finder"></div>
 ```
 
-Pin it to one neighborhood on a per-neighborhood page — this also hides the
-Neighborhood filter, so a visitor cannot widen past the page they are on:
+Pin it to one city on a per-city page — this also hides the City filter, so a
+visitor cannot widen past the page they are on:
 
 ```html
 <div data-perimeter-widget="community-group-finder" data-neighborhood-ids="5"></div>
@@ -32,19 +32,21 @@ Neighborhood filter, so a visitor cannot widen past the page they are on:
 
 ## Filters
 
-The panel mirrors the MP widget it replaces: a **Show/Hide Advanced** toggle over
-Neighborhood, City or Postal Code, Group Focus, Life Stage, Meeting Days, and
+A **Show/Hide Filters** toggle over City, Group Focus, Ages, Meeting Days, and
 Meeting Times, plus a keyword search box above it. While the panel is collapsed
 the toggle carries a badge with the number of active filters (counted per filter,
 so "Sunday + Monday" is one).
 
+Two filters are labelled for readers rather than for Ministry Platform: **City**
+is MP's `City_Ministries` (the endpoint still calls it `neighborhoodIds`), and
+**Ages** is MP's `Life_Stages` ("20s - 30s", "60s plus").
+
 The dropdown options are **data-driven**, not hard-coded — they come from
 `/api/community-groups/facets`, narrowed to values at least one visible group
-actually uses, so the Neighborhood list never offers a neighborhood with zero
-groups.
+actually uses, so the City list never offers a city with zero groups.
 
 Values within one filter are OR-ed and separate filters are AND-ed: checking
-Sunday and Monday widens the results, then picking a Life Stage narrows them.
+Sunday and Monday widens the results, then picking an age range narrows them.
 
 **Meeting Times** are four buckets the API derives from MP's `Meeting_Time`
 column: Morning (before 11:00), Lunchtime (11:00–13:59), Afternoon
@@ -56,10 +58,6 @@ over half of them — never matches a Meeting Times filter.
 value, which has no place in a Su–Sa strip; those groups stay reachable through
 every other filter.
 
-**City or Postal Code** is one box for both: the city matches as a
-case-insensitive substring, the postal code as a prefix, so `30005` still matches
-MP's ZIP+4 values.
-
 ## Config
 
 The widget reads its config from `data-*` attributes on the placeholder div.
@@ -68,7 +66,7 @@ defaults).
 
 | Attribute                | Type    | Default                                   | Description                                                                  |
 | ------------------------ | ------- | ----------------------------------------- | ---------------------------------------------------------------------------- |
-| `data-show-images`       | boolean | `true`                                    | Show the group's neighborhood banner on the card.                            |
+| `data-show-images`       | boolean | `true`                                    | Show the group's city banner on the card.                                    |
 | `data-show-description`  | boolean | `true`                                    | Show the group's description text on the card.                               |
 | `data-description-limit` | number  | `260`                                     | Characters of description shown before truncating with an ellipsis.           |
 | `data-show-filters`      | boolean | `true`                                    | Show the filter panel above the results.                                     |
@@ -76,8 +74,7 @@ defaults).
 | `data-advanced-open`     | boolean | `false`                                   | Start with the advanced filters expanded instead of collapsed.               |
 | `data-hide-full`         | boolean | `false`                                   | Hide groups at capacity instead of badging them "Group Is Full".             |
 | `data-group-type-id`     | number  | `13`                                      | MP Group Type. 13 = Community Group; 1, 3, and 10 are the other finder types. |
-| `data-neighborhood-ids`  | string  | —                                         | Lock to one or more neighborhoods (comma-separated MP City Ministry IDs).     |
-| `data-location`          | string  | —                                         | Preset the City or Postal Code box.                                          |
+| `data-neighborhood-ids`  | string  | —                                         | Lock to one or more cities (comma-separated MP City Ministry IDs).            |
 | `data-max-groups`        | number  | —                                         | Cap the total number of groups shown.                                        |
 | `data-details-url-base`  | string  | perimeter.org group-details               | Base URL each card links to; the group ID is appended.                       |
 | `data-details-label`     | string  | `See Details`                             | Label on the card link.                                                      |
@@ -94,10 +91,12 @@ defaults).
 
 Two things worth knowing about the data:
 
-- **"Neighborhood" is MP's `City_Ministries` table** (`Johns Creek`,
-  `Alpharetta-Milton`, …), not `Congregations` or `Household_Parishes`.
-- **Card banners are per-neighborhood, not per-group.** Every community group in
-  a neighborhood has the same banner attached in MP and marked as its default
+- **The City filter is MP's `City_Ministries` table** (`Johns Creek`,
+  `Alpharetta-Milton`, …), not `Congregations` or `Household_Parishes`. The
+  endpoint parameter is still named `neighborhoodIds` — MP's own group finder
+  called it that.
+- **Card banners are per-city, not per-group.** Every community group in a
+  city has the same banner attached in MP and marked as its default
   image. Served by `GET /api/group-image/{id}`, which 404s when a group has no
   image; the card then falls back to `data-default-image-url` and finally to a
   plain muted band.
@@ -118,3 +117,11 @@ brand blue on the button. Deliberately **no decorative icons** — the
 mission-trip-finder's pin/calendar/cost glyphs are absent here, and the fact
 lines are plain text. The only glyphs are the affordances the form controls need:
 the select chevron and the checkbox marks.
+
+The "Group Is Full" status badge is the one deliberately round element: a pill
+reads as a status, where squaring it made it look like a button.
+
+Filter labels, select placeholders, and the card's fact lines use `text-fg`
+rather than `text-muted-fg`. The muted token sits near 7:1 on the dark surface —
+legible by the numbers, dim in the eye at 12–14px — and these are the answers the
+reader came for, not hints. Card hierarchy comes from size and weight instead.

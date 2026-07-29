@@ -38,19 +38,16 @@ function MessageState({ children }: { children: React.ReactNode }): React.JSX.El
 }
 
 export function App({ config }: AppProps): React.JSX.Element {
-  // A host page can lock the widget to one or more neighborhoods. Those ids are
-  // pinned into the query and the Neighborhood filter is hidden, so a visitor
-  // cannot widen past the page they are on.
+  // A host page can lock the widget to one or more cities. Those ids are pinned
+  // into the query and the City filter is hidden, so a visitor cannot widen
+  // past the page they are on.
   const lockedNeighborhoodIds = React.useMemo(
     () => parseIdList(config.neighborhoodIds),
     [config.neighborhoodIds],
   );
   const neighborhoodLocked = lockedNeighborhoodIds.length > 0;
 
-  const [filters, setFilters] = React.useState<FilterState>({
-    ...EMPTY_FILTERS,
-    location: config.location ?? '',
-  });
+  const [filters, setFilters] = React.useState<FilterState>(EMPTY_FILTERS);
   const [advancedOpen, setAdvancedOpen] = React.useState(config.advancedOpen);
 
   const facetsQuery = useCommunityGroupFacets({ groupTypeId: config.groupTypeId });
@@ -59,7 +56,7 @@ export function App({ config }: AppProps): React.JSX.Element {
   const groupsQuery = useCommunityGroups({
     groupTypeId: config.groupTypeId,
     ...toQueryParams(filters),
-    // A locked neighborhood wins over the (hidden) filter value.
+    // A locked city wins over the (hidden) filter value.
     ...(neighborhoodLocked ? { neighborhoodIds: lockedNeighborhoodIds.join(',') } : {}),
     ...(config.hideFull ? { includeFull: 'false' as const } : {}),
     // No pagination UI: request the max page size. maxGroups caps the list
@@ -70,15 +67,13 @@ export function App({ config }: AppProps): React.JSX.Element {
   const allGroups = groupsQuery.data?.data.groups ?? [];
   const groups = config.maxGroups ? allGroups.slice(0, config.maxGroups) : allGroups;
 
-  const clearFilters = () => setFilters({ ...EMPTY_FILTERS, location: config.location ?? '' });
-
   return (
     <div className="@container p-4 text-left">
       {config.showFilters && (
         <GroupFilters
           filters={filters}
           onChange={setFilters}
-          onClear={clearFilters}
+          onClear={() => setFilters(EMPTY_FILTERS)}
           showSearch={config.showSearch}
           showNeighborhood={!neighborhoodLocked}
           advancedOpen={advancedOpen}

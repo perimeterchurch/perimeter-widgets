@@ -24,7 +24,6 @@ export const MEETING_DAYS = [
 
 export interface FilterState {
   search: string;
-  location: string;
   neighborhoodIds: number[];
   focusIds: number[];
   lifeStageIds: number[];
@@ -34,7 +33,6 @@ export interface FilterState {
 
 export const EMPTY_FILTERS: FilterState = {
   search: '',
-  location: '',
   neighborhoodIds: [],
   focusIds: [],
   lifeStageIds: [],
@@ -49,7 +47,6 @@ export const EMPTY_FILTERS: FilterState = {
  */
 export function activeFilterCount(filters: FilterState): number {
   return [
-    filters.location.trim().length > 0,
     filters.neighborhoodIds.length > 0,
     filters.focusIds.length > 0,
     filters.lifeStageIds.length > 0,
@@ -82,9 +79,6 @@ export function toQueryParams(filters: FilterState): Record<string, string> {
 
   const search = filters.search.trim();
   if (search) params.keyword = search;
-
-  const location = filters.location.trim();
-  if (location) params.location = location;
 
   if (filters.neighborhoodIds.length > 0) {
     params.neighborhoodIds = filters.neighborhoodIds.join(',');

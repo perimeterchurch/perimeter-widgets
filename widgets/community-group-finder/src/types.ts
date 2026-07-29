@@ -50,9 +50,8 @@ export const CommunityGroupFinderConfigSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Lock the widget to one or more neighborhoods (comma-separated MP City Ministry IDs). The Neighborhood filter is hidden when set.',
+      'Lock the widget to one or more cities (comma-separated MP City Ministry IDs). The City filter is hidden when set.',
     ),
-  location: z.string().optional().describe('Preset the City or Postal Code box.'),
   maxGroups: z.coerce
     .number()
     .int()

@@ -163,7 +163,7 @@ describe('community-group-finder App', () => {
   it('hides the filter panel when showFilters is off', () => {
     hooks.groups = groupsResult([GROUP]);
     renderApp({ showFilters: false });
-    expect(screen.queryByRole('button', { name: /Advanced/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Filters/ })).not.toBeInTheDocument();
   });
 });
 
@@ -174,16 +174,16 @@ describe('community-group-finder filters', () => {
     renderApp();
 
     expect(screen.queryByText('Meeting Days')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /Show Advanced/ }));
+    await user.click(screen.getByRole('button', { name: /Show Filters/ }));
     expect(screen.getByText('Meeting Days')).toBeInTheDocument();
     expect(screen.getByText('Meeting Times')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Hide Advanced/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Hide Filters/ })).toBeInTheDocument();
   });
 
   it('starts expanded when advancedOpen is set', () => {
     hooks.groups = groupsResult([GROUP]);
     renderApp({ advancedOpen: true });
-    expect(screen.getByText('Neighborhood')).toBeInTheDocument();
+    expect(screen.getByText('City')).toBeInTheDocument();
   });
 
   it('sends checked meeting days to the endpoint as a comma list', async () => {
@@ -207,48 +207,54 @@ describe('community-group-finder filters', () => {
     expect(hooks.params).toMatchObject({ meetingTimes: 'evening' });
   });
 
-  it('sends the keyword search and the city/postal box', async () => {
+  it('sends the keyword search', async () => {
     hooks.groups = groupsResult([GROUP]);
     const user = userEvent.setup();
     renderApp({ advancedOpen: true });
 
     await user.type(screen.getByLabelText('Search community groups'), 'hiking');
-    await user.type(screen.getByLabelText('City or Postal Code'), '30005');
 
-    expect(hooks.params).toMatchObject({ keyword: 'hiking', location: '30005' });
+    expect(hooks.params).toMatchObject({ keyword: 'hiking' });
+  });
+
+  it('labels the city and ages filters by those names rather than MP terms', () => {
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ advancedOpen: true });
+    expect(screen.getByText('City')).toBeInTheDocument();
+    expect(screen.getByText('Ages')).toBeInTheDocument();
+    expect(screen.queryByText('Neighborhood')).not.toBeInTheDocument();
+    expect(screen.queryByText('Life Stage')).not.toBeInTheDocument();
+  });
+
+  it('has no city-or-postal-code box', () => {
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ advancedOpen: true });
+    expect(screen.queryByLabelText('City or Postal Code')).not.toBeInTheDocument();
   });
 
   it('omits empty filters from the query entirely', () => {
     hooks.groups = groupsResult([GROUP]);
     renderApp();
     expect(hooks.params).not.toHaveProperty('keyword');
-    expect(hooks.params).not.toHaveProperty('location');
     expect(hooks.params).not.toHaveProperty('meetingDayIds');
   });
 
-  it('presets the city/postal box from config', () => {
-    hooks.groups = groupsResult([GROUP]);
-    renderApp({ advancedOpen: true, location: 'Duluth' });
-    expect(screen.getByLabelText('City or Postal Code')).toHaveValue('Duluth');
-  });
-
-  it('clears filters back to the configured location', async () => {
+  it('clears every filter back to empty', async () => {
     hooks.groups = groupsResult([GROUP]);
     const user = userEvent.setup();
-    renderApp({ advancedOpen: true, location: 'Duluth' });
+    renderApp({ advancedOpen: true });
 
     await user.click(screen.getByLabelText('Su'));
     await user.click(screen.getByRole('button', { name: 'Clear All' }));
 
     expect(screen.getByLabelText('Su')).not.toBeChecked();
-    expect(hooks.params).toMatchObject({ location: 'Duluth' });
     expect(hooks.params).not.toHaveProperty('meetingDayIds');
   });
 
-  it('hides the Neighborhood filter and pins the ids when locked to a neighborhood', () => {
+  it('hides the City filter and pins the ids when locked to a city', () => {
     hooks.groups = groupsResult([GROUP]);
     renderApp({ advancedOpen: true, neighborhoodIds: '5' });
-    expect(screen.queryByText('Neighborhood')).not.toBeInTheDocument();
+    expect(screen.queryByText('City')).not.toBeInTheDocument();
     expect(hooks.params).toMatchObject({ neighborhoodIds: '5' });
   });
 
@@ -259,9 +265,9 @@ describe('community-group-finder filters', () => {
 
     await user.click(screen.getByLabelText('Su'));
     await user.click(screen.getByLabelText('Evening'));
-    await user.click(screen.getByRole('button', { name: /Hide Advanced/ }));
+    await user.click(screen.getByRole('button', { name: /Hide Filters/ }));
 
     // Two filters active (days, times) — counted per filter, not per value.
-    expect(screen.getByRole('button', { name: /Show Advanced 2/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Show Filters 2/ })).toBeInTheDocument();
   });
 });

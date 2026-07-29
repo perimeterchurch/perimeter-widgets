@@ -72,10 +72,6 @@ describe('activeFilterCount', () => {
   it('ignores the search box — search is not one of the panel filters', () => {
     expect(activeFilterCount(filters({ search: 'hiking' }))).toBe(0);
   });
-
-  it('ignores a whitespace-only location', () => {
-    expect(activeFilterCount(filters({ location: '   ' }))).toBe(0);
-  });
 });
 
 describe('hasActiveFilters', () => {
@@ -102,7 +98,6 @@ describe('toQueryParams', () => {
       toQueryParams(
         filters({
           search: 'hiking',
-          location: '30005',
           neighborhoodIds: [5, 1],
           focusIds: [7],
           lifeStageIds: [4, 8],
@@ -112,7 +107,6 @@ describe('toQueryParams', () => {
       ),
     ).toEqual({
       keyword: 'hiking',
-      location: '30005',
       neighborhoodIds: '5,1',
       focusIds: '7',
       lifeStageIds: '4,8',
@@ -121,17 +115,14 @@ describe('toQueryParams', () => {
     });
   });
 
-  it('trims search and location', () => {
-    expect(toQueryParams(filters({ search: '  hiking  ', location: ' 30005 ' }))).toEqual({
-      keyword: 'hiking',
-      location: '30005',
-    });
+  it('trims the search term', () => {
+    expect(toQueryParams(filters({ search: '  hiking  ' }))).toEqual({ keyword: 'hiking' });
   });
 
   it('omits whitespace-only text rather than sending a blank filter', () => {
     // The endpoint treats an absent parameter as "not filtered"; a blank string
     // would still arrive as a present-but-unusable filter.
-    expect(toQueryParams(filters({ search: '   ', location: '  ' }))).toEqual({});
+    expect(toQueryParams(filters({ search: '   ' }))).toEqual({});
   });
 });
 
