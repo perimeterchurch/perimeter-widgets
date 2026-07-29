@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
+import remarkGfm from 'remark-gfm';
 import tailwindcss from '@tailwindcss/postcss';
 import { remToPxPlugin } from '@perimeter/vite-plugin-widget';
 import { devServerProxy } from './src/dev-proxy';
@@ -28,11 +29,16 @@ export default defineConfig({
     // that the React transform can then pick up (enforce: 'pre').
     // Frontmatter: strip `---` blocks from rendered output and expose them as a
     // `frontmatter` named export (catalog card descriptions read it).
+    // GFM: tables are a GitHub-Flavored extension, not core markdown. Without
+    // remark-gfm every `| … |` row in docs/ rendered as one run-on paragraph of
+    // literal pipes — the styled `table`/`th`/`td` components in src/lib/mdx.tsx
+    // were mapped but never received a node. Also brings strikethrough,
+    // autolinks, and task lists, which docs/ already assumes it has.
     {
       enforce: 'pre',
       ...mdx({
         providerImportSource: '@mdx-js/react',
-        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm],
       }),
     },
     // include MDX/MD so the React transform + Fast Refresh apply to MDX-emitted JS;
