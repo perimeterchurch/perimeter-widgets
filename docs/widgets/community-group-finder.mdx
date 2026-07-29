@@ -121,7 +121,30 @@ the select chevron and the checkbox marks.
 The "Group Is Full" status badge is the one deliberately round element: a pill
 reads as a status, where squaring it made it look like a button.
 
-Filter labels, select placeholders, and the card's fact lines use `text-fg`
-rather than `text-muted-fg`. The muted token sits near 7:1 on the dark surface —
-legible by the numbers, dim in the eye at 12–14px — and these are the answers the
-reader came for, not hints. Card hierarchy comes from size and weight instead.
+The card carries three type registers, which is why the metadata is bold on a
+lighter gray rather than a fourth color:
+
+| Register | Style | Contrast (light / dark) |
+| --- | --- | --- |
+| Title | 18px bold, `fg` | 15.7 / 17.1 |
+| Metadata (city, schedule, start) | 14px bold, `muted-fg` | 5.3 / 7.0 |
+| Description | 14px regular, `fg` | 15.7 / 17.1 |
+
+Bold is what keeps the lighter gray readable — `muted-fg` clears AA in both
+themes and the weight carries it the rest of the way. Filter labels and select
+placeholders use `text-fg`, not `muted-fg`: at 12px the muted token is legible by
+the numbers and not in the eye, and a select's placeholder here is the field's
+current state ("All Cities" = not filtered) rather than a hint.
+
+### The "See Details" label is white in light mode
+
+Deliberate, to match perimeter.org's own buttons — and it is a known contrast
+exception worth stating plainly. White on the light brand blue (`#60bbe9`)
+measures **2.15:1**, below the 4.5:1 AA threshold. The theme pairs `primary` with
+`primary-fg` (brand navy, 7.32:1) precisely to avoid this, so the widget
+overrides the token for light mode only; dark mode keeps navy, where nothing on
+the page expects white.
+
+If the contrast matters more than the colour match, either option fixes it
+without inventing a new token: `variant="secondary"` gives brand navy with white
+text at 15.7:1, or darkening the button blue lets white clear AA.

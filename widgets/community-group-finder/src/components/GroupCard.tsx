@@ -73,15 +73,17 @@ function GroupBanner({
 }
 
 /**
- * One fact line on the card. Plain text — the finder uses no leading icons.
+ * One metadata line on the card — city, schedule, start date. Plain text; the
+ * finder uses no leading icons.
  *
- * `text-fg` rather than `text-muted-fg`: these lines are the answer the reader
- * came for (where and when the group meets), and the muted token sits near 7:1
- * on the dark surface — legible by the numbers, dim in the eye. The card's
- * hierarchy comes from size and weight instead.
+ * Bold on the muted gray token, which gives the card three distinct registers
+ * without a fourth color: the title is bold + `fg`, the description is regular
+ * + `fg`, and metadata is bold + `muted-fg`. Bold is what keeps the lighter gray
+ * readable — `muted-fg` clears AA in both themes, and the weight carries it the
+ * rest of the way at 14px.
  */
 function GroupFact({ children }: { children: React.ReactNode }): React.JSX.Element {
-  return <p className="font-sans text-sm font-medium text-fg">{children}</p>;
+  return <p className="font-sans text-sm font-bold text-muted-fg">{children}</p>;
 }
 
 export function GroupCard({
@@ -133,10 +135,17 @@ export function GroupCard({
         )}
 
         <div className="mt-auto flex justify-end pt-4">
+          {/*
+            White label in light mode to match perimeter.org's own buttons.
+            This overrides the theme's `primary-fg` (brand navy), which is the
+            token paired with `primary` precisely because white on the light
+            brand blue measures ~2.1:1 — see the note in the widget doc. Dark
+            mode keeps navy, where nothing on the page expects white.
+          */}
           <Button
             size="sm"
             nativeButton={false}
-            className="rounded-none"
+            className="rounded-none text-white dark:text-primary-fg"
             render={<a href={`${config.detailsUrlBase}${group.id}`} />}
           >
             {config.detailsLabel}
