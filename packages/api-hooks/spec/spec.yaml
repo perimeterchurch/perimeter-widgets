@@ -7159,6 +7159,585 @@ paths:
             enum:
               - asc
               - desc
+  /api/community-groups:
+    get:
+      operationId: listCommunityGroups
+      summary: List community groups for the community-group-finder widget
+      tags:
+        - CommunityGroups
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      groups:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: Groups.Group_ID.
+                            name:
+                              type: string
+                              description: Groups.Group_Name.
+                            description:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            neighborhood:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: City_Ministries.City_Ministry, or null.
+                            neighborhoodId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            groupFocus:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Group_Focuses.Group_Focus, or null.
+                            groupFocusId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            lifeStage:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Life_Stages.Life_Stage.
+                            lifeStageId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            meetingDay:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Meeting_Days.Meeting_Day.
+                            meetingDayId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            meetingTime:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description:
+                                Groups.Meeting_Time as "HH:mm:ss", or null. Midnight is treated as unset — staff enter 00:00:00 as a
+                                placeholder.
+                            meetingTimeOfDay:
+                              anyOf:
+                                - type: string
+                                  enum:
+                                    - morning
+                                    - lunchtime
+                                    - afternoon
+                                    - evening
+                                - type: 'null'
+                              description: Bucket derived from meetingTime, or null when there is no time.
+                            meetingFrequency:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Meeting_Frequencies.Meeting_Frequency.
+                            meetingFrequencyId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            city:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Meeting address city. The street line is never returned.
+                            state:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Meeting address state or region.
+                            meetsOnline:
+                              type: boolean
+                            isFull:
+                              type: boolean
+                              description:
+                                True when Groups.Group_Is_Full is set, OR the group has a Target_Size that its participants have reached.
+                                Matches how the MP group-finder widget defines full.
+                            startDate:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Groups.Start_Date, ISO 8601, or null.
+                            participantCount:
+                              anyOf:
+                                - type: integer
+                                  minimum: -9007199254740991
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                              description: Groups.Current_Group_Participants, or null.
+                            targetSize:
+                              anyOf:
+                                - type: integer
+                                  minimum: -9007199254740991
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                              description: Groups.Target_Size.
+                            pendingInquiryCount:
+                              anyOf:
+                                - type: integer
+                                  minimum: -9007199254740991
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                              description:
+                                Group_Inquiries on this group that have not been Placed, or null when countGroupInquiries is off. Exposed
+                                so the `isFull` decision is reproducible from the response.
+                          required:
+                            - id
+                            - name
+                            - description
+                            - neighborhood
+                            - neighborhoodId
+                            - groupFocus
+                            - groupFocusId
+                            - lifeStage
+                            - lifeStageId
+                            - meetingDay
+                            - meetingDayId
+                            - meetingTime
+                            - meetingTimeOfDay
+                            - meetingFrequency
+                            - meetingFrequencyId
+                            - city
+                            - state
+                            - meetsOnline
+                            - isFull
+                            - startDate
+                            - participantCount
+                            - targetSize
+                            - pendingInquiryCount
+                          additionalProperties: false
+                      pagination:
+                        type: object
+                        properties:
+                          page:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          perPage:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          total:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          totalPages:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                        required:
+                          - page
+                          - perPage
+                          - total
+                          - totalPages
+                        additionalProperties: false
+                    required:
+                      - groups
+                      - pagination
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: groupTypeId
+          in: query
+          required: false
+          schema:
+            default: 13
+            description:
+              Groups.Group_Type_ID. Defaults to 13 ("Community Group"); other finder-visible types are 1 (Small Groups),
+              3 (Class), and 10 (Discipleship Group).
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: neighborhoodIds
+          in: query
+          required: false
+          schema:
+            description:
+              Comma-separated Groups.City_Ministry_ID list — the "Neighborhood" filter (City_Ministries, e.g.
+              "Alpharetta-Milton").
+            type: string
+        - name: focusIds
+          in: query
+          required: false
+          schema:
+            description: Comma-separated Groups.Group_Focus_ID list.
+            type: string
+        - name: lifeStageIds
+          in: query
+          required: false
+          schema:
+            description: Comma-separated Groups.Life_Stage_ID list.
+            type: string
+        - name: meetingDayIds
+          in: query
+          required: false
+          schema:
+            description: Comma-separated Groups.Meeting_Day_ID list (1 = Sunday … 7 = Saturday, 8 = Varying Day).
+            type: string
+        - name: meetingTimes
+          in: query
+          required: false
+          schema:
+            description:
+              'Comma-separated meeting-time buckets: morning, lunchtime, afternoon, evening. Groups with no Meeting_Time
+              never match.'
+            type: string
+        - name: location
+          in: query
+          required: false
+          schema:
+            description:
+              City name or postal code. Matched case-insensitively against the meeting address city, and as a prefix
+              against its postal code.
+            type: string
+            maxLength: 100
+        - name: keyword
+          in: query
+          required: false
+          schema:
+            description: Case-insensitive search over group name, description, and neighborhood.
+            type: string
+            maxLength: 100
+        - name: meetsOnline
+          in: query
+          required: false
+          schema:
+            description: When set, restricts to groups whose Meets_Online matches. Unset returns both.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: includeFull
+          in: query
+          required: false
+          schema:
+            default: 'true'
+            description:
+              When "false", full groups are omitted. Defaults to "true" so the widget can render its own "Group Is Full"
+              badge. See `isFull` for what counts as full.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: countGroupInquiries
+          in: query
+          required: false
+          schema:
+            default: 'false'
+            description:
+              When "true", pending Group_Inquiries count toward Target_Size when deciding whether a group is full.
+              Mirrors the MP group-finder widget's `countgroupinquiries`. Off by default.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: showFutureGroups
+          in: query
+          required: false
+          schema:
+            default: 'true'
+            description:
+              When "false", groups whose Start_Date has not arrived yet are omitted. Mirrors the MP group-finder widget's
+              `showfuturegroups`. On by default.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: includeHidden
+          in: query
+          required: false
+          schema:
+            description:
+              When "true", groups with Available_Online unset are included. Off by default — the finder shows only groups
+              published online.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: includeEnded
+          in: query
+          required: false
+          schema:
+            description: When "true", groups with a past End_Date are included. Off by default.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: page
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 1
+            maximum: 9007199254740991
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            default: 50
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: sort
+          in: query
+          required: false
+          schema:
+            default: name
+            description: Sort field. Defaults to group name.
+            type: string
+            enum:
+              - name
+              - neighborhood
+              - startDate
+        - name: order
+          in: query
+          required: false
+          schema:
+            default: asc
+            type: string
+            enum:
+              - asc
+              - desc
+  /api/community-groups/facets:
+    get:
+      operationId: listCommunityGroupFacets
+      summary: List filter options for the community-group-finder widget
+      tags:
+        - CommunityGroups
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      neighborhoods:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
+                          additionalProperties: false
+                      focuses:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
+                          additionalProperties: false
+                      lifeStages:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
+                          additionalProperties: false
+                      meetingDays:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
+                          additionalProperties: false
+                      meetingTimes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              enum:
+                                - morning
+                                - lunchtime
+                                - afternoon
+                                - evening
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
+                          additionalProperties: false
+                    required:
+                      - neighborhoods
+                      - focuses
+                      - lifeStages
+                      - meetingDays
+                      - meetingTimes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: groupTypeId
+          in: query
+          required: false
+          schema:
+            default: 13
+            description: Restrict facets to values actually used by groups of this type.
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: includeHidden
+          in: query
+          required: false
+          schema:
+            description: Match the list endpoint's visibility rule.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: includeEnded
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+  /api/group-image/{id}:
+    get:
+      operationId: getGroupImage
+      summary: Get the default image for a group
+      tags:
+        - CommunityGroups
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Binary image data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
   /api/invoices/{guid}:
     get:
       operationId: getInvoice
@@ -7245,7 +7824,7 @@ paths:
   /api/info:
     get:
       operationId: getInfo
-      summary: Get API version and deployment information
+      summary: Get the running build's version and deployment identity
       tags:
         - Info
       responses:
@@ -7257,11 +7836,39 @@ paths:
                 type: object
                 properties:
                   version:
+                    anyOf:
+                      - type: string
+                      - type: 'null'
+                  environment:
                     type: string
-                  lastDeployment:
+                    description: Vercel environment ("production" | "preview" | "development"); "development" off Vercel.
+                  commitSha:
+                    anyOf:
+                      - type: string
+                      - type: 'null'
+                    description:
+                      Git commit the running deployment was built from. Compare against origin/main to confirm a deploy actually
+                      landed.
+                  branch:
+                    anyOf:
+                      - type: string
+                      - type: 'null'
+                    description: Git branch the running deployment was built from.
+                  deploymentId:
+                    anyOf:
+                      - type: string
+                      - type: 'null'
+                    description: Vercel deployment ID serving this request.
+                  serverTime:
                     type: string
+                    description: Current server time, ISO 8601. Not a deployment timestamp.
                 required:
-                  - lastDeployment
+                  - version
+                  - environment
+                  - commitSha
+                  - branch
+                  - deploymentId
+                  - serverTime
                 additionalProperties: false
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -14180,9 +14787,19 @@ paths:
                         type: string
                         enum:
                           - viewer
+                          - restricted_viewer
+                          - unrestricted_viewer
                           - author
                           - admin
                       isAdmin:
+                        type: boolean
+                      isStaff:
+                        type: boolean
+                      canReadUnrestricted:
+                        type: boolean
+                      canReadAllRestricted:
+                        type: boolean
+                      isRestrictedToGrants:
                         type: boolean
                       scopedCategoryIds:
                         type: array
@@ -14196,6 +14813,12 @@ paths:
                           type: integer
                           exclusiveMinimum: 0
                           maximum: 9007199254740991
+                      grantedArticleIds:
+                        type: array
+                        items:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
                       canManageCategories:
                         type: boolean
                       canManagePermissions:
@@ -14203,8 +14826,13 @@ paths:
                     required:
                       - role
                       - isAdmin
+                      - isStaff
+                      - canReadUnrestricted
+                      - canReadAllRestricted
+                      - isRestrictedToGrants
                       - scopedCategoryIds
                       - grantedCategoryIds
+                      - grantedArticleIds
                       - canManageCategories
                       - canManagePermissions
                     additionalProperties: false
@@ -14553,6 +15181,8 @@ paths:
                           type: string
                           enum:
                             - viewer
+                            - restricted_viewer
+                            - unrestricted_viewer
                             - author
                             - admin
                         categoryId:
@@ -14562,6 +15192,16 @@ paths:
                               maximum: 9007199254740991
                             - type: 'null'
                         categoryName:
+                          anyOf:
+                            - type: string
+                            - type: 'null'
+                        articleId:
+                          anyOf:
+                            - type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            - type: 'null'
+                        articleTitle:
                           anyOf:
                             - type: string
                             - type: 'null'
@@ -14580,6 +15220,8 @@ paths:
                         - role
                         - categoryId
                         - categoryName
+                        - articleId
+                        - articleTitle
                         - grantedBy
                         - grantedDate
                       additionalProperties: false
@@ -14679,9 +15321,17 @@ paths:
                   type: string
                   enum:
                     - viewer
+                    - restricted_viewer
+                    - unrestricted_viewer
                     - author
                     - admin
                 categoryId:
+                  anyOf:
+                    - type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                    - type: 'null'
+                articleId:
                   anyOf:
                     - type: integer
                       exclusiveMinimum: 0

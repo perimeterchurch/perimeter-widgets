@@ -1,0 +1,182 @@
+---
+description: Find a Perimeter community group by city, focus, age range, and meeting time.
+---
+
+# community-group-finder
+
+A responsive card grid of **community groups**, with a filter panel above it.
+Each card shows the group's city banner, its name, the city and state it
+meets in, its meeting day and time, and an optional description, and links to
+that group's group-details page. Groups at capacity are badged "Group Is Full".
+
+Built to replace the stock Ministry Platform group-finder widget that
+perimeter.org embedded previously. Unlike the other finder widgets there is no
+legacy `reactwidgets` version — this is the first Perimeter-built one.
+
+Groups are sorted by name and, by default, limited to groups published online in
+Ministry Platform that have not ended.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="community-group-finder"></div>
+```
+
+Pin it to one city on a per-city page — this also hides the City filter, so a
+visitor cannot widen past the page they are on:
+
+```html
+<div data-perimeter-widget="community-group-finder" data-neighborhood-ids="5"></div>
+```
+
+## Filters
+
+A **Show/Hide Filters** toggle over City, Group Focus, Ages, Meeting Days, and
+Meeting Times, plus a keyword search box above it. While the panel is collapsed
+the toggle carries a badge with the number of active filters (counted per filter,
+so "Sunday + Monday" is one).
+
+Two filters are labelled for readers rather than for Ministry Platform: **City**
+is MP's `City_Ministries` (the endpoint still calls it `neighborhoodIds`), and
+**Ages** is MP's `Life_Stages` ("20s - 30s", "60s plus").
+
+The dropdown options are **data-driven**, not hard-coded — they come from
+`/api/community-groups/facets`, narrowed to values at least one visible group
+actually uses, so the City list never offers a city with zero groups.
+
+Values within one filter are OR-ed and separate filters are AND-ed: checking
+Sunday and Monday widens the results, then picking an age range narrows them.
+
+**Meeting Times** are four buckets the API derives from MP's `Meeting_Time`
+column: Morning (before 11:00), Lunchtime (11:00–13:59), Afternoon
+(14:00–16:59), and Evening (17:00 onward). Evening is open-ended because most
+community groups meet then. A group with no meeting time in MP — currently a bit
+over half of them — never matches a Meeting Times filter.
+
+**Meeting Days** covers Sunday through Saturday. MP also has a "Varying Day"
+value, which has no place in a Su–Sa strip; those groups stay reachable through
+every other filter.
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/types.ts` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute                | Type    | Default                                   | Description                                                                  |
+| ------------------------ | ------- | ----------------------------------------- | ---------------------------------------------------------------------------- |
+| `data-show-images`       | boolean | `true`                                    | Show the group's city banner on the card.                                    |
+| `data-show-description`  | boolean | `true`                                    | Show the group's description text on the card.                               |
+| `data-description-limit` | number  | `260`                                     | Characters of description shown before truncating with an ellipsis.           |
+| `data-show-filters`      | boolean | `true`                                    | Show the filter panel above the results.                                     |
+| `data-show-search`       | boolean | `true`                                    | Show the keyword search box above the filters.                               |
+| `data-advanced-open`     | boolean | `false`                                   | Start with the advanced filters expanded instead of collapsed.               |
+| `data-show-full-groups`  | boolean | `true`                                    | Show groups at capacity, badged "Group Is Full". False hides them.           |
+| `data-count-group-inquiries` | boolean | `false`                               | Let pending inquiries count toward a group's target size when judging full.  |
+| `data-show-future-groups` | boolean | `true`                                   | Show groups whose start date has not arrived yet.                            |
+| `data-group-type-id`     | number  | `13`                                      | MP Group Type. 13 = Community Group; 1, 3, and 10 are the other finder types. |
+| `data-neighborhood-ids`  | string  | —                                         | Lock to one or more cities (comma-separated MP City Ministry IDs).            |
+| `data-max-groups`        | number  | —                                         | Cap the total number of groups shown.                                        |
+| `data-details-url-base`  | string  | perimeter.org group-details               | Base URL each card links to; the group ID is appended.                       |
+| `data-details-label`     | string  | `See Details`                             | Label on the card link.                                                      |
+| `data-empty-message`     | string  | `No community groups match your filters.` | Message shown when the list has no groups.                                   |
+| `data-default-image-url` | string  | —                                         | Fallback banner URL for groups with no artwork in MP.                        |
+| `data-api-url`           | string  | —                                         | Override the perimeter-api base URL (advanced).                              |
+
+### Parity with the MP group-finder widget
+
+The stock `<mpp-group-finder>` widget this replaces documented four attributes:
+
+| MP attribute              | MP default | Here                                                                      |
+| ------------------------- | ---------- | ------------------------------------------------------------------------- |
+| `targeturl`               | —          | `data-details-url-base` (takes a full base URL; the group ID is appended)  |
+| `countgroupinquiries`     | `false`    | `data-count-group-inquiries`, same default                                 |
+| `showfullgroups`          | `false`    | `data-show-full-groups`, but defaulting to **`true`** — see below          |
+| `showsuggestagroupbutton` | `false`    | **Intentionally not carried over** — Perimeter does not use it            |
+
+Two deliberate differences from MP:
+
+- **`showFullGroups` defaults to `true`**, where MP hides full groups by default.
+  A full group still tells a reader the group exists and is worth asking about,
+  so it stays listed with a badge. Set the attribute to `false` for MP's
+  behaviour.
+- **"Full" means the same thing as in MP** — the `Group Is Full` flag is set, _or_
+  the group's target size has been reached. Turning on
+  `data-count-group-inquiries` lets pending inquiries occupy provisional seats
+  against that target, so a group can read as full before anyone has formally
+  joined.
+
+**There is no Suggest a Group button, by decision — not as an omission.** It is
+the only part of the MP widget that writes to Ministry Platform, and it needs a
+logged-in visitor, a form, and spam handling. This widget is entirely read-only
+and public, which is why it needs no auth and can be cached hard. If the button
+is ever wanted, it belongs in its own widget or its own release, not behind a
+display flag here.
+
+## Data source
+
+`GET /api/community-groups` and `GET /api/community-groups/facets`
+(perimeter-api). Each group is an MP `Groups` row of the configured
+`Group_Type_ID`, joined to the lookups the filters use. See
+`docs/domains/community-groups.md` in perimeter-api for the full mapping.
+
+Two things worth knowing about the data:
+
+- **The City filter is MP's `City_Ministries` table** (`Johns Creek`,
+  `Alpharetta-Milton`, …), not `Congregations` or `Household_Parishes`. The
+  endpoint parameter is still named `neighborhoodIds` — MP's own group finder
+  called it that.
+- **Card banners are per-city, not per-group.** Every community group in a
+  city has the same banner attached in MP and marked as its default
+  image. Served by `GET /api/group-image/{id}`, which 404s when a group has no
+  image; the card then falls back to `data-default-image-url` and finally to a
+  plain muted band.
+
+The card **never shows a street address.** `Groups.Offsite_Meeting_Address` is a
+leader's home in nearly every case, so the API returns only the city and state —
+the street line is never sent to the browser at all.
+
+The **start date is shown only for groups that have not begun yet.**
+Long-running groups carry a `Start_Date` from years ago (many are 2014), and
+"Starts: Sun, Feb 9, 2014" on a card reads as stale data rather than information.
+
+## Design notes
+
+Styled after the mission-trip-finder: square corners throughout, no shadow on the
+card or the "See Details" button, Sweet Sans (`font-sans`) for all text, and the
+brand blue on the button. Deliberately **no decorative icons** — the
+mission-trip-finder's pin/calendar/cost glyphs are absent here, and the fact
+lines are plain text. The only glyphs are the affordances the form controls need:
+the select chevron and the checkbox marks.
+
+The "Group Is Full" status badge is the one deliberately round element: a pill
+reads as a status, where squaring it made it look like a button.
+
+The card carries three type registers, which is why the metadata is bold on a
+lighter gray rather than a fourth color:
+
+| Register | Style | Contrast (light / dark) |
+| --- | --- | --- |
+| Title | 18px bold, `fg` | 15.7 / 17.1 |
+| Metadata (city, schedule, start) | 14px bold, `muted-fg` | 5.3 / 7.0 |
+| Description | 14px regular, `fg` | 15.7 / 17.1 |
+
+Bold is what keeps the lighter gray readable — `muted-fg` clears AA in both
+themes and the weight carries it the rest of the way. Filter labels and select
+placeholders use `text-fg`, not `muted-fg`: at 12px the muted token is legible by
+the numbers and not in the eye, and a select's placeholder here is the field's
+current state ("All Cities" = not filtered) rather than a hint.
+
+### The "See Details" label is white in light mode
+
+Deliberate, to match perimeter.org's own buttons — and it is a known contrast
+exception worth stating plainly. White on the light brand blue (`#60bbe9`)
+measures **2.15:1**, below the 4.5:1 AA threshold. The theme pairs `primary` with
+`primary-fg` (brand navy, 7.32:1) precisely to avoid this, so the widget
+overrides the token for light mode only; dark mode keeps navy, where nothing on
+the page expects white.
+
+If the contrast matters more than the colour match, either option fixes it
+without inventing a new token: `variant="secondary"` gives brand navy with white
+text at 15.7:1, or darkening the button blue lets white clear AA.
