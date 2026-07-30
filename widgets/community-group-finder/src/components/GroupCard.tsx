@@ -136,16 +136,21 @@ export function GroupCard({
 
         <div className="mt-auto flex justify-end pt-4">
           {/*
-            White label in light mode to match perimeter.org's own buttons.
-            This overrides the theme's `primary-fg` (brand navy), which is the
-            token paired with `primary` precisely because white on the light
-            brand blue measures ~2.1:1 — see the note in the widget doc. Dark
-            mode keeps navy, where nothing on the page expects white.
+            Light mode uses `secondary` (brand navy + white, 15.7:1) rather than
+            `primary`: the label has to be white to match perimeter.org's own
+            buttons, and white on the light brand blue is only 2.15:1.
+
+            Dark mode flips back to the brand blue. `secondary` is a dark slate
+            in the dark palette, which leaves the label readable but the button
+            itself at 1.21:1 against the card — legible text in a shape that no
+            longer reads as a button. The blue is 7.3:1 with its navy label and
+            is what the dark palette intends for a call to action.
           */}
           <Button
+            variant="secondary"
             size="sm"
             nativeButton={false}
-            className="rounded-none text-white dark:text-primary-fg"
+            className="rounded-none dark:bg-primary dark:text-primary-fg dark:hover:bg-primary/90"
             render={<a href={`${config.detailsUrlBase}${group.id}`} />}
           >
             {config.detailsLabel}

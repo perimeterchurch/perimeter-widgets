@@ -168,15 +168,22 @@ placeholders use `text-fg`, not `muted-fg`: at 12px the muted token is legible b
 the numbers and not in the eye, and a select's placeholder here is the field's
 current state ("All Cities" = not filtered) rather than a hint.
 
-### The "See Details" label is white in light mode
+### The "See Details" button changes colour per theme
 
-Deliberate, to match perimeter.org's own buttons — and it is a known contrast
-exception worth stating plainly. White on the light brand blue (`#60bbe9`)
-measures **2.15:1**, below the 4.5:1 AA threshold. The theme pairs `primary` with
-`primary-fg` (brand navy, 7.32:1) precisely to avoid this, so the widget
-overrides the token for light mode only; dark mode keeps navy, where nothing on
-the page expects white.
+The label has to be white to match perimeter.org's own buttons, and white on the
+light brand blue (`#60bbe9`) is only **2.15:1** — well under the 4.5:1 AA
+threshold, and the reason the theme pairs `primary` with `primary-fg` (brand
+navy) rather than white. So light mode uses `secondary` (brand navy) instead,
+which pairs with white and is equally on-brand.
 
-If the contrast matters more than the colour match, either option fixes it
-without inventing a new token: `variant="secondary"` gives brand navy with white
-text at 15.7:1, or darkening the button blue lets white clear AA.
+Dark mode flips back to the brand blue, because `secondary` is a dark slate in
+the dark palette: the label stays readable on it, but the button sits at
+**1.21:1** against the card — legible text in a shape that no longer reads as a
+button.
+
+| Theme | Button | Label | Label on button | Button on card |
+| ----- | ------ | ----- | --------------- | -------------- |
+| Light | `secondary` (navy `#09243f`) | white | 15.7:1 | 15.7:1 |
+| Dark  | `primary` (blue `#60bbe9`) | navy | 7.3:1 | 8.3:1 |
+
+Both figures are measured on a bare embed, not in the studio.
