@@ -6,6 +6,10 @@
   "outputDirectory": ".",
   "rewrites": [
     {
+      "source": "/community-group-finder/latest.js",
+      "destination": "/community-group-finder/0.1.0/index.js"
+    },
+    {
       "source": "/example/latest.js",
       "destination": "/example/0.0.1/index.js"
     },
