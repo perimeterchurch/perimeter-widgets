@@ -31,9 +31,17 @@ describe('GuidePage (/guides/:slug)', () => {
 
     // Text unique to docs/guides-mdx/styling-widgets.mdx — proves the real MDX
     // chunk lazy-loaded and rendered through StudioMDXProvider.
-    await waitFor(() => {
-      expect(scope.getByText(/tokens-first/i)).toBeTruthy();
-    });
+    //
+    // Generous timeout because this awaits a real lazy import, not a state
+    // flush: transforming + evaluating the MDX chunk takes well over waitFor's
+    // 1s default on a 2-core CI runner sharing cores with the other suites.
+    // Matches the 10s the other lazy-chunk page tests use.
+    await waitFor(
+      () => {
+        expect(scope.getByText(/tokens-first/i)).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
     // The guide owns the page heading: the MDX `# Styling widgets` maps to the
     // single studio-styled h1.
     expect(container.querySelector('h1')?.textContent).toBe('Styling widgets');
