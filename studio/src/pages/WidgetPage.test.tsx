@@ -50,9 +50,14 @@ describe('WidgetPage (/widgets/:slug)', () => {
     const scope = within(container);
 
     // The widget module/css load async, then WidgetPreview mounts the real host.
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: this awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
 
     // The inspector (which carries the embed snippet) is a closed-by-default
     // slide-out drawer now — open it via its header toggle before asserting.

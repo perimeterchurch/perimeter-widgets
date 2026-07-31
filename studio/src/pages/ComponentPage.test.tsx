@@ -32,9 +32,14 @@ describe('ComponentPage (/components/:name)', () => {
 
     // Text unique to docs/components/button.mdx — proves the real MDX chunk
     // lazy-loaded and rendered (not the gallery, which shows export names only).
-    await waitFor(() => {
-      expect(scope.getByText(/A clickable action\./)).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: this awaits a real lazy MDX import, which
+    // exceeds a second on a 2-core CI runner. Same reason across this file.
+    await waitFor(
+      () => {
+        expect(scope.getByText(/A clickable action\./)).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
     // The doc owns the page heading: the MDX `# Button` maps to the single
     // studio-styled h1 (no redundant chrome header above it).
     expect(container.querySelector('h1')?.textContent).toBe('Button');
@@ -45,9 +50,12 @@ describe('ComponentPage (/components/:name)', () => {
     const scope = within(container);
 
     // Text unique to docs/components/input.mdx — proves the MDX chunk rendered.
-    await waitFor(() => {
-      expect(scope.getByText(/A single-line text field\./)).toBeTruthy();
-    });
+    await waitFor(
+      () => {
+        expect(scope.getByText(/A single-line text field\./)).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
     // The doc owns the page heading.
     expect(container.querySelector('h1')?.textContent).toBe('Input');
     // The <Example> mounts a ComponentStage shadow root — its presence proves the
@@ -63,9 +71,12 @@ describe('ComponentPage (/components/:name)', () => {
     const { container } = renderAt('/components/tabs');
     const scope = within(container);
 
-    await waitFor(() => {
-      expect(scope.getByText(/A set of layered sections/)).toBeTruthy();
-    });
+    await waitFor(
+      () => {
+        expect(scope.getByText(/A set of layered sections/)).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
     expect(container.querySelector('h1')?.textContent).toBe('Tabs');
     const hosts = Array.from(container.querySelectorAll<HTMLElement>('div')).filter(
       (el) => el.shadowRoot,

@@ -11,22 +11,25 @@
       (freight-display-pro, sweet-sans-pro) so widget previews render the real
       fonts instead of the token fallbacks. Dev/studio only: shipped widgets
       rely on the embedding host page (perimeter.org) loading its own kit. Font
-      availability is document-scoped, so this reaches into shadow-root previews.
-      Do not remove it to "clean up" the studio's own font — the previews and
-      the `font-serif` token specimens both depend on it.
+      availability is document-scoped, so this reaches into shadow-root previews
+      but NOT into the preview iframes, which link it themselves — see
+      src/lib/brand-fonts.ts. Do not remove it to "clean up" the studio's own
+      font: the previews and the `font-serif` token specimen depend on it.
 
-      Geist — the STUDIO CHROME face only (sidebar, nav, docs, tables). The
-      studio is a tool, not a Perimeter-branded page, so its own UI does not use
-      the brand sans. Widgets are unaffected: `resolveTokens` pins
-      `font-family: var(--font-sans)` on every widget's shadow host, so Geist
-      cannot inherit into a preview even though font-family pierces shadow roots.
+      Inter + Playfair Display — the STUDIO CHROME faces only (header, sidebar,
+      nav, docs, tables), matching the Knowledge Base subsite so the internal
+      tools read as one family. Inter carries the UI text; Playfair is used for
+      the "Perimeter" wordmark alone. Widgets are unaffected: `resolveTokens`
+      pins `font-family: var(--font-sans)` on every widget's shadow host, so the
+      chrome face cannot inherit into a preview even though font-family pierces
+      shadow roots.
     -->
     <link rel="stylesheet" href="https://use.typekit.net/hpg7onr.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Playfair+Display:wght@400..900&display=swap"
     />
   </head>
   <body>
