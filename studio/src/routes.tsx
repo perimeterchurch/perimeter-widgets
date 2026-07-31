@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { OverviewPage } from './pages/OverviewPage';
 import { WidgetPage } from './pages/WidgetPage';
 import { PreviewPage } from './pages/PreviewPage';
+import { ComponentsPage } from './pages/ComponentsPage';
 import { ComponentPage } from './pages/ComponentPage';
 import { TokensPage } from './pages/TokensPage';
 import { GuidePage } from './pages/GuidePage';
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <OverviewPage /> },
       { path: 'widgets/:slug', element: <WidgetPage /> },
+      { path: 'components', element: <ComponentsPage /> },
       { path: 'components/:name', element: <ComponentPage /> },
       { path: 'tokens', element: <TokensPage /> },
       { path: 'guides/:slug', element: <GuidePage /> },

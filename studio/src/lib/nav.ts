@@ -1,4 +1,4 @@
-import type { WidgetEntry, ComponentEntry } from './discovery';
+import type { WidgetEntry } from './discovery';
 import { titleFromSlug } from './labels';
 
 export interface NavItem {
@@ -28,8 +28,13 @@ export interface CatalogNavEntry {
  * Pure shaping of discovery output into the sidebar's grouped nav. Keeping it a
  * plain function (no React, no globs, no fetch) makes the Sidebar trivially
  * testable with a fixture and keeps route paths (`/catalog/<slug>`,
- * `/widgets/<slug>`, `/components/<name>`, `/guides/<slug>`) defined in exactly
- * one place.
+ * `/widgets/<slug>`, `/components`, `/guides/<slug>`) defined in exactly one
+ * place.
+ *
+ * Components are NOT enumerated here. They used to be one rail entry each, 18
+ * of them, which buried the rest of the nav; now a single Reference link points
+ * at `/components`, which owns the full list. That page does its own discovery,
+ * so this function no longer takes component entries at all.
  *
  * The Catalog group is the canonical widget list — released widgets (runtime
  * manifest ∩ definitions, resolved by the caller) linking to their catalog
@@ -43,7 +48,6 @@ export interface CatalogNavEntry {
  */
 export function buildNav(
   catalog: CatalogNavEntry[],
-  components: ComponentEntry[],
   guides: GuideEntry[] = [],
   devWidgets: WidgetEntry[] | null = null,
 ): NavGroup[] {
@@ -67,12 +71,12 @@ export function buildNav(
         ]
       : []),
     {
-      label: 'Components',
-      items: components.map((c) => ({ to: `/components/${c.name}`, label: c.name })),
-    },
-    {
       label: 'Reference',
       items: [
+        // One link to the index rather than ~40 rail entries. The component docs
+        // are looked up, not browsed, and the long list crowded out everything
+        // else in the sidebar. /components owns the full list.
+        { to: '/components', label: 'Components' },
         { to: '/tokens', label: 'Tokens' },
         ...guides.map((g) => ({ to: `/guides/${g.slug}`, label: g.label })),
       ],
