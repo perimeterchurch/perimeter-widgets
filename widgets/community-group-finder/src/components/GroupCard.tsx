@@ -136,11 +136,15 @@ export function GroupCard({
 
         <div className="mt-auto flex justify-end pt-4">
           {/*
-            White label in light mode to match perimeter.org's own buttons.
-            This overrides the theme's `primary-fg` (brand navy), which is the
-            token paired with `primary` precisely because white on the light
-            brand blue measures ~2.1:1 — see the note in the widget doc. Dark
-            mode keeps navy, where nothing on the page expects white.
+            White label in light mode to match perimeter.org's own buttons,
+            which are white on this same accent at the same ~2.1:1. This
+            overrides the theme's `primary-fg` (brand navy), the token paired
+            with `primary` precisely to avoid that ratio. An ACCEPTED exception,
+            not an oversight: #192 records the decision and the two measured
+            fixes, both of which belong on the site's buttons rather than here —
+            changing only the widget would break the colour match that is the
+            point. Dark mode keeps navy, where nothing expects white.
+            Pinned by tests/details-button-contrast.test.ts.
           */}
           <Button
             size="sm"
