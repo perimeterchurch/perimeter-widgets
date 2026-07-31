@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CDN_BASE_URL } from '../lib/catalog';
+import { brandFontsLinkTag } from '../lib/brand-fonts';
 import { serializeWidgetAttrs, type PreviewTheme } from '../lib/embed-snippet';
 
 /** postMessage type for srcdoc→parent failure reports (same-origin srcdoc). */
@@ -29,6 +30,11 @@ function isCdnPreviewError(data: unknown): data is CdnPreviewErrorMessage {
  * must never fail silently). Prod-visible by design (BuiltBundlePreview stays
  * DEV-only). NEVER add `sandbox`: without allow-same-origin it forces an opaque
  * origin, localStorage throws, and MP sign-in can no longer reach the widget.
+ *
+ * The one thing the frame does NOT leave bare is fonts: it links the brand kit,
+ * because the real host page (perimeter.org) loads one and a widget's CSS only
+ * *names* sweet-sans-pro. Omitting it renders the preview in Inter. For a truly
+ * bare host — no kit, no styles — use `pnpm embed-lab`.
  */
 export function CdnBundlePreview({
   slug,
@@ -62,6 +68,11 @@ export function CdnBundlePreview({
   const loaderUrl = JSON.stringify(`${CDN_BASE_URL}/loader.js`);
   const srcDoc = [
     '<!doctype html><html><head><meta charset="utf-8">',
+    // The brand faces. An iframe is its own document and inherits no fonts from
+    // the studio, so without this the framed widget names sweet-sans-pro, fails
+    // to find it, and renders the Inter fallback — a preview that quietly
+    // misrepresents perimeter.org, which loads its own kit.
+    brandFontsLinkTag(),
     '<style>html,body{margin:0;padding:0}</style>',
     '<script>',
     'function __report(message){',
