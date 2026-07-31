@@ -1,122 +1,189 @@
-import { lazy, Suspense, useMemo, useState, type ComponentType } from 'react';
-import { useParams } from 'react-router';
-import type { WidgetDefinition } from '@perimeter/widget-runtime';
+import { lazy, Suspense, useMemo, type ComponentType } from 'react';
+import { useParams, useSearchParams } from 'react-router';
+import { Button } from '@perimeter/ui/button';
+import { Skeleton } from '@perimeter/ui/skeleton';
 import { Spinner } from '@perimeter/ui/spinner';
+import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
 import { toWidgetEntries, widgetDefGlob, widgetCssGlob, type WidgetEntry } from '../lib/discovery';
+import { useCatalog, type CatalogEntry } from '../lib/catalog';
 import { widgetDoc } from '../lib/widget-docs';
 import { StudioMDXProvider } from '../lib/mdx';
-import { WidgetPreview } from '../components/WidgetPreview';
-import { Canvas } from '../components/Canvas';
-import { InspectorDrawer } from '../components/InspectorDrawer';
+import { EmbedView } from '../components/EmbedView';
+import { DevView } from '../components/DevView';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { ShareLinkButton } from '../components/ShareLinkButton';
-import { usePreviewConfig } from '../hooks/use-preview-config';
-import { useChromeTheme } from '../lib/use-chrome-theme';
 import { titleFromSlug } from '../lib/labels';
 import { NotFoundPage } from './NotFoundPage';
 
+/** Tab ids, also the `?tab=` values. */
+const EMBED = 'embed';
+const DEV = 'dev';
+
+/** The Dev tab is a developer tool — local dev only, as the old nav group was. */
+const DEV_AVAILABLE = import.meta.env.DEV;
+
 /**
- * The widget route: a host-page-sim canvas mounting the widget through the real
- * mount() (parity with production), beside the Inspector (Config / Theme / Info
- * tabs + the generated embed snippet). Unknown slugs render the 404 page.
+ * The one widget route, replacing the old split between `/catalog/:slug` (shipped
+ * bundle + options + snippet) and `/widgets/:slug` (source canvas + inspector).
+ * Those were two views of the same widget on two routes, so the sidebar listed
+ * everything twice; now they are tabs on one page.
+ *
+ * - **Embed** — the shipped CDN bundle, options playground, copyable snippet.
+ *   Needs a release; the default, since it is what non-developers come for.
+ * - **Dev** — source preview through the real `mount()` + Inspector. Local dev
+ *   only, and the only tab for a widget that has no shipped bundle yet.
+ *
+ * The MDX doc renders below the tabs, not inside one: it documents the widget
+ * whichever view you are in, and the options reference wants to be readable while
+ * you tune the options above it.
+ *
+ * The active tab lives in `?tab=` so a link can point at either view. That sits
+ * alongside the Dev tab's own preview params (usePreviewConfig), which is why the
+ * tab is read from useSearchParams here rather than held in component state.
  */
 export function WidgetPage() {
   const { slug } = useParams();
-  const widgets = useMemo(() => toWidgetEntries(widgetDefGlob, widgetCssGlob), []);
-  const entry = slug ? widgets.find((w) => w.slug === slug) : undefined;
+  const { entries, isLoading, error, retry } = useCatalog();
+  const devWidgets = useMemo(() => toWidgetEntries(widgetDefGlob, widgetCssGlob), []);
 
-  if (!entry) return <NotFoundPage />;
-  return <WidgetView key={entry.slug} entry={entry} />;
-}
+  const released = slug ? entries.find((e) => e.slug === slug) : undefined;
+  const source = slug ? devWidgets.find((w) => w.slug === slug) : undefined;
 
-function WidgetView({ entry }: { entry: WidgetEntry }) {
-  // The preview's tuned state (config overrides + token overrides + theme +
-  // viewport) lives in the URL so a dialed-in preview is shareable and survives
-  // reload — usePreviewConfig is the single source of truth, replacing local
-  // useState. The standalone /preview/:slug route reads the same params.
-  const { state, setConfig, setTokens, setTheme, setViewport, setBackground, buildShareUrl } =
-    usePreviewConfig();
-  const [def, setDef] = useState<WidgetDefinition | null>(null);
-  const doc = widgetDoc(entry.slug);
+  const canDev = DEV_AVAILABLE && source !== undefined;
 
-  // The preview theme follows the studio chrome (sidebar) toggle until the canvas
-  // Theme control pins one explicitly — so switching the studio to dark also
-  // darkens the widget preview, matching the gallery stage. `state.theme` (the
-  // pinned value from the URL) wins when set.
-  const chromeTheme = useChromeTheme();
-  const previewTheme = state.theme ?? chromeTheme;
+  // Only the manifest-dependent cases wait on the manifest. When a source view is
+  // available, render it immediately and let the Embed tab appear once the fetch
+  // resolves — gating the whole page on a remote request would make the developer
+  // view hostage to widgets.perimeter.org being reachable, which it is not when
+  // offline, and which stalled the visual harness.
+  if (!canDev) {
+    if (isLoading) {
+      return (
+        <div data-testid="viewer-skeleton" className="space-y-4 p-6">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-[40vh] w-full" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      );
+    }
+    if (error) {
+      return (
+        <div role="alert" className="m-6 space-y-2 rounded-md border border-border bg-muted p-4">
+          <p className="text-sm text-fg">Couldn&apos;t reach widgets.perimeter.org: {error}</p>
+          <Button type="button" variant="outline" size="sm" onClick={retry}>
+            Retry
+          </Button>
+        </div>
+      );
+    }
+    // Unknown slug, or an unreleased widget on the deployed site.
+    if (!released) return <NotFoundPage />;
+  }
 
   return (
-    // Fragment, not one h-full column: `main` (the Layout scroll region) has a
-    // definite height, so the first child's h-full fills exactly one viewport of
-    // it (header + canvas) and the doc section flows BELOW, reachable by
-    // scrolling `main`. Putting the section inside the h-full column starved the
-    // canvas instead — a doc taller than the viewport can't shrink below its
-    // content (min-height:auto), so the flex-1 min-h-0 canvas collapsed to 0px.
+    <WidgetView
+      key={slug}
+      slug={slug!}
+      released={released}
+      source={source}
+      manifestError={error}
+      manifestResolved={!isLoading}
+    />
+  );
+}
+
+function WidgetView({
+  slug,
+  released,
+  source,
+  manifestError,
+  manifestResolved,
+}: {
+  slug: string;
+  released: CatalogEntry | undefined;
+  source: WidgetEntry | undefined;
+  manifestError: string | null;
+  /** False while the CDN manifest is still in flight — `released` is not yet
+   * authoritative, so nothing may claim the widget is unreleased. */
+  manifestResolved: boolean;
+}) {
+  const [params, setParams] = useSearchParams();
+  const doc = widgetDoc(slug);
+
+  const canEmbed = released !== undefined;
+  const canDev = DEV_AVAILABLE && source !== undefined;
+
+  const tabs = [
+    ...(canEmbed ? [{ id: EMBED, label: 'Embed' }] : []),
+    ...(canDev ? [{ id: DEV, label: 'Dev' }] : []),
+  ];
+  // Embed wins when available; an unreleased widget lands on Dev because that is
+  // its only view. A `?tab=` naming an unavailable tab falls back rather than
+  // rendering blank.
+  const requested = params.get('tab');
+  const active =
+    requested && tabs.some((t) => t.id === requested) ? requested : (tabs[0]?.id ?? EMBED);
+
+  const selectTab = (id: string) => {
+    const next = new URLSearchParams(params);
+    if (id === tabs[0]?.id) next.delete('tab');
+    else next.set('tab', id);
+    // `replace` so tab flicks don't stack history entries between the page and
+    // the thing the visitor was reading before it.
+    setParams(next, { replace: true });
+  };
+
+  return (
     <>
-      <div className="flex h-full flex-col">
-        <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
-          <div>
-            <Breadcrumbs
-              crumbs={[
-                { label: 'Home', to: '/' },
-                { label: 'Widgets' },
-                { label: titleFromSlug(entry.slug) },
-              ]}
-            />
-            <h1 className="mt-1 text-xl font-semibold tracking-tight text-fg">
-              {titleFromSlug(entry.slug)}
-            </h1>
+      <div className="space-y-6 p-6">
+        <header>
+          <Breadcrumbs
+            crumbs={[
+              { label: 'Home', to: '/' },
+              { label: 'Widgets', to: '/widgets' },
+              { label: titleFromSlug(slug) },
+            ]}
+          />
+          <div className="mt-1 flex items-center justify-between gap-4">
+            <h1 className="text-xl font-semibold tracking-tight text-fg">{titleFromSlug(slug)}</h1>
+            {/* Nothing until the manifest resolves: on a cold dev server the join
+                imports every released widget's module, and labelling a widget
+                "not released" in the meantime is simply wrong. */}
+            {released ? (
+              <code className="text-xs text-muted-fg">v{released.version}</code>
+            ) : manifestResolved ? (
+              <code className="text-xs text-muted-fg">not released</code>
+            ) : null}
           </div>
-          <div className="flex items-center gap-2">
-            {/* Share / standalone — copy a deep link carrying the current preview
-              state, or open the full-bleed /preview/:slug route in a new tab. */}
-            <ShareLinkButton
-              copyUrl={() => buildShareUrl(window.location.pathname)}
-              standaloneUrl={buildShareUrl(`/preview/${entry.slug}`)}
-            />
-            {/* Inspector — hand-rolled slide-out drawer (Config / Theme / Info tabs +
-              embed snippet), closed by default. Its toggle lives in the header; the
-              canvas keeps the full width when the drawer is closed. */}
-            <InspectorDrawer
-              definition={def}
-              slug={entry.slug}
-              configOverrides={state.config}
-              tokenOverrides={state.tokens}
-              onConfigChange={setConfig}
-              onThemeChange={setTokens}
-            />
-          </div>
+          {released?.description && (
+            <p className="mt-1 text-sm text-muted-fg">{released.description}</p>
+          )}
         </header>
 
-        <div className="min-h-0 flex-1 overflow-hidden">
-          {/* Preview canvas — viewport-preset + background + light/dark toolbar around
-            the real mount(). Canvas owns the scroll/background and swaps in the
-            host-page sim (HostFrame) when its host-sim background is selected
-            (the default). Theme + viewport are lifted into the URL here so they
-            drive both the toolbar controls and the shareable preview link. */}
-          <Canvas
-            slug={entry.slug}
-            theme={previewTheme}
-            onThemeChange={setTheme}
-            viewport={state.viewport}
-            onViewportChange={setViewport}
-            background={state.background}
-            onBackgroundChange={setBackground}
-          >
-            <WidgetPreview
-              entry={entry}
-              configOverrides={state.config}
-              tokenOverrides={state.tokens}
-              theme={previewTheme}
-              onDefinition={setDef}
-            />
-          </Canvas>
-        </div>
+        {/* One tab needs no chooser — an unreleased widget in dev, or the
+            deployed site where Dev does not exist. */}
+        {tabs.length > 1 && (
+          <SegmentedTabs
+            items={tabs}
+            value={active}
+            onChange={selectTab}
+            aria-label="Widget view"
+            className="w-fit"
+          />
+        )}
+
+        {manifestError && canDev && (
+          <p role="status" className="text-sm text-muted-fg">
+            Couldn&apos;t reach widgets.perimeter.org ({manifestError}), so the shipped-bundle view
+            is unavailable. The source view below still works.
+          </p>
+        )}
+
+        {active === EMBED && released ? <EmbedView entry={released} /> : null}
+        {active === DEV && source ? <DevView entry={source} /> : null}
       </div>
 
-      {/* Optional widget doc: rendered below the canvas when docs/widgets/<slug>.mdx
-          exists — purpose, config reference, embed instructions. Nothing otherwise. */}
+      {/* The widget's own doc — purpose, options reference, embed instructions —
+          when docs/widgets/<slug>.mdx exists. Nothing otherwise. */}
       {doc ? (
         <section className="border-t border-border">
           <WidgetDoc loader={doc} />

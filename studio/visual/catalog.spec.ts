@@ -5,7 +5,7 @@ import { STUDIO_URL, mockCdn, mockSermonsApi } from './helpers';
 test.describe('catalog', () => {
   test('landing lists released widgets with auth badges (axe clean)', async ({ page }) => {
     await mockCdn(page);
-    await page.goto(`${STUDIO_URL}/catalog`);
+    await page.goto(`${STUDIO_URL}/widgets`);
     // Scope to the content region: the sidebar's Catalog group now lists the
     // same widgets (with an sr-only "Sign-in required"), so page-wide queries
     // would resolve to two elements and trip strict mode.
@@ -27,7 +27,7 @@ test.describe('catalog', () => {
   test('viewer runs the shipped sermons bundle hermetically', async ({ page }) => {
     await mockCdn(page);
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/catalog/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons`);
     // Snippet present with the loader form.
     await expect(page.getByText('data-perimeter-widget="sermons"').first()).toBeVisible();
     // The shipped bundle actually MOUNTED and rendered fixture data: Playwright
@@ -39,7 +39,7 @@ test.describe('catalog', () => {
 
   test('auth viewer shows the sign-in panel and the embedded gate', async ({ page }) => {
     await mockCdn(page);
-    await page.goto(`${STUDIO_URL}/catalog/my-shepherds`);
+    await page.goto(`${STUDIO_URL}/widgets/my-shepherds`);
     await expect(page.getByRole('region', { name: /sign-in status/i })).toBeVisible();
     const frame = page.frameLocator('iframe[title="Live widget: my-shepherds"]');
     await expect(frame.getByText(/please sign in/i)).toBeVisible();

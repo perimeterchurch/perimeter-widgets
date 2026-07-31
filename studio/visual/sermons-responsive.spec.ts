@@ -52,7 +52,7 @@ async function widgetState(page: Page) {
 test.describe('sermons responsive overhaul', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     // Default viewport is fluid (wide) → desktop → grid; cards settle here before
     // we switch presets (switching the preset changes the view branch).

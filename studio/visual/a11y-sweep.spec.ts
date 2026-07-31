@@ -75,7 +75,7 @@ test.describe('Pagination — keyboard reachable (shadow DOM)', () => {
   test('page control is a focusable <button> that activates on Enter', async ({ page }) => {
     await mockSermonsApi(page); // image route + defaults
     await routeSermonsList(page, multiPageSermons(3));
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     await waitForSermonCards(page, 1);
 
@@ -151,7 +151,7 @@ test.describe('MultiCombobox — shadow-DOM mount does not loop (regression)', (
 
     await mockSermonsApi(page);
     await routeSermonsList(page, multiPageSermons(2));
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     // If the comboboxes looped, render would throw before cards ever appear.
     await waitForSermonCards(page, 1);
@@ -175,7 +175,7 @@ test.describe('Empty results — dashed border renders', () => {
     test(`empty card shows a real dashed border (${theme})`, async ({ page }) => {
       await mockSermonsApi(page);
       await routeSermonsList(page, emptySermons);
-      await page.goto(`${STUDIO_URL}/widgets/sermons`);
+      await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
       await waitForShadowMount(page);
       await setWidgetTheme(page, theme);
 

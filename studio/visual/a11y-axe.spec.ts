@@ -68,7 +68,7 @@ function digest(violations: Awaited<ReturnType<typeof widgetViolations>>) {
 test.describe('axe-core: sermons widget has no WCAG A/AA violations', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     await waitForResultsLoaded(page);
   });

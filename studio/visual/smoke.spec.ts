@@ -22,7 +22,7 @@ import {
 test.describe('studio visual harness — sermons', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     // The shadow root mounts before the mocked query resolves — wait for the
     // cards so theme toggles + computed-color reads don't race the data mount.

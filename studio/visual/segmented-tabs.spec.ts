@@ -39,7 +39,7 @@ async function shadowTabBg(page: import('@playwright/test').Page, label: string)
 test.describe('SegmentedTabs — sermons tab row (shadow DOM)', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     await waitForSermonCards(page, 3);
   });
@@ -73,7 +73,7 @@ test.describe('SegmentedTabs — sermons tab row (shadow DOM)', () => {
 test.describe('SegmentedTabs — studio inspector tabs (light DOM)', () => {
   test('Config/Theme/Info tabs switch panels and mark the active tab', async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
 
     // The inspector lives in a drawer; open it before the tablist exists.

@@ -28,7 +28,7 @@ test.describe('ConfigPanel — field alignment (light DOM inspector)', () => {
     page,
   }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
 
     // The inspector lives in a drawer; open it. Config is the default tab.

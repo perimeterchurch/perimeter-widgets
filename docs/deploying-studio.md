@@ -75,7 +75,7 @@ In **Settings → Domains** add **`style.perimeter.org`** and follow Vercel's DN
 Once `style.perimeter.org` resolves, verify in a browser:
 
 - [ ] **Routes load and deep-link.** Visit `/`, then hard-reload directly on `/tokens`, `/components/button`, and `/guides/styling-widgets` — each renders (proves the SPA-fallback rewrite is live; without it these 404).
-- [ ] **A widget mounts against the production API.** Open a widget route (e.g. `/widgets/sermons`) — the preview mounts through the real `mount()` and pulls live data from `api.perimeter.org` (sermons is public, no auth). No console errors; no host-page CSS bleed into the shadow root.
+- [ ] **A widget runs against the production API.** Open a widget route (e.g. `/widgets/sermons`) — the Embed view runs the SHIPPED bundle through the real `loader.js` → manifest → immutable-bundle chain and pulls live data from `api.perimeter.org` (sermons is public, no auth). No console errors; no host-page CSS bleed into the shadow root. (The Dev tab, which mounts from source through `mount()`, is local-dev only and correctly absent here.)
 - [ ] **`/tokens` renders the live design-token reference** — color swatches, radii, and type scale each show their CSS-variable name and default.
 - [ ] **Components render through the shadow-DOM stage.** A `/components/:name` page shows its MDX doc with live examples (or the auto-gallery fallback for components without a doc).
 - [ ] **The dev-only built-bundle preview is absent** — the deployed site is the clean read-only gallery; the source ⇄ built-bundle toggle only exists under `import.meta.env.DEV`.
