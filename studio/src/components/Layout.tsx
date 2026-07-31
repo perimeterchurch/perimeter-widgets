@@ -42,8 +42,9 @@ export function Layout() {
     return buildNav(catalog, components, guides, devWidgets);
   }, [entries]);
 
+  // Geist for the chrome; the brand sans belongs to the widgets.
   return (
-    <div className="grid h-screen grid-cols-1 bg-bg font-sans text-fg lg:grid-cols-[16rem_1fr]">
+    <div className="grid h-screen grid-cols-1 bg-bg font-studio text-fg lg:grid-cols-[16rem_1fr]">
       <Sidebar nav={nav} />
       <main className="overflow-auto">
         <ErrorBoundary>

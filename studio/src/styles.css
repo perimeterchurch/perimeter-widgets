@@ -2,3 +2,30 @@
 @import 'tw-animate-css';
 @import '@perimeter/theme/tailwind.css';
 @config '../tailwind.config.ts';
+
+/*
+ * Studio chrome face. The studio is a tool, not a Perimeter-branded page, so its
+ * own UI (sidebar, nav, doc prose, tables) uses Geist rather than the brand sans.
+ *
+ * This is deliberately a SEPARATE token from `--font-sans`, which stays
+ * sweet-sans-pro: that token is shared with every shipped widget, and the
+ * `/tokens` page renders it as a live specimen. Changing it here would change
+ * perimeter.org.
+ *
+ * Widget previews are safe from this. `font-family` inherits and does pierce
+ * shadow roots, but `resolveTokens` pins `font-family: var(--font-sans)` on
+ * every widget's shadow host, so a preview re-asserts the brand face regardless
+ * of what the studio document sets. Guarded by studio/src/lib/studio-font.test.ts.
+ */
+@theme {
+  --font-studio: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+/*
+ * Set on `body` as well as via the `font-studio` utility on the chrome roots, so
+ * anything rendered outside Layout (error boundaries, portals, the Vite overlay's
+ * siblings) still picks up Geist instead of falling back to the brand sans.
+ */
+body {
+  font-family: var(--font-studio);
+}
