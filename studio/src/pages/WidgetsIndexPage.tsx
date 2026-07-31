@@ -8,17 +8,21 @@ import { Breadcrumbs } from '../components/Breadcrumbs';
 import { titleFromSlug } from '../lib/labels';
 
 /**
- * Staff-facing catalog: every RELEASED widget (live CDN manifest ∩ repo
- * definitions, `example` hidden) as a card linking to its viewer. No live
- * embeds here — the grid stays fast with zero iframes.
+ * The widgets index: every RELEASED widget (live CDN manifest ∩ repo definitions,
+ * `example` hidden) as a card linking to its page. No live embeds here — the grid
+ * stays fast with zero iframes.
+ *
+ * Released only, deliberately: this is the shipped set, and an unreleased widget
+ * has no version or description to show. Local dev reaches the in-progress ones
+ * from the sidebar, which marks them.
  */
-export function CatalogPage() {
+export function WidgetsIndexPage() {
   const { entries, isLoading, error, retry } = useCatalog();
 
   return (
     <div className="p-6">
-      <Breadcrumbs crumbs={[{ label: 'Home', to: '/' }, { label: 'Catalog' }]} />
-      <h1 className="mt-1 text-xl font-semibold tracking-tight text-fg">Widget catalog</h1>
+      <Breadcrumbs crumbs={[{ label: 'Home', to: '/' }, { label: 'Widgets' }]} />
+      <h1 className="mt-1 text-xl font-semibold tracking-tight text-fg">Widgets</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted-fg">
         Released widgets running on widgets.perimeter.org. Open one to see it live, tune its
         options, and copy the embed snippet.
@@ -47,7 +51,7 @@ export function CatalogPage() {
       ) : (
         <div className="mt-6 grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
           {entries.map((entry) => (
-            <CatalogCard key={entry.slug} entry={entry} />
+            <WidgetCard key={entry.slug} entry={entry} />
           ))}
         </div>
       )}
@@ -55,9 +59,9 @@ export function CatalogPage() {
   );
 }
 
-function CatalogCard({ entry }: { entry: CatalogEntry }) {
+function WidgetCard({ entry }: { entry: CatalogEntry }) {
   return (
-    <Link to={`/catalog/${entry.slug}`} className="block focus:outline-hidden">
+    <Link to={`/widgets/${entry.slug}`} className="block focus:outline-hidden">
       <Card className="h-full space-y-2 p-5 transition-colors hover:border-ring">
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold text-fg">{titleFromSlug(entry.slug)}</span>

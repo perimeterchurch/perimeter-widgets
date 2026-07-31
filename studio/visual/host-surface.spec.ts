@@ -49,7 +49,7 @@ async function readHostSurface(page: Page): Promise<HostSurface> {
 test.describe('the shadow host paints a themed surface', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     await waitForResultsLoaded(page);
   });

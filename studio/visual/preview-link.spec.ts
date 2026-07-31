@@ -12,7 +12,7 @@ test.describe('shareable preview link — surface + theme hydration', () => {
     page,
   }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons?bg=dark&theme=dark`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev&bg=dark&theme=dark`);
     await waitForShadowMount(page);
 
     // The widget host carries data-theme="dark" (drives :host([data-theme=dark])).

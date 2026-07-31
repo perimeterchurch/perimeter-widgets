@@ -15,12 +15,12 @@ import { toWidgetEntries, widgetDefGlob, widgetCssGlob } from '../lib/discovery'
  * NOT here — it lives inside the widget route, since only widget pages have
  * config/theme.
  *
- * The sidebar's Catalog group is the canonical widget list, so it is fed by the
- * runtime catalog (live CDN manifest ∩ definitions) rather than raw discovery:
- * released widgets link to /catalog/<slug> with an auth lock where sign-in is
- * required. Until the manifest resolves, buildNav falls back to the single
- * catalog landing link. The source-preview pages keep a nav group only in local
- * dev — deployed visitors reach them through each catalog page's docs link.
+ * The sidebar's Widgets group is fed by the runtime catalog (live CDN manifest ∩
+ * definitions) rather than raw discovery, so released widgets link to
+ * /widgets/<slug> with an auth lock where sign-in is required. Until the manifest
+ * resolves, buildNav falls back to the index link. In local dev the discovered
+ * widgets are passed too, so in-repo widgets that are not shipped yet still
+ * appear (marked `dev`, and their page offers the Dev tab only).
  *
  * Below `lg` the grid collapses to a single column and the Sidebar becomes an
  * off-canvas drawer, so content gets full width. The drawer's open state lives

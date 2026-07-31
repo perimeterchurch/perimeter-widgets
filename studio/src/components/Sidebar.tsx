@@ -101,6 +101,14 @@ export function Sidebar({ nav, open, onOpenChange }: SidebarProps) {
                               <span className="sr-only">Sign-in required</span>
                             </>
                           )}
+                          {/* Not shipped to the CDN yet, so its page has no
+                              Embed tab — say so here rather than let the
+                              missing tab read as a bug. Local dev only. */}
+                          {item.unreleased && (
+                            <span className="shrink-0 text-xs font-normal text-chrome-muted-fg">
+                              dev
+                            </span>
+                          )}
                         </span>
                       </NavLink>
                     </li>

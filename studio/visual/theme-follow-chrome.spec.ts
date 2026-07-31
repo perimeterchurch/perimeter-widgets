@@ -85,7 +85,7 @@ test.describe('chrome theme drives the gallery stage + widget preview', () => {
 
   test('sermons: the preview follows chrome dark with no canvas toggle', async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
     await waitForShadowMount(page);
     await waitForSermonCards(page, 3);
 

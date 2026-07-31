@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, beforeAll, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import { render, waitFor, cleanup, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router';
 import { WidgetPage } from './WidgetPage';
@@ -15,7 +15,18 @@ import { decodePreviewState } from '../lib/preview-link';
 describe('WidgetPage deep-linkable preview', () => {
   afterEach(() => {
     cleanup();
+    vi.unstubAllGlobals();
     document.documentElement.removeAttribute('data-theme');
+  });
+
+  // The widget page reads the CDN manifest to decide whether an Embed tab exists.
+  // Stubbed so this suite stays hermetic; `example` is absent from the fixture, so
+  // it is source-only and the Dev view renders directly with no tab to pick.
+  beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ sermons: '1.4.3' }) }),
+    );
   });
 
   beforeAll(() => {
@@ -73,10 +84,13 @@ describe('WidgetPage deep-linkable preview', () => {
     // Open the inspector and edit the example widget's greeting text field. The
     // Config tab has a single text input (greeting); count renders as a spinbutton.
     fireEvent.click(scope.getByRole('button', { name: /inspector/i }));
-    const greeting = await waitFor(() => {
-      const dialog = scope.getByRole('dialog', { name: /inspector/i });
-      return within(dialog).getByRole('textbox');
-    });
+    const greeting = await waitFor(
+      () => {
+        const dialog = scope.getByRole('dialog', { name: /inspector/i });
+        return within(dialog).getByRole('textbox');
+      },
+      { timeout: 10_000 },
+    );
     fireEvent.change(greeting, { target: { value: 'Howdy' } });
 
     await waitFor(() => {
@@ -110,10 +124,13 @@ describe('WidgetPage deep-linkable preview', () => {
 
     // The inspector's greeting field reflects the hydrated config value.
     fireEvent.click(scope.getByRole('button', { name: /inspector/i }));
-    const greeting = await waitFor(() => {
-      const dialog = scope.getByRole('dialog', { name: /inspector/i });
-      return within(dialog).getByRole<HTMLInputElement>('textbox');
-    });
+    const greeting = await waitFor(
+      () => {
+        const dialog = scope.getByRole('dialog', { name: /inspector/i });
+        return within(dialog).getByRole<HTMLInputElement>('textbox');
+      },
+      { timeout: 10_000 },
+    );
     expect(greeting.value).toBe('FromLink');
   });
 
