@@ -61,7 +61,7 @@ export function Sidebar({ nav }: SidebarProps) {
         id="studio-sidebar"
         inert={offCanvasHidden || undefined}
         className={cn(
-          'flex h-screen flex-col border-r border-border bg-bg font-sans',
+          'flex h-screen flex-col border-r border-border bg-bg font-studio',
           // Off-canvas on small screens, in-flow on lg.
           'fixed inset-y-0 left-0 z-20 w-64 -translate-x-full transition-transform duration-200',
           open && 'translate-x-0 shadow-lg',

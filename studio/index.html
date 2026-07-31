@@ -5,13 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perimeter Widget Studio</title>
     <!--
-      Perimeter's Adobe Fonts (Typekit) kit — loads the brand faces
+      Two font sources, for two different jobs.
+
+      Typekit — Perimeter's Adobe Fonts kit, loading the BRAND faces
       (freight-display-pro, sweet-sans-pro) so widget previews render the real
       fonts instead of the token fallbacks. Dev/studio only: shipped widgets
       rely on the embedding host page (perimeter.org) loading its own kit. Font
       availability is document-scoped, so this reaches into shadow-root previews.
+      Do not remove it to "clean up" the studio's own font — the previews and
+      the `font-serif` token specimens both depend on it.
+
+      Geist — the STUDIO CHROME face only (sidebar, nav, docs, tables). The
+      studio is a tool, not a Perimeter-branded page, so its own UI does not use
+      the brand sans. Widgets are unaffected: `resolveTokens` pins
+      `font-family: var(--font-sans)` on every widget's shadow host, so Geist
+      cannot inherit into a preview even though font-family pierces shadow roots.
     -->
     <link rel="stylesheet" href="https://use.typekit.net/hpg7onr.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap"
+    />
   </head>
   <body>
     <div id="root"></div>
