@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router';
-import { Input } from '@perimeter/ui/input';
-import { Button } from '@perimeter/ui/button';
 import { cn } from '@perimeter/ui/utils/cn';
 import type { NavGroup } from '../lib/nav';
 
@@ -15,9 +13,9 @@ interface SidebarProps {
 
 /**
  * The persistent left rail, styled to match the Knowledge Base subsite's
- * AppSidebar: an 18rem column under the sticky header, a nav-filter box, and
- * grouped NavLinks as rounded pills — the active one filled with the chrome
- * accent rather than the brand blue the studio used before.
+ * AppSidebar: an 18rem column under the sticky header with grouped NavLinks as
+ * rounded pills — the active one filled with the chrome accent rather than the
+ * brand blue the studio used before.
  *
  * Active route styling comes from react-router's NavLink `aria-current="page"`.
  * Collapses below `lg` into an off-canvas drawer (the rail is hidden, not
@@ -25,11 +23,11 @@ interface SidebarProps {
  * button and dismissed by the scrim, Escape, or navigating.
  *
  * The brand lockup and the theme toggle used to live here; both moved to
- * AppHeader, where the KB puts them.
+ * AppHeader, where the KB puts them. A nav-filter box used to sit above the
+ * groups; it was removed as unnecessary — the full nav fits in one scroll and
+ * the KB's rail carries no filter either.
  */
 export function Sidebar({ nav, open, onOpenChange }: SidebarProps) {
-  const [query, setQuery] = useState('');
-
   // Below lg the rail is off-canvas (translate-only) when closed; at lg it is
   // always in-flow. When it is off-canvas-and-closed, take it out of the tab
   // order + a11y tree so keyboard/SR users can't reach the hidden menu (a
@@ -47,19 +45,6 @@ export function Sidebar({ nav, open, onOpenChange }: SidebarProps) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onOpenChange]);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return nav;
-    return nav
-      .map((group) => ({
-        ...group,
-        items: group.items.filter((item) => item.label.toLowerCase().includes(q)),
-      }))
-      .filter((group) => group.items.length > 0);
-  }, [nav, query]);
-
-  const hasMatches = filtered.length > 0;
 
   return (
     <>
@@ -85,73 +70,45 @@ export function Sidebar({ nav, open, onOpenChange }: SidebarProps) {
           'lg:sticky lg:top-16 lg:z-0 lg:h-[calc(100vh-4rem)] lg:translate-x-0',
         )}
       >
-        <div className="px-4 pb-2 pt-4">
-          <Input
-            type="search"
-            aria-label="Filter navigation"
-            placeholder="Search…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="h-9 border-chrome-border text-chrome-fg placeholder:text-chrome-muted-fg"
-          />
-        </div>
-
-        <nav className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-          {hasMatches ? (
-            <ul className="space-y-5">
-              {filtered.map((group) => (
-                <li key={group.label}>
-                  {/* Sentence-case and full-size, as the KB labels "Categories"
-                      — not the small uppercase eyebrow the studio used. */}
-                  <h2 className="px-1 pb-2 text-base font-semibold text-chrome-fg">
-                    {group.label}
-                  </h2>
-                  <ul className="flex flex-col gap-1">
-                    {group.items.map((item) => (
-                      <li key={item.to}>
-                        <NavLink
-                          to={item.to}
-                          onClick={() => onOpenChange(false)}
-                          className={({ isActive }) =>
-                            cn(
-                              'flex h-10 items-center gap-2.5 rounded-lg px-3 text-base leading-none transition-colors duration-150',
-                              'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-chrome-primary/50',
-                              isActive
-                                ? 'bg-chrome-accent font-semibold text-chrome-accent-fg'
-                                : 'font-medium text-chrome-pill-fg hover:bg-chrome-accent/60 hover:text-chrome-pill-hover-fg',
-                            )
-                          }
-                        >
-                          <span className="flex items-center gap-1.5 truncate">
-                            {item.label}
-                            {item.authRequired && (
-                              <>
-                                <LockIcon />
-                                <span className="sr-only">Sign-in required</span>
-                              </>
-                            )}
-                          </span>
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="px-1 py-3">
-              <p className="text-sm text-chrome-muted-fg">No matches for “{query.trim()}”.</p>
-              <Button
-                type="button"
-                variant="link"
-                size="sm"
-                onClick={() => setQuery('')}
-                className="mt-1 h-auto p-0 text-sm text-chrome-primary"
-              >
-                Clear search
-              </Button>
-            </div>
-          )}
+        <nav className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-4">
+          <ul className="space-y-5">
+            {nav.map((group) => (
+              <li key={group.label}>
+                {/* Sentence-case and full-size, as the KB labels "Categories"
+                    — not the small uppercase eyebrow the studio used. */}
+                <h2 className="px-1 pb-2 text-base font-semibold text-chrome-fg">{group.label}</h2>
+                <ul className="flex flex-col gap-1">
+                  {group.items.map((item) => (
+                    <li key={item.to}>
+                      <NavLink
+                        to={item.to}
+                        onClick={() => onOpenChange(false)}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex h-10 items-center gap-2.5 rounded-lg px-3 text-base leading-none transition-colors duration-150',
+                            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-chrome-primary/50',
+                            isActive
+                              ? 'bg-chrome-accent font-semibold text-chrome-accent-fg'
+                              : 'font-medium text-chrome-pill-fg hover:bg-chrome-accent/60 hover:text-chrome-pill-hover-fg',
+                          )
+                        }
+                      >
+                        <span className="flex items-center gap-1.5 truncate">
+                          {item.label}
+                          {item.authRequired && (
+                            <>
+                              <LockIcon />
+                              <span className="sr-only">Sign-in required</span>
+                            </>
+                          )}
+                        </span>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
         </nav>
       </aside>
     </>

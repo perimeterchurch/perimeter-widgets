@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, within, fireEvent, cleanup } from '@testing-library/react';
+import { render, within, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { Sidebar } from './Sidebar';
 import type { NavGroup } from '../lib/nav';
@@ -60,53 +60,6 @@ describe('Sidebar', () => {
     expect(within(locked).getByText('Sign-in required')).toBeTruthy();
     const open = ui.getByRole('link', { name: 'Sermons' });
     expect(within(open).queryByText('Sign-in required')).toBeNull();
-  });
-
-  it('filters items as you type in the search box (case-insensitive)', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <Sidebar nav={fixtureNav} open={false} onOpenChange={() => {}} />
-      </MemoryRouter>,
-    );
-    const ui = within(container);
-    const search = ui.getByRole('searchbox');
-
-    fireEvent.change(search, { target: { value: 'serm' } });
-
-    expect(ui.getByRole('link', { name: 'sermons' })).toBeTruthy();
-    expect(ui.queryByRole('link', { name: 'example' })).toBeNull();
-    expect(ui.queryByRole('link', { name: 'button' })).toBeNull();
-  });
-
-  it('shows an empty state when nothing matches the filter', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <Sidebar nav={fixtureNav} open={false} onOpenChange={() => {}} />
-      </MemoryRouter>,
-    );
-    const ui = within(container);
-    fireEvent.change(ui.getByRole('searchbox'), { target: { value: 'zzz-nomatch' } });
-    expect(ui.getByText(/no matches/i)).toBeTruthy();
-  });
-
-  it('offers a clear-search affordance from the empty state that restores all nav', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <Sidebar nav={fixtureNav} open={false} onOpenChange={() => {}} />
-      </MemoryRouter>,
-    );
-    const ui = within(container);
-    const search = ui.getByRole('searchbox');
-    fireEvent.change(search, { target: { value: 'zzz-nomatch' } });
-
-    // The dead-end "No matches" state carries a button to clear the filter.
-    const clear = ui.getByRole('button', { name: /clear search/i });
-    fireEvent.click(clear);
-
-    // Search is reset and the full nav returns.
-    expect((search as HTMLInputElement).value).toBe('');
-    expect(ui.getByRole('link', { name: 'sermons' })).toBeTruthy();
-    expect(ui.getByRole('link', { name: 'example' })).toBeTruthy();
   });
 
   it('marks the link for the current route active via aria-current="page"', () => {
