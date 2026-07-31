@@ -4,27 +4,102 @@
 @config '../tailwind.config.ts';
 
 /*
- * Studio chrome face. The studio is a tool, not a Perimeter-branded page, so its
- * own UI (sidebar, nav, doc prose, tables) uses Geist rather than the brand sans.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Studio CHROME theme — deliberately separate from the widget tokens.
+ * ─────────────────────────────────────────────────────────────────────────────
  *
- * This is deliberately a SEPARATE token from `--font-sans`, which stays
- * sweet-sans-pro: that token is shared with every shipped widget, and the
- * `/tokens` page renders it as a live specimen. Changing it here would change
- * perimeter.org.
+ * The studio is an internal tool, and it is styled to match the Knowledge Base
+ * subsite (knowledgebase-2.0) so Perimeter's internal apps read as one family:
+ * Inter for UI text, Playfair Display for the "Perimeter" wordmark, a near-black
+ * on white light mode, and a brand-navy dark mode.
  *
- * Widget previews are safe from this. `font-family` inherits and does pierce
- * shadow roots, but `resolveTokens` pins `font-family: var(--font-sans)` on
- * every widget's shadow host, so a preview re-asserts the brand face regardless
- * of what the studio document sets. Guarded by studio/src/lib/studio-font.test.ts.
+ * Everything here is `chrome-*` / `font-studio*` and touches NOTHING that a
+ * widget uses. That separation is load-bearing:
+ *
+ * - `--font-sans` stays sweet-sans-pro and `--font-serif` stays
+ *   freight-display-pro. They are shared with every shipped widget and rendered
+ *   as live specimens on /tokens, so repointing them would restyle
+ *   perimeter.org.
+ * - `bg`/`fg`/`border`/`accent` likewise belong to `@perimeter/theme` and drive
+ *   widget surfaces. The chrome uses its own scale instead of overriding those.
+ *
+ * Widget previews are structurally safe from the chrome face: `font-family`
+ * inherits and does pierce shadow roots, but `resolveTokens` pins
+ * `font-family: var(--font-sans)` on every widget's shadow host, so a preview
+ * re-asserts the brand face regardless of what the studio document sets.
+ * Guarded by src/lib/studio-font.test.ts.
  */
 @theme {
-  --font-studio: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Chrome UI face. Matches the KB's Inter. */
+  --font-studio: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Wordmark only — the KB uses Playfair Display for "Perimeter", not the
+     brand serif. Kept off body text on purpose. */
+  --font-studio-serif: 'Playfair Display', ui-serif, Georgia, serif;
+
+  /* Indirected through plain custom properties so the `:root[data-theme]`
+     blocks below can swap them per theme — `@theme` values are static. */
+  --color-chrome-bg: var(--chrome-bg);
+  --color-chrome-fg: var(--chrome-fg);
+  --color-chrome-card: var(--chrome-card);
+  --color-chrome-border: var(--chrome-border);
+  --color-chrome-muted-fg: var(--chrome-muted-fg);
+  --color-chrome-accent: var(--chrome-accent);
+  --color-chrome-accent-fg: var(--chrome-accent-fg);
+  --color-chrome-primary: var(--chrome-primary);
+  /* Nav pill states, mirroring the KB's pill-* scale. */
+  --color-chrome-pill-fg: var(--chrome-pill-fg);
+  --color-chrome-pill-hover-fg: var(--chrome-pill-hover-fg);
+}
+
+/*
+ * Light — the KB's palette verbatim. Note `fg` is a neutral near-black rather
+ * than the brand navy the widget palette uses for text; that difference is the
+ * main reason the chrome needs its own scale.
+ */
+:root {
+  --chrome-bg: #ffffff;
+  --chrome-fg: #171717;
+  --chrome-card: #ffffff;
+  --chrome-border: #d4d4d4;
+  --chrome-muted-fg: #737373;
+  --chrome-accent: #e6e6e6;
+  --chrome-accent-fg: #171717;
+  --chrome-primary: #5dbde6;
+  --chrome-pill-fg: #404040;
+  --chrome-pill-hover-fg: #171717;
+}
+
+/*
+ * Dark — brand navy, as the KB does it. The studio chrome theme writes
+ * `data-theme` on <html> (see lib/use-studio-theme.ts), which is why this is an
+ * attribute selector on :root and not a `.dark` class like the KB's Next app.
+ */
+:root[data-theme='dark'] {
+  --chrome-bg: #09243f;
+  --chrome-fg: #e7f1f8;
+  --chrome-card: #0b2f52;
+  --chrome-border: #123b61;
+  /*
+   * Lightened from the KB's #6b8fa8, which fails AA here. That value clears 4.5:1
+   * against the page background (#09243f, 4.58:1) but the sidebar is the CARD
+   * colour, and on #0b2f52 it measures only 3.97:1 — the studio's axe gate
+   * flagged every nav item. #8fadc4 is the same muted blue-gray blended 15%
+   * toward the KB's own hover colour: 5.80:1 on the card, 6.69:1 on the
+   * background. Guarded by visual/catalog.spec.ts's axe sweep.
+   */
+  --chrome-muted-fg: #8fadc4;
+  --chrome-accent: #1a4570;
+  --chrome-accent-fg: #e7f1f8;
+  --chrome-primary: #5dbde6;
+  --chrome-pill-fg: #8fadc4;
+  --chrome-pill-hover-fg: #c9d9e6;
 }
 
 /*
  * Set on `body` as well as via the `font-studio` utility on the chrome roots, so
  * anything rendered outside Layout (error boundaries, portals, the Vite overlay's
- * siblings) still picks up Geist instead of falling back to the brand sans.
+ * siblings) still picks up the chrome face instead of falling back to the brand
+ * sans.
  */
 body {
   font-family: var(--font-studio);

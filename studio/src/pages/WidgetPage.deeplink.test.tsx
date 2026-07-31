@@ -61,9 +61,14 @@ describe('WidgetPage deep-linkable preview', () => {
     const { container } = renderWidgetAt('/widgets/example');
     const scope = within(container);
 
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
 
     // Open the inspector and edit the example widget's greeting text field. The
     // Config tab has a single text input (greeting); count renders as a spinbutton.
@@ -88,9 +93,14 @@ describe('WidgetPage deep-linkable preview', () => {
     const { container } = renderWidgetAt(`/widgets/example?${params.toString()}`);
     const scope = within(container);
 
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
 
     // The canvas Theme control reflects the hydrated dark theme.
     const themeGroup = scope.getByRole('group', { name: /theme/i });
@@ -116,9 +126,14 @@ describe('WidgetPage deep-linkable preview', () => {
     const { container } = renderWidgetAt('/widgets/example');
     const scope = within(container);
 
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
 
     const themeGroup = scope.getByRole('group', { name: /theme/i });
     expect(
@@ -136,9 +151,14 @@ describe('WidgetPage deep-linkable preview', () => {
     const { container } = renderWidgetAt('/widgets/example');
     const scope = within(container);
 
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
 
     const surfaceGroup = within(scope.getByRole('group', { name: /surface/i }));
     fireEvent.click(surfaceGroup.getByRole('button', { name: /^white$/i }));
@@ -152,9 +172,14 @@ describe('WidgetPage deep-linkable preview', () => {
     const { container } = renderWidgetAt('/widgets/example?bg=dark');
     const scope = within(container);
 
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
 
     // The Surface group has a "Dark" option AND so does Theme — scope to the group.
     const surfaceGroup = within(scope.getByRole('group', { name: /surface/i }));
@@ -181,9 +206,14 @@ describe('standalone preview route (/preview/:slug)', () => {
     const { container } = renderPreviewAt('/preview/example');
     const scope = within(container);
 
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
 
     // Full-bleed standalone surface; no studio chrome.
     expect(container.querySelector('[data-standalone-preview]')).toBeTruthy();
@@ -193,9 +223,14 @@ describe('standalone preview route (/preview/:slug)', () => {
 
   it('applies the viewport width from the URL', async () => {
     const { container } = renderPreviewAt('/preview/example?viewport=375');
-    await waitFor(() => {
-      expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
-    });
+    // 10s, not waitFor's 1s default: awaits the lazily imported widget
+    // definition + its mount, which exceeds a second on a 2-core CI runner.
+    await waitFor(
+      () => {
+        expect(container.querySelector('[data-perimeter-widget-preview]')).toBeTruthy();
+      },
+      { timeout: 10_000 },
+    );
     const frame = container.querySelector('[data-preview-frame]') as HTMLElement;
     expect(frame.style.width).toBe('375px');
   });
