@@ -49,7 +49,11 @@ function ComponentDoc({
         <article className="mx-auto max-w-3xl px-6 py-10">
           <div className="mb-4">
             <Breadcrumbs
-              crumbs={[{ label: 'Home', to: '/' }, { label: 'Components' }, { label: name }]}
+              crumbs={[
+                { label: 'Home', to: '/' },
+                { label: 'Components', to: '/components' },
+                { label: name },
+              ]}
             />
           </div>
           <Suspense
@@ -76,7 +80,11 @@ function Gallery({ entry }: { entry: ComponentEntry }) {
     <div className="flex h-full flex-col">
       <header className="border-b border-border px-6 py-4">
         <Breadcrumbs
-          crumbs={[{ label: 'Home', to: '/' }, { label: 'Components' }, { label: entry.name }]}
+          crumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Components', to: '/components' },
+            { label: entry.name },
+          ]}
         />
         <h1 className="mt-1 font-mono text-xl font-semibold tracking-tight text-fg">
           {entry.name}

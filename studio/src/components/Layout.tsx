@@ -6,13 +6,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { buildNav } from '../lib/nav';
 import { listGuides } from '../lib/guide-docs';
 import { useCatalog } from '../lib/catalog';
-import {
-  toWidgetEntries,
-  toComponentEntries,
-  widgetDefGlob,
-  widgetCssGlob,
-  componentGlob,
-} from '../lib/discovery';
+import { toWidgetEntries, widgetDefGlob, widgetCssGlob } from '../lib/discovery';
 
 /**
  * The persistent SPA shell, laid out like the Knowledge Base subsite: a sticky
@@ -50,10 +44,9 @@ export function Layout() {
       slug: e.slug,
       authRequired: e.definition?.auth === 'required',
     }));
-    const components = toComponentEntries(componentGlob);
     const guides = listGuides().map((g) => ({ slug: g.slug, label: g.title }));
     const devWidgets = import.meta.env.DEV ? toWidgetEntries(widgetDefGlob, widgetCssGlob) : null;
-    return buildNav(catalog, components, guides, devWidgets);
+    return buildNav(catalog, guides, devWidgets);
   }, [entries]);
 
   // The chrome scale and face; the brand tokens belong to the widgets.
