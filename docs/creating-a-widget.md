@@ -78,7 +78,7 @@ export default defineConfig(widgetConfig({ name: '<your-widget>' }));
 pnpm dev
 ```
 
-The Vite studio auto-discovers widgets via `import.meta.glob('/widgets/*/src/widget.tsx')` and lists yours automatically — no registry to hand-edit. Select it to preview through the real `mount()`, with live config editing, the theme editor, and HMR. Edit `src/app.tsx` and the preview hot-reloads.
+The Vite studio auto-discovers widgets via `import.meta.glob('/widgets/*/src/widget.tsx')` and lists yours automatically — no registry to hand-edit. It appears under **Widgets** in the sidebar marked `dev`, since it has no released bundle yet, and its page opens straight onto the **Dev** tab: the preview through the real `mount()`, with live config editing, the theme editor, and HMR. Edit `src/app.tsx` and the preview hot-reloads. Once you release it, the same page gains an **Embed** tab carrying the shipped bundle, the options playground, and the copyable snippet.
 
 ### Theming the preview
 

@@ -50,7 +50,7 @@ test.describe('sermons loading skeletons — viewMode-aware', () => {
     }) => {
       // Hold the list query in-flight ~1.5s so the skeleton is observable.
       await mockSermonsApi(page, { listDelayMs: 1500 });
-      await page.goto(`${STUDIO_URL}/widgets/sermons?sermons-view=${view}`);
+      await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev&sermons-view=${view}`);
       await waitForShadowMount(page);
 
       // 1. Loading state: the skeleton wrapper exists with the viewMode shape.
@@ -84,7 +84,7 @@ test.describe('sermons loading skeletons — viewMode-aware', () => {
     // Resolve the list fast but DELAY the image ~3s so the per-image blur-up
     // Skeleton (MediaCard FallbackImage) is observable before <img> onLoad.
     await mockSermonsApi(page, { imageDelayMs: 3000 });
-    await page.goto(`${STUDIO_URL}/widgets/sermons?sermons-view=grid`);
+    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev&sermons-view=grid`);
     await waitForShadowMount(page);
 
     // While the image request is in-flight, each card's FallbackImage renders an

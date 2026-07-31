@@ -6,6 +6,13 @@ export interface NavItem {
   label: string;
   /** Renders the sidebar lock indicator — the widget needs an MP sign-in. */
   authRequired?: boolean;
+  /**
+   * Discovered in the repo but absent from the live CDN manifest, so it has no
+   * shipped bundle to embed — its page offers the Dev view only. Local dev only
+   * (the deployed sidebar never lists these), and marked in the rail so a
+   * missing Embed tab reads as expected rather than broken.
+   */
+  unreleased?: boolean;
 }
 export interface NavGroup {
   label: string;
@@ -27,55 +34,63 @@ export interface CatalogNavEntry {
 /**
  * Pure shaping of discovery output into the sidebar's grouped nav. Keeping it a
  * plain function (no React, no globs, no fetch) makes the Sidebar trivially
- * testable with a fixture and keeps route paths (`/catalog/<slug>`,
- * `/widgets/<slug>`, `/components`, `/guides/<slug>`) defined in exactly one
- * place.
+ * testable with a fixture and keeps route paths (`/widgets/<slug>`,
+ * `/components`, `/guides/<slug>`) defined in exactly one place.
+ *
+ * ONE `Widgets` group, not the old Catalog + "Widget source (dev)" pair. Those
+ * were two views of the same widget on two routes, which meant the same thing
+ * appeared twice in the rail; now `/widgets/<slug>` carries both as tabs and the
+ * rail lists each widget once. The released set (runtime manifest ∩ definitions,
+ * resolved by the caller) is the spine; in local dev, widgets that exist in the
+ * repo but are not shipped yet are appended with `unreleased` so the rail says
+ * why their page has no Embed tab. While the manifest hasn't resolved
+ * (loading/error) `catalog` is empty, so with no dev widgets either the group
+ * falls back to the index link and never dead-ends.
  *
  * Components are NOT enumerated here. They used to be one rail entry each, 18
  * of them, which buried the rest of the nav; now a single Reference link points
  * at `/components`, which owns the full list. That page does its own discovery,
  * so this function no longer takes component entries at all.
- *
- * The Catalog group is the canonical widget list — released widgets (runtime
- * manifest ∩ definitions, resolved by the caller) linking to their catalog
- * viewer pages, with an auth flag for the lock indicator. While the manifest
- * hasn't resolved (loading/error) `catalog` is empty and the group falls back
- * to the single landing link, so the sidebar never dead-ends.
- *
- * The source-preview pages (`/widgets/<slug>`) stay routable everywhere but
- * only get a nav group in local dev (`devWidgets` non-null) — on the deployed
- * site the catalog is the one widget list staff see.
  */
 export function buildNav(
   catalog: CatalogNavEntry[],
   guides: GuideEntry[] = [],
   devWidgets: WidgetEntry[] | null = null,
 ): NavGroup[] {
-  const catalogItems: NavItem[] =
-    catalog.length > 0
-      ? catalog.map((c) => ({
-          to: `/catalog/${c.slug}`,
-          label: titleFromSlug(c.slug),
-          authRequired: c.authRequired,
+  const released = new Set(catalog.map((c) => c.slug));
+  const widgetItems: NavItem[] = catalog.map((c) => ({
+    to: `/widgets/${c.slug}`,
+    label: titleFromSlug(c.slug),
+    authRequired: c.authRequired,
+  }));
+
+  // Dev-only tail: in-repo widgets with no shipped bundle. Sorted among
+  // themselves so the order is stable, and kept after the released ones rather
+  // than interleaved — the shipped set is what the rail is mostly for.
+  if (devWidgets !== null) {
+    widgetItems.push(
+      ...devWidgets
+        .filter((w) => !released.has(w.slug))
+        .map((w) => ({
+          to: `/widgets/${w.slug}`,
+          label: titleFromSlug(w.slug),
+          unreleased: true,
         }))
-      : [{ to: '/catalog', label: 'Widget catalog' }];
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    );
+  }
 
   return [
-    { label: 'Catalog', items: catalogItems },
-    ...(devWidgets !== null
-      ? [
-          {
-            label: 'Widget source (dev)',
-            items: devWidgets.map((w) => ({ to: `/widgets/${w.slug}`, label: w.slug })),
-          },
-        ]
-      : []),
+    {
+      label: 'Widgets',
+      items: widgetItems.length > 0 ? widgetItems : [{ to: '/widgets', label: 'All widgets' }],
+    },
     {
       label: 'Reference',
       items: [
-        // One link to the index rather than ~40 rail entries. The component docs
-        // are looked up, not browsed, and the long list crowded out everything
-        // else in the sidebar. /components owns the full list.
+        // One link to the index rather than an entry per component. The component
+        // docs are looked up, not browsed, and the long list crowded out
+        // everything else in the sidebar. /components owns the full list.
         { to: '/components', label: 'Components' },
         { to: '/tokens', label: 'Tokens' },
         ...guides.map((g) => ({ to: `/guides/${g.slug}`, label: g.label })),

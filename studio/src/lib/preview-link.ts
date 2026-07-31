@@ -54,6 +54,15 @@ export interface PreviewState {
 
 const PRESET_VIEWPORTS = ['mobile', 'tablet', 'desktop', 'fluid'] as const;
 
+/**
+ * Every search-param key this codec owns. Exported so a caller rewriting the URL
+ * can clear exactly these and leave everything else alone — the query string is
+ * shared with params this codec knows nothing about (the widget page's `tab`, and
+ * widget-specific ones like sermons' `sermons-view`), and blindly replacing it
+ * drops them.
+ */
+export const PREVIEW_PARAM_KEYS = ['config', 'tokens', 'theme', 'viewport', 'bg'] as const;
+
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

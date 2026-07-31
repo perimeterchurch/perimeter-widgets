@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, within, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { CatalogPage } from './CatalogPage';
+import { WidgetsIndexPage } from './WidgetsIndexPage';
 
 afterEach(() => {
   cleanup();
@@ -16,12 +16,12 @@ function stubManifest(body: unknown, ok = true) {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <CatalogPage />
+      <WidgetsIndexPage />
     </MemoryRouter>,
   );
 }
 
-describe('CatalogPage', () => {
+describe('WidgetsIndexPage (/widgets)', () => {
   it('shows skeleton cards while loading, then real cards', async () => {
     stubManifest({ 'my-shepherds': '0.1.0', sermons: '1.4.2' });
     const { container } = renderPage();
@@ -30,7 +30,7 @@ describe('CatalogPage', () => {
     // First real widget-module import goes through vitest's transform pipeline;
     // under a fully parallel workspace run that can exceed the 1s default.
     const link = await ui.findByRole('link', { name: /my shepherds/i }, { timeout: 10_000 });
-    expect(link.getAttribute('href')).toBe('/catalog/my-shepherds');
+    expect(link.getAttribute('href')).toBe('/widgets/my-shepherds');
     expect(within(link).getByText('0.1.0')).toBeTruthy();
     // auth: 'required' → badge
     expect(within(link).getByText(/sign-in required/i)).toBeTruthy();

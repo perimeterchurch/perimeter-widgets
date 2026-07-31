@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, beforeAll, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import { render, waitFor, cleanup, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router';
 import { WidgetPage } from './WidgetPage';
@@ -15,7 +15,18 @@ import { decodePreviewState } from '../lib/preview-link';
 describe('WidgetPage deep-linkable preview', () => {
   afterEach(() => {
     cleanup();
+    vi.unstubAllGlobals();
     document.documentElement.removeAttribute('data-theme');
+  });
+
+  // The widget page reads the CDN manifest to decide whether an Embed tab exists.
+  // Stubbed so this suite stays hermetic; `example` is absent from the fixture, so
+  // it is source-only and the Dev view renders directly with no tab to pick.
+  beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ sermons: '1.4.3' }) }),
+    );
   });
 
   beforeAll(() => {
