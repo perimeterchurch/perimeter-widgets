@@ -69,6 +69,10 @@ export default defineConfig({
   // the whole `visual/` tree from the vitest run; it is driven by `pnpm visual`.
   test: {
     exclude: [...configDefaults.exclude, 'visual/**'],
+    // Raises Testing Library's per-assertion async budget to 10s — see the file
+    // for why the 1s default is wrong for a suite that waits on real lazy
+    // imports. Pairs with the testTimeout below.
+    setupFiles: ['./vitest.setup.ts'],
     // Node's experimental webstorage global would otherwise shadow happy-dom's
     // localStorage with undefined (same fix as packages/auth/vitest.config.ts) —
     // MpLoginPanel's MPLocalStorageAuth reads localStorage in tests.

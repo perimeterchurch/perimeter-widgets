@@ -84,10 +84,13 @@ describe('WidgetPage deep-linkable preview', () => {
     // Open the inspector and edit the example widget's greeting text field. The
     // Config tab has a single text input (greeting); count renders as a spinbutton.
     fireEvent.click(scope.getByRole('button', { name: /inspector/i }));
-    const greeting = await waitFor(() => {
-      const dialog = scope.getByRole('dialog', { name: /inspector/i });
-      return within(dialog).getByRole('textbox');
-    });
+    const greeting = await waitFor(
+      () => {
+        const dialog = scope.getByRole('dialog', { name: /inspector/i });
+        return within(dialog).getByRole('textbox');
+      },
+      { timeout: 10_000 },
+    );
     fireEvent.change(greeting, { target: { value: 'Howdy' } });
 
     await waitFor(() => {
@@ -121,10 +124,13 @@ describe('WidgetPage deep-linkable preview', () => {
 
     // The inspector's greeting field reflects the hydrated config value.
     fireEvent.click(scope.getByRole('button', { name: /inspector/i }));
-    const greeting = await waitFor(() => {
-      const dialog = scope.getByRole('dialog', { name: /inspector/i });
-      return within(dialog).getByRole<HTMLInputElement>('textbox');
-    });
+    const greeting = await waitFor(
+      () => {
+        const dialog = scope.getByRole('dialog', { name: /inspector/i });
+        return within(dialog).getByRole<HTMLInputElement>('textbox');
+      },
+      { timeout: 10_000 },
+    );
     expect(greeting.value).toBe('FromLink');
   });
 
