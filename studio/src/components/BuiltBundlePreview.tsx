@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@perimeter/ui/card';
+import { brandFontsLinkTag } from '../lib/brand-fonts';
 import { builtBundleUrl } from '../lib/built-bundles';
 
 /**
@@ -102,6 +103,9 @@ export function BuiltBundlePreview({ slug }: { slug: string }) {
   const scriptUrl = JSON.stringify(url);
   const srcDoc = [
     '<!doctype html><html><head><meta charset="utf-8">',
+    // Brand faces — an iframe inherits no fonts from the studio document. See
+    // ../lib/brand-fonts.ts.
+    brandFontsLinkTag(),
     '<style>html,body{margin:0;padding:0}</style>',
     '<script>',
     'function __report(message){',

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { globalTokens, resolveTokens } from '@perimeter/theme';
+import { BRAND_FONTS_CSS_URL } from './brand-fonts';
 // `?raw` rather than node:fs — the studio's TS program is browser-only
 // (`types: ["vite/client"]`), so it has no node globals.
 //
@@ -35,8 +36,10 @@ describe('studio chrome font', () => {
 
   it('loads Geist and keeps the Typekit kit for the brand faces', () => {
     expect(indexHtml).toContain('family=Geist');
-    // Removing this breaks widget previews and the font-serif specimen.
-    expect(indexHtml).toContain('use.typekit.net');
+    // Removing this breaks shadow-root previews and the font-serif specimen.
+    // Same URL the preview iframes inject — fonts are per-document, so the kit
+    // is needed in both places and the two must not drift.
+    expect(indexHtml).toContain(BRAND_FONTS_CSS_URL);
   });
 });
 

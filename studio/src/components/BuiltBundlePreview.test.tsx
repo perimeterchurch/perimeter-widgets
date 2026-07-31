@@ -10,6 +10,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, within, cleanup, act } from '@testing-library/react';
 import { BuiltBundlePreview, BUILT_PREVIEW_ERROR_TYPE } from './BuiltBundlePreview';
+import { BRAND_FONTS_CSS_URL } from '../lib/brand-fonts';
 
 // Mock built-bundle discovery so the test does not depend on a real on-disk dist.
 // `built` resolves to a fake URL; any other slug resolves to null (not built yet).
@@ -35,6 +36,15 @@ describe('BuiltBundlePreview', () => {
     expect(srcdoc).toContain('data-perimeter-widget="built"');
     // …and the script tag pointing at the resolved bundle URL.
     expect(srcdoc).toContain('<script src="http://localhost/widgets/built/dist/index.js"');
+  });
+
+  it('links the brand fonts inside the frame', () => {
+    // Fonts are document-scoped: studio/index.html's kit covers shadow-root
+    // previews but not an iframe, which needs its own link or the widget falls
+    // back to Inter.
+    const { container } = render(<BuiltBundlePreview slug="built" />);
+    const iframe = container.querySelector('iframe') as HTMLIFrameElement;
+    expect(iframe.getAttribute('srcdoc') ?? '').toContain(BRAND_FONTS_CSS_URL);
   });
 
   it('wires the srcdoc to postMessage load/runtime errors to the parent', () => {

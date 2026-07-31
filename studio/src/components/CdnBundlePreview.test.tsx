@@ -7,6 +7,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup, act } from '@testing-library/react';
 import { CdnBundlePreview, CDN_PREVIEW_ERROR_TYPE } from './CdnBundlePreview';
+import { BRAND_FONTS_CSS_URL } from '../lib/brand-fonts';
 
 afterEach(cleanup);
 
@@ -28,6 +29,15 @@ describe('CdnBundlePreview', () => {
       '<div data-perimeter-widget="sermons" data-per-page="5" data-theme="dark"></div>',
     );
     expect(srcdoc).not.toContain('data-nowprocket'); // WP-Rocket hint is snippet-only
+  });
+
+  it('links the brand fonts inside the frame', () => {
+    // An iframe is its own document and inherits no fonts from the studio, so
+    // studio/index.html's kit does not reach it. Without this link the framed
+    // widget names sweet-sans-pro, does not find it, and renders Inter — a
+    // preview that misrepresents perimeter.org, which loads its own kit.
+    const { container } = render(<CdnBundlePreview slug="sermons" overrides={{}} theme="light" />);
+    expect(frameSrcdoc(container)).toContain(BRAND_FONTS_CSS_URL);
   });
 
   it('regenerates the srcdoc when overrides change', () => {
