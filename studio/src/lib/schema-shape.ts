@@ -35,6 +35,13 @@ export interface SchemaField {
   type: string;
   /** The schema default formatted for display, or null when the field has none. */
   default: string | null;
+  /**
+   * The same default as its REAL value rather than display text, or undefined when
+   * the field has none. Controls that need to render the default as state (the
+   * boolean switch showing a `default(true)` field as on) must not have to parse
+   * `default`'s formatting back into a value.
+   */
+  rawDefault: unknown;
   /** Whether the field is optional (no value required). */
   optional: boolean;
   /** Allowed values for a ZodEnum field, or null for non-enum fields. */
@@ -66,6 +73,7 @@ function formatDefault(value: unknown): string {
 function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
   let current: z.ZodTypeAny = field;
   let defaultValue: string | null = null;
+  let rawDefault: unknown;
   let optional = false;
 
   // Capture the description from the OUTERMOST wrapper before peeling —
@@ -75,8 +83,11 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
 
   for (let i = 0; i < 10; i++) {
     if (current instanceof z.ZodDefault) {
-      // defaultValue() is loosely typed (`any`); format defensively.
-      defaultValue = formatDefault(current._def.defaultValue());
+      // defaultValue() is loosely typed (`any`); read it once, keep the real value
+      // for controls (landing in `unknown`, so callers must narrow) and format
+      // defensively for display.
+      rawDefault = current._def.defaultValue();
+      defaultValue = formatDefault(rawDefault);
       /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
       current = current.removeDefault();
     } else if (current instanceof z.ZodOptional || current instanceof z.ZodNullable) {
@@ -117,7 +128,7 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
     type = ctor.replace(/^Zod/, '').toLowerCase();
   }
 
-  return { type, default: defaultValue, optional, enumOptions, min, max, description };
+  return { type, default: defaultValue, rawDefault, optional, enumOptions, min, max, description };
 }
 
 /**
