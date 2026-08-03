@@ -124,8 +124,20 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
       }
     }
     // ZodString → "string", ZodNumber → "number", ZodBoolean → "boolean", etc.
-    const ctor = current.constructor.name; // e.g. "ZodString"
-    type = ctor.replace(/^Zod/, '').toLowerCase();
+    //
+    // Read the name from zod's `_def.typeName` — a STRING zod stores on every
+    // schema ("ZodBoolean", "ZodNumber", …) — NOT from `constructor.name`. A
+    // production build minifies zod's class names, so `constructor.name` becomes a
+    // mangled letter and `type` never equals "boolean"/"number"; every field then
+    // falls through to a text input. This only reproduces in the minified bundle —
+    // the dev server and the Playwright harness both run unminified source, which
+    // is why it shipped. `_def.typeName` is a string literal, so it survives.
+    // Guarded by schema-shape.test.ts's minification-safety test.
+    // `_def` is loosely typed (`any`); narrow to just the field we read so the
+    // access is type-safe rather than disabled.
+    const def = current._def as { typeName?: string } | undefined;
+    const name = typeof def?.typeName === 'string' ? def.typeName : current.constructor.name;
+    type = name.replace(/^Zod/, '').toLowerCase();
   }
 
   return { type, default: defaultValue, rawDefault, optional, enumOptions, min, max, description };
