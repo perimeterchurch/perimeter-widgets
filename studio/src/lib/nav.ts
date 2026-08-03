@@ -1,5 +1,5 @@
 import type { WidgetEntry } from './discovery';
-import { titleFromSlug } from './labels';
+import { widgetTitle } from './labels';
 
 export interface NavItem {
   to: string;
@@ -60,7 +60,7 @@ export function buildNav(
   const released = new Set(catalog.map((c) => c.slug));
   const widgetItems: NavItem[] = catalog.map((c) => ({
     to: `/widgets/${c.slug}`,
-    label: titleFromSlug(c.slug),
+    label: widgetTitle(c.slug),
     authRequired: c.authRequired,
   }));
 
@@ -73,7 +73,7 @@ export function buildNav(
         .filter((w) => !released.has(w.slug))
         .map((w) => ({
           to: `/widgets/${w.slug}`,
-          label: titleFromSlug(w.slug),
+          label: widgetTitle(w.slug),
           unreleased: true,
         }))
         .sort((a, b) => a.label.localeCompare(b.label)),

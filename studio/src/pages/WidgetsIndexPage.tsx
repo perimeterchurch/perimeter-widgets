@@ -5,7 +5,7 @@ import { Button } from '@perimeter/ui/button';
 import { Skeleton } from '@perimeter/ui/skeleton';
 import { useCatalog, type CatalogEntry } from '../lib/catalog';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { titleFromSlug } from '../lib/labels';
+import { widgetTitle } from '../lib/labels';
 
 /**
  * The widgets index: every RELEASED widget (live CDN manifest ∩ repo definitions,
@@ -64,7 +64,7 @@ function WidgetCard({ entry }: { entry: CatalogEntry }) {
     <Link to={`/widgets/${entry.slug}`} className="block focus:outline-hidden">
       <Card className="h-full space-y-2 p-5 transition-colors hover:border-ring">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-semibold text-fg">{titleFromSlug(entry.slug)}</span>
+          <span className="font-semibold text-fg">{widgetTitle(entry.slug)}</span>
           <code className="text-xs text-muted-fg">{entry.version}</code>
         </div>
         {entry.definition?.auth === 'required' && <Badge>Sign-in required</Badge>}
