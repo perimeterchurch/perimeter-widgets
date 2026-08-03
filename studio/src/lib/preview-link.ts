@@ -11,6 +11,20 @@
 export type PreviewViewport = 'mobile' | 'tablet' | 'desktop' | 'fluid' | { custom: number };
 
 /**
+ * Pixel width of each device preset — the conventional mobile/tablet/desktop
+ * breakpoints the design system targets. Lives here, next to `PreviewViewport`,
+ * because BOTH preview surfaces size themselves from it: the Dev tab's Canvas
+ * presets and the Embed tab's device toggle. They were separate literals for one
+ * revision and that is exactly how "tablet" comes to mean two different widths
+ * depending on which tab you are looking at.
+ */
+export const VIEWPORT_WIDTHS = {
+  mobile: 375,
+  tablet: 768,
+  desktop: 1280,
+} as const satisfies Record<string, number>;
+
+/**
  * The canvas background surface painted behind the preview frame. `host-sim` is
  * the default (the production-truth HostFrame). Persisted in the share link so a
  * dialed-in inspection surface travels with the link; the DEV-only Source⇄Built

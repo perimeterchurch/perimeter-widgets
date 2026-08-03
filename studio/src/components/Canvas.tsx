@@ -6,6 +6,7 @@ import { HostFrame } from './HostFrame';
 import { BuiltBundlePreview } from './BuiltBundlePreview';
 import {
   BACKGROUND_SURFACES,
+  VIEWPORT_WIDTHS,
   type PreviewBackground,
   type PreviewViewport,
 } from '../lib/preview-link';
@@ -21,13 +22,13 @@ type PreviewSource = 'source' | 'built';
 /**
  * Viewport-width presets for the preview canvas. `null` means fluid — the frame
  * stretches to the canvas width with no fixed constraint, matching a full-width
- * host page. The px values are the conventional mobile/tablet/desktop breakpoints
- * the design system targets.
+ * host page. Device widths come from the shared `VIEWPORT_WIDTHS` so this canvas
+ * and the Embed tab's device toggle cannot disagree about what "tablet" is.
  */
 const PRESETS = [
-  { id: 'mobile', label: 'Mobile', px: 375 },
-  { id: 'tablet', label: 'Tablet', px: 768 },
-  { id: 'desktop', label: 'Desktop', px: 1280 },
+  { id: 'mobile', label: 'Mobile', px: VIEWPORT_WIDTHS.mobile },
+  { id: 'tablet', label: 'Tablet', px: VIEWPORT_WIDTHS.tablet },
+  { id: 'desktop', label: 'Desktop', px: VIEWPORT_WIDTHS.desktop },
   { id: 'fluid', label: 'Fluid', px: null },
 ] as const;
 

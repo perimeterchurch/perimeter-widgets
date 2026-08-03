@@ -78,8 +78,10 @@ const TABS: { id: TabId; label: string }[] = [
  * Tabs compound, whose orientation handling (and content-sized
  * `inline-flex w-fit` list) fights a full-width drawer header. Only the active
  * panel mounts below the bar, filling the drawer width with comfortable padding
- * (no per-panel Card nesting). The embed snippet sits in a persistent footer so
- * it shows once regardless of the active tab.
+ * (no per-panel Card nesting). The embed snippet leads, above the tab bar, so the
+ * paste-ready markup is the first thing in the drawer rather than something you
+ * scroll a long Config field list to reach; it sits OUTSIDE the tabpanel so it
+ * still shows once regardless of the active tab.
  */
 export function Inspector({
   definition,
@@ -95,6 +97,10 @@ export function Inspector({
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="border-b border-border px-3 pb-4">
+        <EmbedSnippet slug={slug} config={configOverrides} />
+      </div>
+
       <SegmentedTabs
         items={TABS}
         value={active}
@@ -129,10 +135,6 @@ export function Inspector({
           ) : (
             <p className="p-3 text-sm text-muted-fg">Loading schema…</p>
           ))}
-      </div>
-
-      <div className="border-t border-border px-3 pt-4">
-        <EmbedSnippet slug={slug} config={configOverrides} />
       </div>
     </div>
   );
