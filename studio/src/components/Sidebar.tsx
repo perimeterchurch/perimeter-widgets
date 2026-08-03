@@ -85,7 +85,13 @@ export function Sidebar({ nav, open, onOpenChange }: SidebarProps) {
                         onClick={() => onOpenChange(false)}
                         className={({ isActive }) =>
                           cn(
-                            'flex h-10 items-center gap-2.5 rounded-lg px-3 text-base leading-none transition-colors duration-150',
+                            // No `leading-none` here: at line-height 1 the line box
+                            // is exactly the font size, so descenders (g, y, p)
+                            // fall outside it and the `truncate` below —
+                            // overflow: hidden — clips them. The row is a
+                            // fixed h-10 with items-center, so normal leading
+                            // costs no height.
+                            'flex h-10 items-center gap-2.5 rounded-lg px-3 text-base transition-colors duration-150',
                             'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-chrome-primary/50',
                             isActive
                               ? 'bg-chrome-accent font-semibold text-chrome-accent-fg'
