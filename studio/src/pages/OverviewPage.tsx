@@ -8,7 +8,7 @@ import {
   widgetCssGlob,
   componentGlob,
 } from '../lib/discovery';
-import { titleFromSlug } from '../lib/labels';
+import { titleFromSlug, widgetTitle } from '../lib/labels';
 import { useCatalog } from '../lib/catalog';
 
 interface OverviewItem {
@@ -77,7 +77,7 @@ export function OverviewPage() {
     return {
       widgets: w.map((x) => ({
         to: released.has(x.slug) ? `/catalog/${x.slug}` : `/widgets/${x.slug}`,
-        title: titleFromSlug(x.slug),
+        title: widgetTitle(x.slug),
         slug: x.slug,
       })),
       components: c.map((x) => ({
