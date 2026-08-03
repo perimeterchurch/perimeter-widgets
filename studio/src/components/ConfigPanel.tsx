@@ -60,7 +60,11 @@ export function ConfigPanel({ definition, overrides, onChange }: Props) {
   const set = (key: string, value: unknown) => onChange({ ...overrides, [key]: value });
 
   return (
-    <div className="flex flex-col gap-3 p-3">
+    // `gap-5` between rows against the rows' own `gap-y-1`: each field's control and
+    // its hint line have to read as one group, and at the old `gap-3` the 12px
+    // between fields was close enough to the 4px inside them that the list looked
+    // like one undifferentiated block.
+    <div className="flex flex-col gap-5 p-3">
       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-fg">
         Config (data-*)
       </h3>
@@ -88,16 +92,15 @@ function FieldControl({
   value: unknown;
   onChange: (key: string, value: unknown) => void;
 }) {
-  // Boolean → checkbox, emitting a real boolean.
+  // Boolean → on/off switch, emitting a real boolean.
+  //
+  // `overrides` is sparse: an untouched field has no entry at all, and the widget
+  // gets the schema's own default. So the switch must show that DEFAULT rather than
+  // off — a `default(true)` field rendering as off while its hint read
+  // "Default: true" implied the option was disabled when the widget had it on.
   if (field.type === 'boolean') {
-    return (
-      <input
-        type="checkbox"
-        className="size-4 justify-self-start rounded-sm border border-border bg-bg accent-primary"
-        checked={value === true}
-        onChange={(e) => onChange(field.key, e.target.checked)}
-      />
-    );
+    const on = typeof value === 'boolean' ? value : field.rawDefault === true;
+    return <BooleanSwitch checked={on} onChange={(next) => onChange(field.key, next)} />;
   }
 
   // Enum → native select with exactly the allowed options.
@@ -151,5 +154,58 @@ function FieldControl({
       value={text}
       onChange={(e) => onChange(field.key, e.target.value)}
     />
+  );
+}
+
+/**
+ * On/off switch for a boolean field — a track that fills with `primary` and a thumb
+ * that slides, so the control's own shape says "on" or "off" without reading a hint.
+ *
+ * A real `<input type="checkbox">` remains the control: it keeps native keyboard
+ * toggling and stays labelable, so the field row's `<label>` wrapper still targets
+ * it. `role="switch"` is what makes assistive tech announce it as on/off rather
+ * than checked/unchecked. The track and thumb are SIBLING spans rather than
+ * `::before`/`::after` on the input, because pseudo-elements don't render on
+ * replaced elements like `<input>`; `peer-checked:` styles them off the input's
+ * state, which is why the input must come first in the DOM.
+ *
+ * The thumb uses `muted-fg` off / `primary-fg` on so it stays legible against both
+ * track colors in light AND dark themes.
+ *
+ * No explicit `aria-checked`: HTML-AAM already maps a native checkbox's checkedness
+ * onto the switch role's on/off state, so hand-setting it would only add a second
+ * source of truth to keep in sync.
+ *
+ * The readout beside the track says `true`/`false` rather than On/Off deliberately:
+ * this panel edits `data-*` attributes, so the value the switch is reporting is the
+ * one that gets copied out as `data-show-image="false"`, and it's the same word the
+ * hint's "Default: true" and the Info tab's schema table use. On/Off would be a
+ * second vocabulary for one value. It's `aria-hidden` because the switch role
+ * already announces its own state — otherwise AT would read the value twice.
+ */
+function BooleanSwitch({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <span className="inline-flex items-center gap-2 justify-self-start">
+      <span className="relative inline-flex h-5 w-9 shrink-0">
+        <input
+          type="checkbox"
+          role="switch"
+          className="peer absolute inset-0 z-10 m-0 size-full cursor-pointer appearance-none rounded-full focus:outline-hidden"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <span className="pointer-events-none absolute inset-0 rounded-full border border-border bg-muted transition-colors peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring/40" />
+        <span className="pointer-events-none absolute top-0.5 left-0.5 size-4 rounded-full bg-muted-fg transition peer-checked:translate-x-4 peer-checked:bg-primary-fg" />
+      </span>
+      <span aria-hidden="true" className="text-xs font-medium text-fg">
+        {checked ? 'true' : 'false'}
+      </span>
+    </span>
   );
 }

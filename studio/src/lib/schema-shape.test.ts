@@ -8,6 +8,7 @@ describe('describeSchemaFields — enum/min-max/description', () => {
     view: z.enum(['grid', 'list']).default('grid').describe('How items are laid out.'),
     perPage: z.coerce.number().int().min(0).max(20).default(3).describe('Items per page.'),
     showHeader: z.coerce.boolean().optional().describe('Toggle the header.'),
+    showImage: z.coerce.boolean().default(true).describe('Show the artwork.'),
     title: z.string().default('Hello'),
   });
 
@@ -21,6 +22,7 @@ describe('describeSchemaFields — enum/min-max/description', () => {
     view: field('view'),
     perPage: field('perPage'),
     showHeader: field('showHeader'),
+    showImage: field('showImage'),
     title: field('title'),
   };
 
@@ -64,5 +66,19 @@ describe('describeSchemaFields — enum/min-max/description', () => {
     expect(byKey.view.default).toBe('grid');
     expect(byKey.showHeader.optional).toBe(true);
     expect(byKey.title.default).toBe('Hello');
+  });
+
+  // `default` is display text, so a boolean default arrives as the STRING "true".
+  // ConfigPanel's switch needs the real value to render its on/off state, which is
+  // what `rawDefault` carries — parsing the display string back would be a trap.
+  it('carries the default as its real value in rawDefault', () => {
+    expect(byKey.showImage.rawDefault).toBe(true);
+    expect(byKey.showImage.default).toBe('true');
+    expect(byKey.perPage.rawDefault).toBe(3);
+    expect(byKey.view.rawDefault).toBe('grid');
+  });
+
+  it('leaves rawDefault undefined for a field with no default', () => {
+    expect(byKey.showHeader.rawDefault).toBeUndefined();
   });
 });

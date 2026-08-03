@@ -7,9 +7,9 @@ import { mkdirSync } from 'node:fs';
  * layout, so the unit test can only assert the grid classes — it can't prove the
  * controls actually line up. Here, in a real browser, open the inspector's
  * Config tab (the sermons schema renders string text inputs like `apiUrl`, enum
- * `<select>`s like `defaultTab`/`defaultView`, and boolean `hide*` checkboxes)
+ * `<select>`s like `defaultTab`/`defaultView`, and boolean `hide*` switches)
  * and assert the full-width text/select controls share the same left edge, right
- * edge, AND height, and that a boolean checkbox starts at that same left edge
+ * edge, AND height, and that a boolean switch starts at that same left edge
  * (left-aligned in the control column via justify-self-start, not stretched and
  * not floating).
  */
@@ -24,7 +24,7 @@ async function controlBox(
 }
 
 test.describe('ConfigPanel — field alignment (light DOM inspector)', () => {
-  test('text/select controls share a left edge and height; checkbox left-aligns', async ({
+  test('text/select controls share a left edge and height; switch left-aligns', async ({
     page,
   }) => {
     await mockSermonsApi(page);
@@ -41,29 +41,29 @@ test.describe('ConfigPanel — field alignment (light DOM inspector)', () => {
     );
 
     // The Config panel is a tabpanel of <label> rows. Grab a text input, a
-    // <select>, and a checkbox — the three control shapes the panel renders.
+    // <select>, and a switch — the three control shapes the panel renders. The
+    // switch's input is stretched over its own track, so measure the wrapper span
+    // that is the actual grid item in the control column.
     const panel = page.getByRole('tabpanel');
     const textBox = panel.getByRole('textbox').first(); // string field
     const selectBox = panel.getByRole('combobox').first(); // enum field
-    const checkBox = panel.getByRole('checkbox').first(); // boolean field
+    const switchBox = panel.getByRole('switch').first().locator('..'); // boolean field
 
     await expect(textBox).toBeVisible();
     await expect(selectBox).toBeVisible();
-    await expect(checkBox).toBeVisible();
+    await expect(switchBox).toBeVisible();
 
     const text = await controlBox(textBox);
     const select = await controlBox(selectBox);
-    const check = await controlBox(checkBox);
+    const check = await controlBox(switchBox);
 
     // Left edges of the full-width controls align within sub-pixel rounding.
     expect(Math.abs(text.x - select.x), `text.x ${text.x} vs select.x ${select.x}`).toBeLessThan(
       1.5,
     );
-    // The checkbox left-aligns to the SAME control-column edge (justify-self-start),
+    // The switch left-aligns to the SAME control-column edge (justify-self-start),
     // not floating elsewhere.
-    expect(Math.abs(text.x - check.x), `text.x ${text.x} vs checkbox.x ${check.x}`).toBeLessThan(
-      1.5,
-    );
+    expect(Math.abs(text.x - check.x), `text.x ${text.x} vs switch.x ${check.x}`).toBeLessThan(1.5);
 
     // Full-width controls also share a right edge (w-full fills the column).
     expect(
@@ -76,8 +76,8 @@ test.describe('ConfigPanel — field alignment (light DOM inspector)', () => {
       Math.abs(text.height - select.height),
       `text.h ${text.height} vs select.h ${select.height}`,
     ).toBeLessThan(1.5);
-    // The checkbox keeps its intrinsic (smaller) size — it is NOT stretched to h-9.
-    expect(check.height, `checkbox height ${check.height} should be < control height`).toBeLessThan(
+    // The switch keeps its intrinsic (smaller) size — it is NOT stretched to h-9.
+    expect(check.height, `switch height ${check.height} should be < control height`).toBeLessThan(
       text.height,
     );
 
