@@ -11,7 +11,7 @@ import { StudioMDXProvider } from '../lib/mdx';
 import { EmbedView } from '../components/EmbedView';
 import { DevView } from '../components/DevView';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { titleFromSlug } from '../lib/labels';
+import { widgetTitle } from '../lib/labels';
 import { NotFoundPage } from './NotFoundPage';
 
 /** Tab ids, also the `?tab=` values. */
@@ -140,11 +140,11 @@ function WidgetView({
             crumbs={[
               { label: 'Home', to: '/' },
               { label: 'Widgets', to: '/widgets' },
-              { label: titleFromSlug(slug) },
+              { label: widgetTitle(slug) },
             ]}
           />
           <div className="mt-1 flex items-center justify-between gap-4">
-            <h1 className="text-xl font-semibold tracking-tight text-fg">{titleFromSlug(slug)}</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-fg">{widgetTitle(slug)}</h1>
             {/* Nothing until the manifest resolves: on a cold dev server the join
                 imports every released widget's module, and labelling a widget
                 "not released" in the meantime is simply wrong. */}
