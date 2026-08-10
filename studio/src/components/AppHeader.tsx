@@ -1,17 +1,19 @@
 import { Link } from 'react-router';
 import { Button } from '@perimeter/ui/button';
 import { useStudioTheme } from '../lib/use-studio-theme';
+import { AccountMenu } from './AccountMenu';
 
 /**
  * The studio's top bar, matching the Knowledge Base subsite's AppHeader: a
  * sticky 4rem row carrying the "Perimeter <subsite>" wordmark on the left and an
  * icon cluster on the right, over a hairline bottom border.
  *
- * Two deliberate differences from the KB, both because the studio has no user
- * session of its own:
+ * Differences from the KB:
  *
- * - no avatar / user menu — MP sign-in here is per-widget (it authorises a
- *   preview, not the site), so there is no site-level identity to show
+ * - the site-level identity is optional — `AccountMenu` shows a sign-out only
+ *   when the studio runs behind the Next auth shell (`studio-host`); in
+ *   standalone dev/tests it renders nothing. (Widget-preview sign-in is a
+ *   separate, per-widget concern that authorises a preview, not the site.)
  * - no search icon — the KB's returns you to a home hero that owns the search;
  *   the studio's search is a nav FILTER and belongs beside the nav it filters
  *
@@ -72,6 +74,8 @@ export function AppHeader({
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </Button>
+          {/* Site-level sign-out — only rendered behind the auth shell. */}
+          <AccountMenu />
         </div>
       </div>
     </header>
