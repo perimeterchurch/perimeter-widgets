@@ -6,6 +6,36 @@ import { serializeWidgetAttrs, type PreviewTheme } from '../lib/embed-snippet';
 /** postMessage type for srcdoc→parent failure reports (same-origin srcdoc). */
 export const CDN_PREVIEW_ERROR_TYPE = 'perimeter-cdn-preview-error';
 
+/**
+ * The origin a shipped bundle calls when nothing overrides it — mirrors
+ * `DEFAULT_API_URL` in @perimeter/widget-runtime. The impersonation fetch-shim
+ * (below) rewrites requests to this origin onto the shell proxy.
+ */
+const PROD_API_ORIGIN = 'https://api.perimeter.org';
+
+/**
+ * A tiny script injected into the srcdoc while impersonating that rewrites any
+ * `fetch` to the default API origin onto the shell proxy. `data-api-url` alone is
+ * not enough: a widget only picks it up if its config schema declares `apiUrl`
+ * (Zod strips undeclared keys at mount), and e.g. my-giving-history does not — so
+ * its api client falls back to the default origin and impersonation is ignored.
+ * Patching fetch at the document level catches every widget regardless, without
+ * touching the shipped bundles. Runs in <head> before the async loader mounts.
+ */
+function impersonationFetchShim(proxyBase: string): string {
+  return [
+    '<script>(function(){',
+    `var P=${JSON.stringify(proxyBase)},D=${JSON.stringify(PROD_API_ORIGIN)};`,
+    'var f=window.fetch.bind(window);',
+    'window.fetch=function(input,init){try{',
+    'var u=typeof input==="string"?input:(input&&input.url);',
+    'if(u&&u.indexOf(D)===0){var r=P+u.slice(D.length);',
+    'input=typeof input==="string"?r:new Request(r,input);}',
+    '}catch(e){}return f(input,init);};',
+    '})();</script>',
+  ].join('');
+}
+
 interface CdnPreviewErrorMessage {
   type: typeof CDN_PREVIEW_ERROR_TYPE;
   slug: string;
@@ -85,6 +115,9 @@ export function CdnBundlePreview({
     'window.onerror=function(message,source,line,col,err){__report((err&&err.stack)||message);return false};',
     'window.addEventListener("unhandledrejection",function(e){__report("Unhandled rejection: "+((e.reason&&e.reason.message)||e.reason))});',
     '</script>',
+    // Impersonation only: reroute default-origin API calls to the shell proxy so
+    // widgets whose schema doesn't declare `apiUrl` still resolve on the target.
+    apiUrl ? impersonationFetchShim(apiUrl) : '',
     '</head><body>',
     // Div before the loader script (BuiltBundlePreview's proven order). The
     // copyable snippet is script-first per the docs — functionally equivalent
