@@ -49,7 +49,9 @@ export const auth = betterAuth({
             'http://www.thinkministry.com/dataplatform/scopes/all',
           ],
           pkce: false,
-          mapProfileToUser: async (profile) => {
+          // Not async: the gate is synchronous (the OIDC `roles` claim carries
+          // everything). Better Auth accepts a sync mapper and awaits it anyway.
+          mapProfileToUser: (profile) => {
             const p = profile as Record<string, unknown>;
 
             // ── ROLE GATE ──────────────────────────────────────────────

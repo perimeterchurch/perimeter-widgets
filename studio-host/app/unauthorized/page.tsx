@@ -46,7 +46,7 @@ export default function UnauthorizedPage() {
       <p style={{ margin: 0, color: '#a8a29e', fontSize: '0.9rem' }}>
         If you believe you should have access, contact a Ministry Platform administrator.
       </p>
-      <button style={button} onClick={signOutAndRetry}>
+      <button style={button} onClick={() => void signOutAndRetry()}>
         Sign out and try another account
       </button>
     </main>
