@@ -74,6 +74,28 @@ Both are **dev-only**: Vite loads `.env.development` only in serve/dev mode, and
 
 ---
 
+## The auth shell (`studio-host`)
+
+`studio-host/` is a thin **Next.js** app that becomes the deployed `style.perimeter.org`. It gates the studio behind Ministry Platform login (restricted to MP roles **Administrators** and **Website Folder - Edit**) and serves the Vite-built studio (`studio/dist`) as static assets. Auth is Better Auth + MP OIDC, cookie-backed (no database); the gate reads the OIDC `roles` claim — see `docs/superpowers/plans/2026-08-10-studio-mp-auth-wall.md`.
+
+**The Vite studio and its test/visual suites are unchanged and _ungated_.** `pnpm dev` (Vite, `:5173`) and the Playwright suites (which target `:5173`) never go through the wall — it lives only in the shell. Develop the studio exactly as before; only run the shell when you need to exercise auth.
+
+Run the gated experience locally:
+
+```bash
+# 1. Build the studio (Node <22.18 needs the strip-types flag — see below).
+NODE_OPTIONS=--experimental-strip-types pnpm --filter @perimeter/studio build
+# 2. Copy the build into the shell and start it.
+pnpm --filter @perimeter/studio-host embed
+pnpm --filter @perimeter/studio-host dev        # Next shell on http://localhost:5273
+```
+
+`pnpm --filter @perimeter/studio-host build` chains all three (studio build → embed → `next build`) via its `prebuild` hook. Copy `studio-host/.env.local.example` → `.env.local` and fill in `BETTER_AUTH_SECRET` + the MP client creds first. Note: MP only has `http://localhost:5173/api/auth/oauth2/callback/ministryplatform` registered, so a full interactive login needs either that callback registered for `:5273` or the shell run on `:5173`.
+
+> **`NODE_OPTIONS=--experimental-strip-types`** — on Node < 22.18 the studio build (and its vitest) fail with `ERR_UNKNOWN_FILE_EXTENSION ".ts"` from `@perimeter/vite-plugin-widget`. Set that flag (or use Node ≥ 22.18) when building or testing the studio.
+
+---
+
 ## Building Widgets
 
 ```bash

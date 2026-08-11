@@ -1,0 +1,6 @@
+node_modules/
+.next/
+next-env.d.ts
+# public/ is build output — the Vite studio copied in by scripts/embed-studio.mjs
+public/
+.env.local
