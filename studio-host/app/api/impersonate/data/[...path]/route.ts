@@ -48,14 +48,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ path: st
   // `joined` already carries the perimeter-api `/api/...` prefix (the widgets
   // request it verbatim), so this is a transparent pass-through to the origin.
   const url = `${perimeterApiUrl()}/${joined}${search}`;
-  console.log(
-    JSON.stringify({
-      event: 'impersonate.proxy',
-      by: session.user.email,
-      target,
-      path: joined,
-    }),
-  );
 
   const upstream = await fetch(url, {
     headers: {
@@ -65,6 +57,19 @@ export async function GET(req: Request, { params }: { params: Promise<{ path: st
     },
   });
   const bodyText = await upstream.text();
+  // Log AFTER the round-trip so the upstream status + body size are captured —
+  // this is what distinguishes "target has no data" (200, tiny body) from an
+  // on-behalf-of failure (4xx) when a widget renders empty.
+  console.log(
+    JSON.stringify({
+      event: 'impersonate.proxy',
+      by: session.user.email,
+      target,
+      path: joined,
+      status: upstream.status,
+      bytes: bodyText.length,
+    }),
+  );
   return new NextResponse(bodyText, {
     status: upstream.status,
     headers: {

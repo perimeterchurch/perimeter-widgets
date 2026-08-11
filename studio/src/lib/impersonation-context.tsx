@@ -24,10 +24,14 @@ export interface ImpersonationState {
   isAdmin: boolean;
   /** Active impersonation target User_ID, or null. */
   targetUserId: number | null;
+  /** Display label for the active target (name), when known this session. Lost
+   * across a full reload — falls back to the User_ID then. */
+  targetLabel: string | null;
   /** Search users with a login by name / login / email (admin-gated). */
   searchUsers: (query: string) => Promise<ImpersonationUser[]>;
-  /** Begin impersonating a User_ID. Returns false if the shell rejected it. */
-  start: (targetUserId: number) => Promise<boolean>;
+  /** Begin impersonating a User_ID. Returns false if the shell rejected it.
+   * `label` (the picked user's name) is remembered for the active indicator. */
+  start: (targetUserId: number, label?: string) => Promise<boolean>;
   /** Stop impersonating. */
   stop: () => Promise<void>;
 }
@@ -36,6 +40,7 @@ const defaultState: ImpersonationState = {
   ready: false,
   isAdmin: false,
   targetUserId: null,
+  targetLabel: null,
   searchUsers: () => Promise.resolve([]),
   start: () => Promise.resolve(false),
   stop: () => Promise.resolve(),
@@ -68,6 +73,7 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [targetUserId, setTargetUserId] = useState<number | null>(null);
+  const [targetLabel, setTargetLabel] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -93,7 +99,7 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
     return body?.data ?? [];
   }, []);
 
-  const start = useCallback(async (target: number) => {
+  const start = useCallback(async (target: number, label?: string) => {
     const res = await fetch('/api/impersonate/start', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -101,6 +107,7 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
     }).catch(() => null);
     if (!res || !res.ok) return false;
     setTargetUserId(target);
+    setTargetLabel(label ?? null);
     return true;
   }, []);
 
@@ -111,11 +118,12 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
       body: '{}',
     }).catch(() => {});
     setTargetUserId(null);
+    setTargetLabel(null);
   }, []);
 
   return (
     <ImpersonationContext.Provider
-      value={{ ready, isAdmin, targetUserId, searchUsers, start, stop }}
+      value={{ ready, isAdmin, targetUserId, targetLabel, searchUsers, start, stop }}
     >
       {children}
     </ImpersonationContext.Provider>

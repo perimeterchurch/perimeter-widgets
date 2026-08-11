@@ -2,7 +2,6 @@ import { Link } from 'react-router';
 import { Button } from '@perimeter/ui/button';
 import { useStudioTheme } from '../lib/use-studio-theme';
 import { AccountMenu } from './AccountMenu';
-import { ImpersonateControl } from './ImpersonateControl';
 
 /**
  * The studio's top bar, matching the Knowledge Base subsite's AppHeader: a
@@ -58,8 +57,6 @@ export function AppHeader({
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          {/* Admin-only impersonation control — renders nothing otherwise. */}
-          <ImpersonateControl />
           {/* Chrome light/dark toggle — themes the studio shell only (via
               data-theme on documentElement). Independent of the widget-preview
               canvas theme control. Moved here from the sidebar to match the KB;
