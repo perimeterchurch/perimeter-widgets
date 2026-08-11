@@ -61,7 +61,7 @@ export function AccountMenu() {
       size="sm"
       aria-label="Sign out"
       title={user.email ? `Sign out (${user.email})` : 'Sign out'}
-      onClick={signOut}
+      onClick={() => void signOut()}
       className="size-9 shrink-0 p-0 text-chrome-fg"
     >
       <LogoutIcon />
