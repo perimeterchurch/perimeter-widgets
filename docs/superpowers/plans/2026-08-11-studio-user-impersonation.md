@@ -85,7 +85,7 @@ gated widget fetch  ──►  shell proxy /api/impersonate/data/*   (studio-hos
 
 ## 8. Phasing & rough effort (~3–5 days, two repos)
 
-- **Phase 0 (spike, ~½ day):** with a test user's `User_ID`, `curl` perimeter-api `x-api-key` + `x-on-behalf-of-user` → confirm `giving/history` returns their data and `shepherds` returns empty (proves the premise **and** the P-1 need) — no code changes.
+- **Phase 0 (spike) — ✅ DONE (2026-08-11).** Against local perimeter-api `:5500` with `x-api-key` + `x-on-behalf-of-user: 68219`: `giving/history` → `200` with the target's real data (proves the mechanism); `shepherds` → `200 {"shepherds":[]}` (empty — confirms the `username` gap / P-1 need); `shepherds` with service key but NO on-behalf-of → `403 USER_AUTH_REQUIRED` (on-behalf-of is what yields the `'user'` context). Premise + P-1 validated; no surprises.
 - **Phase 1 (~1 day):** perimeter-api P-1 (+ P-2 if needed) → PR.
 - **Phase 2 (~1 day):** shell proxy + impersonation session + user-search proxy + env.
 - **Phase 3 (~1–1.5 days):** studio admin gate, picker, widget routing (U-3), banner.
