@@ -45,7 +45,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ path: st
   }
 
   const search = new URL(req.url).search;
-  const url = `${perimeterApiUrl()}/api/${joined}${search}`;
+  // `joined` already carries the perimeter-api `/api/...` prefix (the widgets
+  // request it verbatim), so this is a transparent pass-through to the origin.
+  const url = `${perimeterApiUrl()}/${joined}${search}`;
   console.log(
     JSON.stringify({
       event: 'impersonate.proxy',

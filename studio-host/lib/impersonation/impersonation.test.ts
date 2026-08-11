@@ -20,14 +20,15 @@ describe('isAdministrator', () => {
 });
 
 describe('isAllowedProxyPath', () => {
-  it('allows only the whitelisted read endpoints', () => {
-    expect(isAllowedProxyPath('giving/history')).toBe(true);
-    expect(isAllowedProxyPath('shepherds')).toBe(true);
+  it('allows only the whitelisted read endpoints (verbatim widget paths)', () => {
+    expect(isAllowedProxyPath('api/giving/history')).toBe(true);
+    expect(isAllowedProxyPath('api/shepherds')).toBe(true);
   });
   it('rejects anything else (least privilege)', () => {
-    expect(isAllowedProxyPath('contacts')).toBe(false);
-    expect(isAllowedProxyPath('giving/history/../contacts')).toBe(false);
-    expect(isAllowedProxyPath('shepherds/write')).toBe(false);
+    expect(isAllowedProxyPath('api/contacts')).toBe(false);
+    expect(isAllowedProxyPath('api/giving/history/../contacts')).toBe(false);
+    expect(isAllowedProxyPath('api/shepherds/write')).toBe(false);
+    expect(isAllowedProxyPath('giving/history')).toBe(false); // missing /api prefix
     expect(isAllowedProxyPath('')).toBe(false);
   });
 });

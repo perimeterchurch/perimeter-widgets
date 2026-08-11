@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { AppHeader } from './AppHeader';
 import { Sidebar } from './Sidebar';
+import { ImpersonationBanner } from './ImpersonationBanner';
 import { ErrorBoundary } from './ErrorBoundary';
 import { buildNav } from '../lib/nav';
 import { listGuides } from '../lib/guide-docs';
@@ -52,6 +53,7 @@ export function Layout() {
   // The chrome scale and face; the brand tokens belong to the widgets.
   return (
     <div className="min-h-screen bg-chrome-bg font-studio text-chrome-fg">
+      <ImpersonationBanner />
       <AppHeader navOpen={navOpen} onNavOpenChange={setNavOpen} />
       {/* `items-start` keeps the sticky rail from being stretched to the row
           height, which would defeat position: sticky. */}

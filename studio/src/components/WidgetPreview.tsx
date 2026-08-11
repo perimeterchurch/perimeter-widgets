@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { mount, type WidgetDefinition, type MountedWidget } from '@perimeter/widget-runtime';
 import { ZodError } from 'zod';
 import type { WidgetEntry } from '../lib/discovery';
+import { useImpersonation } from '../lib/impersonation-context';
 
 /** Build a human-readable message from a mount error, naming the offending field for ZodErrors. */
 function describeMountError(err: unknown): string {
@@ -71,20 +72,31 @@ export function WidgetPreview({
     };
   }, [entry, onDefinition]);
 
-  // (Re)mount when def/css/config change. Same mount() used in production —
-  // mount() now re-validates configOverrides through the schema (parity with the
-  // prod data-* gate), so invalid ConfigPanel input throws here. Surface it instead
-  // of white-screening.
+  // While impersonating (admin-only, behind the shell) route the widget's API
+  // calls through the shell proxy so they resolve on behalf of the target. Null
+  // target → normal behavior (and a safe default without the provider, e.g. in
+  // tests).
+  const { targetUserId } = useImpersonation();
+
+  // (Re)mount when def/css/config/impersonation change. Same mount() used in
+  // production — mount() now re-validates configOverrides through the schema
+  // (parity with the prod data-* gate), so invalid ConfigPanel input throws
+  // here. Surface it instead of white-screening.
   useEffect(() => {
     const host = hostRef.current;
     if (!host || !def) return;
     try {
-      // DATA/hooks knob: in dev, point the runtime API client at the local
-      // perimeter-api so React Query hooks fetch from localhost:5500 instead of
-      // the prod default (api.perimeter.org). This is independent of the images
-      // knob (VITE_API_URL → format.ts); both must be set for dev parity. Left
-      // undefined in the deployed studio build so prod uses DEFAULT_API_URL.
-      const apiBaseUrl = import.meta.env.DEV ? 'http://localhost:5500' : undefined;
+      // DATA/hooks knob. Impersonation wins: point the runtime API client at the
+      // shell proxy (/api/impersonate/data) so hooks fetch the target's data.
+      // Otherwise in dev point at the local perimeter-api (localhost:5500); left
+      // undefined in the deployed, non-impersonating build so prod uses
+      // DEFAULT_API_URL. Independent of the images knob (VITE_API_URL → format.ts).
+      const apiBaseUrl =
+        targetUserId != null
+          ? `${window.location.origin}/api/impersonate/data`
+          : import.meta.env.DEV
+            ? 'http://localhost:5500'
+            : undefined;
       handleRef.current = mount(host, def, css, { configOverrides, apiBaseUrl });
       setMountError(null);
     } catch (err) {
@@ -95,7 +107,7 @@ export function WidgetPreview({
       handleRef.current?.unmount();
       handleRef.current = null;
     };
-  }, [def, css, configOverrides]);
+  }, [def, css, configOverrides, targetUserId]);
 
   // Live token edits without a remount.
   useEffect(() => {
