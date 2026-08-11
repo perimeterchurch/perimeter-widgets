@@ -9,6 +9,14 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
  * banner render nothing and widgets fetch normally. The default context value
  * makes `useImpersonation()` safe without a provider (e.g. in unit tests).
  */
+/** A candidate impersonation target from the admin user search. */
+export interface ImpersonationUser {
+  userID: number;
+  displayName: string;
+  email: string | null;
+  userName?: string;
+}
+
 export interface ImpersonationState {
   /** True once `/api/me` has resolved. */
   ready: boolean;
@@ -16,6 +24,8 @@ export interface ImpersonationState {
   isAdmin: boolean;
   /** Active impersonation target User_ID, or null. */
   targetUserId: number | null;
+  /** Search users with a login by name / login / email (admin-gated). */
+  searchUsers: (query: string) => Promise<ImpersonationUser[]>;
   /** Begin impersonating a User_ID. Returns false if the shell rejected it. */
   start: (targetUserId: number) => Promise<boolean>;
   /** Stop impersonating. */
@@ -26,6 +36,7 @@ const defaultState: ImpersonationState = {
   ready: false,
   isAdmin: false,
   targetUserId: null,
+  searchUsers: () => Promise.resolve([]),
   start: () => Promise.resolve(false),
   stop: () => Promise.resolve(),
 };
@@ -71,6 +82,17 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const searchUsers = useCallback(async (query: string): Promise<ImpersonationUser[]> => {
+    const q = query.trim();
+    if (q.length < 2) return [];
+    const res = await fetch(`/api/impersonate/users?q=${encodeURIComponent(q)}`, {
+      headers: { accept: 'application/json' },
+    }).catch(() => null);
+    if (!res || !res.ok) return [];
+    const body = (await res.json().catch(() => null)) as { data?: ImpersonationUser[] } | null;
+    return body?.data ?? [];
+  }, []);
+
   const start = useCallback(async (target: number) => {
     const res = await fetch('/api/impersonate/start', {
       method: 'POST',
@@ -92,7 +114,9 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ImpersonationContext.Provider value={{ ready, isAdmin, targetUserId, start, stop }}>
+    <ImpersonationContext.Provider
+      value={{ ready, isAdmin, targetUserId, searchUsers, start, stop }}
+    >
       {children}
     </ImpersonationContext.Provider>
   );
