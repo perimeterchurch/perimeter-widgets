@@ -10,6 +10,7 @@ import { MpLoginPanel } from './MpLoginPanel';
 import { ConfigPanel } from './ConfigPanel';
 import { useChromeTheme } from '../lib/use-chrome-theme';
 import { VIEWPORT_WIDTHS } from '../lib/preview-link';
+import { useImpersonation } from '../lib/impersonation-context';
 
 /**
  * The three device widths the Embed preview can be pinned to, as icon-only
@@ -54,6 +55,13 @@ export function EmbedView({ entry }: { entry: CatalogEntry }) {
   );
   const deviceWidth = DEVICES.find((d) => d.id === device)!.px;
 
+  // While impersonating (admin-only, behind the shell) route the LIVE preview's
+  // shipped bundle through the shell proxy so its authenticated data resolves on
+  // behalf of the target. Preview-only — the copyable snippet stays canonical.
+  const { targetUserId } = useImpersonation();
+  const previewApiUrl =
+    targetUserId != null ? `${window.location.origin}/api/impersonate/data` : undefined;
+
   return (
     <div className="space-y-6">
       {entry.definition && entry.definition.auth !== 'none' && (
@@ -67,7 +75,12 @@ export function EmbedView({ entry }: { entry: CatalogEntry }) {
             "as wide as there is room" instead of forcing a horizontal scrollbar on
             a laptop screen. */}
         <div className="mx-auto w-full" style={{ maxWidth: `${deviceWidth}px` }}>
-          <CdnBundlePreview slug={entry.slug} overrides={overrides} theme={theme} />
+          <CdnBundlePreview
+            slug={entry.slug}
+            overrides={overrides}
+            theme={theme}
+            apiUrl={previewApiUrl}
+          />
         </div>
       </div>
 

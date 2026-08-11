@@ -40,18 +40,22 @@ export function CdnBundlePreview({
   slug,
   overrides,
   theme,
+  apiUrl,
 }: {
   slug: string;
   overrides: Record<string, unknown>;
   theme: PreviewTheme;
+  /** When impersonating, the shell proxy base — routes the shipped bundle's API
+   * calls on behalf of the target. Same-origin srcdoc, so cookies flow. */
+  apiUrl?: string | undefined;
 }) {
   const [error, setError] = useState<string | null>(null);
 
-  // Any change that regenerates the srcdoc (slug, overrides, theme) gets a
-  // fresh error slate — a stale banner over a healthy remount misleads.
+  // Any change that regenerates the srcdoc (slug, overrides, theme, apiUrl) gets
+  // a fresh error slate — a stale banner over a healthy remount misleads.
   useEffect(() => {
     setError(null);
-  }, [slug, overrides, theme]);
+  }, [slug, overrides, theme, apiUrl]);
 
   useEffect(() => {
     function onMessage(event: MessageEvent) {
@@ -85,7 +89,7 @@ export function CdnBundlePreview({
     // Div before the loader script (BuiltBundlePreview's proven order). The
     // copyable snippet is script-first per the docs — functionally equivalent
     // here since the loader scans + observes the whole document.
-    `<div ${serializeWidgetAttrs(slug, overrides, theme)}></div>`,
+    `<div ${serializeWidgetAttrs(slug, overrides, theme, apiUrl)}></div>`,
     `<script src=${loaderUrl} async onerror="__report('Failed to load loader.js: '+this.src)"></script>`,
     '</body></html>',
   ].join('');
