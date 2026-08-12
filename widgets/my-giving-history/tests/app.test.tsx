@@ -37,6 +37,7 @@ const sampleItems = [
     date: '2025-12-01T00:00:00.000-05:00',
     amount: 70,
     donorName: 'Sam Giver',
+    softCreditSource: null,
     paymentType: 'Credit Card',
     programName: 'Missions',
   },
@@ -46,6 +47,7 @@ const sampleItems = [
     date: '2026-02-15T00:00:00.000-05:00',
     amount: 25,
     donorName: 'Pat Giver',
+    softCreditSource: null,
     paymentType: 'Cash',
     programName: 'Tithes',
   },
@@ -100,6 +102,28 @@ describe('my-giving-history App', () => {
     expect(screen.getByLabelText('Giving by year')).toBeInTheDocument();
     expect(screen.getByText('2 gifts · $95.00 total')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Download CSV' })).toBeInTheDocument();
+  });
+
+  it('names the fund under the donor for a soft-credited gift', () => {
+    useGivingHistoryMock.mockReturnValue(
+      queryResult({
+        isSuccess: true,
+        data: envelope([
+          {
+            ...sampleItems[0],
+            softCreditSource: 'Fidelity Charitable Gift Fund Foundation',
+          },
+        ]),
+      }),
+    );
+    renderApp();
+
+    const table = screen.getByLabelText('Giving history');
+    // Credited to the member, with the giving fund named beneath.
+    expect(within(table).getByText('Sam Giver')).toBeInTheDocument();
+    expect(
+      within(table).getByText('via Fidelity Charitable Gift Fund Foundation'),
+    ).toBeInTheDocument();
   });
 
   it('filters the table when a year is selected', () => {

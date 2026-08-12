@@ -32,7 +32,14 @@ export function GivingTable({ items }: { items: GivingHistoryItem[] }): React.JS
             {items.map((item) => (
               <tr key={item.distributionId} className="border-b border-border/50">
                 <td className="py-2 pr-4 whitespace-nowrap">{formatGiftDate(item.date)}</td>
-                <td className="py-2 pr-4">{item.donorName}</td>
+                <td className="py-2 pr-4">
+                  {item.donorName}
+                  {item.softCreditSource === null ? null : (
+                    // Soft credit: the household is credited, but the money came
+                    // from a fund, employer, or trust — name it.
+                    <span className="block text-xs text-muted-fg">via {item.softCreditSource}</span>
+                  )}
+                </td>
                 <td className="py-2 pr-4">{item.programName}</td>
                 <td className="py-2 pr-4">{item.paymentType}</td>
                 <td className="py-2 text-right tabular-nums">{formatCurrency(item.amount)}</td>

@@ -37,13 +37,19 @@ function csvCell(value: string): string {
   return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 }
 
-/** Build a CSV (Date, Donor, Program, Type, Amount) for the given rows. */
+/**
+ * Build a CSV (Date, Donor, Given By, Program, Type, Amount) for the given
+ * rows. "Given By" carries the soft-credit source — the fund, employer, or
+ * trust the gift actually came from — and is blank for gifts the household
+ * gave directly. Accounting reconciles against that column.
+ */
 export function buildCsv(items: GivingHistoryItem[]): string {
-  const header = ['Date', 'Donor', 'Program', 'Type', 'Amount'];
+  const header = ['Date', 'Donor', 'Given By', 'Program', 'Type', 'Amount'];
   const rows = items.map((item) =>
     [
       formatGiftDate(item.date),
       item.donorName,
+      item.softCreditSource ?? '',
       item.programName,
       item.paymentType,
       item.amount.toFixed(2),

@@ -9,6 +9,7 @@ function item(overrides: Partial<GivingHistoryItem> = {}): GivingHistoryItem {
     date: '2026-02-15T00:00:00.000-05:00',
     amount: 70,
     donorName: 'Sam Giver',
+    softCreditSource: null,
     paymentType: 'Cash',
     programName: 'Tithes & Offerings (Fund)',
     ...overrides,
@@ -36,7 +37,21 @@ describe('format helpers', () => {
       item({ donorName: 'Giver, Sam', programName: 'General', amount: 1234.5 }),
     ]);
     const lines = csv.split('\n');
-    expect(lines[0]).toBe('Date,Donor,Program,Type,Amount');
-    expect(lines[1]).toBe('2/15/2026,"Giver, Sam",General,Cash,1234.50');
+    expect(lines[0]).toBe('Date,Donor,Given By,Program,Type,Amount');
+    // Given By is blank for a gift the household gave directly.
+    expect(lines[1]).toBe('2/15/2026,"Giver, Sam",,General,Cash,1234.50');
+  });
+
+  it('names the soft-credit source in the Given By column', () => {
+    const csv = buildCsv([
+      item({
+        softCreditSource: 'Fidelity Charitable Gift Fund Foundation',
+        programName: 'Forward Campaign',
+        amount: 800,
+      }),
+    ]);
+    expect(csv.split('\n')[1]).toBe(
+      '2/15/2026,Sam Giver,Fidelity Charitable Gift Fund Foundation,Forward Campaign,Cash,800.00',
+    );
   });
 });
