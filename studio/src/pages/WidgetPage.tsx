@@ -10,6 +10,7 @@ import { widgetDoc } from '../lib/widget-docs';
 import { StudioMDXProvider } from '../lib/mdx';
 import { EmbedView } from '../components/EmbedView';
 import { DevView } from '../components/DevView';
+import { ImpersonatePanel } from '../components/ImpersonatePanel';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { widgetTitle } from '../lib/labels';
 import { NotFoundPage } from './NotFoundPage';
@@ -112,6 +113,11 @@ function WidgetView({
   const canEmbed = released !== undefined;
   const canDev = DEV_AVAILABLE && source !== undefined;
 
+  // Impersonation only changes what an authenticated widget resolves its data to,
+  // so the admin panel appears on those pages only. `auth: 'none'` widgets (and
+  // doc/component pages) never show it.
+  const authWidget = released?.definition?.auth != null && released.definition.auth !== 'none';
+
   const tabs = [
     ...(canEmbed ? [{ id: EMBED, label: 'Embed' }] : []),
     ...(canDev ? [{ id: DEV, label: 'Dev' }] : []),
@@ -170,6 +176,8 @@ function WidgetView({
             className="w-fit"
           />
         )}
+
+        {authWidget && <ImpersonatePanel />}
 
         {manifestError && canDev && (
           <p role="status" className="text-sm text-muted-fg">

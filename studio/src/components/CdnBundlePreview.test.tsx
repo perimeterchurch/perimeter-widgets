@@ -48,6 +48,27 @@ describe('CdnBundlePreview', () => {
     expect(frameSrcdoc(container)).toContain('data-per-page="9"');
   });
 
+  it('omits the impersonation fetch-shim when no apiUrl is given', () => {
+    const { container } = render(<CdnBundlePreview slug="sermons" overrides={{}} theme="light" />);
+    const srcdoc = frameSrcdoc(container);
+    expect(srcdoc).not.toContain('window.fetch=');
+    expect(srcdoc).not.toContain('data-api-url');
+  });
+
+  it('injects the fetch-shim + data-api-url when impersonating (apiUrl set)', () => {
+    const proxy = 'http://localhost:5173/api/impersonate/data';
+    const { container } = render(
+      <CdnBundlePreview slug="my-giving-history" overrides={{}} theme="light" apiUrl={proxy} />,
+    );
+    const srcdoc = frameSrcdoc(container);
+    // Shipped bundle picks it up only if it declares `apiUrl`; the shim covers
+    // the ones that don't by rewriting default-origin calls onto the proxy.
+    expect(srcdoc).toContain(`data-api-url="${proxy}"`);
+    expect(srcdoc).toContain('window.fetch=');
+    expect(srcdoc).toContain(JSON.stringify(proxy));
+    expect(srcdoc).toContain(JSON.stringify('https://api.perimeter.org'));
+  });
+
   it('shows an error banner when the frame posts a failure', () => {
     const { container, getByRole } = render(
       <CdnBundlePreview slug="sermons" overrides={{}} theme="light" />,

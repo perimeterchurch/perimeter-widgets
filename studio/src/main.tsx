@@ -5,6 +5,7 @@ import { router } from './routes';
 import { installRootTokens } from './lib/light-dom-tokens';
 import { applyInitialStudioTheme } from './lib/use-studio-theme';
 import { bridgeMpToken } from './lib/mp-token-bridge';
+import { ImpersonationProvider } from './lib/impersonation-context';
 import './styles.css';
 
 installRootTokens();
@@ -20,6 +21,8 @@ void bridgeMpToken();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ImpersonationProvider>
+      <RouterProvider router={router} />
+    </ImpersonationProvider>
   </StrictMode>,
 );
