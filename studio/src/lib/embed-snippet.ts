@@ -22,6 +22,12 @@ export function serializeWidgetAttrs(
   slug: string,
   overrides: Record<string, unknown>,
   theme: PreviewTheme,
+  /**
+   * Optional `data-api-url` base. Used by the live Embed PREVIEW while
+   * impersonating (to route the shipped bundle through the shell proxy) — NOT by
+   * the copyable snippet, which must stay the canonical host-page form.
+   */
+  apiUrl?: string,
 ): string {
   const attrs = [`data-perimeter-widget="${escapeAttribute(slug)}"`];
   for (const key of Object.keys(overrides).sort()) {
@@ -36,6 +42,7 @@ export function serializeWidgetAttrs(
     attrs.push(`data-${camelToKebab(key)}="${escapeAttribute(text)}"`);
   }
   if (theme === 'dark') attrs.push('data-theme="dark"');
+  if (apiUrl) attrs.push(`data-api-url="${escapeAttribute(apiUrl)}"`);
   return attrs.join(' ');
 }
 
