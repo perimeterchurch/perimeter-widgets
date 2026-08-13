@@ -87,7 +87,7 @@ describe('community-group-finder App', () => {
       screen.getByText('Alpharetta-Milton: Bob and Cindy Heath Community Group'),
     ).toBeInTheDocument();
     expect(screen.getByText('Alpharetta, GA')).toBeInTheDocument();
-    expect(screen.getByText('Sundays @ 5:00 PM')).toBeInTheDocument();
+    expect(screen.getByText('Sundays at 5:00 PM')).toBeInTheDocument();
     expect(screen.getByText('Starts: Sun, Aug 16, 2099')).toBeInTheDocument();
   });
 
@@ -111,6 +111,29 @@ describe('community-group-finder App', () => {
     renderApp();
     expect(screen.getByText('Group Is Full')).toBeInTheDocument();
     expect(screen.getByText(GROUP.name)).toBeInTheDocument();
+  });
+
+  // The pill is absolutely positioned so it can overlay the banner. With images
+  // off there is no banner, so it lands on the title — a title long enough to
+  // reach the card's right edge ran underneath it. The content block reserves a
+  // band for it in exactly that case.
+  it('reserves room for the full pill when there is no banner to overlay', () => {
+    hooks.groups = groupsResult([{ ...GROUP, isFull: true }]);
+    renderApp({ showImages: false });
+    const content = screen.getByText(GROUP.name).parentElement;
+    expect(content).toHaveClass('pt-9');
+  });
+
+  it('leaves the banner card padding alone when images are on', () => {
+    hooks.groups = groupsResult([{ ...GROUP, isFull: true }]);
+    renderApp({ showImages: true });
+    expect(screen.getByText(GROUP.name).parentElement).not.toHaveClass('pt-9');
+  });
+
+  it('does not reserve pill room for a group that is not full', () => {
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ showImages: false });
+    expect(screen.getByText(GROUP.name).parentElement).not.toHaveClass('pt-9');
   });
 
   it('keeps full groups by default, sending no includeFull override', () => {
