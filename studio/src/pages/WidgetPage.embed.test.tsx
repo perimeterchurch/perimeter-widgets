@@ -173,18 +173,24 @@ describe('WidgetPage — Embed tab', () => {
     expect(ui.queryByText(/^v\d/)).toBeNull();
   });
 
-  it('renders the widget doc below the tabs, not inside one', async () => {
-    // The doc documents the widget whichever view you are in, and the options
-    // reference wants to be readable while you tune the options above it.
+  // The MDX doc body used to render below the tabs. It is gone: everything it told
+  // an embedder is already on this page — the snippet block is generated live and
+  // the Configure panel lists every option with its description and default, both
+  // from the widget's own zod schema. sermons had the worst of it at 233 lines.
+  it('renders no doc body below the tabs', async () => {
     const { container, ui } = renderAt('/widgets/sermons');
     await ui.findByRole('tab', { name: 'Embed' }, { timeout: 10_000 });
-    const tablist = container.querySelector('[role="tablist"]')!;
-    const docSection = container.querySelector('section.border-t')!;
-    expect(docSection).toBeTruthy();
-    // Document order: the doc follows the tab strip rather than being nested in it.
-    expect(tablist.contains(docSection)).toBe(false);
-    expect(
-      tablist.compareDocumentPosition(docSection) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expect(container.querySelector('section.border-t')).toBeNull();
+    expect(container.querySelector('article')).toBeNull();
+    // The doc's own H1 was the widget slug — the heading this removes.
+    expect(ui.queryByRole('heading', { name: 'sermons' })).toBeNull();
+  });
+
+  // Removing the body must not take the one-line description with it: that comes
+  // from the same MDX files' `description:` frontmatter, via widgetDescription.
+  it('keeps the widget description under the title', async () => {
+    const { ui } = renderAt('/widgets/sermons');
+    await ui.findByRole('tab', { name: 'Embed' }, { timeout: 10_000 });
+    expect(ui.getByRole('heading', { level: 1, name: 'Sermons' })).toBeTruthy();
   });
 });
