@@ -44,10 +44,14 @@ blank never reads as missing data. The underlying API field is
 The member stays named on every row because the row's donor is not always the
 row's giver: for an **IRA distribution (QCD)** the custodian — Fidelity
 Brokerage Services, Charles Schwab, Morgan Stanley, Merrill Lynch — is only the
-conduit, and the member is the actual donor. MP has no field distinguishing a
-QCD from a DAF grant today (`Donation_Sources` is unused and nothing carries a
-QCD marker), so the widget cannot label them differently. If that distinction
-is ever needed for receipting, it has to start as a classification in MP.
+conduit, and the member is the actual donor. MP already records that
+distinction as a **payment type** — `Payment_Type` 36, "Qualified Charitable
+Distribution" — so it reaches the widget's **Type** column and is filterable
+there like any other payment method. A QCD therefore needs no new
+classification in MP to be told apart from a DAF grant, including for
+receipting. What the Donor column alone can't tell you is which of the two a
+given organization is, which is the other reason the member's name stays on
+the row.
 
 ## Authentication
 
