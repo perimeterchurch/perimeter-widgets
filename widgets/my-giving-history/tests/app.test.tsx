@@ -104,7 +104,7 @@ describe('my-giving-history App', () => {
     expect(screen.getByRole('button', { name: 'Download CSV' })).toBeInTheDocument();
   });
 
-  it('names the fund under the donor for a soft-credited gift', () => {
+  it('lists a soft-credited gift under the foundation, crediting the member', () => {
     useGivingHistoryMock.mockReturnValue(
       queryResult({
         isSuccess: true,
@@ -118,12 +118,11 @@ describe('my-giving-history App', () => {
     );
     renderApp();
 
+    // The foundation is the Donor — what donors scan for — with the member it
+    // is credited to on the row beneath.
     const table = screen.getByLabelText('Giving history');
-    // Credited to the member, with the giving fund named beneath.
-    expect(within(table).getByText('Sam Giver')).toBeInTheDocument();
-    expect(
-      within(table).getByText('via Fidelity Charitable Gift Fund Foundation'),
-    ).toBeInTheDocument();
+    expect(within(table).getByText('Fidelity Charitable Gift Fund Foundation')).toBeInTheDocument();
+    expect(within(table).getByText('credited to Sam Giver')).toBeInTheDocument();
   });
 
   it('filters the table when a year is selected', () => {

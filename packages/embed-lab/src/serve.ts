@@ -1,7 +1,7 @@
 import { createServer, type Server } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 /**
  * Embed lab — a local host-page playground for manually testing widget embeds.
@@ -89,7 +89,11 @@ export function startEmbedLab(port = EMBED_LAB_PORT): Server {
 }
 
 // Direct invocation: `pnpm embed-lab` (root) / `pnpm serve` (this package).
-if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file://').href) {
+// pathToFileURL, not `new URL(argv[1], 'file://')`: argv[1] is a native path, so
+// on Windows it is "C:\…\serve.ts", which that form does not turn into the
+// "file:///C:/…" shape import.meta.url has. The comparison silently failed and
+// the server never started — the command just exited 0 with no output.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   startEmbedLab();
   console.log(`Embed lab → http://localhost:${EMBED_LAB_PORT}`);
 }

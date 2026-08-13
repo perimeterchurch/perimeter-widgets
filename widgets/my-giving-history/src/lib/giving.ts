@@ -1,5 +1,5 @@
 import type { GivingHistoryItem } from '@perimeter/api-hooks';
-import { getYear } from './format';
+import { donorLabel, getYear } from './format';
 
 export interface GivingFilterState {
   year: string;
@@ -32,7 +32,7 @@ export function filterItems(
   return items.filter(
     (item) =>
       (filters.year === '' || getYear(item.date) === filters.year) &&
-      (filters.donor === '' || item.donorName === filters.donor) &&
+      (filters.donor === '' || donorLabel(item) === filters.donor) &&
       (filters.paymentType === '' || item.paymentType === filters.paymentType) &&
       (filters.program === '' || item.programName === filters.program),
   );
@@ -54,7 +54,7 @@ export function filterOptions(items: GivingHistoryItem[]): GivingFilterOptions {
   return {
     // Years newest-first; the rest alphabetical.
     years: [...new Set(items.map((i) => getYear(i.date)))].sort((a, b) => b.localeCompare(a)),
-    donors: distinctSorted(items.map((i) => i.donorName)),
+    donors: distinctSorted(items.map(donorLabel)),
     paymentTypes: distinctSorted(items.map((i) => i.paymentType)),
     programs: distinctSorted(items.map((i) => i.programName)),
   };

@@ -26,6 +26,20 @@ export function getYear(iso: string): string {
   return iso.slice(0, 4);
 }
 
+/**
+ * The donor a row is listed under: the giving organization for a soft-credited
+ * gift (a foundation, donor-advised fund, or employer), otherwise the household
+ * member. This is what donors scan for — they know these as "Foundation checks"
+ * and look for the foundation's name, which is how the legacy MyGivingHistory
+ * widget listed them.
+ *
+ * The table's Donor column, the Donor filter's options, and the CSV all read
+ * from here, so the three can never disagree about what a row is filed under.
+ */
+export function donorLabel(item: GivingHistoryItem): string {
+  return item.softCreditSource ?? item.donorName;
+}
+
 /** A gift's date as `M/D/YYYY`, parsed from the ISO string's date parts. */
 export function formatGiftDate(iso: string): string {
   const [year, month, day] = iso.slice(0, 10).split('-');
@@ -38,18 +52,20 @@ function csvCell(value: string): string {
 }
 
 /**
- * Build a CSV (Date, Donor, Given By, Program, Type, Amount) for the given
- * rows. "Given By" carries the soft-credit source — the fund, employer, or
- * trust the gift actually came from — and is blank for gifts the household
- * gave directly. Accounting reconciles against that column.
+ * Build a CSV (Date, Donor, Credited To, Program, Type, Amount) for the given
+ * rows, matching the table: **Donor** is who the gift came from (a foundation
+ * or donor-advised fund on a soft-credited gift, otherwise the member) and
+ * **Credited To** is the household member it counts for. Both are always
+ * populated — on a directly-given gift they are the same name — so accounting
+ * can pivot on either without reading blanks as missing data.
  */
 export function buildCsv(items: GivingHistoryItem[]): string {
-  const header = ['Date', 'Donor', 'Given By', 'Program', 'Type', 'Amount'];
+  const header = ['Date', 'Donor', 'Credited To', 'Program', 'Type', 'Amount'];
   const rows = items.map((item) =>
     [
       formatGiftDate(item.date),
+      donorLabel(item),
       item.donorName,
-      item.softCreditSource ?? '',
       item.programName,
       item.paymentType,
       item.amount.toFixed(2),

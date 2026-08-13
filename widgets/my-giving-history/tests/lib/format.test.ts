@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { buildCsv, formatCurrency, formatGiftDate, getYear } from '../../src/lib/format';
+import {
+  buildCsv,
+  donorLabel,
+  formatCurrency,
+  formatGiftDate,
+  getYear,
+} from '../../src/lib/format';
 import type { GivingHistoryItem } from '@perimeter/api-hooks';
 
 function item(overrides: Partial<GivingHistoryItem> = {}): GivingHistoryItem {
@@ -32,17 +38,27 @@ describe('format helpers', () => {
     expect(formatCurrency(-12.5)).toBe('-$12.50');
   });
 
+  it('lists a soft-credited gift under the foundation, crediting the member', () => {
+    expect(donorLabel(item({ softCreditSource: 'Fidelity Charitable Gift Fund Foundation' }))).toBe(
+      'Fidelity Charitable Gift Fund Foundation',
+    );
+  });
+
+  it('lists a directly-given gift under the member', () => {
+    expect(donorLabel(item({ softCreditSource: null }))).toBe('Sam Giver');
+  });
+
   it('builds CSV with a header and quotes cells containing commas', () => {
     const csv = buildCsv([
       item({ donorName: 'Giver, Sam', programName: 'General', amount: 1234.5 }),
     ]);
     const lines = csv.split('\n');
-    expect(lines[0]).toBe('Date,Donor,Given By,Program,Type,Amount');
-    // Given By is blank for a gift the household gave directly.
-    expect(lines[1]).toBe('2/15/2026,"Giver, Sam",,General,Cash,1234.50');
+    expect(lines[0]).toBe('Date,Donor,Credited To,Program,Type,Amount');
+    // Directly given: Donor and Credited To are the same member.
+    expect(lines[1]).toBe('2/15/2026,"Giver, Sam","Giver, Sam",General,Cash,1234.50');
   });
 
-  it('names the soft-credit source in the Given By column', () => {
+  it('puts the foundation in Donor and the member in Credited To', () => {
     const csv = buildCsv([
       item({
         softCreditSource: 'Fidelity Charitable Gift Fund Foundation',
@@ -51,7 +67,7 @@ describe('format helpers', () => {
       }),
     ]);
     expect(csv.split('\n')[1]).toBe(
-      '2/15/2026,Sam Giver,Fidelity Charitable Gift Fund Foundation,Forward Campaign,Cash,800.00',
+      '2/15/2026,Fidelity Charitable Gift Fund Foundation,Sam Giver,Forward Campaign,Cash,800.00',
     );
   });
 });

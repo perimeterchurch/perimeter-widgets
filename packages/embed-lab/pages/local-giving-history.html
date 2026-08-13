@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — local my-giving-history</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+      }
+      .banner {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+      /* A deliberately narrow column: the giving table's widest cell is a
+         foundation name, so this is the layout most likely to break — the table
+         must scroll inside its own wrapper rather than widening the column. */
+      .column {
+        max-width: 375px;
+        border: 1px dashed #cbd5e1;
+        padding: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>local — the unreleased build from widgets/my-giving-history/dist/</h1>
+    <p><a href="/">← lab index</a></p>
+    <p class="banner">
+      Bypasses the loader and embeds <code>/local/my-giving-history/index.js</code> directly. Build
+      first: <code>pnpm --filter @perimeter/widget-my-giving-history build</code>. This widget is
+      auth-gated, so it shows the sign-in prompt until
+      <code>localStorage['mpp-widgets_AuthToken']</code> holds a token — set one (with
+      <code>mpp-widgets_ExpiresAfter</code> in the future) to render the table.
+      <code>data-api-url</code>
+      points at a local perimeter-api on :5500.
+    </p>
+
+    <div class="column">
+      <div data-perimeter-widget="my-giving-history" data-api-url="http://localhost:5500"></div>
+    </div>
+    <script src="/local/my-giving-history/index.js" data-nowprocket async></script>
+  </body>
+</html>
