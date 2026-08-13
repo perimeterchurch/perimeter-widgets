@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
-import { widgetDoc, widgetDescription } from './widget-docs';
+import { widgetDescription } from './widget-docs';
 
 // Asserts against the REAL repo docs (globs resolve from repo root in tests,
 // same as the dev server) — my-shepherds gains frontmatter in this task.
@@ -15,7 +15,10 @@ describe('widget docs frontmatter', () => {
     expect(await widgetDescription('nope-not-a-widget')).toBeNull();
   });
 
-  it('still exposes the component loader', () => {
-    expect(widgetDoc('my-shepherds')).toBeTypeOf('function');
+  // The doc BODY is no longer rendered anywhere, so no loader is exported. The
+  // frontmatter above is the only thing these files still feed.
+  it('exposes nothing but the description reader', async () => {
+    const mod = await import('./widget-docs');
+    expect(Object.keys(mod)).toEqual(['widgetDescription']);
   });
 });

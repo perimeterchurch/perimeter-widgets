@@ -6,6 +6,15 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    # turbo.json sets concurrency to 20 so `pnpm dev` can start every persistent
+    # task (eight widgets + studio + studio-host, and counting). That setting is
+    # global, so it also governs `turbo typecheck lint test` here — and on a
+    # 2-core runner, twenty package tasks each spawning vitest workers starve
+    # timing-sensitive tests: WidgetPage.embed.test.tsx times out on its 10s
+    # manifest join, the Embed/Dev tab strip never renders, and the run fails
+    # intermittently. Cap CI at the pre-existing default; dev keeps its headroom.
+    env:
+      TURBO_CONCURRENCY: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
