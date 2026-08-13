@@ -144,7 +144,7 @@ function pluralizeDay(meetingDay: string): string {
 }
 
 /**
- * The card's schedule line: `Sundays @ 5:00 PM`.
+ * The card's schedule line: `Sundays at 5:00 PM`.
  *
  * Falls back through what MP actually has, since most groups are missing at
  * least one piece — day plus time when both exist, then day alone, then time
@@ -159,7 +159,7 @@ export function formatMeetingSchedule(
   const day = meetingDay === null ? null : pluralizeDay(meetingDay);
   const time = formatMeetingTime(meetingTime);
 
-  if (day && time) return `${day} @ ${time}`;
+  if (day && time) return `${day} at ${time}`;
   if (day) return day;
   if (time) return time;
   return meetingFrequency;

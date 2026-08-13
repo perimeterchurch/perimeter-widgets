@@ -13,6 +13,46 @@ a gift spread across multiple programs appears as multiple rows. Columns: date,
 donor, program, payment type, and amount. The user can filter by year, donor,
 payment type, and program, and download the filtered rows as CSV.
 
+## Foundation gifts (soft credits)
+
+Gifts that reached Perimeter through a foundation, donor-advised fund, employer
+match, or IRA custodian are recorded in MP against that organization and
+**soft-credited** to the member. The history includes both halves of that
+model, so these gifts appear alongside gifts the household gave directly.
+
+Donors know these as **"Foundation checks"** and scan the Donor column for the
+foundation's name, which is how the legacy `MyGivingHistory` widget listed
+them. So a soft-credited row is **listed under the organization**, with the
+member it counts for on a second line:
+
+| Date | Donor | Program |
+| --- | --- | --- |
+| 8/5/2026 | Fidelity Charitable Gift Fund Foundation<br />_credited to Dennis Lee_ | FRONTIER Campaign |
+| 7/19/2026 | Dennis Lee | Tithes & Offerings (Fund) |
+
+The `donorLabel()` helper in `src/lib/format.ts` is the single source of that
+choice — the Donor column, the **Donor filter's options**, and the CSV all read
+from it, so they can never disagree about what a row is filed under. Filtering
+by a foundation therefore also redraws the year chart, which is how to see
+"giving through this fund by year" without a separate control.
+
+The CSV carries both: **Donor** (the organization, or the member on a direct
+gift) and **Credited To** (always the member). Both are always populated, so a
+blank never reads as missing data. The underlying API field is
+`softCreditSource` (`string | null`).
+
+The member stays named on every row because the row's donor is not always the
+row's giver: for an **IRA distribution (QCD)** the custodian — Fidelity
+Brokerage Services, Charles Schwab, Morgan Stanley, Merrill Lynch — is only the
+conduit, and the member is the actual donor. MP already records that
+distinction as a **payment type** — `Payment_Type` 36, "Qualified Charitable
+Distribution" — so it reaches the widget's **Type** column and is filterable
+there like any other payment method. A QCD therefore needs no new
+classification in MP to be told apart from a DAF grant, including for
+receipting. What the Donor column alone can't tell you is which of the two a
+given organization is, which is the other reason the member's name stays on
+the row.
+
 ## Authentication
 
 This widget requires a signed-in Ministry Platform user (`auth: 'required'`).

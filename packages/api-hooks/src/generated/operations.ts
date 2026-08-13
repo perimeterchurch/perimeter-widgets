@@ -407,12 +407,10 @@ export interface paths {
     get: operations['getContact'];
     put?: never;
     post?: never;
-    /** Delete a contact */
-    delete: operations['deleteContact'];
+    delete?: never;
     options?: never;
     head?: never;
-    /** Update an existing contact */
-    patch: operations['updateContact'];
+    patch?: never;
     trace?: never;
   };
   '/api/contacts/search': {
@@ -3411,88 +3409,6 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
-  deleteContact: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': Record<string, never>;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  updateContact: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          displayName?: string;
-          /** Format: email */
-          emailAddress?: string;
-          firstName?: string;
-          lastName?: string;
-          mobilePhone?: string;
-          householdId?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              message: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
   searchContactsEnriched: {
     parameters: {
       query: {
@@ -5229,6 +5145,7 @@ export interface operations {
                 date: string;
                 amount: number;
                 donorName: string;
+                softCreditSource: string | null;
                 paymentType: string;
                 programName: string;
               }[];
@@ -8989,6 +8906,7 @@ export interface operations {
               grantedCategoryIds: number[];
               grantedArticleIds: number[];
               canManageCategories: boolean;
+              canManageScopedCategories: boolean;
               canManagePermissions: boolean;
             };
             meta?: {

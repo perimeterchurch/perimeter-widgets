@@ -75,11 +75,11 @@ describe('formatMeetingTime', () => {
 
 describe('formatMeetingSchedule', () => {
   it('pluralizes the day and joins it to the time', () => {
-    expect(formatMeetingSchedule('Sunday', '17:00:00', 'Biweekly')).toBe('Sundays @ 5:00 PM');
+    expect(formatMeetingSchedule('Sunday', '17:00:00', 'Biweekly')).toBe('Sundays at 5:00 PM');
   });
 
   it('does not pluralize "Varying Day"', () => {
-    expect(formatMeetingSchedule('Varying Day', '19:00:00', null)).toBe('Varying Day @ 7:00 PM');
+    expect(formatMeetingSchedule('Varying Day', '19:00:00', null)).toBe('Varying Day at 7:00 PM');
   });
 
   it('falls back to the day alone when there is no time', () => {

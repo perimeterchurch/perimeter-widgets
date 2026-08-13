@@ -16,6 +16,7 @@ const items: GivingHistoryItem[] = [
     date: '2025-12-01T00:00:00.000-05:00',
     amount: 70,
     donorName: 'Sam Giver',
+    softCreditSource: null,
     paymentType: 'Credit Card',
     programName: 'Missions',
   },
@@ -25,6 +26,7 @@ const items: GivingHistoryItem[] = [
     date: '2026-02-15T00:00:00.000-05:00',
     amount: 25,
     donorName: 'Pat Giver',
+    softCreditSource: null,
     paymentType: 'Cash',
     programName: 'Tithes',
   },
@@ -34,6 +36,7 @@ const items: GivingHistoryItem[] = [
     date: '2026-03-20T00:00:00.000-04:00',
     amount: 100,
     donorName: 'Sam Giver',
+    softCreditSource: 'Fidelity Charitable Gift Fund Foundation',
     paymentType: 'Cash',
     programName: 'Tithes',
   },
@@ -47,15 +50,30 @@ describe('giving filters + aggregation', () => {
 
   it('filters by a single field and by multiple fields combined', () => {
     expect(filterItems(items, { ...EMPTY_FILTERS, year: '2026' })).toHaveLength(2);
-    expect(filterItems(items, { ...EMPTY_FILTERS, donor: 'Sam Giver' })).toHaveLength(2);
-    const both = filterItems(items, { ...EMPTY_FILTERS, year: '2026', donor: 'Sam Giver' });
-    expect(both.map((i) => i.distributionId)).toEqual([3]);
+    // Item 3 is Sam's gift but arrived through Fidelity, so it is filed under
+    // the foundation — only item 1 is listed under Sam himself.
+    const sam = filterItems(items, { ...EMPTY_FILTERS, donor: 'Sam Giver' });
+    expect(sam.map((i) => i.distributionId)).toEqual([1]);
+    expect(filterItems(items, { ...EMPTY_FILTERS, year: '2026', donor: 'Sam Giver' })).toEqual([]);
+  });
+
+  it('filters soft-credited gifts by the foundation that sent them', () => {
+    const viaFidelity = filterItems(items, {
+      ...EMPTY_FILTERS,
+      donor: 'Fidelity Charitable Gift Fund Foundation',
+    });
+    expect(viaFidelity.map((i) => i.distributionId)).toEqual([3]);
   });
 
   it('derives distinct option lists (years newest-first, rest alphabetical)', () => {
     const options = filterOptions(items);
     expect(options.years).toEqual(['2026', '2025']);
-    expect(options.donors).toEqual(['Pat Giver', 'Sam Giver']);
+    // The Donor list offers foundations alongside members, matching the column.
+    expect(options.donors).toEqual([
+      'Fidelity Charitable Gift Fund Foundation',
+      'Pat Giver',
+      'Sam Giver',
+    ]);
     expect(options.paymentTypes).toEqual(['Cash', 'Credit Card']);
     expect(options.programs).toEqual(['Missions', 'Tithes']);
   });
