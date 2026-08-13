@@ -187,4 +187,26 @@ describe('WidgetPage — Embed tab', () => {
       tablist.compareDocumentPosition(docSection) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+
+  // The doc is reference material, not the page's subject. Collapsed, it cannot
+  // read as the main content under the controls — and the lazy MDX chunk is not
+  // fetched until someone asks for it.
+  it('collapses the widget doc behind a disclosure, closed on arrival', async () => {
+    const { container, ui } = renderAt('/widgets/sermons');
+    await ui.findByRole('tab', { name: 'Embed' }, { timeout: 10_000 });
+    const toggle = ui.getByRole('button', { name: /Documentation/ });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    // Nothing of the doc is in the DOM while closed — not merely hidden.
+    expect(container.querySelector('article')).toBeNull();
+  });
+
+  it('reveals the doc when the disclosure is opened', async () => {
+    const { ui } = renderAt('/widgets/sermons');
+    await ui.findByRole('tab', { name: 'Embed' }, { timeout: 10_000 });
+    const toggle = ui.getByRole('button', { name: /Documentation/ });
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    // The MDX chunk streams in async; the article wrapper is there immediately.
+    expect(await ui.findByRole('article', {}, { timeout: 10_000 })).toBeTruthy();
+  });
 });

@@ -1,5 +1,6 @@
-import { lazy, Suspense, useMemo, type ComponentType } from 'react';
+import { lazy, Suspense, useMemo, useState, type ComponentType } from 'react';
 import { useParams, useSearchParams } from 'react-router';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@perimeter/ui/button';
 import { Skeleton } from '@perimeter/ui/skeleton';
 import { Spinner } from '@perimeter/ui/spinner';
@@ -191,13 +192,60 @@ function WidgetView({
       </div>
 
       {/* The widget's own doc — purpose, options reference, embed instructions —
-          when docs/widgets/<slug>.mdx exists. Nothing otherwise. */}
-      {doc ? (
-        <section className="border-t border-border">
-          <WidgetDoc loader={doc} />
-        </section>
-      ) : null}
+          when docs/widgets/<slug>.mdx exists. Nothing otherwise.
+
+          Collapsed by default. These docs run long (sermons is 233 lines,
+          community-group-finder 196) and most of what they cover is already on
+          screen above them: the snippet block is generated live and the config
+          playground lists every option with its description and default, both
+          from the widget's own zod schema. So the doc opened as a wall of prose
+          under the controls, which read as the page's main content rather than
+          as reference. Behind a disclosure it stays one click away for the
+          reader who wants the "why" without displacing the tuning UI. */}
+      {doc ? <WidgetDocSection loader={doc} /> : null}
     </>
+  );
+}
+
+/**
+ * The doc section: a disclosure whose panel is the widget's MDX doc.
+ *
+ * The doc is rendered only while open, not hidden with CSS, so the lazy MDX
+ * chunk is never fetched for a reader who does not ask for it — eight widgets
+ * each carry one. Follows the studio's own disclosure shape (a `Button` with
+ * `aria-expanded`, as in InspectorDrawer and AppHeader) rather than `<details>`,
+ * which cannot defer its children.
+ *
+ * Keeps the `section.border-t` wrapper: it is the seam between the tuning UI and
+ * the reference material either way, and `WidgetPage.embed.test.tsx` pins the
+ * doc's position relative to the tab strip through it.
+ */
+function WidgetDocSection({ loader }: { loader: () => Promise<{ default: ComponentType }> }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <section className="border-t border-border">
+      <div className="mx-auto max-w-3xl px-6 py-4">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+          className="-mx-2 w-full justify-between px-2"
+        >
+          <span className="text-sm font-semibold tracking-tight">Documentation</span>
+          {/* Rotates to point down when open; `aria-expanded` on the button is
+              what actually conveys state, so the glyph is decorative. */}
+          <ChevronDown
+            aria-hidden="true"
+            className={`h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        </Button>
+      </div>
+
+      {open && <WidgetDoc loader={loader} />}
+    </section>
   );
 }
 
@@ -210,7 +258,8 @@ function WidgetDoc({ loader }: { loader: () => Promise<{ default: ComponentType 
   const Doc = useMemo(() => lazy(loader), [loader]);
   return (
     <StudioMDXProvider>
-      <article className="mx-auto max-w-3xl px-6 py-10">
+      {/* No top padding: the disclosure toggle above supplies that gap. */}
+      <article className="mx-auto max-w-3xl px-6 pb-10">
         <Suspense
           fallback={
             <div className="flex justify-center py-16 text-muted-fg">
