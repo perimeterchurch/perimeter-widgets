@@ -27,7 +27,7 @@
     },
     {
       "source": "/my-giving-history/latest.js",
-      "destination": "/my-giving-history/0.1.0/index.js"
+      "destination": "/my-giving-history/0.1.1/index.js"
     },
     {
       "source": "/my-shepherds/latest.js",
