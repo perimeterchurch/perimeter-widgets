@@ -103,6 +103,13 @@ export function GroupCard({
   // not begun yet has a start date worth printing.
   const startDate = isUpcoming(group.startDate) ? formatStartDate(group.startDate) : null;
 
+  // The full pill is absolutely positioned so it can sit over the banner. With
+  // images off there is no banner to sit on, so it lands on the title instead —
+  // and a title long enough to reach the card's right edge runs under it. Reserve
+  // a band for the pill in that case: `top-2` + the pill's `h-5` is 28px, plus a
+  // gap. Kept off the image case so the banner layout is untouched.
+  const reservePillSpace = group.isFull && !config.showImages;
+
   return (
     <li className="relative flex flex-col overflow-hidden rounded-none border border-border bg-bg text-fg">
       {config.showImages && (
@@ -121,7 +128,7 @@ export function GroupCard({
         </div>
       )}
 
-      <div className="flex flex-1 flex-col gap-1 p-4">
+      <div className={cn('flex flex-1 flex-col gap-1 p-4', reservePillSpace && 'pt-9')}>
         <h3 className="font-sans text-lg leading-snug font-bold text-balance">{group.name}</h3>
 
         {location && <GroupFact>{location}</GroupFact>}
