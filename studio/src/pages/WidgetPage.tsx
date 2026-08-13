@@ -1,13 +1,10 @@
-import { lazy, Suspense, useMemo, type ComponentType } from 'react';
+import { useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { Button } from '@perimeter/ui/button';
 import { Skeleton } from '@perimeter/ui/skeleton';
-import { Spinner } from '@perimeter/ui/spinner';
 import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
 import { toWidgetEntries, widgetDefGlob, widgetCssGlob, type WidgetEntry } from '../lib/discovery';
 import { useCatalog, type CatalogEntry } from '../lib/catalog';
-import { widgetDoc } from '../lib/widget-docs';
-import { StudioMDXProvider } from '../lib/mdx';
 import { EmbedView } from '../components/EmbedView';
 import { DevView } from '../components/DevView';
 import { ImpersonatePanel } from '../components/ImpersonatePanel';
@@ -33,9 +30,12 @@ const DEV_AVAILABLE = import.meta.env.DEV;
  * - **Dev** — source preview through the real `mount()` + Inspector. Local dev
  *   only, and the only tab for a widget that has no shipped bundle yet.
  *
- * The MDX doc renders below the tabs, not inside one: it documents the widget
- * whichever view you are in, and the options reference wants to be readable while
- * you tune the options above it.
+ * Nothing renders below the tabs. The per-widget MDX doc used to, but everything
+ * it covered for an embedder is already on this page: the snippet block is
+ * generated live and the Configure panel lists every option with its description
+ * and default, both from the widget's own zod schema. The files remain under
+ * `docs/widgets/` — their `description:` frontmatter is still the subtitle above,
+ * via `widgetDescription` — but the body is no longer shown.
  *
  * The active tab lives in `?tab=` so a link can point at either view. That sits
  * alongside the Dev tab's own preview params (usePreviewConfig), which is why the
@@ -108,7 +108,6 @@ function WidgetView({
   manifestResolved: boolean;
 }) {
   const [params, setParams] = useSearchParams();
-  const doc = widgetDoc(slug);
 
   const canEmbed = released !== undefined;
   const canDev = DEV_AVAILABLE && source !== undefined;
@@ -189,38 +188,6 @@ function WidgetView({
         {active === EMBED && released ? <EmbedView entry={released} /> : null}
         {active === DEV && source ? <DevView entry={source} /> : null}
       </div>
-
-      {/* The widget's own doc — purpose, options reference, embed instructions —
-          when docs/widgets/<slug>.mdx exists. Nothing otherwise. */}
-      {doc ? (
-        <section className="border-t border-border">
-          <WidgetDoc loader={doc} />
-        </section>
-      ) : null}
     </>
-  );
-}
-
-/**
- * Renders the lazily-loaded per-widget MDX doc inside the studio's MDX provider,
- * matching the guide/component doc treatment (own heading, comfortable measure,
- * Suspense spinner while the async chunk streams in).
- */
-function WidgetDoc({ loader }: { loader: () => Promise<{ default: ComponentType }> }) {
-  const Doc = useMemo(() => lazy(loader), [loader]);
-  return (
-    <StudioMDXProvider>
-      <article className="mx-auto max-w-3xl px-6 py-10">
-        <Suspense
-          fallback={
-            <div className="flex justify-center py-16 text-muted-fg">
-              <Spinner />
-            </div>
-          }
-        >
-          <Doc />
-        </Suspense>
-      </article>
-    </StudioMDXProvider>
   );
 }
