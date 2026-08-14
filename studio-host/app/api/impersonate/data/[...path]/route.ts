@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { headers as nextHeaders, cookies as nextCookies } from 'next/headers';
-import { auth } from '@/lib/auth/better-auth';
-import { isAdministrator } from '@/lib/impersonation/admin';
+import { requireAdmin } from '@/lib/auth/access';
 import { readTarget } from '@/lib/impersonation/cookie';
 import {
   IMPERSONATE_COOKIE,
@@ -9,23 +8,25 @@ import {
   perimeterApiUrl,
 } from '@/lib/impersonation/config';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/impersonate/data/<whitelisted path>
  *
- * Admin-only (MP role 2) read proxy. Reads the impersonation target from the
- * signed cookie and forwards a whitelisted perimeter-api GET with the service
- * key + `x-on-behalf-of-user`, so the gated widgets render the target's data.
- * Read-only, whitelisted paths only — impersonation can never drive a write.
+ * Admin-only (MP role 2) read proxy, checked against LIVE MP roles — so an admin
+ * whose role is revoked mid-session stops being able to read other people's data
+ * within about a minute, rather than for as long as their cookie lasts.
+ *
+ * Reads the impersonation target from the signed cookie and forwards a
+ * whitelisted perimeter-api GET with the service key + `x-on-behalf-of-user`, so
+ * the gated widgets render the target's data. Read-only, whitelisted paths only —
+ * impersonation can never drive a write.
  */
 export async function GET(req: Request, { params }: { params: Promise<{ path: string[] }> }) {
   const hdrs = await nextHeaders();
-  const session = await auth.api.getSession({ headers: hdrs });
-  if (!session) {
-    return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
-  }
-  if (!isAdministrator((session.user as { roles?: string | null }).roles)) {
-    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  }
+  const gate = await requireAdmin(hdrs);
+  if (!gate.ok) return gate.response;
 
   const cookieStore = await nextCookies();
   const target = readTarget(cookieStore.get(IMPERSONATE_COOKIE)?.value);
@@ -63,7 +64,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ path: st
   console.log(
     JSON.stringify({
       event: 'impersonate.proxy',
-      by: session.user.email,
+      by: gate.access.email,
       target,
       path: joined,
       status: upstream.status,

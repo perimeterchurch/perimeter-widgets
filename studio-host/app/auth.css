@@ -1,0 +1,160 @@
+/**
+ * Styling for the shell's two auth pages (/sign-in, /access-denied).
+ *
+ * These deliberately reproduce the HELPDESK sign-in experience
+ * (`helpdesk/src/app/sign-in/page.tsx`) so signing in to the studio looks and
+ * behaves like signing in to helpdesk: a centred card on a stone background, a
+ * full-width primary button, system-following dark mode.
+ *
+ * Helpdesk gets this from Tailwind v4 utilities; this shell has no Tailwind (its
+ * dependency set is `next` + `react` + `better-auth`, and the visible UI is the
+ * Vite studio served from /public). So the utilities helpdesk uses are written
+ * out here by hand, with the SAME token values — `--color-primary` #5b5bd6 and
+ * the warm stone neutrals come straight from
+ * `helpdesk/src/styles/tokens.css`. If those tokens change there, change them
+ * here.
+ *
+ * Dark mode is `prefers-color-scheme` rather than helpdesk's `.dark` class.
+ * Helpdesk drives that class with next-themes at `defaultTheme="system"`, so for
+ * a visitor who hasn't overridden the theme — which is everyone arriving at a
+ * sign-in page, before any app chrome has loaded — the two resolve identically,
+ * without pulling a theme provider into the shell.
+ */
+
+:root {
+  /* helpdesk tokens.css */
+  --color-primary: #5b5bd6;
+  --color-primary-hover: #4e4eca;
+  --color-primary-foreground: #ffffff;
+
+  /* Tailwind warm stone neutrals, as helpdesk uses them */
+  --stone-50: #fafaf9;
+  --stone-100: #f5f5f4;
+  --stone-300: #d6d3d1;
+  --stone-600: #57534e;
+  --stone-800: #292524;
+  --stone-900: #1c1917;
+  --stone-950: #0c0a09;
+
+  /* Resolved roles: light. Mirrors helpdesk's `bg-stone-50 dark:bg-stone-900`
+     page / `bg-white dark:bg-stone-800` card pairs. */
+  --page-bg: var(--stone-50);
+  --card-bg: #ffffff;
+  --title-fg: var(--stone-900);
+  --body-fg: var(--stone-600);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: var(--stone-900);
+    --card-bg: var(--stone-800);
+    --title-fg: var(--stone-100);
+    --body-fg: var(--stone-300);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* helpdesk's body: bg-white text-stone-900 dark:bg-stone-950 dark:text-stone-50 */
+  background: var(--card-bg);
+  color: var(--title-fg);
+  font-family: var(--font-studio-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* flex min-h-screen items-center justify-center bg-stone-50 dark:bg-stone-900 */
+.auth-main {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: var(--page-bg);
+  padding: 1rem;
+}
+
+/* w-full max-w-md rounded-lg bg-white p-8 shadow dark:bg-stone-800 */
+.auth-card {
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 0.75rem;
+  background: var(--card-bg);
+  padding: 2rem;
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.1),
+    0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+/* The access-denied card is centred; the sign-in card is not. */
+.auth-card--centered {
+  text-align: center;
+}
+
+/* mb-2 text-2xl font-semibold text-stone-900 dark:text-stone-100 */
+.auth-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  color: var(--title-fg);
+}
+
+/* mb-6 text-stone-600 dark:text-stone-300 */
+.auth-body {
+  margin: 0 0 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--body-fg);
+}
+
+.auth-body:last-child {
+  margin-bottom: 0;
+}
+
+/* w-full rounded bg-primary px-4 py-2 text-white transition-colors hover:bg-primary-hover */
+.auth-button {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0.25rem;
+  background: var(--color-primary);
+  padding: 0.5rem 1rem;
+  font: inherit;
+  color: var(--color-primary-foreground);
+  cursor: pointer;
+  transition:
+    color 150ms,
+    background-color 150ms;
+}
+
+.auth-button:hover {
+  background: var(--color-primary-hover);
+}
+
+.auth-button:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* text-primary hover:underline — helpdesk's "sign in as a different user" */
+.auth-link {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
