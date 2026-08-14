@@ -21,6 +21,23 @@
 const TOKEN_KEY = 'mpp-widgets_AuthToken';
 const EXP_KEY = 'mpp-widgets_ExpiresAfter';
 
+/**
+ * Remove the bridged token on sign-out.
+ *
+ * The server can clear its own cookies but not localStorage, so without this a
+ * "signed out" browser kept a live MP access token — and any widget that reads
+ * `MPLocalStorageAuth` went on treating the user as signed in until the token
+ * expired on its own. Called by `AccountMenu` before it hits `/api/auth/logout`.
+ */
+export function clearBridgedMpToken(): void {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(EXP_KEY);
+  } catch {
+    /* localStorage unavailable (private mode, blocked) — nothing to clear */
+  }
+}
+
 export async function bridgeMpToken(): Promise<void> {
   try {
     const res = await fetch('/api/mp-token', { headers: { accept: 'application/json' } });

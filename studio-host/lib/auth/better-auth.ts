@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { genericOAuth } from 'better-auth/plugins';
 import { authorizeRoles } from './roles';
+import { AUTH_COOKIE_PREFIX } from './config';
 
 // Ported from the Knowledge Base (knowledgebase-2.0/src/lib/auth/better-auth.ts):
 // Better Auth + generic OAuth → MP OIDC, cookie-backed (no database).
@@ -31,7 +32,9 @@ export const auth = betterAuth({
     storeAccountCookie: true,
   },
   advanced: {
-    cookiePrefix: 'studio',
+    // Shared with the sign-out cookie sweep (`expire-cookies.ts`) so the two
+    // cannot drift — if they did, sign-out would stop clearing the session.
+    cookiePrefix: AUTH_COOKIE_PREFIX,
   },
   plugins: [
     genericOAuth({
@@ -60,9 +63,9 @@ export const auth = betterAuth({
             const { allowed, matched } = authorizeRoles(p.roles);
             if (!allowed) {
               // Throwing aborts the OAuth callback, so NO user/session is
-              // created. Task 1.4 passes `errorCallbackURL: '/unauthorized'`
-              // at sign-in so this surfaces as the unauthorized page rather
-              // than a raw 500.
+              // created. The sign-in page passes
+              // `errorCallbackURL: '/access-denied'` so this surfaces as the
+              // access-denied page rather than a raw 500.
               throw new Error('ACCESS_DENIED_ROLE');
             }
 

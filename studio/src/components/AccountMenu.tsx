@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@perimeter/ui/button';
+import { clearBridgedMpToken } from '../lib/mp-token-bridge';
 
 interface SessionUser {
   name?: string;
@@ -42,16 +43,31 @@ export function AccountMenu() {
   if (!user) return null;
 
   const signOut = async () => {
-    // Body must be valid JSON — Better Auth JSON.parses it, so an empty body
-    // with an application/json content-type 500s.
-    await fetch('/api/auth/sign-out', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: '{}',
-    }).catch(() => {});
-    // Land on /signin in signed-out mode so it does NOT auto-bounce back through
-    // MP SSO (which would silently sign the user right back in).
-    window.location.href = '/signin?signedout=1';
+    // Clear the bridged MP token FIRST, and unconditionally. It's the one piece
+    // of signed-out state the server can't reach (see `mp-token-bridge.ts`), and
+    // leaving a live MP access token in localStorage after a sign-out is the
+    // thing most likely to be mistaken for "still signed in".
+    clearBridgedMpToken();
+
+    // `/api/auth/logout` does the rest server-side: clears the Better Auth
+    // session cookies, drops the impersonation cookie, sets the signed-out
+    // cookie that stops /sign-in bouncing straight back through MP SSO, and
+    // returns where to go to end the MP session itself.
+    let redirectTo = '/sign-in';
+    try {
+      const res = await fetch('/api/auth/logout', {
+        method: 'POST',
+        // Body must be valid JSON — an empty body with an application/json
+        // content-type is parsed and 500s.
+        headers: { 'content-type': 'application/json' },
+        body: '{}',
+      });
+      const data = (await res.json().catch(() => null)) as { redirectTo?: string } | null;
+      if (data?.redirectTo) redirectTo = data.redirectTo;
+    } catch {
+      /* fall back to /sign-in — the local token is already gone */
+    }
+    window.location.href = redirectTo;
   };
 
   return (

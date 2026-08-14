@@ -1,23 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { isAdministrator } from './admin';
 import { isAllowedProxyPath } from './config';
 import { signTarget, readTarget } from './cookie';
 
 process.env.BETTER_AUTH_SECRET ||= 'test-secret-for-impersonation-cookies';
 
-describe('isAdministrator', () => {
-  it('allows a session whose roles include Administrators', () => {
-    expect(isAdministrator('Administrators')).toBe(true);
-    expect(isAdministrator('Administrators,Website Folder - Edit')).toBe(true);
-    expect(isAdministrator('Website Folder - Edit, Administrators')).toBe(true);
-  });
-  it('denies Website-Folder-only, empty, and missing roles', () => {
-    expect(isAdministrator('Website Folder - Edit')).toBe(false);
-    expect(isAdministrator('')).toBe(false);
-    expect(isAdministrator(null)).toBe(false);
-    expect(isAdministrator(undefined)).toBe(false);
-  });
-});
+// The admin gate itself moved to `lib/auth/roles.ts` + `lib/auth/access.ts` when
+// it started reading live MP roles instead of the session cookie's role names;
+// it is covered by `lib/auth/roles.test.ts`.
 
 describe('isAllowedProxyPath', () => {
   it('allows only the whitelisted read endpoints (verbatim widget paths)', () => {

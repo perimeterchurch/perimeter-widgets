@@ -9,18 +9,18 @@ import { isPublicPath } from './public-paths';
 const SPA_FALLBACK = /^\/((?!api\/|_next\/|assets\/|favicon\.ico|.*\.[a-zA-Z0-9]+$).*)$/;
 
 /**
- * Real Next routes (`app/health/route.ts`, `app/signin/page.tsx`,
- * `app/unauthorized/page.tsx`). The rewrite is registered under `afterFiles`, so
+ * Real Next routes (`app/health/route.ts`, `app/sign-in/page.tsx`,
+ * `app/access-denied/page.tsx`). The rewrite is registered under `afterFiles`, so
  * these win over the fallback — which is precisely why they can be public
  * WITHOUT handing out the studio, and why the complement property below holds.
  */
-const REAL_ROUTES = new Set(['/health', '/signin', '/unauthorized']);
+const REAL_ROUTES = new Set(['/health', '/sign-in', '/access-denied']);
 
 const servesTheStudio = (path: string) =>
   !REAL_ROUTES.has(path) && (path === '/' || SPA_FALLBACK.test(path));
 
 /** Paths that must NOT require a session. */
-const PUBLIC = ['/health', '/signin', '/unauthorized', '/favicon.ico'];
+const PUBLIC = ['/health', '/sign-in', '/access-denied', '/favicon.ico'];
 const PUBLIC_UNDER_PREFIX = [
   '/api/me',
   '/api/auth/callback/ministryplatform',
@@ -39,8 +39,8 @@ const PREFIX_LOOKALIKES = [
   '/assetsfoo',
   '/healthz',
   '/healthcheck/deep/link',
-  '/signinx',
-  '/unauthorizedx',
+  '/sign-inx',
+  '/access-deniedx',
 ];
 
 const STUDIO_ROUTES = ['/', '/tokens', '/widgets/my-giving-history', '/guides/styling-widgets'];
@@ -64,7 +64,7 @@ describe('isPublicPath', () => {
 
   it('gates a path that merely CONTAINS a public name', () => {
     expect(isPublicPath('/x/api/me')).toBe(false);
-    expect(isPublicPath('/prefix-signin')).toBe(false);
+    expect(isPublicPath('/prefix-sign-in')).toBe(false);
   });
 });
 

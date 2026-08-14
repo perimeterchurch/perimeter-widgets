@@ -1,25 +1,32 @@
 import { NextResponse } from 'next/server';
 import { headers as nextHeaders } from 'next/headers';
-import { auth } from '@/lib/auth/better-auth';
-import { isAdministrator } from '@/lib/impersonation/admin';
+import { requireAdmin } from '@/lib/auth/access';
+import { isSameOriginRequest } from '@/lib/auth/same-origin';
 import { signTarget } from '@/lib/impersonation/cookie';
 import { IMPERSONATE_COOKIE } from '@/lib/impersonation/config';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/impersonate/start  { targetUserId }
  *
- * Admin-only (MP role 2). Sets the signed httpOnly impersonation cookie so the
- * data proxy forwards subsequent gated-widget reads on behalf of the target.
+ * Admin-only (MP role 2), checked against LIVE MP roles — an admin whose role was
+ * revoked can no longer start impersonating, where before the check read a
+ * `roles` CSV frozen into their session cookie at sign-in.
+ *
+ * Sets the signed httpOnly impersonation cookie so the data proxy forwards
+ * subsequent gated-widget reads on behalf of the target.
  */
 export async function POST(req: Request) {
   const hdrs = await nextHeaders();
-  const session = await auth.api.getSession({ headers: hdrs });
-  if (!session) {
-    return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
+
+  if (!isSameOriginRequest({ method: req.method, headers: hdrs })) {
+    return NextResponse.json({ error: 'cross_origin' }, { status: 403 });
   }
-  if (!isAdministrator((session.user as { roles?: string | null }).roles)) {
-    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  }
+
+  const gate = await requireAdmin(hdrs);
+  if (!gate.ok) return gate.response;
 
   const body = (await req.json().catch(() => null)) as { targetUserId?: unknown } | null;
   const targetUserId = Number(body?.targetUserId);
@@ -30,7 +37,7 @@ export async function POST(req: Request) {
   console.log(
     JSON.stringify({
       event: 'impersonate.start',
-      by: session.user.email,
+      by: gate.access.email,
       target: targetUserId,
     }),
   );
