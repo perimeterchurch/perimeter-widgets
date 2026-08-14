@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { StaffContactConfigSchema } from '../src/types';
 
 describe('StaffContactConfigSchema', () => {
-  it('defaults contactGuid to empty and recaptchaSiteKey to the Perimeter key', () => {
+  it('defaults contactGuid to empty and recaptchaSiteKey to the Perimeter v3 key', () => {
     const config = StaffContactConfigSchema.parse({});
     expect(config.contactGuid).toBe('');
-    expect(config.recaptchaSiteKey).toMatch(/^6L/);
+    expect(config.recaptchaSiteKey).toBe('6LfJFoYtAAAAAChdFF8MhIv7ma3l7xG2bJDQdzvk');
     expect(config.apiUrl).toBeUndefined();
   });
 

@@ -50,9 +50,11 @@ The widget reads its config from `data-*` attributes on the placeholder div.
   website-visible_ employee. A GUID that isn't a current staff member returns a
   "Staff member not found" notice, so the form can't be pointed at arbitrary
   contacts.
-- **reCAPTCHA** — a Google reCAPTCHA v2 checkbox, rendered explicitly into the
-  shadow root. The token is sent with the submission and verified server-side
-  before any Ministry Platform write.
+- **reCAPTCHA** — Google reCAPTCHA **v3** (invisible, score-based). A token is
+  minted with `grecaptcha.execute()` on submit and verified server-side (success
+  + score) before any Ministry Platform write. v3 is used rather than the v2
+  checkbox because v2's challenge iframe does not work inside the widget's shadow
+  DOM. The badge is hidden and the required attribution shown by the form.
 - **Submit** — `POST /api/staff-contact` creates the MP communication and shows a
   confirmation with a "Send another message" action.
 
@@ -65,7 +67,9 @@ before this widget works from a production origin — its path
 
 ## reCAPTCHA setup
 
-The public **site key** ships as the widget default; the private **secret key**
-lives in perimeter-api's `RECAPTCHA_SECRET` env var. The reCAPTCHA key's allowed
+Uses a **reCAPTCHA v3 (score-based)** key — not the v2 checkbox. The public
+**site key** is the widget default (or `data-recaptcha-site-key`); the private
+**secret** lives in perimeter-api's `RECAPTCHA_SECRET` env var. The key's allowed
 domains must include every origin the widget is embedded on (e.g.
-`perimeter.org`).
+`perimeter.org`, plus `localhost` for local testing). The server rejects
+assessments below a 0.5 score.

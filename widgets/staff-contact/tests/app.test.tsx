@@ -1,11 +1,11 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
-import * as React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { App } from '../src/app';
 import { StaffContactConfigSchema, type StaffContactConfig } from '../src/types';
 
 const GUID = '641f26fa-12c2-48b7-8392-81e6c02a76bb';
+const SITE_KEY = 'test-site-key';
 
 /** Mutable hook state the mocks read; reset before each test. */
 const state = vi.hoisted<{ member: unknown; mutation: unknown }>(() => ({
@@ -13,23 +13,19 @@ const state = vi.hoisted<{ member: unknown; mutation: unknown }>(() => ({
   mutation: undefined,
 }));
 
+/** reCAPTCHA v3 token minting is mocked — no Google script in tests. */
+const recaptcha = vi.hoisted(() => ({
+  getRecaptchaToken: vi.fn(),
+}));
+
 vi.mock('@perimeter/api-hooks', () => ({
   useStaffMember: () => state.member,
   useSubmitStaffContact: () => state.mutation,
 }));
 
-// The real Recaptcha loads Google's script; stub it with a button that "solves".
-vi.mock('../src/components/Recaptcha', () => ({
-  Recaptcha: React.forwardRef(
-    ({ onChange }: { onChange: (t: string | null) => void }, ref: React.Ref<unknown>) => {
-      React.useImperativeHandle(ref, () => ({ reset: () => onChange(null) }), [onChange]);
-      return (
-        <button type="button" data-testid="solve" onClick={() => onChange('tok-123')}>
-          solve
-        </button>
-      );
-    },
-  ),
+vi.mock('../src/lib/recaptcha', () => ({
+  getRecaptchaToken: recaptcha.getRecaptchaToken,
+  loadRecaptchaV3: vi.fn().mockResolvedValue(undefined),
 }));
 
 function memberResult(data: unknown, over: Record<string, unknown> = {}) {
@@ -55,12 +51,29 @@ function mutationResult(over: Record<string, unknown> = {}) {
 }
 
 function config(overrides: Record<string, unknown> = {}): StaffContactConfig {
-  return StaffContactConfigSchema.parse({ contactGuid: GUID, ...overrides });
+  return StaffContactConfigSchema.parse({
+    contactGuid: GUID,
+    recaptchaSiteKey: SITE_KEY,
+    ...overrides,
+  });
+}
+
+function fillForm() {
+  fireEvent.change(screen.getByLabelText('Your Name'), {
+    target: { value: 'Samantha Halpin' },
+  });
+  fireEvent.change(screen.getByLabelText('Your Email'), {
+    target: { value: 'samantha@example.com' },
+  });
+  fireEvent.change(screen.getByLabelText('Message'), {
+    target: { value: 'Hello there' },
+  });
 }
 
 beforeEach(() => {
   state.member = memberResult({ name: 'Jen Lancaster', jobTitle: 'Guest Services Associate' });
   state.mutation = mutationResult();
+  recaptcha.getRecaptchaToken.mockReset().mockResolvedValue('v3-token');
 });
 
 describe('staff-contact widget App', () => {
@@ -83,48 +96,30 @@ describe('staff-contact widget App', () => {
     expect(screen.getByText('Staff member not found')).toBeInTheDocument();
   });
 
-  it('submits the form with the reCAPTCHA token once solved', () => {
+  it('mints a reCAPTCHA v3 token on submit and includes it in the request', async () => {
     render(<App config={config()} />);
-    fireEvent.change(screen.getByLabelText('Your Name'), {
-      target: { value: 'Samantha Halpin' },
-    });
-    fireEvent.change(screen.getByLabelText('Your Email'), {
-      target: { value: 'samantha@example.com' },
-    });
-    fireEvent.change(screen.getByLabelText('Message'), {
-      target: { value: 'Hello there' },
-    });
-    fireEvent.click(screen.getByTestId('solve'));
+    fillForm();
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
 
     const mutation = state.mutation as { mutate: ReturnType<typeof vi.fn> };
-    expect(mutation.mutate).toHaveBeenCalledTimes(1);
-    expect(mutation.mutate).toHaveBeenCalledWith(
-      {
-        contactGuid: GUID,
-        senderName: 'Samantha Halpin',
-        senderEmail: 'samantha@example.com',
-        message: 'Hello there',
-        recaptchaToken: 'tok-123',
-      },
-      expect.anything(),
-    );
+    await waitFor(() => expect(mutation.mutate).toHaveBeenCalledTimes(1));
+    expect(recaptcha.getRecaptchaToken).toHaveBeenCalledWith(SITE_KEY, 'staff_contact');
+    expect(mutation.mutate).toHaveBeenCalledWith({
+      contactGuid: GUID,
+      senderName: 'Samantha Halpin',
+      senderEmail: 'samantha@example.com',
+      message: 'Hello there',
+      recaptchaToken: 'v3-token',
+    });
   });
 
-  it('blocks submission until the reCAPTCHA is solved', () => {
+  it('shows an error and does not submit when reCAPTCHA fails', async () => {
+    recaptcha.getRecaptchaToken.mockReset().mockRejectedValue(new Error('blocked'));
     render(<App config={config()} />);
-    fireEvent.change(screen.getByLabelText('Your Name'), {
-      target: { value: 'Sam' },
-    });
-    fireEvent.change(screen.getByLabelText('Your Email'), {
-      target: { value: 'sam@example.com' },
-    });
-    fireEvent.change(screen.getByLabelText('Message'), {
-      target: { value: 'Hi' },
-    });
+    fillForm();
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
 
-    expect(screen.getByRole('alert')).toHaveTextContent(/reCAPTCHA/);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/could not verify/i));
     const mutation = state.mutation as { mutate: ReturnType<typeof vi.fn> };
     expect(mutation.mutate).not.toHaveBeenCalled();
   });

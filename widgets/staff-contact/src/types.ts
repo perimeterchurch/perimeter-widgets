@@ -1,7 +1,12 @@
 import { z } from 'zod';
 
-/** Perimeter's public reCAPTCHA v2 site key for the staff-contact form. */
-const DEFAULT_RECAPTCHA_SITE_KEY = '6Lda7IUtAAAAAFEWjhObewv13I4ANd4SZOFJxgcR';
+/**
+ * Perimeter's public reCAPTCHA **v3** (score-based) site key for the
+ * staff-contact form. (The earlier v2 checkbox key can't be used — v2 doesn't
+ * work inside the widget's shadow DOM.) Overridable per embed via
+ * `data-recaptcha-site-key`.
+ */
+const DEFAULT_RECAPTCHA_SITE_KEY = '6LfJFoYtAAAAAChdFF8MhIv7ma3l7xG2bJDQdzvk';
 
 /**
  * Host-page config for the staff-contact widget. Every value arrives as a
@@ -19,7 +24,7 @@ export const StaffContactConfigSchema = z.object({
   recaptchaSiteKey: z
     .string()
     .default(DEFAULT_RECAPTCHA_SITE_KEY)
-    .describe('Google reCAPTCHA v2 site key (public). Overridable per embed.'),
+    .describe('Google reCAPTCHA v3 site key (public). Overridable per embed.'),
   // The mount reads `apiUrl` off the parsed config to point the API client and
   // the photo <img> at a specific perimeter-api origin. Leave unset in
   // production (defaults to api.perimeter.org).

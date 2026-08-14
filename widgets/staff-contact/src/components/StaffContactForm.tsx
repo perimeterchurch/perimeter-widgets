@@ -5,7 +5,10 @@ import { Textarea } from '@perimeter/ui/textarea';
 import { Button } from '@perimeter/ui/button';
 import { Spinner } from '@perimeter/ui/spinner';
 import { useSubmitStaffContact } from '@perimeter/api-hooks';
-import { Recaptcha, type RecaptchaHandle } from './Recaptcha';
+import { getRecaptchaToken, loadRecaptchaV3 } from '../lib/recaptcha';
+
+/** reCAPTCHA v3 action name (echoed back in the server-side assessment). */
+const RECAPTCHA_ACTION = 'staff_contact';
 
 interface StaffContactFormProps {
   contactGuid: string;
@@ -23,10 +26,15 @@ export function StaffContactForm({
   const [senderEmail, setSenderEmail] = React.useState('');
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
-  const [token, setToken] = React.useState<string | null>(null);
+  const [verifying, setVerifying] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
-  const recaptchaRef = React.useRef<RecaptchaHandle>(null);
   const submit = useSubmitStaffContact();
+
+  // Warm up the reCAPTCHA v3 script on mount so the token is ready quickly (and
+  // the badge-hiding style is applied). Failures are surfaced only on submit.
+  React.useEffect(() => {
+    if (recaptchaSiteKey) void loadRecaptchaV3(recaptchaSiteKey).catch(() => {});
+  }, [recaptchaSiteKey]);
 
   function reset(): void {
     submit.reset();
@@ -34,36 +42,33 @@ export function StaffContactForm({
     setSenderEmail('');
     setSubject('');
     setMessage('');
-    setToken(null);
     setFormError(null);
-    recaptchaRef.current?.reset();
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setFormError(null);
-    if (!token) {
-      setFormError('Please complete the reCAPTCHA to send your message.');
+
+    let token: string;
+    setVerifying(true);
+    try {
+      token = await getRecaptchaToken(recaptchaSiteKey, RECAPTCHA_ACTION);
+    } catch {
+      setVerifying(false);
+      setFormError('Could not verify your request. Please refresh and try again.');
       return;
     }
+    setVerifying(false);
+
     const trimmedSubject = subject.trim();
-    submit.mutate(
-      {
-        contactGuid,
-        senderName: senderName.trim(),
-        senderEmail: senderEmail.trim(),
-        message: message.trim(),
-        recaptchaToken: token,
-        ...(trimmedSubject ? { subject: trimmedSubject } : {}),
-      },
-      {
-        onError: () => {
-          // Tokens are single-use — clear it so the visitor re-checks before retrying.
-          recaptchaRef.current?.reset();
-          setToken(null);
-        },
-      },
-    );
+    submit.mutate({
+      contactGuid,
+      senderName: senderName.trim(),
+      senderEmail: senderEmail.trim(),
+      message: message.trim(),
+      recaptchaToken: token,
+      ...(trimmedSubject ? { subject: trimmedSubject } : {}),
+    });
   }
 
   if (submit.isSuccess) {
@@ -82,10 +87,10 @@ export function StaffContactForm({
     );
   }
 
-  const pending = submit.isPending;
+  const pending = verifying || submit.isPending;
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4" noValidate={false}>
+    <form onSubmit={(e) => void handleSubmit(e)} className="grid gap-4">
       <div className="grid gap-2">
         <Label htmlFor="staff-contact-name">Your Name</Label>
         <Input
@@ -134,25 +139,47 @@ export function StaffContactForm({
         />
       </div>
 
-      <Recaptcha ref={recaptchaRef} siteKey={recaptchaSiteKey} onChange={setToken} />
-
       {(formError || submit.isError) && (
         <p className="text-sm text-destructive" role="alert">
           {formError ?? 'Something went wrong sending your message. Please try again.'}
         </p>
       )}
 
-      <div>
-        <Button type="submit" disabled={pending}>
-          {pending ? (
-            <>
-              <Spinner className="mr-2" />
-              Sending…
-            </>
-          ) : (
-            'Send'
-          )}
-        </Button>
+      <div className="grid gap-3">
+        <div>
+          <Button type="submit" disabled={pending}>
+            {pending ? (
+              <>
+                <Spinner className="mr-2" />
+                {verifying ? 'Verifying…' : 'Sending…'}
+              </>
+            ) : (
+              'Send'
+            )}
+          </Button>
+        </div>
+        {/* Required attribution when the reCAPTCHA badge is hidden. */}
+        <p className="text-xs text-muted-foreground">
+          This form is protected by reCAPTCHA. Google's{' '}
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            Privacy Policy
+          </a>{' '}
+          and{' '}
+          <a
+            href="https://policies.google.com/terms"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            Terms of Service
+          </a>{' '}
+          apply.
+        </p>
       </div>
     </form>
   );
