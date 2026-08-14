@@ -1,5 +1,9 @@
-/** Impersonation is restricted to this MP security role (role 2). */
-export const ADMIN_ROLE_NAME = 'Administrators';
+/**
+ * Impersonation is restricted to MP role 2 (Administrators). The gate itself
+ * lives in `lib/auth/roles.ts` (`ADMIN_ROLE_ID`) and is applied through
+ * `requireAdmin` in `lib/auth/access.ts`, which checks LIVE MP roles rather than
+ * the names frozen into the session cookie at sign-in.
+ */
 
 /** httpOnly cookie holding the signed impersonation target (a User_ID). */
 export const IMPERSONATE_COOKIE = 'studio.impersonate';
