@@ -178,9 +178,14 @@ export function Canvas({
   const onKeyRef = useRef<(e: KeyboardEvent) => void>(() => {});
   onKeyRef.current = (e: KeyboardEvent) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const el = document.activeElement as HTMLElement | null;
+    // Pierce shadow roots: a focused field inside a widget's shadow DOM (e.g.
+    // the staff-contact form) retargets `document.activeElement` to the shadow
+    // HOST (a <div>), so a plain tagName check misses it and `t` would toggle
+    // the theme mid-typing — remounting the widget and wiping the form.
+    const el = deepActiveElement();
     const tag = el?.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el?.isContentEditable) return;
+    const editable = el instanceof HTMLElement && el.isContentEditable;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || editable) return;
     const presetByKey: Record<string, PresetId> = {
       '1': 'mobile',
       '2': 'tablet',
@@ -402,6 +407,21 @@ export function Canvas({
       </div>
     </div>
   );
+}
+
+/**
+ * The truly-focused element, descending through open shadow roots. From the
+ * document's perspective `document.activeElement` stops at a shadow host, so a
+ * field focused inside a widget's shadow DOM reads as the host `<div>`. Walking
+ * `shadowRoot.activeElement` recovers the real `<input>`/`<textarea>` so the
+ * canvas shortcuts can correctly stand down while the user types in a widget.
+ */
+function deepActiveElement(): Element | null {
+  let el: Element | null = document.activeElement;
+  while (el?.shadowRoot?.activeElement) {
+    el = el.shadowRoot.activeElement;
+  }
+  return el;
 }
 
 /**
