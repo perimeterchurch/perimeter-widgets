@@ -38,8 +38,13 @@ async function extractMessage(res: Response, label: string): Promise<string> {
   return `${label} request failed: ${res.status}`;
 }
 
-export async function fetchJson<T>(client: FetchClient, path: string, label: string): Promise<T> {
-  const res = await client.fetch(path);
+export async function fetchJson<T>(
+  client: FetchClient,
+  path: string,
+  label: string,
+  init?: RequestInit,
+): Promise<T> {
+  const res = await client.fetch(path, init);
   if (!res.ok) {
     throw new ApiError(res.status, await extractMessage(res, label));
   }

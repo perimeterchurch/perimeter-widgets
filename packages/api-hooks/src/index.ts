@@ -54,5 +54,17 @@ export {
   type CommunityGroupFacetOption,
 } from './community-groups/use-community-group-facets';
 
+export {
+  useStaffMember,
+  type UseStaffMemberResponse,
+  type StaffMember,
+} from './staff-contact/use-staff-member';
+
+export {
+  useSubmitStaffContact,
+  type SubmitStaffContactInput,
+  type SubmitStaffContactResponse,
+} from './staff-contact/use-submit-staff-contact';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';
