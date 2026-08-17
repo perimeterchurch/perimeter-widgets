@@ -5,12 +5,30 @@ import { Skeleton } from '@perimeter/ui/skeleton';
 import { cn } from '@perimeter/ui/utils/cn';
 import type { EventFinderConfig } from './types';
 import { eventImageUrl, formatEventDate, formatEventDateAlt } from './lib/format';
+import { PERIMETER_MARK_DATA_URI } from './lib/perimeter-mark';
 
 export interface AppProps {
   config: EventFinderConfig;
 }
 
 const IMAGE_BOX = 'w-full overflow-hidden aspect-video bg-muted';
+
+/**
+ * Branded fallback tile shown when an event has no image (and no custom
+ * `defaultImageUrl` loads): the Perimeter arch mark as a watermark on the brand
+ * navy panel. Purely decorative — the wrapper is `aria-hidden` and the card's
+ * title carries the accessible name, so the mark needs no alt text.
+ */
+function EventImagePlaceholder(): React.JSX.Element {
+  return (
+    <div
+      className={cn(IMAGE_BOX, 'flex items-center justify-center bg-surface-dark')}
+      aria-hidden="true"
+    >
+      <img src={PERIMETER_MARK_DATA_URI} alt="" className="w-[36%] max-w-36" />
+    </div>
+  );
+}
 
 /**
  * Event artwork with a loading skeleton and a graceful fallback when the image
@@ -31,9 +49,9 @@ function EventImage({
   const [failed, setFailed] = React.useState(false);
   const triedFallback = React.useRef(false);
 
-  // On error, try the configured default image once before giving up on the
-  // icon placeholder. Each card is keyed by event id, so this state resets per
-  // event without needing to sync the `src` prop.
+  // On error, try the configured default image once before falling back to the
+  // branded placeholder. Each card is keyed by event id, so this state resets
+  // per event without needing to sync the `src` prop.
   const handleError = () => {
     if (fallbackSrc && !triedFallback.current && currentSrc !== fallbackSrc) {
       triedFallback.current = true;
@@ -45,14 +63,7 @@ function EventImage({
   };
 
   if (failed) {
-    return (
-      <div
-        className={cn('flex items-center justify-center text-muted-fg', IMAGE_BOX)}
-        aria-hidden="true"
-      >
-        <CalendarIcon className="h-2/5 w-2/5 max-h-16 max-w-16 opacity-40" />
-      </div>
-    );
+    return <EventImagePlaceholder />;
   }
 
   return (
@@ -70,24 +81,6 @@ function EventImage({
         onError={handleError}
       />
     </div>
-  );
-}
-
-function CalendarIcon({ className }: { className?: string }): React.JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4M8 2v4M3 10h18" />
-    </svg>
   );
 }
 
