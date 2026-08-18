@@ -61,7 +61,15 @@ export async function middleware(req: NextRequest) {
 }
 
 function redirectTo(pathname: string, req: NextRequest) {
-  return NextResponse.redirect(new URL(pathname, req.url));
+  const url = new URL(pathname, req.url);
+  // Preserve the page the user was trying to reach so the sign-in page can send
+  // them back there after the MP OAuth round-trip (it reads `callbackUrl`).
+  // Without this, every gated deep link lands on `/` post-login. Only carry it
+  // to sign-in — /access-denied is a terminal page, not a way back in.
+  if (pathname === '/sign-in') {
+    url.searchParams.set('callbackUrl', req.nextUrl.pathname + req.nextUrl.search);
+  }
+  return NextResponse.redirect(url);
 }
 
 export const config = {
