@@ -13,7 +13,7 @@ describe('CommunityGroupFinderConfigSchema', () => {
       countGroupInquiries: false,
       showFutureGroups: true,
       groupTypeId: 13,
-      detailsUrlBase: 'https://www.perimeter.org/group-details/?id=',
+      targetUrl: 'https://www.perimeter.org/group-details/?id=',
       detailsLabel: 'See Details',
     });
   });

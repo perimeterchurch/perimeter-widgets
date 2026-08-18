@@ -84,10 +84,14 @@ export const CommunityGroupFinderConfigSchema = z.object({
     .positive()
     .optional()
     .describe('Cap the total number of groups shown.'),
-  detailsUrlBase: z
+  // Named after MP's own `targeturl` on the `<mpp-group-finder>` widget this
+  // replaced, which is the word the people configuring these pages already use.
+  targetUrl: z
     .string()
     .default('https://www.perimeter.org/group-details/?id=')
-    .describe('Base URL each card links to; the group ID is appended.'),
+    .describe(
+      'Page each card links to. The group ID is appended, so this ends in the query parameter that carries it — point a per-ministry page at its own details slug. (MP: targeturl)',
+    ),
   detailsLabel: z.string().default('See Details').describe('Label on the card link.'),
   emptyMessage: z
     .string()

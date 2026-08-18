@@ -76,9 +76,10 @@ defaults).
 | `data-count-group-inquiries` | boolean | `false`                               | Let pending inquiries count toward a group's target size when judging full.  |
 | `data-show-future-groups` | boolean | `true`                                   | Show groups whose start date has not arrived yet.                            |
 | `data-group-type-id`     | number  | `13`                                      | MP Group Type. 13 = Community Group; 1, 3, and 10 are the other finder types. |
+| `data-ministry-ids`      | string  | —                                         | Lock to one or more owning ministries (comma-separated MP Ministry IDs). Only discriminates on group types 1 and 10 — type 13 is all one ministry. |
 | `data-neighborhood-ids`  | string  | —                                         | Lock to one or more cities (comma-separated MP City Ministry IDs).            |
 | `data-max-groups`        | number  | —                                         | Cap the total number of groups shown.                                        |
-| `data-details-url-base`  | string  | perimeter.org group-details               | Base URL each card links to; the group ID is appended.                       |
+| `data-target-url`        | string  | perimeter.org group-details               | Page each card links to; the group ID is appended. (MP: `targeturl`)         |
 | `data-details-label`     | string  | `See Details`                             | Label on the card link.                                                      |
 | `data-empty-message`     | string  | `No community groups match your filters.` | Message shown when the list has no groups.                                   |
 | `data-default-image-url` | string  | —                                         | Fallback banner URL for groups with no artwork in MP.                        |
@@ -90,7 +91,7 @@ The stock `<mpp-group-finder>` widget this replaces documented four attributes:
 
 | MP attribute              | MP default | Here                                                                      |
 | ------------------------- | ---------- | ------------------------------------------------------------------------- |
-| `targeturl`               | —          | `data-details-url-base` (takes a full base URL; the group ID is appended)  |
+| `targeturl`               | —          | `data-target-url`, same name — takes a full base URL, the group ID is appended |
 | `countgroupinquiries`     | `false`    | `data-count-group-inquiries`, same default                                 |
 | `showfullgroups`          | `false`    | `data-show-full-groups`, but defaulting to **`true`** — see below          |
 | `showsuggestagroupbutton` | `false`    | **Intentionally not carried over** — Perimeter does not use it            |

@@ -114,6 +114,18 @@ describe('community-group-finder App', () => {
     );
   });
 
+  // The reason targetUrl exists: a per-ministry page has its own details page.
+  // Nothing covered the override before, so a rename of this option could have
+  // silently reverted every card to the default group-details URL.
+  it('sends the card link to a configured targetUrl instead', () => {
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ targetUrl: 'https://www.perimeter.org/womens-discipleship-details/?id=' });
+    expect(screen.getByRole('link', { name: 'See Details' })).toHaveAttribute(
+      'href',
+      'https://www.perimeter.org/womens-discipleship-details/?id=14392',
+    );
+  });
+
   it('badges a group at capacity instead of hiding it', () => {
     hooks.groups = groupsResult([{ ...GROUP, isFull: true }]);
     renderApp();
