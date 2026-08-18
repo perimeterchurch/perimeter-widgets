@@ -69,15 +69,38 @@ describe('event-finder App', () => {
     expect(screen.queryByRole('link', { name: 'See Details' })).toBeNull();
   });
 
-  it('renders the HTML description only when showDescription is set', () => {
+  it('renders the description as plain text only when showDescription is set', () => {
     hooks.result = queryResult([EVENT]);
     const { rerender } = renderApp({ showDescription: false });
-    expect(screen.queryByText('Chapel', { selector: 'strong' })).toBeNull();
+    expect(screen.queryByText('Meeting in the Chapel.')).toBeNull();
 
     rerender(
       <App config={EventFinderConfigSchema.parse({ listId: '18', showDescription: true })} />,
     );
-    expect(screen.getByText('Chapel', { selector: 'strong' })).toBeInTheDocument();
+    // MP's HTML is stripped to plain text (no <strong>), matching the group finder.
+    const desc = screen.getByText('Meeting in the Chapel.');
+    expect(desc).toBeInTheDocument();
+    expect(desc.querySelector('strong')).toBeNull();
+  });
+
+  it('truncates the description to descriptionLimit on a word boundary', () => {
+    const long = 'Join us for a wonderful evening of worship music fellowship and prayer together';
+    hooks.result = queryResult([{ ...EVENT, description: `<p>${long}</p>` }]);
+    renderApp({ showDescription: true, descriptionLimit: 20 });
+
+    const node = screen.getByText(/^Join us/);
+    expect(node.textContent?.endsWith('…')).toBe(true);
+    // Word-boundary trim keeps it at or under the limit (plus the ellipsis).
+    expect((node.textContent ?? '').length).toBeLessThanOrEqual(21);
+  });
+
+  it('shows the location by default and hides it when showLocation is false', () => {
+    hooks.result = queryResult([EVENT]);
+    const { rerender } = renderApp({ showLocation: true });
+    expect(screen.getByText('Chapel')).toBeInTheDocument();
+
+    rerender(<App config={EventFinderConfigSchema.parse({ listId: '18', showLocation: false })} />);
+    expect(screen.queryByText('Chapel')).toBeNull();
   });
 
   it('renders event images only when showImages is set', () => {

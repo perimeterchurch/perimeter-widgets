@@ -4,7 +4,13 @@ import { Button } from '@perimeter/ui/button';
 import { Skeleton } from '@perimeter/ui/skeleton';
 import { cn } from '@perimeter/ui/utils/cn';
 import type { EventFinderConfig } from './types';
-import { eventImageUrl, formatEventDate, formatEventDateAlt } from './lib/format';
+import {
+  eventImageUrl,
+  formatEventDate,
+  formatEventDateAlt,
+  htmlToText,
+  truncate,
+} from './lib/format';
 import { PERIMETER_MARK_DATA_URI } from './lib/perimeter-mark';
 
 export interface AppProps {
@@ -108,14 +114,16 @@ function EventCard({
       <div className="flex flex-1 flex-col gap-2 p-4">
         <h3 className="font-sans text-xl leading-snug font-bold text-balance">{event.title}</h3>
         <p className="font-sans text-sm font-medium text-muted-fg">{dateText}</p>
-        {event.location && <p className="font-sans text-sm text-muted-fg">{event.location}</p>}
+        {config.showLocation && event.location && (
+          <p className="font-sans text-sm text-muted-fg">{event.location}</p>
+        )}
 
         {config.showDescription && event.description && (
-          <div
-            className="mt-1 text-sm leading-relaxed [&_a]:underline"
-            // MP stores the description as sanitized HTML authored by staff.
-            dangerouslySetInnerHTML={{ __html: event.description }}
-          />
+          // MP stores the description as HTML; render a plain-text opening
+          // clipped to descriptionLimit (matches the group-finder card).
+          <p className="mt-1 font-sans text-sm leading-relaxed">
+            {truncate(htmlToText(event.description), config.descriptionLimit)}
+          </p>
         )}
 
         {config.showDetails && event.detailsUrl && (
@@ -168,6 +176,8 @@ export function App({ config }: AppProps): React.JSX.Element {
     {
       listId: config.listId,
       ...(config.includePast ? { includePast: 'true' } : {}),
+      // Default (on) shows every occurrence; only send the flag to collapse.
+      ...(config.showFullSeries ? {} : { showFullSeries: 'false' as const }),
       ...(config.featured ? { featured: 'true' } : {}),
       ...(config.congregationId ? { congregationId: config.congregationId } : {}),
       ...(config.programId ? { programId: config.programId } : {}),
