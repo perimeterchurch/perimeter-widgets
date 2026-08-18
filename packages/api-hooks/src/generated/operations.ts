@@ -2736,6 +2736,7 @@ export interface operations {
         from?: string;
         to?: string;
         includePast?: 'true' | 'false';
+        showFullSeries?: 'true' | 'false';
         page?: number;
         perPage?: number;
         order?: 'asc' | 'desc';

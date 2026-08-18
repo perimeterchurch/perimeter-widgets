@@ -124,3 +124,34 @@ export function formatEventDateAlt(startIso: string): string {
   if (!start) return startIso;
   return `${weekdayShort(start)} | ${MONTHS_LONG[start.month - 1]} ${start.day} | ${formatTime(start)}`;
 }
+
+/**
+ * Convert an MP HTML description to plain text with whitespace collapsed. Event
+ * descriptions are staff-authored HTML, but the card shows a short truncated
+ * opening (see {@link truncate}), so tags and links are dropped rather than
+ * rendered. Uses `DOMParser` — which neither runs scripts nor loads resources —
+ * with a crude tag-strip fallback for any non-DOM environment.
+ */
+export function htmlToText(html: string): string {
+  const raw =
+    typeof DOMParser !== 'undefined'
+      ? (new DOMParser().parseFromString(html, 'text/html').body.textContent ?? '')
+      : html.replace(/<[^>]*>/g, ' ');
+  return raw.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Trim to `limit` characters on a word boundary, appending an ellipsis. Mirrors
+ * the community-group-finder `truncate` so both finders clip descriptions the
+ * same way: prefer a word break, but fall back to a hard cut when the text
+ * opens with one very long unbroken token.
+ */
+export function truncate(text: string, limit: number): string {
+  const collapsed = text.trim();
+  if (collapsed.length <= limit) return collapsed;
+
+  const cut = collapsed.slice(0, limit);
+  const lastSpace = cut.lastIndexOf(' ');
+  const body = lastSpace > limit * 0.3 ? cut.slice(0, lastSpace) : cut;
+  return `${body.replace(/[\s,.;:!-]+$/, '')}…`;
+}

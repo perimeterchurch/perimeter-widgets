@@ -13,6 +13,10 @@ export const EventFinderConfigSchema = z.object({
     .default('')
     .describe('One or more MP Events List IDs, comma-separated, e.g. "18,208".'),
   showImages: z.coerce.boolean().default(false).describe("Show each event's image."),
+  showLocation: z.coerce
+    .boolean()
+    .default(true)
+    .describe("Show the event's location, when it has one."),
   showDetails: z.coerce
     .boolean()
     .default(true)
@@ -20,7 +24,13 @@ export const EventFinderConfigSchema = z.object({
   showDescription: z.coerce
     .boolean()
     .default(false)
-    .describe('Show the event description (rendered as HTML from MP).'),
+    .describe('Show the event description (staff-authored text from MP).'),
+  descriptionLimit: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(260)
+    .describe('Characters of description shown before truncating with an ellipsis.'),
   altDate: z.coerce
     .boolean()
     .default(false)
@@ -29,6 +39,12 @@ export const EventFinderConfigSchema = z.object({
     .boolean()
     .default(false)
     .describe('Include past events. By default only upcoming events are shown.'),
+  showFullSeries: z.coerce
+    .boolean()
+    .default(true)
+    .describe(
+      'Show every occurrence of a recurring event. Set false to collapse each series to a single card (its next upcoming date).',
+    ),
   congregationId: z.coerce
     .number()
     .int()
