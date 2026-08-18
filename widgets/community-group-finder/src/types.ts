@@ -61,6 +61,17 @@ export const CommunityGroupFinderConfigSchema = z.object({
     .describe(
       'MP Group Type. 13 = Community Group; other finder-visible types are 1 (Small Groups), 3 (Class), 10 (Discipleship Group).',
     ),
+  // Not a visitor-facing filter: there is no Ministry dropdown in the panel,
+  // because the ministry is a property of the page rather than something a
+  // visitor browses. Nothing is hidden when this is set — the City, Focus and
+  // Life Stage dropdowns simply narrow to the values that ministry's groups
+  // actually use, since the facets request carries the same ids.
+  ministryIds: z
+    .string()
+    .optional()
+    .describe(
+      "Lock the widget to one or more owning ministries (comma-separated MP Ministry IDs). Different from the cities below: 113 = Women's Discipleship, 50 = Men's Discipleship, 29 = Belong Ministries. Most useful with groupTypeId 1 or 10 — type 13 is almost entirely ministry 29.",
+    ),
   neighborhoodIds: z
     .string()
     .optional()
@@ -73,10 +84,14 @@ export const CommunityGroupFinderConfigSchema = z.object({
     .positive()
     .optional()
     .describe('Cap the total number of groups shown.'),
-  detailsUrlBase: z
+  // Named after MP's own `targeturl` on the `<mpp-group-finder>` widget this
+  // replaced, which is the word the people configuring these pages already use.
+  targetUrl: z
     .string()
     .default('https://www.perimeter.org/group-details/?id=')
-    .describe('Base URL each card links to; the group ID is appended.'),
+    .describe(
+      'Page each card links to. The group ID is appended, so this ends in the query parameter that carries it — point a per-ministry page at its own details slug. (MP: targeturl)',
+    ),
   detailsLabel: z.string().default('See Details').describe('Label on the card link.'),
   emptyMessage: z
     .string()

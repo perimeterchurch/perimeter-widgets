@@ -61,6 +61,75 @@ components:
       description: Internal server error
       content: *a1
 paths:
+  /api/auth/roles:
+    get:
+      operationId: getRoles
+      summary:
+        Returns the authenticated caller's MP security Role_IDs so sibling frontend apps can re-check authorization per
+        request
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      roleIds:
+                        type: array
+                        items:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                    required:
+                      - userId
+                      - roleIds
+                    additionalProperties: false
+                    description:
+                      Authenticated caller's MinistryPlatform security Role_IDs from dp_User_Roles, for apps gating on MP's own
+                      role model
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: &a2
+        - bearerAuth: []
   /api/auth/me:
     get:
       operationId: getMe
@@ -156,8 +225,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
-      security: &a2
-        - bearerAuth: []
+      security: *a2
   /api/sermons:
     get:
       operationId: listSermons
@@ -7079,6 +7147,18 @@ paths:
                               anyOf:
                                 - type: string
                                 - type: 'null'
+                            ministry:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Ministries.Ministry_Name — the ministry that owns the group.
+                            ministryId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                              description: Groups.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response.
                             neighborhood:
                               anyOf:
                                 - type: string
@@ -7200,6 +7280,8 @@ paths:
                             - id
                             - name
                             - description
+                            - ministry
+                            - ministryId
                             - neighborhood
                             - neighborhoodId
                             - groupFocus
@@ -7283,6 +7365,14 @@ paths:
             type: integer
             exclusiveMinimum: 0
             maximum: 9007199254740991
+        - name: ministryIds
+          in: query
+          required: false
+          schema:
+            description:
+              Comma-separated Groups.Ministry_ID list (Ministries — the owning ministry, e.g. 29 "Belong Ministries", 105
+              "Young Adults", 111 "Community Groups"). Distinct from neighborhoodIds, which is City_Ministries.
+            type: string
         - name: neighborhoodIds
           in: query
           required: false
@@ -7573,6 +7663,14 @@ paths:
             type: integer
             exclusiveMinimum: 0
             maximum: 9007199254740991
+        - name: ministryIds
+          in: query
+          required: false
+          schema:
+            description:
+              Comma-separated Groups.Ministry_ID list. Mirrors the list endpoint so a page locked to one ministry gets
+              dropdowns built from that ministry alone.
+            type: string
         - name: includeHidden
           in: query
           required: false
