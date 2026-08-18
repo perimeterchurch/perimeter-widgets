@@ -58,4 +58,14 @@ describe('CommunityGroupFinderConfigSchema', () => {
       neighborhoodIds: '5,1',
     });
   });
+
+  it('keeps ministryIds as a raw string too, and unset by default', () => {
+    // Ministry_ID (Ministries) is a different column from City_Ministry_ID
+    // (City_Ministries) behind neighborhoodIds — both are configurable, and the
+    // names are close enough that a swap would be easy to miss.
+    expect(CommunityGroupFinderConfigSchema.parse({ ministryIds: '113,50' })).toMatchObject({
+      ministryIds: '113,50',
+    });
+    expect(CommunityGroupFinderConfigSchema.parse({}).ministryIds).toBeUndefined();
+  });
 });

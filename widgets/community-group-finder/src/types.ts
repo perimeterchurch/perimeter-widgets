@@ -61,6 +61,17 @@ export const CommunityGroupFinderConfigSchema = z.object({
     .describe(
       'MP Group Type. 13 = Community Group; other finder-visible types are 1 (Small Groups), 3 (Class), 10 (Discipleship Group).',
     ),
+  // Not a visitor-facing filter: there is no Ministry dropdown in the panel,
+  // because the ministry is a property of the page rather than something a
+  // visitor browses. Nothing is hidden when this is set — the City, Focus and
+  // Life Stage dropdowns simply narrow to the values that ministry's groups
+  // actually use, since the facets request carries the same ids.
+  ministryIds: z
+    .string()
+    .optional()
+    .describe(
+      "Lock the widget to one or more owning ministries (comma-separated MP Ministry IDs). Different from the cities below: 113 = Women's Discipleship, 50 = Men's Discipleship, 29 = Belong Ministries. Most useful with groupTypeId 1 or 10 — type 13 is almost entirely ministry 29.",
+    ),
   neighborhoodIds: z
     .string()
     .optional()

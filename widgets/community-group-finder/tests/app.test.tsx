@@ -54,9 +54,14 @@ const FACETS = {
   meetingTimes: [{ id: 'evening', name: 'Evening' }],
 };
 
-const hooks = vi.hoisted<{ groups: unknown; params: unknown }>(() => ({
+const hooks = vi.hoisted<{
+  groups: unknown;
+  params: unknown;
+  facetParams: unknown;
+}>(() => ({
   groups: undefined,
   params: undefined,
+  facetParams: undefined,
 }));
 
 vi.mock('@perimeter/api-hooks', () => ({
@@ -64,11 +69,14 @@ vi.mock('@perimeter/api-hooks', () => ({
     hooks.params = params;
     return hooks.groups;
   },
-  useCommunityGroupFacets: () => ({
-    data: { success: true, data: FACETS },
-    isLoading: false,
-    isError: false,
-  }),
+  useCommunityGroupFacets: (params: unknown) => {
+    hooks.facetParams = params;
+    return {
+      data: { success: true, data: FACETS },
+      isLoading: false,
+      isError: false,
+    };
+  },
 }));
 
 function config(overrides: Record<string, unknown> = {}): CommunityGroupFinderConfig {
@@ -305,6 +313,39 @@ describe('community-group-finder filters', () => {
     renderApp({ advancedOpen: true, neighborhoodIds: '5' });
     expect(screen.queryByText('City')).not.toBeInTheDocument();
     expect(hooks.params).toMatchObject({ neighborhoodIds: '5' });
+  });
+
+  it('pins the ministry ids on both the group and the facet request', () => {
+    // The facets request has to carry them too, or the City / Focus / Life Stage
+    // dropdowns would offer values that only exist in another ministry's groups
+    // and match nothing.
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ ministryIds: '113, 50' });
+    expect(hooks.params).toMatchObject({ ministryIds: '113,50' });
+    expect(hooks.facetParams).toMatchObject({ ministryIds: '113,50' });
+  });
+
+  it('sends no ministryIds at all when none are configured', () => {
+    // Absent means "every ministry". An empty string would still read as a
+    // present filter on the endpoint.
+    hooks.groups = groupsResult([GROUP]);
+    renderApp();
+    expect(hooks.params).not.toHaveProperty('ministryIds');
+    expect(hooks.facetParams).not.toHaveProperty('ministryIds');
+  });
+
+  it('ignores an unparseable ministryIds value rather than filtering to nothing', () => {
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ ministryIds: 'abc,-1' });
+    expect(hooks.params).not.toHaveProperty('ministryIds');
+  });
+
+  it('leaves every filter control in place when locked to a ministry', () => {
+    // Unlike the city lock, there is no Ministry dropdown to hide — the City
+    // filter must survive so a visitor can still narrow within the ministry.
+    hooks.groups = groupsResult([GROUP]);
+    renderApp({ advancedOpen: true, ministryIds: '113' });
+    expect(screen.getByText('City')).toBeInTheDocument();
   });
 
   it('badges the number of active filters while the panel is collapsed', async () => {

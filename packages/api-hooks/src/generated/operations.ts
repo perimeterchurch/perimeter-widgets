@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+  '/api/auth/roles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Returns the authenticated caller's MP security Role_IDs so sibling frontend apps can re-check authorization per request */
+    get: operations['getRoles'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/auth/me': {
     parameters: {
       query?: never;
@@ -1992,6 +2009,48 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  getRoles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            /** @description Authenticated caller's MinistryPlatform security Role_IDs from dp_User_Roles, for apps gating on MP's own role model */
+            data: {
+              userId: number;
+              roleIds: number[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
   getMe: {
     parameters: {
       query?: never;
@@ -5298,6 +5357,7 @@ export interface operations {
     parameters: {
       query?: {
         groupTypeId?: number;
+        ministryIds?: string;
         neighborhoodIds?: string;
         focusIds?: string;
         lifeStageIds?: string;
@@ -5338,6 +5398,10 @@ export interface operations {
                 /** @description Groups.Group_Name. */
                 name: string;
                 description: string | null;
+                /** @description Ministries.Ministry_Name — the ministry that owns the group. */
+                ministry: string | null;
+                /** @description Groups.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response. */
+                ministryId: number | null;
                 /** @description City_Ministries.City_Ministry, or null. */
                 neighborhood: string | null;
                 neighborhoodId: number | null;
@@ -5401,6 +5465,7 @@ export interface operations {
     parameters: {
       query?: {
         groupTypeId?: number;
+        ministryIds?: string;
         includeHidden?: 'true' | 'false';
         includeEnded?: 'true' | 'false';
       };
