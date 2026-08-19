@@ -36,6 +36,10 @@
     {
       "source": "/sermons/latest.js",
       "destination": "/sermons/1.4.3/index.js"
+    },
+    {
+      "source": "/staff-contact/latest.js",
+      "destination": "/staff-contact/0.1.0/index.js"
     }
   ],
   "headers": [
