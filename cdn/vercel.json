@@ -7,11 +7,11 @@
   "rewrites": [
     {
       "source": "/community-group-finder/latest.js",
-      "destination": "/community-group-finder/0.1.1/index.js"
+      "destination": "/community-group-finder/0.2.0/index.js"
     },
     {
       "source": "/event-finder/latest.js",
-      "destination": "/event-finder/0.1.0/index.js"
+      "destination": "/event-finder/0.1.2/index.js"
     },
     {
       "source": "/example/latest.js",

@@ -47,14 +47,29 @@ export function App({ config }: AppProps): React.JSX.Element {
   );
   const neighborhoodLocked = lockedNeighborhoodIds.length > 0;
 
+  // The owning ministry is a property of the page, not something a visitor
+  // browses, so this has no filter control — it just narrows every request.
+  // The facets request carries it too, so the dropdowns that DO exist offer
+  // only values this ministry's groups use.
+  const lockedMinistryIds = React.useMemo(
+    () => parseIdList(config.ministryIds),
+    [config.ministryIds],
+  );
+  const ministryParam =
+    lockedMinistryIds.length > 0 ? { ministryIds: lockedMinistryIds.join(',') } : {};
+
   const [filters, setFilters] = React.useState<FilterState>(EMPTY_FILTERS);
   const [advancedOpen, setAdvancedOpen] = React.useState(config.advancedOpen);
 
-  const facetsQuery = useCommunityGroupFacets({ groupTypeId: config.groupTypeId });
+  const facetsQuery = useCommunityGroupFacets({
+    groupTypeId: config.groupTypeId,
+    ...ministryParam,
+  });
   const facets = facetsQuery.data?.data;
 
   const groupsQuery = useCommunityGroups({
     groupTypeId: config.groupTypeId,
+    ...ministryParam,
     ...toQueryParams(filters),
     // A locked city wins over the (hidden) filter value.
     ...(neighborhoodLocked ? { neighborhoodIds: lockedNeighborhoodIds.join(',') } : {}),

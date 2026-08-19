@@ -157,7 +157,7 @@ export function GroupCard({
             size="sm"
             nativeButton={false}
             className="rounded-none text-white dark:text-primary-fg"
-            render={<a href={`${config.detailsUrlBase}${group.id}`} />}
+            render={<a href={`${config.targetUrl}${group.id}`} />}
           >
             {config.detailsLabel}
           </Button>
