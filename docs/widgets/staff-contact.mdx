@@ -1,0 +1,75 @@
+---
+description: Email a Perimeter staff member from a contact form, keyed by their Contact GUID.
+---
+
+# staff-contact
+
+A contact form for emailing a single staff member. It shows the staff member's
+photo, name, and job title, then a Your Name / Your Email / Subject / Message
+form with a reCAPTCHA. On submit it creates a communication in Ministry Platform
+that emails the staff member, with the sender as the reply-to — the same record
+staff have always seen from the website contact form.
+
+Built to replace the stock Ministry Platform "EmailFormWidget" that perimeter.org
+embedded on its `/staff-contact/` page. The one behavioral change: the staff
+member is identified by their **MP Contact GUID** instead of their Employee ID,
+which is far harder to guess. The recipient email is resolved server-side from
+that GUID and is never exposed to or set by the browser.
+
+## Embed
+
+The host page reads the staff member's Contact GUID from its own URL (e.g.
+`/staff-contact/?contactGuid=…`, the successor to the old `?eid=…`) and passes it
+to the widget as `data-contact-guid`:
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div
+  data-perimeter-widget="staff-contact"
+  data-contact-guid="641f26fa-12c2-48b7-8392-81e6c02a76bb"
+></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/types.ts` is the source of truth.
+
+| Attribute                | Required | Default                         | Description                                                                 |
+| ------------------------ | -------- | ------------------------------- | --------------------------------------------------------------------------- |
+| `data-contact-guid`      | Yes      | —                               | MP Contact GUID of the staff member to email. Without it the widget shows a "contact form unavailable" notice. |
+| `data-recaptcha-site-key`| No       | Perimeter's public v2 site key  | Google reCAPTCHA v2 site key (public). Override only for a different key.    |
+| `data-api-url`           | No       | `https://api.perimeter.org`     | Override the perimeter-api base URL (advanced / local dev).                 |
+
+## Behavior
+
+- **Header** — fetches the staff member from `GET /api/staff-contact/{guid}` and
+  shows their photo (`GET /api/staff-contact/{guid}/photo`, with an initials
+  placeholder when there is none), name, and job title.
+- **Contactable staff only** — the API resolves the GUID to a _currently
+  website-visible_ employee. A GUID that isn't a current staff member returns a
+  "Staff member not found" notice, so the form can't be pointed at arbitrary
+  contacts.
+- **reCAPTCHA** — Google reCAPTCHA **v3** (invisible, score-based). A token is
+  minted with `grecaptcha.execute()` on submit and verified server-side (success
+  + score) before any Ministry Platform write. v3 is used rather than the v2
+  checkbox because v2's challenge iframe does not work inside the widget's shadow
+  DOM. The badge is hidden and the required attribution shown by the form.
+- **Submit** — `POST /api/staff-contact` creates the MP communication and shows a
+  confirmation with a "Send another message" action.
+
+## API
+
+Backed by the **staff-contact** endpoints in perimeter-api
+(`docs/domains/staff-contact.md` there). The perimeter-api change must deploy
+before this widget works from a production origin — its path
+(`/api/staff-contact`) also has to be in the API's widget CORS allowlist.
+
+## reCAPTCHA setup
+
+Uses a **reCAPTCHA v3 (score-based)** key — not the v2 checkbox. The public
+**site key** is the widget default (or `data-recaptcha-site-key`); the private
+**secret** lives in perimeter-api's `RECAPTCHA_SECRET` env var. The key's allowed
+domains must include every origin the widget is embedded on (e.g.
+`perimeter.org`, plus `localhost` for local testing). The server rejects
+assessments below a 0.5 score.

@@ -38,8 +38,16 @@ async function extractMessage(res: Response, label: string): Promise<string> {
   return `${label} request failed: ${res.status}`;
 }
 
-export async function fetchJson<T>(client: FetchClient, path: string, label: string): Promise<T> {
-  const res = await client.fetch(path);
+export async function fetchJson<T>(
+  client: FetchClient,
+  path: string,
+  label: string,
+  init?: RequestInit,
+): Promise<T> {
+  // Only forward `init` when a caller provides it, so read hooks keep calling
+  // `client.fetch(path)` with a single argument (matching the FetchClient
+  // contract and existing call-site expectations); mutations pass method/body.
+  const res = init === undefined ? await client.fetch(path) : await client.fetch(path, init);
   if (!res.ok) {
     throw new ApiError(res.status, await extractMessage(res, label));
   }
