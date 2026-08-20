@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { CDN_BASE_URL } from '../lib/catalog';
 import { brandFontsLinkTag } from '../lib/brand-fonts';
 import { serializeWidgetAttrs, type PreviewTheme } from '../lib/embed-snippet';
+import { PREVIEW_FRAME_URL, usePreviewFrame } from '../lib/preview-frame';
 
-/** postMessage type for srcdoc→parent failure reports (same-origin srcdoc). */
+/** postMessage type for frame→parent failure reports (the frame is same-origin). */
 export const CDN_PREVIEW_ERROR_TYPE = 'perimeter-cdn-preview-error';
 
 /**
@@ -14,7 +15,7 @@ export const CDN_PREVIEW_ERROR_TYPE = 'perimeter-cdn-preview-error';
 const PROD_API_ORIGIN = 'https://api.perimeter.org';
 
 /**
- * A tiny script injected into the srcdoc while impersonating that rewrites any
+ * A tiny script injected into the harness while impersonating that rewrites any
  * `fetch` to the default API origin onto the shell proxy. `data-api-url` alone is
  * not enough: a widget only picks it up if its config schema declares `apiUrl`
  * (Zod strips undeclared keys at mount), and e.g. my-giving-history does not — so
@@ -53,20 +54,17 @@ function isCdnPreviewError(data: unknown): data is CdnPreviewErrorMessage {
 }
 
 /**
- * The catalog's live embed: the SHIPPED production bundle, loaded through the
- * real loader.js → manifest.json → immutable-bundle chain, inside a same-origin
- * srcdoc iframe — exactly what a bare WordPress host page does, isolated from
- * studio React/CSS. Same failure channel as BuiltBundlePreview (a blank frame
- * must never fail silently). Prod-visible by design (BuiltBundlePreview stays
- * DEV-only). NEVER add `sandbox`: without allow-same-origin it forces an opaque
- * origin, localStorage throws, and MP sign-in can no longer reach the widget.
+ * The bare host page written into the preview frame: the mount div plus the real
+ * loader.js, exactly what a WordPress page carries. Exported so tests can assert
+ * on the harness text directly — the frame receives it via `document.write`, so
+ * there is no `srcdoc` attribute to read.
  *
- * The one thing the frame does NOT leave bare is fonts: it links the brand kit,
+ * The one thing this does NOT leave bare is fonts: it links the brand kit,
  * because the real host page (perimeter.org) loads one and a widget's CSS only
  * *names* sweet-sans-pro. Omitting it renders the preview in Inter. For a truly
  * bare host — no kit, no styles — use `pnpm embed-lab`.
  */
-export function CdnBundlePreview({
+export function buildCdnPreviewHtml({
   slug,
   overrides,
   theme,
@@ -75,32 +73,12 @@ export function CdnBundlePreview({
   slug: string;
   overrides: Record<string, unknown>;
   theme: PreviewTheme;
-  /** When impersonating, the shell proxy base — routes the shipped bundle's API
-   * calls on behalf of the target. Same-origin srcdoc, so cookies flow. */
   apiUrl?: string | undefined;
-}) {
-  const [error, setError] = useState<string | null>(null);
-
-  // Any change that regenerates the srcdoc (slug, overrides, theme, apiUrl) gets
-  // a fresh error slate — a stale banner over a healthy remount misleads.
-  useEffect(() => {
-    setError(null);
-  }, [slug, overrides, theme, apiUrl]);
-
-  useEffect(() => {
-    function onMessage(event: MessageEvent) {
-      if (isCdnPreviewError(event.data) && event.data.slug === slug) {
-        setError(event.data.message);
-      }
-    }
-    window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
-  }, [slug]);
-
+}): string {
   const errorType = JSON.stringify(CDN_PREVIEW_ERROR_TYPE);
   const slugLiteral = JSON.stringify(slug);
   const loaderUrl = JSON.stringify(`${CDN_BASE_URL}/loader.js`);
-  const srcDoc = [
+  return [
     '<!doctype html><html><head><meta charset="utf-8">',
     // The brand faces. An iframe is its own document and inherits no fonts from
     // the studio, so without this the framed widget names sweet-sans-pro, fails
@@ -126,6 +104,53 @@ export function CdnBundlePreview({
     `<script src=${loaderUrl} async onerror="__report('Failed to load loader.js: '+this.src)"></script>`,
     '</body></html>',
   ].join('');
+}
+
+/**
+ * The catalog's live embed: the SHIPPED production bundle, loaded through the
+ * real loader.js → manifest.json → immutable-bundle chain, inside a same-origin
+ * iframe — exactly what a bare WordPress host page does, isolated from studio
+ * React/CSS. Same failure channel as BuiltBundlePreview (a blank frame must
+ * never fail silently). Prod-visible by design (BuiltBundlePreview stays
+ * DEV-only). NEVER add `sandbox`: without allow-same-origin it forces an opaque
+ * origin, localStorage throws, and MP sign-in can no longer reach the widget.
+ *
+ * The frame loads `PREVIEW_FRAME_URL` and the harness is written into it rather
+ * than passed as `srcdoc`, so the framed page has a real hostname — see
+ * ../lib/preview-frame.ts for why (reCAPTCHA cannot verify `about:srcdoc`).
+ */
+export function CdnBundlePreview({
+  slug,
+  overrides,
+  theme,
+  apiUrl,
+}: {
+  slug: string;
+  overrides: Record<string, unknown>;
+  theme: PreviewTheme;
+  /** When impersonating, the shell proxy base — routes the shipped bundle's API
+   * calls on behalf of the target. Same-origin srcdoc, so cookies flow. */
+  apiUrl?: string | undefined;
+}) {
+  const [error, setError] = useState<string | null>(null);
+
+  // Any change that regenerates the harness (slug, overrides, theme, apiUrl) gets
+  // a fresh error slate — a stale banner over a healthy remount misleads.
+  useEffect(() => {
+    setError(null);
+  }, [slug, overrides, theme, apiUrl]);
+
+  useEffect(() => {
+    function onMessage(event: MessageEvent) {
+      if (isCdnPreviewError(event.data) && event.data.slug === slug) {
+        setError(event.data.message);
+      }
+    }
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [slug]);
+
+  const frameRef = usePreviewFrame(buildCdnPreviewHtml({ slug, overrides, theme, apiUrl }));
 
   return (
     <div className="relative min-h-[24rem] w-full">
@@ -140,7 +165,8 @@ export function CdnBundlePreview({
       )}
       <iframe
         title={`Live widget: ${slug}`}
-        srcDoc={srcDoc}
+        ref={frameRef}
+        src={PREVIEW_FRAME_URL}
         className="block h-[70vh] w-full border-0 bg-white"
       />
     </div>

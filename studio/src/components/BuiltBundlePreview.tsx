@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@perimeter/ui/card';
 import { brandFontsLinkTag } from '../lib/brand-fonts';
 import { builtBundleUrl } from '../lib/built-bundles';
+import { PREVIEW_FRAME_URL, usePreviewFrame } from '../lib/preview-frame';
 
 /**
- * postMessage type the srcdoc iframe uses to report a load/runtime failure to the
- * parent studio. The srcdoc iframe is same-origin (it has no `src`, so it inherits
- * the parent's origin), so `window.parent.postMessage` reaches the studio and the
- * parent can read `event.data` without a cross-origin guard. Exported so the parent
- * listener and the render test agree on one stable identifier.
+ * postMessage type the preview iframe uses to report a load/runtime failure to
+ * the parent studio. The frame loads a studio-origin URL, so it is same-origin:
+ * `window.parent.postMessage` reaches the studio and the parent can read
+ * `event.data` without a cross-origin guard. Exported so the parent listener and
+ * the render test agree on one stable identifier.
  */
 export const BUILT_PREVIEW_ERROR_TYPE = 'perimeter-built-preview-error';
 
@@ -29,81 +30,24 @@ function isBuiltPreviewError(data: unknown): data is BuiltPreviewErrorMessage {
 }
 
 /**
- * Dev-only preview of a widget's *shipped* artifact — the actual built IIFE from
- * `widgets/<slug>/dist/index.js`, the byte-for-byte file the CDN serves. This is
- * the final pre-release parity check: source-mounted previews use the dev React
- * + dev CSS pipeline, while this runs the production bundle exactly as a host
- * page would.
+ * Minimal host document for the shipped IIFE, written into the preview frame.
+ * Carries the mount target the bundle's autoMount observes (keyed by slug),
+ * `margin:0` so the widget owns the frame, and an error channel: a
+ * `window.onerror` handler plus the bundle script's own `onerror` both
+ * postMessage the failure to the parent so a blank/crashed frame is reported
+ * instead of failing silently. The JSON-encoded type + slug keep the injected
+ * script free of unescaped interpolation.
  *
- * Why an iframe: the built IIFE calls `autoMount`, which observes `document.body`
- * globally and instantiates its own React. Running it in the studio's own document
- * would collide with the studio's React tree and global observers. An iframe gives
- * the bundle its own document/window — the parity-honest sandbox — so it mounts
- * exactly as it does on a real host page.
- *
- * Failure surfacing: the built bundle runs in a sandboxed document where a load
- * failure (stale/missing `dist`, a `?url` 404) or a runtime throw is otherwise
- * invisible — the frame just renders blank. The srcdoc installs a `window.onerror`
- * handler and an `onerror` on the bundle script that `postMessage` the failure to
- * the parent (same-origin srcdoc), and this component listens and renders a clear
- * in-frame error banner instead of a silent blank frame. It also flags a dev-built
- * (`pnpm dev` watch) bundle, which crashes under the production `NODE_ENV` the
- * runtime defines.
- *
- * Gated behind `import.meta.env.DEV` by its only caller (Canvas), so Rollup
- * tree-shakes the whole feature out of the deployed read-only site.
+ * Exported so tests can assert on the harness text directly — the frame receives
+ * it via `document.write`, so there is no `srcdoc` attribute to read.
  */
-export function BuiltBundlePreview({ slug }: { slug: string }) {
-  const url = builtBundleUrl(slug);
-  const [error, setError] = useState<string | null>(null);
-
-  // Reset any prior error when the previewed widget changes.
-  useEffect(() => {
-    setError(null);
-  }, [slug, url]);
-
-  // Listen for failures the srcdoc iframe reports. The srcdoc iframe is same-origin,
-  // so its `window.parent.postMessage` arrives here; filter by message type + slug
-  // so an unrelated frame's message can't spoof this preview's error state.
-  useEffect(() => {
-    function onMessage(event: MessageEvent) {
-      if (isBuiltPreviewError(event.data) && event.data.slug === slug) {
-        setError(event.data.message);
-      }
-    }
-    window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
-  }, [slug]);
-
-  if (!url) {
-    return (
-      <Card className="mx-auto max-w-md">
-        <CardContent className="space-y-2 p-6 text-center">
-          <p className="text-sm font-semibold text-fg">Build the widget first</p>
-          <p className="text-sm text-muted-fg">
-            No built bundle was found for this widget. Build it, then switch back to this view to
-            preview the shipped artifact.
-          </p>
-          <pre className="mt-1 overflow-x-auto rounded-md bg-fg px-3 py-2 text-left font-mono text-xs leading-relaxed text-bg">
-            pnpm --filter ./widgets/{slug} build
-          </pre>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Minimal host document for the shipped IIFE. The mount target the bundle's
-  // autoMount observes (keyed by slug), `margin:0` so the widget owns the frame,
-  // and an error channel: a `window.onerror` handler plus the bundle script's own
-  // `onerror` both postMessage the failure to the parent so a blank/crashed frame
-  // is reported instead of failing silently. The JSON-encoded type + slug keep the
-  // injected script free of unescaped interpolation.
+export function buildBuiltPreviewHtml({ slug, url }: { slug: string; url: string }): string {
   const errorType = JSON.stringify(BUILT_PREVIEW_ERROR_TYPE);
   const slugLiteral = JSON.stringify(slug);
   const scriptUrl = JSON.stringify(url);
-  const srcDoc = [
+  return [
     '<!doctype html><html><head><meta charset="utf-8">',
-    // Brand faces — an iframe inherits no fonts from the studio document. See
+    // Brand faces — an iframe inherits no fonts from the studio. See
     // ../lib/brand-fonts.ts.
     brandFontsLinkTag(),
     '<style>html,body{margin:0;padding:0}</style>',
@@ -122,6 +66,75 @@ export function BuiltBundlePreview({ slug }: { slug: string }) {
     `<script src=${scriptUrl} onerror="__report('Failed to load bundle script: '+this.src)"></script>`,
     '</body></html>',
   ].join('');
+}
+
+/**
+ * Dev-only preview of a widget's *shipped* artifact — the actual built IIFE from
+ * `widgets/<slug>/dist/index.js`, the byte-for-byte file the CDN serves. This is
+ * the final pre-release parity check: source-mounted previews use the dev React
+ * + dev CSS pipeline, while this runs the production bundle exactly as a host
+ * page would.
+ *
+ * Why an iframe: the built IIFE calls `autoMount`, which observes `document.body`
+ * globally and instantiates its own React. Running it in the studio's own document
+ * would collide with the studio's React tree and global observers. An iframe gives
+ * the bundle its own document/window — the parity-honest sandbox — so it mounts
+ * exactly as it does on a real host page.
+ *
+ * Failure surfacing: the built bundle runs in an isolated document where a load
+ * failure (stale/missing `dist`, a `?url` 404) or a runtime throw is otherwise
+ * invisible — the frame just renders blank. The harness installs a `window.onerror`
+ * handler and an `onerror` on the bundle script that `postMessage` the failure to
+ * the parent (the frame is same-origin), and this component listens and renders a
+ * clear in-frame error banner instead of a silent blank frame. It also flags a
+ * dev-built (`pnpm dev` watch) bundle, which crashes under the production
+ * `NODE_ENV` the runtime defines.
+ *
+ * Gated behind `import.meta.env.DEV` by its only caller (Canvas), so Rollup
+ * tree-shakes the whole feature out of the deployed read-only site.
+ */
+export function BuiltBundlePreview({ slug }: { slug: string }) {
+  const url = builtBundleUrl(slug);
+  const [error, setError] = useState<string | null>(null);
+
+  // Reset any prior error when the previewed widget changes.
+  useEffect(() => {
+    setError(null);
+  }, [slug, url]);
+
+  // Listen for failures the preview iframe reports. The frame is same-origin, so
+  // its `window.parent.postMessage` arrives here; filter by message type + slug
+  // so an unrelated frame's message can't spoof this preview's error state.
+  useEffect(() => {
+    function onMessage(event: MessageEvent) {
+      if (isBuiltPreviewError(event.data) && event.data.slug === slug) {
+        setError(event.data.message);
+      }
+    }
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [slug]);
+
+  // Called on every render (rules of hooks) — including the unbuilt-slug render
+  // below, which returns a hint instead of a frame and never attaches the ref.
+  const frameRef = usePreviewFrame(url ? buildBuiltPreviewHtml({ slug, url }) : '');
+
+  if (!url) {
+    return (
+      <Card className="mx-auto max-w-md">
+        <CardContent className="space-y-2 p-6 text-center">
+          <p className="text-sm font-semibold text-fg">Build the widget first</p>
+          <p className="text-sm text-muted-fg">
+            No built bundle was found for this widget. Build it, then switch back to this view to
+            preview the shipped artifact.
+          </p>
+          <pre className="mt-1 overflow-x-auto rounded-md bg-fg px-3 py-2 text-left font-mono text-xs leading-relaxed text-bg">
+            pnpm --filter ./widgets/{slug} build
+          </pre>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="relative h-[70vh] w-full">
@@ -141,7 +154,8 @@ export function BuiltBundlePreview({ slug }: { slug: string }) {
       )}
       <iframe
         title={`Built bundle preview: ${slug}`}
-        srcDoc={srcDoc}
+        ref={frameRef}
+        src={PREVIEW_FRAME_URL}
         // Fill the canvas frame; the canvas constrains the outer width via presets.
         className="block h-full w-full border-0 bg-white"
       />
