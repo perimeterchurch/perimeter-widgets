@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@perimeter/ui/card';
 import { brandFontsLinkTag } from '../lib/brand-fonts';
 import { builtBundleUrl } from '../lib/built-bundles';
-import { PREVIEW_FRAME_URL, usePreviewFrame } from '../lib/preview-frame';
+import { usePreviewFrame } from '../lib/preview-frame';
 
 /**
  * postMessage type the preview iframe uses to report a load/runtime failure to
@@ -117,7 +117,9 @@ export function BuiltBundlePreview({ slug }: { slug: string }) {
 
   // Called on every render (rules of hooks) — including the unbuilt-slug render
   // below, which returns a hint instead of a frame and never attaches the ref.
-  const frameRef = usePreviewFrame(url ? buildBuiltPreviewHtml({ slug, url }) : '');
+  const { ref: frameRef, src: frameSrc } = usePreviewFrame(
+    url ? buildBuiltPreviewHtml({ slug, url }) : '',
+  );
 
   if (!url) {
     return (
@@ -155,7 +157,7 @@ export function BuiltBundlePreview({ slug }: { slug: string }) {
       <iframe
         title={`Built bundle preview: ${slug}`}
         ref={frameRef}
-        src={PREVIEW_FRAME_URL}
+        src={frameSrc}
         // Fill the canvas frame; the canvas constrains the outer width via presets.
         className="block h-full w-full border-0 bg-white"
       />

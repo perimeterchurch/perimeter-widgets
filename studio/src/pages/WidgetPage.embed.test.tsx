@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// @vitest-environment-options { "settings": { "disableJavaScriptEvaluation": true } }
+// @vitest-environment-options { "settings": { "disableJavaScriptEvaluation": true, "disableIframePageLoading": true } }
 // The Embed tab renders CdnBundlePreview, whose harness carries an inline
 // script and a <script src> at the real loader.js. happy-dom would fetch and run
 // them, so evaluation is disabled here — the same treatment CdnBundlePreview's own
