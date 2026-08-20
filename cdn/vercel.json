@@ -39,7 +39,7 @@
     },
     {
       "source": "/staff-contact/latest.js",
-      "destination": "/staff-contact/0.1.0/index.js"
+      "destination": "/staff-contact/0.1.1/index.js"
     }
   ],
   "headers": [
