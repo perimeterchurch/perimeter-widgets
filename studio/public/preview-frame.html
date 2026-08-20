@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Perimeter widget preview frame</title>
+  </head>
+  <body>
+    <!--
+      Intentionally empty. The studio's preview components load this file into
+      their iframe and then write the widget harness into it (see
+      studio/src/lib/preview-frame.ts).
+
+      Why a real file instead of the iframe's `srcdoc` attribute: a srcdoc
+      document has no URL of its own (`about:srcdoc`), so it has no hostname.
+      Anything that verifies the page's origin then fails inside the frame — most
+      visibly Google reCAPTCHA, whose execute() hands back a short error token
+      that the server rejects with `browser-error`. Loading this file first gives
+      the frame the studio's real origin and hostname; writing the harness into it
+      afterwards keeps that URL.
+    -->
+  </body>
+</html>
