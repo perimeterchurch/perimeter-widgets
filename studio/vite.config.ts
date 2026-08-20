@@ -69,6 +69,16 @@ export default defineConfig({
   // the whole `visual/` tree from the vitest run; it is driven by `pnpm visual`.
   test: {
     exclude: [...configDefaults.exclude, 'visual/**'],
+    // The preview components render `<iframe src="/preview-frame.html">` (a real
+    // URL is required so the framed page has an origin — see
+    // src/lib/preview-frame.ts). happy-dom would try to actually FETCH that page,
+    // which fails with ECONNREFUSED and surfaces as an unhandled error that
+    // fails the run even though every assertion passed. Nothing in the suite
+    // needs the frame's page to load — the harness is asserted through the
+    // exported builders — so switch iframe page loading off for the whole suite
+    // rather than per file, which a new preview test would otherwise have to
+    // rediscover.
+    environmentOptions: { happyDOM: { settings: { disableIframePageLoading: true } } },
     // Raises Testing Library's per-assertion async budget to 10s — see the file
     // for why the 1s default is wrong for a suite that waits on real lazy
     // imports. Pairs with the testTimeout below.
