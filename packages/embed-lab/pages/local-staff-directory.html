@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — local staff-directory</title>
+    <style>
+      /* perimeter.org's measured host styles (provenance:
+         packages/parity/fixtures/wordpress.html, read from the live page
+         2026-06-02): 19px/35px body type, #353535 text, 1425px container. */
+      body {
+        font-size: 19px;
+        line-height: 35px;
+        color: #353535;
+        background: #ffffff;
+        font-family: sans-serif;
+        margin: 0;
+      }
+      .container {
+        max-width: 1425px;
+        padding: 0 90px;
+        margin: 0 auto;
+      }
+      .banner {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        text-transform: none;
+      }
+
+      /* …plus deliberately hostile global CSS a bad theme/plugin might ship.
+         None of it may reach inside the shadow root. `img { filter: grayscale }`
+         and the `ul`/`li` rules are the ones that matter most here: this widget
+         is a list of photographs, so a leak would be unmistakable. */
+      * {
+        letter-spacing: 0.5px !important;
+      }
+      h1,
+      h2,
+      h3,
+      p,
+      span {
+        text-transform: uppercase;
+      }
+      img {
+        filter: grayscale(1);
+        border: 4px solid lime;
+      }
+      ul {
+        list-style: disc;
+        padding-left: 3rem;
+      }
+      li {
+        display: list-item !important;
+        margin-bottom: 2rem;
+      }
+      input,
+      select {
+        background: hotpink !important;
+        border-radius: 12px !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>local staff-directory — on a hostile host page</h1>
+      <p><a href="/">← lab index</a></p>
+      <p class="banner">
+        Bypasses the loader and embeds <code>/local/staff-directory/index.js</code> directly. Build
+        first: <code>pnpm --filter @perimeter/widget-staff-directory build</code>.
+        <code>data-api-url</code> points at a local perimeter-api on :5500 — run
+        <code>pnpm dev</code> there. The host page ships perimeter.org's real 19px type plus hostile
+        global CSS; inside the widget the photo grid must stay a grid (no bullets, no 2rem row
+        gaps), the headshots must stay in colour with no lime border, and the search field must not
+        be hotpink.
+      </p>
+
+      <div data-perimeter-widget="staff-directory" data-api-url="http://localhost:5500"></div>
+      <script src="/local/staff-directory/index.js" data-nowprocket async></script>
+    </div>
+  </body>
+</html>
