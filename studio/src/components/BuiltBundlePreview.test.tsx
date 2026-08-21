@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// @vitest-environment-options { "settings": { "disableJavaScriptEvaluation": true } }
+// @vitest-environment-options { "settings": { "disableJavaScriptEvaluation": true, "disableIframePageLoading": true } }
 // The component's harness carries an inline error-reporting <script> and a
 // <script src> at the (fake) built bundle. happy-dom would otherwise execute the
 // inline script and fetch + run the URL; the empty response throws an async

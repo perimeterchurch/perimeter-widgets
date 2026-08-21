@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// @vitest-environment-options { "settings": { "disableJavaScriptEvaluation": true } }
+// @vitest-environment-options { "settings": { "disableJavaScriptEvaluation": true, "disableIframePageLoading": true } }
 // Same reason as BuiltBundlePreview.test.tsx: happy-dom would otherwise execute
 // the harness's inline script AND fetch + run the loader.js URL (real network /
 // unhandled rejection). The harness is asserted through `buildCdnPreviewHtml`

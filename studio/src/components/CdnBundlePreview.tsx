@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { CDN_BASE_URL } from '../lib/catalog';
 import { brandFontsLinkTag } from '../lib/brand-fonts';
 import { serializeWidgetAttrs, type PreviewTheme } from '../lib/embed-snippet';
-import { PREVIEW_FRAME_URL, usePreviewFrame } from '../lib/preview-frame';
+import { usePreviewFrame } from '../lib/preview-frame';
 
 /** postMessage type for frame→parent failure reports (the frame is same-origin). */
 export const CDN_PREVIEW_ERROR_TYPE = 'perimeter-cdn-preview-error';
@@ -150,7 +150,9 @@ export function CdnBundlePreview({
     return () => window.removeEventListener('message', onMessage);
   }, [slug]);
 
-  const frameRef = usePreviewFrame(buildCdnPreviewHtml({ slug, overrides, theme, apiUrl }));
+  const { ref: frameRef, src: frameSrc } = usePreviewFrame(
+    buildCdnPreviewHtml({ slug, overrides, theme, apiUrl }),
+  );
 
   return (
     <div className="relative min-h-[24rem] w-full">
@@ -166,7 +168,7 @@ export function CdnBundlePreview({
       <iframe
         title={`Live widget: ${slug}`}
         ref={frameRef}
-        src={PREVIEW_FRAME_URL}
+        src={frameSrc}
         className="block h-[70vh] w-full border-0 bg-white"
       />
     </div>
