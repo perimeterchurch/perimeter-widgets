@@ -40,6 +40,10 @@
     {
       "source": "/staff-contact/latest.js",
       "destination": "/staff-contact/0.1.1/index.js"
+    },
+    {
+      "source": "/staff-directory/latest.js",
+      "destination": "/staff-directory/0.1.0/index.js"
     }
   ],
   "headers": [
