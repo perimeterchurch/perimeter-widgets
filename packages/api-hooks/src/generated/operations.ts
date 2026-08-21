@@ -4,57 +4,6 @@
  */
 
 export interface paths {
-  '/api/staff-contact/{guid}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a staff member (by Contact GUID) for the staff-contact widget */
-    get: operations['getStaffContactMember'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/staff-contact/{guid}/photo': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a staff member's photo for the staff-contact widget */
-    get: operations['getStaffContactPhoto'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/staff-contact': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Send a message to a staff member via the staff-contact widget */
-    post: operations['submitStaffContact'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/auth/roles': {
     parameters: {
       query?: never;
@@ -1064,6 +1013,91 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/staff-contact/{guid}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a staff member (by Contact GUID) for the staff-contact widget */
+    get: operations['getStaffContactMember'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/staff-contact/{guid}/photo': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a staff member's photo for the staff-contact widget */
+    get: operations['getStaffContactPhoto'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/staff-contact': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Send a message to a staff member via the staff-contact widget */
+    post: operations['submitStaffContact'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/staff-directory': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List staff for the staff-directory widget */
+    get: operations['listStaffDirectory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/staff-directory/facets': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List filter options for the staff-directory widget */
+    get: operations['listStaffDirectoryFacets'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/invoices/{guid}': {
     parameters: {
       query?: never;
@@ -2060,125 +2094,6 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  getStaffContactMember: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        guid: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              name: string;
-              jobTitle: string | null;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getStaffContactPhoto: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        guid: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  submitStaffContact: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** Format: uuid */
-          contactGuid: string;
-          senderName: string;
-          /** Format: email */
-          senderEmail: string;
-          subject?: string;
-          message: string;
-          recaptchaToken: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              /** @constant */
-              submitted: true;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
   getRoles: {
     parameters: {
       query?: never;
@@ -5720,6 +5635,266 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  getStaffContactMember: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        guid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              name: string;
+              jobTitle: string | null;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getStaffContactPhoto: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        guid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string;
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  submitStaffContact: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: uuid */
+          contactGuid: string;
+          senderName: string;
+          /** Format: email */
+          senderEmail: string;
+          subject?: string;
+          message: string;
+          recaptchaToken: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              /** @constant */
+              submitted: true;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listStaffDirectory: {
+    parameters: {
+      query?: {
+        ministryIds?: string;
+        personnelTypeIds?: string;
+        contactIds?: string;
+        keyword?: string;
+        includeHidden?: 'true' | 'false';
+        includeEnded?: 'true' | 'false';
+        page?: number;
+        perPage?: number;
+        sort?: 'name' | 'ministry' | 'startDate';
+        order?: 'asc' | 'desc';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              staff: {
+                /** @description HR_Personnel.Personnel_ID. */
+                personnelId: number;
+                /** @description Contacts.Contact_ID. */
+                contactId: number;
+                /** @description Contacts.Contact_GUID — the identifier the staff-contact form takes (`/staff-contact/?contactGuid=…`). Null when MP has no GUID on the record, in which case the card cannot link anywhere. */
+                contactGuid: string | null;
+                /** @description Display name: nickname + last name when a nickname exists, otherwise first + last. */
+                name: string;
+                firstName: string | null;
+                lastName: string | null;
+                nickname: string | null;
+                /** @description The staff headshot, served from MP's public files endpoint, or null when the person has no photo on file (the widget then renders a placeholder avatar). */
+                photoUrl: string | null;
+                /** @description HR_Personnel_Types.Personnel_Type. */
+                personnelType: string | null;
+                personnelTypeId: number | null;
+                /** @description HR_Personnel.Personnel_Start_Date, ISO 8601, or null. */
+                startDate: string | null;
+                /** @description Every website-visible position, ordered longest-held first. Never empty — a person with no visible position is not in the directory at all. */
+                positions: {
+                  /** @description HR_Positions.Position_ID. */
+                  id: number;
+                  /** @description HR_Positions.Position_Title. */
+                  title: string;
+                  /** @description Ministries.Ministry_Name — the ministry the position sits in. */
+                  ministry: string | null;
+                  /** @description HR_Positions.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response. */
+                  ministryId: number | null;
+                  /** @description HR_Positions.Department_Head. */
+                  isDepartmentHead: boolean;
+                  /** @description HR_Positions.Division_Head. */
+                  isDivisionHead: boolean;
+                  /** @description HR_Positions.Position_Start, ISO 8601, or null. */
+                  startDate: string | null;
+                }[];
+              }[];
+              pagination: {
+                page: number;
+                perPage: number;
+                total: number;
+                totalPages: number;
+              };
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listStaffDirectoryFacets: {
+    parameters: {
+      query?: {
+        ministryIds?: string;
+        personnelTypeIds?: string;
+        includeHidden?: 'true' | 'false';
+        includeEnded?: 'true' | 'false';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              ministries: {
+                id: number;
+                name: string;
+              }[];
+              personnelTypes: {
+                id: number;
+                name: string;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
   getInvoice: {
     parameters: {
       query?: never;
@@ -9144,6 +9319,12 @@ export interface operations {
               canManageCategories: boolean;
               canManageScopedCategories: boolean;
               canManagePermissions: boolean;
+              /** @default false */
+              isPersonnel: boolean;
+              /** @default [] */
+              ministryMemberIds: number[];
+              /** @default [] */
+              ministryLedIds: number[];
             };
             meta?: {
               count?: number;

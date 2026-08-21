@@ -103,18 +103,25 @@ Priority order is driven by backend readiness (build the cheap, already-backed o
   - [ ] Scaffold; port ElderCard
   - [ ] Tests, release
 
-### 6. Staff — **Priority 6 (Med lift)**
+### 6. Staff — **Priority 6 (Med lift)** → rebuilt as `staff-directory`
 - **Does:** ELT + EMT leadership sections + searchable staff directory grouped by department. (Has a hardcoded special-case for Employee_ID 41 / Ryan Carson.)
 - **Auth:** public.
 - **Legacy source:** MP stored proc `api_custom_Staff_Widget` with `@ELT=1` / `@EMT=1` / search params.
-- **perimeter-api:** ❌ **no staff domain**.
+- **perimeter-api:** ✅ `/api/staff-directory` + `/facets` (see `docs/domains/staff-directory.md` there).
 - **Checklist:**
-  - [ ] Build staff endpoint(s) supporting ELT / EMT / search modes (port SP + params)
-  - [ ] Decide whether to keep or relocate the Ryan Carson hardcode (department override) — ideally data-driven
-  - [ ] Verify columns vs live schema
-  - [ ] api-client + api-hooks
-  - [ ] Scaffold; port ELTSection, EMTSection, StaffSection/List/Item, SearchBar
-  - [ ] Tests, release
+  - [x] Build staff endpoint(s) — reads the NEW `HR_Personnel` / `HR_Positions` tables, not `Employees` / `Departments`
+  - [x] The Ryan Carson hardcode is gone, and data-driven: `HR_Positions` is one-to-many, so multiple roles are representable
+  - [x] Verify columns vs live schema
+  - [x] api-hooks (`useStaffDirectory`, `useStaffDirectoryFacets`)
+  - [x] Scaffold; StaffSection/List/Item/SearchBar became `StaffCard` + `StaffFilters`
+  - [x] Tests
+  - [ ] Release
+- **Deliberately NOT ported:** ELTSection and EMTSection. Nothing in the new HR
+  tables identifies either team, and ruling elders (EMT) are not staff so they
+  have no personnel record at all. Needs a data source before it can be built.
+- **Also fixed on the way:** `staff-contact`'s contactability gate read
+  `Employees`, where 26 of this directory's people have no active row — every one
+  a card whose contact link 404'd. Both now share one gate.
 
 ### 7. MissionTripFinder — **Priority 7 (Med lift, greenfield domain)**
 - **Does:** Public list of open mission trips.
@@ -163,7 +170,7 @@ Priority order is driven by backend readiness (build the cheap, already-backed o
 | Events | EventDetails, EventFinder | partial (detail ✅, finder ⚠️) |
 | Giving | FrontierPledge, MyGivingHistory | partial (system ✅, routes ⚠️/❌) |
 | **Missions** | MissionTripFinder, MyMissions | **greenfield** |
-| Staff | Staff | greenfield |
+| Staff | Staff → **staff-directory** | ✅ built (`/api/staff-directory`) |
 | Shepherds/Elders | MyShepherds | greenfield |
 | Check-in | CheckInDashboard | greenfield |
 

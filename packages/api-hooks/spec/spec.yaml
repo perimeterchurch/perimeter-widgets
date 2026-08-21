@@ -1889,6 +1889,18 @@ paths:
             enum:
               - 'true'
               - 'false'
+        - name: showFullSeries
+          in: query
+          required: false
+          schema:
+            description:
+              When "false", each recurring series (Events sharing a Parent_Event_ID) collapses to its single soonest
+              occurrence, so a weekly event shows one card instead of one per date. Defaults to "true" — every
+              occurrence is returned.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
         - name: page
           in: query
           required: false
@@ -7716,6 +7728,582 @@ paths:
             type: integer
             exclusiveMinimum: 0
             maximum: 9007199254740991
+  /api/staff-contact/{guid}:
+    get:
+      operationId: getStaffContactMember
+      summary: Get a staff member (by Contact GUID) for the staff-contact widget
+      tags:
+        - StaffContact
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      jobTitle:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                    required:
+                      - name
+                      - jobTitle
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+  /api/staff-contact/{guid}/photo:
+    get:
+      operationId: getStaffContactPhoto
+      summary: Get a staff member's photo for the staff-contact widget
+      tags:
+        - StaffContact
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Binary image data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+  /api/staff-contact:
+    post:
+      operationId: submitStaffContact
+      summary: Send a message to a staff member via the staff-contact widget
+      tags:
+        - StaffContact
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      submitted:
+                        type: boolean
+                        const: true
+                    required:
+                      - submitted
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contactGuid:
+                  type: string
+                  format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                senderName:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                senderEmail:
+                  type: string
+                  maxLength: 254
+                  format: email
+                  pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+                subject:
+                  type: string
+                  maxLength: 200
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 5000
+                recaptchaToken:
+                  type: string
+                  minLength: 1
+              required:
+                - contactGuid
+                - senderName
+                - senderEmail
+                - message
+                - recaptchaToken
+              additionalProperties: false
+  /api/staff-directory:
+    get:
+      operationId: listStaffDirectory
+      summary: List staff for the staff-directory widget
+      tags:
+        - StaffDirectory
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      staff:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            personnelId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: HR_Personnel.Personnel_ID.
+                            contactId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: Contacts.Contact_ID.
+                            contactGuid:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description:
+                                Contacts.Contact_GUID — the identifier the staff-contact form takes (`/staff-contact/?contactGuid=…`). Null
+                                when MP has no GUID on the record, in which case the card cannot link anywhere.
+                            name:
+                              type: string
+                              description: 'Display name: nickname + last name when a nickname exists, otherwise first + last.'
+                            firstName:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            lastName:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            nickname:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            photoUrl:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description:
+                                The staff headshot, served from MP's public files endpoint, or null when the person has no photo on file
+                                (the widget then renders a placeholder avatar).
+                            personnelType:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: HR_Personnel_Types.Personnel_Type.
+                            personnelTypeId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            startDate:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: HR_Personnel.Personnel_Start_Date, ISO 8601, or null.
+                            positions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    exclusiveMinimum: 0
+                                    maximum: 9007199254740991
+                                    description: HR_Positions.Position_ID.
+                                  title:
+                                    type: string
+                                    description: HR_Positions.Position_Title.
+                                  ministry:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                    description: Ministries.Ministry_Name — the ministry the position sits in.
+                                  ministryId:
+                                    anyOf:
+                                      - type: integer
+                                        exclusiveMinimum: 0
+                                        maximum: 9007199254740991
+                                      - type: 'null'
+                                    description: HR_Positions.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response.
+                                  isDepartmentHead:
+                                    type: boolean
+                                    description: HR_Positions.Department_Head.
+                                  isDivisionHead:
+                                    type: boolean
+                                    description: HR_Positions.Division_Head.
+                                  startDate:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                    description: HR_Positions.Position_Start, ISO 8601, or null.
+                                required:
+                                  - id
+                                  - title
+                                  - ministry
+                                  - ministryId
+                                  - isDepartmentHead
+                                  - isDivisionHead
+                                  - startDate
+                                additionalProperties: false
+                              description:
+                                Every website-visible position, ordered longest-held first. Never empty — a person with no visible position
+                                is not in the directory at all.
+                          required:
+                            - personnelId
+                            - contactId
+                            - contactGuid
+                            - name
+                            - firstName
+                            - lastName
+                            - nickname
+                            - photoUrl
+                            - personnelType
+                            - personnelTypeId
+                            - startDate
+                            - positions
+                          additionalProperties: false
+                      pagination:
+                        type: object
+                        properties:
+                          page:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          perPage:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          total:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          totalPages:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                        required:
+                          - page
+                          - perPage
+                          - total
+                          - totalPages
+                        additionalProperties: false
+                    required:
+                      - staff
+                      - pagination
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: ministryIds
+          in: query
+          required: false
+          schema:
+            description:
+              Comma-separated HR_Positions.Ministry_ID list (Ministries — what the old staff widget called a
+              "department", e.g. 3 "Accounting", 14 "High School"). A person matches when ANY of their visible positions
+              does.
+            type: string
+        - name: personnelTypeIds
+          in: query
+          required: false
+          schema:
+            description:
+              Comma-separated HR_Personnel.Personnel_Type_ID list (1 Full Time Exempt, 2 Full Time Not Exempt, 3 Part
+              Time Not Exempt, 4 Contractor/1099, 5 Intern, 6 Unpaid Volunteer, 7 Resident, 8 Part Time Exempt). Unset
+              returns every type that is website-visible.
+            type: string
+        - name: contactIds
+          in: query
+          required: false
+          schema:
+            description:
+              Comma-separated Contacts.Contact_ID list. Pins the directory to a hand-picked roster — the modern
+              replacement for the legacy widget's `data-employees` Employee_ID list.
+            type: string
+        - name: keyword
+          in: query
+          required: false
+          schema:
+            description: Case-insensitive search over the person's name and every visible position's title and ministry.
+            type: string
+            maxLength: 100
+        - name: includeHidden
+          in: query
+          required: false
+          schema:
+            description:
+              When "true", personnel and positions with Show_On_Website unset are included. Off by default — the
+              directory shows only staff published to the website.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: includeEnded
+          in: query
+          required: false
+          schema:
+            description:
+              When "true", people whose personnel record has ended and positions whose Position_End has passed are
+              included. Off by default.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: page
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 1
+            maximum: 9007199254740991
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            default: 500
+            type: integer
+            minimum: 1
+            maximum: 500
+        - name: sort
+          in: query
+          required: false
+          schema:
+            default: name
+            description: Sort field. "name" sorts by last name then first, matching the legacy widget's alphabetical grid.
+            type: string
+            enum:
+              - name
+              - ministry
+              - startDate
+        - name: order
+          in: query
+          required: false
+          schema:
+            default: asc
+            type: string
+            enum:
+              - asc
+              - desc
+  /api/staff-directory/facets:
+    get:
+      operationId: listStaffDirectoryFacets
+      summary: List filter options for the staff-directory widget
+      tags:
+        - StaffDirectory
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      ministries:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
+                          additionalProperties: false
+                      personnelTypes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
+                          additionalProperties: false
+                    required:
+                      - ministries
+                      - personnelTypes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: ministryIds
+          in: query
+          required: false
+          schema:
+            description:
+              Comma-separated HR_Positions.Ministry_ID list. Mirrors the list endpoint so a page locked to a few
+              ministries gets dropdowns built from those alone.
+            type: string
+        - name: personnelTypeIds
+          in: query
+          required: false
+          schema:
+            description: Match the list endpoint's personnel-type filter.
+            type: string
+        - name: includeHidden
+          in: query
+          required: false
+          schema:
+            description: Match the list endpoint's visibility rule.
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: includeEnded
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
   /api/invoices/{guid}:
     get:
       operationId: getInvoice
@@ -14803,6 +15391,23 @@ paths:
                         type: boolean
                       canManagePermissions:
                         type: boolean
+                      isPersonnel:
+                        default: false
+                        type: boolean
+                      ministryMemberIds:
+                        default: []
+                        type: array
+                        items:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                      ministryLedIds:
+                        default: []
+                        type: array
+                        items:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
                     required:
                       - role
                       - isAdmin
@@ -14816,6 +15421,9 @@ paths:
                       - canManageCategories
                       - canManageScopedCategories
                       - canManagePermissions
+                      - isPersonnel
+                      - ministryMemberIds
+                      - ministryLedIds
                     additionalProperties: false
                   meta:
                     type: object

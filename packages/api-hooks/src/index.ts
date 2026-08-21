@@ -66,5 +66,20 @@ export {
   type SubmitStaffContactResponse,
 } from './staff-contact/use-submit-staff-contact';
 
+export {
+  useStaffDirectory,
+  type UseStaffDirectoryParams,
+  type UseStaffDirectoryResponse,
+  type StaffDirectoryMember,
+  type StaffDirectoryPosition,
+} from './staff-directory/use-staff-directory';
+
+export {
+  useStaffDirectoryFacets,
+  type UseStaffDirectoryFacetsParams,
+  type UseStaffDirectoryFacetsResponse,
+  type StaffDirectoryFacetOption,
+} from './staff-directory/use-staff-directory-facets';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';

@@ -1,0 +1,90 @@
+---
+description: The Perimeter staff directory — a searchable photo grid linking to each person's contact form.
+---
+
+# staff-directory
+
+A responsive grid of **staff photo cards**. Each card shows the person's
+headshot with their name and job title over it, and links to their
+staff-contact form. A search box and a department dropdown sit above the grid.
+
+This is the modern rebuild of the `reactwidgets` **Staff** widget. Two things
+changed underneath it: the data now comes from Ministry Platform's `HR_Personnel`
+/ `HR_Positions` tables rather than the retired `api_custom_Staff_Widget` stored
+proc, and cards link by **Contact GUID** rather than the old
+`?eid=<Employee ID>`.
+
+Staff are sorted alphabetically by last name and limited to people published to
+the website in Ministry Platform whose record has not ended.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="staff-directory"></div>
+```
+
+Pin it to one department on a per-ministry staff page — this also hides the
+department dropdown, so a visitor cannot widen past the page they are on:
+
+```html
+<div data-perimeter-widget="staff-directory" data-ministry-ids="14"></div>
+```
+
+Show a hand-picked roster (a leadership page, for instance) with the heading and
+search removed:
+
+```html
+<div
+  data-perimeter-widget="staff-directory"
+  data-contact-ids="583177,598448,606974"
+  data-title=""
+  data-intro=""
+  data-show-search=""
+></div>
+```
+
+## Filters
+
+A keyword search and a **department** dropdown. Search matches a person's name
+and every one of their position titles and departments, so someone searching a
+person's second role still finds them.
+
+"Department" is the reader-facing name for MP's `Ministries`, which replaced the
+old `Departments` table. The dropdown options are **data-driven** — they come
+from `/api/staff-directory/facets`, narrowed to departments at least one visible
+staff member actually belongs to, so the list never offers an empty one.
+
+## Multiple positions
+
+A person can hold more than one position, and the card shows every title,
+joined with a middle dot. The legacy widget had a hardcoded special case for the
+one employee who spanned two ministries; that is now just what the data says.
+
+Titles are ordered longest-held first, so the primary role reads first.
+
+## Photos
+
+Headshots come from Ministry Platform. Roughly two in five staff have none on
+file, and those cards render the person's initials on a plain tile — no extra
+request. Set `data-default-photo-url` to use a shared placeholder image instead.
+
+Photos are lazy-loaded, which matters here: MP serves each headshot at full
+resolution (around 1 MB), so a grid of 350 people would be very heavy if every
+image loaded up front.
+
+## Not included
+
+The legacy widget's **Executive Leadership Team** and **Elder Ministry Team**
+sections are not here. Nothing in the new HR tables identifies either group, and
+ruling elders are not staff, so they have no personnel record at all. The
+legacy `data-elt` / `data-emt` attributes have no equivalent.
+
+`data-params`, which passed raw arguments to the stored proc, is replaced by the
+`data-ministry-ids`, `data-personnel-type-ids`, and `data-contact-ids` options.
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div. See
+`src/types.ts` for the zod schema — the source of truth for available options and
+defaults.
