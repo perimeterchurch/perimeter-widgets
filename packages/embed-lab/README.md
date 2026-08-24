@@ -29,6 +29,7 @@ The lab serves real artifacts behind one origin:
 | `/pages/multi.html`                 | Two widgets, one loader tag (per-name dedupe, independent themes)                    |
 | `/pages/local.html`                 | Direct embed of the local `dist/` build, no loader                                   |
 | `/pages/local-staff-directory.html` | The local `staff-directory` build on a hostile host (img / ul-li / form-field leaks) |
+| `/pages/local-prayer-wall.html`     | The local `prayer-wall` build on a hostile host (form / radio / fieldset leaks)      |
 
 Widgets fetch live data from `https://api.perimeter.org` (the built bundle's default), so
 pages need internet access. Add `data-api-url="http://localhost:5500"` to a placeholder to
