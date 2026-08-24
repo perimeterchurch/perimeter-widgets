@@ -9,6 +9,7 @@ export { autoMount, disposeAutoMount } from './auto-mount';
 export { ensureGlobal, type PerimeterWidgetsGlobal } from './global';
 export { useAuth } from './hooks/use-auth';
 export { useApiClient } from './hooks/use-api-client';
+export { loadRecaptchaV3, getRecaptchaToken, type RecaptchaEnterprise } from './recaptcha';
 
 /** @internal Test helpers. */
 export { clearAll } from './registry';
