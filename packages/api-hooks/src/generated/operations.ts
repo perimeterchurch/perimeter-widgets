@@ -1098,6 +1098,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/prayer-wall/requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List staff-approved, publicly shared prayer requests from the last 60 days */
+    get: operations['listPrayerRequests'];
+    put?: never;
+    /** Submit a prayer or praise request (pending staff approval before it appears) */
+    post: operations['submitPrayerRequest'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/prayer-wall/requests/{id}/prayer': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Record that someone prayed for a request ("I Prayed") */
+    post: operations['recordPrayerForRequest'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/prayer-wall/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the signed-in caller's name for the prayer-wall form's "Me" field */
+    get: operations['getPrayerWallIdentity'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/invoices/{guid}': {
     parameters: {
       query?: never;
@@ -5892,6 +5944,208 @@ export interface operations {
         };
       };
       400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  listPrayerRequests: {
+    parameters: {
+      query?: {
+        page?: number;
+        perPage?: number;
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              requests: {
+                /** @description Feedback_Entries.Feedback_Entry_ID. */
+                id: number;
+                /** @description The submitter's nickname or first name — never a full name — or 'Anonymous' when the request was shared anonymously. */
+                submittedBy: string;
+                /** @description Feedback_Entries.Date_Submitted, ISO 8601, America/New_York. */
+                submittedAt: string;
+                /** @description Feedback_Entries.Description. */
+                request: string;
+                /** @description Feedback_Entries.Prayer_Count — how many times someone has pressed "I Prayed". */
+                prayerCount: number;
+              }[];
+              pagination: {
+                page: number;
+                perPage: number;
+                total: number;
+                totalPages: number;
+              };
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  submitPrayerRequest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          firstName?: string;
+          lastName?: string;
+          /** Format: email */
+          email?: string;
+          /** @description The request itself. Capped at 2000 characters to match Feedback_Entries.Description. */
+          request: string;
+          /** @enum {string} */
+          privacy: 'online' | 'staff' | 'anonymous';
+          /**
+           * @description Sets Feedback_Entries.Prayer_Notifications — "Email Me When Someone Prays".
+           * @default false
+           */
+          notifyMe: boolean;
+          recaptchaToken: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              /** @constant */
+              submitted: true;
+              /** @constant */
+              pendingApproval: true;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  recordPrayerForRequest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              id: number;
+              prayerCount: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getPrayerWallIdentity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              /** @description Nickname (or first name) plus last name. */
+              name: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
       500: components['responses']['InternalError'];
     };
   };

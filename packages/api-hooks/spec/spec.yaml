@@ -8304,6 +8304,356 @@ paths:
             enum:
               - 'true'
               - 'false'
+  /api/prayer-wall/requests:
+    get:
+      operationId: listPrayerRequests
+      summary: List staff-approved, publicly shared prayer requests from the last 60 days
+      tags:
+        - PrayerWall
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      requests:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: Feedback_Entries.Feedback_Entry_ID.
+                            submittedBy:
+                              type: string
+                              description:
+                                The submitter's nickname or first name — never a full name — or 'Anonymous' when the request was shared
+                                anonymously.
+                            submittedAt:
+                              type: string
+                              description: Feedback_Entries.Date_Submitted, ISO 8601, America/New_York.
+                            request:
+                              type: string
+                              description: Feedback_Entries.Description.
+                            prayerCount:
+                              type: integer
+                              minimum: 0
+                              maximum: 9007199254740991
+                              description: Feedback_Entries.Prayer_Count — how many times someone has pressed "I Prayed".
+                          required:
+                            - id
+                            - submittedBy
+                            - submittedAt
+                            - request
+                            - prayerCount
+                          additionalProperties: false
+                      pagination:
+                        type: object
+                        properties:
+                          page:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          perPage:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          total:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          totalPages:
+                            type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                        required:
+                          - page
+                          - perPage
+                          - total
+                          - totalPages
+                        additionalProperties: false
+                    required:
+                      - requests
+                      - pagination
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            default: 1
+            type: integer
+            minimum: 1
+            maximum: 9007199254740991
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            default: 8
+            type: integer
+            minimum: 1
+            maximum: 50
+        - name: days
+          in: query
+          required: false
+          schema:
+            default: 60
+            description: Size of the rolling window, in days back from today. Defaults to 60.
+            type: integer
+            minimum: 1
+            maximum: 365
+    post:
+      operationId: submitPrayerRequest
+      summary: Submit a prayer or praise request (pending staff approval before it appears)
+      tags:
+        - PrayerWall
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      submitted:
+                        type: boolean
+                        const: true
+                      pendingApproval:
+                        type: boolean
+                        const: true
+                    required:
+                      - submitted
+                      - pendingApproval
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                lastName:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                email:
+                  type: string
+                  maxLength: 254
+                  format: email
+                  pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+                request:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+                  description: The request itself. Capped at 2000 characters to match Feedback_Entries.Description.
+                privacy:
+                  type: string
+                  enum:
+                    - online
+                    - staff
+                    - anonymous
+                notifyMe:
+                  default: false
+                  description: Sets Feedback_Entries.Prayer_Notifications — "Email Me When Someone Prays".
+                  type: boolean
+                recaptchaToken:
+                  type: string
+                  minLength: 1
+              required:
+                - request
+                - privacy
+                - notifyMe
+                - recaptchaToken
+              additionalProperties: false
+  /api/prayer-wall/requests/{id}/prayer:
+    post:
+      operationId: recordPrayerForRequest
+      summary: Record that someone prayed for a request ("I Prayed")
+      tags:
+        - PrayerWall
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      prayerCount:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                    required:
+                      - id
+                      - prayerCount
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+  /api/prayer-wall/me:
+    get:
+      operationId: getPrayerWallIdentity
+      summary: Get the signed-in caller's name for the prayer-wall form's "Me" field
+      tags:
+        - PrayerWall
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Nickname (or first name) plus last name.
+                    required:
+                      - name
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
   /api/invoices/{guid}:
     get:
       operationId: getInvoice
