@@ -34,6 +34,10 @@
       "destination": "/my-shepherds/0.1.0/index.js"
     },
     {
+      "source": "/prayer-wall/latest.js",
+      "destination": "/prayer-wall/0.1.0/index.js"
+    },
+    {
       "source": "/sermons/latest.js",
       "destination": "/sermons/1.4.3/index.js"
     },
