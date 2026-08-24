@@ -67,6 +67,10 @@ The widget reads its config from `data-*` attributes on the placeholder div.
 - **reCAPTCHA** — invisible, score-based, minted on submit and verified
   server-side before any MP write. The badge is hidden and the required
   attribution is shown by the form. The vendor app had no bot check at all.
+- **Square corners** — the widget zeroes the three radius tokens
+  (`themeOverrides` in `src/widget.tsx`), because Perimeter's design language has
+  no corner radius. A host page's `data-theme-radius-*` still wins if an embed
+  ever needs one back.
 - **Names** — a first name and never a surname, whatever MP holds.
 - **Dates** — formatted in America/New_York ("Monday, August 17, 2026"), so a
   late-evening request doesn't read as the previous day for a visitor on the west
