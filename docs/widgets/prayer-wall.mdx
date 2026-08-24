@@ -1,0 +1,85 @@
+---
+description: Share a prayer or praise request, read what the church is praying over, and pray along.
+---
+
+# prayer-wall
+
+Two halves of one page: a collapsed bar that opens a request form, and the feed
+of requests the church is currently praying over. Each card carries the date, the
+submitter's first name (or `Anonymous`), the request itself, and an **I Prayed**
+button that becomes a running count once pressed.
+
+Built to replace the vendor app that has been running perimeter.org's
+`/prayer-wall/` page (`ministryplatform.perimeter.org/PrayerWidgetWebAPI`), whose
+source Perimeter never had. The design is a deliberate reproduction of that wall;
+data lives where it always has, in Ministry Platform's `Feedback_Entries`.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="prayer-wall"></div>
+```
+
+The wall works signed out. When the MP login widget is on the page and the
+visitor is signed in, the form collapses to a read-only **Me** field and their
+request is attached to their own contact — so pair it with the login widget on
+the prayer-wall page:
+
+```html
+<script src="https://ministryplatform.perimeter.org/widgets/dist/UserLogin.js"></script>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/types.ts` is the source of truth.
+
+| Attribute                 | Required | Default                            | Description                                                            |
+| ------------------------- | -------- | ---------------------------------- | ---------------------------------------------------------------------- |
+| `data-show-form`          | No       | `true`                             | Show the request form.                                                 |
+| `data-show-feed`          | No       | `true`                             | Show the feed. Set both and you get today's page; set one for a split.  |
+| `data-days`               | No       | `60`                               | How far back the feed reaches, in days (1–365).                         |
+| `data-per-page`           | No       | `8`                                | Requests per page (1–50).                                              |
+| `data-form-title`         | No       | `I have a Prayer or Praise Request` | Label on the bar that opens the form.                                  |
+| `data-feed-title`         | No       | `Recent Prayers & Praise`          | Heading above the feed.                                                |
+| `data-recaptcha-site-key` | No       | Perimeter's public site key         | Google reCAPTCHA site key (public). Override only for a different key.  |
+| `data-api-url`            | No       | `https://api.perimeter.org`         | Override the perimeter-api base URL (advanced / local dev).            |
+
+## Behavior
+
+- **What appears** — `GET /api/prayer-wall/requests` returns only requests that
+  staff have **approved** in MP _and_ whose submitter chose "Share Online",
+  inside the rolling window. A new request is therefore invisible until it is
+  approved, which the confirmation message says out loud.
+- **Submitting** — `POST /api/prayer-wall/requests`. Signed in, the submitter
+  comes from the MP token and the form asks only for the request; signed out it
+  asks for first name, last name and email, which the API matches to an existing
+  MP contact or uses to create one.
+- **Privacy** — the three choices the old wall offered: _Share Online_ (public,
+  under a first name), _Share Only Staff and Shepherding_ (never public), _Share
+  Anonymously_ (public as `Anonymous`).
+- **I Prayed** — `POST /api/prayer-wall/requests/{id}/prayer` increments the
+  count and returns the new total, which replaces the button. The pressed ids are
+  remembered in `localStorage`, so a reload shows the count rather than offering
+  the button again — the one behavior change from the wall this replaces, where
+  refreshing let the same person keep pushing a count up.
+- **reCAPTCHA** — invisible, score-based, minted on submit and verified
+  server-side before any MP write. The badge is hidden and the required
+  attribution is shown by the form. The vendor app had no bot check at all.
+- **Names** — a first name and never a surname, whatever MP holds.
+- **Dates** — formatted in America/New_York ("Monday, August 17, 2026"), so a
+  late-evening request doesn't read as the previous day for a visitor on the west
+  coast.
+
+## Testing it locally
+
+```bash
+pnpm --filter @perimeter/widget-prayer-wall build
+pnpm embed-lab   # → http://localhost:4400/pages/local-prayer-wall.html
+```
+
+That page embeds the local build on perimeter.org's real host type plus hostile
+global CSS aimed at what this widget is made of: a real `form`, radio buttons, a
+textarea, and `fieldset`/`legend`. Run `pnpm dev` in the sibling perimeter-api so
+the page's `data-api-url` has something to talk to.

@@ -23,7 +23,7 @@ vi.mock('@perimeter/api-hooks', () => ({
   useSubmitStaffContact: () => state.mutation,
 }));
 
-vi.mock('../src/lib/recaptcha', () => ({
+vi.mock('@perimeter/widget-runtime', () => ({
   getRecaptchaToken: recaptcha.getRecaptchaToken,
   loadRecaptchaV3: vi.fn().mockResolvedValue(undefined),
 }));
