@@ -4,8 +4,8 @@ import { Input } from '@perimeter/ui/input';
 import { Textarea } from '@perimeter/ui/textarea';
 import { Button } from '@perimeter/ui/button';
 import { Spinner } from '@perimeter/ui/spinner';
+import { getRecaptchaToken, loadRecaptchaV3 } from '@perimeter/widget-runtime';
 import { useSubmitStaffContact } from '@perimeter/api-hooks';
-import { getRecaptchaToken, loadRecaptchaV3 } from '../lib/recaptcha';
 
 /** reCAPTCHA v3 action name (echoed back in the server-side assessment). */
 const RECAPTCHA_ACTION = 'staff_contact';

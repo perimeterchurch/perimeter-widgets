@@ -81,5 +81,26 @@ export {
   type StaffDirectoryFacetOption,
 } from './staff-directory/use-staff-directory-facets';
 
+export {
+  usePrayerRequests,
+  PRAYER_REQUESTS_QUERY_KEY,
+  type UsePrayerRequestsParams,
+  type UsePrayerRequestsResponse,
+  type PrayerRequest,
+} from './prayer-wall/use-prayer-requests';
+
+export {
+  useSubmitPrayerRequest,
+  type SubmitPrayerRequestInput,
+  type SubmitPrayerRequestResponse,
+} from './prayer-wall/use-submit-prayer-request';
+
+export { useRecordPrayer, type RecordPrayerResponse } from './prayer-wall/use-record-prayer';
+
+export {
+  usePrayerWallIdentity,
+  type UsePrayerWallIdentityResponse,
+} from './prayer-wall/use-prayer-wall-identity';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';
