@@ -255,6 +255,23 @@ describe('trip detail content', () => {
     expect(screen.queryByRole('link', { name: 'Register to Join' })).not.toBeInTheDocument();
   });
 
+  it('keeps the fundraising goal off the detail, where it read as a price tag', async () => {
+    renderApp({ tripId: 958 });
+
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: 'Support Journey' })).toBeInTheDocument(),
+    );
+    // $2,400 is on the card; above the CTAs it looked like the cost of
+    // pressing "Register to Join". showCost still governs the card.
+    expect(screen.queryByText(/\$2,400/)).not.toBeInTheDocument();
+  });
+
+  it('still shows spots left when showSpots is on', async () => {
+    renderApp({ tripId: 958, showSpots: 'true' });
+
+    await waitFor(() => expect(screen.getByText('14 spots left')).toBeInTheDocument());
+  });
+
   it('shows the donation disclaimer, and hides it when blanked', async () => {
     const { unmount } = renderApp({ tripId: 958 });
     await waitFor(() => expect(screen.getByText('Donation Disclaimer')).toBeInTheDocument());

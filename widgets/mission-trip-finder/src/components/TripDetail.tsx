@@ -8,11 +8,11 @@ import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
 import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import type { MissionTripFinderConfig } from '../types';
-import { fillUrlTemplate, formatCost, formatTripDatesLong, spotsRemaining } from '../lib/format';
+import { fillUrlTemplate, formatTripDatesLong, spotsRemaining } from '../lib/format';
 import { TripHero } from './TripHero';
 import { TripFact, ICON } from './TripFact';
 import { TeamGrid } from './TeamGrid';
-import { ArrowLeftIcon, CheckIcon, LinkIcon, MoneyIcon, PersonIcon } from './icons';
+import { ArrowLeftIcon, CheckIcon, LinkIcon, PersonIcon } from './icons';
 
 interface TripDetailProps {
   id: number;
@@ -129,18 +129,14 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
                 />
               )}
 
-              {(config.showCost || config.showSpots) && (
+              {/* No cost line here: the fundraising goal is on the card, and
+                  above the CTAs it read as a price tag on the "Register to
+                  Join" button. `showCost` still governs the card. */}
+              {config.showSpots && spotsLeft !== null && !trip.registrationFull && (
                 <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
-                  {config.showCost && trip.cost !== null && (
-                    <TripFact icon={<MoneyIcon className={ICON} />}>
-                      {formatCost(trip.cost)} per participant
-                    </TripFact>
-                  )}
-                  {config.showSpots && spotsLeft !== null && !trip.registrationFull && (
-                    <TripFact icon={<PersonIcon className={ICON} />}>
-                      {spotsLeft === 1 ? '1 spot left' : `${spotsLeft} spots left`}
-                    </TripFact>
-                  )}
+                  <TripFact icon={<PersonIcon className={ICON} />}>
+                    {spotsLeft === 1 ? '1 spot left' : `${spotsLeft} spots left`}
+                  </TripFact>
                 </div>
               )}
 

@@ -57,7 +57,7 @@ defaults).
 | Attribute                | Type    | Default                                | Description                                                                       |
 | ------------------------ | ------- | -------------------------------------- | --------------------------------------------------------------------------------- |
 | `data-show-description`  | boolean | `true`                                 | Show the trip's description text on the card.                                     |
-| `data-show-cost`         | boolean | `true`                                 | Show the per-participant fundraising goal.                                        |
+| `data-show-cost`         | boolean | `true`                                 | Show the per-participant fundraising goal **on the card**. The detail never shows it. |
 | `data-show-spots`        | boolean | `false`                                | Show remaining spots (e.g. "3 spots left") on trips that have a cap.              |
 | `data-hide-full`         | boolean | `false`                                | Hide trips at capacity instead of badging them "Registration Full".               |
 | `data-include-past`      | boolean | `false`                                | Include closed trips (default shows open GO Journeys only).                       |
@@ -120,6 +120,16 @@ The detail adds two fields the list does not carry:
 Banner images are absolute URLs on the destination record (an external CDN), not
 served by perimeter-api. A trip whose destination has no banner falls back to
 `data-default-image-url`, then to a globe placeholder.
+
+### Square corners
+
+The widget zeroes the three radius tokens (`themeOverrides` in `src/widget.tsx`),
+because Perimeter's design language has no corner radius — the cards, hero and
+team photos are already rectangles. That flattens every `@perimeter/ui`
+component it renders (Button, Skeleton, the message boxes) from one place.
+Status badges are untouched: they use `rounded-4xl`, which is not one of those
+tokens, so a pill still reads as a pill. A host page's `data-theme-radius-*`
+still wins if an embed ever needs a radius back.
 
 > **Changed in 0.2.0:** `data-details-url-base` used to default to the
 > go-journey-details page, so every card linked out. It now defaults to unset,
