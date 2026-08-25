@@ -77,7 +77,7 @@ export function TripHero({
         </div>
       )}
 
-      <div className="relative flex flex-col items-center gap-2 text-center text-white">
+      <div className="relative flex w-full max-w-3xl flex-col items-center gap-2 text-center text-white">
         <h2 className="font-serif text-4xl leading-[1.05] font-normal text-balance @md:text-6xl @xl:text-7xl">
           {name}
         </h2>
