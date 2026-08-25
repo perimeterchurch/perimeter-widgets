@@ -3,6 +3,7 @@ import {
   fillUrlTemplate,
   formatCost,
   formatTripDates,
+  formatTripDatesLong,
   participantPhotoUrl,
   spotsRemaining,
 } from '../src/lib/format';
@@ -116,5 +117,30 @@ describe('participantPhotoUrl', () => {
     expect(participantPhotoUrl(958, 99928, 'https://api.example.org/')).toBe(
       'https://api.example.org/api/mission-trips/958/participant/99928/image',
     );
+  });
+});
+
+describe('formatTripDatesLong', () => {
+  it('prints the year on both ends, unlike the compact card format', () => {
+    // The legacy detail page formatted each date `MMMM dd, yyyy` on its own, so
+    // the hero repeats the year where the card collapses it.
+    expect(formatTripDatesLong('2026-07-25T00:00:00', '2026-07-30T00:00:00')).toBe(
+      'July 25, 2026 \u2013 July 30, 2026',
+    );
+    expect(formatTripDates('2026-07-25T00:00:00', '2026-07-30T00:00:00')).toBe(
+      'July 25 \u2013 July 30, 2026',
+    );
+  });
+
+  it('collapses a single-day trip to one date', () => {
+    expect(formatTripDatesLong('2026-07-25T00:00:00', '2026-07-25T09:00:00')).toBe('July 25, 2026');
+  });
+
+  it('collapses when the trip has no end date', () => {
+    expect(formatTripDatesLong('2026-07-25T00:00:00', null)).toBe('July 25, 2026');
+  });
+
+  it('returns null for an unscheduled trip', () => {
+    expect(formatTripDatesLong(null, '2026-07-30T00:00:00')).toBeNull();
   });
 });

@@ -51,17 +51,23 @@ export function TripGrid({
   const allTrips = query.data?.data.trips ?? [];
   const trips = config.maxTrips ? allTrips.slice(0, config.maxTrips) : allTrips;
 
-  if (query.isLoading) return <LoadingState />;
-  if (query.isError) {
-    return <MessageState>Unable to load mission trips. Please try again later.</MessageState>;
-  }
-  if (trips.length === 0) return <MessageState>{config.emptyMessage}</MessageState>;
-
+  // The browse view owns its padding: the detail's hero is full-bleed, so the
+  // shared container above cannot carry it.
   return (
-    <ul className={GRID}>
-      {trips.map((trip) => (
-        <TripCard key={trip.id} trip={trip} config={config} onOpen={onOpenTrip} />
-      ))}
-    </ul>
+    <div className="p-4">
+      {query.isLoading ? (
+        <LoadingState />
+      ) : query.isError ? (
+        <MessageState>Unable to load mission trips. Please try again later.</MessageState>
+      ) : trips.length === 0 ? (
+        <MessageState>{config.emptyMessage}</MessageState>
+      ) : (
+        <ul className={GRID}>
+          {trips.map((trip) => (
+            <TripCard key={trip.id} trip={trip} config={config} onOpen={onOpenTrip} />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
