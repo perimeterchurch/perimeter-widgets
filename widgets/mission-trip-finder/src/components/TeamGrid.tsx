@@ -1,41 +1,57 @@
 import * as React from 'react';
 import type { MissionTripParticipant } from '@perimeter/api-hooks';
-import { cn } from '@perimeter/ui/utils/cn';
 import type { MissionTripFinderConfig } from '../types';
 import { fillUrlTemplate, participantPhotoUrl } from '../lib/format';
 import { PersonIcon } from './icons';
 
 /**
- * One team member's avatar. The photo endpoint 404s for anyone with no photo on
- * file — which is most people — so a failed load is the expected path, not an
- * error, and it falls back to a person glyph.
+ * Square portrait with the name across the bottom. The photo sits under a dark
+ * scrim that lifts on hover — the legacy page's treatment, and it does real
+ * work: it holds the white name legible over portraits shot on every
+ * conceivable background.
  *
- * Deliberately NOT opacity-faded on load, unlike TripBanner: a roster renders
- * every avatar at once, and per-element opacity transitions on a large grid are
- * the exact shape that strands elements at `opacity: 0`. The container fades;
- * the avatars do not.
+ * The scrim is a sibling overlay rather than a filter/opacity on the <img>
+ * itself. Fading ~20 images each on their own opacity transition is the shape
+ * that strands them invisible; animating a solid overlay's opacity is cheap and
+ * leaves the photo's own compositing alone.
  */
-function Avatar({ src, alt }: { src: string; alt: string }): React.JSX.Element {
+function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Element {
   const [failed, setFailed] = React.useState(false);
 
   return (
-    <div className="aspect-square w-full overflow-hidden rounded-full bg-muted">
+    <div className="group relative aspect-square w-full overflow-hidden bg-neutral-800">
       {failed ? (
-        <div className="flex h-full w-full items-center justify-center text-muted-fg">
-          <PersonIcon className="h-1/2 w-1/2 opacity-40" />
+        <div className="flex h-full w-full items-center justify-center text-white/30">
+          <PersonIcon className="h-1/2 w-1/2" />
         </div>
       ) : (
         <img
           src={src}
-          alt={alt}
+          alt={name}
           loading="lazy"
           className="block h-full w-full object-cover"
           onError={() => setFailed(true)}
         />
       )}
+
+      <div
+        className="absolute inset-0 bg-black/45 transition-colors duration-300 group-hover:bg-black/0"
+        aria-hidden="true"
+      />
+
+      <span className="absolute inset-x-0 bottom-0 px-2 pb-5 text-center font-sans text-sm leading-snug text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+        {name}
+      </span>
     </div>
   );
 }
+
+/**
+ * Sized-and-wrapped rather than a strict grid: a final row with one or two
+ * people centres under the row above it instead of hanging off the left edge,
+ * which is what a `grid-cols-*` track would do.
+ */
+const CARD = 'w-[calc(50%-0.3125rem)] @sm:w-[150px] @xl:w-[190px]';
 
 export function TeamGrid({
   tripId,
@@ -50,23 +66,20 @@ export function TeamGrid({
 
   return (
     <section>
-      <h3 className="mb-4 font-sans text-xl font-bold">Meet the Team</h3>
-      <ul className="grid grid-cols-3 gap-4 @md:grid-cols-4 @2xl:grid-cols-6">
+      <h3 className="mb-6 text-center font-serif text-4xl leading-tight font-normal text-balance @2xl:text-5xl">
+        Meet the Team
+      </h3>
+      <ul className="flex flex-wrap justify-center gap-2.5">
         {participants.map((person) => {
-          const avatar = (
-            <>
-              <Avatar
-                src={participantPhotoUrl(tripId, person.pledgeId, config.apiUrl)}
-                alt={person.name}
-              />
-              <span className="mt-2 block text-center font-sans text-sm leading-snug">
-                {person.name}
-              </span>
-            </>
+          const photo = (
+            <TeamPhoto
+              src={participantPhotoUrl(tripId, person.pledgeId, config.apiUrl)}
+              name={person.name}
+            />
           );
 
           return (
-            <li key={person.pledgeId}>
+            <li key={person.pledgeId} className={CARD}>
               {/* The legacy template wrapped these in href="insert link" — a
                   placeholder that was never wired up. Unset by default, so a
                   team card is plain content unless the embed points it
@@ -77,15 +90,12 @@ export function TeamGrid({
                     id: tripId,
                     pledgeId: person.pledgeId,
                   })}
-                  className={cn(
-                    'block text-fg no-underline',
-                    'hover:[&_span]:underline focus-visible:[&_span]:underline',
-                  )}
+                  className="block no-underline"
                 >
-                  {avatar}
+                  {photo}
                 </a>
               ) : (
-                avatar
+                photo
               )}
             </li>
           );

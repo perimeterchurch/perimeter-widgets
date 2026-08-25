@@ -30,7 +30,7 @@ function MissionTripWidget({ config }: AppProps): React.JSX.Element {
   const viewKey = nav.screen === 'detail' && nav.id ? `detail-${nav.id}` : 'browse';
 
   return (
-    <div className="@container p-4 text-left">
+    <div className="@container text-left">
       {/* One fade for the whole screen. Individual cards and avatars are
           deliberately not animated: a roster or a long grid animating each
           element is the shape that strands items at opacity 0 on a real host
