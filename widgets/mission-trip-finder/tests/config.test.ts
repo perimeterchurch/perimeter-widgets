@@ -10,6 +10,7 @@ describe('MissionTripFinderConfigSchema', () => {
       hideFull: false,
       includePast: false,
       showTeam: true,
+      fullBleedHero: true,
     });
   });
 

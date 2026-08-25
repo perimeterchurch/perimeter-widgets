@@ -65,6 +65,7 @@ defaults).
 | `data-keyword`           | string  | —                                      | Search trip names, destinations, and descriptions.                                |
 | `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
 | `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
+| `data-full-bleed-hero`   | boolean | `true`                                 | Stretch the detail's cover photo to the full page width. See below.               |
 | `data-show-team`         | boolean | `true`                                 | Show the "Meet the Team" roster on the detail view.                               |
 | `data-register-url`      | string  | mission-trip-application page          | "Register to Join" destination. `{id}` is replaced with the trip ID.              |
 | `data-support-url`       | string  | onlinegiving.org form 1385             | "Support Journey" destination. `{id}` is replaced with the trip ID.               |
@@ -120,6 +121,23 @@ The detail adds two fields the list does not carry:
 Banner images are absolute URLs on the destination record (an external CDN), not
 served by perimeter-api. A trip whose destination has no banner falls back to
 `data-default-image-url`, then to a globe placeholder.
+
+### The full-bleed hero
+
+The detail's cover photo escapes the host page's content container and spans
+the whole page, the way the legacy details page did. It is **measured** rather
+than sized with `width: 100vw`: `100vw` includes the vertical scrollbar, which
+is ~15px of horizontal overflow on any page that does not set
+`overflow-x: hidden`, and the usual `calc(50% - 50vw)` idiom assumes the embed
+is horizontally centred in the viewport.
+
+Two things to know:
+
+- An ancestor with `overflow: hidden` or a `transform` clips the breakout. The
+  hero then renders at its container width — the pre-breakout look, not a
+  broken one.
+- Set `data-full-bleed-hero="false"` for an embed in a sidebar or a narrow
+  column, where a page-wide hero would overwhelm the rest of the page.
 
 ### Square corners
 

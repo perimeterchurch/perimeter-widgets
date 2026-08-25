@@ -291,3 +291,36 @@ describe('trip detail content', () => {
     await waitFor(() => expect(screen.getByText('Trip not found')).toBeInTheDocument());
   });
 });
+
+describe('full-bleed hero', () => {
+  it('stretches the hero to the page width, escaping the host container', async () => {
+    // jsdom reports 0 for every rect, so this asserts the mechanism — that the
+    // hero is sized off the page rather than left at its container width —
+    // rather than the pixel result. The measured widths are checked in the
+    // embed lab against a real host container.
+    renderApp({ tripId: 958 });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    const hero = screen
+      .getByRole('heading', { name: /Mana De Vida/ })
+      .closest('div')?.parentElement;
+    expect(hero?.style.width).toMatch(/px$/);
+    expect(hero?.style.marginLeft).toMatch(/px$/);
+    expect(hero?.style.marginRight).toMatch(/px$/);
+  });
+
+  it('leaves the hero in its container when fullBleedHero is off', async () => {
+    renderApp({ tripId: 958, fullBleedHero: '' });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    const hero = screen
+      .getByRole('heading', { name: /Mana De Vida/ })
+      .closest('div')?.parentElement;
+    expect(hero?.style.width).toBe('');
+    expect(hero?.style.marginLeft).toBe('');
+  });
+});

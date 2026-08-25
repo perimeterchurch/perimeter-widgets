@@ -9,6 +9,7 @@ import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
 import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import type { MissionTripFinderConfig } from '../types';
 import { fillUrlTemplate, formatTripDatesLong, spotsRemaining } from '../lib/format';
+import { FullBleed } from './FullBleed';
 import { TripHero } from './TripHero';
 import { TripFact, ICON } from './TripFact';
 import { TeamGrid } from './TeamGrid';
@@ -91,7 +92,11 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
         isLoading={isLoading}
         skeleton={
           <div>
-            <Skeleton className="h-[340px] w-full rounded-none @md:h-[440px] @xl:h-[520px]" />
+            {/* Full-bleed too, so the hero does not jump from container width
+                to page width the moment the trip arrives. */}
+            <FullBleed enabled={config.fullBleedHero}>
+              <Skeleton className="h-[340px] w-full rounded-none @md:h-[440px] @xl:h-[520px]" />
+            </FullBleed>
             <div className={`${COLUMN} space-y-4 py-12`}>
               <Skeleton className="h-5 w-full" />
               <Skeleton className="h-5 w-11/12" />
@@ -108,6 +113,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
               name={trip.name}
               destination={trip.destination}
               dates={formatTripDatesLong(trip.startDate, trip.endDate)}
+              fullBleed={config.fullBleedHero}
             />
 
             <div className={`${COLUMN} space-y-10 py-12`}>
