@@ -131,13 +131,17 @@ is ~15px of horizontal overflow on any page that does not set
 `overflow-x: hidden`, and the usual `calc(50% - 50vw)` idiom assumes the embed
 is horizontally centred in the viewport.
 
-Two things to know:
+The breakout stops at the nearest ancestor that clips — anything whose
+`overflow` is not `visible`, or which establishes a containing block with a
+`transform`. Such an ancestor would clip the hero anyway, so bounding to it
+means the hero fills exactly the space it can occupy and its centred title
+stays centred on what the reader actually sees.
 
-- An ancestor with `overflow: hidden` or a `transform` clips the breakout. The
-  hero then renders at its container width — the pre-breakout look, not a
-  broken one.
-- Set `data-full-bleed-hero="false"` for an embed in a sidebar or a narrow
-  column, where a page-wide hero would overwhelm the rest of the page.
+The hero's text sits in the same 768px measure as the body column, so a long
+trip name wraps instead of running the full width of a wide page.
+
+Set `data-full-bleed-hero="false"` for an embed in a sidebar or a narrow
+column, where a page-wide hero would overwhelm the rest of the page.
 
 ### Square corners
 

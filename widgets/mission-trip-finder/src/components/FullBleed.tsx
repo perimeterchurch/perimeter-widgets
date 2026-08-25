@@ -19,9 +19,13 @@ import * as React from 'react';
  * still measures the host's width, and the breakout adds nothing to any
  * ancestor's scroll width.
  *
- * Not fixable from here: an ancestor with `overflow: hidden` or a `transform`
- * clips the breakout. The element degrades to its container width, which is
- * the pre-breakout rendering rather than anything broken.
+ * The breakout stops at the nearest ancestor that clips — anything whose
+ * `overflow` is not `visible`, or which establishes a containing block with a
+ * `transform`. Such an ancestor would clip the element anyway; bounding to it
+ * means the hero fills exactly the space it can actually occupy, so its
+ * centred content is centred on what the reader sees. Without that bound the
+ * element is sized to the whole document, and the clipped-off remainder pulls
+ * its contents off-centre — which is what the studio's preview panel showed.
  */
 export function FullBleed({
   enabled,
@@ -54,10 +58,10 @@ export function FullBleed({
 
     const apply = () => {
       const rect = anchor.getBoundingClientRect();
-      const pageWidth = document.documentElement.clientWidth;
-      const left = `${-rect.left}px`;
-      const right = `${-(pageWidth - rect.right)}px`;
-      const width = `${pageWidth}px`;
+      const bounds = bleedBounds(anchor);
+      const left = `${-(rect.left - bounds.left)}px`;
+      const right = `${-(bounds.left + bounds.width - rect.right)}px`;
+      const width = `${bounds.width}px`;
       // Written only on change: the ResizeObserver below watches an ancestor,
       // and an unconditional write risks a resize -> write -> resize loop.
       if (el.style.width !== width) el.style.width = width;
@@ -85,4 +89,45 @@ export function FullBleed({
       {children}
     </div>
   );
+}
+
+interface Bounds {
+  left: number;
+  width: number;
+}
+
+/**
+ * How far the breakout may actually spread: the content box of the nearest
+ * ancestor that clips, or the document when nothing does.
+ *
+ * The walk crosses shadow boundaries, because the widget's own host sits inside
+ * the page's DOM and the clipping ancestor is usually out there. `clientWidth`
+ * and `clientLeft` are used rather than the bounding rect so a scrollbar or a
+ * border on the clipping ancestor is excluded, the same reason the document
+ * branch uses `documentElement.clientWidth` over `100vw`.
+ */
+function bleedBounds(from: Element): Bounds {
+  let node = parentOf(from);
+
+  while (node) {
+    const style = getComputedStyle(node);
+    const clips =
+      style.overflowX !== 'visible' || style.overflowY !== 'visible' || style.transform !== 'none';
+
+    if (clips) {
+      const rect = node.getBoundingClientRect();
+      return { left: rect.left + node.clientLeft, width: node.clientWidth };
+    }
+    node = parentOf(node);
+  }
+
+  const doc = document.documentElement;
+  return { left: doc.getBoundingClientRect().left, width: doc.clientWidth };
+}
+
+/** The next element up, stepping out of a shadow root onto its host. */
+function parentOf(node: Element): Element | null {
+  if (node.parentElement) return node.parentElement;
+  const root = node.getRootNode();
+  return root instanceof ShadowRoot ? root.host : null;
 }
