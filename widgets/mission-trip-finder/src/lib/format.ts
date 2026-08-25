@@ -77,3 +77,52 @@ export function spotsRemaining(
   if (maximumRegistrants === null) return null;
   return Math.max(0, maximumRegistrants - registrantCount);
 }
+
+const PRODUCTION_BASE_URL = 'https://api.perimeter.org';
+const DEV_BASE_URL = '';
+
+/**
+ * Resolves the perimeter-api base URL. Priority:
+ * 1. Explicit `baseUrl` argument (the `apiUrl` widget config)
+ * 2. `VITE_API_URL` environment variable (studio dev → localhost:5500)
+ * 3. `''` (same-origin) in dev, `api.perimeter.org` in production
+ *
+ * Mirrors the resolver in the community-group-finder/event-finder/sermons
+ * widgets so image `<img>` tags resolve against the API origin rather than the
+ * host page's origin.
+ */
+function resolveApiBaseUrl(baseUrl?: string): string {
+  // A trailing slash is trimmed so `data-api-url="https://api.perimeter.org/"`
+  // does not produce a doubled slash in the path.
+  if (baseUrl) return baseUrl.replace(/\/$/, '');
+
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    if (import.meta.env.DEV) return DEV_BASE_URL;
+  }
+
+  return PRODUCTION_BASE_URL;
+}
+
+/**
+ * A team member's profile photo URL. The endpoint 404s both for a participant
+ * with no photo on file (the common case) and for a pledge that is not on the
+ * trip, so callers must treat a failed load as "use the default avatar".
+ */
+export function participantPhotoUrl(tripId: number, pledgeId: number, apiBaseUrl?: string): string {
+  return `${resolveApiBaseUrl(apiBaseUrl)}/api/mission-trips/${tripId}/participant/${pledgeId}/image`;
+}
+
+/**
+ * Fill a configured URL template. `{id}` is the trip, `{pledgeId}` the
+ * participant. Templates rather than base URLs because the legacy giving form
+ * needs its `#!/` fragment after the campaign ID, which appending cannot do.
+ */
+export function fillUrlTemplate(
+  template: string,
+  values: { id: number; pledgeId?: number },
+): string {
+  return template
+    .replace(/\{id\}/g, String(values.id))
+    .replace(/\{pledgeId\}/g, values.pledgeId === undefined ? '' : String(values.pledgeId));
+}

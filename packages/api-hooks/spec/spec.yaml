@@ -7119,6 +7119,207 @@ paths:
             enum:
               - asc
               - desc
+  /api/mission-trips/{id}:
+    get:
+      operationId: getMissionTrip
+      summary: Get one GO Journey mission trip with its team roster
+      tags:
+        - Missions
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                        description: Pledge_Campaigns.Pledge_Campaign_ID.
+                      name:
+                        type: string
+                        description: Public trip name (Pledge_Campaigns.Nickname, falling back to Campaign_Name).
+                      destination:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description: Journey_Destinations.Destination_Name, or null.
+                      destinationId:
+                        anyOf:
+                          - type: integer
+                            exclusiveMinimum: 0
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      description:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      bannerUrl:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description: Journey_Destinations.Website_Banner, or null.
+                      startDate:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description: Trip start (Trip_Start_Date), ISO 8601, or null when unset.
+                      endDate:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description: Trip end (Trip_End_Date), ISO 8601, or null when unset.
+                      registrationEndDate:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description: Campaign close (End_Date), ISO 8601, or null.
+                      cost:
+                        anyOf:
+                          - type: number
+                          - type: 'null'
+                        description: Per-participant fundraising target (Fundraising_Goal), or null.
+                      registrantCount:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                        description: Active or completed pledges on the campaign (Pledge_Status_ID <= 2).
+                      maximumRegistrants:
+                        anyOf:
+                          - type: integer
+                            minimum: -9007199254740991
+                            maximum: 9007199254740991
+                          - type: 'null'
+                      registrationFull:
+                        type: boolean
+                        description: True when the campaign has a cap and registrantCount has reached it.
+                      invitationOnly:
+                        type: boolean
+                      longDescription:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description:
+                          "Pledge_Campaigns.Long_Description — the long-form trip write-up. Staff-authored HTML from the MP editor
+                          (`<p>`, `<b>`, `<em>`), NOT plain text: render it sanitized. The list endpoint's `description`
+                          is the plain-text teaser."
+                      participants:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            pledgeId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: Pledges.Pledge_ID — the participant's seat on this trip.
+                            name:
+                              type: string
+                              description:
+                                'Display name: Pledges.Beneficiary when set (it carries couples, e.g. "Sue and Brett Swanson"), otherwise
+                                the donor contact''s nickname + last name.'
+                          required:
+                            - pledgeId
+                            - name
+                          additionalProperties: false
+                        description:
+                          The trip team, sorted by last name. Same seat-holding pledge statuses that `registrantCount` counts, so the
+                          two always agree.
+                    required:
+                      - id
+                      - name
+                      - destination
+                      - destinationId
+                      - description
+                      - bannerUrl
+                      - startDate
+                      - endDate
+                      - registrationEndDate
+                      - cost
+                      - registrantCount
+                      - maximumRegistrants
+                      - registrationFull
+                      - invitationOnly
+                      - longDescription
+                      - participants
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+  /api/mission-trips/{id}/participant/{pledgeId}/image:
+    get:
+      operationId: getMissionTripParticipantPhoto
+      summary: Get a trip participant's profile photo
+      tags:
+        - Missions
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Binary image data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: pledgeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
   /api/community-groups:
     get:
       operationId: listCommunityGroups
@@ -15758,6 +15959,13 @@ paths:
                           type: integer
                           exclusiveMinimum: 0
                           maximum: 9007199254740991
+                      managedCompilationIds:
+                        default: []
+                        type: array
+                        items:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
                     required:
                       - role
                       - isAdmin
@@ -15774,6 +15982,7 @@ paths:
                       - isPersonnel
                       - ministryMemberIds
                       - ministryLedIds
+                      - managedCompilationIds
                     additionalProperties: false
                   meta:
                     type: object

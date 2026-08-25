@@ -1,16 +1,20 @@
 ---
-description: Browse open Perimeter GO Journey mission trips.
+description: Browse open Perimeter GO Journey mission trips, with a detail view for each trip.
 ---
 
 # mission-trip-finder
 
-A responsive card grid of open **GO Journey** mission trips. Each card shows the
-destination banner, trip name, destination, travel dates, the per-participant
-fundraising goal, and an optional description, and links to that trip's
-go-journey-details page. Trips at capacity and invitation-only trips are badged.
-Rebuild of the legacy `reactwidgets` MissionTripFinder (which called the
-`api_custom_Mission_Trip_Finder_Widget` stored proc) on the perimeter-api
-backend.
+A responsive card grid of open **GO Journey** mission trips, plus a detail view
+for each one. Cards show the destination banner, trip name, destination, travel
+dates, the per-participant fundraising goal, and an optional description; trips
+at capacity and invitation-only trips are badged.
+
+Clicking a card opens that trip's detail **in place** — the long-form trip
+write-up, the two calls to action, the team roster, and the donation
+disclaimer — without leaving the page. Rebuild of the legacy `reactwidgets`
+MissionTripFinder and the legacy `MissionTripDetails` HTML widget
+(`api_custom_Mission_Trip_Finder_Widget` and
+`api_custom_Mission_Trip_Detail_Widget`) on the perimeter-api backend.
 
 Trips are sorted by travel date and, by default, limited to campaigns that are
 still open and marked for the website in Ministry Platform.
@@ -22,44 +26,104 @@ still open and marked for the website in Ministry Platform.
 <div data-perimeter-widget="mission-trip-finder"></div>
 ```
 
+### As a details page
+
+`data-trip-id` pins the widget to one trip: it renders that trip's detail alone,
+with no grid behind it and no Back button. This is what a dedicated
+go-journey-details page embeds, so the same bundle serves both surfaces and
+existing `?id=` links keep working.
+
+```html
+<div data-perimeter-widget="mission-trip-finder" data-trip-id="958"></div>
+```
+
+## Navigation and deep links
+
+The open trip lives in the URL as `?trip-screen=detail&trip-id=<id>`, so a trip
+is a shareable link and the browser back button steps out of the detail. The
+detail view carries a **Copy link** button for exactly that. Keys are prefixed
+`trip-` so two embeds on one page never collide.
+
+A `data-trip-id` embed never writes to the URL — the host page owns it.
+
 ## Config
 
 The widget reads its config from `data-*` attributes on the placeholder div.
 `src/types.ts` holds the zod schema (the source of truth for options and
 defaults).
 
-| Attribute                | Type    | Default                                    | Description                                                            |
-| ------------------------ | ------- | ------------------------------------------ | ------------------------------------------------------------------------ |
-| `data-show-description`  | boolean | `true`                                     | Show the trip's description text on the card.                          |
-| `data-show-cost`         | boolean | `true`                                     | Show the per-participant fundraising goal.                             |
-| `data-show-spots`        | boolean | `false`                                    | Show remaining spots (e.g. "3 spots left") on trips that have a cap.   |
-| `data-hide-full`         | boolean | `false`                                    | Hide trips at capacity instead of badging them "Registration Full".    |
-| `data-include-past`      | boolean | `false`                                    | Include closed trips (default shows open GO Journeys only).            |
-| `data-destination-id`    | number  | —                                          | Filter to one destination (MP Journey Destination ID).                 |
-| `data-keyword`           | string  | —                                          | Search trip names, destinations, and descriptions.                     |
-| `data-max-trips`         | number  | —                                          | Cap the total number of trips shown.                                   |
-| `data-details-url-base`  | string  | perimeter.org go-journey-details           | Base URL each card links to; the trip ID is appended.                  |
-| `data-empty-message`     | string  | `No mission trips are open right now.`     | Message shown when the list has no trips.                              |
-| `data-default-image-url` | string  | —                                          | Fallback banner for trips whose destination has no artwork.            |
-| `data-api-url`           | string  | —                                          | Override the perimeter-api base URL (advanced).                        |
+| Attribute                | Type    | Default                                | Description                                                                       |
+| ------------------------ | ------- | -------------------------------------- | --------------------------------------------------------------------------------- |
+| `data-show-description`  | boolean | `true`                                 | Show the trip's description text on the card.                                     |
+| `data-show-cost`         | boolean | `true`                                 | Show the per-participant fundraising goal.                                        |
+| `data-show-spots`        | boolean | `false`                                | Show remaining spots (e.g. "3 spots left") on trips that have a cap.              |
+| `data-hide-full`         | boolean | `false`                                | Hide trips at capacity instead of badging them "Registration Full".               |
+| `data-include-past`      | boolean | `false`                                | Include closed trips (default shows open GO Journeys only).                       |
+| `data-destination-id`    | number  | —                                      | Filter to one destination (MP Journey Destination ID).                            |
+| `data-keyword`           | string  | —                                      | Search trip names, destinations, and descriptions.                                |
+| `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
+| `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
+| `data-show-team`         | boolean | `true`                                 | Show the "Meet the Team" roster on the detail view.                               |
+| `data-register-url`      | string  | mission-trip-application page          | "Register to Join" destination. `{id}` is replaced with the trip ID.              |
+| `data-support-url`       | string  | onlinegiving.org form 1385             | "Support Journey" destination. `{id}` is replaced with the trip ID.               |
+| `data-participant-url`   | string  | —                                      | Link each team member somewhere. `{pledgeId}` and `{id}` are replaced.            |
+| `data-disclaimer-text`   | string  | the standard donation disclaimer       | Text at the foot of the detail view. Empty string hides the block.                |
+| `data-details-url-base`  | string  | —                                      | Link cards OUT to this URL instead of opening the detail in place. See below.     |
+| `data-empty-message`     | string  | `No mission trips are open right now.` | Message shown when the list has no trips.                                         |
+| `data-default-image-url` | string  | —                                      | Fallback banner for trips whose destination has no artwork.                       |
+| `data-api-url`           | string  | —                                      | Override the perimeter-api base URL (advanced).                                   |
 
 Beyond these filters, the endpoint always restricts to GO Journey pledge
 campaigns (`Pledge_Campaign_Type_ID = 2`) that are marked `Display_On_Website`
 and — unless `data-include-past` is set — have not closed.
 
+### The CTA options are templates, not base URLs
+
+`data-register-url`, `data-support-url` and `data-participant-url` substitute
+`{id}` / `{pledgeId}` anywhere in the string rather than appending to the end.
+The giving form needs its `#!/` fragment **after** the campaign ID, which
+appending cannot express:
+
+```
+https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id={id}#!/
+```
+
+"Register to Join" is dropped automatically on trips that are full or
+invitation-only — registering for either is a dead end. "Support Journey" stays.
+
+`data-participant-url` is unset by default, and team cards are then plain
+content rather than links. The legacy template wrapped them in a placeholder
+`href="insert link"` that was never wired up to anything.
+
 ## Data source
 
-`GET /api/mission-trips` (perimeter-api). Each trip is an MP `Pledge_Campaigns`
-row of type 2, joined to `Journey_Destinations` for the destination name and
-banner image. The "registration full" state comes from a roll-up of the
-campaign's `Pledges` against `Maximum_Registrants` — MP has no registrant-count
-column, so the API counts pledges in a seat-holding status (Active or
-Completed). See `docs/domains/missions.md` in perimeter-api.
+`GET /api/mission-trips` for the list and `GET /api/mission-trips/{id}` for the
+detail (perimeter-api). Each trip is an MP `Pledge_Campaigns` row of type 2,
+joined to `Journey_Destinations` for the destination name and banner image. The
+"registration full" state comes from a roll-up of the campaign's `Pledges`
+against `Maximum_Registrants` — MP has no registrant-count column, so the API
+counts pledges in a seat-holding status (Active or Completed). See
+`docs/domains/missions.md` in perimeter-api.
+
+The detail adds two fields the list does not carry:
+
+- **`longDescription`** — `Pledge_Campaigns.Long_Description`, authored in MP's
+  rich-text editor. It is **HTML**, unlike the plain-text `description` on the
+  card, and is sanitized with DOMPurify before rendering.
+- **`participants`** — the team, from the campaign's seat-holding pledges. Each
+  is a display name and a `pledgeId`; photos come from
+  `GET /api/mission-trips/{id}/participant/{pledgeId}/image`, which 404s for the
+  many people with no photo on file, so an avatar falls back to a person glyph.
 
 Banner images are absolute URLs on the destination record (an external CDN), not
 served by perimeter-api. A trip whose destination has no banner falls back to
 `data-default-image-url`, then to a globe placeholder.
 
-> **Not ported:** the legacy widget hard-coded the go-journey-details link and
-> always showed every open trip. Both are now configurable
-> (`data-details-url-base`, `data-hide-full`, `data-max-trips`).
+> **Changed in 0.2.0:** `data-details-url-base` used to default to the
+> go-journey-details page, so every card linked out. It now defaults to unset,
+> and a card opens the widget's own detail view instead. Set it to restore the
+> hand-off to a separate page.
+
+> **Not ported:** the legacy detail page embedded a Google Map of the
+> destination, keyed with an API key committed to a public repo. The map is
+> dropped rather than re-keyed — the destination name is already on the page.

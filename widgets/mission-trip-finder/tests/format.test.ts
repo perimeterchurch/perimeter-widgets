@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { formatCost, formatTripDates, spotsRemaining } from '../src/lib/format';
+import {
+  fillUrlTemplate,
+  formatCost,
+  formatTripDates,
+  participantPhotoUrl,
+  spotsRemaining,
+} from '../src/lib/format';
 
 describe('formatTripDates', () => {
   it('prints the year once when both ends share it', () => {
@@ -62,5 +68,53 @@ describe('spotsRemaining', () => {
 
   it('floors at zero when a trip is over its cap', () => {
     expect(spotsRemaining(28, 27)).toBe(0);
+  });
+});
+
+describe('fillUrlTemplate', () => {
+  it('substitutes the trip ID', () => {
+    expect(fillUrlTemplate('https://example.org/apply?pledgecampaignid={id}', { id: 948 })).toBe(
+      'https://example.org/apply?pledgecampaignid=948',
+    );
+  });
+
+  it('keeps anything after the placeholder', () => {
+    // The whole reason these are templates: the giving form needs its `#!/`
+    // fragment AFTER the campaign ID, which appending to a base URL cannot do.
+    expect(
+      fillUrlTemplate(
+        'https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id={id}#!/',
+        {
+          id: 948,
+        },
+      ),
+    ).toBe('https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id=948#!/');
+  });
+
+  it('substitutes the pledge ID for participant links', () => {
+    expect(
+      fillUrlTemplate('https://example.org/p?trip={id}&pledge={pledgeId}', {
+        id: 948,
+        pledgeId: 99928,
+      }),
+    ).toBe('https://example.org/p?trip=948&pledge=99928');
+  });
+
+  it('replaces every occurrence of a placeholder', () => {
+    expect(fillUrlTemplate('{id}/{id}', { id: 5 })).toBe('5/5');
+  });
+});
+
+describe('participantPhotoUrl', () => {
+  it('nests the pledge under the trip so the API can verify membership', () => {
+    expect(participantPhotoUrl(958, 99928, 'https://api.example.org')).toBe(
+      'https://api.example.org/api/mission-trips/958/participant/99928/image',
+    );
+  });
+
+  it('tolerates a trailing slash on the configured base URL', () => {
+    expect(participantPhotoUrl(958, 99928, 'https://api.example.org/')).toBe(
+      'https://api.example.org/api/mission-trips/958/participant/99928/image',
+    );
   });
 });
