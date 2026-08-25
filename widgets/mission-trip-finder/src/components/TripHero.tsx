@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Skeleton } from '@perimeter/ui/skeleton';
 import { cn } from '@perimeter/ui/utils/cn';
+import { FullBleed } from './FullBleed';
 import { GlobeIcon } from './icons';
 
 /**
@@ -18,12 +19,14 @@ export function TripHero({
   name,
   destination,
   dates,
+  fullBleed,
 }: {
   src: string | null;
   fallbackSrc?: string | undefined;
   name: string;
   destination: string | null;
   dates: string | null;
+  fullBleed: boolean;
 }): React.JSX.Element {
   const [currentSrc, setCurrentSrc] = React.useState(src ?? fallbackSrc ?? null);
   const [loaded, setLoaded] = React.useState(false);
@@ -43,7 +46,10 @@ export function TripHero({
   const showImage = !failed && currentSrc !== null;
 
   return (
-    <div className="relative flex min-h-[340px] w-full items-center justify-center overflow-hidden bg-neutral-900 px-6 py-16 @md:min-h-[440px] @xl:min-h-[520px]">
+    <FullBleed
+      enabled={fullBleed}
+      className="relative flex min-h-[340px] w-full items-center justify-center overflow-hidden bg-neutral-900 px-6 py-16 @md:min-h-[440px] @xl:min-h-[520px]"
+    >
       {showImage && (
         <>
           {!loaded && <Skeleton className="absolute inset-0 h-full w-full rounded-none" />}
@@ -86,6 +92,6 @@ export function TripHero({
           </p>
         )}
       </div>
-    </div>
+    </FullBleed>
   );
 }
