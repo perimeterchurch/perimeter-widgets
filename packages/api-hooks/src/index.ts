@@ -39,6 +39,12 @@ export {
   type UseMissionTripsResponse,
   type MissionTrip,
 } from './missions/use-mission-trips';
+export {
+  useMissionTrip,
+  type UseMissionTripResponse,
+  type MissionTripDetail,
+  type MissionTripParticipant,
+} from './missions/use-mission-trip';
 
 export {
   useCommunityGroups,

@@ -4,8 +4,10 @@ import { z } from 'zod';
  * Mission Trip Finder config. Arrives from the host page as `data-*`
  * attributes (always strings), so numeric/boolean fields use `z.coerce.*`.
  * Defaults mirror the legacy reactwidgets MissionTripFinder, which showed every
- * open GO Journey — including full and invitation-only ones — as a card grid
- * linking to the go-journey-details page.
+ * open GO Journey — including full and invitation-only ones — as a card grid.
+ * Since 0.2.0 a card opens the trip's detail view in place rather than linking
+ * out to the go-journey-details page; `detailsUrlBase` restores the old
+ * hand-off for embeds that still want it.
  */
 export const MissionTripFinderConfigSchema = z.object({
   showDescription: z.coerce
@@ -40,8 +42,63 @@ export const MissionTripFinderConfigSchema = z.object({
     .describe('Cap the total number of trips shown.'),
   detailsUrlBase: z
     .string()
-    .default('https://www.perimeter.org/global-outreach/go-journey-details/?id=')
-    .describe('Base URL each card links to; the trip ID is appended.'),
+    .optional()
+    .describe(
+      'Link cards OUT to this URL (the trip ID is appended) instead of opening the ' +
+        "widget's own detail view. Leave unset — the default — and a card opens the " +
+        'detail in place. Setting it restores the pre-0.2.0 behaviour of handing off ' +
+        'to a separate details page.',
+    ),
+  tripId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe(
+      "Open straight to this trip's detail view, with no list behind it. This is what " +
+        'lets one embed stand in for a dedicated details page: point it at ' +
+        '?id=<trip> from the host page and the widget renders that trip alone.',
+    ),
+  showTeam: z.coerce
+    .boolean()
+    .default(true)
+    .describe('Show the "Meet the Team" roster on the detail view.'),
+  registerUrl: z
+    .string()
+    .default(
+      'https://www.perimeter.org/pages/outreach-volunteer/global-outreach/global-outreach/pages/mission-trip-application/?pledgecampaignid={id}',
+    )
+    .describe(
+      'Destination of the "Register to Join" button. `{id}` is replaced with the trip ID. ' +
+        'Hidden automatically on trips that are full or invitation-only.',
+    ),
+  supportUrl: z
+    .string()
+    .default('https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id={id}#!/')
+    .describe(
+      'Destination of the "Support Journey" button. `{id}` is replaced with the trip ID. ' +
+        'A template rather than a base URL because the giving form needs its `#!/` ' +
+        'fragment AFTER the campaign ID.',
+    ),
+  participantUrl: z
+    .string()
+    .optional()
+    .describe(
+      'Link each team member to their own support page. `{pledgeId}` and `{id}` are ' +
+        'replaced with the participant and trip IDs. Unset by default, in which case ' +
+        'team cards are not links — the legacy template had a placeholder href that ' +
+        'was never wired up to anything.',
+    ),
+  disclaimerText: z
+    .string()
+    .default(
+      'Donations are tax-deductible and must be made payable to Perimeter Church, who is ' +
+        'training and sending the team and who requests that this be above your regular ' +
+        'tithe and offerings to your local church. If I raise more than 100%, the ' +
+        'additional funds will be allocated to the team fund, and, after that, used at ' +
+        'the discretion of the Global Outreach Ministry Team.',
+    )
+    .describe('Donation disclaimer shown at the foot of the detail view. Empty string hides it.'),
   emptyMessage: z
     .string()
     .default('No mission trips are open right now.')
