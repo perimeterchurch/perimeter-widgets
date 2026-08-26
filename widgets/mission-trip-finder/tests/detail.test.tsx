@@ -343,7 +343,7 @@ describe('gallery scroller', () => {
     renderApp({ tripId: 958 });
 
     const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
-    const bleed = scroller.parentElement;
+    const bleed = scroller.parentElement?.parentElement;
     expect(bleed?.style.width).toMatch(/px$/);
     expect(bleed?.style.marginLeft).toMatch(/px$/);
   });
@@ -352,7 +352,29 @@ describe('gallery scroller', () => {
     renderApp({ tripId: 958, fullBleed: '' });
 
     const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
-    expect(scroller.parentElement?.style.width).toBe('');
+    expect(scroller.parentElement?.parentElement?.style.width).toBe('');
+  });
+});
+
+describe('gallery chevron', () => {
+  it('is hidden when nothing overflows', async () => {
+    // jsdom reports scrollWidth === clientWidth === 0, so nothing overflows and
+    // the control must not appear — an arrow that cannot move is worse than no
+    // arrow. The overflow case is checked in the embed lab.
+    renderApp({ tripId: 958, galleryUrls: 'https://a.example/1.jpg' });
+
+    await waitFor(() =>
+      expect(screen.getByRole('region', { name: /Photos from/ })).toBeInTheDocument(),
+    );
+    expect(screen.queryByRole('button', { name: 'Show more photos' })).not.toBeInTheDocument();
+  });
+
+  it('hides the native scrollbar, which is why the chevron exists', async () => {
+    renderApp({ tripId: 958 });
+
+    const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
+    expect(scroller.className).toContain('[scrollbar-width:none]');
+    expect(scroller.className).toContain('[&::-webkit-scrollbar]:hidden');
   });
 });
 

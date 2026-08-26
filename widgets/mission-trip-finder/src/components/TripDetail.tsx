@@ -123,7 +123,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
 
             <TripGallery images={gallery} alt={trip.name} fullBleed={config.fullBleed} />
 
-            <Section className="gap-12">
+            <Section>
               <SectionHeading>About the Journey</SectionHeading>
 
               {/* Long_Description is authored in Ministry Platform's rich-text
@@ -132,7 +132,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
                   repeated here. */}
               {trip.longDescription && (
                 <div
-                  className={`${READING_COLUMN} font-sans text-lg leading-[1.9] [&_a]:underline [&_p]:mb-8 [&_p:last-child]:mb-0`}
+                  className={`${READING_COLUMN} font-sans text-lg leading-[1.9] [&_a]:underline [&_p]:mb-[1.9em] [&_p:last-child]:mb-0`}
                   dangerouslySetInnerHTML={safeBody}
                 />
               )}
@@ -144,11 +144,11 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
               )}
 
               {(showRegister || config.supportUrl) && (
-                <div className="flex flex-wrap justify-center gap-8">
+                <div className="flex flex-wrap justify-center gap-4">
                   {showRegister && config.registerUrl && (
                     <Button
                       size="lg"
-                      className="w-[200px] text-xl font-bold"
+                      className="whitespace-nowrap"
                       render={<a href={fillUrlTemplate(config.registerUrl, { id: trip.id })} />}
                     >
                       Register to Join
@@ -157,7 +157,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
                   {config.supportUrl && (
                     <Button
                       size="lg"
-                      className="w-[200px] text-xl font-bold"
+                      className="whitespace-nowrap"
                       render={<a href={fillUrlTemplate(config.supportUrl, { id: trip.id })} />}
                     >
                       Support Journey
@@ -181,7 +181,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
             )}
 
             {config.disclaimerText && (
-              <section className="px-6 pb-16 @md:pb-24 @xl:pb-30">
+              <Section className="border-t border-border" innerClassName="items-start">
                 <div className={READING_COLUMN}>
                   <h3 className="mb-3 font-sans text-sm font-bold tracking-wide uppercase">
                     Donation Disclaimer
@@ -190,7 +190,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
                     {config.disclaimerText}
                   </p>
                 </div>
-              </section>
+              </Section>
             )}
           </div>
         )}
