@@ -18,6 +18,11 @@ page. The detail follows the 2026 Figma redesign, in bands:
 4. **Hear From Others** — testimonials on the brand navy surface.
 5. **Meet the Team** — the roster as darkened squares that brighten on hover.
 6. **Donation disclaimer.** Rebuild of the legacy `reactwidgets`
+
+Clicking someone in the roster opens their **GO Journey Participant** page in
+place: the trip heading and photo scroller stay, and everything below them is
+replaced by that person's photo, fundraising progress, support letter and a
+"View Trip Details" button back to the trip.
 MissionTripFinder and the legacy `MissionTripDetails` HTML widget
 (`api_custom_Mission_Trip_Finder_Widget` and
 `api_custom_Mission_Trip_Detail_Widget`) on the perimeter-api backend.
@@ -72,6 +77,8 @@ defaults).
 | `data-full-bleed`        | boolean | `true`                                 | Let the photo scroller and testimonial band span the full page width. See below.  |
 | `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. See below.                     |
 | `data-show-testimonials` | boolean | `true`                                 | Show the "Hear From Others" band.                                                 |
+| `data-pledge-id`        | number  | —                                      | Open straight to one participant's page. Pairs with `data-trip-id`.               |
+| `data-participant-support-url` | string | onlinegiving.org form 1385 | "Support <name>" destination. `{id}` and `{pledgeId}` are replaced.               |
 | `data-show-team`         | boolean | `true`                                 | Show the "Meet the Team" roster on the detail view.                               |
 | `data-register-url`      | string  | mission-trip-application page          | "Register to Join" destination. `{id}` is replaced with the trip ID.              |
 | `data-support-url`       | string  | onlinegiving.org form 1385             | "Support Journey" destination. `{id}` is replaced with the trip ID.               |
@@ -171,6 +178,33 @@ since an arrow that cannot move is worse than no arrow, and it honours
 
 The scroller is also a labelled region with a tab stop, so a keyboard user can
 arrow through the photos — without that the overflow is unreachable for them.
+
+### The participant page
+
+Replaces the legacy `/go-journey-participant/?pledge=<id>` page. A dedicated
+page embeds it the same way the trip page does — read `?pledge=` from the host
+URL and pass it in as `data-pledge-id`, alongside `data-trip-id`. Inside the
+finder it is a URL state (`?trip-pledge=<id>`), so it is a shareable deep link
+and browser-back steps out of it.
+
+`data-participant-url` still takes precedence: set it and roster cards link out
+to a separate page instead of opening the participant view in place, the same
+way `data-details-url-base` works for trip cards.
+
+Two things come from live MP fields the legacy page got wrong:
+
+- **The letter is `Pledges.Letter`.** The old stored proc read
+  `Journey_Members.Letter`, and that table has no rows for any current trip, so
+  the legacy page would have shown nothing. Most participants have not written
+  one; the page renders fine without it.
+- **Progress is real.** `raised` is summed from `Donation_Distributions` and
+  `goal` is the campaign's per-participant `Fundraising_Goal`. The legacy
+  template read a dataset its proc never returned, so its bar was always empty.
+
+The bar is a real `<progress>` element rather than a pair of divs, so it is
+announced with its value and maximum ("$1,150 raised of a $2,210 goal"). It is
+omitted entirely when the campaign has no goal — there is nothing to measure
+against.
 
 ### Vertical rhythm
 

@@ -7285,6 +7285,133 @@ paths:
             type: integer
             exclusiveMinimum: 0
             maximum: 9007199254740991
+  /api/mission-trips/{id}/participant/{pledgeId}:
+    get:
+      operationId: getMissionTripParticipant
+      summary: Get a trip participant's letter and fundraising progress
+      tags:
+        - Missions
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      pledgeId:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      tripId:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                        description: The campaign this pledge belongs to.
+                      name:
+                        type: string
+                        description: Display name, same rules as the roster (Beneficiary wins).
+                      firstName:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description:
+                          The donor contact's given name on its own, for the "Support Sally" call to action. Resolved from the
+                          contact rather than from `name`, so it stays a single first name even when `name` is a
+                          Beneficiary string covering two people ("Samantha and Jack Morgan" -> "Samantha").
+                      letter:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                        description:
+                          Pledges.Letter — the participant's support letter. Staff/participant-authored HTML from the MP editor, so
+                          render it sanitized. Null when unwritten, which is the common case.
+                      raised:
+                        type: number
+                        description:
+                          Money actually received against this pledge (sum of Donation_Distributions.Amount). NOT
+                          Pledges.Total_Pledge, which is a different figure and is 0 for most rows.
+                      goal:
+                        anyOf:
+                          - type: number
+                          - type: 'null'
+                        description:
+                          The campaign's per-participant Fundraising_Goal, or null when the campaign has none. Every participant on a
+                          trip shares the same goal.
+                      tripLeader:
+                        type: boolean
+                      facebookUrl:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      xUrl:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                      instagramUrl:
+                        anyOf:
+                          - type: string
+                          - type: 'null'
+                    required:
+                      - pledgeId
+                      - tripId
+                      - name
+                      - firstName
+                      - letter
+                      - raised
+                      - goal
+                      - tripLeader
+                      - facebookUrl
+                      - xUrl
+                      - instagramUrl
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+        - name: pledgeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
   /api/mission-trips/{id}/participant/{pledgeId}/image:
     get:
       operationId: getMissionTripParticipantPhoto
@@ -15876,6 +16003,9 @@ paths:
                     - draft
                     - published
                     - archived
+                changeSummary:
+                  type: string
+                  maxLength: 500
               additionalProperties: false
   /api/kb/me/capabilities:
     get:

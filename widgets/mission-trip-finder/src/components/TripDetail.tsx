@@ -12,6 +12,7 @@ import { TESTIMONIALS } from '../lib/testimonials';
 import { Section, SectionHeading, SECTION_Y, READING_COLUMN } from './Section';
 import { TripHeading } from './TripHeading';
 import { TripGallery } from './TripGallery';
+import { ParticipantDetail } from './ParticipantDetail';
 import { Testimonials } from './Testimonials';
 import { TripFact, ICON } from './TripFact';
 import { TeamGrid } from './TeamGrid';
@@ -23,9 +24,21 @@ interface TripDetailProps {
   onBack: () => void;
   /** False when the embed is pinned to one trip — there is no list to go back to. */
   showBack: boolean;
+  /** A participant being viewed on this trip, or null for the trip itself. */
+  pledgeId: number | null;
+  onSelectParticipant: (pledgeId: number) => void;
+  onCloseParticipant: () => void;
 }
 
-export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): React.JSX.Element {
+export function TripDetail({
+  id,
+  config,
+  onBack,
+  showBack,
+  pledgeId,
+  onSelectParticipant,
+  onCloseParticipant,
+}: TripDetailProps): React.JSX.Element {
   const { data, isLoading, error } = useMissionTrip(id);
   const trip = data?.data;
   const safeBody = useSafeHtml(trip?.longDescription);
@@ -123,74 +136,90 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
 
             <TripGallery images={gallery} alt={trip.name} fullBleed={config.fullBleed} />
 
-            <Section>
-              <SectionHeading>About the Journey</SectionHeading>
+            {pledgeId !== null ? (
+              <ParticipantDetail
+                tripId={id}
+                pledgeId={pledgeId}
+                config={config}
+                onBackToTrip={onCloseParticipant}
+              />
+            ) : (
+              <>
+                <Section>
+                  <SectionHeading>About the Journey</SectionHeading>
 
-              {/* Long_Description is authored in Ministry Platform's rich-text
+                  {/* Long_Description is authored in Ministry Platform's rich-text
                   editor, so it arrives as HTML and is sanitized by useSafeHtml.
                   `description` (plain text) is the card teaser and is not
                   repeated here. */}
-              {trip.longDescription && (
-                <div
-                  className={`${READING_COLUMN} font-sans text-lg leading-[1.9] [&_a]:underline [&_p]:mb-[1.9em] [&_p:last-child]:mb-0`}
-                  dangerouslySetInnerHTML={safeBody}
-                />
-              )}
-
-              {config.showSpots && spotsLeft !== null && !trip.registrationFull && (
-                <TripFact icon={<PersonIcon className={ICON} />}>
-                  {spotsLeft === 1 ? '1 spot left' : `${spotsLeft} spots left`}
-                </TripFact>
-              )}
-
-              {(showRegister || config.supportUrl) && (
-                <div className="flex flex-wrap justify-center gap-4">
-                  {showRegister && config.registerUrl && (
-                    <Button
-                      size="lg"
-                      className="whitespace-nowrap"
-                      render={<a href={fillUrlTemplate(config.registerUrl, { id: trip.id })} />}
-                    >
-                      Register to Join
-                    </Button>
+                  {trip.longDescription && (
+                    <div
+                      className={`${READING_COLUMN} font-sans text-lg leading-[1.9] [&_a]:underline [&_p]:mb-[1.9em] [&_p:last-child]:mb-0`}
+                      dangerouslySetInnerHTML={safeBody}
+                    />
                   )}
-                  {config.supportUrl && (
-                    <Button
-                      size="lg"
-                      className="whitespace-nowrap"
-                      render={<a href={fillUrlTemplate(config.supportUrl, { id: trip.id })} />}
-                    >
-                      Support Journey
-                    </Button>
+
+                  {config.showSpots && spotsLeft !== null && !trip.registrationFull && (
+                    <TripFact icon={<PersonIcon className={ICON} />}>
+                      {spotsLeft === 1 ? '1 spot left' : `${spotsLeft} spots left`}
+                    </TripFact>
                   )}
-                </div>
-              )}
-            </Section>
 
-            {config.showTestimonials && (
-              <Testimonials testimonials={TESTIMONIALS} fullBleed={config.fullBleed} />
-            )}
+                  {(showRegister || config.supportUrl) && (
+                    <div className="flex flex-wrap justify-center gap-4">
+                      {showRegister && config.registerUrl && (
+                        <Button
+                          size="lg"
+                          className="whitespace-nowrap"
+                          render={<a href={fillUrlTemplate(config.registerUrl, { id: trip.id })} />}
+                        >
+                          Register to Join
+                        </Button>
+                      )}
+                      {config.supportUrl && (
+                        <Button
+                          size="lg"
+                          className="whitespace-nowrap"
+                          render={<a href={fillUrlTemplate(config.supportUrl, { id: trip.id })} />}
+                        >
+                          Support Journey
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </Section>
 
-            {/* TeamGrid brings its own "Meet the Team" heading and card
+                {config.showTestimonials && (
+                  <Testimonials testimonials={TESTIMONIALS} fullBleed={config.fullBleed} />
+                )}
+
+                {/* TeamGrid brings its own "Meet the Team" heading and card
                 treatment, both deliberately left as they were — the Figma
                 restyles the bands around it, not the roster. */}
-            {config.showTeam && (
-              <Section>
-                <TeamGrid tripId={trip.id} participants={trip.participants} config={config} />
-              </Section>
-            )}
+                {config.showTeam && (
+                  <Section>
+                    <TeamGrid
+                      tripId={trip.id}
+                      participants={trip.participants}
+                      config={config}
+                      onSelect={onSelectParticipant}
+                    />
+                  </Section>
+                )}
 
-            {config.disclaimerText && (
-              <Section className="border-t border-border" innerClassName="items-start">
-                <div className={READING_COLUMN}>
-                  <h3 className="mb-3 font-sans text-sm font-bold tracking-wide uppercase">
-                    Donation Disclaimer
-                  </h3>
-                  <p className="font-sans text-sm leading-loose text-muted-fg">
-                    {config.disclaimerText}
-                  </p>
-                </div>
-              </Section>
+                {config.disclaimerText && (
+                  <Section className="border-t border-border" innerClassName="items-start">
+                    <div className={READING_COLUMN}>
+                      <h3 className="mb-3 font-sans text-sm font-bold tracking-wide uppercase">
+                        Donation Disclaimer
+                      </h3>
+                      <p className="font-sans text-sm leading-loose text-muted-fg">
+                        {config.disclaimerText}
+                      </p>
+                    </div>
+                  </Section>
+                )}
+              </>
             )}
           </div>
         )}

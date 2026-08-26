@@ -82,6 +82,25 @@ export const MissionTripFinderConfigSchema = z.object({
       'Show the "Hear From Others" testimonial band on the detail view. The testimonials are ' +
         'placeholder copy today — see src/lib/testimonials.ts.',
     ),
+  pledgeId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe(
+      "Open straight to one participant's page. Pairs with `tripId` on a dedicated " +
+        'participant page, which reads `?pledge=` from its own URL and passes it in.',
+    ),
+  participantSupportUrl: z
+    .string()
+    .default(
+      'https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id={id}&mp_pledge_id={pledgeId}#!/',
+    )
+    .describe(
+      'Destination of the "Support <name>" button on a participant\'s page. `{id}` and ' +
+        '`{pledgeId}` are replaced. Defaults to the same giving form as Support Journey ' +
+        'with the pledge attached, which is what the legacy participant page used.',
+    ),
   showTeam: z.coerce
     .boolean()
     .default(true)

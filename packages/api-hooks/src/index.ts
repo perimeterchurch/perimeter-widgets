@@ -44,6 +44,9 @@ export {
   type UseMissionTripResponse,
   type MissionTripDetail,
   type MissionTripParticipant,
+  useMissionTripParticipant,
+  type UseMissionTripParticipantResponse,
+  type MissionTripParticipantDetail,
 } from './missions/use-mission-trip';
 
 export {

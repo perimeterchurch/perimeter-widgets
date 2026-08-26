@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { parseAsInteger, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import type { MissionTripFinderConfig } from '../types';
 
@@ -15,9 +15,14 @@ export interface TripNavigation {
   screen: ScreenMode;
   /** The trip being viewed, or null on the browse screen. */
   id: number | null;
+  /** The participant being viewed on that trip, or null for the trip itself. */
+  pledgeId: number | null;
   /** True when the embed is pinned to one trip and there is no list to go back to. */
   isPinned: boolean;
   openTrip: (id: number) => void;
+  openParticipant: (pledgeId: number) => void;
+  /** Leave the participant view for the trip it belongs to. */
+  closeParticipant: () => void;
   back: () => void;
 }
 
@@ -39,6 +44,7 @@ export function useTripNavigation(config: MissionTripFinderConfig): TripNavigati
     () => ({
       screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault('browse'),
       id: parseAsInteger,
+      pledge: parseAsInteger,
     }),
     [],
   );
@@ -54,12 +60,28 @@ export function useTripNavigation(config: MissionTripFinderConfig): TripNavigati
 
   const [state, setState] = useQueryStates(params, { history: 'push', urlKeys });
 
+  // Only used by the pinned branch below, but hooks cannot be called
+  // conditionally — a pinned embed must not write to a URL it does not own.
+  //
+  // `config.pledgeId` SEEDS this rather than being merged with it on every
+  // render. Falling back to the config value each time would pin the
+  // participant permanently: "View Trip Details" clears the state, the config
+  // immediately supplies it again, and the button does nothing.
+  const [pinnedPledge, setPinnedPledge] = useState<number | null>(config.pledgeId ?? null);
+
   if (config.tripId) {
+    // Pinned: the host page owns the URL, so participant selection is local
+    // state rather than a query param. `data-pledge-id` is how such a page
+    // opens straight to a participant — it reads `?pledge=` itself and passes
+    // it in, exactly as it does with `?id=` and `data-trip-id`.
     return {
       screen: 'detail',
       id: config.tripId,
+      pledgeId: pinnedPledge,
       isPinned: true,
       openTrip: () => {},
+      openParticipant: setPinnedPledge,
+      closeParticipant: () => setPinnedPledge(null),
       back: () => {},
     };
   }
@@ -67,12 +89,19 @@ export function useTripNavigation(config: MissionTripFinderConfig): TripNavigati
   return {
     screen: state.screen === 'detail' && state.id ? 'detail' : 'browse',
     id: state.id,
+    pledgeId: state.screen === 'detail' && state.id ? state.pledge : null,
     isPinned: false,
     openTrip: (id: number) => {
-      void setState({ screen: 'detail', id });
+      void setState({ screen: 'detail', id, pledge: null });
+    },
+    openParticipant: (pledgeId: number) => {
+      void setState({ pledge: pledgeId });
+    },
+    closeParticipant: () => {
+      void setState({ pledge: null });
     },
     back: () => {
-      void setState({ screen: 'browse', id: null });
+      void setState({ screen: 'browse', id: null, pledge: null });
     },
   };
 }

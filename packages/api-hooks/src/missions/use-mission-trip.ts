@@ -29,3 +29,34 @@ export function useMissionTrip(id: number): UseQueryResult<UseMissionTripRespons
     enabled: Number.isFinite(id) && id > 0,
   });
 }
+
+export type UseMissionTripParticipantResponse =
+  operations['getMissionTripParticipant']['responses']['200']['content']['application/json'];
+
+/** One participant's letter, fundraising progress and social links. */
+export type MissionTripParticipantDetail = UseMissionTripParticipantResponse['data'];
+
+/**
+ * One trip participant for the finder's GO Journey Participant view. Backs
+ * `GET /api/mission-trips/{id}/participant/{pledgeId}`.
+ *
+ * `letter` is HTML authored in Ministry Platform's editor — sanitize it. The
+ * endpoint 404s when the pledge does not hold a seat on `tripId`, which is the
+ * membership check rather than an error to surface loudly.
+ */
+export function useMissionTripParticipant(
+  tripId: number,
+  pledgeId: number,
+): UseQueryResult<UseMissionTripParticipantResponse> {
+  const client = useApiClient();
+  return useQuery({
+    queryKey: ['mission-trip-participant', tripId, pledgeId],
+    queryFn: async () =>
+      fetchJson<UseMissionTripParticipantResponse>(
+        client,
+        `/api/mission-trips/${tripId}/participant/${pledgeId}`,
+        'Mission trip participant',
+      ),
+    enabled: Number.isFinite(tripId) && tripId > 0 && Number.isFinite(pledgeId) && pledgeId > 0,
+  });
+}
