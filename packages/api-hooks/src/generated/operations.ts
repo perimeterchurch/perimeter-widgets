@@ -962,6 +962,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/mission-trips/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get one GO Journey mission trip with its team roster */
+    get: operations['getMissionTrip'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/mission-trips/{id}/participant/{pledgeId}/image': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a trip participant's profile photo */
+    get: operations['getMissionTripParticipantPhoto'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/community-groups': {
     parameters: {
       query?: never;
@@ -5491,6 +5525,105 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  getMissionTrip: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              /** @description Pledge_Campaigns.Pledge_Campaign_ID. */
+              id: number;
+              /** @description Public trip name (Pledge_Campaigns.Nickname, falling back to Campaign_Name). */
+              name: string;
+              /** @description Journey_Destinations.Destination_Name, or null. */
+              destination: string | null;
+              destinationId: number | null;
+              description: string | null;
+              /** @description Journey_Destinations.Website_Banner, or null. */
+              bannerUrl: string | null;
+              /** @description Trip start (Trip_Start_Date), ISO 8601, or null when unset. */
+              startDate: string | null;
+              /** @description Trip end (Trip_End_Date), ISO 8601, or null when unset. */
+              endDate: string | null;
+              /** @description Campaign close (End_Date), ISO 8601, or null. */
+              registrationEndDate: string | null;
+              /** @description Per-participant fundraising target (Fundraising_Goal), or null. */
+              cost: number | null;
+              /** @description Active or completed pledges on the campaign (Pledge_Status_ID <= 2). */
+              registrantCount: number;
+              maximumRegistrants: number | null;
+              /** @description True when the campaign has a cap and registrantCount has reached it. */
+              registrationFull: boolean;
+              invitationOnly: boolean;
+              /** @description Pledge_Campaigns.Long_Description — the long-form trip write-up. Staff-authored HTML from the MP editor (`<p>`, `<b>`, `<em>`), NOT plain text: render it sanitized. The list endpoint's `description` is the plain-text teaser. */
+              longDescription: string | null;
+              /** @description The trip team, sorted by last name. Same seat-holding pledge statuses that `registrantCount` counts, so the two always agree. */
+              participants: {
+                /** @description Pledges.Pledge_ID — the participant's seat on this trip. */
+                pledgeId: number;
+                /** @description Display name: Pledges.Beneficiary when set (it carries couples, e.g. "Sue and Brett Swanson"), otherwise the donor contact's nickname + last name. */
+                name: string;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getMissionTripParticipantPhoto: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        pledgeId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string;
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
   listCommunityGroups: {
     parameters: {
       query?: {
@@ -9579,6 +9712,8 @@ export interface operations {
               ministryMemberIds: number[];
               /** @default [] */
               ministryLedIds: number[];
+              /** @default [] */
+              managedCompilationIds: number[];
             };
             meta?: {
               count?: number;

@@ -58,6 +58,26 @@ export function formatTripDates(startIso: string | null, endIso: string | null):
 }
 
 /**
+ * The hero's spelled-out travel window, e.g.
+ * `July 25, 2026 – July 30, 2026`. Unlike {@link formatTripDates} the year is
+ * printed on both ends even when they match: this is the legacy detail page's
+ * format (its proc formatted each date `MMMM dd, yyyy` independently), and at
+ * hero size the repetition reads as deliberate rather than redundant. Cards
+ * keep the compact form.
+ */
+export function formatTripDatesLong(startIso: string | null, endIso: string | null): string | null {
+  const start = startIso ? parseMpDate(startIso) : null;
+  if (!start) return null;
+
+  const end = endIso ? parseMpDate(endIso) : null;
+  const sameDay =
+    end && end.year === start.year && end.month === start.month && end.day === start.day;
+
+  if (!end || sameDay) return formatDay(start, true);
+  return `${formatDay(start, true)} \u2013 ${formatDay(end, true)}`;
+}
+
+/**
  * Whole-dollar USD, e.g. `$3,500`. Mission-trip goals are always round numbers
  * in MP, and the legacy widget's cents were noise on the card.
  */
@@ -76,4 +96,53 @@ export function spotsRemaining(
 ): number | null {
   if (maximumRegistrants === null) return null;
   return Math.max(0, maximumRegistrants - registrantCount);
+}
+
+const PRODUCTION_BASE_URL = 'https://api.perimeter.org';
+const DEV_BASE_URL = '';
+
+/**
+ * Resolves the perimeter-api base URL. Priority:
+ * 1. Explicit `baseUrl` argument (the `apiUrl` widget config)
+ * 2. `VITE_API_URL` environment variable (studio dev → localhost:5500)
+ * 3. `''` (same-origin) in dev, `api.perimeter.org` in production
+ *
+ * Mirrors the resolver in the community-group-finder/event-finder/sermons
+ * widgets so image `<img>` tags resolve against the API origin rather than the
+ * host page's origin.
+ */
+function resolveApiBaseUrl(baseUrl?: string): string {
+  // A trailing slash is trimmed so `data-api-url="https://api.perimeter.org/"`
+  // does not produce a doubled slash in the path.
+  if (baseUrl) return baseUrl.replace(/\/$/, '');
+
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    if (import.meta.env.DEV) return DEV_BASE_URL;
+  }
+
+  return PRODUCTION_BASE_URL;
+}
+
+/**
+ * A team member's profile photo URL. The endpoint 404s both for a participant
+ * with no photo on file (the common case) and for a pledge that is not on the
+ * trip, so callers must treat a failed load as "use the default avatar".
+ */
+export function participantPhotoUrl(tripId: number, pledgeId: number, apiBaseUrl?: string): string {
+  return `${resolveApiBaseUrl(apiBaseUrl)}/api/mission-trips/${tripId}/participant/${pledgeId}/image`;
+}
+
+/**
+ * Fill a configured URL template. `{id}` is the trip, `{pledgeId}` the
+ * participant. Templates rather than base URLs because the legacy giving form
+ * needs its `#!/` fragment after the campaign ID, which appending cannot do.
+ */
+export function fillUrlTemplate(
+  template: string,
+  values: { id: number; pledgeId?: number },
+): string {
+  return template
+    .replace(/\{id\}/g, String(values.id))
+    .replace(/\{pledgeId\}/g, values.pledgeId === undefined ? '' : String(values.pledgeId));
 }

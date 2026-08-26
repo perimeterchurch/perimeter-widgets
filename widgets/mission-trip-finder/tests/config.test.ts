@@ -9,8 +9,41 @@ describe('MissionTripFinderConfigSchema', () => {
       showSpots: false,
       hideFull: false,
       includePast: false,
-      detailsUrlBase: 'https://www.perimeter.org/global-outreach/go-journey-details/?id=',
+      showTeam: true,
+      fullBleedHero: true,
     });
+  });
+
+  it('leaves detailsUrlBase unset so a card opens the detail in place', () => {
+    // Changed in 0.2.0. It used to default to the go-journey-details page, so
+    // every embed linked out; leaving it unset is what routes a click into the
+    // widget's own detail view. Setting it restores the hand-off.
+    expect(MissionTripFinderConfigSchema.parse({}).detailsUrlBase).toBeUndefined();
+  });
+
+  it('defaults the CTA templates to the legacy destinations', () => {
+    const config = MissionTripFinderConfigSchema.parse({});
+    expect(config.registerUrl).toContain('mission-trip-application/?pledgecampaignid={id}');
+    // The giving form needs its `#!/` fragment AFTER the campaign ID, which is
+    // why these are templates rather than base URLs.
+    expect(config.supportUrl).toBe(
+      'https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id={id}#!/',
+    );
+  });
+
+  it('leaves participantUrl unset — the legacy href was never wired up', () => {
+    expect(MissionTripFinderConfigSchema.parse({}).participantUrl).toBeUndefined();
+  });
+
+  it('carries the legacy donation disclaimer by default', () => {
+    expect(MissionTripFinderConfigSchema.parse({}).disclaimerText).toContain(
+      'Donations are tax-deductible',
+    );
+  });
+
+  it('coerces tripId, which pins the embed to a single trip', () => {
+    expect(MissionTripFinderConfigSchema.parse({ tripId: '958' }).tripId).toBe(958);
+    expect(MissionTripFinderConfigSchema.parse({}).tripId).toBeUndefined();
   });
 
   it('keeps apiUrl, which the mount reads to pick the API base URL', () => {
@@ -32,5 +65,16 @@ describe('MissionTripFinderConfigSchema', () => {
     expect(config.hideFull).toBe(true);
     expect(config.destinationId).toBe(7);
     expect(config.maxTrips).toBe(6);
+  });
+});
+
+describe('widget definition', () => {
+  it('renders as rectangles — Perimeter has no corner radius', async () => {
+    const { default: widget } = await import('../src/widget');
+    expect(widget.themeOverrides).toEqual({
+      'radius-sm': '0px',
+      'radius-md': '0px',
+      'radius-lg': '0px',
+    });
   });
 });

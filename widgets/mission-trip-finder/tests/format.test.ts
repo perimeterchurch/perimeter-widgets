@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { formatCost, formatTripDates, spotsRemaining } from '../src/lib/format';
+import {
+  fillUrlTemplate,
+  formatCost,
+  formatTripDates,
+  formatTripDatesLong,
+  participantPhotoUrl,
+  spotsRemaining,
+} from '../src/lib/format';
 
 describe('formatTripDates', () => {
   it('prints the year once when both ends share it', () => {
@@ -62,5 +69,78 @@ describe('spotsRemaining', () => {
 
   it('floors at zero when a trip is over its cap', () => {
     expect(spotsRemaining(28, 27)).toBe(0);
+  });
+});
+
+describe('fillUrlTemplate', () => {
+  it('substitutes the trip ID', () => {
+    expect(fillUrlTemplate('https://example.org/apply?pledgecampaignid={id}', { id: 948 })).toBe(
+      'https://example.org/apply?pledgecampaignid=948',
+    );
+  });
+
+  it('keeps anything after the placeholder', () => {
+    // The whole reason these are templates: the giving form needs its `#!/`
+    // fragment AFTER the campaign ID, which appending to a base URL cannot do.
+    expect(
+      fillUrlTemplate(
+        'https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id={id}#!/',
+        {
+          id: 948,
+        },
+      ),
+    ).toBe('https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id=948#!/');
+  });
+
+  it('substitutes the pledge ID for participant links', () => {
+    expect(
+      fillUrlTemplate('https://example.org/p?trip={id}&pledge={pledgeId}', {
+        id: 948,
+        pledgeId: 99928,
+      }),
+    ).toBe('https://example.org/p?trip=948&pledge=99928');
+  });
+
+  it('replaces every occurrence of a placeholder', () => {
+    expect(fillUrlTemplate('{id}/{id}', { id: 5 })).toBe('5/5');
+  });
+});
+
+describe('participantPhotoUrl', () => {
+  it('nests the pledge under the trip so the API can verify membership', () => {
+    expect(participantPhotoUrl(958, 99928, 'https://api.example.org')).toBe(
+      'https://api.example.org/api/mission-trips/958/participant/99928/image',
+    );
+  });
+
+  it('tolerates a trailing slash on the configured base URL', () => {
+    expect(participantPhotoUrl(958, 99928, 'https://api.example.org/')).toBe(
+      'https://api.example.org/api/mission-trips/958/participant/99928/image',
+    );
+  });
+});
+
+describe('formatTripDatesLong', () => {
+  it('prints the year on both ends, unlike the compact card format', () => {
+    // The legacy detail page formatted each date `MMMM dd, yyyy` on its own, so
+    // the hero repeats the year where the card collapses it.
+    expect(formatTripDatesLong('2026-07-25T00:00:00', '2026-07-30T00:00:00')).toBe(
+      'July 25, 2026 \u2013 July 30, 2026',
+    );
+    expect(formatTripDates('2026-07-25T00:00:00', '2026-07-30T00:00:00')).toBe(
+      'July 25 \u2013 July 30, 2026',
+    );
+  });
+
+  it('collapses a single-day trip to one date', () => {
+    expect(formatTripDatesLong('2026-07-25T00:00:00', '2026-07-25T09:00:00')).toBe('July 25, 2026');
+  });
+
+  it('collapses when the trip has no end date', () => {
+    expect(formatTripDatesLong('2026-07-25T00:00:00', null)).toBe('July 25, 2026');
+  });
+
+  it('returns null for an unscheduled trip', () => {
+    expect(formatTripDatesLong(null, '2026-07-30T00:00:00')).toBeNull();
   });
 });

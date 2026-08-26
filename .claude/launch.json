@@ -4,8 +4,18 @@
     {
       "name": "studio",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev"],
+      "runtimeArgs": [
+        "dev"
+      ],
       "port": 5173
+    },
+    {
+      "name": "embed-lab",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "embed-lab"
+      ],
+      "port": 4400
     }
   ]
 }

@@ -43,6 +43,7 @@ vi.mock('@perimeter/api-hooks', () => ({
     hooks.params = params;
     return hooks.result;
   },
+  useMissionTrip: () => ({ data: undefined, isLoading: true, error: null }),
 }));
 
 function config(overrides: Record<string, unknown> = {}): MissionTripFinderConfig {
@@ -63,19 +64,20 @@ describe('mission-trip-finder App', () => {
     expect(screen.getByText('$3,500')).toBeInTheDocument();
   });
 
-  it('links the whole card to the go-journey details page for that trip', () => {
+  it('makes the card a button, not a link, when the detail opens in place', () => {
     hooks.result = queryResult([TRIP]);
     renderApp();
-    expect(screen.getByRole('link')).toHaveAttribute(
-      'href',
-      'https://www.perimeter.org/global-outreach/go-journey-details/?id=948',
-    );
+    // A <button> rather than an href-less <a>, so keyboard and screen-reader
+    // semantics match what the click actually does.
+    expect(screen.getByRole('button', { name: /Ghana Hope/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('honours a custom details URL base', () => {
+  it('links the card out when a details URL base is configured', () => {
     hooks.result = queryResult([TRIP]);
     renderApp({ detailsUrlBase: 'https://example.org/trip/' });
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.org/trip/948');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('badges a full trip in the attention colour, distinct from the info badge', () => {
