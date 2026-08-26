@@ -292,35 +292,102 @@ describe('trip detail content', () => {
   });
 });
 
-describe('full-bleed hero', () => {
-  it('stretches the hero to the page width, escaping the host container', async () => {
-    // jsdom reports 0 for every rect, so this asserts the mechanism — that the
-    // hero is sized off the page rather than left at its container width —
-    // rather than the pixel result. The measured widths are checked in the
-    // embed lab against a real host container.
+describe('gallery scroller', () => {
+  it('falls back to the destination banner when no gallery is configured', async () => {
+    renderApp({ tripId: 958 });
+
+    const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
+    const imgs = [...scroller.querySelectorAll('img')].map((i) => i.getAttribute('src'));
+    expect(imgs).toEqual(['https://cdn.example.org/guatemala.jpg']);
+  });
+
+  it('uses the configured list, comma-separated, over the banner', async () => {
+    renderApp({
+      tripId: 958,
+      galleryUrls: 'https://a.example/1.jpg, https://a.example/2.jpg,https://a.example/3.jpg',
+    });
+
+    const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
+    expect([...scroller.querySelectorAll('img')].map((i) => i.getAttribute('src'))).toEqual([
+      'https://a.example/1.jpg',
+      'https://a.example/2.jpg',
+      'https://a.example/3.jpg',
+    ]);
+  });
+
+  it('is keyboard reachable — a scroll container needs a tab stop', async () => {
+    renderApp({ tripId: 958 });
+
+    const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
+    expect(scroller).toHaveAttribute('tabindex', '0');
+  });
+
+  it('renders nothing when there is no banner and no configured images', async () => {
+    hooks.detail = {
+      data: { success: true, data: { ...DETAIL, bannerUrl: null } },
+      isLoading: false,
+      error: null,
+    };
     renderApp({ tripId: 958 });
 
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
     );
-    const hero = screen
-      .getByRole('heading', { name: /Mana De Vida/ })
-      .closest('div')?.parentElement;
-    expect(hero?.style.width).toMatch(/px$/);
-    expect(hero?.style.marginLeft).toMatch(/px$/);
-    expect(hero?.style.marginRight).toMatch(/px$/);
+    expect(screen.queryByRole('region', { name: /Photos from/ })).not.toBeInTheDocument();
   });
 
-  it('leaves the hero in its container when fullBleedHero is off', async () => {
-    renderApp({ tripId: 958, fullBleedHero: '' });
+  it('spans the page width, escaping the host container', async () => {
+    // jsdom reports 0 for every rect, so this asserts the mechanism — that the
+    // band is sized off the page rather than left at its container width. The
+    // measured widths are checked in the embed lab against a real host.
+    renderApp({ tripId: 958 });
+
+    const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
+    const bleed = scroller.parentElement;
+    expect(bleed?.style.width).toMatch(/px$/);
+    expect(bleed?.style.marginLeft).toMatch(/px$/);
+  });
+
+  it('leaves the bands in their container when fullBleed is off', async () => {
+    renderApp({ tripId: 958, fullBleed: '' });
+
+    const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
+    expect(scroller.parentElement?.style.width).toBe('');
+  });
+});
+
+describe('testimonials', () => {
+  it('renders the hardcoded quotes with a monogram, not a fake headshot', async () => {
+    renderApp({ tripId: 958 });
+
+    await waitFor(() => expect(screen.getByText('Hear From Others')).toBeInTheDocument());
+    expect(screen.getByText('Olivia Ramirez')).toBeInTheDocument();
+    expect(screen.getByText(/gratitude, humility, and joy/)).toBeInTheDocument();
+    // Placeholder people must not get invented faces.
+    expect(screen.getByText('OR')).toBeInTheDocument();
+    const band = screen.getByText('Hear From Others').closest('section, div');
+    expect(band?.querySelectorAll('img').length ?? 0).toBe(0);
+  });
+
+  it('can be turned off', async () => {
+    renderApp({ tripId: 958, showTestimonials: '' });
 
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
     );
-    const hero = screen
-      .getByRole('heading', { name: /Mana De Vida/ })
-      .closest('div')?.parentElement;
-    expect(hero?.style.width).toBe('');
-    expect(hero?.style.marginLeft).toBe('');
+    expect(screen.queryByText('Hear From Others')).not.toBeInTheDocument();
+  });
+});
+
+describe('Meet the Team stays untouched', () => {
+  it('keeps its own heading and its darkened square cards', async () => {
+    renderApp({ tripId: 958 });
+
+    await waitFor(() => expect(screen.getByText('Meet the Team')).toBeInTheDocument());
+    // Exactly one heading — the section must not add a second above TeamGrid.
+    expect(screen.getAllByText('Meet the Team')).toHaveLength(1);
+    const card = screen.getByAltText('Lori Allison').closest('div');
+    expect(card?.className).toContain('aspect-square');
+    expect(card?.querySelector('.bg-black\\/45')).not.toBeNull();
   });
 });

@@ -68,7 +68,7 @@ export function TeamGrid({
 
   return (
     <section className={className}>
-      <h3 className="mb-6 text-center font-serif text-4xl leading-tight font-normal text-balance @2xl:text-5xl">
+      <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-medium text-balance @md:text-4xl @xl:text-5xl">
         Meet the Team
       </h3>
       <ul className="flex flex-wrap justify-center gap-2.5">

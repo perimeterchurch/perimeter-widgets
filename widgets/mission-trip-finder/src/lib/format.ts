@@ -36,6 +36,11 @@ function formatDay(p: DateParts, withYear: boolean): string {
   return withYear ? `${base}, ${p.year}` : base;
 }
 
+/** `MMMM dd, yyyy` — zero-padded day, as the legacy proc and the Figma print it. */
+function formatDayPadded(p: DateParts): string {
+  return `${MONTHS_LONG[p.month - 1]} ${String(p.day).padStart(2, '0')}, ${p.year}`;
+}
+
 /**
  * A trip's travel window, e.g. `July 8 – July 17, 2026`. The year is printed
  * once when both ends share it, twice when the trip straddles New Year, and the
@@ -73,8 +78,10 @@ export function formatTripDatesLong(startIso: string | null, endIso: string | nu
   const sameDay =
     end && end.year === start.year && end.month === start.month && end.day === start.day;
 
-  if (!end || sameDay) return formatDay(start, true);
-  return `${formatDay(start, true)} \u2013 ${formatDay(end, true)}`;
+  if (!end || sameDay) return formatDayPadded(start);
+  // Hyphen, not an en dash, and both years spelled out: this is the legacy
+  // detail page's exact string, which the Figma reproduces.
+  return `${formatDayPadded(start)} - ${formatDayPadded(end)}`;
 }
 
 /**
@@ -145,4 +152,16 @@ export function fillUrlTemplate(
   return template
     .replace(/\{id\}/g, String(values.id))
     .replace(/\{pledgeId\}/g, values.pledgeId === undefined ? '' : String(values.pledgeId));
+}
+
+/**
+ * Split a comma-separated config list into trimmed, non-empty entries.
+ * `data-*` attributes are single strings, so a list has to arrive this way.
+ */
+export function splitList(value: string | undefined): string[] {
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
 }

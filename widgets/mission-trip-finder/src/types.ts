@@ -59,13 +59,28 @@ export const MissionTripFinderConfigSchema = z.object({
         'lets one embed stand in for a dedicated details page: point it at ' +
         '?id=<trip> from the host page and the widget renders that trip alone.',
     ),
-  fullBleedHero: z.coerce
+  fullBleed: z.coerce
     .boolean()
     .default(true)
     .describe(
-      "Stretch the detail view's cover photo across the full page width, escaping the host " +
-        "page's content container. Turn this off for an embed in a sidebar or a narrow " +
-        'column, where a page-wide hero would overwhelm it.',
+      "Let the detail view's photo scroller and testimonial band span the full page width, " +
+        "escaping the host page's content container. Turn this off for an embed in a sidebar " +
+        'or a narrow column, where page-wide bands would overwhelm it.',
+    ),
+  galleryUrls: z
+    .string()
+    .optional()
+    .describe(
+      "Comma-separated image URLs for the detail view's photo scroller. With none set the " +
+        "scroller shows the destination's banner image on its own. MP has no per-trip gallery " +
+        'today, so these have to be supplied by the embed.',
+    ),
+  showTestimonials: z.coerce
+    .boolean()
+    .default(true)
+    .describe(
+      'Show the "Hear From Others" testimonial band on the detail view. The testimonials are ' +
+        'placeholder copy today — see src/lib/testimonials.ts.',
     ),
   showTeam: z.coerce
     .boolean()
