@@ -10,10 +10,14 @@ dates, the per-participant fundraising goal, and an optional description; trips
 at capacity and invitation-only trips are badged.
 
 Clicking a card opens that trip's detail **in place**, without leaving the
-page: a full-bleed cover photo with the trip name, destination and dates
-centred over it, then the long-form write-up, the two calls to action, the team
-roster as darkened squares that brighten on hover, and the donation disclaimer.
-The layout follows the legacy detail page. Rebuild of the legacy `reactwidgets`
+page. The detail follows the 2026 Figma redesign, in bands:
+
+1. **Heading** — trip name, destination and travel dates, centred on white.
+2. **Photo scroller** — a full-bleed horizontal row of square photos.
+3. **About the Journey** — the long-form write-up and the two calls to action.
+4. **Hear From Others** — testimonials on the brand navy surface.
+5. **Meet the Team** — the roster as darkened squares that brighten on hover.
+6. **Donation disclaimer.** Rebuild of the legacy `reactwidgets`
 MissionTripFinder and the legacy `MissionTripDetails` HTML widget
 (`api_custom_Mission_Trip_Finder_Widget` and
 `api_custom_Mission_Trip_Detail_Widget`) on the perimeter-api backend.
@@ -65,7 +69,9 @@ defaults).
 | `data-keyword`           | string  | —                                      | Search trip names, destinations, and descriptions.                                |
 | `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
 | `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
-| `data-full-bleed-hero`   | boolean | `true`                                 | Stretch the detail's cover photo to the full page width. See below.               |
+| `data-full-bleed`        | boolean | `true`                                 | Let the photo scroller and testimonial band span the full page width. See below.  |
+| `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. See below.                     |
+| `data-show-testimonials` | boolean | `true`                                 | Show the "Hear From Others" band.                                                 |
 | `data-show-team`         | boolean | `true`                                 | Show the "Meet the Team" roster on the detail view.                               |
 | `data-register-url`      | string  | mission-trip-application page          | "Register to Join" destination. `{id}` is replaced with the trip ID.              |
 | `data-support-url`       | string  | onlinegiving.org form 1385             | "Support Journey" destination. `{id}` is replaced with the trip ID.               |
@@ -122,26 +128,59 @@ Banner images are absolute URLs on the destination record (an external CDN), not
 served by perimeter-api. A trip whose destination has no banner falls back to
 `data-default-image-url`, then to a globe placeholder.
 
-### The full-bleed hero
+### The full-bleed bands
 
-The detail's cover photo escapes the host page's content container and spans
-the whole page, the way the legacy details page did. It is **measured** rather
-than sized with `width: 100vw`: `100vw` includes the vertical scrollbar, which
-is ~15px of horizontal overflow on any page that does not set
-`overflow-x: hidden`, and the usual `calc(50% - 50vw)` idiom assumes the embed
-is horizontally centred in the viewport.
+The photo scroller and the testimonial band escape the host page's content
+container and span the whole page. They are **measured** rather than sized with
+`width: 100vw`: `100vw` includes the vertical scrollbar, which is ~15px of
+horizontal overflow on any page that does not set `overflow-x: hidden`, and the
+usual `calc(50% - 50vw)` idiom assumes the embed is horizontally centred in the
+viewport.
 
 The breakout stops at the nearest ancestor that clips — anything whose
 `overflow` is not `visible`, or which establishes a containing block with a
-`transform`. Such an ancestor would clip the hero anyway, so bounding to it
-means the hero fills exactly the space it can occupy and its centred title
-stays centred on what the reader actually sees.
+`transform`. Such an ancestor would clip the band anyway, so bounding to it
+means the band fills exactly the space it can occupy and its centred contents
+stay centred on what the reader actually sees.
 
-The hero's text sits in the same 768px measure as the body column, so a long
-trip name wraps instead of running the full width of a wide page.
+Set `data-full-bleed="false"` for an embed in a sidebar or a narrow column,
+where page-wide bands would overwhelm the rest of the page.
 
-Set `data-full-bleed-hero="false"` for an embed in a sidebar or a narrow
-column, where a page-wide hero would overwhelm the rest of the page.
+### The photo scroller
+
+Ministry Platform has **no per-trip gallery today**, so the scroller is fed by
+`data-gallery-urls` (comma-separated). With none set it falls back to the
+destination's banner image on its own — the one real photo every trip has, and
+the one the pre-redesign hero displayed. With no banner either, the scroller
+does not render.
+
+MP does have the right shape, unwired: `Journey_Files` holds `Link` and
+`Thumbnail_Link` per file and joins through `Journey_Contents`, but every live
+campaign has a null `Journey_Content_ID`, so nothing reaches it (the rows that
+exist are old demo data, one of them another church's sample banner). If Global
+Outreach starts populating it this becomes an API-backed list without the
+component changing shape.
+
+The scroller is a labelled region with a tab stop, so a keyboard user can arrow
+through the photos — without that the overflow is unreachable for them.
+
+### Testimonials
+
+**The testimonials are hardcoded placeholder copy**, in
+`src/lib/testimonials.ts`. MP has nowhere to put them: there is no testimonial
+or story table, and nothing on `Pledge_Campaigns` holds free text per person.
+They were requested hardcoded so the band could be reviewed while a real source
+is decided.
+
+Each card shows an initials monogram rather than a photo. The names are the
+Figma's placeholder copy rather than real people, and there are no headshots to
+source — inventing faces to go with invented quotes would be worse than
+initials. A real source can swap the monogram for a photo without touching the
+layout.
+
+The Figma screenshot shows a `2 / 5` pager over this band. That is Figma's own
+presentation-mode frame counter, not a carousel control, so every testimonial
+renders rather than being paged.
 
 ### Square corners
 
@@ -161,3 +200,9 @@ still wins if an embed ever needs a radius back.
 > **Not ported:** the legacy detail page embedded a Google Map of the
 > destination, keyed with an API key committed to a public repo. The map is
 > dropped rather than re-keyed — the destination name is already on the page.
+
+> **One deliberate deviation from the Figma:** it draws the two CTAs as white
+> text on the `#60bbe9` brand accent, which is about 2:1 contrast and fails
+> WCAG AA. The buttons use the theme's `primary`/`primary-fg` pair instead —
+> the same `#60bbe9` fill with brand-navy text, 7.3:1. The token comments and
+> `packages/theme/tests/contrast.test.ts` both exist to hold that line.

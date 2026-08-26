@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useMissionTrip } from '@perimeter/api-hooks';
-import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@perimeter/ui/empty';
 import { Skeleton } from '@perimeter/ui/skeleton';
@@ -8,9 +7,12 @@ import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
 import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import type { MissionTripFinderConfig } from '../types';
-import { fillUrlTemplate, formatTripDatesLong, spotsRemaining } from '../lib/format';
-import { FullBleed } from './FullBleed';
-import { TripHero } from './TripHero';
+import { fillUrlTemplate, formatTripDatesLong, splitList, spotsRemaining } from '../lib/format';
+import { TESTIMONIALS } from '../lib/testimonials';
+import { Section, SectionHeading, SECTION_Y, READING_COLUMN } from './Section';
+import { TripHeading } from './TripHeading';
+import { TripGallery } from './TripGallery';
+import { Testimonials } from './Testimonials';
 import { TripFact, ICON } from './TripFact';
 import { TeamGrid } from './TeamGrid';
 import { ArrowLeftIcon, CheckIcon, LinkIcon, PersonIcon } from './icons';
@@ -22,19 +24,6 @@ interface TripDetailProps {
   /** False when the embed is pinned to one trip — there is no list to go back to. */
   showBack: boolean;
 }
-
-/** The detail's readable column. The hero deliberately escapes it. */
-const COLUMN = 'mx-auto w-full max-w-3xl px-6';
-
-/**
- * Doubles the column's `space-y-10` gap above the roster and the disclaimer,
- * which each want more separation than the run of text above them.
- *
- * Padding, not margin: the column is a plain block element, so `space-y` puts
- * its gap on the preceding sibling's margin-bottom, and an added margin-top
- * here would collapse against it rather than add to it.
- */
-const SECTION_GAP = 'pt-10';
 
 export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): React.JSX.Element {
   const { data, isLoading, error } = useMissionTrip(id);
@@ -54,8 +43,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
     if (trip) headingRef.current?.focus();
   }, [trip]);
 
-  // Sits above the hero rather than floating on it: these are widget chrome,
-  // not part of the page the legacy design reproduces.
+  // Widget chrome, above the page the design reproduces.
   const toolbar = (
     <div className="flex items-center justify-between gap-3 p-4">
       {showBack ? (
@@ -76,7 +64,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
     return (
       <div>
         {toolbar}
-        <div className={COLUMN}>
+        <Section>
           <Empty>
             <EmptyHeader>
               <EmptyTitle>Trip not found</EmptyTitle>
@@ -85,7 +73,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
-        </div>
+        </Section>
       </div>
     );
   }
@@ -95,6 +83,11 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
   // the button is dropped rather than shown and rejected on the far side.
   const showRegister = !!trip && !trip.registrationFull && !trip.invitationOnly;
 
+  // The destination banner is the fallback gallery: it is the one real photo
+  // every trip has, and it is what the previous hero displayed.
+  const configured = splitList(config.galleryUrls);
+  const gallery = configured.length > 0 ? configured : trip?.bannerUrl ? [trip.bannerUrl] : [];
+
   return (
     <div>
       {toolbar}
@@ -102,37 +95,36 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
         isLoading={isLoading}
         skeleton={
           <div>
-            {/* Full-bleed too, so the hero does not jump from container width
-                to page width the moment the trip arrives. */}
-            <FullBleed enabled={config.fullBleedHero}>
-              <Skeleton className="h-[340px] w-full rounded-none @md:h-[440px] @xl:h-[520px]" />
-            </FullBleed>
-            <div className={`${COLUMN} space-y-4 py-12`}>
-              <Skeleton className="h-5 w-full" />
-              <Skeleton className="h-5 w-11/12" />
-              <Skeleton className="h-5 w-2/3" />
+            <div className={`${SECTION_Y} flex flex-col items-center gap-3 px-6`}>
+              <Skeleton className="h-12 w-3/4 max-w-2xl" />
+              <Skeleton className="h-8 w-40" />
+              <Skeleton className="h-5 w-64" />
+            </div>
+            <div className="flex gap-4 px-2.5">
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton
+                  key={i}
+                  className="aspect-square w-[260px] shrink-0 @md:w-[340px] @xl:w-[420px]"
+                />
+              ))}
             </div>
           </div>
         }
       >
         {trip && (
           <div ref={headingRef} tabIndex={-1} className="outline-hidden">
-            <TripHero
-              src={trip.bannerUrl}
-              fallbackSrc={config.defaultImageUrl}
+            <TripHeading
               name={trip.name}
               destination={trip.destination}
               dates={formatTripDatesLong(trip.startDate, trip.endDate)}
-              fullBleed={config.fullBleedHero}
+              registrationFull={trip.registrationFull}
+              invitationOnly={trip.invitationOnly}
             />
 
-            <div className={`${COLUMN} space-y-10 py-12`}>
-              {(trip.registrationFull || trip.invitationOnly) && (
-                <div className="flex flex-wrap justify-center gap-2">
-                  {trip.registrationFull && <Badge variant="warning">Registration Full</Badge>}
-                  {trip.invitationOnly && <Badge variant="secondary">Invitation Only</Badge>}
-                </div>
-              )}
+            <TripGallery images={gallery} alt={trip.name} fullBleed={config.fullBleed} />
+
+            <Section className="gap-12">
+              <SectionHeading>About the Journey</SectionHeading>
 
               {/* Long_Description is authored in Ministry Platform's rich-text
                   editor, so it arrives as HTML and is sanitized by useSafeHtml.
@@ -140,27 +132,23 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
                   repeated here. */}
               {trip.longDescription && (
                 <div
-                  className="text-base leading-loose [&_a]:underline [&_p]:mb-5 [&_p:last-child]:mb-0"
+                  className={`${READING_COLUMN} font-sans text-lg leading-[1.9] [&_a]:underline [&_p]:mb-8 [&_p:last-child]:mb-0`}
                   dangerouslySetInnerHTML={safeBody}
                 />
               )}
 
-              {/* No cost line here: the fundraising goal is on the card, and
-                  above the CTAs it read as a price tag on the "Register to
-                  Join" button. `showCost` still governs the card. */}
               {config.showSpots && spotsLeft !== null && !trip.registrationFull && (
-                <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
-                  <TripFact icon={<PersonIcon className={ICON} />}>
-                    {spotsLeft === 1 ? '1 spot left' : `${spotsLeft} spots left`}
-                  </TripFact>
-                </div>
+                <TripFact icon={<PersonIcon className={ICON} />}>
+                  {spotsLeft === 1 ? '1 spot left' : `${spotsLeft} spots left`}
+                </TripFact>
               )}
 
               {(showRegister || config.supportUrl) && (
-                <div className="flex flex-wrap justify-center gap-3">
+                <div className="flex flex-wrap justify-center gap-8">
                   {showRegister && config.registerUrl && (
                     <Button
                       size="lg"
+                      className="w-[200px] text-xl font-bold"
                       render={<a href={fillUrlTemplate(config.registerUrl, { id: trip.id })} />}
                     >
                       Register to Join
@@ -169,7 +157,7 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
                   {config.supportUrl && (
                     <Button
                       size="lg"
-                      variant="outline"
+                      className="w-[200px] text-xl font-bold"
                       render={<a href={fillUrlTemplate(config.supportUrl, { id: trip.id })} />}
                     >
                       Support Journey
@@ -177,25 +165,33 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
                   )}
                 </div>
               )}
+            </Section>
 
-              {config.showTeam && (
-                <TeamGrid
-                  tripId={trip.id}
-                  participants={trip.participants}
-                  config={config}
-                  className={SECTION_GAP}
-                />
-              )}
+            {config.showTestimonials && (
+              <Testimonials testimonials={TESTIMONIALS} fullBleed={config.fullBleed} />
+            )}
 
-              {config.disclaimerText && (
-                <section className={SECTION_GAP}>
+            {/* TeamGrid brings its own "Meet the Team" heading and card
+                treatment, both deliberately left as they were — the Figma
+                restyles the bands around it, not the roster. */}
+            {config.showTeam && (
+              <Section>
+                <TeamGrid tripId={trip.id} participants={trip.participants} config={config} />
+              </Section>
+            )}
+
+            {config.disclaimerText && (
+              <section className="px-6 pb-16 @md:pb-24 @xl:pb-30">
+                <div className={READING_COLUMN}>
                   <h3 className="mb-3 font-sans text-sm font-bold tracking-wide uppercase">
                     Donation Disclaimer
                   </h3>
-                  <p className="text-sm leading-loose text-muted-fg">{config.disclaimerText}</p>
-                </section>
-              )}
-            </div>
+                  <p className="font-sans text-sm leading-loose text-muted-fg">
+                    {config.disclaimerText}
+                  </p>
+                </div>
+              </section>
+            )}
           </div>
         )}
       </SkeletonTransition>
