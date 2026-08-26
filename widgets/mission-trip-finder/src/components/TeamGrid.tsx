@@ -58,17 +58,20 @@ export function TeamGrid({
   participants,
   config,
   className,
+  onSelect,
 }: {
   tripId: number;
   participants: MissionTripParticipant[];
   config: MissionTripFinderConfig;
   className?: string | undefined;
+  /** Open this person's page in place. Omitted when `participantUrl` links out. */
+  onSelect?: ((pledgeId: number) => void) | undefined;
 }): React.JSX.Element | null {
   if (participants.length === 0) return null;
 
   return (
     <section className={className}>
-      <h3 className="mb-6 text-center font-serif text-4xl leading-tight font-normal text-balance @2xl:text-5xl">
+      <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-medium text-balance @md:text-4xl @xl:text-5xl">
         Meet the Team
       </h3>
       <ul className="flex flex-wrap justify-center gap-2.5">
@@ -82,10 +85,10 @@ export function TeamGrid({
 
           return (
             <li key={person.pledgeId} className={CARD}>
-              {/* The legacy template wrapped these in href="insert link" — a
-                  placeholder that was never wired up. Unset by default, so a
-                  team card is plain content unless the embed points it
-                  somewhere. */}
+              {/* An anchor when the embed hands off to a separate participant
+                  page, a button when the page opens in place — the same split
+                  the trip cards make, so keyboard and screen-reader semantics
+                  match what the click actually does. */}
               {config.participantUrl ? (
                 <a
                   href={fillUrlTemplate(config.participantUrl, {
@@ -96,6 +99,15 @@ export function TeamGrid({
                 >
                   {photo}
                 </a>
+              ) : onSelect ? (
+                <button
+                  type="button"
+                  onClick={() => onSelect(person.pledgeId)}
+                  className="block w-full cursor-pointer text-left"
+                  aria-label={`View ${person.name}'s page`}
+                >
+                  {photo}
+                </button>
               ) : (
                 photo
               )}

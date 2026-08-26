@@ -10,7 +10,8 @@ describe('MissionTripFinderConfigSchema', () => {
       hideFull: false,
       includePast: false,
       showTeam: true,
-      fullBleedHero: true,
+      fullBleed: true,
+      showTestimonials: true,
     });
   });
 
@@ -76,5 +77,18 @@ describe('widget definition', () => {
       'radius-md': '0px',
       'radius-lg': '0px',
     });
+  });
+});
+
+describe('gallery config', () => {
+  it('leaves galleryUrls unset — MP has no per-trip gallery to default to', () => {
+    expect(MissionTripFinderConfigSchema.parse({}).galleryUrls).toBeUndefined();
+  });
+
+  it('accepts a comma-separated list from a data-* attribute', () => {
+    const config = MissionTripFinderConfigSchema.parse({
+      galleryUrls: 'https://a.example/1.jpg, https://a.example/2.jpg',
+    });
+    expect(config.galleryUrls).toBe('https://a.example/1.jpg, https://a.example/2.jpg');
   });
 });
