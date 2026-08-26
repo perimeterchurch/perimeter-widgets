@@ -255,6 +255,23 @@ describe('trip detail content', () => {
     expect(screen.queryByRole('link', { name: 'Register to Join' })).not.toBeInTheDocument();
   });
 
+  it('keeps the fundraising goal off the detail, where it read as a price tag', async () => {
+    renderApp({ tripId: 958 });
+
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: 'Support Journey' })).toBeInTheDocument(),
+    );
+    // $2,400 is on the card; above the CTAs it looked like the cost of
+    // pressing "Register to Join". showCost still governs the card.
+    expect(screen.queryByText(/\$2,400/)).not.toBeInTheDocument();
+  });
+
+  it('still shows spots left when showSpots is on', async () => {
+    renderApp({ tripId: 958, showSpots: 'true' });
+
+    await waitFor(() => expect(screen.getByText('14 spots left')).toBeInTheDocument());
+  });
+
   it('shows the donation disclaimer, and hides it when blanked', async () => {
     const { unmount } = renderApp({ tripId: 958 });
     await waitFor(() => expect(screen.getByText('Donation Disclaimer')).toBeInTheDocument());
@@ -272,5 +289,38 @@ describe('trip detail content', () => {
     renderApp({ tripId: 958 });
 
     await waitFor(() => expect(screen.getByText('Trip not found')).toBeInTheDocument());
+  });
+});
+
+describe('full-bleed hero', () => {
+  it('stretches the hero to the page width, escaping the host container', async () => {
+    // jsdom reports 0 for every rect, so this asserts the mechanism — that the
+    // hero is sized off the page rather than left at its container width —
+    // rather than the pixel result. The measured widths are checked in the
+    // embed lab against a real host container.
+    renderApp({ tripId: 958 });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    const hero = screen
+      .getByRole('heading', { name: /Mana De Vida/ })
+      .closest('div')?.parentElement;
+    expect(hero?.style.width).toMatch(/px$/);
+    expect(hero?.style.marginLeft).toMatch(/px$/);
+    expect(hero?.style.marginRight).toMatch(/px$/);
+  });
+
+  it('leaves the hero in its container when fullBleedHero is off', async () => {
+    renderApp({ tripId: 958, fullBleedHero: '' });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    const hero = screen
+      .getByRole('heading', { name: /Mana De Vida/ })
+      .closest('div')?.parentElement;
+    expect(hero?.style.width).toBe('');
+    expect(hero?.style.marginLeft).toBe('');
   });
 });

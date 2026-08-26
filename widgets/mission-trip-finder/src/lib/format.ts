@@ -58,6 +58,26 @@ export function formatTripDates(startIso: string | null, endIso: string | null):
 }
 
 /**
+ * The hero's spelled-out travel window, e.g.
+ * `July 25, 2026 – July 30, 2026`. Unlike {@link formatTripDates} the year is
+ * printed on both ends even when they match: this is the legacy detail page's
+ * format (its proc formatted each date `MMMM dd, yyyy` independently), and at
+ * hero size the repetition reads as deliberate rather than redundant. Cards
+ * keep the compact form.
+ */
+export function formatTripDatesLong(startIso: string | null, endIso: string | null): string | null {
+  const start = startIso ? parseMpDate(startIso) : null;
+  if (!start) return null;
+
+  const end = endIso ? parseMpDate(endIso) : null;
+  const sameDay =
+    end && end.year === start.year && end.month === start.month && end.day === start.day;
+
+  if (!end || sameDay) return formatDay(start, true);
+  return `${formatDay(start, true)} \u2013 ${formatDay(end, true)}`;
+}
+
+/**
  * Whole-dollar USD, e.g. `$3,500`. Mission-trip goals are always round numbers
  * in MP, and the legacy widget's cents were noise on the card.
  */

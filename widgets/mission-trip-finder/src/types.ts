@@ -59,6 +59,14 @@ export const MissionTripFinderConfigSchema = z.object({
         'lets one embed stand in for a dedicated details page: point it at ' +
         '?id=<trip> from the host page and the widget renders that trip alone.',
     ),
+  fullBleedHero: z.coerce
+    .boolean()
+    .default(true)
+    .describe(
+      "Stretch the detail view's cover photo across the full page width, escaping the host " +
+        "page's content container. Turn this off for an embed in a sidebar or a narrow " +
+        'column, where a page-wide hero would overwhelm it.',
+    ),
   showTeam: z.coerce
     .boolean()
     .default(true)

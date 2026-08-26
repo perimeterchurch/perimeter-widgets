@@ -10,6 +10,7 @@ describe('MissionTripFinderConfigSchema', () => {
       hideFull: false,
       includePast: false,
       showTeam: true,
+      fullBleedHero: true,
     });
   });
 
@@ -64,5 +65,16 @@ describe('MissionTripFinderConfigSchema', () => {
     expect(config.hideFull).toBe(true);
     expect(config.destinationId).toBe(7);
     expect(config.maxTrips).toBe(6);
+  });
+});
+
+describe('widget definition', () => {
+  it('renders as rectangles — Perimeter has no corner radius', async () => {
+    const { default: widget } = await import('../src/widget');
+    expect(widget.themeOverrides).toEqual({
+      'radius-sm': '0px',
+      'radius-md': '0px',
+      'radius-lg': '0px',
+    });
   });
 });
