@@ -979,6 +979,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/mission-trips/{id}/participant/{pledgeId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a trip participant's letter and fundraising progress */
+    get: operations['getMissionTripParticipant'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/mission-trips/{id}/participant/{pledgeId}/image': {
     parameters: {
       query?: never;
@@ -5598,6 +5615,64 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  getMissionTripParticipant: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        pledgeId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              pledgeId: number;
+              /** @description The campaign this pledge belongs to. */
+              tripId: number;
+              /** @description Display name, same rules as the roster (Beneficiary wins). */
+              name: string;
+              /** @description The donor contact's given name on its own, for the "Support Sally" call to action. Resolved from the contact rather than from `name`, so it stays a single first name even when `name` is a Beneficiary string covering two people ("Samantha and Jack Morgan" -> "Samantha"). */
+              firstName: string | null;
+              /** @description Pledges.Letter — the participant's support letter. Staff/participant-authored HTML from the MP editor, so render it sanitized. Null when unwritten, which is the common case. */
+              letter: string | null;
+              /** @description Money actually received against this pledge (sum of Donation_Distributions.Amount). NOT Pledges.Total_Pledge, which is a different figure and is 0 for most rows. */
+              raised: number;
+              /** @description The campaign's per-participant Fundraising_Goal, or null when the campaign has none. Every participant on a trip shares the same goal. */
+              goal: number | null;
+              tripLeader: boolean;
+              facebookUrl: string | null;
+              xUrl: string | null;
+              instagramUrl: string | null;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
   getMissionTripParticipantPhoto: {
     parameters: {
       query?: never;
@@ -9638,6 +9713,7 @@ export interface operations {
           tags?: string[];
           /** @enum {string} */
           status?: 'draft' | 'published' | 'archived';
+          changeSummary?: string;
         };
       };
     };
