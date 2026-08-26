@@ -26,6 +26,16 @@ interface TripDetailProps {
 /** The detail's readable column. The hero deliberately escapes it. */
 const COLUMN = 'mx-auto w-full max-w-3xl px-6';
 
+/**
+ * Doubles the column's `space-y-10` gap above the roster and the disclaimer,
+ * which each want more separation than the run of text above them.
+ *
+ * Padding, not margin: the column is a plain block element, so `space-y` puts
+ * its gap on the preceding sibling's margin-bottom, and an added margin-top
+ * here would collapse against it rather than add to it.
+ */
+const SECTION_GAP = 'pt-10';
+
 export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): React.JSX.Element {
   const { data, isLoading, error } = useMissionTrip(id);
   const trip = data?.data;
@@ -169,11 +179,16 @@ export function TripDetail({ id, config, onBack, showBack }: TripDetailProps): R
               )}
 
               {config.showTeam && (
-                <TeamGrid tripId={trip.id} participants={trip.participants} config={config} />
+                <TeamGrid
+                  tripId={trip.id}
+                  participants={trip.participants}
+                  config={config}
+                  className={SECTION_GAP}
+                />
               )}
 
               {config.disclaimerText && (
-                <section>
+                <section className={SECTION_GAP}>
                   <h3 className="mb-3 font-sans text-sm font-bold tracking-wide uppercase">
                     Donation Disclaimer
                   </h3>

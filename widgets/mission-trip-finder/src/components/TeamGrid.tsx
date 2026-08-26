@@ -57,15 +57,17 @@ export function TeamGrid({
   tripId,
   participants,
   config,
+  className,
 }: {
   tripId: number;
   participants: MissionTripParticipant[];
   config: MissionTripFinderConfig;
+  className?: string | undefined;
 }): React.JSX.Element | null {
   if (participants.length === 0) return null;
 
   return (
-    <section>
+    <section className={className}>
       <h3 className="mb-6 text-center font-serif text-4xl leading-tight font-normal text-balance @2xl:text-5xl">
         Meet the Team
       </h3>
