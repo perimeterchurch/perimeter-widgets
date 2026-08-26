@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FullBleed } from './FullBleed';
-import { SECTION_Y, SectionHeading } from './Section';
+import { SECTION_GAP, SECTION_Y, SectionHeading } from './Section';
 import { initials, type Testimonial } from '../lib/testimonials';
 
 /**
@@ -23,7 +23,7 @@ export function Testimonials({
   return (
     <FullBleed enabled={fullBleed} className="bg-surface-dark text-surface-dark-fg">
       <div className={`${SECTION_Y} px-6`}>
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12">
+        <div className={`mx-auto flex w-full max-w-6xl flex-col items-center ${SECTION_GAP}`}>
           <SectionHeading>Hear From Others</SectionHeading>
 
           <ul className="grid w-full gap-10 @2xl:grid-cols-3">

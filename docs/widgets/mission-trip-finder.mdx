@@ -161,8 +161,27 @@ exist are old demo data, one of them another church's sample banner). If Global
 Outreach starts populating it this becomes an API-backed list without the
 component changing shape.
 
-The scroller is a labelled region with a tab stop, so a keyboard user can arrow
-through the photos — without that the overflow is unreachable for them.
+The native scrollbar is hidden, so a circular chevron button sits over the
+right edge as the affordance. It advances by exactly one tile, keeping the
+scroll-snap points aligned, and wraps to the start at the end — with no
+scrollbar and only a forward control, stopping dead would leave a mouse user
+with no way back. It is not rendered at all when the photos do not overflow,
+since an arrow that cannot move is worse than no arrow, and it honours
+`prefers-reduced-motion` by jumping rather than smooth-scrolling.
+
+The scroller is also a labelled region with a tab stop, so a keyboard user can
+arrow through the photos — without that the overflow is unreachable for them.
+
+### Vertical rhythm
+
+Every band carries the same 120px above and below (stepping down to 64px on
+narrow embeds), and the gap between a band's own children is a uniform 64px.
+Two deliberate exceptions, both from the Figma: the photo scroller has no
+vertical padding at all, so it sits flush against the bands either side, and
+the heading's three lines are one tight cluster rather than three children.
+
+That means adjacent bands are 240px apart while the scroller's neighbours are
+120px — the scroller's flush edges are what create the difference.
 
 ### Testimonials
 
