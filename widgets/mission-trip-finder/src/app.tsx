@@ -27,7 +27,12 @@ const fadeSlide = {
 function MissionTripWidget({ config }: AppProps): React.JSX.Element {
   const nav = useTripNavigation(config);
 
-  const viewKey = nav.screen === 'detail' && nav.id ? `detail-${nav.id}` : 'browse';
+  const viewKey =
+    nav.screen === 'detail' && nav.id
+      ? nav.pledgeId
+        ? `participant-${nav.id}-${nav.pledgeId}`
+        : `detail-${nav.id}`
+      : 'browse';
 
   return (
     <div className="@container text-left">
@@ -38,7 +43,15 @@ function MissionTripWidget({ config }: AppProps): React.JSX.Element {
       <AnimatePresence mode="wait">
         <motion.div key={viewKey} {...fadeSlide}>
           {nav.screen === 'detail' && nav.id ? (
-            <TripDetail id={nav.id} config={config} onBack={nav.back} showBack={!nav.isPinned} />
+            <TripDetail
+              id={nav.id}
+              config={config}
+              onBack={nav.back}
+              showBack={!nav.isPinned}
+              pledgeId={nav.pledgeId}
+              onSelectParticipant={nav.openParticipant}
+              onCloseParticipant={nav.closeParticipant}
+            />
           ) : (
             <TripGrid config={config} onOpenTrip={nav.openTrip} />
           )}

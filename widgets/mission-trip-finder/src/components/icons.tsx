@@ -90,3 +90,11 @@ export function CheckIcon({ className }: IconProps): React.JSX.Element {
     </svg>
   );
 }
+
+export function ChevronRightIcon({ className }: IconProps): React.JSX.Element {
+  return (
+    <svg {...STROKE} className={className}>
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  );
+}

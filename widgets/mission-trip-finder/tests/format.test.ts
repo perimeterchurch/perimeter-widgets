@@ -5,6 +5,7 @@ import {
   formatTripDates,
   formatTripDatesLong,
   participantPhotoUrl,
+  splitList,
   spotsRemaining,
 } from '../src/lib/format';
 
@@ -121,14 +122,21 @@ describe('participantPhotoUrl', () => {
 });
 
 describe('formatTripDatesLong', () => {
-  it('prints the year on both ends, unlike the compact card format', () => {
-    // The legacy detail page formatted each date `MMMM dd, yyyy` on its own, so
-    // the hero repeats the year where the card collapses it.
-    expect(formatTripDatesLong('2026-07-25T00:00:00', '2026-07-30T00:00:00')).toBe(
-      'July 25, 2026 \u2013 July 30, 2026',
+  it('prints both years, zero-padded and hyphenated, unlike the card format', () => {
+    // `MMMM dd, yyyy - MMMM dd, yyyy` — the legacy proc's exact string, which
+    // the Figma reproduces ("July 25, 2026 - August 01, 2026").
+    expect(formatTripDatesLong('2026-07-25T00:00:00', '2026-08-01T00:00:00')).toBe(
+      'July 25, 2026 - August 01, 2026',
     );
+    // The card still collapses a shared year and uses an en dash.
     expect(formatTripDates('2026-07-25T00:00:00', '2026-07-30T00:00:00')).toBe(
       'July 25 \u2013 July 30, 2026',
+    );
+  });
+
+  it('zero-pads a single-digit day', () => {
+    expect(formatTripDatesLong('2026-07-05T00:00:00', '2026-07-09T00:00:00')).toBe(
+      'July 05, 2026 - July 09, 2026',
     );
   });
 
@@ -142,5 +150,17 @@ describe('formatTripDatesLong', () => {
 
   it('returns null for an unscheduled trip', () => {
     expect(formatTripDatesLong(null, '2026-07-30T00:00:00')).toBeNull();
+  });
+});
+
+describe('splitList', () => {
+  it('splits, trims, and drops empties', () => {
+    expect(splitList('a.jpg, b.jpg ,, c.jpg ')).toEqual(['a.jpg', 'b.jpg', 'c.jpg']);
+  });
+
+  it('returns nothing for an unset or blank value', () => {
+    expect(splitList(undefined)).toEqual([]);
+    expect(splitList('   ')).toEqual([]);
+    expect(splitList(',,')).toEqual([]);
   });
 });

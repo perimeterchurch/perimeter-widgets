@@ -92,12 +92,16 @@
       <p class="banner">
         <code>data-trip-id="958"</code> renders that trip's detail alone: no grid behind it, no Back
         button, and the URL is never written to. This is the mode that replaces the widget on the
-        WordPress go-journey-details page.
+        WordPress go-journey-details page. It also carries <code>data-gallery-urls</code> with five
+        real banners, so the photo scroller has something to scroll &mdash; drag it, or focus it and
+        use the arrow keys. Embed 1 above has none set, so its scroller falls back to the single
+        destination banner.
       </p>
       <div
         data-perimeter-widget="mission-trip-finder"
         data-api-url="http://localhost:5500"
         data-trip-id="958"
+        data-gallery-urls="https://perimetercdnstorage.blob.core.windows.net/widgets/Guatemala-MMM-Banner.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/banner-poland.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/croatia.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/UgandaEgypt.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/Bangkok-Thailand.jpg"
       ></div>
 
       <script src="/local/mission-trip-finder/index.js" data-nowprocket async></script>

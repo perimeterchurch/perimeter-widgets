@@ -59,13 +59,47 @@ export const MissionTripFinderConfigSchema = z.object({
         'lets one embed stand in for a dedicated details page: point it at ' +
         '?id=<trip> from the host page and the widget renders that trip alone.',
     ),
-  fullBleedHero: z.coerce
+  fullBleed: z.coerce
     .boolean()
     .default(true)
     .describe(
-      "Stretch the detail view's cover photo across the full page width, escaping the host " +
-        "page's content container. Turn this off for an embed in a sidebar or a narrow " +
-        'column, where a page-wide hero would overwhelm it.',
+      "Let the detail view's photo scroller and testimonial band span the full page width, " +
+        "escaping the host page's content container. Turn this off for an embed in a sidebar " +
+        'or a narrow column, where page-wide bands would overwhelm it.',
+    ),
+  galleryUrls: z
+    .string()
+    .optional()
+    .describe(
+      "Comma-separated image URLs for the detail view's photo scroller. With none set the " +
+        "scroller shows the destination's banner image on its own. MP has no per-trip gallery " +
+        'today, so these have to be supplied by the embed.',
+    ),
+  showTestimonials: z.coerce
+    .boolean()
+    .default(true)
+    .describe(
+      'Show the "Hear From Others" testimonial band on the detail view. The testimonials are ' +
+        'placeholder copy today — see src/lib/testimonials.ts.',
+    ),
+  pledgeId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe(
+      "Open straight to one participant's page. Pairs with `tripId` on a dedicated " +
+        'participant page, which reads `?pledge=` from its own URL and passes it in.',
+    ),
+  participantSupportUrl: z
+    .string()
+    .default(
+      'https://perimeter.onlinegiving.org/donate/form/1385?mp_campaign_id={id}&mp_pledge_id={pledgeId}#!/',
+    )
+    .describe(
+      'Destination of the "Support <name>" button on a participant\'s page. `{id}` and ' +
+        '`{pledgeId}` are replaced. Defaults to the same giving form as Support Journey ' +
+        'with the pledge attached, which is what the legacy participant page used.',
     ),
   showTeam: z.coerce
     .boolean()
