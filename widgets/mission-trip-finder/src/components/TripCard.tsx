@@ -63,13 +63,19 @@ export function TripCard({
     </>
   );
 
+  // `link` mode (the default) hands off to a separate details page; `inline`
+  // opens the widget's own view. An empty `detailsUrlBase` in link mode would
+  // leave a card with nowhere to go, so it falls through to inline rather than
+  // rendering a dead anchor.
+  const linkOut = config.detailsMode === 'link' && !!config.detailsUrlBase;
+
   return (
     <li className="flex">
       {/* An anchor when the embed hands off to a separate details page, a
           button when the detail opens in place. A <button> rather than a
           href-less <a> so keyboard and screen-reader semantics match what the
           click actually does. */}
-      {config.detailsUrlBase ? (
+      {linkOut ? (
         <a href={`${config.detailsUrlBase}${trip.id}`} className={SHELL}>
           {body}
         </a>

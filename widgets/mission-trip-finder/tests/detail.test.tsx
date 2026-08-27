@@ -50,7 +50,10 @@ function config(overrides: Record<string, unknown> = {}): MissionTripFinderConfi
 }
 
 function renderApp(overrides: Record<string, unknown> = {}) {
-  return render(<App config={config(overrides)} />);
+  // `detailsMode: 'inline'` on every render here: link mode is the default so a
+  // release cannot change a live embed, but these specs are about the in-place
+  // detail, which an embed opts into.
+  return render(<App config={config({ detailsMode: 'inline', ...overrides })} />);
 }
 
 beforeEach(() => {

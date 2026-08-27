@@ -9,8 +9,12 @@ for each one. Cards show the destination banner, trip name, destination, travel
 dates, the per-participant fundraising goal, and an optional description; trips
 at capacity and invitation-only trips are badged.
 
-Clicking a card opens that trip's detail **in place**, without leaving the
-page. The detail follows the 2026 Figma redesign, in bands:
+By default a card links out to the go-journey-details page, exactly as it has
+since 0.1.0. Set `data-details-mode="inline"` and the card instead opens that
+trip's detail **in place**, without leaving the page — see
+[Choosing a details mode](#choosing-a-details-mode).
+
+The detail follows the 2026 Figma redesign, in bands:
 
 1. **Heading** — trip name, destination and travel dates, centred on white.
 2. **Photo scroller** — a full-bleed horizontal row of square photos.
@@ -78,13 +82,14 @@ defaults).
 | `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. See below.                     |
 | `data-show-testimonials` | boolean | `true`                                 | Show the "Hear From Others" band.                                                 |
 | `data-pledge-id`        | number  | —                                      | Open straight to one participant's page. Pairs with `data-trip-id`.               |
-| `data-participant-support-url` | string | onlinegiving.org form 1385 | "Support <name>" destination. `{id}` and `{pledgeId}` are replaced.               |
+| `data-participant-support-url` | string | onlinegiving.org form 1385 | Destination of the participant "Support" button. `{id}` and `{pledgeId}` are replaced.               |
 | `data-show-team`         | boolean | `true`                                 | Show the "Meet the Team" roster on the detail view.                               |
 | `data-register-url`      | string  | mission-trip-application page          | "Register to Join" destination. `{id}` is replaced with the trip ID.              |
 | `data-support-url`       | string  | onlinegiving.org form 1385             | "Support Journey" destination. `{id}` is replaced with the trip ID.               |
 | `data-participant-url`   | string  | —                                      | Link each team member somewhere. `{pledgeId}` and `{id}` are replaced.            |
 | `data-disclaimer-text`   | string  | the standard donation disclaimer       | Text at the foot of the detail view. Empty string hides the block.                |
-| `data-details-url-base`  | string  | —                                      | Link cards OUT to this URL instead of opening the detail in place. See below.     |
+| `data-details-mode`      | `link` \| `inline` | `link`                      | What a card click does. `link` hands off to `data-details-url-base`; `inline` opens the detail in place. |
+| `data-details-url-base`  | string  | perimeter.org go-journey-details       | Where a card links in `link` mode; the trip ID is appended. Ignored in `inline` mode. |
 | `data-empty-message`     | string  | `No mission trips are open right now.` | Message shown when the list has no trips.                                         |
 | `data-default-image-url` | string  | —                                      | Fallback banner for trips whose destination has no artwork.                       |
 | `data-api-url`           | string  | —                                      | Override the perimeter-api base URL (advanced).                                   |
@@ -178,6 +183,37 @@ since an arrow that cannot move is worse than no arrow, and it honours
 
 The scroller is also a labelled region with a tab stop, so a keyboard user can
 arrow through the photos — without that the overflow is unreachable for them.
+
+### Choosing a details mode
+
+`data-details-mode` defaults to **`link`**, and that default is load-bearing
+rather than conservative for its own sake.
+
+The loader resolves an unpinned embed's version straight from the manifest:
+
+```js
+var version = nodes[i].getAttribute('data-perimeter-version') || manifest[name];
+```
+
+The manifest is fetched `no-cache`, so **every live embed moves to a new version
+the moment it is published**. If the in-place detail were the default, releasing
+would silently change every page already carrying the widget. Keeping `link` the
+default means publishing a version is never a behaviour change: a page opts in
+when it is ready, with one attribute.
+
+```html
+<!-- Behaves exactly as it does today, on any version -->
+<div data-perimeter-widget="mission-trip-finder"></div>
+
+<!-- Opts into the widget's own detail view -->
+<div data-perimeter-widget="mission-trip-finder" data-details-mode="inline"></div>
+```
+
+`link` mode with an empty `data-details-url-base` falls through to inline rather
+than rendering a card with no href.
+
+`data-trip-id` and `data-pledge-id` are unaffected — they render a detail or a
+participant directly, with no card to click.
 
 ### The participant page
 
