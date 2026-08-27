@@ -305,6 +305,18 @@ Only filled buttons are affected. The `outline` and `ghost` buttons (Back, Copy
 link, View Trip Details) sit on white, where a white label would be invisible,
 so they keep the dark text.
 
+### The metadata grey
+
+Secondary text — destination, dates, trip facts, the donation disclaimer, the
+empty-state message — overrides `color-muted-fg` to `hsl(215 0.5% 43.28%)`
+(`#6E6E6F`). That is the shared token's lightness with the saturation taken from
+16% down to a near-neutral 0.5%, so the metadata reads grey rather than
+blue-grey next to the navy headings. Global Outreach's colour.
+
+Unlike the white button labels, this is **not** an accessibility exception: it
+holds 5.08:1 on white and 4.63:1 in the `bg-muted` message box, both above the
+4.5:1 AA floor. `tests/config.test.ts` computes both and fails below it.
+
 ### The photo placeholder
 
 Most of a roster has no photo on file, so `PhotoFallback` is what a team grid
