@@ -1,6 +1,6 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../src/app';
 import { MissionTripFinderConfigSchema, type MissionTripFinderConfig } from '../src/types';
@@ -153,6 +153,22 @@ describe('participant page content', () => {
       'src',
       expect.stringContaining('/api/mission-trips/945/participant/100223/image'),
     );
+  });
+
+  // Most of the roster has no photo on file, so the image 404s and this is the
+  // common path, not an edge case. The branded mark has to replace the portrait
+  // without leaving a second, redundant accessible name behind it.
+  it('falls back to the branded mark when the photo 404s', async () => {
+    const photo = await waitFor(() => screen.getByAltText('Samantha and Jack Morgan'));
+    fireEvent.error(photo);
+
+    expect(screen.queryByAltText('Samantha and Jack Morgan')).not.toBeInTheDocument();
+    const mark = document.querySelector('img[src^="data:image/png;base64,"]');
+    expect(mark).toBeInTheDocument();
+    expect(mark).toHaveAttribute('aria-hidden', 'true');
+    expect(mark).toHaveAttribute('alt', '');
+    // The name is still announced once, by the heading.
+    expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument();
   });
 
   it('renders progress as a real <progress>, announced with its figures', async () => {

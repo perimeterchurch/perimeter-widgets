@@ -24,7 +24,7 @@ export function TripHeading({
 }): React.JSX.Element {
   return (
     <header className={`${SECTION_Y} flex flex-col items-center gap-3 px-6 text-center`}>
-      <h2 className="max-w-2xl font-serif text-4xl leading-[1.1] font-medium text-balance text-fg @md:text-5xl @xl:text-6xl">
+      <h2 className="max-w-2xl font-sans text-4xl leading-[1.1] font-medium text-balance text-fg @md:text-5xl @xl:text-6xl">
         {name}
       </h2>
 

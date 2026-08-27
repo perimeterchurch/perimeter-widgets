@@ -86,11 +86,27 @@ describe('MissionTripFinderConfigSchema', () => {
 describe('widget definition', () => {
   it('renders as rectangles — Perimeter has no corner radius', async () => {
     const { default: widget } = await import('../src/widget');
-    expect(widget.themeOverrides).toEqual({
+    expect(widget.themeOverrides).toMatchObject({
       'radius-sm': '0px',
       'radius-md': '0px',
       'radius-lg': '0px',
     });
+  });
+
+  // Global Outreach asked for white button labels knowing they fail WCAG AA on
+  // the light `primary` blue (~2:1, against 7.3:1 for the default navy). Pinned
+  // so the override cannot be lost silently in a refactor — and so the reason
+  // it exists is written down next to it.
+  it('overrides primary-fg to white for button labels, by ministry request', async () => {
+    const { default: widget } = await import('../src/widget');
+    expect(widget.themeOverrides?.['color-primary-fg']).toBe('hsl(0 0% 100%)');
+  });
+
+  // The override has to stay scoped to this widget: the shared palette keeps
+  // the AA-compliant pairing that packages/theme guards for every other widget.
+  it('does not touch the shared palette', async () => {
+    const { globalTokens } = await import('@perimeter/theme');
+    expect(globalTokens['color-primary-fg']).toBe('hsl(210 75% 14.1%)');
   });
 });
 

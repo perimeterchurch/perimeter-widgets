@@ -2,7 +2,7 @@ import * as React from 'react';
 import type { MissionTripParticipant } from '@perimeter/api-hooks';
 import type { MissionTripFinderConfig } from '../types';
 import { fillUrlTemplate, participantPhotoUrl } from '../lib/format';
-import { PersonIcon } from './icons';
+import { PhotoFallback } from './PhotoFallback';
 
 /**
  * Square portrait with the name across the bottom. The photo sits under a dark
@@ -21,9 +21,7 @@ function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Elem
   return (
     <div className="group relative aspect-square w-full overflow-hidden bg-neutral-800">
       {failed ? (
-        <div className="flex h-full w-full items-center justify-center text-white/30">
-          <PersonIcon className="h-1/2 w-1/2" />
-        </div>
+        <PhotoFallback />
       ) : (
         <img
           src={src}
@@ -71,7 +69,7 @@ export function TeamGrid({
 
   return (
     <section className={className}>
-      <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-medium text-balance @md:text-4xl @xl:text-5xl">
+      <h3 className="mb-6 text-center font-sans text-3xl leading-tight font-medium text-balance @md:text-4xl @xl:text-5xl">
         Meet the Team
       </h3>
       <ul className="flex flex-wrap justify-center gap-2.5">

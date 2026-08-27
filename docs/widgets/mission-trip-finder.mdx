@@ -134,7 +134,9 @@ The detail adds two fields the list does not carry:
 - **`participants`** — the team, from the campaign's seat-holding pledges. Each
   is a display name and a `pledgeId`; photos come from
   `GET /api/mission-trips/{id}/participant/{pledgeId}/image`, which 404s for the
-  many people with no photo on file, so an avatar falls back to a person glyph.
+  many people with no photo on file — so the placeholder is the common case, not
+  an edge case, and it is branded rather than a generic glyph (see
+  [The photo placeholder](#the-photo-placeholder)).
 
 Banner images are absolute URLs on the destination record (an external CDN), not
 served by perimeter-api. A trip whose destination has no banner falls back to
@@ -286,12 +288,46 @@ still wins if an embed ever needs a radius back.
 > and a card opens the widget's own detail view instead. Set it to restore the
 > hand-off to a separate page.
 
+### White button labels
+
+Filled buttons draw their label in white on the `#60bbe9` brand accent. That is
+about 2:1 contrast and **fails WCAG AA** — the theme's default `primary-fg` is
+brand navy on the same fill, at 7.3:1.
+
+This is Global Outreach's explicit decision, made knowing the tradeoff, and it
+matches the Figma. It is scoped to this widget by overriding `color-primary-fg`
+in `themeOverrides` rather than by changing the palette, so every other widget
+keeps the AA-compliant pairing that `packages/theme/tests/contrast.test.ts`
+guards. Two tests in `tests/config.test.ts` pin both halves: the override is
+present here, and the shared palette is untouched.
+
+Only filled buttons are affected. The `outline` and `ghost` buttons (Back, Copy
+link, View Trip Details) sit on white, where a white label would be invisible,
+so they keep the dark text.
+
+### The photo placeholder
+
+Most of a roster has no photo on file, so `PhotoFallback` is what a team grid
+mostly renders. It is the Perimeter arch mark as a white silhouette at 30%
+opacity over a `bg-primary` field — the standard branded tile, so a grid of them
+reads as deliberate rather than broken.
+
+The mark ships as an inlined data URI (`src/lib/perimeter-mark.ts`, ~23 kB)
+because widgets render in a shadow DOM on host pages we do not control, where a
+bundled asset is the only thing guaranteed not to 404. It is white rather than
+pre-tinted so the field stays token-driven: retint `primary` and the placeholder
+follows.
+
+In the team grid the tile sits under the same hover scrim as a real photo, which
+keeps the white name legible and lifts on hover. The participant portrait has no
+scrim, so it shows the tile at full strength.
+
+### Type
+
+Headings are `font-sans` (sweet-sans-pro) throughout, not the theme's
+`font-serif` display face — Global Outreach asked for Sweet Sans across the
+page.
+
 > **Not ported:** the legacy detail page embedded a Google Map of the
 > destination, keyed with an API key committed to a public repo. The map is
 > dropped rather than re-keyed — the destination name is already on the page.
-
-> **One deliberate deviation from the Figma:** it draws the two CTAs as white
-> text on the `#60bbe9` brand accent, which is about 2:1 contrast and fails
-> WCAG AA. The buttons use the theme's `primary`/`primary-fg` pair instead —
-> the same `#60bbe9` fill with brand-navy text, 7.3:1. The token comments and
-> `packages/theme/tests/contrast.test.ts` both exist to hold that line.

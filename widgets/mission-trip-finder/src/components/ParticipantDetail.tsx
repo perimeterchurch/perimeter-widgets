@@ -8,7 +8,8 @@ import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
 import type { MissionTripFinderConfig } from '../types';
 import { fillUrlTemplate, formatCost, participantPhotoUrl } from '../lib/format';
 import { Section, READING_COLUMN } from './Section';
-import { ArrowLeftIcon, PersonIcon } from './icons';
+import { ArrowLeftIcon } from './icons';
+import { PhotoFallback } from './PhotoFallback';
 
 /**
  * Money raised against the participant's goal.
@@ -44,9 +45,7 @@ function Portrait({ src, name }: { src: string; name: string }): React.JSX.Eleme
   return (
     <div className="size-40 overflow-hidden rounded-full bg-muted @md:size-52">
       {failed ? (
-        <div className="flex h-full w-full items-center justify-center text-muted-fg">
-          <PersonIcon className="h-1/2 w-1/2 opacity-40" />
-        </div>
+        <PhotoFallback />
       ) : (
         <img
           src={src}
@@ -130,7 +129,7 @@ export function ParticipantDetail({
             <h3
               ref={headingRef}
               tabIndex={-1}
-              className="text-center font-serif text-3xl leading-tight font-medium text-balance outline-hidden @md:text-4xl @xl:text-5xl"
+              className="text-center font-sans text-3xl leading-tight font-medium text-balance outline-hidden @md:text-4xl @xl:text-5xl"
             >
               {participant.name}
             </h3>
