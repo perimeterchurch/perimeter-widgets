@@ -4,10 +4,11 @@ import { z } from 'zod';
  * Mission Trip Finder config. Arrives from the host page as `data-*`
  * attributes (always strings), so numeric/boolean fields use `z.coerce.*`.
  * Defaults mirror the legacy reactwidgets MissionTripFinder, which showed every
- * open GO Journey — including full and invitation-only ones — as a card grid.
- * Since 0.2.0 a card opens the trip's detail view in place rather than linking
- * out to the go-journey-details page; `detailsUrlBase` restores the old
- * hand-off for embeds that still want it.
+ * open GO Journey — including full and invitation-only ones — as a card grid
+ * linking out to the go-journey-details page. That link-out is still the
+ * DEFAULT: `detailsMode: 'inline'` opts an embed into the widget's own detail
+ * view, so publishing a new version never changes a live embed's behaviour on
+ * its own.
  */
 export const MissionTripFinderConfigSchema = z.object({
   showDescription: z.coerce
@@ -40,14 +41,22 @@ export const MissionTripFinderConfigSchema = z.object({
     .positive()
     .optional()
     .describe('Cap the total number of trips shown.'),
+  detailsMode: z
+    .enum(['link', 'inline'])
+    .default('link')
+    .describe(
+      'What a trip card does when clicked. `link` (the default) hands off to ' +
+        '`detailsUrlBase`, which is what every embed did before the detail view existed. ' +
+        "`inline` opens the widget's own detail view in place. Defaults to `link` so " +
+        'releasing a new version never changes a live embed underneath you — switch an ' +
+        'embed over deliberately, when the page is ready for it.',
+    ),
   detailsUrlBase: z
     .string()
-    .optional()
+    .default('https://www.perimeter.org/global-outreach/go-journey-details/?id=')
     .describe(
-      'Link cards OUT to this URL (the trip ID is appended) instead of opening the ' +
-        "widget's own detail view. Leave unset — the default — and a card opens the " +
-        'detail in place. Setting it restores the pre-0.2.0 behaviour of handing off ' +
-        'to a separate details page.',
+      'Where a card links to in `link` mode; the trip ID is appended. Ignored in ' +
+        '`inline` mode.',
     ),
   tripId: z.coerce
     .number()

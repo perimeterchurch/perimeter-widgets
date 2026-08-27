@@ -64,16 +64,26 @@ describe('mission-trip-finder App', () => {
     expect(screen.getByText('$3,500')).toBeInTheDocument();
   });
 
-  it('makes the card a button, not a link, when the detail opens in place', () => {
+  it('links the card out by default — the pre-detail-view behaviour', () => {
     hooks.result = queryResult([TRIP]);
     renderApp();
+    expect(screen.getByRole('link')).toHaveAttribute(
+      'href',
+      'https://www.perimeter.org/global-outreach/go-journey-details/?id=948',
+    );
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('makes the card a button in inline mode', () => {
+    hooks.result = queryResult([TRIP]);
+    renderApp({ detailsMode: 'inline' });
     // A <button> rather than an href-less <a>, so keyboard and screen-reader
     // semantics match what the click actually does.
     expect(screen.getByRole('button', { name: /Ghana Hope/ })).toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('links the card out when a details URL base is configured', () => {
+  it('honours a custom details URL base in link mode', () => {
     hooks.result = queryResult([TRIP]);
     renderApp({ detailsUrlBase: 'https://example.org/trip/' });
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.org/trip/948');
@@ -214,5 +224,15 @@ describe('mission-trip-finder App', () => {
     hooks.result = queryResult(null, { isError: true, isSuccess: false });
     renderApp();
     expect(screen.getByText(/unable to load mission trips/i)).toBeInTheDocument();
+  });
+});
+
+describe('details mode fallback', () => {
+  it('falls through to inline rather than rendering a dead anchor', () => {
+    // link mode with nowhere to link would leave a card with no href at all.
+    hooks.result = queryResult([TRIP]);
+    renderApp({ detailsMode: 'link', detailsUrlBase: '' });
+    expect(screen.getByRole('button', { name: /Ghana Hope/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

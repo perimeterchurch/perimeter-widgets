@@ -86,7 +86,25 @@
         invisible, and the cover photo must span the full page width — past this container's 90px
         padding, edge to edge — without introducing a horizontal scrollbar.
       </p>
-      <div data-perimeter-widget="mission-trip-finder" data-api-url="http://localhost:5500"></div>
+      <div
+        data-perimeter-widget="mission-trip-finder"
+        data-api-url="http://localhost:5500"
+        data-details-mode="inline"
+      ></div>
+
+      <h2>1b — the default: cards link OUT (what a live embed still does)</h2>
+      <p class="banner">
+        No <code>data-details-mode</code>, so cards are anchors to the go-journey-details page,
+        exactly as released 0.1.0 behaves. This is the release-safety default: publishing a new
+        version must never change a live embed underneath us. Hover a card and check the status bar
+        &mdash; it should show a <code>perimeter.org/global-outreach/go-journey-details</code>
+        URL, and clicking must leave the page rather than opening the detail.
+      </p>
+      <div
+        data-perimeter-widget="mission-trip-finder"
+        data-api-url="http://localhost:5500"
+        data-max-trips="3"
+      ></div>
 
       <h2>2 — pinned to one trip (what a details page embeds)</h2>
       <p class="banner">
