@@ -4,6 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Embed Lab — local mission-trip-finder</title>
+    <!--
+      Perimeter's Adobe Fonts kit, the same one studio/index.html loads (kept in
+      studio/src/lib/brand-fonts.ts).
+
+      Widget bundles ship no `@font-face` of their own: their CSS *names*
+      sweet-sans-pro and freight-display-pro, and font availability is scoped to
+      a DOCUMENT, so the embedding page has to have loaded them. perimeter.org
+      loads its own kit, so live widgets get the real faces — but a lab page
+      without this link falls through the token stack to Inter, which reads as a
+      widget bug when it is really a missing host font.
+
+      This page is the one used to review the widget's typography, so it loads
+      the kit to match the real host. The other lab pages stay deliberately bare:
+      their job is catching style leaks, not judging type.
+    -->
+    <link rel="stylesheet" href="https://use.typekit.net/hpg7onr.css" />
     <style>
       /* perimeter.org's measured host styles (provenance:
          packages/parity/fixtures/wordpress.html, read from the live page
