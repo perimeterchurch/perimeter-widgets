@@ -15,11 +15,25 @@ describe('MissionTripFinderConfigSchema', () => {
     });
   });
 
-  it('leaves detailsUrlBase unset so a card opens the detail in place', () => {
-    // Changed in 0.2.0. It used to default to the go-journey-details page, so
-    // every embed linked out; leaving it unset is what routes a click into the
-    // widget's own detail view. Setting it restores the hand-off.
-    expect(MissionTripFinderConfigSchema.parse({}).detailsUrlBase).toBeUndefined();
+  it('defaults to linking out, so releasing never changes a live embed', () => {
+    // Release safety: an embed that sets nothing must behave exactly as it did
+    // before the detail view existed. Flipping this default would silently
+    // change every live page the moment a new version reaches the manifest.
+    const config = MissionTripFinderConfigSchema.parse({});
+    expect(config.detailsMode).toBe('link');
+    expect(config.detailsUrlBase).toBe(
+      'https://www.perimeter.org/global-outreach/go-journey-details/?id=',
+    );
+  });
+
+  it('opts into the in-place detail view explicitly', () => {
+    expect(MissionTripFinderConfigSchema.parse({ detailsMode: 'inline' }).detailsMode).toBe(
+      'inline',
+    );
+  });
+
+  it('rejects an unknown details mode rather than guessing', () => {
+    expect(() => MissionTripFinderConfigSchema.parse({ detailsMode: 'popup' })).toThrow();
   });
 
   it('defaults the CTA templates to the legacy destinations', () => {
