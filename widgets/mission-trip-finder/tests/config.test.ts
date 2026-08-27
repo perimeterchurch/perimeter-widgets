@@ -47,7 +47,8 @@ describe('MissionTripFinderConfigSchema', () => {
       includePast: false,
       showTeam: true,
       fullBleed: true,
-      showTestimonials: true,
+      showGallery: false,
+      showTestimonials: false,
     });
   });
 

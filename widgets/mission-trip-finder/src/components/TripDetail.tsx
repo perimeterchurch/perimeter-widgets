@@ -97,7 +97,9 @@ export function TripDetail({
   const showRegister = !!trip && !trip.registrationFull && !trip.invitationOnly;
 
   // The destination banner is the fallback gallery: it is the one real photo
-  // every trip has, and it is what the previous hero displayed.
+  // every trip has, and it is what the previous hero displayed. Only reached
+  // when `showGallery` is on — the scroller is off by default until Global
+  // Outreach has photos to put in it.
   const configured = splitList(config.galleryUrls);
   const gallery = configured.length > 0 ? configured : trip?.bannerUrl ? [trip.bannerUrl] : [];
 
@@ -113,14 +115,16 @@ export function TripDetail({
               <Skeleton className="h-8 w-40" />
               <Skeleton className="h-5 w-64" />
             </div>
-            <div className="flex gap-4 px-2.5">
-              {Array.from({ length: 4 }, (_, i) => (
-                <Skeleton
-                  key={i}
-                  className="aspect-square w-[260px] shrink-0 @md:w-[340px] @xl:w-[420px]"
-                />
-              ))}
-            </div>
+            {config.showGallery && (
+              <div className="flex gap-4 px-2.5">
+                {Array.from({ length: 4 }, (_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="aspect-square w-[260px] shrink-0 @md:w-[340px] @xl:w-[420px]"
+                  />
+                ))}
+              </div>
+            )}
           </div>
         }
       >
@@ -134,7 +138,9 @@ export function TripDetail({
               invitationOnly={trip.invitationOnly}
             />
 
-            <TripGallery images={gallery} alt={trip.name} fullBleed={config.fullBleed} />
+            {config.showGallery && (
+              <TripGallery images={gallery} alt={trip.name} fullBleed={config.fullBleed} />
+            )}
 
             {pledgeId !== null ? (
               <ParticipantDetail

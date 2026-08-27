@@ -99,8 +99,9 @@
         the widget the cards must stay a plain grid (no bullets, no 2rem row gaps), banners and team
         avatars must have no red border and no grayscale, and buttons must stay brand blue rather
         than lime. On the detail, <strong>every</strong> team avatar must be visible — none stranded
-        invisible, and the cover photo must span the full page width — past this container's 90px
-        padding, edge to edge — without introducing a horizontal scrollbar.
+        invisible. Both opt-in bands are off here, so the detail runs heading &rarr; About the
+        Journey &rarr; Meet the Team with no photo scroller and no testimonials &mdash; that is the
+        default, and it must look finished rather than gap-toothed.
       </p>
       <div
         data-perimeter-widget="mission-trip-finder"
@@ -126,15 +127,20 @@
       <p class="banner">
         <code>data-trip-id="958"</code> renders that trip's detail alone: no grid behind it, no Back
         button, and the URL is never written to. This is the mode that replaces the widget on the
-        WordPress go-journey-details page. It also carries <code>data-gallery-urls</code> with five
-        real banners, so the photo scroller has something to scroll &mdash; drag it, or focus it and
-        use the arrow keys. Embed 1 above has none set, so its scroller falls back to the single
-        destination banner.
+        WordPress go-journey-details page. It also opts into <strong>both</strong> bands:
+        <code>data-show-gallery="true"</code> with five real banners in
+        <code>data-gallery-urls</code>, and <code>data-show-testimonials="true"</code>. Drag the
+        scroller, or focus it and use the arrow keys. The cover photos must span the full page width
+        &mdash; past this container's 90px padding, edge to edge &mdash; without introducing a
+        horizontal scrollbar. Both bands are off by default (embed 1), because Global Outreach has
+        no gallery photos and the testimonial quotes are still placeholder copy.
       </p>
       <div
         data-perimeter-widget="mission-trip-finder"
         data-api-url="http://localhost:5500"
         data-trip-id="958"
+        data-show-gallery="true"
+        data-show-testimonials="true"
         data-gallery-urls="https://perimetercdnstorage.blob.core.windows.net/widgets/Guatemala-MMM-Banner.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/banner-poland.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/croatia.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/UgandaEgypt.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/Bangkok-Thailand.jpg"
       ></div>
 

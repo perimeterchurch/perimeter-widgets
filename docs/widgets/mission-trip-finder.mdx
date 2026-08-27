@@ -79,8 +79,9 @@ defaults).
 | `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
 | `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
 | `data-full-bleed`        | boolean | `true`                                 | Let the photo scroller and testimonial band span the full page width. See below.  |
-| `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. See below.                     |
-| `data-show-testimonials` | boolean | `true`                                 | Show the "Hear From Others" band.                                                 |
+| `data-show-gallery`      | boolean | `false`                                | Show the horizontal photo scroller. Off until an embed supplies photos.           |
+| `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. Needs `data-show-gallery`.     |
+| `data-show-testimonials` | boolean | `false`                                | Show the "Hear From Others" band. Off — the quotes are placeholder copy.          |
 | `data-pledge-id`        | number  | —                                      | Open straight to one participant's page. Pairs with `data-trip-id`.               |
 | `data-participant-support-url` | string | onlinegiving.org form 1385 | Destination of the participant "Support" button. `{id}` and `{pledgeId}` are replaced.               |
 | `data-show-team`         | boolean | `true`                                 | Show the "Meet the Team" roster on the detail view.                               |
@@ -162,11 +163,17 @@ where page-wide bands would overwhelm the rest of the page.
 
 ### The photo scroller
 
+**Off by default** — set `data-show-gallery="true"` to render it.
+
 Ministry Platform has **no per-trip gallery today**, so the scroller is fed by
 `data-gallery-urls` (comma-separated). With none set it falls back to the
 destination's banner image on its own — the one real photo every trip has, and
 the one the pre-redesign hero displayed. With no banner either, the scroller
 does not render.
+
+That fallback is exactly why the band is off by default: a horizontal scroller
+holding a single image reads as a design element missing its content rather than
+as a deliberate choice. Turn it on once the embed has photos to give it.
 
 MP does have the right shape, unwired: `Journey_Files` holds `Link` and
 `Thumbnail_Link` per file and joins through `Journey_Contents`, but every live
@@ -256,6 +263,11 @@ That means adjacent bands are 240px apart while the scroller's neighbours are
 120px — the scroller's flush edges are what create the difference.
 
 ### Testimonials
+
+**Off by default** — set `data-show-testimonials="true"` to render the band.
+Leave it off until `src/lib/testimonials.ts` holds attributable quotes from real
+people: the band shipping on by accident would put invented words in strangers'
+mouths on a church page.
 
 **The testimonials are hardcoded placeholder copy**, in
 `src/lib/testimonials.ts`. MP has nowhere to put them: there is no testimonial

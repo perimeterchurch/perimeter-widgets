@@ -210,10 +210,20 @@ describe('participant page content', () => {
     expect(screen.queryByText('About the Journey')).not.toBeInTheDocument();
   });
 
-  it('keeps the trip heading and photo scroller above it', async () => {
+  it('keeps the trip heading above it', async () => {
     await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
     expect(screen.getByRole('heading', { name: 'Guatemala Medical Missions' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: /Photos from/ })).toBeInTheDocument();
+  });
+
+  // The scroller is shared with the trip view, so turning it on has to carry
+  // through to a participant's page rather than being dropped with the rest of
+  // the lower page.
+  it('keeps the photo scroller above it when the scroller is on', async () => {
+    render(<App config={config({ tripId: 945, pledgeId: 100223, showGallery: true })} />);
+    await waitFor(() =>
+      expect(screen.getAllByText('GO Journey Participant').length).toBeGreaterThan(0),
+    );
+    expect(screen.getAllByRole('region', { name: /Photos from/ }).length).toBeGreaterThan(0);
   });
 
   it('returns to the trip via View Trip Details', async () => {
