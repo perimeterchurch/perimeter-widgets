@@ -37,7 +37,7 @@ function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Elem
         aria-hidden="true"
       />
 
-      <span className="absolute inset-x-0 bottom-0 px-2 pb-5 text-center font-sans text-sm leading-snug text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+      <span className="absolute inset-x-0 bottom-0 px-2 pb-5 text-center font-sans text-sm leading-snug text-white">
         {name}
       </span>
     </div>
@@ -69,7 +69,7 @@ export function TeamGrid({
 
   return (
     <section className={className}>
-      <h3 className="mb-6 text-center font-sans text-3xl leading-tight font-medium text-balance @md:text-4xl @xl:text-5xl">
+      <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-bold text-balance @md:text-4xl @xl:text-5xl">
         Meet the Team
       </h3>
       <ul className="flex flex-wrap justify-center gap-2.5">

@@ -324,9 +324,21 @@ scrim, so it shows the tile at full strength.
 
 ### Type
 
-Headings are `font-sans` (sweet-sans-pro) throughout, not the theme's
-`font-serif` display face — Global Outreach asked for Sweet Sans across the
-page.
+Two faces, split by tier. The two display tiers — the hero trip name and the
+section headings (About the Journey, Meet the Team, Hear From Others, and a
+participant's name) — are `font-serif` (freight-display-pro) at `font-bold`.
+Everything below them is `font-sans` (sweet-sans-pro): card titles, the
+destination and dates, trip facts, body copy, buttons and labels.
+
+`font-bold` rather than `font-medium` is load-bearing. Perimeter's Adobe Fonts
+kit ships freight-display-pro in **400 and 700 only**, so a 500 weight matched
+the 400 face and the headings rendered lighter than intended. 700 is a real face
+in the kit, so the weight is drawn rather than synthesized.
+
+Widget bundles ship no `@font-face` of their own — they name the families and
+rely on the embedding page having loaded the kit, since font availability is
+document-scoped. perimeter.org loads its own kit; a page that does not falls
+through the token stack to Inter.
 
 > **Not ported:** the legacy detail page embedded a Google Map of the
 > destination, keyed with an API key committed to a public repo. The map is
