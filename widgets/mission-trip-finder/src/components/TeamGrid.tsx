@@ -45,11 +45,19 @@ function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Elem
 }
 
 /**
- * Sized-and-wrapped rather than a strict grid: a final row with one or two
- * people centres under the row above it instead of hanging off the left edge,
- * which is what a `grid-cols-*` track would do.
+ * Three to a row — the roster reads as a block rather than a ragged wall,
+ * because every card is the same size and every row is the same length.
+ *
+ * Still sized-and-wrapped rather than a `grid-cols-3` track: a final row with
+ * one or two people centres under the row above it, where a real grid would
+ * hang it off the left edge. An 11-person roster ends on a row of two, so that
+ * is the common case, not the exception.
+ *
+ * Widths are percentages of the row minus that row's share of the 0.625rem gap
+ * (`gap-2.5`): two gaps across three cards is 0.41667rem each. Two columns
+ * below `@sm` — three squares plus names in a 360px column is unreadable.
  */
-const CARD = 'w-[calc(50%-0.3125rem)] @sm:w-[150px] @xl:w-[190px]';
+const CARD = 'w-[calc(50%-0.3125rem)] @sm:w-[calc(33.333%-0.41667rem)]';
 
 export function TeamGrid({
   tripId,

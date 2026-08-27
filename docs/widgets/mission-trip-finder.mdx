@@ -20,7 +20,8 @@ The detail follows the 2026 Figma redesign, in bands:
 2. **Photo scroller** — a full-bleed horizontal row of square photos.
 3. **About the Journey** — the long-form write-up and the two calls to action.
 4. **Hear From Others** — testimonials on the brand navy surface.
-5. **Meet the Team** — the roster as darkened squares that brighten on hover.
+5. **Meet the Team** — the roster as darkened squares that brighten on hover,
+   three to a row (two below `@sm`).
 6. **Donation disclaimer.** Rebuild of the legacy `reactwidgets`
 
 Clicking someone in the roster opens their **GO Journey Participant** page in
@@ -341,6 +342,16 @@ because widgets render in a shadow DOM on host pages we do not control, where a
 bundled asset is the only thing guaranteed not to 404. It is white rather than
 pre-tinted so the field stays token-driven: retint `primary` and the placeholder
 follows.
+
+### The roster layout
+
+Three cards to a row, dropping to two below `@sm` — three squares plus names in
+a 360px column is unreadable.
+
+It is flex-wrap with percentage widths rather than a `grid-cols-3` track,
+because a final row of one or two people has to centre under the row above it
+instead of hanging off the left edge. An 11-person roster ends on a row of two,
+so that is the common case rather than an edge case.
 
 In the team grid the tile sits under the same hover scrim as a real photo, which
 keeps the white name legible and lifts on hover. The participant portrait has no
