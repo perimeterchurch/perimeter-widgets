@@ -76,6 +76,15 @@ export const MissionTripFinderConfigSchema = z.object({
         "escaping the host page's content container. Turn this off for an embed in a sidebar " +
         'or a narrow column, where page-wide bands would overwhelm it.',
     ),
+  heroStyle: z
+    .enum(['plain', 'cover'])
+    .default('plain')
+    .describe(
+      "How the detail view opens. 'plain' is the redesign's white band — name, destination and " +
+        "dates as navy type on white. 'cover' is the legacy hero: the destination's banner photo " +
+        'full-bleed and darkened, with the same three lines centred over it in white. Use ' +
+        "'cover' to keep a photo at the top of the page while the scroller has none to show.",
+    ),
   showGallery: z.coerce
     .boolean()
     .default(false)

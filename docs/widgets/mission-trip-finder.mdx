@@ -80,6 +80,7 @@ defaults).
 | `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
 | `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
 | `data-full-bleed`        | boolean | `true`                                 | Let the photo scroller and testimonial band span the full page width. See below.  |
+| `data-hero-style`        | enum    | `plain`                                | `plain` white band, or `cover` for the legacy photo hero. See below.              |
 | `data-show-gallery`      | boolean | `false`                                | Show the horizontal photo scroller. Off until an embed supplies photos.           |
 | `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. Needs `data-show-gallery`.     |
 | `data-show-testimonials` | boolean | `false`                                | Show the "Hear From Others" band. Off — the quotes are placeholder copy.          |
@@ -161,6 +162,25 @@ stay centred on what the reader actually sees.
 
 Set `data-full-bleed="false"` for an embed in a sidebar or a narrow column,
 where page-wide bands would overwhelm the rest of the page.
+
+### The hero
+
+Two shapes, chosen with `data-hero-style`.
+
+`plain` (the default) is the redesign's white band: name, destination and dates
+as navy type on white. It gives the title real contrast and needs no scrim.
+
+`cover` is the legacy hero — the destination's banner photo full-bleed and
+darkened to `black/50`, with the same three lines centred over it in white. The
+overlay is flat rather than a gradient behind the text because destination
+banners are staff-chosen photos of wildly varying brightness (a night skyline,
+a white-walled street), and a flat darkening is the only thing that holds white
+type legible across all of them.
+
+`cover` exists because the redesign moved the photography down into the
+scroller, and the scroller has no photos yet. It puts the one photo every trip
+does have back at the top of the page. Both heroes carry the Registration Full
+and Invitation Only badges.
 
 ### The photo scroller
 

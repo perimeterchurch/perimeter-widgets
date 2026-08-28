@@ -295,6 +295,50 @@ describe('trip detail content', () => {
   });
 });
 
+describe('hero style', () => {
+  // The redesign's white band is the default; the legacy cover photo is opt-in
+  // so that publishing a version never changes a live embed's hero.
+  it('opens on the plain white band by default', async () => {
+    renderApp({ tripId: 958 });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    // The cover hero paints the banner as a decorative background image; the
+    // plain band has no image of its own at all.
+    expect(document.querySelector('img[src*="guatemala.jpg"]')).not.toBeInTheDocument();
+  });
+
+  it('paints the destination banner behind the title on cover', async () => {
+    renderApp({ tripId: 958, heroStyle: 'cover' });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    const img = document.querySelector('img[src*="guatemala.jpg"]');
+    expect(img).toBeInTheDocument();
+    // Decorative: the trip name is already the heading beside it, so the photo
+    // must not announce itself a second time.
+    expect(img).toHaveAttribute('aria-hidden', 'true');
+    expect(img).toHaveAttribute('alt', '');
+  });
+
+  it('keeps the status badges on the cover hero', async () => {
+    hooks.detail = {
+      data: { success: true, data: { ...DETAIL, registrationFull: true } },
+      isLoading: false,
+      error: null,
+    };
+    renderApp({ tripId: 958, heroStyle: 'cover' });
+
+    await waitFor(() => expect(screen.getByText('Registration Full')).toBeInTheDocument());
+  });
+
+  it('rejects an unknown hero style rather than guessing', () => {
+    expect(() => MissionTripFinderConfigSchema.parse({ heroStyle: 'parallax' })).toThrow();
+  });
+});
+
 describe('gallery scroller', () => {
   it('falls back to the destination banner when no gallery is configured', async () => {
     renderApp({ tripId: 958, showGallery: true });
