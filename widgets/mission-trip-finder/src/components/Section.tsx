@@ -63,7 +63,7 @@ export function SectionHeading({
   return (
     <h3
       className={cn(
-        'text-center font-serif text-3xl leading-tight font-medium text-balance @md:text-4xl @xl:text-5xl',
+        'text-center font-serif text-3xl leading-tight font-bold text-balance @md:text-4xl @xl:text-5xl',
         className,
       )}
     >

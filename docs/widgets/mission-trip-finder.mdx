@@ -20,7 +20,8 @@ The detail follows the 2026 Figma redesign, in bands:
 2. **Photo scroller** — a full-bleed horizontal row of square photos.
 3. **About the Journey** — the long-form write-up and the two calls to action.
 4. **Hear From Others** — testimonials on the brand navy surface.
-5. **Meet the Team** — the roster as darkened squares that brighten on hover.
+5. **Meet the Team** — the roster as darkened squares that brighten on hover,
+   three to a row (two below `@sm`).
 6. **Donation disclaimer.** Rebuild of the legacy `reactwidgets`
 
 Clicking someone in the roster opens their **GO Journey Participant** page in
@@ -79,8 +80,10 @@ defaults).
 | `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
 | `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
 | `data-full-bleed`        | boolean | `true`                                 | Let the photo scroller and testimonial band span the full page width. See below.  |
-| `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. See below.                     |
-| `data-show-testimonials` | boolean | `true`                                 | Show the "Hear From Others" band.                                                 |
+| `data-hero-style`        | enum    | `plain`                                | `plain` white band, or `cover` for the legacy photo hero. See below.              |
+| `data-show-gallery`      | boolean | `false`                                | Show the horizontal photo scroller. Off until an embed supplies photos.           |
+| `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. Needs `data-show-gallery`.     |
+| `data-show-testimonials` | boolean | `false`                                | Show the "Hear From Others" band. Off — the quotes are placeholder copy.          |
 | `data-pledge-id`        | number  | —                                      | Open straight to one participant's page. Pairs with `data-trip-id`.               |
 | `data-participant-support-url` | string | onlinegiving.org form 1385 | Destination of the participant "Support" button. `{id}` and `{pledgeId}` are replaced.               |
 | `data-show-team`         | boolean | `true`                                 | Show the "Meet the Team" roster on the detail view.                               |
@@ -134,7 +137,9 @@ The detail adds two fields the list does not carry:
 - **`participants`** — the team, from the campaign's seat-holding pledges. Each
   is a display name and a `pledgeId`; photos come from
   `GET /api/mission-trips/{id}/participant/{pledgeId}/image`, which 404s for the
-  many people with no photo on file, so an avatar falls back to a person glyph.
+  many people with no photo on file — so the placeholder is the common case, not
+  an edge case, and it is branded rather than a generic glyph (see
+  [The photo placeholder](#the-photo-placeholder)).
 
 Banner images are absolute URLs on the destination record (an external CDN), not
 served by perimeter-api. A trip whose destination has no banner falls back to
@@ -158,13 +163,38 @@ stay centred on what the reader actually sees.
 Set `data-full-bleed="false"` for an embed in a sidebar or a narrow column,
 where page-wide bands would overwhelm the rest of the page.
 
+### The hero
+
+Two shapes, chosen with `data-hero-style`.
+
+`plain` (the default) is the redesign's white band: name, destination and dates
+as navy type on white. It gives the title real contrast and needs no scrim.
+
+`cover` is the legacy hero — the destination's banner photo full-bleed and
+darkened to `black/50`, with the same three lines centred over it in white. The
+overlay is flat rather than a gradient behind the text because destination
+banners are staff-chosen photos of wildly varying brightness (a night skyline,
+a white-walled street), and a flat darkening is the only thing that holds white
+type legible across all of them.
+
+`cover` exists because the redesign moved the photography down into the
+scroller, and the scroller has no photos yet. It puts the one photo every trip
+does have back at the top of the page. Both heroes carry the Registration Full
+and Invitation Only badges.
+
 ### The photo scroller
+
+**Off by default** — set `data-show-gallery="true"` to render it.
 
 Ministry Platform has **no per-trip gallery today**, so the scroller is fed by
 `data-gallery-urls` (comma-separated). With none set it falls back to the
 destination's banner image on its own — the one real photo every trip has, and
 the one the pre-redesign hero displayed. With no banner either, the scroller
 does not render.
+
+That fallback is exactly why the band is off by default: a horizontal scroller
+holding a single image reads as a design element missing its content rather than
+as a deliberate choice. Turn it on once the embed has photos to give it.
 
 MP does have the right shape, unwired: `Journey_Files` holds `Link` and
 `Thumbnail_Link` per file and joins through `Journey_Contents`, but every live
@@ -255,6 +285,11 @@ That means adjacent bands are 240px apart while the scroller's neighbours are
 
 ### Testimonials
 
+**Off by default** — set `data-show-testimonials="true"` to render the band.
+Leave it off until `src/lib/testimonials.ts` holds attributable quotes from real
+people: the band shipping on by accident would put invented words in strangers'
+mouths on a church page.
+
 **The testimonials are hardcoded placeholder copy**, in
 `src/lib/testimonials.ts`. MP has nowhere to put them: there is no testimonial
 or story table, and nothing on `Pledge_Campaigns` holds free text per person.
@@ -286,12 +321,86 @@ still wins if an embed ever needs a radius back.
 > and a card opens the widget's own detail view instead. Set it to restore the
 > hand-off to a separate page.
 
+### White button labels
+
+Filled buttons draw their label in white on the `#60bbe9` brand accent. That is
+about 2:1 contrast and **fails WCAG AA** — the theme's default `primary-fg` is
+brand navy on the same fill, at 7.3:1.
+
+This is Global Outreach's explicit decision, made knowing the tradeoff, and it
+matches the Figma. It is scoped to this widget by overriding `color-primary-fg`
+in `themeOverrides` rather than by changing the palette, so every other widget
+keeps the AA-compliant pairing that `packages/theme/tests/contrast.test.ts`
+guards. Two tests in `tests/config.test.ts` pin both halves: the override is
+present here, and the shared palette is untouched.
+
+Only filled buttons are affected. The `outline` and `ghost` buttons (Back, Copy
+link, View Trip Details) sit on white, where a white label would be invisible,
+so they keep the dark text.
+
+### The metadata grey
+
+Secondary text — destination, dates, trip facts, the donation disclaimer, the
+empty-state message — overrides `color-muted-fg` to `hsl(215 0.5% 43.28%)`
+(`#6E6E6F`). That is the shared token's lightness with the saturation taken from
+16% down to a near-neutral 0.5%, so the metadata reads grey rather than
+blue-grey next to the navy headings. Global Outreach's colour.
+
+Unlike the white button labels, this is **not** an accessibility exception: it
+holds 5.08:1 on white and 4.63:1 in the `bg-muted` message box, both above the
+4.5:1 AA floor. `tests/config.test.ts` computes both and fails below it.
+
+### The photo placeholder
+
+Most of a roster has no photo on file, so `PhotoFallback` is what a team grid
+mostly renders. It is the Perimeter arch mark as a white silhouette at 30%
+opacity over a `bg-primary` field — the standard branded tile, so a grid of them
+reads as deliberate rather than broken.
+
+The mark ships as an inlined data URI (`src/lib/perimeter-mark.ts`, ~23 kB)
+because widgets render in a shadow DOM on host pages we do not control, where a
+bundled asset is the only thing guaranteed not to 404. It is white rather than
+pre-tinted so the field stays token-driven: retint `primary` and the placeholder
+follows.
+
+### The roster layout
+
+Three cards to a row, dropping to two below `@sm` — three squares plus names in
+a 360px column is unreadable.
+
+It is flex-wrap with percentage widths rather than a `grid-cols-3` track,
+because a final row of one or two people has to centre under the row above it
+instead of hanging off the left edge. An 11-person roster ends on a row of two,
+so that is the common case rather than an edge case.
+
+The roster is capped at `max-w-lg` — narrower than the band around it — which
+is what sets the card size: 32rem across three columns lands each card at
+164px. Capping the *card* instead would not work, because flex-wrap then fits a
+fourth and fifth onto the row. Left at the band's own `max-w-4xl` the cards
+reach ~292px on a full-width page, larger than a wall of headshots wants.
+
+In the team grid the tile sits under the same hover scrim as a real photo, which
+keeps the white name legible and lifts on hover. The participant portrait has no
+scrim, so it shows the tile at full strength.
+
+### Type
+
+Two faces, split by tier. The two display tiers — the hero trip name and the
+section headings (About the Journey, Meet the Team, Hear From Others, and a
+participant's name) — are `font-serif` (freight-display-pro) at `font-bold`.
+Everything below them is `font-sans` (sweet-sans-pro): card titles, the
+destination and dates, trip facts, body copy, buttons and labels.
+
+`font-bold` rather than `font-medium` is load-bearing. Perimeter's Adobe Fonts
+kit ships freight-display-pro in **400 and 700 only**, so a 500 weight matched
+the 400 face and the headings rendered lighter than intended. 700 is a real face
+in the kit, so the weight is drawn rather than synthesized.
+
+Widget bundles ship no `@font-face` of their own — they name the families and
+rely on the embedding page having loaded the kit, since font availability is
+document-scoped. perimeter.org loads its own kit; a page that does not falls
+through the token stack to Inter.
+
 > **Not ported:** the legacy detail page embedded a Google Map of the
 > destination, keyed with an API key committed to a public repo. The map is
 > dropped rather than re-keyed — the destination name is already on the page.
-
-> **One deliberate deviation from the Figma:** it draws the two CTAs as white
-> text on the `#60bbe9` brand accent, which is about 2:1 contrast and fails
-> WCAG AA. The buttons use the theme's `primary`/`primary-fg` pair instead —
-> the same `#60bbe9` fill with brand-navy text, 7.3:1. The token comments and
-> `packages/theme/tests/contrast.test.ts` both exist to hold that line.

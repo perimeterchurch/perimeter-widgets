@@ -76,20 +76,40 @@ export const MissionTripFinderConfigSchema = z.object({
         "escaping the host page's content container. Turn this off for an embed in a sidebar " +
         'or a narrow column, where page-wide bands would overwhelm it.',
     ),
+  heroStyle: z
+    .enum(['plain', 'cover'])
+    .default('plain')
+    .describe(
+      "How the detail view opens. 'plain' is the redesign's white band — name, destination and " +
+        "dates as navy type on white. 'cover' is the legacy hero: the destination's banner photo " +
+        'full-bleed and darkened, with the same three lines centred over it in white. Use ' +
+        "'cover' to keep a photo at the top of the page while the scroller has none to show.",
+    ),
+  showGallery: z.coerce
+    .boolean()
+    .default(false)
+    .describe(
+      "Show the detail view's horizontal photo scroller. Off by default: MP has no per-trip " +
+        'gallery, so without `galleryUrls` the scroller has only the destination banner to ' +
+        'show, which reads as a design element missing its content. Turn it on once the embed ' +
+        'supplies photos.',
+    ),
   galleryUrls: z
     .string()
     .optional()
     .describe(
-      "Comma-separated image URLs for the detail view's photo scroller. With none set the " +
-        "scroller shows the destination's banner image on its own. MP has no per-trip gallery " +
-        'today, so these have to be supplied by the embed.',
+      "Comma-separated image URLs for the detail view's photo scroller. Requires " +
+        "`showGallery`. With none set the scroller shows the destination's banner image on " +
+        'its own. MP has no per-trip gallery today, so these have to be supplied by the embed.',
     ),
   showTestimonials: z.coerce
     .boolean()
-    .default(true)
+    .default(false)
     .describe(
-      'Show the "Hear From Others" testimonial band on the detail view. The testimonials are ' +
-        'placeholder copy today — see src/lib/testimonials.ts.',
+      'Show the "Hear From Others" testimonial band on the detail view. Off by default because ' +
+        'the testimonials are hardcoded placeholder copy, not real quotes — see ' +
+        'src/lib/testimonials.ts. Do not turn it on until that file holds attributable ' +
+        'quotes from real people.',
     ),
   pledgeId: z.coerce
     .number()

@@ -295,9 +295,53 @@ describe('trip detail content', () => {
   });
 });
 
+describe('hero style', () => {
+  // The redesign's white band is the default; the legacy cover photo is opt-in
+  // so that publishing a version never changes a live embed's hero.
+  it('opens on the plain white band by default', async () => {
+    renderApp({ tripId: 958 });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    // The cover hero paints the banner as a decorative background image; the
+    // plain band has no image of its own at all.
+    expect(document.querySelector('img[src*="guatemala.jpg"]')).not.toBeInTheDocument();
+  });
+
+  it('paints the destination banner behind the title on cover', async () => {
+    renderApp({ tripId: 958, heroStyle: 'cover' });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    const img = document.querySelector('img[src*="guatemala.jpg"]');
+    expect(img).toBeInTheDocument();
+    // Decorative: the trip name is already the heading beside it, so the photo
+    // must not announce itself a second time.
+    expect(img).toHaveAttribute('aria-hidden', 'true');
+    expect(img).toHaveAttribute('alt', '');
+  });
+
+  it('keeps the status badges on the cover hero', async () => {
+    hooks.detail = {
+      data: { success: true, data: { ...DETAIL, registrationFull: true } },
+      isLoading: false,
+      error: null,
+    };
+    renderApp({ tripId: 958, heroStyle: 'cover' });
+
+    await waitFor(() => expect(screen.getByText('Registration Full')).toBeInTheDocument());
+  });
+
+  it('rejects an unknown hero style rather than guessing', () => {
+    expect(() => MissionTripFinderConfigSchema.parse({ heroStyle: 'parallax' })).toThrow();
+  });
+});
+
 describe('gallery scroller', () => {
   it('falls back to the destination banner when no gallery is configured', async () => {
-    renderApp({ tripId: 958 });
+    renderApp({ tripId: 958, showGallery: true });
 
     const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
     const imgs = [...scroller.querySelectorAll('img')].map((i) => i.getAttribute('src'));
@@ -307,6 +351,7 @@ describe('gallery scroller', () => {
   it('uses the configured list, comma-separated, over the banner', async () => {
     renderApp({
       tripId: 958,
+      showGallery: true,
       galleryUrls: 'https://a.example/1.jpg, https://a.example/2.jpg,https://a.example/3.jpg',
     });
 
@@ -319,7 +364,7 @@ describe('gallery scroller', () => {
   });
 
   it('is keyboard reachable — a scroll container needs a tab stop', async () => {
-    renderApp({ tripId: 958 });
+    renderApp({ tripId: 958, showGallery: true });
 
     const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
     expect(scroller).toHaveAttribute('tabindex', '0');
@@ -331,7 +376,7 @@ describe('gallery scroller', () => {
       isLoading: false,
       error: null,
     };
-    renderApp({ tripId: 958 });
+    renderApp({ tripId: 958, showGallery: true });
 
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
@@ -343,7 +388,7 @@ describe('gallery scroller', () => {
     // jsdom reports 0 for every rect, so this asserts the mechanism — that the
     // band is sized off the page rather than left at its container width. The
     // measured widths are checked in the embed lab against a real host.
-    renderApp({ tripId: 958 });
+    renderApp({ tripId: 958, showGallery: true });
 
     const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
     const bleed = scroller.parentElement?.parentElement;
@@ -352,7 +397,7 @@ describe('gallery scroller', () => {
   });
 
   it('leaves the bands in their container when fullBleed is off', async () => {
-    renderApp({ tripId: 958, fullBleed: '' });
+    renderApp({ tripId: 958, showGallery: true, fullBleed: '' });
 
     const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
     expect(scroller.parentElement?.parentElement?.style.width).toBe('');
@@ -364,7 +409,7 @@ describe('gallery chevron', () => {
     // jsdom reports scrollWidth === clientWidth === 0, so nothing overflows and
     // the control must not appear — an arrow that cannot move is worse than no
     // arrow. The overflow case is checked in the embed lab.
-    renderApp({ tripId: 958, galleryUrls: 'https://a.example/1.jpg' });
+    renderApp({ tripId: 958, showGallery: true, galleryUrls: 'https://a.example/1.jpg' });
 
     await waitFor(() =>
       expect(screen.getByRole('region', { name: /Photos from/ })).toBeInTheDocument(),
@@ -373,7 +418,7 @@ describe('gallery chevron', () => {
   });
 
   it('hides the native scrollbar, which is why the chevron exists', async () => {
-    renderApp({ tripId: 958 });
+    renderApp({ tripId: 958, showGallery: true });
 
     const scroller = await waitFor(() => screen.getByRole('region', { name: /Photos from/ }));
     expect(scroller.className).toContain('[scrollbar-width:none]');
@@ -383,7 +428,7 @@ describe('gallery chevron', () => {
 
 describe('testimonials', () => {
   it('renders the hardcoded quotes with a monogram, not a fake headshot', async () => {
-    renderApp({ tripId: 958 });
+    renderApp({ tripId: 958, showTestimonials: true });
 
     await waitFor(() => expect(screen.getByText('Hear From Others')).toBeInTheDocument());
     expect(screen.getByText('Olivia Ramirez')).toBeInTheDocument();
@@ -394,11 +439,55 @@ describe('testimonials', () => {
     expect(band?.querySelectorAll('img').length ?? 0).toBe(0);
   });
 
-  it('can be turned off', async () => {
-    renderApp({ tripId: 958, showTestimonials: '' });
+  // The quotes in src/lib/testimonials.ts are invented placeholder copy, so the
+  // band shipping on by accident would put words in strangers' mouths on a
+  // church page. Off unless an embed asks for it.
+  it('is off by default, because the quotes are placeholder copy', async () => {
+    renderApp({ tripId: 958 });
 
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Hear From Others')).not.toBeInTheDocument();
+  });
+});
+
+describe('the scroller and testimonial bands are opt-in', () => {
+  // Global Outreach has no photos and no real quotes yet, so both bands stay
+  // off until an embed turns them on. The rest of the detail view — heading,
+  // About the Journey, roster, disclaimer — is unaffected.
+  it('renders neither band by default', async () => {
+    renderApp({ tripId: 958 });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    expect(screen.queryByRole('region', { name: /Photos from/ })).not.toBeInTheDocument();
+    expect(screen.queryByText('Hear From Others')).not.toBeInTheDocument();
+    // ...and the page it sits in is still whole.
+    expect(screen.getByText('About the Journey')).toBeInTheDocument();
+    expect(screen.getByText('Meet the Team')).toBeInTheDocument();
+  });
+
+  it('shows the scroller once an embed opts in', async () => {
+    renderApp({ tripId: 958, showGallery: true });
+
+    await waitFor(() =>
+      expect(screen.getByRole('region', { name: /Photos from/ })).toBeInTheDocument(),
+    );
+  });
+
+  it('shows the testimonial band once an embed opts in', async () => {
+    renderApp({ tripId: 958, showTestimonials: true });
+
+    await waitFor(() => expect(screen.getByText('Hear From Others')).toBeInTheDocument());
+  });
+
+  it('takes the two independently', async () => {
+    renderApp({ tripId: 958, showGallery: true });
+
+    await waitFor(() =>
+      expect(screen.getByRole('region', { name: /Photos from/ })).toBeInTheDocument(),
     );
     expect(screen.queryByText('Hear From Others')).not.toBeInTheDocument();
   });
