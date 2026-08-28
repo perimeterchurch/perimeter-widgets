@@ -214,7 +214,7 @@ export function TripDetail({
                 )}
 
                 {config.disclaimerText && (
-                  <Section className="border-t border-border" innerClassName="items-start">
+                  <Section innerClassName="items-start">
                     <div className={READING_COLUMN}>
                       <h3 className="mb-3 font-sans text-sm font-bold tracking-wide uppercase">
                         Donation Disclaimer
