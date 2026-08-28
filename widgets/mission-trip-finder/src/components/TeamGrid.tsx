@@ -2,7 +2,7 @@ import * as React from 'react';
 import type { MissionTripParticipant } from '@perimeter/api-hooks';
 import type { MissionTripFinderConfig } from '../types';
 import { fillUrlTemplate, participantPhotoUrl } from '../lib/format';
-import { PersonIcon } from './icons';
+import { PhotoFallback } from './PhotoFallback';
 
 /**
  * Square portrait with the name across the bottom. The photo sits under a dark
@@ -21,9 +21,7 @@ function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Elem
   return (
     <div className="group relative aspect-square w-full overflow-hidden bg-neutral-800">
       {failed ? (
-        <div className="flex h-full w-full items-center justify-center text-white/30">
-          <PersonIcon className="h-1/2 w-1/2" />
-        </div>
+        <PhotoFallback />
       ) : (
         <img
           src={src}
@@ -39,7 +37,7 @@ function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Elem
         aria-hidden="true"
       />
 
-      <span className="absolute inset-x-0 bottom-0 px-2 pb-5 text-center font-sans text-sm leading-snug text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+      <span className="absolute inset-x-0 bottom-0 px-2 pb-5 text-center font-sans text-sm leading-snug text-white">
         {name}
       </span>
     </div>
@@ -47,11 +45,30 @@ function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Elem
 }
 
 /**
- * Sized-and-wrapped rather than a strict grid: a final row with one or two
- * people centres under the row above it instead of hanging off the left edge,
- * which is what a `grid-cols-*` track would do.
+ * Three to a row — the roster reads as a block rather than a ragged wall,
+ * because every card is the same size and every row is the same length.
+ *
+ * Still sized-and-wrapped rather than a `grid-cols-3` track: a final row with
+ * one or two people centres under the row above it, where a real grid would
+ * hang it off the left edge. An 11-person roster ends on a row of two, so that
+ * is the common case, not the exception.
+ *
+ * Widths are percentages of the row minus that row's share of the 0.625rem gap
+ * (`gap-2.5`): two gaps across three cards is 0.41667rem each. Two columns
+ * below `@sm` — three squares plus names in a 360px column is unreadable.
  */
-const CARD = 'w-[calc(50%-0.3125rem)] @sm:w-[150px] @xl:w-[190px]';
+const CARD = 'w-[calc(50%-0.3125rem)] @sm:w-[calc(33.333%-0.41667rem)]';
+
+/**
+ * The roster is capped narrower than the band it sits in.
+ *
+ * Card size is derived from this width, not set on the card — capping the card
+ * instead would let a fourth and fifth card wrap onto the row, since flex-wrap
+ * fits as many as the line allows. At 32rem the three columns land at 164px
+ * each; left to the band's own `max-w-4xl` they reach ~292px on a full-width
+ * page, which is larger than a roster of headshots wants to be.
+ */
+const ROSTER = 'mx-auto w-full max-w-lg';
 
 export function TeamGrid({
   tripId,
@@ -71,10 +88,10 @@ export function TeamGrid({
 
   return (
     <section className={className}>
-      <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-medium text-balance @md:text-4xl @xl:text-5xl">
+      <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-bold text-balance @md:text-4xl @xl:text-5xl">
         Meet the Team
       </h3>
-      <ul className="flex flex-wrap justify-center gap-2.5">
+      <ul className={`${ROSTER} flex flex-wrap justify-center gap-2.5`}>
         {participants.map((person) => {
           const photo = (
             <TeamPhoto

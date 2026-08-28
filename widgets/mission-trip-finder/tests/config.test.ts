@@ -1,6 +1,42 @@
 import { describe, it, expect } from 'vitest';
 import { MissionTripFinderConfigSchema } from '../src/types';
 
+/**
+ * WCAG relative luminance / contrast, over this repo's `hsl(H S% L%)` token
+ * format. A trimmed copy of packages/theme/tests/contrast.test.ts's helpers —
+ * that suite guards the shared palette, and this widget overrides two of its
+ * colors, so the same arithmetic has to run against the overrides.
+ */
+function parseHsl(value: string): [number, number, number] {
+  const m = value.match(/^hsl\((\d+(?:\.\d+)?) (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)%\)$/);
+  if (!m) throw new Error(`not a parseable hsl token: ${value}`);
+  const [h, s, l] = [Number(m[1]), Number(m[2]) / 100, Number(m[3]) / 100];
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m2 = l - c / 2;
+  const seg = [
+    [c, x, 0],
+    [x, c, 0],
+    [0, c, x],
+    [0, x, c],
+    [x, 0, c],
+    [c, 0, x],
+  ][Math.floor(h / 60) % 6]!;
+  return [(seg[0]! + m2) * 255, (seg[1]! + m2) * 255, (seg[2]! + m2) * 255];
+}
+
+function contrast(fg: [number, number, number], bg: [number, number, number]): number {
+  const lum = (rgb: [number, number, number]) => {
+    const [r, g, b] = rgb.map((v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    }) as [number, number, number];
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const [l1, l2] = [lum(fg), lum(bg)].sort((a, b) => b - a) as [number, number];
+  return (l1 + 0.05) / (l2 + 0.05);
+}
+
 describe('MissionTripFinderConfigSchema', () => {
   it('defaults to the open, badged, cost-and-description view', () => {
     expect(MissionTripFinderConfigSchema.parse({})).toMatchObject({
@@ -11,7 +47,8 @@ describe('MissionTripFinderConfigSchema', () => {
       includePast: false,
       showTeam: true,
       fullBleed: true,
-      showTestimonials: true,
+      showGallery: false,
+      showTestimonials: false,
     });
   });
 
@@ -86,11 +123,45 @@ describe('MissionTripFinderConfigSchema', () => {
 describe('widget definition', () => {
   it('renders as rectangles — Perimeter has no corner radius', async () => {
     const { default: widget } = await import('../src/widget');
-    expect(widget.themeOverrides).toEqual({
+    expect(widget.themeOverrides).toMatchObject({
       'radius-sm': '0px',
       'radius-md': '0px',
       'radius-lg': '0px',
     });
+  });
+
+  // Global Outreach asked for white button labels knowing they fail WCAG AA on
+  // the light `primary` blue (~2:1, against 7.3:1 for the default navy). Pinned
+  // so the override cannot be lost silently in a refactor — and so the reason
+  // it exists is written down next to it.
+  it('overrides primary-fg to white for button labels, by ministry request', async () => {
+    const { default: widget } = await import('../src/widget');
+    expect(widget.themeOverrides?.['color-primary-fg']).toBe('hsl(0 0% 100%)');
+  });
+
+  // The override has to stay scoped to this widget: the shared palette keeps
+  // the AA-compliant pairing that packages/theme guards for every other widget.
+  it('does not touch the shared palette', async () => {
+    const { globalTokens } = await import('@perimeter/theme');
+    expect(globalTokens['color-primary-fg']).toBe('hsl(210 75% 14.1%)');
+  });
+
+  it('uses the ministry metadata grey for secondary text', async () => {
+    const { default: widget } = await import('../src/widget');
+    expect(widget.themeOverrides?.['color-muted-fg']).toBe('hsl(215 0.5% 43.28%)');
+  });
+
+  // Unlike the white button labels, this one is NOT a knowing AA exception —
+  // it stays above the 4.5:1 floor on both surfaces the widget renders muted
+  // text on. Pinned so a later "just nudge the grey" cannot quietly drop it
+  // below, the way the 2026-06-10 axe sweep caught the shared token.
+  it('keeps the metadata grey above WCAG AA on the surfaces it renders on', async () => {
+    const { default: widget } = await import('../src/widget');
+    const { globalTokens } = await import('@perimeter/theme');
+
+    const fg = parseHsl(widget.themeOverrides!['color-muted-fg']!);
+    expect(contrast(fg, parseHsl('hsl(0 0% 100%)'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(fg, parseHsl(globalTokens['color-muted']))).toBeGreaterThanOrEqual(4.5);
   });
 });
 

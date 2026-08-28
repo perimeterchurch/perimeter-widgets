@@ -11,6 +11,7 @@ import { fillUrlTemplate, formatTripDatesLong, splitList, spotsRemaining } from 
 import { TESTIMONIALS } from '../lib/testimonials';
 import { Section, SectionHeading, SECTION_Y, READING_COLUMN } from './Section';
 import { TripHeading } from './TripHeading';
+import { TripHero } from './TripHero';
 import { TripGallery } from './TripGallery';
 import { ParticipantDetail } from './ParticipantDetail';
 import { Testimonials } from './Testimonials';
@@ -97,7 +98,9 @@ export function TripDetail({
   const showRegister = !!trip && !trip.registrationFull && !trip.invitationOnly;
 
   // The destination banner is the fallback gallery: it is the one real photo
-  // every trip has, and it is what the previous hero displayed.
+  // every trip has, and it is what the previous hero displayed. Only reached
+  // when `showGallery` is on — the scroller is off by default until Global
+  // Outreach has photos to put in it.
   const configured = splitList(config.galleryUrls);
   const gallery = configured.length > 0 ? configured : trip?.bannerUrl ? [trip.bannerUrl] : [];
 
@@ -108,33 +111,54 @@ export function TripDetail({
         isLoading={isLoading}
         skeleton={
           <div>
-            <div className={`${SECTION_Y} flex flex-col items-center gap-3 px-6`}>
-              <Skeleton className="h-12 w-3/4 max-w-2xl" />
-              <Skeleton className="h-8 w-40" />
-              <Skeleton className="h-5 w-64" />
-            </div>
-            <div className="flex gap-4 px-2.5">
-              {Array.from({ length: 4 }, (_, i) => (
-                <Skeleton
-                  key={i}
-                  className="aspect-square w-[260px] shrink-0 @md:w-[340px] @xl:w-[420px]"
-                />
-              ))}
-            </div>
+            {config.heroStyle === 'cover' ? (
+              <Skeleton className="h-[340px] w-full rounded-none @md:h-[440px] @xl:h-[520px]" />
+            ) : (
+              <div className={`${SECTION_Y} flex flex-col items-center gap-3 px-6`}>
+                <Skeleton className="h-12 w-3/4 max-w-2xl" />
+                <Skeleton className="h-8 w-40" />
+                <Skeleton className="h-5 w-64" />
+              </div>
+            )}
+            {config.showGallery && (
+              <div className="flex gap-4 px-2.5">
+                {Array.from({ length: 4 }, (_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="aspect-square w-[260px] shrink-0 @md:w-[340px] @xl:w-[420px]"
+                  />
+                ))}
+              </div>
+            )}
           </div>
         }
       >
         {trip && (
           <div ref={headingRef} tabIndex={-1} className="outline-hidden">
-            <TripHeading
-              name={trip.name}
-              destination={trip.destination}
-              dates={formatTripDatesLong(trip.startDate, trip.endDate)}
-              registrationFull={trip.registrationFull}
-              invitationOnly={trip.invitationOnly}
-            />
+            {config.heroStyle === 'cover' ? (
+              <TripHero
+                src={trip.bannerUrl}
+                fallbackSrc={config.defaultImageUrl}
+                name={trip.name}
+                destination={trip.destination}
+                dates={formatTripDatesLong(trip.startDate, trip.endDate)}
+                registrationFull={trip.registrationFull}
+                invitationOnly={trip.invitationOnly}
+                fullBleed={config.fullBleed}
+              />
+            ) : (
+              <TripHeading
+                name={trip.name}
+                destination={trip.destination}
+                dates={formatTripDatesLong(trip.startDate, trip.endDate)}
+                registrationFull={trip.registrationFull}
+                invitationOnly={trip.invitationOnly}
+              />
+            )}
 
-            <TripGallery images={gallery} alt={trip.name} fullBleed={config.fullBleed} />
+            {config.showGallery && (
+              <TripGallery images={gallery} alt={trip.name} fullBleed={config.fullBleed} />
+            )}
 
             {pledgeId !== null ? (
               <ParticipantDetail
@@ -208,7 +232,7 @@ export function TripDetail({
                 )}
 
                 {config.disclaimerText && (
-                  <Section className="border-t border-border" innerClassName="items-start">
+                  <Section innerClassName="items-start">
                     <div className={READING_COLUMN}>
                       <h3 className="mb-3 font-sans text-sm font-bold tracking-wide uppercase">
                         Donation Disclaimer
