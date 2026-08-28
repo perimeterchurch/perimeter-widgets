@@ -353,6 +353,12 @@ because a final row of one or two people has to centre under the row above it
 instead of hanging off the left edge. An 11-person roster ends on a row of two,
 so that is the common case rather than an edge case.
 
+The roster is capped at `max-w-lg` — narrower than the band around it — which
+is what sets the card size: 32rem across three columns lands each card at
+164px. Capping the *card* instead would not work, because flex-wrap then fits a
+fourth and fifth onto the row. Left at the band's own `max-w-4xl` the cards
+reach ~292px on a full-width page, larger than a wall of headshots wants.
+
 In the team grid the tile sits under the same hover scrim as a real photo, which
 keeps the white name legible and lifts on hover. The participant portrait has no
 scrim, so it shows the tile at full strength.

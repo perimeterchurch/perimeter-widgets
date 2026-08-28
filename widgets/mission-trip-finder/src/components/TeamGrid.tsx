@@ -59,6 +59,17 @@ function TeamPhoto({ src, name }: { src: string; name: string }): React.JSX.Elem
  */
 const CARD = 'w-[calc(50%-0.3125rem)] @sm:w-[calc(33.333%-0.41667rem)]';
 
+/**
+ * The roster is capped narrower than the band it sits in.
+ *
+ * Card size is derived from this width, not set on the card — capping the card
+ * instead would let a fourth and fifth card wrap onto the row, since flex-wrap
+ * fits as many as the line allows. At 32rem the three columns land at 164px
+ * each; left to the band's own `max-w-4xl` they reach ~292px on a full-width
+ * page, which is larger than a roster of headshots wants to be.
+ */
+const ROSTER = 'mx-auto w-full max-w-lg';
+
 export function TeamGrid({
   tripId,
   participants,
@@ -80,7 +91,7 @@ export function TeamGrid({
       <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-bold text-balance @md:text-4xl @xl:text-5xl">
         Meet the Team
       </h3>
-      <ul className="flex flex-wrap justify-center gap-2.5">
+      <ul className={`${ROSTER} flex flex-wrap justify-center gap-2.5`}>
         {participants.map((person) => {
           const photo = (
             <TeamPhoto
