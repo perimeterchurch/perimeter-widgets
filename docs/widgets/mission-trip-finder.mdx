@@ -316,10 +316,20 @@ Status badges are untouched: they use `rounded-4xl`, which is not one of those
 tokens, so a pill still reads as a pill. A host page's `data-theme-radius-*`
 still wins if an embed ever needs a radius back.
 
-> **Changed in 0.2.0:** `data-details-url-base` used to default to the
-> go-journey-details page, so every card linked out. It now defaults to unset,
-> and a card opens the widget's own detail view instead. Set it to restore the
-> hand-off to a separate page.
+> **New in 0.2.0 — all of it opt-in.** The in-place detail view
+> (`data-details-mode="inline"`), the photo scroller (`data-show-gallery`), the
+> testimonial band (`data-show-testimonials`), the classic cover hero
+> (`data-hero-style="cover"`) and the participant pages
+> (`data-trip-id`/`data-pledge-id`) are all off by default. An embed that sets
+> nothing behaves exactly as 0.1.0 did: cards are anchors to
+> `data-details-url-base`, which still defaults to the go-journey-details page.
+> Publishing 0.2.0 does not change a live embed's behaviour.
+>
+> Two style tokens do change unconditionally, because they are widget-wide
+> overrides rather than features: `color-muted-fg` (secondary text on the cards
+> goes from blue-grey to a neutral grey) and the three radius tokens (loading
+> skeletons and the empty-state box render square). Card corners, badges and
+> the card title face are unchanged.
 
 ### White button labels
 
