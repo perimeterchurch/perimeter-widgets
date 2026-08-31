@@ -119,6 +119,47 @@ reads as Perimeter blue at 5.3:1 on white and 4.8:1 on `bg-muted`. It belongs in
 Either way the crumbs underline on hover and focus. At this contrast that is the
 only dependable signal that they are interactive, so it is not decoration.
 
+### The full-width detail
+
+By default the detail view sits inside whatever content column the embed is in.
+On a long landing page that reads as a panel part-way down someone else's page —
+on perimeter.org the embed is about 1800px down, so opening a trip rendered it
+off-screen below the marketing copy, and only the hero, scroller and testimonial
+band escaped the 1069px column at all.
+
+`data-detail-layout="full"` makes a trip read as its own page instead: every band
+spans the page, and opening one takes the reader to the top of it.
+
+```html
+<div
+  data-perimeter-widget="mission-trip-finder"
+  data-details-mode="inline"
+  data-detail-layout="full"
+  data-header-offset="90"
+></div>
+```
+
+`data-header-offset` is the height of the host page's fixed header — 90 on
+perimeter.org. Without it the top of the detail opens *behind* the header.
+
+The inner content does not get wider: the reading column stays `max-w-2xl` and
+the bands `max-w-4xl`, both centred. What changes is the frame around them.
+
+It is off by default, so an existing embed keeps sitting exactly where it sits
+today. Two things are worth knowing before turning it on:
+
+- **The bands stop breaking out individually.** In `full` the wrapper around the
+  whole detail owns the breakout. Every `FullBleed` measures the shadow host
+  rather than its own parent, so leaving the hero's own breakout on would apply
+  the same negative margin twice and push it off the page edge.
+- **The scroll runs twice, on purpose.** Once when the skeleton mounts and again
+  when the trip's content lands. A scroll issued against the skeleton targets a
+  document that has not grown yet, and the browser clamps it — on the lab's
+  perimeter.org-shaped page that left the detail nearly 400px short. It is also
+  instant rather than smooth, and it targets the shadow host: the view itself
+  mounts inside an entry animation that starts it 8px lower, and scrolling to a
+  transformed element overshoots by exactly that.
+
 ## Config
 
 The widget reads its config from `data-*` attributes on the placeholder div.
@@ -137,6 +178,8 @@ defaults).
 | `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
 | `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
 | `data-full-bleed`        | boolean | `true`                                 | Let the photo scroller and testimonial band span the full page width. See below.  |
+| `data-detail-layout`     | enum    | `contained`                            | `full` makes the whole detail span the page and open at the top of itself.        |
+| `data-header-offset`     | number  | `0`                                    | Height of the host's fixed header, so the detail does not open behind it.         |
 | `data-hero-style`        | enum    | `plain`                                | `plain` white band, or `cover` for the legacy photo hero. See below.              |
 | `data-show-gallery`      | boolean | `false`                                | Show the horizontal photo scroller. Off until an embed supplies photos.           |
 | `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. Needs `data-show-gallery`.     |

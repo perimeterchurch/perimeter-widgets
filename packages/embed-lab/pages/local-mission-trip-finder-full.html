@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — local mission-trip-finder, full-width detail</title>
+    <!-- Perimeter's Adobe Fonts kit, as on local-mission-trip-finder.html. -->
+    <link rel="stylesheet" href="https://use.typekit.net/hpg7onr.css" />
+    <style>
+      /*
+       * This page reproduces the shape of the live GO Journeys page, measured
+       * from it on 2026-08-31, because that shape is the whole reason
+       * `data-detail-layout="full"` exists:
+       *
+       *   - #header-outer is position: fixed, 90px tall, z-index 9999
+       *   - the embed sits ~1800px down, under the landing content
+       *   - the content column is 1069px inside a 1249px viewport (90px pad)
+       *   - body is overflow: hidden, so FullBleed's bounds resolve to it
+       *
+       * ONE embed, deliberately. Two unpinned mission-trip embeds share the
+       * `trip-` URL keys, so opening a trip in one opens it in the other and
+       * the page reflows underneath — which makes the scroll impossible to
+       * measure. The real page has one.
+       */
+      body {
+        font-size: 19px;
+        line-height: 35px;
+        color: #353535;
+        background: #ffffff;
+        font-family: sans-serif;
+        margin: 0;
+        overflow: hidden;
+      }
+      .container {
+        max-width: 1425px;
+        padding: 0 90px;
+        margin: 0 auto;
+      }
+      .banner {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+      .host-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 90px;
+        z-index: 9999;
+        background: #09243f;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+      }
+      .host-lede {
+        padding: 130px 0 60px;
+        min-height: 1400px;
+      }
+      .host-footer {
+        background: #09243f;
+        color: #fff;
+        padding: 80px 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="host-header">fixed host header — 90px, z-index 9999</div>
+
+    <div class="container">
+      <div class="host-lede">
+        <h1>GO Journeys</h1>
+        <p><a href="/">← lab index</a></p>
+        <p class="banner">
+          <code>data-detail-layout="full"</code> + <code>data-header-offset="90"</code>. Build
+          first: <code>pnpm --filter @perimeter/widget-mission-trip-finder build</code>, and run
+          <code>pnpm dev</code> in perimeter-api for <code>:5500</code>.
+        </p>
+        <p class="banner">
+          <strong>What to check.</strong> Click a card. The page should travel to the top of the
+          detail and land it just <em>below</em> the fixed header, not behind it. Every band — About
+          the Journey and Meet the Team included, not only the hero — should span the full 1249px.
+          Nothing may break out <strong>twice</strong>: no band starting left of the viewport, and
+          no horizontal scrollbar. Then use the breadcrumb back to the grid and confirm the page
+          still behaves.
+        </p>
+        <p>
+          Stand-in for the ~1800px of landing content above the embed on the real page. Scroll past
+          it to reach the widget.
+        </p>
+      </div>
+
+      <div
+        data-perimeter-widget="mission-trip-finder"
+        data-api-url="http://localhost:5500"
+        data-details-mode="inline"
+        data-detail-layout="full"
+        data-header-offset="90"
+        data-hero-style="cover"
+      ></div>
+    </div>
+
+    <div class="host-footer">host footer</div>
+
+    <script src="/local/mission-trip-finder/index.js" data-nowprocket async></script>
+  </body>
+</html>
