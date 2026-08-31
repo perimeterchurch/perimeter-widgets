@@ -58,6 +58,16 @@ export const MissionTripFinderConfigSchema = z.object({
       'Where a card links to in `link` mode; the trip ID is appended. Ignored in ' +
         '`inline` mode.',
     ),
+  listUrl: z
+    .string()
+    .optional()
+    .describe(
+      'Where the "GO Journeys" breadcrumb points on a pinned embed. An embed with a list ' +
+        'behind it goes back to its own grid and ignores this. A `tripId`-pinned embed has ' +
+        'no grid, so without this the trail starts at the trip and the top level is dropped ' +
+        'rather than rendered as a word that does nothing — set it to the GO Journeys ' +
+        'landing page to complete the trail.',
+    ),
   tripId: z.coerce
     .number()
     .int()
