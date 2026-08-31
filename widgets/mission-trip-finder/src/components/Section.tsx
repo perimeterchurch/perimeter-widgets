@@ -16,6 +16,17 @@ import { cn } from '@perimeter/ui/utils/cn';
  */
 export const SECTION_Y = 'py-16 @md:py-24 @xl:py-30';
 
+/**
+ * Cancels most of the preceding band's bottom padding.
+ *
+ * Only the breadcrumb trail uses this. The trail belongs to the heading above
+ * it, not to the section below, and at `SECTION_Y`'s full 4–7.5rem it sat
+ * marooned in the middle of the gap between the two, reading as a third thing.
+ * Pulling it up leaves a deliberate ~2.5–4rem under the dates. Paired with
+ * `SECTION_Y`: if that scale changes, this one has to move with it.
+ */
+export const PULL_UNDER_SECTION = '-mt-10 @md:-mt-16 @xl:-mt-20';
+
 /** Gap between a band's own children (heading, body, buttons). */
 export const SECTION_GAP = 'gap-10 @md:gap-16';
 

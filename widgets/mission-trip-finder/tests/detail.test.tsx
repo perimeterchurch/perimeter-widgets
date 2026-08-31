@@ -1,6 +1,6 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from '../src/app';
 import { MissionTripFinderConfigSchema, type MissionTripFinderConfig } from '../src/types';
@@ -43,6 +43,11 @@ vi.mock('@perimeter/api-hooks', () => ({
     hooks.detailId = id;
     return hooks.detail;
   },
+  // Deliberately stuck loading, and never given data. The participant view's
+  // own content is covered in participant.test.tsx; here it exists only so the
+  // breadcrumb specs can open that level, and its permanent emptiness is what
+  // proves the trail's last crumb comes from the trip roster instead.
+  useMissionTripParticipant: () => ({ data: undefined, isLoading: true, error: null }),
 }));
 
 function config(overrides: Record<string, unknown> = {}): MissionTripFinderConfig {
@@ -77,7 +82,9 @@ describe('trip detail navigation', () => {
     renderApp();
     await userEvent.click(screen.getByRole('button', { name: /Mana De Vida/ }));
 
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'GO Journeys' })).toBeInTheDocument(),
+    );
     expect(hooks.detailId).toBe(958);
   });
 
@@ -91,12 +98,14 @@ describe('trip detail navigation', () => {
     });
   });
 
-  it('goes back to the list', async () => {
+  it('goes back to the list from the breadcrumb', async () => {
     renderApp();
     await userEvent.click(screen.getByRole('button', { name: /Mana De Vida/ }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'GO Journeys' })).toBeInTheDocument(),
+    );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Back' }));
+    await userEvent.click(screen.getByRole('button', { name: 'GO Journeys' }));
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /Mana De Vida/ })).toBeInTheDocument(),
     );
@@ -121,20 +130,113 @@ describe('trip detail navigation', () => {
 });
 
 describe('tripId-pinned embed', () => {
-  it('renders the detail with no list behind it and no Back button', async () => {
+  it('renders the detail with no list behind it and no way back to one', async () => {
     renderApp({ tripId: 958 });
 
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
     );
     expect(hooks.detailId).toBe(958);
-    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+    // Nothing above the trip to point at, so the trail is dropped entirely
+    // rather than rendered as a single word that goes nowhere.
+    expect(screen.queryByRole('navigation', { name: 'Breadcrumb' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'GO Journeys' })).not.toBeInTheDocument();
   });
 
   it('does not write to the URL — the host page owns it', async () => {
     renderApp({ tripId: 958 });
     await waitFor(() => expect(hooks.detailId).toBe(958));
     expect(window.location.search).toBe('');
+  });
+});
+
+describe('the breadcrumb trail', () => {
+  // The trail replaced the Back button: Back could only undo one step, so from
+  // a participant's page there was no way to reach the list without pressing it
+  // twice, and nothing on screen said where you were.
+  it('names the level you are on, and links the one above it', async () => {
+    renderApp();
+    await userEvent.click(screen.getByRole('button', { name: /Mana De Vida/ }));
+
+    const trail = await waitFor(() => screen.getByRole('navigation', { name: 'Breadcrumb' }));
+    expect(within(trail).getByRole('button', { name: 'GO Journeys' })).toBeInTheDocument();
+    // The trip is where you are, so it is text rather than a link to itself.
+    expect(within(trail).getByText('Serving students at Mana De Vida')).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(
+      within(trail).queryByRole('button', { name: 'Serving students at Mana De Vida' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('grows to three levels on a participant, and the middle one goes back to the trip', async () => {
+    window.history.replaceState(null, '', '/?trip-screen=detail&trip-id=958&trip-pledge=97540');
+    renderApp();
+
+    const trail = await waitFor(() => screen.getByRole('navigation', { name: 'Breadcrumb' }));
+    expect(within(trail).getByRole('button', { name: 'GO Journeys' })).toBeInTheDocument();
+    expect(within(trail).getByText('Lori Allison')).toHaveAttribute('aria-current', 'page');
+
+    await userEvent.click(
+      within(trail).getByRole('button', { name: 'Serving students at Mana De Vida' }),
+    );
+    await waitFor(() => expect(window.location.search).not.toContain('trip-pledge'));
+  });
+
+  it('reads the participant name off the roster, without a second fetch', async () => {
+    // The participant fetch is mocked as permanently loading, so the name
+    // cannot have come from it — it comes from `trip.participants`, the same
+    // roster Meet the Team renders.
+    window.history.replaceState(null, '', '/?trip-screen=detail&trip-id=958&trip-pledge=99930');
+    renderApp();
+
+    const trail = await waitFor(() => screen.getByRole('navigation', { name: 'Breadcrumb' }));
+    expect(within(trail).getByText('Sue and Brett Swanson')).toBeInTheDocument();
+  });
+
+  it('still names the level for a pledge that is not on this roster', async () => {
+    window.history.replaceState(null, '', '/?trip-screen=detail&trip-id=958&trip-pledge=1');
+    renderApp();
+
+    const trail = await waitFor(() => screen.getByRole('navigation', { name: 'Breadcrumb' }));
+    expect(within(trail).getByText('Participant')).toHaveAttribute('aria-current', 'page');
+    // The trip must not look like the current page while a participant is open.
+    expect(
+      within(trail).getByRole('button', { name: 'Serving students at Mana De Vida' }),
+    ).toBeInTheDocument();
+  });
+
+  it('gives a pinned embed its top level back via listUrl', async () => {
+    renderApp({ tripId: 958, listUrl: 'https://www.perimeter.org/go-journeys/' });
+
+    const trail = await waitFor(() => screen.getByRole('navigation', { name: 'Breadcrumb' }));
+    expect(within(trail).getByRole('link', { name: 'GO Journeys' })).toHaveAttribute(
+      'href',
+      'https://www.perimeter.org/go-journeys/',
+    );
+  });
+
+  // A pinned embed opened straight to a participant still has somewhere to go:
+  // up to the trip. That level is worth showing even with no `listUrl`.
+  it('shows the trip level on a pinned participant page with no listUrl', async () => {
+    renderApp({ tripId: 958, pledgeId: 97540 });
+
+    const trail = await waitFor(() => screen.getByRole('navigation', { name: 'Breadcrumb' }));
+    expect(within(trail).queryByText('GO Journeys')).not.toBeInTheDocument();
+    expect(
+      within(trail).getByRole('button', { name: 'Serving students at Mana De Vida' }),
+    ).toBeInTheDocument();
+    expect(within(trail).getByText('Lori Allison')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('sits beneath the hero, whichever hero the embed renders', async () => {
+    renderApp({ tripId: 958, listUrl: 'https://example.org/', heroStyle: 'cover' });
+
+    const trail = await waitFor(() => screen.getByRole('navigation', { name: 'Breadcrumb' }));
+    const heading = screen.getByRole('heading', { name: /Mana De Vida/ });
+    // DOCUMENT_POSITION_FOLLOWING: the trail comes after the heading.
+    expect(heading.compareDocumentPosition(trail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
 
