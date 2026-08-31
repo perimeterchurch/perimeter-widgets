@@ -240,6 +240,103 @@ describe('the breadcrumb trail', () => {
   });
 });
 
+describe('detail layout', () => {
+  // Release safety: an embed that sets nothing must keep sitting inside the
+  // host's content column exactly as it did before this option existed.
+  it('stays contained by default, and does not move the page', async () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    renderApp();
+    await userEvent.click(screen.getByRole('button', { name: /Mana De Vida/ }));
+
+    await waitFor(() => expect(screen.getByText('About the Journey')).toBeInTheDocument());
+    expect(document.querySelector('[data-detail-layout="contained"]')).toBeInTheDocument();
+    expect(scrollIntoView).not.toHaveBeenCalled();
+  });
+
+  it('spans the page and scrolls to the top of the detail when opted in', async () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    renderApp({ detailLayout: 'full' });
+    await userEvent.click(screen.getByRole('button', { name: /Mana De Vida/ }));
+
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+    expect(scrollIntoView.mock.calls[0]![0]).toMatchObject({ block: 'start' });
+    expect(document.querySelector('[data-detail-layout="full"]')).toBeInTheDocument();
+  });
+
+  // The embed sits ~1800px down a landing page on perimeter.org, so a deep link
+  // lands the reader at the top of that page with the detail far below it.
+  it('scrolls on a deep link too, not only on a click', async () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    window.history.replaceState(null, '', '/?trip-screen=detail&trip-id=958');
+    renderApp({ detailLayout: 'full' });
+
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+  });
+
+  it('offsets the scroll by the host header so the top is not hidden behind it', async () => {
+    renderApp({ tripId: 958, detailLayout: 'full', headerOffset: 90 });
+
+    const wrapper = await waitFor(() => document.querySelector('[data-detail-layout="full"]'));
+    expect(wrapper).toHaveStyle({ scrollMarginTop: '90px' });
+  });
+
+  it('leaves no offset when the host has no fixed header', async () => {
+    renderApp({ tripId: 958, detailLayout: 'full' });
+
+    const wrapper = await waitFor(() => document.querySelector('[data-detail-layout="full"]'));
+    expect((wrapper as HTMLElement).style.scrollMarginTop).toBe('0px');
+  });
+
+  // The offset is written onto the element the scroll actually targets. Outside
+  // a shadow root — which is how these tests render — that is this wrapper; in
+  // a real embed it is the shadow host, which is the one element that sits
+  // outside the view's entry animation and so does not move under the scroll.
+  it('cleans the offset off again when the detail unmounts', async () => {
+    const { unmount } = renderApp({ tripId: 958, detailLayout: 'full', headerOffset: 90 });
+    const wrapper = await waitFor(() => document.querySelector('[data-detail-layout="full"]'));
+    expect(wrapper).toHaveStyle({ scrollMarginTop: '90px' });
+
+    unmount();
+    expect((wrapper as HTMLElement).style.scrollMarginTop).toBe('');
+  });
+
+  // Every FullBleed measures the SHADOW HOST rather than its own parent, so a
+  // nested one re-applies the same negative margin and shoves the band a
+  // container's worth of padding off the page edge. In `full` the wrapper owns
+  // the breakout and the bands must stand down.
+  it('does not break the hero out twice — the wrapper owns it in full', async () => {
+    renderApp({ tripId: 958, detailLayout: 'full', heroStyle: 'cover', showGallery: true });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    // jsdom does no layout, so assert on the mechanism: exactly one element in
+    // the tree carries a FullBleed inline width, and it is the wrapper.
+    const bled = Array.from(document.querySelectorAll<HTMLElement>('div')).filter(
+      (el) => el.style.width !== '' && el.style.marginLeft !== '',
+    );
+    expect(bled).toHaveLength(1);
+    expect(bled[0]!.firstElementChild).toHaveAttribute('data-detail-layout', 'full');
+  });
+
+  it('still lets the bands break out on their own when contained', async () => {
+    renderApp({ tripId: 958, heroStyle: 'cover', showGallery: true });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /Mana De Vida/ })).toBeInTheDocument(),
+    );
+    const bled = Array.from(document.querySelectorAll<HTMLElement>('div')).filter(
+      (el) => el.style.width !== '' && el.style.marginLeft !== '',
+    );
+    // Hero and gallery each break out; nothing wraps the detail as a whole.
+    expect(bled.length).toBeGreaterThan(1);
+    expect(document.querySelector('[data-detail-layout="contained"]')).toBeInTheDocument();
+  });
+});
+
 describe('trip detail content', () => {
   it('renders the long description as sanitized HTML, not escaped text', async () => {
     renderApp({ tripId: 958 });
