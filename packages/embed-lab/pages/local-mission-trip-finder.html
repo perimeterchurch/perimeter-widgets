@@ -95,13 +95,15 @@
       <h2>1 — the finder, with the detail opening in place</h2>
       <p class="banner">
         Click a card: it should fade to the trip's detail view without leaving the page, and the URL
-        should gain <code>?trip-screen=detail&amp;trip-id=…</code>. Back returns to the grid. Inside
-        the widget the cards must stay a plain grid (no bullets, no 2rem row gaps), banners and team
-        avatars must have no red border and no grayscale, and buttons must stay brand blue rather
-        than lime. On the detail, <strong>every</strong> team avatar must be visible — none stranded
-        invisible. Both opt-in bands are off here, so the detail runs heading &rarr; About the
-        Journey &rarr; Meet the Team with no photo scroller and no testimonials &mdash; that is the
-        default, and it must look finished rather than gap-toothed.
+        should gain <code>?trip-screen=detail&amp;trip-id=…</code>. Beneath the heading is the
+        breadcrumb trail &mdash; <code>GO Journeys / &lt;trip&gt;</code> &mdash; and the blue crumb
+        returns to the grid. Open a team member and it grows a third level, whose middle crumb goes
+        back to the trip. Inside the widget the cards must stay a plain grid (no bullets, no 2rem
+        row gaps), banners and team avatars must have no red border and no grayscale, and buttons
+        must stay brand blue rather than lime. On the detail, <strong>every</strong> team avatar
+        must be visible — none stranded invisible. Both opt-in bands are off here, so the detail
+        runs heading &rarr; About the Journey &rarr; Meet the Team with no photo scroller and no
+        testimonials &mdash; that is the default, and it must look finished rather than gap-toothed.
       </p>
       <div
         data-perimeter-widget="mission-trip-finder"
@@ -130,15 +132,20 @@
         WordPress go-journey-details page. It also opts into <strong>both</strong> bands:
         <code>data-show-gallery="true"</code> with five real banners in
         <code>data-gallery-urls</code>, and <code>data-show-testimonials="true"</code>. Drag the
-        scroller, or focus it and use the arrow keys. The cover photos must span the full page width
-        &mdash; past this container's 90px padding, edge to edge &mdash; without introducing a
-        horizontal scrollbar. Both bands are off by default (embed 1), because Global Outreach has
-        no gallery photos and the testimonial quotes are still placeholder copy.
+        scroller, or focus it and use the arrow keys. <code>data-list-url</code> is what gives a
+        pinned embed its top crumb: with no grid behind it the widget has nowhere of its own to go,
+        so without that attribute the trail starts at the trip &mdash; and a one-crumb trail is
+        dropped rather than shown, which is why embed 3 below has no trail until you open a
+        participant. The cover photos must span the full page width &mdash; past this container's
+        90px padding, edge to edge &mdash; without introducing a horizontal scrollbar. Both bands
+        are off by default (embed 1), because Global Outreach has no gallery photos and the
+        testimonial quotes are still placeholder copy.
       </p>
       <div
         data-perimeter-widget="mission-trip-finder"
         data-api-url="http://localhost:5500"
         data-trip-id="958"
+        data-list-url="https://www.perimeter.org/global-outreach/go-journeys/"
         data-show-gallery="true"
         data-show-testimonials="true"
         data-gallery-urls="https://perimetercdnstorage.blob.core.windows.net/widgets/Guatemala-MMM-Banner.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/banner-poland.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/croatia.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/UgandaEgypt.jpg,https://perimetercdnstorage.blob.core.windows.net/widgets/Bangkok-Thailand.jpg"
@@ -150,13 +157,16 @@
         destination banner full-bleed and darkened, with the name, destination and dates centred
         over it in white. Both bands stay off here, so this is the shape the page had before the
         redesign moved the photography into the scroller. The photo must span the full page width
-        without a horizontal scrollbar, and the white type must stay legible over it.
+        without a horizontal scrollbar, and the white type must stay legible over it. The breadcrumb
+        trail sits directly beneath the photo here, on white, with no pull-up &mdash; the cover band
+        ends at its own edge, where the plain heading carries a section's worth of bottom padding.
       </p>
       <div
         data-perimeter-widget="mission-trip-finder"
         data-api-url="http://localhost:5500"
         data-trip-id="958"
         data-hero-style="cover"
+        data-list-url="https://www.perimeter.org/global-outreach/go-journeys/"
       ></div>
 
       <script src="/local/mission-trip-finder/index.js" data-nowprocket async></script>

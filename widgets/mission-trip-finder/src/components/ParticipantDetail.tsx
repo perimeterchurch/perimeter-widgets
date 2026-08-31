@@ -113,7 +113,6 @@ export function ParticipantDetail({
         isLoading={isLoading}
         skeleton={
           <div className="flex w-full flex-col items-center gap-6">
-            <Skeleton className="h-4 w-48" />
             <Skeleton className="h-10 w-72" />
             <Skeleton className="size-40 rounded-full @md:size-52" />
             <Skeleton className="h-4 w-full max-w-2xl" />
@@ -122,10 +121,9 @@ export function ParticipantDetail({
       >
         {participant && (
           <div className="flex w-full flex-col items-center gap-8">
-            <p className="font-sans text-sm font-bold tracking-widest text-primary uppercase">
-              GO Journey Participant
-            </p>
-
+            {/* No "GO Journey Participant" eyebrow: the breadcrumb trail a few
+                inches above already names this level, and saying it twice made
+                the page read as two headers stacked. */}
             <h3
               ref={headingRef}
               tabIndex={-1}

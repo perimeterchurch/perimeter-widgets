@@ -24,8 +24,8 @@ The detail follows the 2026 Figma redesign, in bands:
    three to a row (two below `@sm`).
 6. **Donation disclaimer.** Rebuild of the legacy `reactwidgets`
 
-Clicking someone in the roster opens their **GO Journey Participant** page in
-place: the trip heading and photo scroller stay, and everything below them is
+Clicking someone in the roster opens their participant page in place: the trip
+heading, breadcrumb trail and photo scroller stay, and everything below them is
 replaced by that person's photo, fundraising progress, support letter and a
 "View Trip Details" button back to the trip.
 MissionTripFinder and the legacy `MissionTripDetails` HTML widget
@@ -45,12 +45,23 @@ still open and marked for the website in Ministry Platform.
 ### As a details page
 
 `data-trip-id` pins the widget to one trip: it renders that trip's detail alone,
-with no grid behind it and no Back button. This is what a dedicated
-go-journey-details page embeds, so the same bundle serves both surfaces and
-existing `?id=` links keep working.
+with no grid behind it. This is what a dedicated go-journey-details page embeds,
+so the same bundle serves both surfaces and existing `?id=` links keep working.
 
 ```html
 <div data-perimeter-widget="mission-trip-finder" data-trip-id="958"></div>
+```
+
+Because there is no grid behind it, such an embed has nowhere of its own to send
+a visitor back to. `data-list-url` supplies that top level for the breadcrumb
+trail:
+
+```html
+<div
+  data-perimeter-widget="mission-trip-finder"
+  data-trip-id="958"
+  data-list-url="https://www.perimeter.org/global-outreach/go-journeys/"
+></div>
 ```
 
 ## Navigation and deep links
@@ -61,6 +72,52 @@ detail view carries a **Copy link** button for exactly that. Keys are prefixed
 `trip-` so two embeds on one page never collide.
 
 A `data-trip-id` embed never writes to the URL — the host page owns it.
+
+### The breadcrumb trail
+
+Going back is a breadcrumb trail sitting directly beneath the hero, not a Back
+button in the toolbar:
+
+```
+GO Journeys / Serving students at Mana De Vida / Lori Allison
+```
+
+Every level above the one you are on is a link in the brand blue; the level you
+are on is grey text carrying `aria-current="page"`. It replaced the Back button
+because Back could only ever undo one step — from a participant's page it took
+two presses to reach the list, and nothing on screen said how deep you were.
+
+The last crumb's name comes off `trip.participants`, the same roster Meet the
+Team renders, so no second request is made for it.
+
+Which levels appear depends on where the embed can actually go:
+
+| Embed                                       | Trail                            |
+| ------------------------------------------- | -------------------------------- |
+| Unpinned, on a trip                         | GO Journeys / _trip_             |
+| Unpinned, on a participant                  | GO Journeys / _trip_ / _name_    |
+| `data-trip-id`, on the trip                 | none                             |
+| `data-trip-id`, on a participant            | _trip_ / _name_                  |
+| `data-trip-id` + `data-list-url`            | GO Journeys / _trip_ …           |
+
+A one-crumb trail is dropped rather than rendered as a single word that goes
+nowhere, which is why a pinned details page shows nothing until either
+`data-list-url` is set or a participant is open.
+
+The links are `primary`, the brand sky-blue, so the trail matches the buttons and
+everything else on the page. `primary` is a FILL colour — it is light because the
+palette pairs it with navy text on top — so as text on white it is about 2.1:1
+and fails WCAG AA. Global Outreach knows and has chosen it, the same call as the
+[white button labels](#white-button-labels).
+
+The replacement is measured and ready if that is ever revisited:
+`hsl(200.1 75.7% 36%)` is the same hue and saturation darkened, which still
+reads as Perimeter blue at 5.3:1 on white and 4.8:1 on `bg-muted`. It belongs in
+`@perimeter/theme` as a `color-link` token rather than as a literal, because
+`color-primary` itself has to stay light for the buttons it fills.
+
+Either way the crumbs underline on hover and focus. At this contrast that is the
+only dependable signal that they are interactive, so it is not decoration.
 
 ## Config
 
@@ -93,6 +150,7 @@ defaults).
 | `data-disclaimer-text`   | string  | the standard donation disclaimer       | Text at the foot of the detail view. Empty string hides the block.                |
 | `data-details-mode`      | `link` \| `inline` | `link`                      | What a card click does. `link` hands off to `data-details-url-base`; `inline` opens the detail in place. |
 | `data-details-url-base`  | string  | perimeter.org go-journey-details       | Where a card links in `link` mode; the trip ID is appended. Ignored in `inline` mode. |
+| `data-list-url`          | string  | —                                      | Where the "GO Journeys" breadcrumb points on a `data-trip-id` embed.              |
 | `data-empty-message`     | string  | `No mission trips are open right now.` | Message shown when the list has no trips.                                         |
 | `data-default-image-url` | string  | —                                      | Fallback banner for trips whose destination has no artwork.                       |
 | `data-api-url`           | string  | —                                      | Override the perimeter-api base URL (advanced).                                   |
@@ -257,6 +315,11 @@ and browser-back steps out of it.
 to a separate page instead of opening the participant view in place, the same
 way `data-details-url-base` works for trip cards.
 
+The page opens on the person's name. It used to carry a blue "GO Journey
+Participant" eyebrow above it; that came out when the breadcrumb trail landed,
+because the trail's last crumb already names the level and the two together read
+as a pair of stacked headers.
+
 Two things come from live MP fields the legacy page got wrong:
 
 - **The letter is `Pledges.Letter`.** The old stored proc read
@@ -344,9 +407,9 @@ keeps the AA-compliant pairing that `packages/theme/tests/contrast.test.ts`
 guards. Two tests in `tests/config.test.ts` pin both halves: the override is
 present here, and the shared palette is untouched.
 
-Only filled buttons are affected. The `outline` and `ghost` buttons (Back, Copy
-link, View Trip Details) sit on white, where a white label would be invisible,
-so they keep the dark text.
+Only filled buttons are affected. The `ghost` and `outline` buttons (Copy link,
+View Trip Details) sit on white, where a white label would be invisible, so they
+keep the dark text.
 
 ### The metadata grey
 

@@ -89,7 +89,9 @@ describe('opening a participant', () => {
     );
     await userEvent.click(card);
 
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(hooks.args).toEqual({ tripId: 945, pledgeId: 100223 });
   });
 
@@ -113,14 +115,18 @@ describe('opening a participant', () => {
     );
     await userEvent.click(card);
 
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(window.location.search).toBe('');
   });
 
   it('boots straight to a participant from data-pledge-id', async () => {
     renderApp({ tripId: 945, pledgeId: 100223 });
 
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(hooks.args).toEqual({ tripId: 945, pledgeId: 100223 });
   });
 
@@ -146,13 +152,24 @@ describe('participant page content', () => {
     renderApp({ tripId: 945, pledgeId: 100223 });
   });
 
-  it('shows the eyebrow, name and photo', async () => {
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
-    expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument();
+  it('shows the name and photo', async () => {
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(screen.getByAltText('Samantha and Jack Morgan')).toHaveAttribute(
       'src',
       expect.stringContaining('/api/mission-trips/945/participant/100223/image'),
     );
+  });
+
+  // Removed once the breadcrumb trail landed: the trail's last crumb already
+  // says which level this is, and the eyebrow repeated it a few inches below,
+  // so the page read as two stacked headers.
+  it('has no "GO Journey Participant" eyebrow above the name', async () => {
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('GO Journey Participant')).not.toBeInTheDocument();
   });
 
   // Most of the roster has no photo on file, so the image 404s and this is the
@@ -203,7 +220,9 @@ describe('participant page content', () => {
   });
 
   it('replaces the lower page — no testimonials, roster or disclaimer', async () => {
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(screen.queryByText('Hear From Others')).not.toBeInTheDocument();
     expect(screen.queryByText('Meet the Team')).not.toBeInTheDocument();
     expect(screen.queryByText('Donation Disclaimer')).not.toBeInTheDocument();
@@ -211,7 +230,9 @@ describe('participant page content', () => {
   });
 
   it('keeps the trip heading above it', async () => {
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(screen.getByRole('heading', { name: 'Guatemala Medical Missions' })).toBeInTheDocument();
   });
 
@@ -221,18 +242,24 @@ describe('participant page content', () => {
   it('keeps the photo scroller above it when the scroller is on', async () => {
     render(<App config={config({ tripId: 945, pledgeId: 100223, showGallery: true })} />);
     await waitFor(() =>
-      expect(screen.getAllByText('GO Journey Participant').length).toBeGreaterThan(0),
+      expect(
+        screen.getAllByRole('heading', { name: 'Samantha and Jack Morgan' }).length,
+      ).toBeGreaterThan(0),
     );
     expect(screen.getAllByRole('region', { name: /Photos from/ }).length).toBeGreaterThan(0);
   });
 
   it('returns to the trip via View Trip Details', async () => {
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
 
     await userEvent.click(screen.getByRole('button', { name: /View Trip Details/ }));
 
     await waitFor(() => expect(screen.getByText('About the Journey')).toBeInTheDocument());
-    expect(screen.queryByText('GO Journey Participant')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Samantha and Jack Morgan' }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -260,7 +287,9 @@ describe('participant edge cases', () => {
     };
     renderApp({ tripId: 945, pledgeId: 100223 });
 
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
@@ -283,7 +312,9 @@ describe('participant edge cases', () => {
     };
     renderApp({ tripId: 945, pledgeId: 100223 });
 
-    await waitFor(() => expect(screen.getByText('GO Journey Participant')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Samantha and Jack Morgan' })).toBeInTheDocument(),
+    );
     expect(screen.getByRole('link', { name: 'Support Samantha' })).toBeInTheDocument();
   });
 
