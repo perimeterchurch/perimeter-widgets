@@ -23,7 +23,7 @@
     },
     {
       "source": "/mission-trip-finder/latest.js",
-      "destination": "/mission-trip-finder/0.2.0/index.js"
+      "destination": "/mission-trip-finder/0.3.0/index.js"
     },
     {
       "source": "/my-giving-history/latest.js",
