@@ -49,7 +49,17 @@ describe('MissionTripFinderConfigSchema', () => {
       fullBleed: true,
       showGallery: false,
       showTestimonials: false,
+      detailLayout: 'contained',
+      headerOffset: 0,
     });
+  });
+
+  it('coerces the header offset from a data-* string', () => {
+    expect(MissionTripFinderConfigSchema.parse({ headerOffset: '90' }).headerOffset).toBe(90);
+  });
+
+  it('rejects an unknown detail layout rather than guessing', () => {
+    expect(() => MissionTripFinderConfigSchema.parse({ detailLayout: 'takeover' })).toThrow();
   });
 
   it('defaults to linking out, so releasing never changes a live embed', () => {

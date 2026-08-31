@@ -78,6 +78,26 @@ export const MissionTripFinderConfigSchema = z.object({
         'lets one embed stand in for a dedicated details page: point it at ' +
         '?id=<trip> from the host page and the widget renders that trip alone.',
     ),
+  detailLayout: z
+    .enum(['contained', 'full'])
+    .default('contained')
+    .describe(
+      "How the detail view sits in the host page. 'contained' (the default) leaves it inside " +
+        "whatever content column the embed sits in. 'full' makes the whole detail span the page " +
+        'width — every band, not just the hero and scroller — and takes the reader to the top of ' +
+        'it when a trip opens, so a trip reads as its own page rather than as a panel part-way ' +
+        'down a landing page. Pair it with `headerOffset` if the host has a fixed header.',
+    ),
+  headerOffset: z.coerce
+    .number()
+    .int()
+    .min(0)
+    .default(0)
+    .describe(
+      "Height in pixels of the host page's fixed header. Only used by `detailLayout: 'full'`, " +
+        'which scrolls the detail to the top of the viewport: without this the first ' +
+        "`headerOffset` pixels end up behind the header. perimeter.org's is 90.",
+    ),
   fullBleed: z.coerce
     .boolean()
     .default(true)
