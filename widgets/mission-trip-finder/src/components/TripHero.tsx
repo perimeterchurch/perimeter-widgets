@@ -89,11 +89,13 @@ export function TripHero({
       )}
 
       <div className="relative flex w-full max-w-3xl flex-col items-center gap-2 text-center text-white">
-        <h2 className="font-serif text-4xl leading-[1.05] font-bold text-balance @md:text-6xl @xl:text-7xl">
+        <h2 className="font-serif text-4xl leading-[1.05] font-normal text-balance @md:text-6xl @xl:text-7xl">
           {name}
         </h2>
         {destination && (
-          <p className="font-serif text-2xl leading-tight font-bold @md:text-4xl">{destination}</p>
+          <p className="font-serif text-2xl leading-tight font-normal @md:text-4xl">
+            {destination}
+          </p>
         )}
         {dates && (
           <p className="font-sans text-lg font-bold tracking-wide text-white/90 @md:text-2xl">
