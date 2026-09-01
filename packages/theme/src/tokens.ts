@@ -47,6 +47,18 @@ export const globalTokens = {
   'font-sans': '"sweet-sans-pro", Inter, system-ui, -apple-system, sans-serif',
   // Brand display serif = Freight Display Pro (Adobe Fonts; perimeter.org H1/H2).
   // Free fallbacks: Playfair Display, then the system serif. Use via `font-serif`.
+  //
+  // Pair it with `font-normal`, never `font-bold`. perimeter.org's Typekit kits
+  // publish freight-display-pro at 400 and 500 ONLY, so `font-bold` (700)
+  // silently matches the 500 face — no error, no synthetic bold, just a heavier
+  // display cut than the brand uses. Every native perimeter.org serif heading
+  // computes to 400 (measured across H1/H2 on a live page: 7 of 7).
+  //
+  // Local preview cannot catch this, because the studio and embed lab load a
+  // DIFFERENT kit (hpg7onr) that does publish freight 700. So `font-bold`
+  // renders a real, deliberate-looking bold locally and degrades to the 500
+  // face only on the live site. Hence the guard in
+  // packages/theme/tests/serif-weight.test.ts.
   'font-serif': '"freight-display-pro", "Playfair Display", Georgia, "Times New Roman", serif',
   'font-mono': 'ui-monospace, SFMono-Regular, monospace',
   // Elevation scale — Tailwind v4's default shadow values, tokenized so an

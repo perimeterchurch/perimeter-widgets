@@ -127,7 +127,7 @@ export function ParticipantDetail({
             <h3
               ref={headingRef}
               tabIndex={-1}
-              className="text-center font-serif text-3xl leading-tight font-bold text-balance outline-hidden @md:text-4xl @xl:text-5xl"
+              className="text-center font-serif text-3xl leading-tight font-normal text-balance outline-hidden @md:text-4xl @xl:text-5xl"
             >
               {participant.name}
             </h3>
