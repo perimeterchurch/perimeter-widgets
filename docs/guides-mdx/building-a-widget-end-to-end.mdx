@@ -60,6 +60,38 @@ The `name` must match in **three** places: `defineWidget({ name })`,
 `widgetConfig({ name })` in `vite.config.ts`, and the host page's
 `data-perimeter-widget="<your-widget>"`. The scaffolder already wires all three.
 
+### Name your config fields for the people who configure them
+
+The studio's Configure panel heads each row with a readable name. Unlabelled
+fields fall back to a humanized key — `showDescription` becomes "Show
+description", `apiUrl` becomes "API URL" — which is fine for a small widget.
+
+Add `configLabels` wherever a key is jargon to the ministry staff who will set
+the widget up:
+
+```tsx
+export default defineWidget({
+  name: '<your-widget>',
+  auth: 'none',
+  schema: MyConfigSchema,
+  configLabels: {
+    detailsMode: 'What clicking a trip does',
+    detailLayout: 'How much of the page a trip fills',
+  },
+  App: ({ config }) => <App config={config} />,
+});
+```
+
+Those two are the cautionary example: as keys they read as near-synonyms while
+doing unrelated things — one decides whether a card navigates away, the other how
+much of the page the detail takes over. Write what the field *does*.
+
+Labels are **presentational only**. The `data-*` attribute an embed writes is
+always derived from the schema key, so a label can be reworded freely without
+touching a live page. The panel shows the attribute alongside the label for
+exactly that reason. Keys are checked against the schema at compile time, so a
+label cannot drift onto a field that does not exist.
+
 ### The `data-*` config contract — coerce everything
 
 Host-page configuration arrives as `data-*` attributes, and HTML attributes are

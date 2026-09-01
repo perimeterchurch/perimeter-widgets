@@ -36,6 +36,46 @@ export default defineWidget({
     'color-primary-fg': 'hsl(0 0% 100%)',
     'color-muted-fg': 'hsl(215 0.5% 43.28%)',
   },
+  // Readable names for the studio's Configure panel. Presentational only — the
+  // `data-*` attribute an embed writes still comes from the schema key, so
+  // nothing here can change a live page.
+  //
+  // Worth having because the keys are jargon in a list: `detailsMode` and
+  // `detailLayout` read as near-synonyms but do unrelated things — one decides
+  // whether a card navigates away, the other how much of the page a trip takes
+  // over. Each label says what the field DOES, not what it is called.
+  configLabels: {
+    showDescription: 'Show description on cards',
+    showCost: 'Show cost on cards',
+    showSpots: 'Show spots remaining',
+    hideFull: 'Hide trips that are full',
+    includePast: 'Include closed trips',
+    destinationId: 'Only show one destination',
+    keyword: 'Filter by search term',
+    maxTrips: 'Most trips to show',
+    detailsMode: 'What clicking a trip does',
+    detailsUrlBase: 'Trip page link (when clicking leaves)',
+    listUrl: 'Link back to the GO Journeys page',
+    tripId: 'Show only this one trip',
+    detailLayout: 'How much of the page a trip fills',
+    takeoverHide: 'Page content to hide behind a trip',
+    headerOffset: "Height of the site's fixed header",
+    fullBleed: 'Let photo bands span the page',
+    heroStyle: 'Top of the trip page',
+    showGallery: 'Show the photo scroller',
+    galleryUrls: 'Photos for the scroller',
+    showTestimonials: 'Show the testimonials band',
+    pledgeId: 'Open straight to one participant',
+    participantSupportUrl: "Giving form for a participant's page",
+    showTeam: 'Show Meet the Team',
+    registerUrl: 'Where "Register to Join" goes',
+    supportUrl: 'Where "Support Journey" goes',
+    participantUrl: 'Send team members to their own page',
+    disclaimerText: 'Donation disclaimer wording',
+    emptyMessage: 'Message when no trips are open',
+    defaultImageUrl: 'Fallback photo for trips with none',
+    apiUrl: 'API address (advanced)',
+  },
   schema: MissionTripFinderConfigSchema,
   App: ({ config }) => <App config={config} />,
 });

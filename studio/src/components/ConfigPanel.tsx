@@ -1,5 +1,7 @@
 import type { WidgetDefinition } from '@perimeter/widget-runtime';
 import { describeSchemaFields, unwrapObject, type SchemaField } from '../lib/schema-shape';
+import { fieldLabel } from '../lib/field-label';
+import { camelToKebab } from '../lib/data-attr';
 
 interface Props {
   definition: WidgetDefinition;
@@ -18,6 +20,10 @@ const INPUT_CLASS =
  * it affects), then the constraint that matters for that control — the enum's
  * allowed values, a number's range — followed by the default and an optional flag.
  * Built as discrete parts so we only show what applies to the field.
+ *
+ * The `data-*` attribute is NOT in here — it is rendered separately, in mono, so
+ * it stays findable now that the row is headed by a prose label rather than by
+ * the schema key.
  */
 function fieldHint(field: SchemaField): string {
   const parts: string[] = [];
@@ -71,12 +77,23 @@ export function ConfigPanel({ definition, overrides, onChange }: Props) {
       {fields.map((field) => (
         <label
           key={field.key}
-          className="grid grid-cols-[minmax(7rem,auto)_1fr] items-center gap-x-2 gap-y-1 text-sm"
+          // The label column is wider than it was, and wraps rather than
+          // truncating: these are sentences now, and "Show remaining spots on a
+          // trip" truncated to "Show remaini…" would be worse than the key it
+          // replaced.
+          className="grid grid-cols-[minmax(9rem,11rem)_1fr] items-center gap-x-3 gap-y-1 text-sm"
         >
-          <span className="truncate font-medium text-fg">{field.key}</span>
+          <span className="font-medium text-balance text-fg">
+            {fieldLabel(field.key, definition.configLabels)}
+          </span>
           <FieldControl field={field} value={overrides[field.key]} onChange={set} />
           {/* Hint spans the input column so it lines up under the control. */}
-          <span className="col-start-2 text-xs leading-snug text-muted-fg">{fieldHint(field)}</span>
+          <span className="col-start-2 text-xs leading-snug text-muted-fg">
+            <code className="rounded-sm bg-muted px-1 py-0.5 font-mono text-[0.7rem] text-fg">
+              data-{camelToKebab(field.key)}
+            </code>{' '}
+            {fieldHint(field)}
+          </span>
         </label>
       ))}
     </div>

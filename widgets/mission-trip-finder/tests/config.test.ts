@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { MissionTripFinderConfigSchema } from '../src/types';
+// Imported STATICALLY, not with `await import(...)` inside each test. Loading
+// this module pulls in the whole App tree (framer-motion, nuqs, api-hooks),
+// and whichever test imported it first paid that cost against the 5s test
+// timeout — which it exceeded under a fully uncached parallel monorepo run.
+// At file scope the same work happens during vitest's import phase, which is
+// not timed.
+import widget from '../src/widget';
+import { globalTokens } from '@perimeter/theme';
 
 /**
  * WCAG relative luminance / contrast, over this repo's `hsl(H S% L%)` token
@@ -143,8 +151,7 @@ describe('MissionTripFinderConfigSchema', () => {
 });
 
 describe('widget definition', () => {
-  it('renders as rectangles — Perimeter has no corner radius', async () => {
-    const { default: widget } = await import('../src/widget');
+  it('renders as rectangles — Perimeter has no corner radius', () => {
     expect(widget.themeOverrides).toMatchObject({
       'radius-sm': '0px',
       'radius-md': '0px',
@@ -156,20 +163,40 @@ describe('widget definition', () => {
   // the light `primary` blue (~2:1, against 7.3:1 for the default navy). Pinned
   // so the override cannot be lost silently in a refactor — and so the reason
   // it exists is written down next to it.
-  it('overrides primary-fg to white for button labels, by ministry request', async () => {
-    const { default: widget } = await import('../src/widget');
+  it('overrides primary-fg to white for button labels, by ministry request', () => {
     expect(widget.themeOverrides?.['color-primary-fg']).toBe('hsl(0 0% 100%)');
   });
 
   // The override has to stay scoped to this widget: the shared palette keeps
   // the AA-compliant pairing that packages/theme guards for every other widget.
-  it('does not touch the shared palette', async () => {
-    const { globalTokens } = await import('@perimeter/theme');
+  it('does not touch the shared palette', () => {
     expect(globalTokens['color-primary-fg']).toBe('hsl(210 75% 14.1%)');
   });
 
-  it('uses the ministry metadata grey for secondary text', async () => {
-    const { default: widget } = await import('../src/widget');
+  // The studio's Configure panel is how Global Outreach sets this widget up, and
+  // an unlabelled field falls back to a humanized key — fine for a small widget,
+  // but this one has 30 fields and several whose keys are jargon. Adding a field
+  // without a label is a compile error's worth of forgetfulness away, so it is
+  // pinned here instead.
+  it('labels every config field for the studio', () => {
+    const keys = Object.keys(MissionTripFinderConfigSchema.shape);
+    expect(keys.length).toBeGreaterThan(25);
+    for (const key of keys) {
+      expect(widget.configLabels?.[key as keyof typeof widget.configLabels], key).toBeTruthy();
+    }
+  });
+
+  // Labels are presentational. The attribute an embed writes comes from the
+  // schema KEY, so rewording a label can never change a live page — and these
+  // keys are the ones live embeds already use.
+  it('keeps the schema keys the live embeds depend on', () => {
+    const keys = Object.keys(MissionTripFinderConfigSchema.shape);
+    for (const key of ['detailsMode', 'detailLayout', 'takeoverHide', 'headerOffset', 'tripId']) {
+      expect(keys).toContain(key);
+    }
+  });
+
+  it('uses the ministry metadata grey for secondary text', () => {
     expect(widget.themeOverrides?.['color-muted-fg']).toBe('hsl(215 0.5% 43.28%)');
   });
 
@@ -177,10 +204,7 @@ describe('widget definition', () => {
   // it stays above the 4.5:1 floor on both surfaces the widget renders muted
   // text on. Pinned so a later "just nudge the grey" cannot quietly drop it
   // below, the way the 2026-06-10 axe sweep caught the shared token.
-  it('keeps the metadata grey above WCAG AA on the surfaces it renders on', async () => {
-    const { default: widget } = await import('../src/widget');
-    const { globalTokens } = await import('@perimeter/theme');
-
+  it('keeps the metadata grey above WCAG AA on the surfaces it renders on', () => {
     const fg = parseHsl(widget.themeOverrides!['color-muted-fg']!);
     expect(contrast(fg, parseHsl('hsl(0 0% 100%)'))).toBeGreaterThanOrEqual(4.5);
     expect(contrast(fg, parseHsl(globalTokens['color-muted']))).toBeGreaterThanOrEqual(4.5);
