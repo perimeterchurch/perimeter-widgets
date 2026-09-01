@@ -170,22 +170,24 @@ describe('Inspector', () => {
   it('defaults to the Config tab showing the schema field inputs', () => {
     const { container } = renderInspector();
     const scope = within(container);
-    // ConfigPanel renders a labelled input per schema key.
-    expect(scope.getByText('greeting')).toBeTruthy();
-    expect(scope.getByText('count')).toBeTruthy();
+    // ConfigPanel renders a labelled input per schema key, headed by a readable
+    // name with the data-* attribute alongside it.
+    expect(scope.getByText('Greeting')).toBeTruthy();
+    expect(scope.getByText('data-greeting')).toBeTruthy();
+    expect(scope.getByText('data-count')).toBeTruthy();
   });
 
   it('lays out Config field rows with an auto-label / flexible-input grid', () => {
     const { container } = renderInspector();
     const scope = within(container);
     // The old `grid-cols-2` split label/input 1:1 and squeezed inputs in the
-    // narrow drawer. The label column should size to content (min 7rem, widened
-    // so long keys stay on one line) and the input column take the remaining
-    // space, with the control vertically centered on the label.
-    const fieldLabel = scope.getByText('greeting').closest('label') as HTMLElement;
+    // narrow drawer. The label column is a bounded width whose content wraps —
+    // the rows are headed by sentences, not keys — and the input column takes
+    // the rest, with the control vertically centered on the label.
+    const fieldLabel = scope.getByText('data-greeting').closest('label') as HTMLElement;
     expect(fieldLabel).toBeTruthy();
     const classes = fieldLabel.className.split(/\s+/);
-    expect(classes).toContain('grid-cols-[minmax(7rem,auto)_1fr]');
+    expect(classes).toContain('grid-cols-[minmax(9rem,11rem)_1fr]');
     expect(classes).toContain('items-center');
     expect(classes).not.toContain('grid-cols-2');
   });

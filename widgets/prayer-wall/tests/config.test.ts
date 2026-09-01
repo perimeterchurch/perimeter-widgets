@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { PrayerWallConfigSchema } from '../src/types';
+// Static, not `await import(...)` inside each test: loading this pulls in the
+// whole App tree, and the test that imported it first paid that cost against
+// the 5s test timeout — which it exceeded under a fully uncached parallel
+// monorepo run. At file scope the work happens in vitest's import phase,
+// which is not timed.
+import widget from '../src/widget';
 
 describe('PrayerWallConfigSchema', () => {
   it('defaults to the wall the church is already running', () => {
@@ -33,8 +39,7 @@ describe('PrayerWallConfigSchema', () => {
 });
 
 describe('widget definition', () => {
-  it('renders as rectangles — Perimeter has no corner radius', async () => {
-    const { default: widget } = await import('../src/widget');
+  it('renders as rectangles — Perimeter has no corner radius', () => {
     expect(widget.themeOverrides).toEqual({
       'radius-sm': '0px',
       'radius-md': '0px',
@@ -42,8 +47,7 @@ describe('widget definition', () => {
     });
   });
 
-  it('leaves auth optional, so the feed stays public', async () => {
-    const { default: widget } = await import('../src/widget');
+  it('leaves auth optional, so the feed stays public', () => {
     expect(widget.auth).toBe('optional');
   });
 });
