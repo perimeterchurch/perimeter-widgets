@@ -3,6 +3,7 @@ import { NuqsAdapter } from 'nuqs/adapters/react';
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import type { MissionTripFinderConfig } from './types';
 import { useTripNavigation } from './hooks/use-trip-navigation';
+import { usePageTakeover } from './hooks/use-page-takeover';
 import { TripGrid } from './components/TripGrid';
 import { TripDetail } from './components/TripDetail';
 
@@ -26,6 +27,19 @@ const fadeSlide = {
 
 function MissionTripWidget({ config }: AppProps): React.JSX.Element {
   const nav = useTripNavigation(config);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+
+  // Driven from here rather than from inside TripDetail. The views below are
+  // keyed by screen, so TripDetail REMOUNTS when a participant opens or closes —
+  // and a takeover that mounts with it would tear itself down and restore the
+  // reader's scroll position in the middle of a visit. Up here its lifetime is
+  // the whole visit: from opening a trip to going back to the list.
+  usePageTakeover({
+    enabled: config.detailLayout === 'takeover' && nav.screen === 'detail' && nav.id !== null,
+    screen: nav.pledgeId !== null ? 'participant' : 'detail',
+    hideSelector: config.takeoverHide,
+    anchorRef: rootRef,
+  });
 
   const viewKey =
     nav.screen === 'detail' && nav.id
@@ -35,7 +49,7 @@ function MissionTripWidget({ config }: AppProps): React.JSX.Element {
       : 'browse';
 
   return (
-    <div className="@container text-left">
+    <div ref={rootRef} className="@container text-left">
       {/* One fade for the whole screen. Individual cards and avatars are
           deliberately not animated: a roster or a long grid animating each
           element is the shape that strands items at opacity 0 on a real host

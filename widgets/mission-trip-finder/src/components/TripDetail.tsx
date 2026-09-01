@@ -54,10 +54,11 @@ export function TripDetail({
   // animation first, and until it does the document is still skeleton-height.
   const [contentEl, setContentEl] = React.useState<HTMLDivElement | null>(null);
 
-  // `full` spans the whole detail across the page and treats a trip as its own
-  // page. Off by default: 'contained' is exactly what every embed did before
-  // this existed, so publishing a version never rearranges a live page.
-  const isFull = config.detailLayout === 'full';
+  // Both `full` and `takeover` span the whole detail across the page; takeover
+  // additionally asks the host page to stand down. Off by default: 'contained'
+  // is exactly what every embed did before this existed, so publishing a version
+  // never rearranges a live page.
+  const isFull = config.detailLayout === 'full' || config.detailLayout === 'takeover';
 
   // The hero, scroller and testimonial band each break out of the host's
   // container on their own. In `full` that job has moved to the wrapper around
