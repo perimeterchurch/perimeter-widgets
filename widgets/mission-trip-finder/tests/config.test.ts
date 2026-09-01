@@ -58,8 +58,20 @@ describe('MissionTripFinderConfigSchema', () => {
     expect(MissionTripFinderConfigSchema.parse({ headerOffset: '90' }).headerOffset).toBe(90);
   });
 
+  it('accepts all three detail layouts', () => {
+    for (const layout of ['contained', 'full', 'takeover'] as const) {
+      expect(MissionTripFinderConfigSchema.parse({ detailLayout: layout }).detailLayout).toBe(
+        layout,
+      );
+    }
+  });
+
   it('rejects an unknown detail layout rather than guessing', () => {
-    expect(() => MissionTripFinderConfigSchema.parse({ detailLayout: 'takeover' })).toThrow();
+    expect(() => MissionTripFinderConfigSchema.parse({ detailLayout: 'overlay' })).toThrow();
+  });
+
+  it('leaves takeoverHide unset — only the host knows what to hide', () => {
+    expect(MissionTripFinderConfigSchema.parse({}).takeoverHide).toBeUndefined();
   });
 
   it('defaults to linking out, so releasing never changes a live embed', () => {

@@ -79,14 +79,27 @@ export const MissionTripFinderConfigSchema = z.object({
         '?id=<trip> from the host page and the widget renders that trip alone.',
     ),
   detailLayout: z
-    .enum(['contained', 'full'])
+    .enum(['contained', 'full', 'takeover'])
     .default('contained')
     .describe(
       "How the detail view sits in the host page. 'contained' (the default) leaves it inside " +
         "whatever content column the embed sits in. 'full' makes the whole detail span the page " +
         'width — every band, not just the hero and scroller — and takes the reader to the top of ' +
-        'it when a trip opens, so a trip reads as its own page rather than as a panel part-way ' +
-        'down a landing page. Pair it with `headerOffset` if the host has a fixed header.',
+        "it when a trip opens. 'takeover' does that AND hands the page over: it puts " +
+        '`data-screen` on the embed while a trip is open, and hides whatever ' +
+        '`takeoverHide` names, so the trip reads as the page rather than as a band part ' +
+        'of the way down one. Both restore themselves when the reader goes back to the list. ' +
+        'Pair either with `headerOffset` if the host has a fixed header.',
+    ),
+  takeoverHide: z
+    .string()
+    .optional()
+    .describe(
+      'CSS selector for host page content to hide while a trip is open. Only used by ' +
+        "`detailLayout: 'takeover'`. This is how an embed hands the page over without the host " +
+        "needing any CSS of its own — on perimeter.org's GO Journeys page, " +
+        '`.wpb_row:not(#upcoming-journeys)` hides every WPBakery row except the one holding the ' +
+        'widget. Removed again the moment the reader goes back to the list.',
     ),
   headerOffset: z.coerce
     .number()

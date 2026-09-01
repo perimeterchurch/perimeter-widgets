@@ -160,6 +160,66 @@ today. Two things are worth knowing before turning it on:
   mounts inside an entry animation that starts it 8px lower, and scrolling to a
   transformed element overshoots by exactly that.
 
+### Handing the page over
+
+`full` widens the detail but the landing page is still around it. `takeover` goes
+further: while a trip is open, the host page's own content is hidden and the trip
+*is* the page, header to footer. Going back to the list restores everything,
+including the reader's place on the page.
+
+```html
+<div
+  data-perimeter-widget="mission-trip-finder"
+  data-details-mode="inline"
+  data-detail-layout="takeover"
+  data-takeover-hide=".wpb_row:not(#upcoming-journeys)"
+  data-header-offset="90"
+></div>
+```
+
+Two things happen while a trip is open:
+
+- **`data-screen` lands on the embed** — `"detail"` or `"participant"`, and
+  nothing at all on the list. Host CSS can hang off that on its own; the
+  attribute is set whether or not `data-takeover-hide` is.
+- **A stylesheet hides whatever `data-takeover-hide` names.** This is what lets
+  an embed hand the page over without the host page needing CSS of its own.
+  On perimeter.org's GO Journeys page, `.wpb_row:not(#upcoming-journeys)` hides
+  every WPBakery row except the one holding the widget — 17 of 18 rows, taking
+  the page from ~7,900px to ~3,400px.
+
+Both are removed the moment the reader goes back, and the page is scrolled back
+to where they left off — hiding most of a page shortens it, and without the
+restore they would land wherever the shorter page put them rather than on the
+card they came from.
+
+#### Why this is not an overlay
+
+The obvious implementation is a `position: fixed` panel over the page. It cannot
+work from inside a widget, and not for want of a big enough `z-index`.
+
+On perimeter.org the embed sits inside two ancestors positioned with
+`z-index: 10` (`.container-wrap` and `.row_col_wrap_12`). Each starts a stacking
+context, so everything the widget paints is confined to z-index 10 in the
+container's context — while the page's first row sits at `z-index: 100` in that
+same context. Measured on the live page: a fixed child of the shadow root at
+`z-index: 2147483647`, the largest value CSS allows, still lost to that row at
+three of five sampled points. No value can win from in there.
+
+So the page is asked to stand down instead. `packages/embed-lab/pages/local-mission-trip-finder-takeover.html`
+reproduces those z-indexes deliberately — they are the regression test.
+
+A self-contained overlay would mean rendering into a second shadow root attached
+to `document.body`, which is a `@perimeter/widget-runtime` change rather than a
+widget one.
+
+#### The selector is validated
+
+It is interpolated into a stylesheet, so anything containing `{`, `}`, `;`, `@`,
+`<` or a comment opener is refused and no stylesheet is injected. The embed
+author already controls the page, so this is not a privilege boundary — it stops
+a typo from corrupting the host's CSS.
+
 ## Config
 
 The widget reads its config from `data-*` attributes on the placeholder div.
@@ -178,8 +238,9 @@ defaults).
 | `data-max-trips`         | number  | —                                      | Cap the total number of trips shown.                                              |
 | `data-trip-id`           | number  | —                                      | Render one trip's detail alone, with no list behind it.                           |
 | `data-full-bleed`        | boolean | `true`                                 | Let the photo scroller and testimonial band span the full page width. See below.  |
-| `data-detail-layout`     | enum    | `contained`                            | `full` makes the whole detail span the page and open at the top of itself.        |
+| `data-detail-layout`     | enum    | `contained`                            | `full` spans the page; `takeover` also hands the page over to the trip.           |
 | `data-header-offset`     | number  | `0`                                    | Height of the host's fixed header, so the detail does not open behind it.         |
+| `data-takeover-hide`    | string  | —                                      | CSS selector for host content to hide while a trip is open (`takeover` only).      |
 | `data-hero-style`        | enum    | `plain`                                | `plain` white band, or `cover` for the legacy photo hero. See below.              |
 | `data-show-gallery`      | boolean | `false`                                | Show the horizontal photo scroller. Off until an embed supplies photos.           |
 | `data-gallery-urls`      | string  | —                                      | Comma-separated image URLs for the photo scroller. Needs `data-show-gallery`.     |
