@@ -113,7 +113,10 @@ describe('ConfigPanel', () => {
       App: () => null,
     } as unknown as WidgetDefinition;
     render(<ConfigPanel definition={def} overrides={{}} onChange={() => {}} />);
-    expect(screen.getByText('perPage')).toBeTruthy();
+    // The row is headed by the humanized label; the attribute proves the field
+    // was reached through the ZodEffects wrapper at all.
+    expect(screen.getByText('Per page')).toBeTruthy();
+    expect(screen.getByText('data-per-page')).toBeTruthy();
   });
 });
 

@@ -80,8 +80,10 @@ describe('WidgetPage — Embed tab', () => {
     // sermons' hide* booleans are all optional/off, so flipping one emits `true`.
     // Named rather than indexed so the test can't silently start driving a
     // different field if the schema's key order changes.
+    // Found by its `data-*` chip: Config rows are headed by a prose label now,
+    // and the attribute is the part that cannot be reworded.
     const hideSeries = within(playground as HTMLElement)
-      .getByText('hideSeries')
+      .getByText('data-hide-series')
       .closest('label')!;
     fireEvent.click(within(hideSeries).getByRole('switch'));
     expect(snippet()).toContain('data-hide-series="true"');

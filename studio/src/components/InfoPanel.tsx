@@ -4,6 +4,7 @@ import { Button } from '@perimeter/ui/button';
 import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import { describeSchemaFields, type SchemaField } from '../lib/schema-shape';
 import { camelToKebab } from '../lib/data-attr';
+import { fieldLabel } from '../lib/field-label';
 
 interface Props {
   definition: WidgetDefinition;
@@ -99,6 +100,12 @@ export function InfoPanel({ definition }: Props) {
                           required
                         </span>
                       )}
+                      {/* The key stays the heading here — this table is the
+                          reference for what you type — with the readable name
+                          under it so the two are learnable together. */}
+                      <span className="block text-[0.7rem] leading-snug text-muted-fg">
+                        {fieldLabel(field.key, definition.configLabels)}
+                      </span>
                     </td>
                     <td className="px-3 py-1.5 align-top">
                       <span className="font-mono text-xs text-muted-fg">{field.type}</span>

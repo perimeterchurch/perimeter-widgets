@@ -11,8 +11,17 @@ import { ConfigPanel } from './ConfigPanel';
 // field type, the typed onChange payload, and the per-field hint here.
 // No global RTL auto-cleanup in this suite — unmount each render.
 
-function makeDefinition(schema: z.ZodTypeAny): WidgetDefinition {
-  return { name: 'example', auth: 'none', schema, App: () => null } as WidgetDefinition;
+function makeDefinition(
+  schema: z.ZodTypeAny,
+  configLabels?: Record<string, string>,
+): WidgetDefinition {
+  return {
+    name: 'example',
+    auth: 'none',
+    schema,
+    configLabels,
+    App: () => null,
+  } as WidgetDefinition;
 }
 
 const definition = makeDefinition(
@@ -26,6 +35,16 @@ const definition = makeDefinition(
     count: z.coerce.number().min(0).max(20).describe('How many items to show').default(3),
   }),
 );
+
+/**
+ * Locate a field's row. Rows are headed by a prose label rather than by the
+ * schema key, so they are found by the `data-*` chip — which the panel
+ * guarantees for every field, and which does not move when a label is reworded.
+ */
+function rowFor(scope: { getByText: (text: string) => HTMLElement }, key: string): HTMLElement {
+  const attr = `data-${key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`;
+  return scope.getByText(attr).closest('label') as HTMLElement;
+}
 
 describe('ConfigPanel', () => {
   afterEach(cleanup);
@@ -50,7 +69,7 @@ describe('ConfigPanel', () => {
     const onChange = vi.fn();
     const { container } = renderPanel({ onChange });
     const scope = within(container);
-    const row = scope.getByText('featured').closest('label') as HTMLElement;
+    const row = rowFor(scope, 'featured');
     // `role="switch"` (not the implicit checkbox role) is what makes assistive tech
     // announce the control as on/off — the whole point of the change.
     const input = within(row).getByRole<HTMLInputElement>('switch');
@@ -67,27 +86,19 @@ describe('ConfigPanel', () => {
   it('shows a boolean switch as ON from the schema default when no override is set', () => {
     const { container } = renderPanel();
     const scope = within(container);
-    const on = within(scope.getByText('showImage').closest('label') as HTMLElement).getByRole(
-      'switch',
-    );
+    const on = within(rowFor(scope, 'showImage')).getByRole('switch');
     expect((on as HTMLInputElement).checked).toBe(true);
 
     // …and a default(false) field still reads off, so this isn't just "always on".
-    const off = within(scope.getByText('featured').closest('label') as HTMLElement).getByRole(
-      'switch',
-    );
+    const off = within(rowFor(scope, 'featured')).getByRole('switch');
     expect((off as HTMLInputElement).checked).toBe(false);
   });
 
   it('lets an explicit override win over the schema default in both directions', () => {
     const { container } = renderPanel({ config: { showImage: false, featured: true } });
     const scope = within(container);
-    const showImage = within(
-      scope.getByText('showImage').closest('label') as HTMLElement,
-    ).getByRole('switch');
-    const featured = within(scope.getByText('featured').closest('label') as HTMLElement).getByRole(
-      'switch',
-    );
+    const showImage = within(rowFor(scope, 'showImage')).getByRole('switch');
+    const featured = within(rowFor(scope, 'featured')).getByRole('switch');
     expect((showImage as HTMLInputElement).checked).toBe(false);
     expect((featured as HTMLInputElement).checked).toBe(true);
   });
@@ -96,9 +107,7 @@ describe('ConfigPanel', () => {
     const onChange = vi.fn();
     const { container } = renderPanel({ onChange });
     const scope = within(container);
-    const input = within(scope.getByText('showImage').closest('label') as HTMLElement).getByRole(
-      'switch',
-    );
+    const input = within(rowFor(scope, 'showImage')).getByRole('switch');
     fireEvent.click(input);
     // Strict equality: a real boolean `false`, which `applyBoolShorthand` also
     // round-trips through the embed's `data-show-image="false"`.
@@ -109,7 +118,7 @@ describe('ConfigPanel', () => {
     const onChange = vi.fn();
     const { container } = renderPanel({ onChange });
     const scope = within(container);
-    const row = scope.getByText('layout').closest('label') as HTMLElement;
+    const row = rowFor(scope, 'layout');
     const select = within(row).getByRole<HTMLSelectElement>('combobox');
     const options = Array.from(select.options).map((o) => o.value);
     expect(options).toEqual(['grid', 'list']);
@@ -121,7 +130,7 @@ describe('ConfigPanel', () => {
     const onChange = vi.fn();
     const { container } = renderPanel({ onChange });
     const scope = within(container);
-    const row = scope.getByText('count').closest('label') as HTMLElement;
+    const row = rowFor(scope, 'count');
     const input = within(row).getByRole<HTMLInputElement>('spinbutton');
     expect(input.type).toBe('number');
     expect(input.min).toBe('0');
@@ -135,7 +144,7 @@ describe('ConfigPanel', () => {
     const onChange = vi.fn();
     const { container } = renderPanel({ onChange });
     const scope = within(container);
-    const row = scope.getByText('greeting').closest('label') as HTMLElement;
+    const row = rowFor(scope, 'greeting');
     const input = within(row).getByRole<HTMLInputElement>('textbox');
     expect(input.type).toBe('text');
     fireEvent.change(input, { target: { value: 'Welcome' } });
@@ -146,24 +155,22 @@ describe('ConfigPanel', () => {
     const { container } = renderPanel();
     const scope = within(container);
 
-    const layoutRow = scope.getByText('layout').closest('label') as HTMLElement;
+    const layoutRow = rowFor(scope, 'layout');
     expect(within(layoutRow).getByText(/How items are arranged/)).toBeTruthy();
     expect(within(layoutRow).getByText(/grid \| list/)).toBeTruthy();
 
-    const countRow = scope.getByText('count').closest('label') as HTMLElement;
+    const countRow = rowFor(scope, 'count');
     expect(within(countRow).getByText(/How many items to show/)).toBeTruthy();
     expect(within(countRow).getByText(/0.*20/)).toBeTruthy();
 
-    const greetingRow = scope.getByText('greeting').closest('label') as HTMLElement;
+    const greetingRow = rowFor(scope, 'greeting');
     expect(within(greetingRow).getByText(/Hello/)).toBeTruthy();
   });
 
   it('tokenizes the inputs so they remain legible in dark mode', () => {
     const { container } = renderPanel();
     const scope = within(container);
-    const input = within(scope.getByText('greeting').closest('label') as HTMLElement).getByRole(
-      'textbox',
-    );
+    const input = within(rowFor(scope, 'greeting')).getByRole('textbox');
     const classes = input.className.split(/\s+/);
     expect(classes).toContain('border-border');
     expect(classes).toContain('bg-bg');
@@ -173,12 +180,15 @@ describe('ConfigPanel', () => {
   it('keeps the auto-label / flexible-input grid on each field row, vertically centered', () => {
     const { container } = renderPanel();
     const scope = within(container);
-    const row = scope.getByText('greeting').closest('label') as HTMLElement;
+    const row = rowFor(scope, 'greeting');
     const classes = row.className.split(/\s+/);
     // A wider label column (7rem) keeps long keys on one line, and `items-center`
     // (not the old `items-baseline`) puts every control on the same horizontal
     // line as its label so the control column's left edges align.
-    expect(classes).toContain('grid-cols-[minmax(7rem,auto)_1fr]');
+    // The label column is wider than it was and its content wraps: the rows are
+    // headed by sentences now, and a truncated one would be worse than the key it
+    // replaced.
+    expect(classes).toContain('grid-cols-[minmax(9rem,11rem)_1fr]');
     expect(classes).toContain('items-center');
     expect(classes).not.toContain('items-baseline');
     expect(classes).not.toContain('grid-cols-2');
@@ -188,7 +198,7 @@ describe('ConfigPanel', () => {
     const { container } = renderPanel();
     const scope = within(container);
     for (const key of ['greeting', 'count', 'layout'] as const) {
-      const row = scope.getByText(key).closest('label') as HTMLElement;
+      const row = rowFor(scope, key);
       const control = within(row).getByRole(
         key === 'count' ? 'spinbutton' : key === 'layout' ? 'combobox' : 'textbox',
       );
@@ -201,7 +211,7 @@ describe('ConfigPanel', () => {
   it('left-aligns the boolean switch in the control column instead of stretching it', () => {
     const { container } = renderPanel();
     const scope = within(container);
-    const row = scope.getByText('featured').closest('label') as HTMLElement;
+    const row = rowFor(scope, 'featured');
     // Two spans deep: the input's parent is the switch track, and THAT sits in the
     // flex wrapper holding track + readout. The wrapper is the grid item, so it's
     // what has to be left-aligned in the control column.
@@ -220,21 +230,21 @@ describe('ConfigPanel', () => {
     const { container } = renderPanel({ config: { featured: true } });
     const scope = within(container);
 
-    const on = within(scope.getByText('featured').closest('label') as HTMLElement);
+    const on = within(rowFor(scope, 'featured'));
     expect(on.getByText('true')).toBeTruthy();
 
     // showImage defaults to true, so an explicit-false override must read "false".
     const { container: c2 } = render(
       <ConfigPanel definition={definition} overrides={{ showImage: false }} onChange={vi.fn()} />,
     );
-    const off = within(within(c2).getByText('showImage').closest('label') as HTMLElement);
+    const off = within(rowFor(within(c2), 'showImage'));
     expect(off.getByText('false')).toBeTruthy();
   });
 
   it('hides the switch readout from assistive tech so the state is not announced twice', () => {
     const { container } = renderPanel();
     const scope = within(container);
-    const row = scope.getByText('showImage').closest('label') as HTMLElement;
+    const row = rowFor(scope, 'showImage');
     // The switch role already conveys on/off; the visible text is a sighted-user
     // duplicate and would otherwise land in the control's accessible name.
     expect(within(row).getByText('true').getAttribute('aria-hidden')).toBe('true');
@@ -250,5 +260,52 @@ describe('ConfigPanel', () => {
     expect(classes).toContain('border-border');
     expect(classes).toContain('bg-bg');
     expect(classes).toContain('text-fg');
+  });
+});
+
+// Rows used to be headed by the raw schema key. `detailsMode` and `detailLayout`
+// read as near-synonyms in a list while doing unrelated things, which is the
+// confusion a prose label fixes. The `data-*` attribute has to stay on screen
+// though: it is the thing you actually paste into a page.
+describe('ConfigPanel field naming', () => {
+  afterEach(cleanup);
+
+  const labelled = makeDefinition(
+    z.object({
+      detailsMode: z.enum(['link', 'inline']).describe('What a card does').default('link'),
+      apiUrl: z.string().optional(),
+    }),
+    { detailsMode: 'What clicking a trip does' },
+  );
+
+  it("heads each row with the widget's label, not the schema key", () => {
+    const { getByText, queryByText } = render(
+      <ConfigPanel definition={labelled} overrides={{}} onChange={vi.fn()} />,
+    );
+    expect(getByText('What clicking a trip does')).toBeTruthy();
+    expect(queryByText('detailsMode')).toBeNull();
+  });
+
+  it('humanizes a field the widget has not labelled', () => {
+    const { getByText } = render(
+      <ConfigPanel definition={labelled} overrides={{}} onChange={vi.fn()} />,
+    );
+    expect(getByText('API URL')).toBeTruthy();
+  });
+
+  it('still shows the data-* attribute for every field', () => {
+    const { getByText } = render(
+      <ConfigPanel definition={labelled} overrides={{}} onChange={vi.fn()} />,
+    );
+    expect(getByText('data-details-mode')).toBeTruthy();
+    expect(getByText('data-api-url')).toBeTruthy();
+  });
+
+  it('falls back to humanized keys for a widget with no configLabels at all', () => {
+    const bare = makeDefinition(z.object({ showTestimonials: z.boolean().default(false) }));
+    const { getByText } = render(
+      <ConfigPanel definition={bare} overrides={{}} onChange={vi.fn()} />,
+    );
+    expect(getByText('Show testimonials')).toBeTruthy();
   });
 });
