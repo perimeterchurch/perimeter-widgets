@@ -345,8 +345,11 @@ export function TripDetail({
                   )}
 
                   {/* TeamGrid brings its own "Meet the Team" heading and card
-                treatment, both deliberately left as they were — the Figma
-                restyles the bands around it, not the roster. */}
+                treatment. The card treatment is deliberately left as it was —
+                the Figma restyles the bands around it, not the roster — but the
+                heading and the gap beneath it come from Section, so the roster
+                sits under its heading at exactly the distance the About band
+                uses. */}
                   {config.showTeam && (
                     <Section>
                       <TeamGrid
