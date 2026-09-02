@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { cn } from '@perimeter/ui/utils/cn';
 import type { MissionTripParticipant } from '@perimeter/api-hooks';
 import type { MissionTripFinderConfig } from '../types';
 import { fillUrlTemplate, participantPhotoUrl } from '../lib/format';
 import { PhotoFallback } from './PhotoFallback';
+import { SECTION_GAP, SectionHeading } from './Section';
 
 /**
  * Square portrait with the name across the bottom. The photo sits under a dark
@@ -87,10 +89,8 @@ export function TeamGrid({
   if (participants.length === 0) return null;
 
   return (
-    <section className={className}>
-      <h3 className="mb-6 text-center font-serif text-3xl leading-tight font-normal text-balance @md:text-4xl @xl:text-5xl">
-        Meet the Team
-      </h3>
+    <section className={cn('flex flex-col', SECTION_GAP, className)}>
+      <SectionHeading>Meet the Team</SectionHeading>
       <ul className={`${ROSTER} flex flex-wrap justify-center gap-2.5`}>
         {participants.map((person) => {
           const photo = (
