@@ -161,14 +161,17 @@ export function ParticipantDetail({
               </Button>
             )}
 
-            {/* Pledges.Letter is written in Ministry Platform's rich-text
-                editor, so it arrives as HTML and is sanitized. Most
-                participants have not written one. */}
-            {participant.letter && (
+            {participant.letter ? (
               <div
                 className={`${READING_COLUMN} font-sans text-base leading-[1.9] [&_a]:underline [&_p]:mb-[1.9em] [&_p:last-child]:mb-0`}
                 dangerouslySetInnerHTML={safeLetter}
               />
+            ) : (
+              <p
+                className={`${READING_COLUMN} text-center font-sans text-base italic text-muted-foreground`}
+              >
+                My letter is coming soon!
+              </p>
             )}
 
             {backButton}
