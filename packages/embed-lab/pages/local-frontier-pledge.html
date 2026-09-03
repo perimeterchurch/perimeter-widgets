@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — local frontier-pledge</title>
+    <style>
+      /* perimeter.org's measured host styles (provenance:
+         packages/parity/fixtures/wordpress.html, read from the live page
+         2026-06-02): 19px/35px body type, #353535 text, 1425px container. */
+      body {
+        font-size: 19px;
+        line-height: 35px;
+        color: #353535;
+        background: #ffffff;
+        font-family: sans-serif;
+        margin: 0;
+      }
+      .container {
+        max-width: 1425px;
+        padding: 0 90px;
+        margin: 0 auto;
+      }
+      .banner {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        text-transform: none;
+      }
+
+      /* …plus deliberately hostile global CSS a bad theme/plugin might ship.
+         None of it may reach inside the shadow root. This widget is a form on a
+         DARK band, so the label rule matters as much as the input one: a label
+         forced to #353535 would disappear against the navy. */
+      * {
+        letter-spacing: 0.5px !important;
+      }
+      h1,
+      h2,
+      h3,
+      p,
+      span {
+        text-transform: uppercase;
+      }
+      input {
+        background: hotpink !important;
+        border-radius: 12px !important;
+        border: 4px dashed red !important;
+      }
+      label {
+        color: #353535 !important;
+        font-size: 11px !important;
+      }
+      button {
+        background: lime !important;
+        text-transform: uppercase !important;
+      }
+      form {
+        border: 4px dashed red;
+        padding: 3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>local frontier-pledge — on a hostile host page</h1>
+      <p><a href="/">← lab index</a></p>
+      <p class="banner">
+        Bypasses the loader and embeds <code>/local/frontier-pledge/index.js</code> directly. Build
+        first: <code>pnpm --filter @perimeter/widget-frontier-pledge build</code>.
+        <code>data-api-url</code> points at a local perimeter-api on :5500 — run
+        <code>pnpm dev</code> there. <strong>Do not submit against production:</strong> a successful
+        submit writes a real pledge into Ministry Platform. Inside the widget the band must stay
+        brand navy with white field labels at their own size, the inputs must be white (not hotpink,
+        not dashed), the "Make Pledge" button must stay brand amber rather than lime, the headline
+        must keep its sentence case, and the form must have no red dashed border or 3rem padding.
+      </p>
+
+      <div data-perimeter-widget="frontier-pledge" data-api-url="http://localhost:5500"></div>
+      <script src="/local/frontier-pledge/index.js" data-nowprocket async></script>
+    </div>
+  </body>
+</html>

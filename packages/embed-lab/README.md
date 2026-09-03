@@ -29,6 +29,7 @@ The lab serves real artifacts behind one origin:
 | `/pages/multi.html`                     | Two widgets, one loader tag (per-name dedupe, independent themes)                                                                                         |
 | `/pages/local.html`                     | Direct embed of the local `dist/` build, no loader                                                                                                        |
 | `/pages/local-staff-directory.html`     | The local `staff-directory` build on a hostile host (img / ul-li / form-field leaks)                                                                      |
+| `/pages/local-frontier-pledge.html`     | The local `frontier-pledge` build on a hostile host (a form on a dark band: label / input / button leaks)                                                 |
 | `/pages/local-prayer-wall.html`         | The local `prayer-wall` build on a hostile host (form / radio / fieldset leaks)                                                                           |
 | `/pages/local-mission-trip-finder.html` | The local `mission-trip-finder` build on a hostile host: browse → detail state, plus a `data-trip-id` pinned embed (ul-li / img leaks, roster visibility) |
 

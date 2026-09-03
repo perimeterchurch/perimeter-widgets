@@ -1,0 +1,80 @@
+---
+description: Public pledge form for the Frontier capital campaign, writing the pledge straight into Ministry Platform.
+---
+
+# frontier-pledge
+
+A single dark band that collects a three-year pledge to the Frontier campaign:
+first and last name, an optional spouse name, email, mobile, and the total
+pledge amount. On submit it creates the Pledges row in Ministry Platform and
+covers the form with a confirmation.
+
+This is the port of the standalone `FrontierPledge` widget from the legacy
+`reactwidgets` repo onto the shared runtime. Same design, same fields, same MP
+note format — what changed is everything around it: the widget mounts through
+`defineWidget`/`autoMount` into a shadow root, is styled from `@perimeter/theme`
+tokens and `@perimeter/ui` components rather than hard-coded hexes, talks to
+perimeter-api through the typed `useCreatePledge` hook instead of a hand-rolled
+`fetch`, and reads its copy from `data-*` attributes instead of literals in the
+JSX.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="frontier-pledge"></div>
+```
+
+The defaults are the live Frontier campaign, so the bare placeholder above is
+the production embed. Everything below is for re-running the appeal on a
+different period.
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/types.ts` is the source of truth.
+
+| Attribute           | Required | Default                                  | Description                                                       |
+| ------------------- | -------- | ---------------------------------------- | ----------------------------------------------------------------- |
+| `data-heading`      | No       | `My 3-Year Pledge`                       | Headline above the form.                                          |
+| `data-period`       | No       | `Jan 2026 - Dec 2028`                    | Pledge period, shown in brand amber under the headline.           |
+| `data-amount-label` | No       | `Total 3-Year Pledge Amount`             | Label on the amount field.                                        |
+| `data-account-url`  | No       | `https://www.perimeter.org/my-perimeter/`| Where the confirmation links a pledger to check their pledge.      |
+| `data-api-url`      | No       | `https://api.perimeter.org`              | Override the perimeter-api base URL (advanced / local dev).       |
+
+There is deliberately **no campaign attribute**. `POST /api/giving/pledges`
+pins the pledge to the Frontier campaign server-side, so nothing a host page
+writes can redirect a pledge to another campaign. The config covers the
+campaign's presentation only.
+
+## Behavior
+
+- **Validation** — every field is validated in the widget
+  (`src/lib/pledge.ts`), not by the browser: the form renders on the navy band,
+  where a native validation bubble is off-brand and easy to miss. Messages
+  appear per field in fixed-height slots, so nothing reflows as the form is
+  checked, and a field's message clears as soon as that field is edited.
+- **Amount** — typed freely, grouped to `12,500.00` when the field is left and
+  ungrouped on the way back in. A pledge of 0 is rejected.
+- **Spouse** — optional, and the only field that does not map to a column: it is
+  folded into the MP note as a `Spouse: …` line, which is where staff read it.
+- **Submit** — `POST /api/giving/pledges`. The API matches the pledger to an
+  existing MP contact by name/email/phone and falls back to the generic donor
+  when there is no match, so a pledge is never lost to a spelling difference.
+- **Confirmation** — covers the form rather than replacing it, so the band keeps
+  its height and the page does not jump. The form beneath is `inert`, focus moves
+  to the confirmation, and Escape (or "Make another pledge") returns a blank form.
+
+## API
+
+Backed by the **giving** endpoints in perimeter-api. `POST /api/giving/pledges`
+is public — the pledge form is an embedded public widget, so there is no auth
+gate; production CORS restricts callers to perimeter.org origins, and
+`/api/giving` is already in the API's widget path allowlist.
+
+One thing to know if you touch the hook: that route is the one perimeter-api
+route that unwraps its controller's `{ success, data }` result and returns the
+bare `{ pledgeId, amount }` payload, so the generated OpenAPI type for
+`createPledge` describes an envelope the wire format does not have.
+`useCreatePledge` types its response off the operation's `['data']` member for
+that reason.
