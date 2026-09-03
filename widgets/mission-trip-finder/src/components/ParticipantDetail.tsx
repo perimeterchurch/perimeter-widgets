@@ -11,6 +11,12 @@ import { Section, READING_COLUMN } from './Section';
 import { ArrowLeftIcon } from './icons';
 import { PhotoFallback } from './PhotoFallback';
 
+function hasVisibleText(html: string | null | undefined): boolean {
+  if (!html) return false;
+  const stripped = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim();
+  return stripped.length > 0;
+}
+
 /**
  * Money raised against the participant's goal.
  *
@@ -161,7 +167,7 @@ export function ParticipantDetail({
               </Button>
             )}
 
-            {participant.letter ? (
+            {hasVisibleText(participant.letter) ? (
               <div
                 className={`${READING_COLUMN} font-sans text-base leading-[1.9] [&_a]:underline [&_p]:mb-[1.9em] [&_p:last-child]:mb-0`}
                 dangerouslySetInnerHTML={safeLetter}
