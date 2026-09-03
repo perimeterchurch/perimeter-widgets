@@ -13,7 +13,10 @@ import { PhotoFallback } from './PhotoFallback';
 
 function hasVisibleText(html: string | null | undefined): boolean {
   if (!html) return false;
-  const stripped = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim();
+  const stripped = html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .trim();
   return stripped.length > 0;
 }
 
