@@ -27,6 +27,12 @@ export {
 } from './giving/use-giving-history';
 
 export {
+  useCreatePledge,
+  type CreatePledgeInput,
+  type CreatePledgeResponse,
+} from './giving/use-create-pledge';
+
+export {
   useEvents,
   type UseEventsParams,
   type UseEventsResponse,
