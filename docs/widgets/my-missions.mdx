@@ -1,0 +1,94 @@
+---
+description: The signed-in member's mission trips — fundraising progress, donors, and their support letter.
+---
+
+# my-missions
+
+Shows the signed-in member every mission trip they are pledged to: fundraising
+progress against their goal, the trip's leaders, the campaign description,
+everyone who has given toward their pledge, and a rich-text editor for their
+support letter. Trip leaders additionally get whole-trip totals, each
+participant's funding progress, and a one-click email to the roster.
+
+Trips are grouped into **Current** (not yet ended) and **Past** (the last five
+years). Head-of-household members also see their household members' pledges,
+labelled with whose trip each one is.
+
+This is a **user-authenticated** widget: it renders a sign-in prompt until a
+MinistryPlatform session exists, then loads the caller's own trips. It is meant
+to live behind login on perimeter.org. Replaces the legacy `MyMissions` embed.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="my-missions"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/widget.tsx` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute                | Type    | Default          | Description                                    |
+| ------------------------ | ------- | ---------------- | ---------------------------------------------- |
+| `data-title`             | string  | `My Missions`    | Heading shown above the trip list               |
+| `data-current-title`     | string  | `Current Trips`  | Heading for trips that have not ended yet       |
+| `data-past-title`        | string  | `Past Trips`     | Heading for trips that have already ended       |
+| `data-show-past-trips`   | boolean | `true`           | Show the past-trips section                     |
+
+## Data
+
+> **Not yet live.** The endpoints below do not exist in perimeter-api yet, so
+> the widget currently renders its error state against a running API. The hooks
+> in `packages/api-hooks/src/missions/use-my-mission-trips.ts` and
+> `use-save-mission-letter.ts` declare the contract by hand and carry a note to
+> replace those declarations with generated `operations[…]` types once the spec
+> includes them. Building the endpoints is the next step; the API path prefix
+> also has to be added to perimeter-api's `WIDGET_PATH_PREFIXES` allow-list, or
+> the widget will pass locally and fail CORS in production.
+
+- `GET /api/missions/my-trips` — the caller's own and (as head of household)
+  their household's mission-trip pledges, each with donations, participants,
+  leaders and letter already nested.
+- `PUT /api/missions/my-trips/{pledgeId}/letter` — replace one pledge's support
+  letter.
+
+Both replace the legacy `api_custom_MyMissionTrips_Current` stored procedure,
+which returned **nine parallel datasets** that the old widget cross-joined in
+the browser on `Pledge_ID` / `Pledge_Campaign_ID`. That merge belongs in the
+service layer, so the endpoint returns one flat list of trips.
+
+The letter write replaces a direct browser `POST` to a signed Azure Logic App
+URL that shipped in the legacy client bundle — a shared key anyone could read,
+writing `Pledges.Letter` with no check that the caller owned the pledge. The
+replacement endpoint must authorize against the caller's own donor record.
+
+## Notes on the port
+
+- **Anonymous donations.** The legacy stored procedure sent the real name,
+  email, phone and address of anonymous donors and the widget merely chose not
+  to render them — readable by anyone who opened the network tab. The endpoint
+  must strip donor identity server-side for anonymous gifts.
+- **Rich text.** The letter editor is Tiptap (ProseMirror), replacing
+  `jodit-react` and its 5,345 lines of injected CSS. ProseMirror resolves
+  selections against `dom.getRootNode()`, so it behaves correctly inside the
+  shadow root; a `document.execCommand` toolbar does not. Because
+  `widgetConfig` emits a single IIFE with no code splitting, the editor is in
+  the bundle for every visitor — it accounts for a little under half of the
+  ~248 KB gzipped artifact, guarded by a budget assertion in
+  `tests/bundle.test.ts`.
+- **Letter with no starting content.** The legacy widget rendered the editor
+  only when a letter already existed, so a participant without one had no way
+  to write it. The editor now always renders.
+- **Dates.** Trip and donation dates are wall-clock calendar dates in MP.
+  `parseTripDate` builds them as local dates, because `new Date('2026-06-12')`
+  is UTC midnight and renders as 6/11 in every US timezone.
+- **Progress colours.** The legacy traffic light (amber / blue / green) maps
+  onto the token palette as amber `warning` under 50%, `primary/60` to 75%, and
+  `primary` above — the palette has no `success` token, and inventing an
+  off-palette green in one widget was the worse trade.
+- **CSV export.** Cell quoting now escapes embedded quotes (one quote in a donor
+  name used to shift every later column) and prefixes formula-leading cells so a
+  spreadsheet treats them as text.
