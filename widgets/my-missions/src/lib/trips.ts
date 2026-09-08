@@ -15,13 +15,24 @@ export function partitionTrips(trips: readonly MyMissionTrip[]): {
 } {
   const current = trips
     .filter((trip) => !trip.past)
-    .sort((a, b) => parseTripDate(a.startDate).getTime() - parseTripDate(b.startDate).getTime());
+    .sort((a, b) => compareDates(a.startDate, b.startDate, 'asc'));
 
   const past = trips
     .filter((trip) => trip.past)
-    .sort((a, b) => parseTripDate(b.endDate).getTime() - parseTripDate(a.endDate).getTime());
+    .sort((a, b) => compareDates(a.endDate, b.endDate, 'desc'));
 
   return { current, past };
+}
+
+/**
+ * Order two nullable MP trip dates, with dateless trips last in either
+ * direction — a trip whose travel dates aren't set yet shouldn't lead the list.
+ */
+function compareDates(a: string | null, b: string | null, order: 'asc' | 'desc'): number {
+  if (a === null) return b === null ? 0 : 1;
+  if (b === null) return -1;
+  const cmp = parseTripDate(a).getTime() - parseTripDate(b).getTime();
+  return order === 'desc' ? -cmp : cmp;
 }
 
 /** Donations newest-first, without mutating the query cache's array. */

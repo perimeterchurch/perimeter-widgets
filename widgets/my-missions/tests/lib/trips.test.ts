@@ -31,6 +31,22 @@ describe('partitionTrips', () => {
     expect(past.map((t) => t.pledgeId)).toEqual([2, 1]);
   });
 
+  it('sorts dateless trips last in either direction', () => {
+    // MP allows a campaign with no travel dates set; such a trip should not
+    // lead the list just because its date parses as epoch 0.
+    const { current } = partitionTrips([
+      trip({ pledgeId: 1, startDate: null }),
+      trip({ pledgeId: 2, startDate: '2026-06-12' }),
+    ]);
+    expect(current.map((t) => t.pledgeId)).toEqual([2, 1]);
+
+    const { past } = partitionTrips([
+      pastTrip({ pledgeId: 3, endDate: null }),
+      pastTrip({ pledgeId: 4, endDate: '2024-03-12' }),
+    ]);
+    expect(past.map((t) => t.pledgeId)).toEqual([4, 3]);
+  });
+
   it('does not mutate the input array', () => {
     const trips = [trip({ pledgeId: 2, startDate: '2026-09-01' }), trip({ pledgeId: 1 })];
     partitionTrips(trips);

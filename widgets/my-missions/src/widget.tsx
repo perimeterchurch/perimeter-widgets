@@ -25,11 +25,16 @@ export default defineWidget({
       .boolean()
       .default(true)
       .describe('Show the past-trips section (the last five years of trips).'),
+    // The mount reads `apiUrl` off the parsed config to pick the API client's
+    // base URL; it is read here too so leader photo `<img>` tags resolve
+    // against the API origin rather than the host page's.
+    apiUrl: z.string().optional().describe('Override the perimeter-api base URL (advanced).'),
   }),
   configLabels: {
     currentTitle: 'Current trips heading',
     pastTitle: 'Past trips heading',
     showPastTrips: 'Show past trips',
+    apiUrl: 'API address (advanced)',
   },
   App: ({ config }) => <App config={config} />,
 });

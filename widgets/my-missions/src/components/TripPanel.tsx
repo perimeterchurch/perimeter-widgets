@@ -7,6 +7,12 @@ import { DonationsSection } from './DonationsSection';
 import { LeaderSection } from './LeaderSection';
 import { LetterSection } from './LetterSection';
 
+export interface TripPanelProps {
+  trip: MyMissionTrip;
+  /** The `apiUrl` config override, for composing leader photo URLs. */
+  apiUrl: string | undefined;
+}
+
 /**
  * The body of one expanded trip: the always-visible status head, then the
  * disclosures that apply to this trip. Section order and the conditions for
@@ -14,12 +20,12 @@ import { LetterSection } from './LetterSection';
  * the reason a leader opens the trip at all), then description, donations, and
  * the letter.
  */
-export function TripPanel({ trip }: { trip: MyMissionTrip }): React.JSX.Element {
+export function TripPanel({ trip, apiUrl }: TripPanelProps): React.JSX.Element {
   const hasDescription = trip.longDescription !== null && trip.longDescription.trim().length > 0;
 
   return (
     <div className="grid gap-4">
-      <StatusSection trip={trip} />
+      <StatusSection trip={trip} apiUrl={apiUrl} />
 
       {trip.leaderSummary !== null && (
         <CollapsibleSection title="Trip Leader Resources">

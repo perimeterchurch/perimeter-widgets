@@ -11,6 +11,7 @@ export interface AppProps {
     currentTitle: string;
     pastTitle: string;
     showPastTrips: boolean;
+    apiUrl?: string | undefined;
   };
 }
 
@@ -43,15 +44,17 @@ function ErrorState({ error }: { error: unknown }): React.JSX.Element {
 function TripSection({
   title,
   trips,
+  apiUrl,
 }: {
   title: string;
   trips: readonly MyMissionTrip[];
+  apiUrl: string | undefined;
 }): React.JSX.Element | null {
   if (trips.length === 0) return null;
   return (
     <section className="grid gap-2">
       <h3 className="text-xl font-semibold text-fg">{title}</h3>
-      <TripsAccordion trips={trips} />
+      <TripsAccordion trips={trips} apiUrl={apiUrl} />
     </section>
   );
 }
@@ -69,7 +72,15 @@ export function App({ config }: AppProps): React.JSX.Element {
     <div className="grid gap-6 p-4 text-fg">
       <h2 className="text-2xl font-bold">{config.title}</h2>
 
-      {query.isLoading ? (
+      {/* `isPending`, NOT `isLoading`. `isLoading` is `isPending && isFetching`,
+          and React Query sets `fetchStatus: 'paused'` — pending, not fetching —
+          whenever it believes the browser is offline, including between retry
+          attempts. Guarding on `isLoading` let that state fall through to the
+          empty branch, so a member on a flaky connection was told "No mission
+          trips yet" about their own fundraising. `isPending` is true whenever
+          there is no data, which is the actual precondition for every branch
+          below. */}
+      {query.isPending ? (
         <LoadingState />
       ) : query.isError ? (
         <ErrorState error={query.error} />
@@ -85,8 +96,8 @@ export function App({ config }: AppProps): React.JSX.Element {
         </Empty>
       ) : (
         <>
-          <TripSection title={config.currentTitle} trips={current} />
-          <TripSection title={config.pastTitle} trips={visiblePast} />
+          <TripSection title={config.currentTitle} trips={current} apiUrl={config.apiUrl} />
+          <TripSection title={config.pastTitle} trips={visiblePast} apiUrl={config.apiUrl} />
         </>
       )}
     </div>

@@ -36,7 +36,13 @@ const config = {
 };
 
 function loaded(trips: MyMissionTrip[]) {
-  return { data: { data: { trips } }, isLoading: false, isError: false, error: null };
+  return {
+    data: { data: { trips } },
+    isPending: false,
+    isLoading: false,
+    isError: false,
+    error: null,
+  };
 }
 
 beforeEach(() => {
@@ -54,11 +60,30 @@ describe('my-missions widget App', () => {
   it('shows a loading state while the request is in flight', () => {
     useMyMissionTrips.mockReturnValue({
       data: undefined,
+      isPending: true,
       isLoading: true,
       isError: false,
       error: null,
     });
     render(<App config={config} />);
+    expect(document.querySelector('[aria-busy="true"]')).not.toBeNull();
+  });
+
+  it('keeps loading — never "no trips" — while a retry is paused offline', () => {
+    // React Query reports fetchStatus 'paused' (pending, NOT fetching) when it
+    // believes the browser is offline, so `isLoading` is false there. Guarding
+    // on `isLoading` told a member on a flaky connection that they had no
+    // mission trips.
+    useMyMissionTrips.mockReturnValue({
+      data: undefined,
+      isPending: true,
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+    render(<App config={config} />);
+
+    expect(screen.queryByText(/no mission trips yet/i)).toBeNull();
     expect(document.querySelector('[aria-busy="true"]')).not.toBeNull();
   });
 
@@ -71,6 +96,7 @@ describe('my-missions widget App', () => {
   it('shows a generic error state when the request fails', () => {
     useMyMissionTrips.mockReturnValue({
       data: undefined,
+      isPending: false,
       isLoading: false,
       isError: true,
       error: new Error('boom'),

@@ -54,7 +54,7 @@ export function trip(overrides: Partial<MyMissionTrip> = {}): MyMissionTrip {
     lastDonationDate: '2026-02-14',
     letter: '<p>Thank you for partnering with me.</p>',
     isLeader: false,
-    leaders: [{ name: 'Priya Raghunathan', email: 'priya@perimeter.org', photoUrl: null }],
+    leaders: [{ name: 'Priya Raghunathan', email: 'priya@perimeter.org', pledgeId: 9101 }],
     donations: [donation()],
     leaderSummary: null,
     participants: [],

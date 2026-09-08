@@ -5,6 +5,12 @@ import { formatDateRange } from '../lib/format';
 import { tripLabel } from '../lib/trips';
 import { TripPanel } from './TripPanel';
 
+export interface TripsAccordionProps {
+  trips: readonly MyMissionTrip[];
+  /** The `apiUrl` config override, for composing leader photo URLs. */
+  apiUrl: string | undefined;
+}
+
 /**
  * The trip list — one row per pledge, at most one expanded at a time (the
  * legacy single-`expandedIndex` behaviour).
@@ -14,7 +20,7 @@ import { TripPanel } from './TripPanel';
  * editor, and a household with several trips would otherwise instantiate one
  * editor per trip on first render.
  */
-export function TripsAccordion({ trips }: { trips: readonly MyMissionTrip[] }): React.JSX.Element {
+export function TripsAccordion({ trips, apiUrl }: TripsAccordionProps): React.JSX.Element {
   const [openPledgeId, setOpenPledgeId] = React.useState<number | null>(null);
   const idPrefix = React.useId();
 
@@ -48,7 +54,7 @@ export function TripsAccordion({ trips }: { trips: readonly MyMissionTrip[] }): 
             </h4>
             {open && (
               <div id={panelId} className="p-4">
-                <TripPanel trip={trip} />
+                <TripPanel trip={trip} apiUrl={apiUrl} />
               </div>
             )}
           </div>

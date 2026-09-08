@@ -69,6 +69,7 @@ export {
 export {
   useSaveMissionLetter,
   type SaveMissionLetterInput,
+  type SaveMissionLetterBody,
   type SaveMissionLetterResponse,
 } from './missions/use-save-mission-letter';
 

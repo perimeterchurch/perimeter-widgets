@@ -31,23 +31,19 @@ The widget reads its config from `data-*` attributes on the placeholder div.
 `src/widget.tsx` holds the zod schema (the source of truth for options and
 defaults).
 
-| Attribute                | Type    | Default          | Description                                    |
-| ------------------------ | ------- | ---------------- | ---------------------------------------------- |
-| `data-title`             | string  | `My Missions`    | Heading shown above the trip list               |
-| `data-current-title`     | string  | `Current Trips`  | Heading for trips that have not ended yet       |
-| `data-past-title`        | string  | `Past Trips`     | Heading for trips that have already ended       |
-| `data-show-past-trips`   | boolean | `true`           | Show the past-trips section                     |
+| Attribute              | Type    | Default         | Description                                     |
+| ---------------------- | ------- | --------------- | ----------------------------------------------- |
+| `data-title`           | string  | `My Missions`   | Heading shown above the trip list                |
+| `data-current-title`   | string  | `Current Trips` | Heading for trips that have not ended yet        |
+| `data-past-title`      | string  | `Past Trips`    | Heading for trips that have already ended        |
+| `data-show-past-trips` | boolean | `true`          | Show the past-trips section                      |
+| `data-api-url`         | string  | —               | Override the perimeter-api base URL (advanced)   |
 
 ## Data
 
-> **Not yet live.** The endpoints below do not exist in perimeter-api yet, so
-> the widget currently renders its error state against a running API. The hooks
-> in `packages/api-hooks/src/missions/use-my-mission-trips.ts` and
-> `use-save-mission-letter.ts` declare the contract by hand and carry a note to
-> replace those declarations with generated `operations[…]` types once the spec
-> includes them. Building the endpoints is the next step; the API path prefix
-> also has to be added to perimeter-api's `WIDGET_PATH_PREFIXES` allow-list, or
-> the widget will pass locally and fail CORS in production.
+Backed by perimeter-api's authenticated missions endpoints. Both require a user
+session; the hook types are generated from the OpenAPI spec like every other
+widget's.
 
 - `GET /api/missions/my-trips` — the caller's own and (as head of household)
   their household's mission-trip pledges, each with donations, participants,
@@ -57,20 +53,32 @@ defaults).
 
 Both replace the legacy `api_custom_MyMissionTrips_Current` stored procedure,
 which returned **nine parallel datasets** that the old widget cross-joined in
-the browser on `Pledge_ID` / `Pledge_Campaign_ID`. That merge belongs in the
-service layer, so the endpoint returns one flat list of trips.
+the browser on `Pledge_ID` / `Pledge_Campaign_ID`. That merge now happens in
+the service layer, so the endpoint returns one flat list of trips.
 
-The letter write replaces a direct browser `POST` to a signed Azure Logic App
-URL that shipped in the legacy client bundle — a shared key anyone could read,
-writing `Pledges.Letter` with no check that the caller owned the pledge. The
-replacement endpoint must authorize against the caller's own donor record.
+Leader photos are not URLs in the payload: each leader carries a `pledgeId`,
+and `leaderPhotoUrl()` composes the public participant-photo route
+(`/api/mission-trips/{campaignId}/participant/{pledgeId}/image`) against the
+resolved API origin, the same way the mission-trip-finder does. That route 404s
+for a leader with no photo on file, which is the common case, so the avatar
+hides itself on error.
+
+See `docs/domains/missions.md` in perimeter-api for the full business rules —
+including that `past` is drawn on the campaign's close date rather than the
+trip's end date, and that a head of household sees their household's pledges
+while other members see only their own.
 
 ## Notes on the port
 
 - **Anonymous donations.** The legacy stored procedure sent the real name,
   email, phone and address of anonymous donors and the widget merely chose not
   to render them — readable by anyone who opened the network tab. The endpoint
-  must strip donor identity server-side for anonymous gifts.
+  now leaves those donors out of its contact lookup entirely, so the identity
+  never reaches the API's memory, let alone the response.
+- **Nullable trip dates.** `Trip_Start_Date` and `Trip_End_Date` are both
+  nullable in MP — a campaign can exist before travel dates are set — so the
+  date range degrades to "From …" / "Through …" / "Dates to be announced", and
+  a dateless trip sorts last rather than leading the list on epoch 0.
 - **Rich text.** The letter editor is Tiptap (ProseMirror), replacing
   `jodit-react` and its 5,345 lines of injected CSS. ProseMirror resolves
   selections against `dom.getRootNode()`, so it behaves correctly inside the

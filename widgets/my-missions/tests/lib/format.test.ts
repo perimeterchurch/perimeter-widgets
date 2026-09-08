@@ -5,6 +5,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateRange,
+  leaderPhotoUrl,
   parseTripDate,
   progressLevel,
   progressPercent,
@@ -52,6 +53,31 @@ describe('formatDate', () => {
 
   it('renders a range', () => {
     expect(formatDateRange('2026-06-12', '2026-06-26')).toBe('6/12/2026 to 6/26/2026');
+  });
+
+  // Both trip dates are nullable in MP — a campaign can exist before its
+  // travel dates are set — and the old code rendered "Invalid Date".
+  it('renders a one-sided range when MP has only one date', () => {
+    expect(formatDateRange('2026-06-12', null)).toBe('From 6/12/2026');
+    expect(formatDateRange(null, '2026-06-26')).toBe('Through 6/26/2026');
+  });
+
+  it('says so when the trip has no dates at all', () => {
+    expect(formatDateRange(null, null)).toBe('Dates to be announced');
+  });
+});
+
+describe('leaderPhotoUrl', () => {
+  it('points at the public participant-photo route on the API origin', () => {
+    expect(leaderPhotoUrl(954, 100134, 'https://api.perimeter.org')).toBe(
+      'https://api.perimeter.org/api/mission-trips/954/participant/100134/image',
+    );
+  });
+
+  it('trims a trailing slash off a configured base URL', () => {
+    expect(leaderPhotoUrl(954, 100134, 'http://localhost:5500/')).toBe(
+      'http://localhost:5500/api/mission-trips/954/participant/100134/image',
+    );
   });
 });
 
