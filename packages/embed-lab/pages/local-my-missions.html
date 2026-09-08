@@ -95,13 +95,18 @@
       <p><a href="/">← lab index</a></p>
       <p class="banner">
         Bypasses the loader and embeds <code>/local/my-missions/index.js</code> directly. Build
-        first: <code>pnpm --filter @perimeter/widget-my-missions build</code>. This is an
-        <strong>authenticated</strong> widget, so it renders a sign-in prompt until an MP token is
-        in <code>localStorage</code> — and its endpoints (<code>GET /api/missions/my-trips</code>,
-        <code>PUT …/{pledgeId}/letter</code>) do not exist in perimeter-api yet, so until they do
-        the states reachable here are the sign-in gate and the error state.
+        first: <code>pnpm --filter @perimeter/widget-my-missions build</code>.
         <code>data-api-url</code> points at a local perimeter-api on :5500 — run
         <code>pnpm dev</code> there.
+      </p>
+      <p class="banner">
+        This is an <strong>authenticated</strong> widget, so it shows the sign-in prompt until an MP
+        token is in <code>localStorage</code>. Two query params make it viewable without a real
+        session: <code>?token=…</code> seeds the gate, and <code>?apiUrl=…</code> overrides the API
+        origin. Point the latter at something that supplies auth for you — the studio's admin-gated
+        impersonation proxy, or any local proxy that attaches <code>x-api-key</code> +
+        <code>x-on-behalf-of-user</code> — and the widget renders that person's real data. Example:
+        <code>?token=dev&amp;apiUrl=http://localhost:5501</code>
       </p>
       <p class="banner">
         What must hold once trips render: the trip rows and Leaders strip stay a plain list (no
@@ -115,6 +120,42 @@
       </p>
 
       <div data-perimeter-widget="my-missions" data-api-url="http://localhost:5500"></div>
+
+      <!-- Runs before the async widget bundle, so the token is in place by the
+           time the AuthGate first reads it and data-api-url is final before
+           mount() parses it. Lab-only: nothing here ships. -->
+      <script>
+        (function seedFromQuery() {
+          const q = new URLSearchParams(location.search);
+          const token = q.get('token');
+          const apiUrl = q.get('apiUrl');
+
+          if (token) {
+            localStorage.setItem('mpp-widgets_AuthToken', token);
+            localStorage.setItem(
+              'mpp-widgets_ExpiresAfter',
+              new Date(Date.now() + 3600e3).toISOString(),
+            );
+          }
+          if (apiUrl) {
+            document
+              .querySelector('[data-perimeter-widget="my-missions"]')
+              .setAttribute('data-api-url', apiUrl);
+          }
+          if (token || apiUrl) {
+            const note = document.createElement('p');
+            note.className = 'banner';
+            note.style.background = '#fef3c7';
+            note.style.borderColor = '#f59e0b';
+            note.textContent =
+              'Query overrides active — token: ' +
+              (token ? 'seeded' : 'none') +
+              ', apiUrl: ' +
+              (apiUrl || 'default :5500');
+            document.querySelector('.container').appendChild(note);
+          }
+        })();
+      </script>
       <script src="/local/my-missions/index.js" data-nowprocket async></script>
     </div>
   </body>

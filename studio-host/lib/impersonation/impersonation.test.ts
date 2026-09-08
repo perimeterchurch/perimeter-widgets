@@ -12,6 +12,7 @@ describe('isAllowedProxyPath', () => {
   it('allows only the whitelisted read endpoints (verbatim widget paths)', () => {
     expect(isAllowedProxyPath('api/giving/history')).toBe(true);
     expect(isAllowedProxyPath('api/shepherds')).toBe(true);
+    expect(isAllowedProxyPath('api/missions/my-trips')).toBe(true);
   });
   it('rejects anything else (least privilege)', () => {
     expect(isAllowedProxyPath('api/contacts')).toBe(false);
@@ -19,6 +20,11 @@ describe('isAllowedProxyPath', () => {
     expect(isAllowedProxyPath('api/shepherds/write')).toBe(false);
     expect(isAllowedProxyPath('giving/history')).toBe(false); // missing /api prefix
     expect(isAllowedProxyPath('')).toBe(false);
+  });
+  it('rejects the my-missions letter write, even though the read is allowed', () => {
+    // Impersonation must never be able to rewrite someone's support letter.
+    expect(isAllowedProxyPath('api/missions/my-trips/100133/letter')).toBe(false);
+    expect(isAllowedProxyPath('api/missions')).toBe(false);
   });
 });
 
