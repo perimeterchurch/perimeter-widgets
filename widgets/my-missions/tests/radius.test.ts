@@ -28,21 +28,20 @@ const TOKEN_SCALE = new Set(['rounded-sm', 'rounded-md', 'rounded-lg', 'rounded-
  * the tokens on purpose. Keyed by repo-relative source path (POSIX-style),
  * value is the set of utilities allowed in that file. Everything else must be
  * on the token scale so a `themeOverrides` change reaches it.
+ *
+ * Naming the utilities here as literals is safe: Tailwind's content globs cover
+ * `src/` and packages/ui/src only (see `widgetContent`), never `tests/`, so a
+ * class name in this file compiles no CSS. The same name in a `src/` comment
+ * WOULD — the scanner reads those — which is why widget.tsx spells them out of
+ * band and this file can just list them.
  */
 const RADIUS_EXCEPTIONS: Record<string, Set<string>> = {
-  // The Leaders strip carries a circular photo + pill chip on purpose —
-  // matches the legacy widget's chip shape and is the accent contrast against
-  // the square rest of the widget, so it must NOT collapse to 0px when the
-  // radius tokens do.
-  'components/StatusSection.tsx': new Set(['rounded-full']),
-  // rounded-4xl is written in the source too but no test file may name it —
-  // the Tailwind scanner reads test files and would compile a live rule for
-  // every widget. Sourced dynamically below instead.
+  // The Leaders strip carries a circular photo (rounded-full) + pill chips
+  // (rounded-4xl) on purpose — the legacy widget's chip shape and the accent
+  // contrast against the square rest of the widget, so they must NOT collapse
+  // to 0px when the radius tokens do.
+  'components/StatusSection.tsx': new Set(['rounded-full', 'rounded-4xl']),
 };
-
-// Fill in the pill radius on Leaders chips without spelling it — see the note
-// on the scanner in the test comment below.
-RADIUS_EXCEPTIONS['components/StatusSection.tsx'].add('rounded-' + '4xl');
 
 describe('square corners', () => {
   it('pins every radius token to 0px', () => {
@@ -69,10 +68,11 @@ describe('square corners', () => {
     // That is what RADIUS_EXCEPTIONS allows on purpose (Leaders is round by
     // design) and what this rule denies everywhere else.
     //
-    // Spelled out only via TOKEN_SCALE / RADIUS_EXCEPTIONS above, never as
-    // prose: Tailwind's scanner treats a class name in a comment (or in this
-    // very file) as a used class and compiles a rule for it into the widget's
-    // CSS.
+    // These class names live in TOKEN_SCALE / RADIUS_EXCEPTIONS above; this is
+    // a test file (outside Tailwind's src-only content globs), so listing them
+    // here compiles no CSS. A `src/` comment is the opposite — the scanner
+    // treats a class name there as used — which is why widget.tsx avoids
+    // spelling them.
     const offenders = sourceFiles(srcDir).flatMap((file) => {
       const rel = path.relative(srcDir, file).split(path.sep).join('/');
       const allowed = RADIUS_EXCEPTIONS[rel] ?? new Set<string>();
