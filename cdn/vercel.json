@@ -34,6 +34,10 @@
       "destination": "/my-giving-history/0.1.1/index.js"
     },
     {
+      "source": "/my-missions/latest.js",
+      "destination": "/my-missions/0.1.0/index.js"
+    },
+    {
       "source": "/my-shepherds/latest.js",
       "destination": "/my-shepherds/0.1.0/index.js"
     },
