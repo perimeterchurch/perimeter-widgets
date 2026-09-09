@@ -8,6 +8,25 @@ export default defineWidget({
   // and household, so there is nothing to render without a session. The
   // runtime's AuthGate shows a sign-in prompt until an MP session exists.
   auth: 'required',
+  // Perimeter's UI standard is square corners: 0px radius, everywhere. The
+  // shared theme still ships 4/8/12px (`packages/theme/src/tokens.ts`), which
+  // the other twelve widgets are built against, so this is a per-widget token
+  // override rather than a change to the design system. Overriding the tokens
+  // rather than stripping `rounded-*` classes flattens the shared
+  // @perimeter/ui components this widget renders (Button, Skeleton, Empty)
+  // too — a class-level sweep could not reach inside those.
+  //
+  // The token scale (sm/md/lg) is the ONLY radius source this widget may use.
+  // The pill, xl and 4xl steps compile to values Tailwind hardcodes into the
+  // CSS, which no token override can reach — tests/radius.test.ts fails the
+  // build if one reappears. It cannot spell them here: Tailwind's scanner reads
+  // comments as candidate classes, so naming one compiles a real rule into the
+  // shipped CSS.
+  themeOverrides: {
+    'radius-sm': '0px',
+    'radius-md': '0px',
+    'radius-lg': '0px',
+  },
   // Host-page config arrives as data-* attributes (always strings). Use
   // z.coerce.number()/z.coerce.boolean() for any numeric/boolean fields so the
   // studio and production parse them identically.

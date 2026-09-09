@@ -28,7 +28,7 @@ function LoadingState(): React.JSX.Element {
 function ErrorState({ error }: { error: unknown }): React.JSX.Element {
   const isAuth = error instanceof ApiError && error.isAuthError;
   return (
-    <Empty>
+    <Empty className="rounded-none">
       <EmptyHeader>
         <EmptyTitle>{isAuth ? 'Your session has expired' : 'Unable to load your trips'}</EmptyTitle>
         <EmptyDescription>
@@ -85,7 +85,7 @@ export function App({ config }: AppProps): React.JSX.Element {
       ) : query.isError ? (
         <ErrorState error={query.error} />
       ) : isEmpty ? (
-        <Empty>
+        <Empty className="rounded-none">
           <EmptyHeader>
             <EmptyTitle>No mission trips yet</EmptyTitle>
             <EmptyDescription>

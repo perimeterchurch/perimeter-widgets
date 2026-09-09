@@ -71,7 +71,11 @@ export function LeaderSection({ summary, participants }: LeaderSectionProps): Re
       <Button
         variant="primary"
         nativeButton={false}
-        className="w-fit"
+        // text-white is a deliberate stakeholder choice, not an oversight: it
+        // overrides the primary variant's `text-primary-fg` (brand navy) with
+        // pure white. White on the light `bg-primary` sky-blue is below the
+        // WCAG AA contrast the rest of the widget holds — kept on request.
+        className="w-fit text-white"
         render={<a href={participantsMailto(summary.email, participants)} />}
       >
         <Mail aria-hidden className="mr-2 size-4" />

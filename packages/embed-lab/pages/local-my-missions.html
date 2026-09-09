@@ -4,6 +4,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Embed Lab — local my-missions</title>
+    <!--
+      Perimeter's Adobe Fonts kit (studio/src/lib/brand-fonts.ts), for the same
+      reason local-mission-trip-finder.html loads it: widget bundles ship no
+      `@font-face`, their CSS only NAMES sweet-sans-pro, and font availability
+      is document-scoped — so a lab page without this link falls through the
+      token stack to Inter and then system-ui, which reads as the widget having
+      the wrong font when the host page simply never loaded it. perimeter.org
+      loads its own kit, so live embeds get the real face.
+
+      It matters more here than on any other lab page: the letter editor is
+      several hundred words of body copy, the largest block of type any widget
+      renders.
+    -->
+    <link rel="stylesheet" href="https://use.typekit.net/hpg7onr.css" />
     <style>
       /* perimeter.org's measured host styles (provenance:
          packages/parity/fixtures/wordpress.html, read from the live page
@@ -69,7 +83,12 @@
       button {
         background: lime !important;
         text-transform: uppercase !important;
-        border-radius: 0 !important;
+        /* The widget ships square corners (0px radius, the Perimeter UI
+           standard), so a `border-radius: 0` here would prove nothing — a leak
+           and a pass would look identical. Pill corners are the inverse
+           assertion: any rounding on a widget button means this rule reached
+           inside the shadow root. */
+        border-radius: 999px !important;
       }
       input {
         background: hotpink !important;
@@ -97,7 +116,7 @@
         Bypasses the loader and embeds <code>/local/my-missions/index.js</code> directly. Build
         first: <code>pnpm --filter @perimeter/widget-my-missions build</code>.
         <code>data-api-url</code> points at a local perimeter-api on :5500 — run
-        <code>pnpm dev</code> there.
+        <code>pnpm dev</code> there, on the branch that carries <code>/api/missions/my-trips</code>.
       </p>
       <p class="banner">
         This is an <strong>authenticated</strong> widget, so it shows the sign-in prompt until an MP
@@ -112,11 +131,13 @@
         What must hold once trips render: the trip rows and Leaders strip stay a plain list (no
         square bullets, no 2rem row gaps); the donations table keeps its own thin border and full
         width rather than a red dashed 50%-wide box with hotpink centred-right cells; every button
-        stays brand blue with rounded corners rather than square lime; the letter editor's
-        contenteditable stays white-on-token with the widget's own font and its natural height, not
+        stays brand blue and <strong>square</strong> rather than lime with pill corners; the letter
+        editor's contenteditable stays white-on-token in Sweet Sans Pro at its natural height, not
         yellow cursive at 40rem; bold text inside the letter and the description stays the widget's
         foreground colour, not red; and links stay brand blue without a strikethrough. Headings must
-        not be uppercased.
+        not be uppercased. Every corner in the widget is square except the Leaders strip, which is
+        round — and every glyph is Sweet Sans Pro, which this page loads for the document the way
+        perimeter.org does.
       </p>
 
       <div data-perimeter-widget="my-missions" data-api-url="http://localhost:5500"></div>
