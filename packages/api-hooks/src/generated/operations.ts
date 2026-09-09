@@ -603,6 +603,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/assessments/by-slug/{slug}/instrument': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Resolve an active instrument by its URL_Slug. Backs the assessments app generic dynamic survey route (/forms/[slug]); 404 when no active instrument carries the slug. */
+    get: operations['getInstrumentBySlug'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/assessments/{instrumentId}/answers/files': {
     parameters: {
       query?: never;
@@ -1013,6 +1030,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/missions/my-trips': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the authenticated member's own mission trips */
+    get: operations['getMyMissionTrips'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/missions/my-trips/{pledgeId}/letter': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Replace one pledge's support letter */
+    put: operations['saveMissionLetter'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/community-groups': {
     parameters: {
       query?: never;
@@ -1193,6 +1244,23 @@ export interface paths {
     };
     /** Get the signed-in caller's name for the prayer-wall form's "Me" field */
     get: operations['getPrayerWallIdentity'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/org-chart': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the staff reporting tree */
+    get: operations['getOrgChart'];
     put?: never;
     post?: never;
     delete?: never;
@@ -3819,6 +3887,8 @@ export interface operations {
               splashPageText?: string;
               reviewableResults: boolean;
               repeatable: boolean;
+              urlSlug?: string;
+              completionText?: string;
               totalAnswerable?: number;
             }[];
             meta?: {
@@ -4353,6 +4423,63 @@ export interface operations {
               splashPageText?: string;
               reviewableResults: boolean;
               repeatable: boolean;
+              urlSlug?: string;
+              completionText?: string;
+              totalAnswerable?: number;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getInstrumentBySlug: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              ID: number;
+              version: number;
+              name: string;
+              description: string;
+              visibilityLevelID: number;
+              startDate: string;
+              endDate?: string;
+              splashPageText?: string;
+              reviewableResults: boolean;
+              repeatable: boolean;
+              urlSlug?: string;
+              completionText?: string;
               totalAnswerable?: number;
             };
             meta?: {
@@ -5699,6 +5826,169 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  getMyMissionTrips: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              trips: {
+                pledgeId: number;
+                campaignId: number;
+                /** @description Pledge_Campaigns.Nickname, falling back to "Destination: start – end" from Journey_Destinations, then Campaign_Name. */
+                name: string;
+                /** @description Pledge_Campaigns.Long_Description, sanitized. Staff-authored HTML. */
+                longDescription: string | null;
+                /** @description Trip_Start_Date, ISO 8601. */
+                startDate: string | null;
+                /** @description Trip_End_Date, ISO 8601. */
+                endDate: string | null;
+                /** @description True once the CAMPAIGN has closed (Pledge_Campaigns.End_Date <= now), not when the trip has travelled. The campaign window stays open for months after a trip returns while giving is still being settled, and the legacy proc drew the Current/Past line here too. */
+                past: boolean;
+                /** @description True when the pledge is the viewer's own; false for a household member's pledge surfaced because the viewer is a head of household. */
+                mine: boolean;
+                /** @description Whose pledge this is, rendered "nickname lastname". */
+                participantName: string;
+                /** @description Pledge_Statuses.Pledge_Status — "Active" or "Completed". */
+                pledgeStatus: string;
+                /** @description Pledges.Total_Pledge — this participant's fundraising goal. */
+                totalPledge: number;
+                /** @description Sum of Donation_Distributions.Amount against this pledge. MP stores no such column; it is rolled up per request. */
+                totalDonations: number;
+                lastDonationDate: string | null;
+                /** @description Pledges.Letter, sanitized — the support letter. Null on a past trip, and null when unwritten. */
+                letter: string | null;
+                /** @description Pledges.Trip_Leader on this pledge. */
+                isLeader: boolean;
+                leaders: {
+                  name: string;
+                  email: string | null;
+                  /** @description The leader's own pledge on this campaign. Feed it to `/api/mission-trips/{campaignId}/participant/{pledgeId}/image` for the photo. */
+                  pledgeId: number;
+                }[];
+                donations: {
+                  /** @description Donations.Donation_Date, ISO 8601. */
+                  date: string;
+                  /** @description Donation_Distributions.Amount — this split of the gift, not the whole donation. */
+                  amount: number;
+                  /** @description Donations.Anonymous. */
+                  anonymous: boolean;
+                  /** @description Rendered "nickname lastname", the organization name for a company contact, or "Anonymous" when the gift is anonymous. */
+                  donorName: string;
+                  email: string | null;
+                  phone: string | null;
+                  /** @description Null for an anonymous gift, and for a donor with no household address. */
+                  address: {
+                    line1: string | null;
+                    line2: string | null;
+                    city: string | null;
+                    /** @description Addresses.[State/Region]. */
+                    state: string | null;
+                    postalCode: string | null;
+                  } | null;
+                }[];
+                leaderSummary: {
+                  /** @description The viewer's own email — the From address for the widget's "Email All Participants" mailto. */
+                  email: string | null;
+                  /** @description Raised across every seat-holding pledge on the campaign. */
+                  totalDonations: number;
+                  /** @description Sum of every seat-holding pledge's Total_Pledge on the campaign. */
+                  totalGoal: number;
+                } | null;
+                participants: {
+                  pledgeId: number;
+                  name: string;
+                  email: string | null;
+                  /** @description Pledges.Total_Pledge — this participant's own goal. */
+                  totalPledge: number;
+                  totalDonations: number;
+                }[];
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  saveMissionLetter: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        pledgeId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description The support letter as HTML. */
+          letter: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              pledgeId: number;
+              /** @description The letter as stored, after sanitization. */
+              letter: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
   listCommunityGroups: {
     parameters: {
       query?: {
@@ -6337,6 +6627,91 @@ export interface operations {
             data: {
               /** @description Nickname (or first name) plus last name. */
               name: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getOrgChart: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              nodes: {
+                /** @description HR_Personnel.Personnel_ID. */
+                personnelId: number;
+                /** @description Contacts.Contact_ID. */
+                contactId: number;
+                /** @description Contacts.Contact_GUID. Null when MP has no GUID on the record. */
+                contactGuid: string | null;
+                /** @description Display name: nickname + last name when a nickname exists, otherwise first + last. */
+                name: string;
+                firstName: string | null;
+                lastName: string | null;
+                nickname: string | null;
+                /** @description The staff headshot from MP's public files endpoint, or null when the person has no photo on file. */
+                photoUrl: string | null;
+                /** @description Resolved HR_Personnel.Personnel_ID of the supervisor. Null identifies a root. NOT the raw HR_Personnel.Supervisor value — a stale pointer left behind by a promotion is remapped to the same person's current record first. */
+                supervisorPersonnelId: number | null;
+                /** @description Positions held, current ones first. May be empty when MP has no position row for the person at all. */
+                positions: {
+                  /** @description HR_Positions.Position_ID. */
+                  id: number;
+                  /** @description HR_Positions.Position_Title. */
+                  title: string;
+                  /** @description Ministries.Ministry_Name — the ministry the position sits in. */
+                  ministry: string | null;
+                  /** @description HR_Positions.Ministry_ID. */
+                  ministryId: number | null;
+                  /** @description HR_Positions.Department_Head. */
+                  isDepartmentHead: boolean;
+                  /** @description HR_Positions.Division_Head. */
+                  isDivisionHead: boolean;
+                  /** @description HR_Positions.Position_End has passed. */
+                  isEnded: boolean;
+                }[];
+                /** @description HR_Personnel_Types.Personnel_Type, e.g. "Full Time Exempt", "Unpaid Volunteer". */
+                personnelType: string | null;
+                personnelTypeId: number | null;
+                /** @description HR_Personnel.Personnel_End_Date is unset or still in the future. */
+                isCurrentPersonnel: boolean;
+                directReportCount: number;
+                /** @description Everyone beneath this node, at any depth — the whole subtree. */
+                totalReportCount: number;
+                /** @description Distance from the root; the root is 1. */
+                depth: number;
+              }[];
+              /** @description Nodes with no supervisor. Normally exactly one (the Senior Pastor); more than one means MP has reporting lines that no longer reach the top. */
+              rootPersonnelIds: number[];
             };
             meta?: {
               count?: number;
