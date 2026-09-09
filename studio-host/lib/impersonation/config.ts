@@ -15,7 +15,14 @@ export const IMPERSONATE_COOKIE = 'studio.impersonate';
  * the widgets request verbatim (the api-hooks include the `/api` prefix), so
  * the proxy is a transparent pass-through to `<perimeterApiUrl>/<path>`.
  */
-export const ALLOWED_PROXY_PATHS: readonly string[] = ['api/giving/history', 'api/shepherds'];
+export const ALLOWED_PROXY_PATHS: readonly string[] = [
+  'api/giving/history',
+  'api/shepherds',
+  // my-missions. The letter write (PUT .../my-trips/{id}/letter) is
+  // deliberately absent: the proxy only forwards GET, and an exact-match
+  // whitelist keeps it that way even if that changed.
+  'api/missions/my-trips',
+];
 
 export function isAllowedProxyPath(path: string): boolean {
   return ALLOWED_PROXY_PATHS.includes(path);

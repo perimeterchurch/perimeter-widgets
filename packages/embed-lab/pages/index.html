@@ -89,6 +89,16 @@
           >legend</code
         >
       </li>
+      <li>
+        <a href="/pages/local-my-missions.html">local-my-missions</a> — the local build of
+        <code>my-missions</code> on the same hostile host, aimed at the parts only this widget has:
+        a <code>table</code> of donations and a ProseMirror <code>[contenteditable]</code> whose
+        <code>p</code>/<code>ul</code>/<code>strong</code> a host's typography rules would happily
+        restyle. Authenticated, so it shows the sign-in gate until a token is present:
+        <code>?token=…&amp;apiUrl=…</code> seeds one and points the widget at anything that supplies
+        auth for it (the studio's impersonation proxy, or a local one attaching
+        <code>x-api-key</code> + <code>x-on-behalf-of-user</code>)
+      </li>
     </ul>
     <p class="note">
       Widgets fetch live data from <code>https://api.perimeter.org</code> (the production API), so

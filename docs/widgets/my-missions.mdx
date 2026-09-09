@@ -1,0 +1,129 @@
+---
+description: The signed-in member's mission trips — fundraising progress, donors, and their support letter.
+---
+
+# my-missions
+
+Shows the signed-in member every mission trip they are pledged to: fundraising
+progress against their goal, the trip's leaders, the campaign description,
+everyone who has given toward their pledge, and a rich-text editor for their
+support letter. Trip leaders additionally get whole-trip totals, each
+participant's funding progress, and a one-click email to the roster.
+
+Trips are grouped into **Current** (not yet ended) and **Past** (the last five
+years). Head-of-household members also see their household members' pledges,
+labelled with whose trip each one is.
+
+This is a **user-authenticated** widget: it renders a sign-in prompt until a
+MinistryPlatform session exists, then loads the caller's own trips. It is meant
+to live behind login on perimeter.org. Replaces the legacy `MyMissions` embed.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div data-perimeter-widget="my-missions"></div>
+```
+
+## Config
+
+The widget reads its config from `data-*` attributes on the placeholder div.
+`src/widget.tsx` holds the zod schema (the source of truth for options and
+defaults).
+
+| Attribute              | Type    | Default         | Description                                     |
+| ---------------------- | ------- | --------------- | ----------------------------------------------- |
+| `data-title`           | string  | `My Missions`   | Heading shown above the trip list                |
+| `data-current-title`   | string  | `Current Trips` | Heading for trips that have not ended yet        |
+| `data-past-title`      | string  | `Past Trips`    | Heading for trips that have already ended        |
+| `data-show-past-trips` | boolean | `true`          | Show the past-trips section                      |
+| `data-api-url`         | string  | —               | Override the perimeter-api base URL (advanced)   |
+
+## Appearance
+
+Square corners: the widget sets `themeOverrides` for `radius-sm`, `radius-md`
+and `radius-lg` to `0px`, which is the Perimeter UI standard. The shared theme
+still ships 4/8/12px, so this is a per-widget override rather than a
+design-system change — the other widgets are unaffected. Because the override
+lands on the tokens, it squares off the shared `@perimeter/ui` components this
+widget renders (buttons, skeletons) as well as its own surfaces. The one
+exception is `<Empty>`, which uses `rounded-xl` — a hardcoded 12px that no
+token can reach — so it takes a local `className="rounded-none"` here.
+
+The Leaders strip stays round on purpose: circular avatar photos and
+pill-shaped chips carry the legacy widget's shape and provide the accent
+contrast against the square rest of the widget. Those two utilities are
+allow-listed in `tests/radius.test.ts`; every other file must stay on the
+token scale, and the test fails the build if a stray `rounded-*` reappears.
+
+Type is Sweet Sans Pro via the `font-sans` token, like every widget. Nothing
+here ships a `@font-face`: font availability is document-scoped, so the real
+face comes from the host page's Adobe Fonts kit (perimeter.org loads one). A
+host without it falls back through Inter to the system sans — which is why the
+lab page loads the kit explicitly.
+
+A host page can still re-round or re-face a single embed with
+`data-theme-radius-md="8px"` / `data-theme-font-sans="…"`, which override the
+widget's own values.
+
+## Data
+
+Backed by perimeter-api's authenticated missions endpoints. Both require a user
+session; the hook types are generated from the OpenAPI spec like every other
+widget's.
+
+- `GET /api/missions/my-trips` — the caller's own and (as head of household)
+  their household's mission-trip pledges, each with donations, participants,
+  leaders and letter already nested.
+- `PUT /api/missions/my-trips/{pledgeId}/letter` — replace one pledge's support
+  letter.
+
+Both replace the legacy `api_custom_MyMissionTrips_Current` stored procedure,
+which returned **nine parallel datasets** that the old widget cross-joined in
+the browser on `Pledge_ID` / `Pledge_Campaign_ID`. That merge now happens in
+the service layer, so the endpoint returns one flat list of trips.
+
+Leader photos are not URLs in the payload: each leader carries a `pledgeId`,
+and `leaderPhotoUrl()` composes the public participant-photo route
+(`/api/mission-trips/{campaignId}/participant/{pledgeId}/image`) against the
+resolved API origin, the same way the mission-trip-finder does. That route 404s
+for a leader with no photo on file, which is the common case, so the avatar
+hides itself on error.
+
+See `docs/domains/missions.md` in perimeter-api for the full business rules —
+including that `past` is drawn on the campaign's close date rather than the
+trip's end date, and that a head of household sees their household's pledges
+while other members see only their own.
+
+## Notes on the port
+
+- **Anonymous donations.** The legacy stored procedure sent the real name,
+  email, phone and address of anonymous donors and the widget merely chose not
+  to render them — readable by anyone who opened the network tab. The endpoint
+  now leaves those donors out of its contact lookup entirely, so the identity
+  never reaches the API's memory, let alone the response.
+- **Nullable trip dates.** `Trip_Start_Date` and `Trip_End_Date` are both
+  nullable in MP — a campaign can exist before travel dates are set — so the
+  date range degrades to "From …" / "Through …" / "Dates to be announced", and
+  a dateless trip sorts last rather than leading the list on epoch 0.
+- **Rich text.** The letter editor is Tiptap (ProseMirror), replacing
+  `jodit-react` and its 5,345 lines of injected CSS. ProseMirror resolves
+  selections against `dom.getRootNode()`, so it behaves correctly inside the
+  shadow root; a `document.execCommand` toolbar does not. Because
+  `widgetConfig` emits a single IIFE with no code splitting, the editor is in
+  the bundle for every visitor — it accounts for a little under half of the
+  ~248 KB gzipped artifact, guarded by a budget assertion in
+  `tests/bundle.test.ts`.
+- **Letter with no starting content.** The legacy widget rendered the editor
+  only when a letter already existed, so a participant without one had no way
+  to write it. The editor now always renders.
+- **Dates.** Trip and donation dates are wall-clock calendar dates in MP.
+  `parseTripDate` builds them as local dates, because `new Date('2026-06-12')`
+  is UTC midnight and renders as 6/11 in every US timezone.
+- **Progress colours.** The legacy traffic light (amber / blue / green) maps
+  onto the token palette as amber `warning` under 50%, `primary/60` to 75%, and
+  `primary` above — the palette has no `success` token, and inventing an
+  off-palette green in one widget was the worse trade.
+- **CSV export.** Cell quoting now escapes embedded quotes (one quote in a donor
+  name used to shift every later column) and prefixes formula-leading cells so a
+  spreadsheet treats them as text.

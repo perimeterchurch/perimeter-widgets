@@ -56,6 +56,24 @@ export {
 } from './missions/use-mission-trip';
 
 export {
+  useMyMissionTrips,
+  type UseMyMissionTripsResponse,
+  type MyMissionTrip,
+  type MyMissionDonation,
+  type MyMissionParticipant,
+  type MyMissionLeader,
+  type MyMissionLeaderSummary,
+  type MyMissionAddress,
+} from './missions/use-my-mission-trips';
+
+export {
+  useSaveMissionLetter,
+  type SaveMissionLetterInput,
+  type SaveMissionLetterBody,
+  type SaveMissionLetterResponse,
+} from './missions/use-save-mission-letter';
+
+export {
   useCommunityGroups,
   type UseCommunityGroupsParams,
   type UseCommunityGroupsResponse,

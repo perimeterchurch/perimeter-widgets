@@ -3694,6 +3694,10 @@ paths:
                           type: boolean
                         repeatable:
                           type: boolean
+                        urlSlug:
+                          type: string
+                        completionText:
+                          type: string
                         totalAnswerable:
                           type: integer
                           minimum: -9007199254740991
@@ -4737,6 +4741,10 @@ paths:
                         type: boolean
                       repeatable:
                         type: boolean
+                      urlSlug:
+                        type: string
+                      completionText:
+                        type: string
                       totalAnswerable:
                         type: integer
                         minimum: -9007199254740991
@@ -4787,6 +4795,109 @@ paths:
             type: integer
             exclusiveMinimum: 0
             maximum: 9007199254740991
+  /api/assessments/by-slug/{slug}/instrument:
+    get:
+      operationId: getInstrumentBySlug
+      summary:
+        Resolve an active instrument by its URL_Slug. Backs the assessments app generic dynamic survey route
+        (/forms/[slug]); 404 when no active instrument carries the slug.
+      tags:
+        - Assessments
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      ID:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      version:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      visibilityLevelID:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                      startDate:
+                        type: string
+                      endDate:
+                        type: string
+                      splashPageText:
+                        type: string
+                      reviewableResults:
+                        type: boolean
+                      repeatable:
+                        type: boolean
+                      urlSlug:
+                        type: string
+                      completionText:
+                        type: string
+                      totalAnswerable:
+                        type: integer
+                        minimum: -9007199254740991
+                        maximum: 9007199254740991
+                    required:
+                      - ID
+                      - version
+                      - name
+                      - description
+                      - visibilityLevelID
+                      - startDate
+                      - reviewableResults
+                      - repeatable
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
   /api/assessments/{instrumentId}/answers/files:
     get:
       operationId: listAnswerFiles
@@ -7447,6 +7558,374 @@ paths:
             type: integer
             exclusiveMinimum: 0
             maximum: 9007199254740991
+  /api/missions/my-trips:
+    get:
+      operationId: getMyMissionTrips
+      summary: Get the authenticated member's own mission trips
+      tags:
+        - Missions
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      trips:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            pledgeId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            campaignId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                            name:
+                              type: string
+                              description:
+                                'Pledge_Campaigns.Nickname, falling back to "Destination: start – end" from Journey_Destinations, then
+                                Campaign_Name.'
+                            longDescription:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Pledge_Campaigns.Long_Description, sanitized. Staff-authored HTML.
+                            startDate:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Trip_Start_Date, ISO 8601.
+                            endDate:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Trip_End_Date, ISO 8601.
+                            past:
+                              type: boolean
+                              description:
+                                True once the CAMPAIGN has closed (Pledge_Campaigns.End_Date <= now), not when the trip has travelled. The
+                                campaign window stays open for months after a trip returns while giving is still being
+                                settled, and the legacy proc drew the Current/Past line here too.
+                            mine:
+                              type: boolean
+                              description:
+                                True when the pledge is the viewer's own; false for a household member's pledge surfaced because the viewer
+                                is a head of household.
+                            participantName:
+                              type: string
+                              description: Whose pledge this is, rendered "nickname lastname".
+                            pledgeStatus:
+                              type: string
+                              description: Pledge_Statuses.Pledge_Status — "Active" or "Completed".
+                            totalPledge:
+                              type: number
+                              description: Pledges.Total_Pledge — this participant's fundraising goal.
+                            totalDonations:
+                              type: number
+                              description:
+                                Sum of Donation_Distributions.Amount against this pledge. MP stores no such column; it is rolled up per
+                                request.
+                            lastDonationDate:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            letter:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Pledges.Letter, sanitized — the support letter. Null on a past trip, and null when unwritten.
+                            isLeader:
+                              type: boolean
+                              description: Pledges.Trip_Leader on this pledge.
+                            leaders:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  email:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                  pledgeId:
+                                    type: integer
+                                    exclusiveMinimum: 0
+                                    maximum: 9007199254740991
+                                    description:
+                                      The leader's own pledge on this campaign. Feed it to
+                                      `/api/mission-trips/{campaignId}/participant/{pledgeId}/image` for the photo.
+                                required:
+                                  - name
+                                  - email
+                                  - pledgeId
+                                additionalProperties: false
+                            donations:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  date:
+                                    type: string
+                                    description: Donations.Donation_Date, ISO 8601.
+                                  amount:
+                                    type: number
+                                    description: Donation_Distributions.Amount — this split of the gift, not the whole donation.
+                                  anonymous:
+                                    type: boolean
+                                    description: Donations.Anonymous.
+                                  donorName:
+                                    type: string
+                                    description:
+                                      Rendered "nickname lastname", the organization name for a company contact, or "Anonymous" when the gift is
+                                      anonymous.
+                                  email:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                  phone:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                  address:
+                                    anyOf:
+                                      - type: object
+                                        properties:
+                                          line1:
+                                            anyOf:
+                                              - type: string
+                                              - type: 'null'
+                                          line2:
+                                            anyOf:
+                                              - type: string
+                                              - type: 'null'
+                                          city:
+                                            anyOf:
+                                              - type: string
+                                              - type: 'null'
+                                          state:
+                                            anyOf:
+                                              - type: string
+                                              - type: 'null'
+                                            description: Addresses.[State/Region].
+                                          postalCode:
+                                            anyOf:
+                                              - type: string
+                                              - type: 'null'
+                                        required:
+                                          - line1
+                                          - line2
+                                          - city
+                                          - state
+                                          - postalCode
+                                        additionalProperties: false
+                                      - type: 'null'
+                                    description: Null for an anonymous gift, and for a donor with no household address.
+                                required:
+                                  - date
+                                  - amount
+                                  - anonymous
+                                  - donorName
+                                  - email
+                                  - phone
+                                  - address
+                                additionalProperties: false
+                            leaderSummary:
+                              anyOf:
+                                - type: object
+                                  properties:
+                                    email:
+                                      anyOf:
+                                        - type: string
+                                        - type: 'null'
+                                      description: The viewer's own email — the From address for the widget's "Email All Participants" mailto.
+                                    totalDonations:
+                                      type: number
+                                      description: Raised across every seat-holding pledge on the campaign.
+                                    totalGoal:
+                                      type: number
+                                      description: Sum of every seat-holding pledge's Total_Pledge on the campaign.
+                                  required:
+                                    - email
+                                    - totalDonations
+                                    - totalGoal
+                                  additionalProperties: false
+                                - type: 'null'
+                            participants:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  pledgeId:
+                                    type: integer
+                                    exclusiveMinimum: 0
+                                    maximum: 9007199254740991
+                                  name:
+                                    type: string
+                                  email:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                  totalPledge:
+                                    type: number
+                                    description: Pledges.Total_Pledge — this participant's own goal.
+                                  totalDonations:
+                                    type: number
+                                required:
+                                  - pledgeId
+                                  - name
+                                  - email
+                                  - totalPledge
+                                  - totalDonations
+                                additionalProperties: false
+                          required:
+                            - pledgeId
+                            - campaignId
+                            - name
+                            - longDescription
+                            - startDate
+                            - endDate
+                            - past
+                            - mine
+                            - participantName
+                            - pledgeStatus
+                            - totalPledge
+                            - totalDonations
+                            - lastDonationDate
+                            - letter
+                            - isLeader
+                            - leaders
+                            - donations
+                            - leaderSummary
+                            - participants
+                          additionalProperties: false
+                    required:
+                      - trips
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+  /api/missions/my-trips/{pledgeId}/letter:
+    put:
+      operationId: saveMissionLetter
+      summary: Replace one pledge's support letter
+      tags:
+        - Missions
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      pledgeId:
+                        type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
+                      letter:
+                        type: string
+                        description: The letter as stored, after sanitization.
+                    required:
+                      - pledgeId
+                      - letter
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+      parameters:
+        - name: pledgeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 9007199254740991
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                letter:
+                  type: string
+                  maxLength: 100000
+                  description: The support letter as HTML.
+              required:
+                - letter
+              additionalProperties: false
   /api/community-groups:
     get:
       operationId: listCommunityGroups
@@ -8955,6 +9434,208 @@ paths:
                         description: Nickname (or first name) plus last name.
                     required:
                       - name
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2
+  /api/org-chart:
+    get:
+      operationId: getOrgChart
+      summary: Get the staff reporting tree
+      tags:
+        - OrgChart
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      nodes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            personnelId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: HR_Personnel.Personnel_ID.
+                            contactId:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: Contacts.Contact_ID.
+                            contactGuid:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: Contacts.Contact_GUID. Null when MP has no GUID on the record.
+                            name:
+                              type: string
+                              description: 'Display name: nickname + last name when a nickname exists, otherwise first + last.'
+                            firstName:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            lastName:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            nickname:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                            photoUrl:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: The staff headshot from MP's public files endpoint, or null when the person has no photo on file.
+                            supervisorPersonnelId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                              description:
+                                Resolved HR_Personnel.Personnel_ID of the supervisor. Null identifies a root. NOT the raw
+                                HR_Personnel.Supervisor value — a stale pointer left behind by a promotion is remapped
+                                to the same person's current record first.
+                            positions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    exclusiveMinimum: 0
+                                    maximum: 9007199254740991
+                                    description: HR_Positions.Position_ID.
+                                  title:
+                                    type: string
+                                    description: HR_Positions.Position_Title.
+                                  ministry:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                    description: Ministries.Ministry_Name — the ministry the position sits in.
+                                  ministryId:
+                                    anyOf:
+                                      - type: integer
+                                        exclusiveMinimum: 0
+                                        maximum: 9007199254740991
+                                      - type: 'null'
+                                    description: HR_Positions.Ministry_ID.
+                                  isDepartmentHead:
+                                    type: boolean
+                                    description: HR_Positions.Department_Head.
+                                  isDivisionHead:
+                                    type: boolean
+                                    description: HR_Positions.Division_Head.
+                                  isEnded:
+                                    type: boolean
+                                    description: HR_Positions.Position_End has passed.
+                                required:
+                                  - id
+                                  - title
+                                  - ministry
+                                  - ministryId
+                                  - isDepartmentHead
+                                  - isDivisionHead
+                                  - isEnded
+                                additionalProperties: false
+                              description: Positions held, current ones first. May be empty when MP has no position row for the person at all.
+                            personnelType:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
+                              description: HR_Personnel_Types.Personnel_Type, e.g. "Full Time Exempt", "Unpaid Volunteer".
+                            personnelTypeId:
+                              anyOf:
+                                - type: integer
+                                  exclusiveMinimum: 0
+                                  maximum: 9007199254740991
+                                - type: 'null'
+                            isCurrentPersonnel:
+                              type: boolean
+                              description: HR_Personnel.Personnel_End_Date is unset or still in the future.
+                            directReportCount:
+                              type: integer
+                              minimum: 0
+                              maximum: 9007199254740991
+                            totalReportCount:
+                              type: integer
+                              minimum: 0
+                              maximum: 9007199254740991
+                              description: Everyone beneath this node, at any depth — the whole subtree.
+                            depth:
+                              type: integer
+                              exclusiveMinimum: 0
+                              maximum: 9007199254740991
+                              description: Distance from the root; the root is 1.
+                          required:
+                            - personnelId
+                            - contactId
+                            - contactGuid
+                            - name
+                            - firstName
+                            - lastName
+                            - nickname
+                            - photoUrl
+                            - supervisorPersonnelId
+                            - positions
+                            - personnelType
+                            - personnelTypeId
+                            - isCurrentPersonnel
+                            - directReportCount
+                            - totalReportCount
+                            - depth
+                          additionalProperties: false
+                      rootPersonnelIds:
+                        type: array
+                        items:
+                          type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                        description:
+                          Nodes with no supervisor. Normally exactly one (the Senior Pastor); more than one means MP has reporting
+                          lines that no longer reach the top.
+                    required:
+                      - nodes
+                      - rootPersonnelIds
                     additionalProperties: false
                   meta:
                     type: object
