@@ -35,7 +35,7 @@
     },
     {
       "source": "/my-missions/latest.js",
-      "destination": "/my-missions/0.1.0/index.js"
+      "destination": "/my-missions/0.2.0/index.js"
     },
     {
       "source": "/my-shepherds/latest.js",
