@@ -33,6 +33,8 @@ const config = {
   currentTitle: 'Current Trips',
   pastTitle: 'Past Trips',
   showPastTrips: true,
+  tripPageUrlBase:
+    'https://www.perimeter.org/global-outreach/go-journeys/?trip-screen=detail&trip-id=',
 };
 
 function loaded(trips: MyMissionTrip[]) {
@@ -134,6 +136,36 @@ describe('my-missions widget App', () => {
     expect(row).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText(/My funds raised/)).toBeInTheDocument();
     expect(screen.getByText('$1,500.00')).toBeInTheDocument();
+  });
+
+  it('shows a Trip Page link on a current trip, pointing at the GO Journey page', async () => {
+    useMyMissionTrips.mockReturnValue(loaded([trip()]));
+    render(<App config={config} />);
+    await userEvent.click(screen.getByRole('button', { name: /Kenya Medical Journey/ }));
+    const link = screen.getByRole('link', { name: /Trip Page/i });
+    // base + the trip's Pledge_Campaign_ID (fixture 4410), new tab, safe rel.
+    expect(link).toHaveAttribute(
+      'href',
+      'https://www.perimeter.org/global-outreach/go-journeys/?trip-screen=detail&trip-id=4410',
+    );
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('omits the Trip Page link on a past trip (its campaign page is typically gone)', async () => {
+    useMyMissionTrips.mockReturnValue(loaded([pastTrip()]));
+    render(<App config={config} />);
+    await userEvent.click(screen.getByRole('button', { name: /Peru/ }));
+    expect(screen.getByText(/funds raised/i)).toBeInTheDocument(); // panel is open
+    expect(screen.queryByRole('link', { name: /Trip Page/i })).toBeNull();
+  });
+
+  it('hides the Trip Page link when the base URL is configured empty', async () => {
+    useMyMissionTrips.mockReturnValue(loaded([trip()]));
+    render(<App config={{ ...config, tripPageUrlBase: '' }} />);
+    await userEvent.click(screen.getByRole('button', { name: /Kenya Medical Journey/ }));
+    expect(screen.getByText(/My funds raised/)).toBeInTheDocument(); // panel is open
+    expect(screen.queryByRole('link', { name: /Trip Page/i })).toBeNull();
   });
 
   it('collapses the open trip when another is opened (one at a time)', async () => {
