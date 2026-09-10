@@ -11,6 +11,7 @@ export interface AppProps {
     currentTitle: string;
     pastTitle: string;
     showPastTrips: boolean;
+    tripPageUrlBase: string;
     apiUrl?: string | undefined;
   };
 }
@@ -45,16 +46,18 @@ function TripSection({
   title,
   trips,
   apiUrl,
+  tripPageUrlBase,
 }: {
   title: string;
   trips: readonly MyMissionTrip[];
   apiUrl: string | undefined;
+  tripPageUrlBase: string;
 }): React.JSX.Element | null {
   if (trips.length === 0) return null;
   return (
     <section className="grid gap-2">
       <h3 className="text-xl font-semibold text-fg">{title}</h3>
-      <TripsAccordion trips={trips} apiUrl={apiUrl} />
+      <TripsAccordion trips={trips} apiUrl={apiUrl} tripPageUrlBase={tripPageUrlBase} />
     </section>
   );
 }
@@ -96,8 +99,18 @@ export function App({ config }: AppProps): React.JSX.Element {
         </Empty>
       ) : (
         <>
-          <TripSection title={config.currentTitle} trips={current} apiUrl={config.apiUrl} />
-          <TripSection title={config.pastTitle} trips={visiblePast} apiUrl={config.apiUrl} />
+          <TripSection
+            title={config.currentTitle}
+            trips={current}
+            apiUrl={config.apiUrl}
+            tripPageUrlBase={config.tripPageUrlBase}
+          />
+          <TripSection
+            title={config.pastTitle}
+            trips={visiblePast}
+            apiUrl={config.apiUrl}
+            tripPageUrlBase={config.tripPageUrlBase}
+          />
         </>
       )}
     </div>

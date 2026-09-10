@@ -44,6 +44,17 @@ export default defineWidget({
       .boolean()
       .default(true)
       .describe('Show the past-trips section (the last five years of trips).'),
+    // Base URL for the "Trip Page" link shown on current (non-past) trips — the
+    // trip's Pledge_Campaign_ID is appended (`...&trip-id=<id>`), pointing at
+    // the perimeter.org GO Journeys detail screen (the same link the live
+    // finder opens). Set empty to hide the link.
+    tripPageUrlBase: z
+      .string()
+      .default('https://www.perimeter.org/global-outreach/go-journeys/?trip-screen=detail&trip-id=')
+      .describe(
+        'Base URL for the "Trip Page" link on current trips; the trip\'s campaign ID is ' +
+          'appended. Set empty to hide the link.',
+      ),
     // The mount reads `apiUrl` off the parsed config to pick the API client's
     // base URL; it is read here too so leader photo `<img>` tags resolve
     // against the API origin rather than the host page's.
@@ -53,6 +64,7 @@ export default defineWidget({
     currentTitle: 'Current trips heading',
     pastTitle: 'Past trips heading',
     showPastTrips: 'Show past trips',
+    tripPageUrlBase: 'Trip page link base (advanced)',
     apiUrl: 'API address (advanced)',
   },
   App: ({ config }) => <App config={config} />,

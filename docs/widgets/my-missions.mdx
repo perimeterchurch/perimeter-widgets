@@ -37,6 +37,7 @@ defaults).
 | `data-current-title`   | string  | `Current Trips` | Heading for trips that have not ended yet        |
 | `data-past-title`      | string  | `Past Trips`    | Heading for trips that have already ended        |
 | `data-show-past-trips` | boolean | `true`          | Show the past-trips section                      |
+| `data-trip-page-url-base` | string | GO Journeys detail URL | Base for the "Trip Page" link on current trips; the trip's campaign ID is appended. Set empty to hide it. |
 | `data-api-url`         | string  | —               | Override the perimeter-api base URL (advanced)   |
 
 ## Appearance
@@ -65,6 +66,17 @@ lab page loads the kit explicitly.
 A host page can still re-round or re-face a single embed with
 `data-theme-radius-md="8px"` / `data-theme-font-sans="…"`, which override the
 widget's own values.
+
+## Trip page link
+
+Each **current** trip shows a "Trip Page" button next to its funding progress
+that opens the public GO Journeys detail screen for that trip in a new tab. The
+URL is `data-trip-page-url-base` + the trip's `campaignId` (its
+`Pledge_Campaign_ID`), i.e.
+`…/go-journeys/?trip-screen=detail&trip-id=<campaignId>`. Past trips omit it
+(their campaign page is typically taken down), and setting
+`data-trip-page-url-base=""` hides it everywhere. This is the same GO Journeys
+detail link the live mission-trip-finder opens.
 
 ## Data
 
