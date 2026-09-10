@@ -11,6 +11,8 @@ export interface TripPanelProps {
   trip: MyMissionTrip;
   /** The `apiUrl` config override, for composing leader photo URLs. */
   apiUrl: string | undefined;
+  /** Base URL for the "Trip Page" link on current trips (campaign ID appended). */
+  tripPageUrlBase: string;
 }
 
 /**
@@ -20,12 +22,12 @@ export interface TripPanelProps {
  * the reason a leader opens the trip at all), then description, donations, and
  * the letter.
  */
-export function TripPanel({ trip, apiUrl }: TripPanelProps): React.JSX.Element {
+export function TripPanel({ trip, apiUrl, tripPageUrlBase }: TripPanelProps): React.JSX.Element {
   const hasDescription = trip.longDescription !== null && trip.longDescription.trim().length > 0;
 
   return (
     <div className="grid gap-4">
-      <StatusSection trip={trip} apiUrl={apiUrl} />
+      <StatusSection trip={trip} apiUrl={apiUrl} tripPageUrlBase={tripPageUrlBase} />
 
       {trip.leaderSummary !== null && (
         <CollapsibleSection title="Trip Leader Resources">

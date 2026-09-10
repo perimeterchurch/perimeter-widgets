@@ -9,6 +9,8 @@ export interface TripsAccordionProps {
   trips: readonly MyMissionTrip[];
   /** The `apiUrl` config override, for composing leader photo URLs. */
   apiUrl: string | undefined;
+  /** Base URL for the per-trip "Trip Page" link (campaign ID appended). */
+  tripPageUrlBase: string;
 }
 
 /**
@@ -20,7 +22,11 @@ export interface TripsAccordionProps {
  * editor, and a household with several trips would otherwise instantiate one
  * editor per trip on first render.
  */
-export function TripsAccordion({ trips, apiUrl }: TripsAccordionProps): React.JSX.Element {
+export function TripsAccordion({
+  trips,
+  apiUrl,
+  tripPageUrlBase,
+}: TripsAccordionProps): React.JSX.Element {
   const [openPledgeId, setOpenPledgeId] = React.useState<number | null>(null);
   const idPrefix = React.useId();
 
@@ -54,7 +60,7 @@ export function TripsAccordion({ trips, apiUrl }: TripsAccordionProps): React.JS
             </h4>
             {open && (
               <div id={panelId} className="p-4">
-                <TripPanel trip={trip} apiUrl={apiUrl} />
+                <TripPanel trip={trip} apiUrl={apiUrl} tripPageUrlBase={tripPageUrlBase} />
               </div>
             )}
           </div>
