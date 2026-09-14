@@ -11282,6 +11282,7 @@ paths:
                                   enum:
                                     - create
                                     - update
+                                    - proc
                                 placeholderId:
                                   anyOf:
                                     - type: integer

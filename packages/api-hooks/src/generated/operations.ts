@@ -7433,7 +7433,7 @@ export interface operations {
                     seq: number;
                     table: string;
                     /** @enum {string} */
-                    op: 'create' | 'update';
+                    op: 'create' | 'update' | 'proc';
                     placeholderId: number | null;
                     rows: {
                       [key: string]: unknown;
