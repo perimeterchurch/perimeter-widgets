@@ -18,8 +18,9 @@ export const EventRegistrationConfigSchema = z.object({
   checkoutUrl: z
     .string()
     .url()
+    .default('https://www.perimeter.org/event-checkout/')
     .describe(
-      'The native Invoice Details & Payment page. The browser is sent to `<checkoutUrl>?<invoiceParam>=<Invoice_GUID>` after a successful submit.',
+      'The native Invoice Details & Payment page. The browser is sent to `<checkoutUrl>?<invoiceParam>=<Invoice_GUID>` after a successful submit. Defaults to the perimeter.org checkout page.',
     ),
   returnUrl: z
     .string()
