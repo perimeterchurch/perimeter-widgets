@@ -1,0 +1,104 @@
+---
+description: Register your whole household for an event and its related sessions in one flow.
+---
+
+# event-registration
+
+The household version of MinistryPlatform's **Event Details & Registration**
+widget. One page for a parent event shows its details and one card per
+registration section — the parent itself when it sells a registration, plus
+every `bp_Related_Events` row (childcare, a spouse section, concurrent
+sessions). A signed-in member picks household members into sections, answers
+each section's options and custom form, sees a running total, and submits once.
+perimeter-api writes exactly the rows the native widget writes and the browser
+is sent to the native **Invoice Details & Payment** page to pay.
+
+Built for events that use related-event (household) registration — Family
+Night, Vision Night + childcare, Bible study + childcare. The native Event
+Finder and native details pages stay in place; staff point a parent event here
+by setting its `External_Registration_URL` to this page.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div
+  data-perimeter-widget="event-registration"
+  data-checkout-url="https://www.perimeter.org/event-checkout/"
+  data-return-url="https://www.perimeter.org/events"
+></div>
+```
+
+The page must carry the event in its query string — `?id=<Event_ID>`, the same
+parameter the native details widget reads — so a Register link from the native
+Event Finder or details page lands here unchanged. Pair the page with MP's login
+widget so members can sign in for the household roster:
+
+```html
+<script src="https://ministryplatform.perimeter.org/widgets/dist/UserLogin.js"></script>
+<mpp-user-login></mpp-user-login>
+```
+
+## Config
+
+`src/types.ts` is the source of truth.
+
+| Attribute                 | Required | Default                     | Description                                                                                          |
+| ------------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `data-checkout-url`       | **Yes**  | —                           | The native Invoice Details & Payment page. After a submit the browser goes to `…?id=<Invoice_GUID>`. |
+| `data-return-url`         | No       | `/events`                   | Where "Back to events" goes.                                                                         |
+| `data-id-param`           | No       | `id`                        | Query-string key carrying the `Event_ID` (MP's `EventDetailWidgetIdParameterName`).                 |
+| `data-event-id`           | No       | —                           | Pin the event instead of reading the query string (studio preview, single-event pages).             |
+| `data-invoice-param`      | No       | `id`                        | Query-string key the checkout page reads (MP's `InvoiceDetailWidgetIdParameterName`).               |
+| `data-default-image-url`  | No       | —                           | Fallback image when the event has none.                                                              |
+| `data-show-map`           | No       | `true`                      | Show "Get directions" when the location has an address.                                              |
+| `data-recaptcha-site-key` | No       | Perimeter's public site key | Used only for the guest (signed-out) path.                                                           |
+| `data-api-url`            | No       | `https://api.perimeter.org` | Override the perimeter-api base URL (local dev).                                                     |
+
+## Behavior
+
+- **Sections** — `GET /api/registration/events/{id}` returns the parent (when it
+  has a product) and each related row in `Position` order. A section with an
+  `Enable_Label` starts collapsed behind that prompt; `Instructions` render
+  above the list; `Button_Text` labels the add button. Closed sections say why
+  (not open yet, closed, full, cancelled, sold out).
+- **Who can go where** — `GET …/roster` returns the household with per-section
+  eligibility. `Show_Household_Position_ID` and `For_Gender_ID` filter members;
+  **`Minor_Registration = 1` lists only children**, `0`/blank lists everyone.
+  Someone already registered in a section's event is grayed out (blocked, not
+  warned). Children show their age so parents can pick the right grade band.
+- **Add a family member** — a signed-in member may add someone not yet in MP;
+  the contact and participant are created inside the submit, in their household.
+- **Guest path** — signed out, and only when neither the event nor any form
+  forces login, a visitor registers themself through the blank form (reCAPTCHA
+  verified server-side). Household features need the login widget.
+- **Pricing** — `POST …/quote` prices the draft on every change: base price,
+  option groups (required / mutually exclusive / quantities / sold out), promo
+  codes, deposits. The total shown is the server's, and submit refuses with a
+  refreshed total if anything changed in between.
+- **Overlap warning** — the same person in two sections whose events run at the
+  same time gets a warning, never a block (childcare-then-event is legitimate).
+- **Submit** — `POST …/submit` with an `Idempotency-Key`; a retry after a network
+  failure replays rather than duplicates. Success redirects to
+  `data-checkout-url?id=<Invoice_GUID>`. Free registrations are complete at that
+  point; paid ones are *Awaiting Payment* until the native checkout takes payment
+  (MP releases unpaid seats after about an hour).
+- **Coming back** — the checkout's "Make Changes" returns with
+  `?id=<eventId>&invoiceid=<guid>`; the widget offers to continue that checkout
+  or start over.
+- **Not supported** — File Upload form fields (a required one closes the
+  section), secondary households, and form fields that also write attributes or
+  opportunity responses (answers are stored; the side effect is not).
+
+## Data source
+
+perimeter-api `RegistrationController` — `docs/domains/event-registration.md`
+and the table-by-table `docs/WRITE-CONTRACT.md` in that repo.
+
+## Testing it locally
+
+Writes are refused by perimeter-api unless its `REGISTRATION_*` guard allows the
+event — dry runs included — so local testing needs a hidden test event on the
+allowlist. `pnpm embed-lab` → `local-event-registration.html?id=<Event_ID>`
+against a local perimeter-api on :5500; set `mpp-widgets_AuthToken` in
+localStorage to see the household roster.
