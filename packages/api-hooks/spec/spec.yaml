@@ -9652,6 +9652,59 @@ paths:
                                 - type: 'null'
                             isParentEvent:
                               type: boolean
+                            audience:
+                              type: object
+                              properties:
+                                minAge:
+                                  anyOf:
+                                    - type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    - type: 'null'
+                                maxAge:
+                                  anyOf:
+                                    - type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    - type: 'null'
+                                minGrade:
+                                  anyOf:
+                                    - type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    - type: 'null'
+                                maxGrade:
+                                  anyOf:
+                                    - type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    - type: 'null'
+                                genderId:
+                                  anyOf:
+                                    - type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    - type: 'null'
+                                householdPositionId:
+                                  anyOf:
+                                    - type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    - type: 'null'
+                                minorsOnly:
+                                  type: boolean
+                                adultsOnly:
+                                  type: boolean
+                              required:
+                                - minAge
+                                - maxAge
+                                - minGrade
+                                - maxGrade
+                                - genderId
+                                - householdPositionId
+                                - minorsOnly
+                                - adultsOnly
+                              additionalProperties: false
                             event:
                               type: object
                               properties:
@@ -9967,6 +10020,7 @@ paths:
                             - showHouseholdPositionId
                             - forGenderId
                             - isParentEvent
+                            - audience
                             - event
                             - product
                             - form
@@ -10154,6 +10208,12 @@ paths:
                                   minimum: -9007199254740991
                                   maximum: 9007199254740991
                                 - type: 'null'
+                            grade:
+                              anyOf:
+                                - type: integer
+                                  minimum: -9007199254740991
+                                  maximum: 9007199254740991
+                                - type: 'null'
                             isMinorPosition:
                               type: boolean
                             isViewer:
@@ -10178,9 +10238,19 @@ paths:
                                           - household_position
                                           - gender
                                           - minors_only
+                                          - too_young
+                                          - too_old
+                                          - wrong_grade
                                           - already_registered
                                           - section_closed
                                       - type: 'null'
+                                  requires:
+                                    type: array
+                                    items:
+                                      type: string
+                                      enum:
+                                        - birth_date
+                                        - grade
                                   existingEventParticipantId:
                                     anyOf:
                                       - type: integer
@@ -10191,6 +10261,7 @@ paths:
                                   - sectionKey
                                   - eligible
                                   - reason
+                                  - requires
                                   - existingEventParticipantId
                                 additionalProperties: false
                           required:
@@ -10202,6 +10273,7 @@ paths:
                             - genderId
                             - dateOfBirth
                             - age
+                            - grade
                             - isMinorPosition
                             - isViewer
                             - hasParticipantRecord
@@ -10437,6 +10509,7 @@ paths:
                                 - LOGIN_REQUIRED
                                 - MINOR_REQUIRED
                                 - BIRTH_DATE_REQUIRED
+                                - GRADE_REQUIRED
                             message:
                               type: string
                             registrationIndex:
@@ -10598,6 +10671,10 @@ paths:
                                 description: yyyy-MM-dd
                                 type: string
                                 pattern: ^\d{4}-\d{2}-\d{2}$
+                              grade:
+                                type: integer
+                                minimum: -1
+                                maximum: 12
                             required:
                               - kind
                               - contactId
@@ -10623,6 +10700,10 @@ paths:
                                 type: integer
                                 minimum: 1
                                 maximum: 2
+                              grade:
+                                type: integer
+                                minimum: -1
+                                maximum: 12
                               householdPositionId:
                                 type: integer
                                 minimum: -9007199254740991
@@ -11019,6 +11100,7 @@ paths:
                                         - LOGIN_REQUIRED
                                         - MINOR_REQUIRED
                                         - BIRTH_DATE_REQUIRED
+                                        - GRADE_REQUIRED
                                     message:
                                       type: string
                                     registrationIndex:
@@ -11244,6 +11326,7 @@ paths:
                                         - LOGIN_REQUIRED
                                         - MINOR_REQUIRED
                                         - BIRTH_DATE_REQUIRED
+                                        - GRADE_REQUIRED
                                     message:
                                       type: string
                                     registrationIndex:
@@ -11466,6 +11549,10 @@ paths:
                                 description: yyyy-MM-dd
                                 type: string
                                 pattern: ^\d{4}-\d{2}-\d{2}$
+                              grade:
+                                type: integer
+                                minimum: -1
+                                maximum: 12
                             required:
                               - kind
                               - contactId
@@ -11491,6 +11578,10 @@ paths:
                                 type: integer
                                 minimum: 1
                                 maximum: 2
+                              grade:
+                                type: integer
+                                minimum: -1
+                                maximum: 12
                               householdPositionId:
                                 type: integer
                                 minimum: -9007199254740991

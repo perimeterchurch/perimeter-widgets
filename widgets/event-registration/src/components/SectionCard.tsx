@@ -5,7 +5,14 @@ import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
 import { RichText } from './RichText';
 import type { DraftRegistration } from '../lib/draft';
-import { formatDeadline, formatEventRange, formatMoney, formatPrice } from '../lib/format';
+import {
+  formatAgeRange,
+  formatDeadline,
+  formatEventRange,
+  formatGradeRange,
+  formatMoney,
+  formatPrice,
+} from '../lib/format';
 
 export interface SectionCardProps {
   section: RegistrationSection;
@@ -76,6 +83,8 @@ export function SectionCard({
 
   const remaining = section.event.remaining;
   const showEventLine = !section.isParentEvent;
+  const ageRange = formatAgeRange(section.audience.minAge, section.audience.maxAge);
+  const gradeRange = formatGradeRange(section.audience.minGrade, section.audience.maxGrade);
 
   return (
     <section
@@ -90,7 +99,13 @@ export function SectionCard({
           {section.product && (
             <Badge variant="outline">{formatPrice(section.product.basePrice)}</Badge>
           )}
-          {section.event.minorRegistration && <Badge variant="secondary">Children</Badge>}
+          {section.audience.adultsOnly ? (
+            <Badge variant="secondary">Adults</Badge>
+          ) : section.audience.minorsOnly ? (
+            <Badge variant="secondary">Children</Badge>
+          ) : null}
+          {!section.audience.adultsOnly && ageRange && <Badge variant="outline">{ageRange}</Badge>}
+          {gradeRange && <Badge variant="outline">{gradeRange}</Badge>}
           {section.open && remaining !== null && (
             <Badge variant={remaining <= 3 ? 'warning' : 'outline'}>
               {remaining} {remaining === 1 ? 'spot' : 'spots'} left

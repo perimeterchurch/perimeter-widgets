@@ -13,7 +13,7 @@ import { OptionGroupField } from './OptionGroupField';
 import { FIELD_TYPE, FormFieldInput, isFieldActive } from './FormFieldInput';
 import { RichText } from './RichText';
 import { attendeeIdentity, newLocalId, type DraftRegistration } from '../lib/draft';
-import { formatAge, formatPrice } from '../lib/format';
+import { GRADE_OPTIONS, formatAge, formatGrade, formatPrice } from '../lib/format';
 
 /** `Household_Positions` a new member may be created with. */
 const NEW_MEMBER_POSITIONS = [
@@ -48,6 +48,8 @@ interface NewMemberDraft {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
+  /** '' = not answered; otherwise a grade on the API scale as a string. */
+  grade: string;
   genderId: '' | '1' | '2';
   householdPositionId: 2 | 3 | 4;
 }
@@ -69,7 +71,12 @@ export function RegistrantEditor({
   onSave,
   onCancel,
 }: RegistrantEditorProps): React.JSX.Element {
-  const minorsOnly = section.event.minorRegistration;
+  const minorsOnly = section.audience.minorsOnly;
+  const adultsOnly = section.audience.adultsOnly;
+  const asksGrade = section.audience.minGrade !== null || section.audience.maxGrade !== null;
+  const positionChoices = NEW_MEMBER_POSITIONS.filter((p) =>
+    adultsOnly ? p.id !== 2 : minorsOnly ? p.id === 2 : true,
+  );
   const eligibleMembers = members.filter((m) =>
     m.eligibility.some((e) => e.sectionKey === section.key && e.eligible),
   );
@@ -100,12 +107,34 @@ export function RegistrantEditor({
     memberBirthDates.get(contactId) ??
     members.find((m) => m.contactId === contactId)?.dateOfBirth ??
     '';
+  // Grades the parent confirmed, by contact id; the roster's derived grade is
+  // the default. Asked only when the section has a grade bound.
+  const [memberGrades, setMemberGrades] = React.useState<Map<number, string>>(() =>
+    existing?.attendee.kind === 'contact' && existing.attendee.grade !== undefined
+      ? new Map([[existing.attendee.contactId, String(existing.attendee.grade)]])
+      : new Map(),
+  );
+  const gradeFor = (contactId: number): string => {
+    const confirmed = memberGrades.get(contactId);
+    if (confirmed !== undefined) return confirmed;
+    const known = members.find((m) => m.contactId === contactId)?.grade ?? null;
+    return known === null ? '' : String(known);
+  };
+  const memberRequires = (contactId: number): ('birth_date' | 'grade')[] =>
+    members
+      .find((m) => m.contactId === contactId)
+      ?.eligibility.find((e) => e.sectionKey === section.key)?.requires ?? [];
+  const asksBirthDateFor = (contactId: number): boolean =>
+    minorsOnly || memberRequires(contactId).includes('birth_date');
+  const asksGradeFor = (contactId: number): boolean =>
+    asksGrade || memberRequires(contactId).includes('grade');
   const [newMember, setNewMember] = React.useState<NewMemberDraft>(() =>
     existing?.attendee.kind === 'new'
       ? {
           firstName: existing.attendee.firstName,
           lastName: existing.attendee.lastName,
           dateOfBirth: existing.attendee.dateOfBirth ?? '',
+          grade: existing.attendee.grade === undefined ? '' : String(existing.attendee.grade),
           genderId: existing.attendee.genderId
             ? (String(existing.attendee.genderId) as '1' | '2')
             : '',
@@ -115,6 +144,7 @@ export function RegistrantEditor({
           firstName: '',
           lastName: members[0]?.lastName ?? '',
           dateOfBirth: '',
+          grade: '',
           genderId: '',
           householdPositionId: minorsOnly ? 2 : 3,
         },
@@ -170,12 +200,21 @@ export function RegistrantEditor({
       const member = eligibleMembers.find((m) => m.contactId === choice.contactId);
       if (!member) return { error: 'Choose who this registration is for.' };
       const label = `${member.firstName} ${member.lastName}`.trim();
-      if (minorsOnly) {
+      const attendee: Extract<RegistrationAttendee, { kind: 'contact' }> = {
+        kind: 'contact',
+        contactId: member.contactId,
+      };
+      if (asksBirthDateFor(member.contactId)) {
         const dateOfBirth = birthDateFor(member.contactId);
         if (!dateOfBirth) return { error: `A date of birth is required for ${member.firstName}.` };
-        return { attendee: { kind: 'contact', contactId: member.contactId, dateOfBirth }, label };
+        attendee.dateOfBirth = dateOfBirth;
       }
-      return { attendee: { kind: 'contact', contactId: member.contactId }, label };
+      if (asksGradeFor(member.contactId)) {
+        const grade = gradeFor(member.contactId);
+        if (grade === '') return { error: `What grade is ${member.firstName} in?` };
+        attendee.grade = Number(grade);
+      }
+      return { attendee, label };
     }
     const first = newMember.firstName.trim();
     const last = newMember.lastName.trim();
@@ -185,12 +224,16 @@ export function RegistrantEditor({
     if (isMinor && !newMember.dateOfBirth)
       return { error: 'A date of birth is required for a child.' };
     if (minorsOnly && !isMinor) return { error: 'This section is for children; choose "Child".' };
+    if (adultsOnly && isMinor) return { error: 'This section is for adults.' };
+    if (asksGrade && isMinor && newMember.grade === '')
+      return { error: `What grade is ${first} in?` };
     return {
       attendee: {
         kind: 'new',
         firstName: first,
         lastName: last,
         ...(newMember.dateOfBirth ? { dateOfBirth: newMember.dateOfBirth } : {}),
+        ...(newMember.grade !== '' ? { grade: Number(newMember.grade) } : {}),
         ...(newMember.genderId ? { genderId: Number(newMember.genderId) } : {}),
         householdPositionId: newMember.householdPositionId,
       },
@@ -312,7 +355,11 @@ export function RegistrantEditor({
                   <span>
                     {m.firstName} {m.lastName}
                     {m.isMinorPosition && m.age !== null && (
-                      <span className="text-muted-fg"> · {formatAge(m.age)}</span>
+                      <span className="text-muted-fg">
+                        {' '}
+                        · {formatAge(m.age)}
+                        {m.grade !== null ? `, ${formatGrade(m.grade)} grade` : ''}
+                      </span>
                     )}
                   </span>
                   {taken ? (
@@ -350,7 +397,33 @@ export function RegistrantEditor({
         </fieldset>
       )}
 
-      {minorsOnly && choice.kind === 'member' && choice.contactId > 0 && (
+      {choice.kind === 'member' && choice.contactId > 0 && asksGradeFor(choice.contactId) && (
+        <div className="grid gap-1">
+          <Label htmlFor={`${idPrefix}-member-grade`}>Grade *</Label>
+          <select
+            id={`${idPrefix}-member-grade`}
+            required
+            value={gradeFor(choice.contactId)}
+            onChange={(e) => {
+              const { contactId } = choice;
+              setMemberGrades((prev) => new Map(prev).set(contactId, e.target.value));
+            }}
+            className="h-9 w-full border border-border bg-bg px-3 font-sans text-sm text-fg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+          >
+            <option value="">Choose a grade</option>
+            {GRADE_OPTIONS.map((g) => (
+              <option key={g.value} value={g.value}>
+                {g.label}
+              </option>
+            ))}
+          </select>
+          <p className="font-sans text-xs text-muted-fg">
+            This school year. A change updates our records.
+          </p>
+        </div>
+      )}
+
+      {choice.kind === 'member' && choice.contactId > 0 && asksBirthDateFor(choice.contactId) && (
         <div className="grid gap-1">
           <Label htmlFor={`${idPrefix}-member-dob`}>Date of birth *</Label>
           <Input
@@ -421,7 +494,25 @@ export function RegistrantEditor({
                 <option value="2">Female</option>
               </select>
             </div>
-            {!minorsOnly && (
+            {asksGrade && newMember.householdPositionId === 2 && (
+              <div className="grid gap-1">
+                <Label htmlFor={`${idPrefix}-new-grade`}>Grade *</Label>
+                <select
+                  id={`${idPrefix}-new-grade`}
+                  value={newMember.grade}
+                  onChange={(e) => setNewMember({ ...newMember, grade: e.target.value })}
+                  className="h-9 w-full border border-border bg-bg px-3 font-sans text-sm text-fg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+                >
+                  <option value="">Choose a grade</option>
+                  {GRADE_OPTIONS.map((g) => (
+                    <option key={g.value} value={g.value}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {positionChoices.length > 1 && (
               <div className="grid gap-1">
                 <Label htmlFor={`${idPrefix}-new-position`}>Relationship</Label>
                 <select
@@ -435,7 +526,7 @@ export function RegistrantEditor({
                   }
                   className="h-9 w-full border border-border bg-bg px-3 font-sans text-sm text-fg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
                 >
-                  {NEW_MEMBER_POSITIONS.map((p) => (
+                  {positionChoices.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.label}
                     </option>
@@ -553,6 +644,12 @@ function eligibilityLabel(
       return 'already registered';
     case 'minors_only':
       return 'children only';
+    case 'too_young':
+      return 'too young';
+    case 'too_old':
+      return 'too old';
+    case 'wrong_grade':
+      return 'not this grade';
     case 'household_position':
     case 'gender':
       return 'not eligible';

@@ -50,3 +50,41 @@ export function formatAge(age: number | null): string {
 export function pluralize(count: number, singular: string, plural = `${singular}s`): string {
   return `${count} ${count === 1 ? singular : plural}`;
 }
+
+/** -1 Pre-K, 0 K, 1..12 — the scale the API uses for grades. */
+export const GRADE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
+  -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+].map((value) => ({ value, label: formatGrade(value) }));
+
+export function formatGrade(grade: number): string {
+  if (grade <= -1) return 'Pre-K';
+  if (grade === 0) return 'K';
+  const suffix =
+    grade % 10 === 1 && grade !== 11
+      ? 'st'
+      : grade % 10 === 2 && grade !== 12
+        ? 'nd'
+        : grade % 10 === 3 && grade !== 13
+          ? 'rd'
+          : 'th';
+  return `${grade}${suffix}`;
+}
+
+/** "Grades K–5", "Grade 6 and up", "Up to grade 8"; null when no grade bound. */
+export function formatGradeRange(min: number | null, max: number | null): string | null {
+  if (min !== null && max !== null)
+    return min === max
+      ? `Grade ${formatGrade(min)}`
+      : `Grades ${formatGrade(min)}–${formatGrade(max)}`;
+  if (min !== null) return `Grade ${formatGrade(min)} and up`;
+  if (max !== null) return `Up to grade ${formatGrade(max)}`;
+  return null;
+}
+
+/** "Ages 3–5", "Ages 18 and up", "Up to age 5"; null when no age bound. */
+export function formatAgeRange(min: number | null, max: number | null): string | null {
+  if (min !== null && max !== null) return min === max ? `Age ${min}` : `Ages ${min}–${max}`;
+  if (min !== null) return `Ages ${min} and up`;
+  if (max !== null) return `Up to age ${max}`;
+  return null;
+}

@@ -6784,6 +6784,16 @@ export interface operations {
                 showHouseholdPositionId: number | null;
                 forGenderId: number | null;
                 isParentEvent: boolean;
+                audience: {
+                  minAge: number | null;
+                  maxAge: number | null;
+                  minGrade: number | null;
+                  maxGrade: number | null;
+                  genderId: number | null;
+                  householdPositionId: number | null;
+                  minorsOnly: boolean;
+                  adultsOnly: boolean;
+                };
                 event: {
                   eventId: number;
                   title: string;
@@ -6933,6 +6943,7 @@ export interface operations {
                 genderId: number | null;
                 dateOfBirth: string | null;
                 age: number | null;
+                grade: number | null;
                 isMinorPosition: boolean;
                 isViewer: boolean;
                 hasParticipantRecord: boolean;
@@ -6945,10 +6956,14 @@ export interface operations {
                         | 'household_position'
                         | 'gender'
                         | 'minors_only'
+                        | 'too_young'
+                        | 'too_old'
+                        | 'wrong_grade'
                         | 'already_registered'
                         | 'section_closed'
                       )
                     | null;
+                  requires: ('birth_date' | 'grade')[];
                   existingEventParticipantId: number | null;
                 }[];
               }[];
@@ -7017,6 +7032,7 @@ export interface operations {
                   contactId: number;
                   /** @description yyyy-MM-dd */
                   dateOfBirth?: string;
+                  grade?: number;
                 }
               | {
                   /** @constant */
@@ -7026,6 +7042,7 @@ export interface operations {
                   /** @description yyyy-MM-dd */
                   dateOfBirth?: string;
                   genderId?: number;
+                  grade?: number;
                   householdPositionId: number;
                   /** Format: email */
                   email?: string;
@@ -7134,7 +7151,8 @@ export interface operations {
                   | 'GUEST_NOT_ALLOWED'
                   | 'LOGIN_REQUIRED'
                   | 'MINOR_REQUIRED'
-                  | 'BIRTH_DATE_REQUIRED';
+                  | 'BIRTH_DATE_REQUIRED'
+                  | 'GRADE_REQUIRED';
                 message: string;
                 registrationIndex: number | null;
                 details?: {
@@ -7205,6 +7223,7 @@ export interface operations {
                   contactId: number;
                   /** @description yyyy-MM-dd */
                   dateOfBirth?: string;
+                  grade?: number;
                 }
               | {
                   /** @constant */
@@ -7214,6 +7233,7 @@ export interface operations {
                   /** @description yyyy-MM-dd */
                   dateOfBirth?: string;
                   genderId?: number;
+                  grade?: number;
                   householdPositionId: number;
                   /** Format: email */
                   email?: string;
@@ -7355,7 +7375,8 @@ export interface operations {
                         | 'GUEST_NOT_ALLOWED'
                         | 'LOGIN_REQUIRED'
                         | 'MINOR_REQUIRED'
-                        | 'BIRTH_DATE_REQUIRED';
+                        | 'BIRTH_DATE_REQUIRED'
+                        | 'GRADE_REQUIRED';
                       message: string;
                       registrationIndex: number | null;
                       details?: {
@@ -7427,7 +7448,8 @@ export interface operations {
                         | 'GUEST_NOT_ALLOWED'
                         | 'LOGIN_REQUIRED'
                         | 'MINOR_REQUIRED'
-                        | 'BIRTH_DATE_REQUIRED';
+                        | 'BIRTH_DATE_REQUIRED'
+                        | 'GRADE_REQUIRED';
                       message: string;
                       registrationIndex: number | null;
                       details?: {

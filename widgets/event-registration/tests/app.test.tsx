@@ -156,6 +156,75 @@ describe('event-registration widget', () => {
     expect(within(card).getByLabelText(/Date of birth/)).toHaveValue('2015-03-22');
   });
 
+  it('marks an adults-only section and offers only adult relationships when adding someone', () => {
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.key === 'related:101'
+          ? { ...s, audience: { ...s.audience, minAge: 18, adultsOnly: true } }
+          : s,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    expect(within(card).getByText('Adults')).toBeInTheDocument();
+    fireEvent.click(within(card).getByRole('button', { name: /Add/ }));
+    fireEvent.click(within(card).getByLabelText(/Someone not listed/));
+    const relationship = within(card).getByLabelText('Relationship') as HTMLSelectElement;
+    expect([...relationship.options].map((o) => o.textContent)).toEqual([
+      'Other adult',
+      'Adult child',
+    ]);
+  });
+
+  it('asks for a grade in a grade-bounded section, prefilled from the roster, and keeps the answer', () => {
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.key === 'related:103'
+          ? { ...s, audience: { ...s.audience, minGrade: 6, maxGrade: 12 } }
+          : s,
+      ),
+    });
+    hooks.roster.data = envelope({
+      ...canoHousehold,
+      members: canoHousehold.members.map((m) =>
+        m.contactId === 698112
+          ? {
+              ...m,
+              grade: 6,
+              eligibility: m.eligibility.map((e) =>
+                e.sectionKey === 'related:103' ? { ...e, requires: ['grade' as const] } : e,
+              ),
+            }
+          : m,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    expect(within(card).getByText('Grades 6th–12th')).toBeInTheDocument();
+    fireEvent.click(within(card).getByRole('checkbox'));
+    fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
+    fireEvent.click(within(card).getByLabelText(/William Cano/));
+    // Two things are labelled "Grade": our select and the form's own question.
+    const gradeControls = () => within(card).getAllByLabelText(/Grade/);
+    const isOurs = (el: HTMLElement) => el.id.endsWith('-member-grade');
+    const gradeSelect = gradeControls().find(isOurs) as HTMLSelectElement;
+    const gradeQuestion = gradeControls().find((el) => !isOurs(el)) as HTMLElement;
+    expect(gradeSelect).toHaveValue('6');
+    fireEvent.change(gradeSelect, { target: { value: '7' } });
+    fireEvent.change(gradeQuestion, { target: { value: '7th' } });
+    fireEvent.click(within(card).getByLabelText('No'));
+    fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
+    expect(within(card).getByRole('button', { name: 'Edit William Cano' })).toBeInTheDocument();
+    fireEvent.click(within(card).getByRole('button', { name: 'Edit William Cano' }));
+    expect(
+      within(card)
+        .getAllByLabelText(/Grade/)
+        .find((el) => el.id.endsWith('-member-grade')),
+    ).toHaveValue('7');
+  });
+
   it('shows the sign-in notice and the guest form when signed out', () => {
     hooks.roster.data = undefined;
     render(<App config={config} auth={authStub(false)} />);
