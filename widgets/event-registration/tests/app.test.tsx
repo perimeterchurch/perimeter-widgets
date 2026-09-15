@@ -225,6 +225,69 @@ describe('event-registration widget', () => {
     ).toHaveValue('7');
   });
 
+  it('places a child in the room whose rule fits and hides the choice, or shows the radios when none fits', () => {
+    const worship = familyNight.sections.find((s) => s.key === 'related:103')!;
+    const base = worship.product!.groups[0]!;
+    const room = (id: number, title: string, minAgeMonths: number, maxAgeMonths: number) => ({
+      ...base.prices[0]!,
+      productOptionPriceId: id,
+      title,
+      price: 0,
+      hidden: false,
+      isPromo: false,
+      remaining: null,
+      placement: { minAgeMonths, maxAgeMonths, minGrade: null, maxGrade: null },
+    });
+    const withRooms = (prices: ReturnType<typeof room>[]) =>
+      envelope({
+        ...familyNight,
+        sections: familyNight.sections.map((s) =>
+          s.key === 'related:103'
+            ? {
+                ...s,
+                product: {
+                  ...s.product!,
+                  groups: [
+                    ...s.product!.groups,
+                    {
+                      ...base,
+                      productOptionGroupId: 7100,
+                      name: 'Room',
+                      required: true,
+                      mutuallyExclusive: true,
+                      prices,
+                    },
+                  ],
+                },
+              }
+            : s,
+        ),
+      });
+
+    // William (2015-03-21) is 138 months on event day → the 8-12 room, no question asked.
+    hooks.event.data = withRooms([room(8101, 'Infants', 0, 24), room(8102, 'Kids 8-12', 96, 156)]);
+    const { unmount } = render(<App config={config} auth={authStub(true)} />);
+    let card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(card).getByRole('checkbox'));
+    fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
+    fireEvent.click(within(card).getByLabelText(/William Cano/));
+    expect(within(card).getByText(/Kids 8-12/)).toBeInTheDocument();
+    expect(within(card).getByText(/from William's birth date/)).toBeInTheDocument();
+    expect(within(card).queryByLabelText(/Infants/)).not.toBeInTheDocument();
+    unmount();
+
+    // No room fits an 11-year-old → the radios come back with a hint.
+    hooks.event.data = withRooms([room(8101, 'Infants', 0, 24), room(8103, 'Toddlers', 24, 48)]);
+    render(<App config={config} auth={authStub(true)} />);
+    card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(card).getByRole('checkbox'));
+    fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
+    fireEvent.click(within(card).getByLabelText(/William Cano/));
+    expect(within(card).getByLabelText(/Infants/)).toBeInTheDocument();
+    expect(within(card).getByLabelText(/Toddlers/)).toBeInTheDocument();
+    expect(within(card).getByText(/None of these fit William's age/)).toBeInTheDocument();
+  });
+
   it('shows the sign-in notice and the guest form when signed out', () => {
     hooks.roster.data = undefined;
     render(<App config={config} auth={authStub(false)} />);

@@ -142,6 +142,7 @@ export const familyNight: RegistrationEvent = {
                 hidden: false,
                 isPromo: false,
                 sortOrder: 2,
+                placement: null,
               },
             ],
           },

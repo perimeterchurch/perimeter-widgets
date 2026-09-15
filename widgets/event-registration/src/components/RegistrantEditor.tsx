@@ -2,6 +2,7 @@ import * as React from 'react';
 import type {
   QuoteProblem,
   RegistrationAttendee,
+  RegistrationOptionGroup,
   RegistrationPlanEntry,
   RegistrationSection,
   RosterMember,
@@ -10,10 +11,11 @@ import { Button } from '@perimeter/ui/button';
 import { Input } from '@perimeter/ui/input';
 import { Label } from '@perimeter/ui/label';
 import { OptionGroupField } from './OptionGroupField';
+import { isPlacementGroup, placementHint, resolvePlacement } from '../lib/placement';
 import { FIELD_TYPE, FormFieldInput, isFieldActive } from './FormFieldInput';
 import { RichText } from './RichText';
 import { attendeeIdentity, newLocalId, type DraftRegistration } from '../lib/draft';
-import { GRADE_OPTIONS, formatAge, formatGrade, formatPrice } from '../lib/format';
+import { GRADE_OPTIONS, formatAge, formatGrade, formatPrice, parseEventDate } from '../lib/format';
 
 /** `Household_Positions` a new member may be created with. */
 const NEW_MEMBER_POSITIONS = [
@@ -35,6 +37,8 @@ export interface RegistrantEditorProps {
   guestName: string;
   /** Problems the last quote reported for this registration, if any. */
   problems: QuoteProblem[];
+  /** Congregation time zone; ages for room placement are taken on the event's start date. */
+  timeZone: string;
   onSave: (registration: DraftRegistration) => void;
   onCancel: () => void;
 }
@@ -68,9 +72,11 @@ export function RegistrantEditor({
   mode,
   guestName,
   problems,
+  timeZone,
   onSave,
   onCancel,
 }: RegistrantEditorProps): React.JSX.Element {
+  const eventStart = parseEventDate(section.event.startDate, timeZone);
   const minorsOnly = section.audience.minorsOnly;
   const adultsOnly = section.audience.adultsOnly;
   const asksGrade = section.audience.minGrade !== null || section.audience.maxGrade !== null;
@@ -127,7 +133,8 @@ export function RegistrantEditor({
   const asksBirthDateFor = (contactId: number): boolean =>
     minorsOnly || memberRequires(contactId).includes('birth_date');
   const asksGradeFor = (contactId: number): boolean =>
-    asksGrade || memberRequires(contactId).includes('grade');
+    asksGrade || memberRequires(contactId).includes('grade') || placementNeedsGrade;
+
   const [newMember, setNewMember] = React.useState<NewMemberDraft>(() =>
     existing?.attendee.kind === 'new'
       ? {
@@ -157,6 +164,61 @@ export function RegistrantEditor({
     () => new Map((existing?.answers ?? []).map((a) => [a.formFieldId, a.response])),
   );
   const [localErrors, setLocalErrors] = React.useState<Map<string, string>>(new Map());
+
+  // ── Room placement (mirror of the server rule) ────────────────────────
+  const placementGroups = (section.product?.groups ?? []).filter(isPlacementGroup);
+  const currentPerson = (): { dateOfBirth: string | null; grade: number | null; name: string } => {
+    if (choice.kind === 'member' && choice.contactId > 0) {
+      const member = members.find((m) => m.contactId === choice.contactId);
+      const g = gradeFor(choice.contactId);
+      return {
+        dateOfBirth: birthDateFor(choice.contactId) || null,
+        grade: g === '' ? null : Number(g),
+        name: member?.firstName ?? 'this child',
+      };
+    }
+    if (choice.kind === 'new') {
+      return {
+        dateOfBirth: newMember.dateOfBirth || null,
+        grade: newMember.grade === '' ? null : Number(newMember.grade),
+        name: newMember.firstName.trim() || 'this child',
+      };
+    }
+    return { dateOfBirth: null, grade: null, name: guestName || 'you' };
+  };
+  const person = currentPerson();
+  const placementOf = new Map(
+    placementGroups.map((g) => [g.productOptionGroupId, resolvePlacement(g, person, eventStart)]),
+  );
+  /** Would a grade decide a room for this child? Then ask for one. */
+  const placementNeedsGrade = placementGroups.some((g) => {
+    const o = resolvePlacement(g, { dateOfBirth: person.dateOfBirth, grade: null }, eventStart);
+    return o.kind === 'ask' && o.reason === 'needs_grade';
+  });
+  /** Groups the server will decide (or ask about) — no local "choose" error, no radios. */
+  const decidedGroupIds = new Set(
+    [...placementOf.entries()]
+      .filter(
+        ([, o]) =>
+          o.kind === 'resolved' ||
+          (o.kind === 'ask' && (o.reason === 'needs_birth_date' || o.reason === 'needs_grade')),
+      )
+      .map(([id]) => id),
+  );
+  const renderPlacement = (group: RegistrationOptionGroup): React.JSX.Element | null => {
+    const outcome = placementOf.get(group.productOptionGroupId);
+    if (!outcome || outcome.kind === 'not_placement') return null;
+    if (outcome.kind === 'resolved') {
+      return (
+        <p className="font-sans text-sm text-fg" data-placement="resolved">
+          <span className="font-medium">{group.name}</span> {outcome.price.title}
+          <span className="text-muted-fg"> — from {person.name}&apos;s birth date</span>
+        </p>
+      );
+    }
+    const hint = placementHint(outcome.reason, person.name);
+    return hint ? <p className="font-sans text-xs text-muted-fg">{hint}</p> : null;
+  };
 
   const idPrefix = `reg-${section.key.replace(/[^a-z0-9]+/gi, '-')}-${existing?.localId ?? 'new'}`;
   const form = section.form;
@@ -256,6 +318,7 @@ export function RegistrantEditor({
 
     for (const group of product?.groups ?? []) {
       if (!group.required) continue;
+      if (decidedGroupIds.has(group.productOptionGroupId)) continue;
       const pickable = group.prices.filter((p) => !p.hidden && !p.isPromo);
       if (pickable.length === 0) continue;
       if (
@@ -298,7 +361,12 @@ export function RegistrantEditor({
       sectionKey: section.key,
       attendee: resolved.attendee,
       attendeeLabel: resolved.label,
-      options,
+      options: options.filter((o) => {
+        const group = placementGroups.find((g) =>
+          g.prices.some((p) => p.productOptionPriceId === o.productOptionPriceId),
+        );
+        return !group || !decidedGroupIds.has(group.productOptionGroupId);
+      }),
       promoCode: promoCode.trim() || undefined,
       answers: activeAnswers,
     });
@@ -555,12 +623,15 @@ export function RegistrantEditor({
       {/* ── Options not tied to a form field ───────────────────────── */}
       {standaloneGroups.map((group) => (
         <div key={group.productOptionGroupId} className="grid gap-1">
-          <OptionGroupField
-            group={group}
-            idPrefix={`${idPrefix}-g${group.productOptionGroupId}`}
-            selections={options}
-            onChange={setOptions}
-          />
+          {renderPlacement(group)}
+          {!decidedGroupIds.has(group.productOptionGroupId) && (
+            <OptionGroupField
+              group={group}
+              idPrefix={`${idPrefix}-g${group.productOptionGroupId}`}
+              selections={options}
+              onChange={setOptions}
+            />
+          )}
           {localErrors.get(`group:${group.productOptionGroupId}`) && (
             <p role="alert" className="font-sans text-xs text-destructive">
               {localErrors.get(`group:${group.productOptionGroupId}`)}

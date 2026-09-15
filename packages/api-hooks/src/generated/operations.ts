@@ -6838,6 +6838,12 @@ export interface operations {
                       hidden: boolean;
                       isPromo: boolean;
                       sortOrder: number | null;
+                      placement: {
+                        minAgeMonths: number | null;
+                        maxAgeMonths: number | null;
+                        minGrade: number | null;
+                        maxGrade: number | null;
+                      } | null;
                     }[];
                   }[];
                 } | null;
@@ -7124,6 +7130,12 @@ export interface operations {
                 attendingOnline: boolean;
                 addsToGroupIds: number[];
                 overlapsWithRegistrationIndexes: number[];
+                resolvedOptions: {
+                  productOptionGroupId: number;
+                  groupName: string;
+                  productOptionPriceId: number;
+                  title: string;
+                }[];
               }[];
               invoiceTotal: number;
               depositRequested: boolean;
@@ -7152,7 +7164,8 @@ export interface operations {
                   | 'LOGIN_REQUIRED'
                   | 'MINOR_REQUIRED'
                   | 'BIRTH_DATE_REQUIRED'
-                  | 'GRADE_REQUIRED';
+                  | 'GRADE_REQUIRED'
+                  | 'CHOOSE_OPTION';
                 message: string;
                 registrationIndex: number | null;
                 details?: {
@@ -7348,6 +7361,12 @@ export interface operations {
                       attendingOnline: boolean;
                       addsToGroupIds: number[];
                       overlapsWithRegistrationIndexes: number[];
+                      resolvedOptions: {
+                        productOptionGroupId: number;
+                        groupName: string;
+                        productOptionPriceId: number;
+                        title: string;
+                      }[];
                     }[];
                     invoiceTotal: number;
                     depositRequested: boolean;
@@ -7376,7 +7395,8 @@ export interface operations {
                         | 'LOGIN_REQUIRED'
                         | 'MINOR_REQUIRED'
                         | 'BIRTH_DATE_REQUIRED'
-                        | 'GRADE_REQUIRED';
+                        | 'GRADE_REQUIRED'
+                        | 'CHOOSE_OPTION';
                       message: string;
                       registrationIndex: number | null;
                       details?: {
@@ -7421,6 +7441,12 @@ export interface operations {
                       attendingOnline: boolean;
                       addsToGroupIds: number[];
                       overlapsWithRegistrationIndexes: number[];
+                      resolvedOptions: {
+                        productOptionGroupId: number;
+                        groupName: string;
+                        productOptionPriceId: number;
+                        title: string;
+                      }[];
                     }[];
                     invoiceTotal: number;
                     depositRequested: boolean;
@@ -7449,7 +7475,8 @@ export interface operations {
                         | 'LOGIN_REQUIRED'
                         | 'MINOR_REQUIRED'
                         | 'BIRTH_DATE_REQUIRED'
-                        | 'GRADE_REQUIRED';
+                        | 'GRADE_REQUIRED'
+                        | 'CHOOSE_OPTION';
                       message: string;
                       registrationIndex: number | null;
                       details?: {

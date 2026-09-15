@@ -9867,6 +9867,41 @@ paths:
                                                       minimum: -9007199254740991
                                                       maximum: 9007199254740991
                                                     - type: 'null'
+                                                placement:
+                                                  anyOf:
+                                                    - type: object
+                                                      properties:
+                                                        minAgeMonths:
+                                                          anyOf:
+                                                            - type: integer
+                                                              minimum: -9007199254740991
+                                                              maximum: 9007199254740991
+                                                            - type: 'null'
+                                                        maxAgeMonths:
+                                                          anyOf:
+                                                            - type: integer
+                                                              minimum: -9007199254740991
+                                                              maximum: 9007199254740991
+                                                            - type: 'null'
+                                                        minGrade:
+                                                          anyOf:
+                                                            - type: integer
+                                                              minimum: -9007199254740991
+                                                              maximum: 9007199254740991
+                                                            - type: 'null'
+                                                        maxGrade:
+                                                          anyOf:
+                                                            - type: integer
+                                                              minimum: -9007199254740991
+                                                              maximum: 9007199254740991
+                                                            - type: 'null'
+                                                      required:
+                                                        - minAgeMonths
+                                                        - maxAgeMonths
+                                                        - minGrade
+                                                        - maxGrade
+                                                      additionalProperties: false
+                                                    - type: 'null'
                                               required:
                                                 - productOptionPriceId
                                                 - title
@@ -9880,6 +9915,7 @@ paths:
                                                 - hidden
                                                 - isPromo
                                                 - sortOrder
+                                                - placement
                                               additionalProperties: false
                                         required:
                                           - productOptionGroupId
@@ -10453,6 +10489,29 @@ paths:
                                 type: integer
                                 minimum: -9007199254740991
                                 maximum: 9007199254740991
+                            resolvedOptions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  productOptionGroupId:
+                                    type: integer
+                                    minimum: -9007199254740991
+                                    maximum: 9007199254740991
+                                  groupName:
+                                    type: string
+                                  productOptionPriceId:
+                                    type: integer
+                                    minimum: -9007199254740991
+                                    maximum: 9007199254740991
+                                  title:
+                                    type: string
+                                required:
+                                  - productOptionGroupId
+                                  - groupName
+                                  - productOptionPriceId
+                                  - title
+                                additionalProperties: false
                           required:
                             - registrationIndex
                             - sectionKey
@@ -10467,6 +10526,7 @@ paths:
                             - attendingOnline
                             - addsToGroupIds
                             - overlapsWithRegistrationIndexes
+                            - resolvedOptions
                           additionalProperties: false
                       invoiceTotal:
                         type: number
@@ -10510,6 +10570,7 @@ paths:
                                 - MINOR_REQUIRED
                                 - BIRTH_DATE_REQUIRED
                                 - GRADE_REQUIRED
+                                - CHOOSE_OPTION
                             message:
                               type: string
                             registrationIndex:
@@ -11044,6 +11105,29 @@ paths:
                                         type: integer
                                         minimum: -9007199254740991
                                         maximum: 9007199254740991
+                                    resolvedOptions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          productOptionGroupId:
+                                            type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          groupName:
+                                            type: string
+                                          productOptionPriceId:
+                                            type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          title:
+                                            type: string
+                                        required:
+                                          - productOptionGroupId
+                                          - groupName
+                                          - productOptionPriceId
+                                          - title
+                                        additionalProperties: false
                                   required:
                                     - registrationIndex
                                     - sectionKey
@@ -11058,6 +11142,7 @@ paths:
                                     - attendingOnline
                                     - addsToGroupIds
                                     - overlapsWithRegistrationIndexes
+                                    - resolvedOptions
                                   additionalProperties: false
                               invoiceTotal:
                                 type: number
@@ -11101,6 +11186,7 @@ paths:
                                         - MINOR_REQUIRED
                                         - BIRTH_DATE_REQUIRED
                                         - GRADE_REQUIRED
+                                        - CHOOSE_OPTION
                                     message:
                                       type: string
                                     registrationIndex:
@@ -11270,6 +11356,29 @@ paths:
                                         type: integer
                                         minimum: -9007199254740991
                                         maximum: 9007199254740991
+                                    resolvedOptions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          productOptionGroupId:
+                                            type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          groupName:
+                                            type: string
+                                          productOptionPriceId:
+                                            type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          title:
+                                            type: string
+                                        required:
+                                          - productOptionGroupId
+                                          - groupName
+                                          - productOptionPriceId
+                                          - title
+                                        additionalProperties: false
                                   required:
                                     - registrationIndex
                                     - sectionKey
@@ -11284,6 +11393,7 @@ paths:
                                     - attendingOnline
                                     - addsToGroupIds
                                     - overlapsWithRegistrationIndexes
+                                    - resolvedOptions
                                   additionalProperties: false
                               invoiceTotal:
                                 type: number
@@ -11327,6 +11437,7 @@ paths:
                                         - MINOR_REQUIRED
                                         - BIRTH_DATE_REQUIRED
                                         - GRADE_REQUIRED
+                                        - CHOOSE_OPTION
                                     message:
                                       type: string
                                     registrationIndex:

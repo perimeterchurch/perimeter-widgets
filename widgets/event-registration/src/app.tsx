@@ -395,6 +395,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                             }
                             mode={signedIn ? 'household' : 'guest'}
                             guestName={guestName}
+                            timeZone={event.timeZone}
                             problems={
                               existing ? (problemsByLocalId.get(existing.localId) ?? []) : []
                             }

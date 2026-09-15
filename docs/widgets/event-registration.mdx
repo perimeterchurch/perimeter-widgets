@@ -71,6 +71,10 @@ widget so members can sign in for the household roster:
   someone; grade-bounded sections show a **Grade** select, prefilled from the child's graduation
   year, and never ask a child whose age rules the grade out. Ineligible members read "too young",
   "too old" or "not this grade".
+  **Room placement** (2026-09-15): when an option group's rooms carry `Placement_*` bounds on
+  the Group record, the widget places the child from their birth date (and grade when a room
+  asks for it), shows the room as a line instead of radios, and the server re-derives it on every
+  quote and submit. The radios return only when no room fits, two fit, or the fit is full.
   In a minors-only section the editor also shows a required **Date of birth** for the chosen child, prefilled from their record. The confirmed date is sent with the registration; the API requires one and writes a correction back to the child's contact, so a birth-date question on the custom form is redundant and can be removed.
   Someone already registered in a section's event is grayed out (blocked, not
   warned). Children show their age so parents can pick the right grade band.
