@@ -6953,6 +6953,11 @@ export interface operations {
                 isMinorPosition: boolean;
                 isViewer: boolean;
                 hasParticipantRecord: boolean;
+                prefill: {
+                  formFieldId: number;
+                  response: string;
+                  since: string | null;
+                }[];
                 eligibility: {
                   /** @description 'parent' or 'related:<Related_Event_ID>'. */
                   sectionKey: string;

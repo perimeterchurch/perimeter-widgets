@@ -10256,6 +10256,26 @@ paths:
                               type: boolean
                             hasParticipantRecord:
                               type: boolean
+                            prefill:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  formFieldId:
+                                    type: integer
+                                    minimum: -9007199254740991
+                                    maximum: 9007199254740991
+                                  response:
+                                    type: string
+                                  since:
+                                    anyOf:
+                                      - type: string
+                                      - type: 'null'
+                                required:
+                                  - formFieldId
+                                  - response
+                                  - since
+                                additionalProperties: false
                             eligibility:
                               type: array
                               items:
@@ -10313,6 +10333,7 @@ paths:
                             - isMinorPosition
                             - isViewer
                             - hasParticipantRecord
+                            - prefill
                             - eligibility
                           additionalProperties: false
                       creatablePositionIds:

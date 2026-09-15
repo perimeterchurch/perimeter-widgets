@@ -78,6 +78,11 @@ widget so members can sign in for the household roster:
   In a minors-only section the editor also shows a required **Date of birth** for the chosen child, prefilled from their record. The confirmed date is sent with the registration; the API requires one and writes a correction back to the child's contact, so a birth-date question on the custom form is redundant and can be removed.
   Someone already registered in a section's event is grayed out (blocked, not
   warned). Children show their age so parents can pick the right grade band.
+- **Prefill from the record** (2026-09-15) — form fields mapped to an attribute on the Form
+  Field (`Add_Attribute_ID` / `Add_Attribute_Type_ID`, the same mapping Kevin's routine writes
+  from) open with the child's current attribute as the answer: Toilet Training, Walking Status
+  and Allergies for TOP Childcare. A note under the form says where it came from; the parent can
+  change anything and only what they confirm is submitted.
 - **Several people at once** (2026-09-15) — the picker is a set of checkboxes. Every ticked
   household member gets their own block (birth date, grade, resolved room, options, form
   questions) and one button adds them all; a sole eligible member is pre-ticked. A "Same answers

@@ -333,6 +333,40 @@ describe('event-registration widget', () => {
     expect(within(card).getAllByText('already added')).toHaveLength(3);
   });
 
+  it("opens a child's block with the answers MP already holds, and lets the parent change them", () => {
+    hooks.roster.data = envelope({
+      ...canoHousehold,
+      members: canoHousehold.members.map((m) =>
+        m.contactId === 698112
+          ? {
+              ...m,
+              prefill: [
+                { formFieldId: 6001, response: '7th', since: '2026-09-01T10:00:00' },
+                { formFieldId: 6002, response: 'No', since: '2026-09-01T10:00:00' },
+              ],
+            }
+          : m,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(card).getByRole('checkbox'));
+    fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
+    tick(card, /William Cano/);
+    expect(within(card).getByLabelText(/Grade/)).toHaveValue('7th');
+    expect(within(card).getByLabelText('No')).toBeChecked();
+    expect(within(card).getByText(/Filled in from William's record/)).toBeInTheDocument();
+    // Prefilled answers satisfy the required fields, so the save goes straight through.
+    fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
+    expect(within(card).getByRole('button', { name: 'Edit William Cano' })).toBeInTheDocument();
+    // The parent can still change a prefilled answer.
+    fireEvent.click(within(card).getByRole('button', { name: 'Edit William Cano' }));
+    fireEvent.change(within(card).getByLabelText(/Grade/), { target: { value: '8th' } });
+    fireEvent.click(within(card).getByRole('button', { name: 'Save changes' }));
+    fireEvent.click(within(card).getByRole('button', { name: 'Edit William Cano' }));
+    expect(within(card).getByLabelText(/Grade/)).toHaveValue('8th');
+  });
+
   it('shows the sign-in notice and the guest form when signed out', () => {
     hooks.roster.data = undefined;
     render(<App config={config} auth={authStub(false)} />);

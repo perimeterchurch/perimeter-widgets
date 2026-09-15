@@ -180,7 +180,24 @@ export function RegistrantEditor({
   });
   const [localErrors, setLocalErrors] = React.useState<Map<string, string>>(new Map());
 
-  const stateOf = (key: PersonKey): PersonState => persons.get(key) ?? emptyPerson();
+  /**
+   * A member's block opens with the answers MP already holds for them
+   * (current Contact_Attributes rendered for this form's mapped fields) —
+   * confirm-or-correct. Only fields this section's form actually shows.
+   */
+  const prefilledAnswers = (key: PersonKey): Map<number, string> => {
+    const member = key.startsWith('c')
+      ? members.find((m) => m.contactId === Number(key.slice(1)))
+      : undefined;
+    const fieldIds = new Set((section.form?.fields ?? []).map((f) => f.formFieldId));
+    return new Map(
+      (member?.prefill ?? [])
+        .filter((a) => fieldIds.has(a.formFieldId))
+        .map((a) => [a.formFieldId, a.response]),
+    );
+  };
+  const stateOf = (key: PersonKey): PersonState =>
+    persons.get(key) ?? { ...emptyPerson(), answers: prefilledAnswers(key) };
   const updatePerson = (key: PersonKey, patch: Partial<PersonState>): void =>
     setPersons((prev) => new Map(prev).set(key, { ...stateOf(key), ...patch }));
 
@@ -655,6 +672,11 @@ export function RegistrantEditor({
         {form && (
           <div className="grid gap-4">
             {index === 0 && <RichText html={form.instructionsHtml} className="text-sm" />}
+            {prefilledAnswers(key).size > 0 && (
+              <p className="font-sans text-xs text-muted-fg" data-prefilled="true">
+                Filled in from {view.firstName}&apos;s record — check it&apos;s still right.
+              </p>
+            )}
             {previous && stateOf(previous.key).answers.size > 0 && (
               <div>
                 <Button

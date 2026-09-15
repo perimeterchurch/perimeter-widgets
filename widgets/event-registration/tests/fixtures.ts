@@ -240,6 +240,7 @@ export const canoHousehold: RegistrationRoster = {
       isMinorPosition: false,
       isViewer: true,
       hasParticipantRecord: true,
+      prefill: [],
       eligibility: [
         {
           sectionKey: 'related:101',
@@ -277,6 +278,7 @@ export const canoHousehold: RegistrationRoster = {
       isMinorPosition: true,
       isViewer: false,
       hasParticipantRecord: true,
+      prefill: [],
       eligibility: [
         {
           sectionKey: 'related:101',
@@ -314,6 +316,7 @@ export const canoHousehold: RegistrationRoster = {
       isMinorPosition: true,
       isViewer: false,
       hasParticipantRecord: false,
+      prefill: [],
       eligibility: [
         {
           sectionKey: 'related:101',
