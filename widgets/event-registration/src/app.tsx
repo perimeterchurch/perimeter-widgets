@@ -220,14 +220,19 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
     );
   }
   if (eventQuery.isError || !event) {
-    const notFound = eventQuery.error instanceof ApiError && eventQuery.error.status === 404;
+    const apiError = eventQuery.error instanceof ApiError ? eventQuery.error : null;
+    // A presented-but-rejected token (expired since the host page stored it) is
+    // a sign-in problem, not an outage; the query re-keys on signedIn, so a
+    // fresh login from the host page refetches on its own.
+    const message =
+      apiError?.status === 404
+        ? 'That event could not be found.'
+        : apiError?.isAuthError
+          ? 'Your sign-in has expired. Please sign in again using the login link at the top of the page.'
+          : 'Unable to load this event right now. Please try again later.';
     return (
       <div className="@container p-4 text-left">
-        <MessageState>
-          {notFound
-            ? 'That event could not be found.'
-            : 'Unable to load this event right now. Please try again later.'}
-        </MessageState>
+        <MessageState>{message}</MessageState>
       </div>
     );
   }

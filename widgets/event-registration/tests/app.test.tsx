@@ -215,4 +215,14 @@ describe('event-registration widget', () => {
     render(<App config={config} auth={authStub(true)} />);
     expect(screen.getByText(/Unable to load this event/)).toBeInTheDocument();
   });
+
+  it('tells a viewer whose stored token was rejected to sign in again, not that the event is down', async () => {
+    const { ApiError } = await vi.importActual<typeof ApiHooks>('@perimeter/api-hooks');
+    hooks.event.data = undefined;
+    hooks.event.isError = true;
+    hooks.event.error = new ApiError(401, 'Authentication required');
+    render(<App config={config} auth={authStub(true)} />);
+    expect(screen.getByText(/Your sign-in has expired/)).toBeInTheDocument();
+    expect(screen.queryByText(/Unable to load this event/)).not.toBeInTheDocument();
+  });
 });

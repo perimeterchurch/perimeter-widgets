@@ -49,6 +49,69 @@
       <code>REGISTRATION_*</code> guard configured for any submit — dry run included.
     </p>
 
+    <!-- Local sign-in helper. MP sign-in is CORS-blocked on localhost, so a developer
+         pastes the mpp-widgets_AuthToken from a signed-in perimeter.org tab here; the
+         runtime's storage poll picks the change up within a second. Dev page only. -->
+    <form class="banner" id="lab-token" style="margin-top: 1rem" autocomplete="off">
+      <label for="lab-token-value"
+        ><strong>Signed-in test:</strong> paste your MP widget token (lasts about an hour)</label
+      >
+      <input id="lab-token-value" type="password" style="width: 24rem; margin: 0 0.5rem" />
+      <button type="submit">Sign in</button>
+      <button type="button" id="lab-token-clear">Sign out</button>
+      <span id="lab-token-state"></span>
+    </form>
+    <script>
+      (() => {
+        const form = document.getElementById('lab-token');
+        const input = document.getElementById('lab-token-value');
+        const state = document.getElementById('lab-token-state');
+        const TOKEN = 'mpp-widgets_AuthToken';
+        const EXPIRES = 'mpp-widgets_ExpiresAfter';
+        const render = () => {
+          const raw = localStorage.getItem(TOKEN);
+          const exp = localStorage.getItem(EXPIRES);
+          state.textContent =
+            raw && raw !== 'null' && exp && Date.parse(exp) > Date.now()
+              ? `signed in until ${new Date(exp).toLocaleTimeString()}`
+              : 'signed out';
+        };
+        // MP widget tokens are short-lived JWTs (about an hour). Store the token's
+        // own exp as mpp-widgets_ExpiresAfter, the way the WordPress plugin does,
+        // so the runtime drops it on time instead of sending a dead token.
+        const tokenExpiry = (token) => {
+          try {
+            const payload = JSON.parse(
+              atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
+            );
+            return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
+          } catch {
+            return null;
+          }
+        };
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const token = input.value.trim();
+          if (!token) return;
+          const exp = tokenExpiry(token);
+          if (exp !== null && exp <= Date.now()) {
+            state.textContent = `that token expired at ${new Date(exp).toLocaleTimeString()} — copy a fresh one`;
+            return;
+          }
+          localStorage.setItem(TOKEN, token);
+          localStorage.setItem(EXPIRES, new Date(exp ?? Date.now() + 3600e3).toISOString());
+          input.value = '';
+          render();
+        });
+        document.getElementById('lab-token-clear').addEventListener('click', () => {
+          localStorage.removeItem(TOKEN);
+          localStorage.removeItem(EXPIRES);
+          render();
+        });
+        render();
+      })();
+    </script>
+
     <div class="column">
       <div
         data-perimeter-widget="event-registration"
