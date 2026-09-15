@@ -399,8 +399,8 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                             problems={
                               existing ? (problemsByLocalId.get(existing.localId) ?? []) : []
                             }
-                            onSave={(registration: DraftRegistration) =>
-                              dispatch({ type: 'save', registration })
+                            onSave={(registrations: DraftRegistration[]) =>
+                              dispatch({ type: 'save-many', registrations })
                             }
                             onCancel={() => dispatch({ type: 'cancel-edit' })}
                           />

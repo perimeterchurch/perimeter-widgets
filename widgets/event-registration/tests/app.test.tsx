@@ -86,6 +86,12 @@ beforeEach(() => {
   hooks.submit.mutate.mockReset();
 });
 
+/** Tick a picker checkbox; a sole eligible member is pre-ticked, so a click there would untick. */
+function tick(card: HTMLElement, name: RegExp): void {
+  const box = within(card).getByRole('checkbox', { name });
+  if (!(box as HTMLInputElement).checked) fireEvent.click(box);
+}
+
 describe('event-registration widget', () => {
   it('shows the event details and one card per section', () => {
     render(<App config={config} auth={authStub(true)} />);
@@ -134,7 +140,7 @@ describe('event-registration widget', () => {
     expect(within(card).getByText(/age 11/)).toBeInTheDocument();
 
     // Required form fields block the save until answered.
-    fireEvent.click(within(card).getByLabelText(/William Cano/));
+    tick(card, /William Cano/);
     // Minors-only: the widget owns the birth date, prefilled from the roster.
     const dob = within(card).getByLabelText(/Date of birth/);
     expect(dob).toHaveValue('2015-03-21');
@@ -205,7 +211,7 @@ describe('event-registration widget', () => {
     expect(within(card).getByText('Grades 6th–12th')).toBeInTheDocument();
     fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
-    fireEvent.click(within(card).getByLabelText(/William Cano/));
+    tick(card, /William Cano/);
     // Two things are labelled "Grade": our select and the form's own question.
     const gradeControls = () => within(card).getAllByLabelText(/Grade/);
     const isOurs = (el: HTMLElement) => el.id.endsWith('-member-grade');
@@ -270,7 +276,7 @@ describe('event-registration widget', () => {
     let card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
     fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
-    fireEvent.click(within(card).getByLabelText(/William Cano/));
+    tick(card, /William Cano/);
     expect(within(card).getByText(/Kids 8-12/)).toBeInTheDocument();
     expect(within(card).getByText(/from William's birth date/)).toBeInTheDocument();
     expect(within(card).queryByLabelText(/Infants/)).not.toBeInTheDocument();
@@ -282,10 +288,49 @@ describe('event-registration widget', () => {
     card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
     fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
-    fireEvent.click(within(card).getByLabelText(/William Cano/));
+    tick(card, /William Cano/);
     expect(within(card).getByLabelText(/Infants/)).toBeInTheDocument();
     expect(within(card).getByLabelText(/Toddlers/)).toBeInTheDocument();
     expect(within(card).getByText(/None of these fit William's age/)).toBeInTheDocument();
+  });
+
+  it('adds several household members in one pass', () => {
+    // Make William and Max eligible for the adult-focus section so three can be ticked.
+    hooks.roster.data = envelope({
+      ...canoHousehold,
+      members: canoHousehold.members.map((m) => ({
+        ...m,
+        eligibility: m.eligibility.map((e) =>
+          e.sectionKey === 'related:101' ? { ...e, eligible: true, reason: null } : e,
+        ),
+      })),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    fireEvent.click(within(card).getByRole('button', { name: /Add/ }));
+    // Three are eligible, so nobody is pre-ticked; tick all three.
+    tick(card, /Jen Cano/);
+    tick(card, /William Cano/);
+    tick(card, /Max Cano/);
+    expect(within(card).getByRole('button', { name: 'Add 3 to registration' })).toBeInTheDocument();
+    // Each ticked person gets their own block.
+    expect(
+      within(card)
+        .getAllByRole('heading', { level: 5 })
+        .map((h) => h.textContent),
+    ).toEqual([
+      'Jen Cano',
+      expect.stringContaining('William Cano'),
+      expect.stringContaining('Max Cano'),
+    ]);
+    fireEvent.click(within(card).getByRole('button', { name: 'Add 3 to registration' }));
+    expect(within(card).getByRole('button', { name: 'Remove Jen Cano' })).toBeInTheDocument();
+    expect(within(card).getByRole('button', { name: 'Remove William Cano' })).toBeInTheDocument();
+    expect(within(card).getByRole('button', { name: 'Remove Max Cano' })).toBeInTheDocument();
+    // Untick nobody and try to add again: they are now "already added" and the picker says so.
+    fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
+    expect(within(card).getByRole('checkbox', { name: /Jen Cano/ })).toBeDisabled();
+    expect(within(card).getAllByText('already added')).toHaveLength(3);
   });
 
   it('shows the sign-in notice and the guest form when signed out', () => {

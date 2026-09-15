@@ -83,6 +83,7 @@ export type DraftAction =
   | { type: 'edit'; localId: string }
   | { type: 'cancel-edit' }
   | { type: 'save'; registration: DraftRegistration }
+  | { type: 'save-many'; registrations: DraftRegistration[] }
   | { type: 'remove'; localId: string }
   | { type: 'set-guest'; guest: Partial<GuestDetails> }
   | { type: 'set-contact'; contact: Partial<ContactDraft> }
@@ -109,6 +110,16 @@ export function draftReducer(state: Draft, action: DraftAction): Draft {
             )
           : [...state.registrations, action.registration],
       };
+    }
+    case 'save-many': {
+      // One editor pass can add several people; each is its own registration.
+      let registrations = state.registrations;
+      for (const registration of action.registrations) {
+        registrations = registrations.some((r) => r.localId === registration.localId)
+          ? registrations.map((r) => (r.localId === registration.localId ? registration : r))
+          : [...registrations, registration];
+      }
+      return { ...state, editing: { kind: 'none' }, registrations };
     }
     case 'remove':
       return {
