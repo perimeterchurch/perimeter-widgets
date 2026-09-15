@@ -87,6 +87,19 @@ export function RegistrantEditor({
         : { kind: 'member', contactId: -1 };
 
   const [choice, setChoice] = React.useState<AttendeeChoice>(initialChoice);
+  // Birth dates the parent confirmed for existing household members, by
+  // contact id; the roster's value is the default. The widget owns this for
+  // minors-only sections — the server requires it there and writes a
+  // correction back to the contact.
+  const [memberBirthDates, setMemberBirthDates] = React.useState<Map<number, string>>(() =>
+    existing?.attendee.kind === 'contact' && existing.attendee.dateOfBirth
+      ? new Map([[existing.attendee.contactId, existing.attendee.dateOfBirth]])
+      : new Map(),
+  );
+  const birthDateFor = (contactId: number): string =>
+    memberBirthDates.get(contactId) ??
+    members.find((m) => m.contactId === contactId)?.dateOfBirth ??
+    '';
   const [newMember, setNewMember] = React.useState<NewMemberDraft>(() =>
     existing?.attendee.kind === 'new'
       ? {
@@ -156,10 +169,13 @@ export function RegistrantEditor({
     if (choice.kind === 'member') {
       const member = eligibleMembers.find((m) => m.contactId === choice.contactId);
       if (!member) return { error: 'Choose who this registration is for.' };
-      return {
-        attendee: { kind: 'contact', contactId: member.contactId },
-        label: `${member.firstName} ${member.lastName}`.trim(),
-      };
+      const label = `${member.firstName} ${member.lastName}`.trim();
+      if (minorsOnly) {
+        const dateOfBirth = birthDateFor(member.contactId);
+        if (!dateOfBirth) return { error: `A date of birth is required for ${member.firstName}.` };
+        return { attendee: { kind: 'contact', contactId: member.contactId, dateOfBirth }, label };
+      }
+      return { attendee: { kind: 'contact', contactId: member.contactId }, label };
     }
     const first = newMember.firstName.trim();
     const last = newMember.lastName.trim();
@@ -332,6 +348,25 @@ export function RegistrantEditor({
             </p>
           )}
         </fieldset>
+      )}
+
+      {minorsOnly && choice.kind === 'member' && choice.contactId > 0 && (
+        <div className="grid gap-1">
+          <Label htmlFor={`${idPrefix}-member-dob`}>Date of birth *</Label>
+          <Input
+            id={`${idPrefix}-member-dob`}
+            type="date"
+            required
+            value={birthDateFor(choice.contactId)}
+            onChange={(e) => {
+              const { contactId } = choice;
+              setMemberBirthDates((prev) => new Map(prev).set(contactId, e.target.value));
+            }}
+          />
+          <p className="font-sans text-xs text-muted-fg">
+            Confirm or correct it — a change updates our records.
+          </p>
+        </div>
       )}
 
       {choice.kind === 'new' && (

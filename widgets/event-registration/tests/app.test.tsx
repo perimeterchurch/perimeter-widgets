@@ -135,6 +135,10 @@ describe('event-registration widget', () => {
 
     // Required form fields block the save until answered.
     fireEvent.click(within(card).getByLabelText(/William Cano/));
+    // Minors-only: the widget owns the birth date, prefilled from the roster.
+    const dob = within(card).getByLabelText(/Date of birth/);
+    expect(dob).toHaveValue('2015-03-21');
+    fireEvent.change(dob, { target: { value: '2015-03-22' } });
     fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
     expect(within(card).getAllByText('This question is required.')).toHaveLength(2);
 
@@ -147,6 +151,9 @@ describe('event-registration widget', () => {
     expect(within(card).getByText('William Cano')).toBeInTheDocument();
     expect(within(card).getByRole('button', { name: 'Edit William Cano' })).toBeInTheDocument();
     expect(within(card).getByRole('button', { name: 'Remove William Cano' })).toBeInTheDocument();
+    // The corrected date is kept on the saved attendee: reopening shows it.
+    fireEvent.click(within(card).getByRole('button', { name: 'Edit William Cano' }));
+    expect(within(card).getByLabelText(/Date of birth/)).toHaveValue('2015-03-22');
   });
 
   it('shows the sign-in notice and the guest form when signed out', () => {

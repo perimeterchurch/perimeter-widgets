@@ -6931,6 +6931,7 @@ export interface operations {
                 displayName: string;
                 householdPositionId: number | null;
                 genderId: number | null;
+                dateOfBirth: string | null;
                 age: number | null;
                 isMinorPosition: boolean;
                 isViewer: boolean;
@@ -7014,6 +7015,8 @@ export interface operations {
                   /** @constant */
                   kind: 'contact';
                   contactId: number;
+                  /** @description yyyy-MM-dd */
+                  dateOfBirth?: string;
                 }
               | {
                   /** @constant */
@@ -7130,7 +7133,8 @@ export interface operations {
                   | 'ADDRESS_REQUIRED'
                   | 'GUEST_NOT_ALLOWED'
                   | 'LOGIN_REQUIRED'
-                  | 'MINOR_REQUIRED';
+                  | 'MINOR_REQUIRED'
+                  | 'BIRTH_DATE_REQUIRED';
                 message: string;
                 registrationIndex: number | null;
                 details?: {
@@ -7199,6 +7203,8 @@ export interface operations {
                   /** @constant */
                   kind: 'contact';
                   contactId: number;
+                  /** @description yyyy-MM-dd */
+                  dateOfBirth?: string;
                 }
               | {
                   /** @constant */
@@ -7348,7 +7354,8 @@ export interface operations {
                         | 'ADDRESS_REQUIRED'
                         | 'GUEST_NOT_ALLOWED'
                         | 'LOGIN_REQUIRED'
-                        | 'MINOR_REQUIRED';
+                        | 'MINOR_REQUIRED'
+                        | 'BIRTH_DATE_REQUIRED';
                       message: string;
                       registrationIndex: number | null;
                       details?: {
@@ -7419,7 +7426,8 @@ export interface operations {
                         | 'ADDRESS_REQUIRED'
                         | 'GUEST_NOT_ALLOWED'
                         | 'LOGIN_REQUIRED'
-                        | 'MINOR_REQUIRED';
+                        | 'MINOR_REQUIRED'
+                        | 'BIRTH_DATE_REQUIRED';
                       message: string;
                       registrationIndex: number | null;
                       details?: {
