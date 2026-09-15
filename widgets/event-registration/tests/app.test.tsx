@@ -170,7 +170,7 @@ describe('event-registration widget', () => {
     expect(within(card).getByText('Adults')).toBeInTheDocument();
     fireEvent.click(within(card).getByRole('button', { name: /Add/ }));
     fireEvent.click(within(card).getByLabelText(/Someone not listed/));
-    const relationship = within(card).getByLabelText('Relationship');
+    const relationship = within(card).getByLabelText<HTMLSelectElement>('Relationship');
     expect([...relationship.options].map((o) => o.textContent)).toEqual([
       'Other adult',
       'Adult child',
