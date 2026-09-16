@@ -128,40 +128,48 @@ test.describe('event-registration mobile-first layout', () => {
         { timeout: 10_000 },
       )
       .toBe(true);
-    await page.evaluate((host) => {
-      const sr = (document.querySelector(host) as HTMLElement).shadowRoot!;
-      const btn = [...sr.querySelectorAll('section[aria-labelledby] button')].find(
-        (b) => b.textContent?.trim() === 'Add registrant',
-      ) as HTMLButtonElement;
-      btn.click();
-    }, PREVIEW);
+    // The card is the control: its footer label is a button stretched over the card.
+    const clickAdd = () =>
+      page.evaluate((host) => {
+        const sr = (document.querySelector(host) as HTMLElement).shadowRoot!;
+        const btn = [...sr.querySelectorAll('section[aria-labelledby] button')].find(
+          (b) => b.textContent?.trim() === 'Add registrant',
+        ) as HTMLButtonElement | undefined;
+        btn?.click();
+        return !!btn;
+      }, PREVIEW);
+    await expect.poll(clickAdd, { message: 'Add registrant present', timeout: 10_000 }).toBe(true);
     await expect
       .poll(async () => (await widgetState(page)).hasDialog, { timeout: 10_000 })
       .toBe(true);
-    expect(await page.evaluate(() => document.body.style.overflow)).toBe('hidden');
+    const bodyOverflow = () => page.evaluate(() => document.body.style.overflow);
+    await expect.poll(bodyOverflow, { timeout: 5_000 }).toBe('hidden');
     await page.keyboard.press('Escape');
     await expect
       .poll(async () => (await widgetState(page)).hasDialog, { timeout: 10_000 })
       .toBe(false);
-    expect(await page.evaluate(() => document.body.style.overflow)).toBe('');
+    await expect.poll(bodyOverflow, { timeout: 5_000 }).toBe('');
   });
 
   test('tablet: still the phone chrome, one card per row, no overflow', async ({ page }) => {
     await selectPreset(page, 'Tablet');
+    // The preview can transiently remount after a preset change, so poll the
+    // whole settled state as one predicate (see sermons-responsive.spec.ts).
     await expect
       .poll(
         async () => {
           const s = await widgetState(page);
-          return s.containerWidth >= 480 && s.containerWidth < 768 && s.hasBar;
+          if (s.containerWidth < 480 || s.containerWidth >= 768) return `width ${s.containerWidth}`;
+          if (!s.hasBar) return 'summary bar absent';
+          if (!s.hasCta) return 'sticky CTA absent';
+          if (s.hasAside) return 'review column present';
+          if (s.overflow) return 'horizontal overflow';
+          if (s.cardGridCols !== 1) return `${s.cardGridCols} card columns`;
+          return 'settled';
         },
-        { timeout: 10_000 },
+        { message: 'tablet layout settled', timeout: 10_000 },
       )
-      .toBe(true);
-    const s = await widgetState(page);
-    expect(s.overflow).toBe(false);
-    expect(s.hasCta).toBe(true);
-    expect(s.hasAside).toBe(false);
-    expect(s.cardGridCols).toBe(1);
+      .toBe('settled');
   });
 
   test('desktop: sticky review column, two cards per row, no sticky bars', async ({ page }) => {
