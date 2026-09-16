@@ -528,7 +528,6 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
           imageUrl={imageUrl}
           fallbackImageUrl={config.defaultImageUrl}
           showMap={config.showMap}
-          returnUrl={config.returnUrl}
         />
 
         {event.cancelled ? (

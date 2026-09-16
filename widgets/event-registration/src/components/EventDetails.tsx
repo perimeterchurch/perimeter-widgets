@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { CalendarDays, MapPin, UserRound } from 'lucide-react';
 import type { RegistrationEvent } from '@perimeter/api-hooks';
-import { Button } from '@perimeter/ui/button';
 import { ExpandableText } from './ExpandableText';
 import { FallbackImage } from './FallbackImage';
 import { RichText } from './RichText';
@@ -12,7 +11,6 @@ export interface EventDetailsProps {
   imageUrl: string | null;
   fallbackImageUrl: string | undefined;
   showMap: boolean;
-  returnUrl: string;
 }
 
 /**
@@ -27,7 +25,6 @@ export function EventDetails({
   imageUrl,
   fallbackImageUrl,
   showMap,
-  returnUrl,
 }: EventDetailsProps): React.JSX.Element {
   const location = event.location;
   const address = location
@@ -43,18 +40,6 @@ export function EventDetails({
 
   return (
     <header className="grid gap-4">
-      <div>
-        <Button
-          variant="link"
-          size="sm"
-          className="px-0"
-          nativeButton={false}
-          render={<a href={returnUrl} />}
-        >
-          ← Back to events
-        </Button>
-      </div>
-
       {imageUrl && (
         <FallbackImage
           sources={[imageUrl, fallbackImageUrl]}

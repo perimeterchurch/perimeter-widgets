@@ -25,7 +25,9 @@ export const EventRegistrationConfigSchema = z.object({
   returnUrl: z
     .string()
     .default('/events')
-    .describe('Where "Back to events" goes. Relative or absolute.'),
+    .describe(
+      'Where the "Back to events" button on the post-registration confirmation goes. Relative or absolute.',
+    ),
   idParam: z
     .string()
     .default('id')

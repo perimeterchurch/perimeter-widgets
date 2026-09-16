@@ -46,7 +46,7 @@ widget so members can sign in for the household roster:
 | Attribute                 | Required | Default                     | Description                                                                                          |
 | ------------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `data-checkout-url`       | No       | perimeter.org `/event-checkout/` | The native Invoice Details & Payment page. After a submit the browser goes to `…?id=<Invoice_GUID>`. |
-| `data-return-url`         | No       | `/events`                   | Where "Back to events" goes.                                                                         |
+| `data-return-url`         | No       | `/events`                   | Where the confirmation's "Back to events" button goes (the hero has no back link; the host page's own does that). |
 | `data-id-param`           | No       | `id`                        | Query-string key carrying the `Event_ID` (MP's `EventDetailWidgetIdParameterName`).                 |
 | `data-event-id`           | No       | —                           | Pin the event instead of reading the query string (studio preview, single-event pages).             |
 | `data-invoice-param`      | No       | `id`                        | Query-string key the checkout page reads (MP's `InvoiceDetailWidgetIdParameterName`).               |
