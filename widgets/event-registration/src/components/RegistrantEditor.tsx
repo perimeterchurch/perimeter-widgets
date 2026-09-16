@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Copy } from 'lucide-react';
 import type {
   QuoteProblem,
   RegistrationAttendee,
@@ -731,11 +732,12 @@ export function RegistrantEditor({
                 <div>
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => copyAnswers(previous.key, key)}
                   >
-                    Same answers as {previous.firstName}
+                    <Copy aria-hidden className="mr-1.5 size-4" />
+                    Copy {previous.firstName}&apos;s answers
                   </Button>
                 </div>
               )}
