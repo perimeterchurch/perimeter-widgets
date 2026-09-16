@@ -109,10 +109,14 @@ widget so members can sign in for the household roster:
 - **Overlap warning** — the same person in two sections whose events run at the
   same time gets a warning, never a block (childcare-then-event is legitimate).
 - **Submit** — `POST …/submit` with an `Idempotency-Key`; a retry after a network
-  failure replays rather than duplicates. Success redirects to
-  `data-checkout-url?id=<Invoice_GUID>`. Free registrations are complete at that
-  point; paid ones are *Awaiting Payment* until the native checkout takes payment
-  (MP releases unpaid seats after about an hour).
+  blip replays the same result. When the invoice total is above $0 the browser goes to
+  `data-checkout-url?id=<Invoice_GUID>` (the native Invoice Details & Payment page; the
+  registration is *Awaiting Payment* until it pays, and MP releases unpaid seats after about an
+  hour). When it
+  is $0 (2026-09-16) the widget stays put and shows "You're registered" with the people and
+  sessions, where the confirmation email goes, and "Register someone else" / "Back to
+  events" — the checkout page would only show a $0 invoice, and MP's Registrant Message job
+  sends the confirmation either way.
 - **Coming back** — the checkout's "Make Changes" returns with
   `?id=<eventId>&invoiceid=<guid>`; the widget offers to continue that checkout
   or start over.

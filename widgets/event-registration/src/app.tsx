@@ -8,6 +8,8 @@ import {
   useSubmitRegistration,
   type QuotedRegistration,
   type RegistrationQuote,
+  type RegistrationRoster,
+  type RegistrationSubmitResult,
 } from '@perimeter/api-hooks';
 import { getRecaptchaToken, loadRecaptchaV3 } from '@perimeter/widget-runtime';
 import { Skeleton } from '@perimeter/ui/skeleton';
@@ -18,6 +20,7 @@ import { SectionCard } from './components/SectionCard';
 import { RegistrantEditor } from './components/RegistrantEditor';
 import { GuestContactForm, SignedInContactForm } from './components/PurchaserForm';
 import { ContactSummary } from './components/ContactSummary';
+import { RegistrationComplete } from './components/RegistrationComplete';
 import { ReviewPanel, submitLabel } from './components/ReviewPanel';
 import { ReviewBody } from './components/ReviewBody';
 import { SummaryBar } from './components/SummaryBar';
@@ -57,6 +60,27 @@ function apiBase(config: EventRegistrationConfig): string {
   }
   return PRODUCTION_API;
 }
+
+/** The signed-in purchaser's contact block, as MP holds it. */
+function contactFromRoster(roster: RegistrationRoster) {
+  return {
+    email: roster.viewer.email ?? '',
+    phone: roster.viewer.phone ?? '',
+    address: {
+      line1: roster.viewer.address?.line1 ?? '',
+      line2: roster.viewer.address?.line2 ?? '',
+      city: roster.viewer.address?.city ?? '',
+      state: roster.viewer.address?.state ?? '',
+      postalCode: roster.viewer.address?.postalCode ?? '',
+    },
+  };
+}
+
+type CompletedSubmit = {
+  result: Extract<RegistrationSubmitResult, { dryRun: false }>;
+  /** Captured before the draft is cleared, so the guest's email survives the reset. */
+  email: string;
+};
 
 function LoadingState(): React.JSX.Element {
   return (
@@ -112,21 +136,11 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   // Pre-fill the signed-in purchaser's contact block once the roster arrives.
   React.useEffect(() => {
     if (!roster) return;
-    dispatch({
-      type: 'prefill-contact',
-      contact: {
-        email: roster.viewer.email ?? '',
-        phone: roster.viewer.phone ?? '',
-        address: {
-          line1: roster.viewer.address?.line1 ?? '',
-          line2: roster.viewer.address?.line2 ?? '',
-          city: roster.viewer.address?.city ?? '',
-          state: roster.viewer.address?.state ?? '',
-          postalCode: roster.viewer.address?.postalCode ?? '',
-        },
-      },
-    });
+    dispatch({ type: 'prefill-contact', contact: contactFromRoster(roster) });
   }, [roster]);
+
+  // A registration that owed nothing confirms in place instead of going to checkout.
+  const [completed, setCompleted] = React.useState<CompletedSubmit | null>(null);
 
   // ── Quote: the server prices the draft whenever it changes ────────────
   const quoteMutation = useRegistrationQuote(page.eventId);
@@ -199,6 +213,19 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       {
         onSuccess: (result) => {
           if (result.data.dryRun) return;
+          if (result.data.invoiceTotal === 0) {
+            // Nothing to pay: the checkout page would only show a $0 invoice.
+            setCompleted({
+              result: result.data,
+              email: signedIn ? draft.contact.email : draft.guest.email,
+            });
+            setQuote(null);
+            dispatch({ type: 'reset' });
+            if (roster) dispatch({ type: 'prefill-contact', contact: contactFromRoster(roster) });
+            void eventQuery.refetch?.();
+            void rosterQuery.refetch?.();
+            return;
+          }
           window.location.assign(result.data.checkoutUrl);
         },
         onError: (error) => {
@@ -523,92 +550,102 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
           <>
             {isGuest && <SignInNotice reason={signInReason} />}
 
-            {canRegister && (
-              <>
-                {compact && (
-                  <SummaryBar
-                    count={draft.registrations.length}
-                    total={quote?.invoiceTotal ?? null}
-                    quoting={quoteMutation.isPending}
-                    showPrices={showPrices}
-                    problemCount={problemCount}
-                    needsContact={contactMissing && draft.registrations.length > 0}
-                    open={summaryOpen}
-                    onToggle={() => setSummaryOpen((o) => !o)}
-                    topOffset={config.stickyTopOffset}
-                  >
-                    <ReviewBody {...reviewBody} />
-                    {contactBlock}
-                  </SummaryBar>
-                )}
+            {completed ? (
+              <RegistrationComplete
+                event={event}
+                result={completed.result}
+                contactEmail={completed.email}
+                returnUrl={config.returnUrl}
+                onRegisterMore={() => setCompleted(null)}
+              />
+            ) : (
+              canRegister && (
+                <>
+                  {compact && (
+                    <SummaryBar
+                      count={draft.registrations.length}
+                      total={quote?.invoiceTotal ?? null}
+                      quoting={quoteMutation.isPending}
+                      showPrices={showPrices}
+                      problemCount={problemCount}
+                      needsContact={contactMissing && draft.registrations.length > 0}
+                      open={summaryOpen}
+                      onToggle={() => setSummaryOpen((o) => !o)}
+                      topOffset={config.stickyTopOffset}
+                    >
+                      <ReviewBody {...reviewBody} />
+                      {contactBlock}
+                    </SummaryBar>
+                  )}
 
-                <div className="grid gap-6 @min-[768px]:grid-cols-[minmax(0,1fr)_22rem] @min-[768px]:items-start">
-                  <div className="grid gap-6">
-                    <div className="grid gap-4 @min-[1024px]:grid-cols-2 @min-[1024px]:items-start">
-                      {sections.map((section) => {
-                        const inSection = draft.registrations.filter(
-                          (r) => r.sectionKey === section.key,
-                        );
-                        const editingHere = editingSection?.key === section.key;
-                        // A guest is one person: once they're in a section, no more adds there.
-                        const canAdd = signedIn ? roster !== null : inSection.length === 0;
-                        return (
-                          <SectionCard
-                            key={section.key}
-                            section={section}
-                            timeZone={event.timeZone}
-                            registrations={inSection}
-                            quotedByLocalId={quotedByLocalId}
-                            showPrices={showPrices}
-                            canAdd={canAdd && (compact || editing.kind === 'none')}
-                            imageSources={sectionImageSources(section)}
-                            onAdd={() => dispatch({ type: 'start-new', sectionKey: section.key })}
-                            onEdit={(localId) => dispatch({ type: 'edit', localId })}
-                            onRemove={(localId) => dispatch({ type: 'remove', localId })}
-                            editor={!compact && editingHere ? renderEditor(section, false) : null}
-                          />
-                        );
-                      })}
+                  <div className="grid gap-6 @min-[768px]:grid-cols-[minmax(0,1fr)_22rem] @min-[768px]:items-start">
+                    <div className="grid gap-6">
+                      <div className="grid gap-4 @min-[1024px]:grid-cols-2 @min-[1024px]:items-start">
+                        {sections.map((section) => {
+                          const inSection = draft.registrations.filter(
+                            (r) => r.sectionKey === section.key,
+                          );
+                          const editingHere = editingSection?.key === section.key;
+                          // A guest is one person: once they're in a section, no more adds there.
+                          const canAdd = signedIn ? roster !== null : inSection.length === 0;
+                          return (
+                            <SectionCard
+                              key={section.key}
+                              section={section}
+                              timeZone={event.timeZone}
+                              registrations={inSection}
+                              quotedByLocalId={quotedByLocalId}
+                              showPrices={showPrices}
+                              canAdd={canAdd && (compact || editing.kind === 'none')}
+                              imageSources={sectionImageSources(section)}
+                              onAdd={() => dispatch({ type: 'start-new', sectionKey: section.key })}
+                              onEdit={(localId) => dispatch({ type: 'edit', localId })}
+                              onRemove={(localId) => dispatch({ type: 'remove', localId })}
+                              editor={!compact && editingHere ? renderEditor(section, false) : null}
+                            />
+                          );
+                        })}
+                      </div>
                     </div>
+
+                    {!compact && (
+                      <div className="@min-[768px]:sticky @min-[768px]:top-4">
+                        <ReviewPanel
+                          {...reviewBody}
+                          contact={contactBlock}
+                          submitting={submitMutation.isPending}
+                          submitError={submitError}
+                          canSubmit={canSubmit}
+                          isGuest={isGuest}
+                          onSubmit={() => void handleSubmit()}
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {!compact && (
-                    <div className="@min-[768px]:sticky @min-[768px]:top-4">
-                      <ReviewPanel
-                        {...reviewBody}
-                        contact={contactBlock}
-                        submitting={submitMutation.isPending}
-                        submitError={submitError}
-                        canSubmit={canSubmit}
-                        isGuest={isGuest}
-                        onSubmit={() => void handleSubmit()}
-                      />
-                    </div>
+                  {compact && (
+                    <StickyCta
+                      state={ctaState}
+                      label={ctaLabel}
+                      problemCount={problemCount}
+                      submitting={submitMutation.isPending}
+                      submitError={submitError}
+                      isGuest={isGuest}
+                      onShowProblems={() => setSummaryOpen(true)}
+                      onPrimary={() => {
+                        if (ctaState === 'needs-contact') goToContactForm();
+                        else if (ctaState === 'ready') void handleSubmit();
+                      }}
+                    />
                   )}
-                </div>
-
-                {compact && (
-                  <StickyCta
-                    state={ctaState}
-                    label={ctaLabel}
-                    problemCount={problemCount}
-                    submitting={submitMutation.isPending}
-                    submitError={submitError}
-                    isGuest={isGuest}
-                    onShowProblems={() => setSummaryOpen(true)}
-                    onPrimary={() => {
-                      if (ctaState === 'needs-contact') goToContactForm();
-                      else if (ctaState === 'ready') void handleSubmit();
-                    }}
-                  />
-                )}
-              </>
+                </>
+              )
             )}
           </>
         )}
       </div>
 
-      {compact && canRegister && editingSection && (
+      {compact && canRegister && !completed && editingSection && (
         <EditorSheet
           title={`${editingExisting ? 'Edit registration' : 'New registration'} — ${editingSection.displayName}`}
           titleId={`editor-${editingSection.key}-title`}

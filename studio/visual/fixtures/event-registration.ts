@@ -136,6 +136,25 @@ export const familyNightEvent = {
   },
 };
 
+/** What `POST …/submit` returns for that free registration. */
+export const parentGatheringSubmit = {
+  success: true as const,
+  data: {
+    dryRun: false,
+    idempotencyKey: 'fixture',
+    replayed: false,
+    invoiceId: 1,
+    invoiceGuid: 'fixture-guid',
+    invoiceTotal: 0,
+    invoiceStatusId: 1,
+    checkoutUrl: 'https://www.perimeter.org/event-checkout/?id=fixture-guid',
+    participants: [],
+    get quote() {
+      return parentGatheringQuote.data;
+    },
+  },
+};
+
 /** The quote for a guest registering themself for the Parent Gathering. */
 export const parentGatheringQuote = {
   success: true as const,

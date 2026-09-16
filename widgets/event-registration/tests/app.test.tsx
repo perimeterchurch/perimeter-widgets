@@ -1,6 +1,6 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type * as ApiHooks from '@perimeter/api-hooks';
 import type * as WidgetRuntime from '@perimeter/widget-runtime';
 import type { AuthProvider } from '@perimeter/auth';
@@ -380,6 +380,91 @@ describe('event-registration widget', () => {
     fireEvent.click(within(card).getByRole('button', { name: 'Save changes' }));
     fireEvent.click(within(card).getByRole('button', { name: 'Edit William Cano' }));
     expect(within(card).getByLabelText(/Grade/)).toHaveValue('8th');
+  });
+
+  it('confirms in place instead of going to checkout when nothing is owed', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const freeQuote = {
+      eventId: 900001,
+      registrations: [
+        {
+          registrationIndex: 0,
+          sectionKey: 'related:101',
+          eventId: 900011,
+          contactId: 684077,
+          attendeeName: 'Jen Cano',
+          isMinor: false,
+          lines: [],
+          subtotal: 0,
+          optionsSummary: null,
+          answerSummary: null,
+          attendingOnline: false,
+          addsToGroupIds: [],
+          overlapsWithRegistrationIndexes: [],
+          resolvedOptions: [],
+        },
+      ],
+      invoiceTotal: 0,
+      depositRequested: false,
+      participationStatusId: 2,
+      invoiceStatusId: 1,
+      addressRequired: false,
+      problems: [],
+      submittable: true,
+      quoteHash: 'free',
+    };
+    hooks.quote.mutate.mockImplementation(
+      (_plan: unknown, opts: { onSuccess: (r: { data: typeof freeQuote }) => void }) =>
+        opts.onSuccess({ data: freeQuote }),
+    );
+    hooks.submit.mutate.mockImplementation(
+      (_body: unknown, opts: { onSuccess: (r: { data: unknown }) => void }) =>
+        opts.onSuccess({
+          data: {
+            dryRun: false,
+            idempotencyKey: 'k',
+            replayed: false,
+            invoiceId: 1,
+            invoiceGuid: 'g',
+            invoiceTotal: 0,
+            invoiceStatusId: 1,
+            checkoutUrl: 'https://www.perimeter.org/event-checkout/?id=g',
+            participants: [],
+            quote: freeQuote,
+          },
+        }),
+    );
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
+    fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Complete registration' }));
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: "You're registered" })).toBeInTheDocument(),
+    );
+    const done = screen.getByRole('region', { name: "You're registered" });
+    expect(within(done).getByText('Jen Cano')).toBeInTheDocument();
+    expect(within(done).getByText('Elementary + Early Years Focus')).toBeInTheDocument();
+    expect(within(done).getByText(/jen@example.com/)).toBeInTheDocument();
+    // The event cards are gone until they ask to register someone else.
+    expect(
+      screen.queryByRole('region', { name: 'Student Night of Worship (Grades 6-12)' }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(within(done).getByRole('button', { name: 'Register someone else' }));
+    expect(
+      screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' }),
+    ).toBeInTheDocument();
+    // The draft was cleared: nothing is listed on the card any more.
+    expect(
+      within(screen.getByRole('region', { name: 'Elementary + Early Years Focus' })).queryByRole(
+        'button',
+        { name: 'Remove Jen Cano' },
+      ),
+    ).not.toBeInTheDocument();
+    vi.useRealTimers();
   });
 
   it('hides "Free" badges and $0.00 amounts when nothing on the event costs anything', () => {
