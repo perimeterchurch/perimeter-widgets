@@ -39,7 +39,9 @@ export function ExpandableText({
   return (
     <div className={`grid gap-1 ${className}`}>
       {open ? (
-        <div id={id}>{children}</div>
+        <div id={id} className="relative z-10">
+          {children}
+        </div>
       ) : (
         <>
           <p className={`${CLAMP[lines]} font-sans text-sm text-muted-fg ${phoneOnly}`}>
@@ -48,13 +50,13 @@ export function ExpandableText({
           {desktopAlwaysOpen && <div className="hidden @min-[768px]:block">{children}</div>}
         </>
       )}
-      <div className={phoneOnly}>
+      <div className={`justify-self-start ${phoneOnly}`}>
         <button
           type="button"
           aria-expanded={open}
           aria-controls={open ? id : undefined}
           onClick={() => setOpen((o) => !o)}
-          className="-my-2 inline-flex min-h-11 items-center gap-1 font-sans text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+          className="relative z-10 -my-2 inline-flex min-h-11 items-center gap-1 font-sans text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
         >
           {open ? (
             <Minus aria-hidden className="size-4" />

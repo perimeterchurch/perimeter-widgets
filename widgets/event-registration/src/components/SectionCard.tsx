@@ -175,7 +175,7 @@ export function SectionCard({
           )}
         </div>
 
-        <ExpandableText summary={summary} className={above}>
+        <ExpandableText summary={summary}>
           <RichText html={section.instructionsHtml} className="text-sm" />
           <RichText
             html={section.event.meetingInstructionsHtml}
