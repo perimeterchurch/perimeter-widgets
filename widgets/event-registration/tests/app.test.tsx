@@ -112,7 +112,9 @@ describe('event-registration widget', () => {
 
   it('shows the signed-in purchaser as a one-line contact, with fields behind Edit', () => {
     render(<App config={config} auth={authStub(true)} />);
-    const contact = screen.getByRole('region', { name: 'Your contact information' });
+    // It is part of the review column, between the total and the submit.
+    const review = screen.getByRole('complementary', { name: 'Your registration' });
+    const contact = within(review).getByRole('region', { name: 'Your contact information' });
     expect(within(contact).getByText('Contact for this registration')).toBeInTheDocument();
     expect(within(contact).getByText('Jen Cano')).toBeInTheDocument();
     expect(within(contact).getByText('jen@example.com')).toBeInTheDocument();

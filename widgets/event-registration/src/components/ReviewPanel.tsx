@@ -4,6 +4,8 @@ import { Spinner } from '@perimeter/ui/spinner';
 import { ReviewBody, type ReviewBodyProps } from './ReviewBody';
 
 export interface ReviewPanelProps extends ReviewBodyProps {
+  /** The "Contact for this registration" line, shown between the total and the submit. */
+  contact?: React.ReactNode;
   submitting: boolean;
   submitError: string | null;
   canSubmit: boolean;
@@ -58,6 +60,7 @@ export function ReviewPanel({
   canSubmit,
   isGuest,
   onSubmit,
+  contact,
   ...body
 }: ReviewPanelProps): React.JSX.Element {
   return (
@@ -70,6 +73,8 @@ export function ReviewPanel({
       </h3>
 
       <ReviewBody {...body} />
+
+      {contact}
 
       {body.registrationCount > 0 && (
         <>

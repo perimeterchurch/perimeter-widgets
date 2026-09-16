@@ -39,7 +39,7 @@ export function ContactSummary({
   return (
     <section
       ref={ref}
-      className="grid gap-3 border border-border bg-bg p-4 @min-[480px]:p-6"
+      className="grid gap-3 border-t border-border pt-3"
       aria-label="Your contact information"
       data-slot="contact-summary"
     >

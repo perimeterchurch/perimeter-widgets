@@ -373,39 +373,6 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
     onPayDepositChange: (payDeposit: boolean) => dispatch({ type: 'set-pay-deposit', payDeposit }),
   };
 
-  let ctaState: CtaState;
-  let ctaLabel: string;
-  if (draft.registrations.length === 0) {
-    ctaState = 'empty';
-    ctaLabel = 'Add someone to continue';
-  } else if (isGuest && !guestContactComplete) {
-    ctaState = 'needs-contact';
-    ctaLabel = 'Continue to your details';
-  } else if (!quote) {
-    ctaState = 'quoting';
-    ctaLabel = 'Checking…';
-  } else if (!quote.submittable) {
-    ctaState = 'blocked';
-    ctaLabel = submitLabel(quote);
-  } else {
-    ctaState = 'ready';
-    ctaLabel = submitLabel(quote);
-  }
-
-  const goToContactForm = (): void => {
-    setContactOpen(true);
-    // The fields mount on the next render.
-    setTimeout(() => {
-      const el = contactRef.current;
-      if (!el) return;
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      const inputs = Array.from(
-        el.querySelectorAll<HTMLInputElement>('input:not([type="checkbox"])'),
-      );
-      (inputs.find((i) => i.value.trim() === '') ?? inputs[0])?.focus();
-    }, 0);
-  };
-
   const sectionImageSources = (section: (typeof sections)[number]) => [
     section.isParentEvent ? null : `${apiBase(config)}/api/event-image/${section.event.eventId}`,
     imageUrl,
@@ -439,6 +406,41 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       ? `${viewer.firstName} ${viewer.lastName}`.trim()
       : ''
     : guestName;
+
+  let ctaState: CtaState;
+  let ctaLabel: string;
+  if (draft.registrations.length === 0) {
+    ctaState = 'empty';
+    ctaLabel = 'Add someone to continue';
+  } else if (contactMissing) {
+    ctaState = 'needs-contact';
+    ctaLabel = isGuest ? 'Continue to your details' : 'Add your contact details';
+  } else if (!quote) {
+    ctaState = 'quoting';
+    ctaLabel = 'Checking…';
+  } else if (!quote.submittable) {
+    ctaState = 'blocked';
+    ctaLabel = submitLabel(quote);
+  } else {
+    ctaState = 'ready';
+    ctaLabel = submitLabel(quote);
+  }
+
+  /** The contact fields live in the review: open it (and them), then focus the first gap. */
+  const goToContactForm = (): void => {
+    setSummaryOpen(true);
+    setContactOpen(true);
+    // The fields mount on the next render.
+    setTimeout(() => {
+      const el = contactRef.current;
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const inputs = Array.from(
+        el.querySelectorAll<HTMLInputElement>('input:not([type="checkbox"])'),
+      );
+      (inputs.find((i) => i.value.trim() === '') ?? inputs[0])?.focus();
+    }, 0);
+  };
 
   const contactBlock = showContact ? (
     <ContactSummary
@@ -529,11 +531,13 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                     quoting={quoteMutation.isPending}
                     showPrices={showPrices}
                     problemCount={problemCount}
+                    needsContact={contactMissing && draft.registrations.length > 0}
                     open={summaryOpen}
                     onToggle={() => setSummaryOpen((o) => !o)}
                     topOffset={config.stickyTopOffset}
                   >
                     <ReviewBody {...reviewBody} />
+                    {contactBlock}
                   </SummaryBar>
                 )}
 
@@ -565,14 +569,13 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                         );
                       })}
                     </div>
-
-                    {contactBlock}
                   </div>
 
                   {!compact && (
                     <div className="@min-[768px]:sticky @min-[768px]:top-4">
                       <ReviewPanel
                         {...reviewBody}
+                        contact={contactBlock}
                         submitting={submitMutation.isPending}
                         submitError={submitError}
                         canSubmit={canSubmit}

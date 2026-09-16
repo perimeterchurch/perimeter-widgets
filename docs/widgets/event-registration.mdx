@@ -132,10 +132,11 @@ build's rem→px rewrite does not touch `@container` params.
 | Summary | sticky bar at the top: count badge, total when prices show, chevron opens the review | same | review column on the right, sticky |
 | Sections | one list in `Position` order; tappable image-led cards with badges, title, "View details", price and the `Button_Text` label + chevron | same | left column, two cards per row from 1024px |
 | Editor | bottom sheet (`<dialog>` + `showModal()`, top layer) | same | inline in the card |
-| Contact | one line below the cards ("Contact for this registration": name · email · phone, Edit); fields open only when email/phone or a required address is missing | same | same, left column |
+| Contact | inside the summary bar's expanded panel, under the total ("Contact for this registration": name · email · phone, Edit); the bar opens itself when email/phone or a required address is missing | same | inside the review column, between the total and the submit |
 | Submit | sticky bottom CTA: "Add someone to continue" → "Continue to your details" (guests) → "Fix N issues" → submit | same | button in the review column |
 
-- **Contact for this registration** (2026-09-16) — not a form. Signed in, the purchaser's
+- **Contact for this registration** (2026-09-16) — part of the review (who gets the receipt
+  sits with the total and the submit), not a card among the events. Signed in, the purchaser's
   name, email and phone from MP show as one line with an Edit button; the fields appear only
   on request or when the record lacks email/phone or the quote requires an address. The
   "update my record" opt-in appears once something has changed and defaults to on. Guests

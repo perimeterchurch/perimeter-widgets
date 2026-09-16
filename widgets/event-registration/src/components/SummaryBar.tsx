@@ -12,6 +12,8 @@ export interface SummaryBarProps {
   showPrices: boolean;
   /** Quote problems; the bar opens itself the first time any appear. */
   problemCount: number;
+  /** The contact line inside needs something (missing email/phone/address): open as well. */
+  needsContact?: boolean;
   open: boolean;
   onToggle: () => void;
   /** Pixels of fixed host header to sit below. */
@@ -32,6 +34,7 @@ export function SummaryBar({
   quoting,
   showPrices,
   problemCount,
+  needsContact = false,
   open,
   onToggle,
   topOffset,
@@ -44,12 +47,13 @@ export function SummaryBar({
   const toggleRef = React.useRef(onToggle);
   toggleRef.current = onToggle;
   React.useEffect(() => {
-    if (problemCount > 0 && !seenProblems.current) {
+    const attention = problemCount > 0 || needsContact;
+    if (attention && !seenProblems.current) {
       seenProblems.current = true;
       if (!openRef.current) toggleRef.current();
     }
-    if (problemCount === 0) seenProblems.current = false;
-  }, [problemCount]);
+    if (!attention) seenProblems.current = false;
+  }, [problemCount, needsContact]);
 
   return (
     <div

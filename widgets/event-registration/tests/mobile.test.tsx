@@ -186,11 +186,15 @@ describe('event-registration widget on a phone', () => {
       'Student Night of Worship (Grades 6-12)',
       'Elementary Active (Grades K-5)',
     ]);
-    // The contact form comes after the cards.
-    const contact = screen.getByRole('region', { name: 'Your contact information' });
+    // The contact line lives in the review, so it is inside the summary bar, not among the cards.
     expect(
-      studentCard().compareDocumentPosition(contact) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+      screen.queryByRole('region', { name: 'Your contact information' }),
+    ).not.toBeInTheDocument();
+    const bar = document.querySelector<HTMLElement>('[data-slot="summary-bar"]')!;
+    fireEvent.click(within(bar).getByRole('button', { expanded: false }));
+    expect(within(bar).getByRole('region', { name: 'Your contact information' })).toHaveTextContent(
+      'Jen Cano',
+    );
   });
 
   it('opens the editor in a bottom sheet, saves from it, and hands focus back', () => {
@@ -316,7 +320,9 @@ describe('event-registration widget on a phone', () => {
     });
     fireEvent.click(within(sheet).getByRole('button', { name: 'Add to registration' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    const contact = screen.getByRole('region', { name: 'Your contact information' });
+    const bar = document.querySelector<HTMLElement>('[data-slot="summary-bar"]')!;
+    fireEvent.click(within(bar).getByRole('button', { expanded: false }));
+    const contact = within(bar).getByRole('region', { name: 'Your contact information' });
     expect(within(contact).getByText('Sam Guest')).toBeInTheDocument();
     expect(within(contact).getByText('sam@example.com')).toBeInTheDocument();
     expect(within(card).getByText('Sam Guest')).toBeInTheDocument();
