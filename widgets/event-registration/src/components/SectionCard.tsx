@@ -279,7 +279,7 @@ export function SectionCard({
         </div>
       )}
 
-      {editor && <div className={`border-t border-border p-4 ${above}`}>{editor}</div>}
+      {editor && <div className={`border-t border-border bg-muted/30 p-4 ${above}`}>{editor}</div>}
     </section>
   );
 }

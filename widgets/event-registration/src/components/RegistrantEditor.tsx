@@ -930,11 +930,20 @@ export function RegistrantEditor({
             : 'grid gap-5 bg-bg'
       }
     >
-      {!embedded && (
-        <h4 id={`editor-${section.key}-title`} className="font-sans text-lg font-bold text-fg">
-          {existing ? 'Edit registration' : 'New registration'} — {section.displayName}
-        </h4>
-      )}
+      {!embedded &&
+        (framed ? (
+          <h4 id={`editor-${section.key}-title`} className="font-sans text-lg font-bold text-fg">
+            {existing ? 'Edit registration' : 'New registration'} — {section.displayName}
+          </h4>
+        ) : (
+          // Inside a card the event title sits right above; just say what this is.
+          <h4
+            id={`editor-${section.key}-title`}
+            className="font-sans text-2xs font-bold tracking-wide text-muted-fg uppercase"
+          >
+            {existing ? 'Edit registration' : 'New registration'}
+          </h4>
+        ))}
 
       {/* ── Who ─────────────────────────────────────────────────────── */}
       {mode === 'guest' ? (
