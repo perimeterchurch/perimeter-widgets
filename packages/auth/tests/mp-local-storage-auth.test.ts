@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { MPLocalStorageAuth } from '../src/mp-local-storage-auth';
+import { MPLocalStorageAuth, detectMPAppRoot } from '../src/mp-local-storage-auth';
+
+const ID_KEY = 'mpp-widgets_IdToken';
 
 const TOKEN_KEY = 'mpp-widgets_AuthToken';
 const EXP_KEY = 'mpp-widgets_ExpiresAfter';
@@ -112,5 +114,153 @@ describe('MPLocalStorageAuth', () => {
     localStorage.setItem('custom_exp', String(Date.now() + 60_000));
     const auth = new MPLocalStorageAuth({ tokenKey: 'custom_token', expiresKey: 'custom_exp' });
     expect(auth.getToken()).toBe('X');
+  });
+
+  describe('silent refresh (MPWidgets REAUTH)', () => {
+    const ROOT = 'https://mp.example.org/widgets';
+    const config = {
+      signInUrl: 'https://mp.example.org/ministryplatformapi/oauth/connect/authorize',
+      responseType: 'code',
+      scope: 'openid http://www.thinkministry.com/dataplatform/scopes/all',
+      clientId: 'TM.Widgets',
+      redirectUrl: 'https://mp.example.org/widgets/signin-oidc',
+      nonce: 'n0nce',
+    };
+    const fetchMock = vi.fn();
+
+    function jsonResponse(body: unknown, ok = true): Response {
+      return { ok, status: ok ? 200 : 500, json: () => Promise.resolve(body) } as Response;
+    }
+
+    function signedIn(expiresInMs: number): void {
+      localStorage.setItem(TOKEN_KEY, 'old-token');
+      localStorage.setItem(ID_KEY, 'old-id');
+      localStorage.setItem(EXP_KEY, new Date(Date.now() + expiresInMs).toString());
+    }
+
+    beforeEach(() => {
+      vi.stubGlobal('fetch', fetchMock);
+      fetchMock.mockReset();
+      fetchMock.mockImplementation((input: string, init?: RequestInit) => {
+        if (input.endsWith('/Api/Auth')) return Promise.resolve(jsonResponse(config));
+        expect(init?.credentials).toBe('include');
+        return Promise.resolve(
+          jsonResponse({
+            accessToken: 'new-token',
+            idToken: 'new-id',
+            expiresIn: 1800,
+            state: 'REAUTH',
+          }),
+        );
+      });
+      window.mppw_refreshTokenPromise = null;
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('detects the MP app root from the MPWidgets script tag', () => {
+      const script = document.createElement('script');
+      script.src = 'https://mp.example.org/widgets/dist/MPWidgets.js';
+      document.head.appendChild(script);
+      expect(detectMPAppRoot()).toBe('https://mp.example.org/widgets');
+      script.remove();
+      expect(detectMPAppRoot()).toBeNull();
+    });
+
+    it('renews the token before it expires and writes the three MPWidgets keys', async () => {
+      signedIn(60_000); // inside the 120 s lead
+      const auth = new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: ROOT });
+      const cb = vi.fn();
+      auth.onChange(cb);
+      await auth.refreshIfNeeded();
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock.mock.calls[0]?.[0]).toBe(`${ROOT}/Api/Auth`);
+      const reauthUrl = String(fetchMock.mock.calls[1]?.[0]);
+      expect(reauthUrl.startsWith(config.signInUrl)).toBe(true);
+      expect(reauthUrl).toContain('client_id=TM.Widgets');
+      expect(reauthUrl).toContain('state=REAUTH');
+      expect(localStorage.getItem(TOKEN_KEY)).toBe('new-token');
+      expect(localStorage.getItem(ID_KEY)).toBe('new-id');
+      const exp = Date.parse(localStorage.getItem(EXP_KEY)!);
+      // expiresIn minus MPWidgets' one-minute margin.
+      expect(exp - Date.now()).toBeGreaterThan(1_700_000);
+      expect(exp - Date.now()).toBeLessThanOrEqual(1_740_000);
+      expect(auth.getToken()).toBe('new-token');
+      expect(cb).toHaveBeenCalledWith('new-token');
+    });
+
+    it('renews a token that has just expired, so a 30-minute lapse does not sign the member out', async () => {
+      signedIn(-5_000);
+      const auth = new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: ROOT });
+      expect(auth.getToken()).toBeNull();
+      await auth.refreshIfNeeded();
+      expect(auth.getToken()).toBe('new-token');
+    });
+
+    it('does nothing when the token is comfortably valid', async () => {
+      signedIn(20 * 60_000);
+      const auth = new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: ROOT });
+      await auth.refreshIfNeeded();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('does nothing without an id token (signed out) or without an MP app root', async () => {
+      localStorage.setItem(TOKEN_KEY, 'old-token');
+      localStorage.setItem(EXP_KEY, new Date(Date.now() - 1000).toString());
+      await new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: ROOT }).refreshIfNeeded();
+      expect(fetchMock).not.toHaveBeenCalled();
+
+      localStorage.setItem(ID_KEY, 'old-id');
+      await new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: false }).refreshIfNeeded();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('does not renew a token that expired more than a day ago', async () => {
+      signedIn(-25 * 60 * 60_000);
+      await new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: ROOT }).refreshIfNeeded();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('leaves the member signed out and backs off when MP refuses', async () => {
+      signedIn(-1000);
+      fetchMock.mockImplementation(() => Promise.resolve(jsonResponse({}, false)));
+      const auth = new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: ROOT });
+      await auth.refreshIfNeeded();
+      expect(auth.getToken()).toBeNull();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      await auth.refreshIfNeeded(); // within the retry window: no second attempt
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("joins MPWidgets' own in-flight refresh instead of firing a second one", async () => {
+      signedIn(-1000);
+      let release!: () => void;
+      window.mppw_refreshTokenPromise = new Promise<void>((r) => {
+        release = () => {
+          localStorage.setItem(TOKEN_KEY, 'mp-token');
+          localStorage.setItem(EXP_KEY, new Date(Date.now() + 1_740_000).toString());
+          r();
+        };
+      });
+      const auth = new MPLocalStorageAuth({ pollIntervalMs: 0, mpAppRoot: ROOT });
+      const pending = auth.refreshIfNeeded();
+      release();
+      await pending;
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(auth.getToken()).toBe('mp-token');
+    });
+
+    it('refreshes from the poll without anyone calling refreshIfNeeded', async () => {
+      vi.useFakeTimers();
+      signedIn(60_000);
+      const auth = new MPLocalStorageAuth({ pollIntervalMs: 100, mpAppRoot: ROOT });
+      await vi.advanceTimersByTimeAsync(150);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(localStorage.getItem(TOKEN_KEY)).toBe('new-token');
+      auth.dispose();
+    });
   });
 });
