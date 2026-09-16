@@ -180,7 +180,7 @@ export const MissionTripFinderConfigSchema = z.object({
   registerUrl: z
     .string()
     .default(
-      'https://www.perimeter.org/pages/outreach-volunteer/global-outreach/global-outreach/pages/mission-trip-application/?pledgecampaignid={id}',
+      'https://www.perimeter.org/global-outreach/go-journey-application/?pledgecampaignid={id}',
     )
     .describe(
       'Destination of the "Register to Join" button. `{id}` is replaced with the trip ID. ' +
