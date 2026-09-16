@@ -135,5 +135,47 @@ export {
   type UsePrayerWallIdentityResponse,
 } from './prayer-wall/use-prayer-wall-identity';
 
+export {
+  useRegistrationEvent,
+  REGISTRATION_EVENT_QUERY_KEY,
+  type UseRegistrationEventResponse,
+  type RegistrationEvent,
+  type RegistrationSection,
+  type RegistrationProduct,
+  type RegistrationOptionGroup,
+  type RegistrationOptionPrice,
+  type RegistrationForm,
+  type RegistrationFormField,
+} from './registration/use-registration-event';
+
+export {
+  useRegistrationRoster,
+  REGISTRATION_ROSTER_QUERY_KEY,
+  type UseRegistrationRosterResponse,
+  type RegistrationRoster,
+  type RosterMember,
+  type RosterEligibility,
+} from './registration/use-registration-roster';
+
+export {
+  useRegistrationQuote,
+  type RegistrationPlanInput,
+  type RegistrationPlanEntry,
+  type RegistrationAttendee,
+  type RegistrationPurchaser,
+  type QuoteRegistrationResponse,
+  type RegistrationQuote,
+  type QuoteProblem,
+  type QuotedRegistration,
+} from './registration/use-registration-quote';
+
+export {
+  useSubmitRegistration,
+  type SubmitRegistrationBody,
+  type SubmitRegistrationInput,
+  type SubmitRegistrationResponse,
+  type RegistrationSubmitResult,
+} from './registration/use-submit-registration';
+
 export type { operations, components, paths } from './generated/operations';
 export { ApiError } from './internal/fetch-json';

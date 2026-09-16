@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Embed Lab — local event-registration</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+      }
+      .banner {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+      .column {
+        max-width: 1100px;
+        border: 1px dashed #cbd5e1;
+        padding: 0.5rem;
+      }
+      /* Hostile host CSS the real WordPress page could ship. None of it may
+         reach inside the shadow root — this widget has radios, checkboxes,
+         selects, date inputs and a textarea, the most form controls of any. */
+      input,
+      textarea,
+      select {
+        background: hotpink !important;
+        border-radius: 12px !important;
+      }
+      label {
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>local — the unreleased build from widgets/event-registration/dist/</h1>
+    <p><a href="/">← lab index</a></p>
+    <p class="banner">
+      Bypasses the loader and embeds <code>/local/event-registration/index.js</code> directly. Build
+      first: <code>pnpm --filter @perimeter/widget-event-registration build</code>. Open this page
+      with <code>?id=&lt;Event_ID&gt;</code> (a hidden test parent event) — the widget reads the
+      event from the query string exactly as the native MP details widget does. Signed-out it shows
+      the guest form; set <code>localStorage['mpp-widgets_AuthToken']</code> (with
+      <code>mpp-widgets_ExpiresAfter</code> in the future) to see the household roster.
+      <code>data-api-url</code> points at a local perimeter-api on :5500, which must have the
+      <code>REGISTRATION_*</code> guard configured for any submit — dry run included.
+    </p>
+
+    <!-- Local sign-in helper. MP sign-in is CORS-blocked on localhost, so a developer
+         pastes the mpp-widgets_AuthToken from a signed-in perimeter.org tab here; the
+         runtime's storage poll picks the change up within a second. Dev page only. -->
+    <form class="banner" id="lab-token" style="margin-top: 1rem" autocomplete="off">
+      <label for="lab-token-value"
+        ><strong>Signed-in test:</strong> paste your MP widget token (lasts about an hour)</label
+      >
+      <input id="lab-token-value" type="password" style="width: 24rem; margin: 0 0.5rem" />
+      <button type="submit">Sign in</button>
+      <button type="button" id="lab-token-clear">Sign out</button>
+      <span id="lab-token-state"></span>
+    </form>
+    <script>
+      (() => {
+        const form = document.getElementById('lab-token');
+        const input = document.getElementById('lab-token-value');
+        const state = document.getElementById('lab-token-state');
+        const TOKEN = 'mpp-widgets_AuthToken';
+        const EXPIRES = 'mpp-widgets_ExpiresAfter';
+        const render = () => {
+          const raw = localStorage.getItem(TOKEN);
+          const exp = localStorage.getItem(EXPIRES);
+          state.textContent =
+            raw && raw !== 'null' && exp && Date.parse(exp) > Date.now()
+              ? `signed in until ${new Date(exp).toLocaleTimeString()}`
+              : 'signed out';
+        };
+        // MP widget tokens are short-lived JWTs (about an hour). Store the token's
+        // own exp as mpp-widgets_ExpiresAfter, the way the WordPress plugin does,
+        // so the runtime drops it on time instead of sending a dead token.
+        const tokenExpiry = (token) => {
+          try {
+            const payload = JSON.parse(
+              atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
+            );
+            return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
+          } catch {
+            return null;
+          }
+        };
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const token = input.value.trim();
+          if (!token) return;
+          const exp = tokenExpiry(token);
+          if (exp !== null && exp <= Date.now()) {
+            state.textContent = `that token expired at ${new Date(exp).toLocaleTimeString()} — copy a fresh one`;
+            return;
+          }
+          localStorage.setItem(TOKEN, token);
+          localStorage.setItem(EXPIRES, new Date(exp ?? Date.now() + 3600e3).toISOString());
+          input.value = '';
+          render();
+        });
+        document.getElementById('lab-token-clear').addEventListener('click', () => {
+          localStorage.removeItem(TOKEN);
+          localStorage.removeItem(EXPIRES);
+          render();
+        });
+        render();
+      })();
+    </script>
+
+    <div class="column">
+      <div
+        data-perimeter-widget="event-registration"
+        data-api-url="http://localhost:5500"
+        data-checkout-url="https://www.perimeter.org/event-checkout/"
+        data-return-url="https://www.perimeter.org/events"
+      ></div>
+    </div>
+    <script src="/local/event-registration/index.js" data-nowprocket async></script>
+  </body>
+</html>
