@@ -100,12 +100,9 @@ export function SectionCard({
   const price = section.product ? formatMoneyParts(section.product.basePrice) : null;
   const tappable = section.open && canAdd && !editor;
 
-  // Tablet puts the picture beside the copy; phone and desktop stack it on top.
+  // The picture always sits on top: event banners are landscape, and a side
+  // column at tablet widths cropped them to a tall sliver.
   const withImage = !noImage;
-  const sideBySide = withImage
-    ? '@min-[480px]:grid-cols-[160px_minmax(0,1fr)] @min-[768px]:grid-cols-1'
-    : '';
-  const spanRight = withImage ? '@min-[480px]:col-start-2 @min-[768px]:col-start-auto' : '';
   // Anything interactive inside the card sits above the stretched add button.
   const above = 'relative z-10';
 
@@ -113,7 +110,7 @@ export function SectionCard({
     <section
       className={`relative grid border bg-bg transition-colors ${
         noImage ? 'border-border border-l-4 border-l-secondary' : 'border-border'
-      } ${sideBySide} ${
+      } ${
         tappable
           ? 'hover:border-secondary hover:shadow-sm has-[button[data-stretched]:focus-visible]:ring-2 has-[button[data-stretched]:focus-visible]:ring-ring has-[button[data-stretched]:active]:bg-muted/40'
           : ''
@@ -126,14 +123,12 @@ export function SectionCard({
         <FallbackImage
           sources={imageSources}
           alt=""
-          className={`aspect-video w-full @min-[480px]:row-span-2 @min-[480px]:aspect-[4/3] @min-[480px]:h-full @min-[768px]:row-span-1 @min-[768px]:aspect-video ${
-            section.open ? '' : 'opacity-60'
-          }`}
+          className={`aspect-video w-full ${section.open ? '' : 'opacity-60'}`}
           onExhausted={markNoImage}
         />
       )}
 
-      <div className={`grid gap-3 p-4 ${spanRight}`}>
+      <div className="grid gap-3 p-4">
         <div className="grid gap-1.5">
           <div className="flex flex-wrap items-center gap-2">
             {section.audience.adultsOnly ? (
@@ -244,7 +239,7 @@ export function SectionCard({
         )}
       </div>
 
-      <div className={`border-t border-border px-4 py-3 ${spanRight}`}>
+      <div className="border-t border-border px-4 py-3">
         {!section.open ? (
           <p className="font-sans text-sm text-muted-fg">{closedReasonText(section, timeZone)}</p>
         ) : (
@@ -282,7 +277,7 @@ export function SectionCard({
         )}
       </div>
 
-      {editor && <div className={`border-t border-border p-4 ${spanRight} ${above}`}>{editor}</div>}
+      {editor && <div className={`border-t border-border p-4 ${above}`}>{editor}</div>}
     </section>
   );
 }
