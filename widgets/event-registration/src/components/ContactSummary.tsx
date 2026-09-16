@@ -19,7 +19,7 @@ export interface ContactSummaryProps {
 }
 
 /**
- * Who the registration's receipt and confirmation go to. One line when the
+ * The purchaser contact for the registration. One line when the
  * record already has what the invoice needs; the fields only when the
  * visitor asks to edit them, or when email, phone or a required address is
  * missing. Deliberately not "Registering as…": this widget registers the
@@ -57,7 +57,6 @@ export function ContactSummary({
               </div>
             </div>
           )}
-          <p className="font-sans text-xs text-muted-fg">The receipt and confirmation go here.</p>
         </div>
         {editing ? (
           canCollapse && (

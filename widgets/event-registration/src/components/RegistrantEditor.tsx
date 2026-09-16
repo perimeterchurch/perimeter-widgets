@@ -796,9 +796,6 @@ export function RegistrantEditor({
         <fieldset className="grid gap-3">
           <legend className="mb-1 font-sans text-sm font-medium text-fg">
             Your details <span className="text-destructive">*</span>
-            <span className="ml-2 font-normal text-muted-fg">
-              The receipt and confirmation go here.
-            </span>
           </legend>
           {guest && onGuestChange && (
             <GuestContactForm
