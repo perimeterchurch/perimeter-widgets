@@ -25,7 +25,7 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM on 
 
 ## Local dev
 
-Prereq: Node 22+ and pnpm 10 (`packageManager` pins `10.34.5`; `corepack enable`). Run `pnpm install` once before anything else. Full walkthrough: `docs/guides/developer-setup.md`.
+Prereq: Node 22+ and pnpm 10 (`packageManager` pins `10.32.1`; `corepack enable`). Run `pnpm install` once before anything else. Full walkthrough: `docs/guides/developer-setup.md`.
 
 - **Studio** — `pnpm dev` serves the Vite studio at `http://localhost:5173` (Vite default; tests pin it via `--port 5173 --strictPort`).
 - **Embed lab** — `pnpm embed-lab` serves bare-host test pages at `http://localhost:4400`.

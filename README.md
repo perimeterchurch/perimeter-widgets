@@ -5,7 +5,7 @@ A Turborepo monorepo of self-contained, embeddable React widgets for perimeter.o
 ## Prerequisites
 
 - **Node.js** 22+ (`engines.node` is `>=22`)
-- **pnpm** 10 — pinned via `packageManager` (`10.34.5`); `corepack enable` picks it up. Always use `pnpm`, never `npm`/`npx`.
+- **pnpm** 10 — pinned via `packageManager` (`10.32.1`); `corepack enable` picks it up. Always use `pnpm`, never `npm`/`npx`.
 
 ## Quick start
 

@@ -12,7 +12,7 @@ A Turborepo monorepo of embeddable React widgets that render in a shadow DOM via
 
 ## Prerequisites
 
-- **Node.js** 22+ and **pnpm** 10 (`10.34.5`, pinned via `packageManager`; `corepack enable`). Always use `pnpm` — never `npm`/`npx`.
+- **Node.js** 22+ and **pnpm** 10 (`10.32.1`, pinned via `packageManager`; `corepack enable`). Always use `pnpm` — never `npm`/`npx`.
 
 ## First-time setup
 
