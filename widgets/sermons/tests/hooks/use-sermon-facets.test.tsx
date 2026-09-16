@@ -138,8 +138,7 @@ describe('useSermonFacets', () => {
     // Two calls per hook: primer (no narrowing) + narrowed. The narrowed
     // speakers call carries the bookId + seriesId filter dimensions.
     const narrowed = speakersCalls.find((p) => (p as { bookId?: string }).bookId !== undefined) as
-      | { bookId?: string; seriesId?: string }
-      | undefined;
+      { bookId?: string; seriesId?: string } | undefined;
     expect(narrowed).toBeDefined();
     expect(narrowed?.bookId).toBe('10');
     expect(narrowed?.seriesId).toBe('100,101');

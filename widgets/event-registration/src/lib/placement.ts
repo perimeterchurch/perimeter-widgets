@@ -10,11 +10,7 @@ import type { RegistrationOptionGroup, RegistrationOptionPrice } from '@perimete
  */
 
 export type PlacementAskReason =
-  | 'needs_birth_date'
-  | 'needs_grade'
-  | 'no_match'
-  | 'ambiguous'
-  | 'unavailable';
+  'needs_birth_date' | 'needs_grade' | 'no_match' | 'ambiguous' | 'unavailable';
 
 export type PlacementOutcome =
   | { kind: 'not_placement' }

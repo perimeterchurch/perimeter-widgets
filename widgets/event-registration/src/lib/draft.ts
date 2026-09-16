@@ -54,9 +54,7 @@ export interface Draft {
   registrations: DraftRegistration[];
   /** Which registration is open in the editor, or a new one for a section. */
   editing:
-    | { kind: 'none' }
-    | { kind: 'existing'; localId: string }
-    | { kind: 'new'; sectionKey: string };
+    { kind: 'none' } | { kind: 'existing'; localId: string } | { kind: 'new'; sectionKey: string };
   guest: GuestDetails;
   contact: ContactDraft;
   payDeposit: boolean;
