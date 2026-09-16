@@ -14,6 +14,10 @@
       "destination": "/event-finder/0.1.2/index.js"
     },
     {
+      "source": "/event-registration/latest.js",
+      "destination": "/event-registration/0.1.0/index.js"
+    },
+    {
       "source": "/example/latest.js",
       "destination": "/example/0.0.1/index.js"
     },
@@ -27,7 +31,7 @@
     },
     {
       "source": "/mission-trip-finder/latest.js",
-      "destination": "/mission-trip-finder/0.5.3/index.js"
+      "destination": "/mission-trip-finder/0.5.4/index.js"
     },
     {
       "source": "/my-giving-history/latest.js",

@@ -1,0 +1,184 @@
+---
+description: Register your whole household for an event and its related sessions in one flow.
+---
+
+# event-registration
+
+The household version of MinistryPlatform's **Event Details & Registration**
+widget. One page for a parent event shows its details and one card per
+registration section — the parent itself when it sells a registration, plus
+every `bp_Related_Events` row (childcare, a spouse section, concurrent
+sessions). A signed-in member picks household members into sections, answers
+each section's options and custom form, sees a running total, and submits once.
+perimeter-api writes exactly the rows the native widget writes and the browser
+is sent to the native **Invoice Details & Payment** page to pay.
+
+Built for events that use related-event (household) registration — Family
+Night, Vision Night + childcare, Bible study + childcare. The native Event
+Finder and native details pages stay in place; staff point a parent event here
+by setting its `External_Registration_URL` to this page.
+
+## Embed
+
+```html
+<script src="https://widgets.perimeter.org/loader.js" async></script>
+<div
+  data-perimeter-widget="event-registration"
+  data-checkout-url="https://www.perimeter.org/event-checkout/"
+  data-return-url="https://www.perimeter.org/events"
+></div>
+```
+
+The page must carry the event in its query string — `?id=<Event_ID>`, the same
+parameter the native details widget reads — so a Register link from the native
+Event Finder or details page lands here unchanged. Pair the page with MP's login
+widget so members can sign in for the household roster:
+
+```html
+<script src="https://ministryplatform.perimeter.org/widgets/dist/UserLogin.js"></script>
+<mpp-user-login></mpp-user-login>
+```
+
+## Config
+
+`src/types.ts` is the source of truth.
+
+| Attribute                 | Required | Default                     | Description                                                                                          |
+| ------------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `data-checkout-url`       | No       | perimeter.org `/event-checkout/` | The native Invoice Details & Payment page. After a submit the browser goes to `…?id=<Invoice_GUID>`. |
+| `data-return-url`         | No       | `/events`                   | Where "Back to events" goes.                                                                         |
+| `data-id-param`           | No       | `id`                        | Query-string key carrying the `Event_ID` (MP's `EventDetailWidgetIdParameterName`).                 |
+| `data-event-id`           | No       | —                           | Pin the event instead of reading the query string (studio preview, single-event pages).             |
+| `data-invoice-param`      | No       | `id`                        | Query-string key the checkout page reads (MP's `InvoiceDetailWidgetIdParameterName`).               |
+| `data-default-image-url`  | No       | —                           | Fallback image when the event has none.                                                              |
+| `data-show-map`           | No       | `true`                      | Show "Get directions" when the location has an address.                                              |
+| `data-recaptcha-site-key` | No       | Perimeter's public site key | Used only for the guest (signed-out) path.                                                           |
+| `data-sticky-top-offset`  | No       | `0`                         | Height in px of a fixed host header, so the phone summary bar sticks below it instead of under it.   |
+| `data-api-url`            | No       | `https://api.perimeter.org` | Override the perimeter-api base URL (local dev).                                                     |
+
+## Behavior
+
+- **Sections** — `GET /api/registration/events/{id}` returns the parent (when it
+  has a product) and each related row in `Position` order. Each is a tappable
+  card: `Button_Text` is the card's label and the whole card is its hit area.
+  The native widget's `Enable_Label` opt-in question is NOT rendered (2026-09-16,
+  Dana: tapping the card is the opt-in); `Instructions` render as the card's
+  one-line summary behind "View details". Closed sections say why (not open
+  yet, closed, full, cancelled, sold out) and are not tappable.
+- **Who can go where** — `GET …/roster` returns the household with per-section
+  eligibility. `Show_Household_Position_ID` and `For_Gender_ID` filter members;
+  **`Minor_Registration = 1` lists only children**, `0`/blank lists everyone.
+  **Audience rules on the Event** (2026-09-15): `Registration_Min_Age` / `Max_Age` (years on
+  event day), `Registration_Min_Grade` / `Max_Grade` (Pre-K–12), gender and household position.
+  Adults-only sections carry an **Adults** badge and offer only adult relationships when adding
+  someone; grade-bounded sections show a **Grade** select, prefilled from the child's graduation
+  year, and never ask a child whose age rules the grade out. Ineligible members read "too young",
+  "too old" or "not this grade".
+  **Room placement** (2026-09-15): when an option group's rooms carry `Placement_*` bounds on
+  the Group record, the widget places the child from their birth date (and grade when a room
+  asks for it), shows the room as a line instead of radios, and the server re-derives it on every
+  quote and submit. The radios return only when no room fits, two fit, or the fit is full.
+  In a minors-only section the editor also shows a required **Date of birth** for the chosen child, prefilled from their record. The confirmed date is sent with the registration; the API requires one and writes a correction back to the child's contact, so a birth-date question on the custom form is redundant and can be removed.
+  Someone already registered in a section's event is grayed out (blocked, not
+  warned). Children show their age so parents can pick the right grade band.
+- **Free events show no prices** (2026-09-15) — when every section is free, offers no deposit and
+  every option is $0, the "Free" badges, per-person amounts and the Total row are hidden. Any
+  paid section or option brings them all back.
+- **Prefill from the record** (2026-09-15) — form fields mapped to an attribute on the Form
+  Field (`Add_Attribute_ID` / `Add_Attribute_Type_ID`, the same mapping Kevin's routine writes
+  from) open with the child's current attribute as the answer: Toilet Training, Walking Status
+  and Allergies for TOP Childcare. A note under the form says where it came from; the parent can
+  change anything and only what they confirm is submitted.
+- **Several people at once** (2026-09-15, drawers 2026-09-16) — the picker is a set of
+  checkboxes and each ticked person answers right under their own name. Ticking opens that
+  person's drawer (birth date, grade, resolved room, options, form questions) and collapses
+  any other; a person whose record already answers everything (prefill) stays collapsed to a
+  summary row ("7th · No ✓ Change"), an unfinished one shows "Needs answers". "Done"
+  re-checks and collapses; saving reopens the first drawer with a problem. One button adds
+  them all; a sole eligible member is pre-ticked. A "Copy …'s answers" button copies the
+  previous person's form answers. Editing an existing registration stays single-person.
+- **Add a family member** — a signed-in member may add someone not yet in MP;
+  the contact and participant are created inside the submit, in their household.
+- **Guest path** — signed out, and only when neither the event nor any form
+  forces login, a visitor registers themself through the blank form (reCAPTCHA
+  verified server-side). Household features need the login widget.
+- **Pricing** — `POST …/quote` prices the draft on every change: base price,
+  option groups (required / mutually exclusive / quantities / sold out), promo
+  codes, deposits. The total shown is the server's, and submit refuses with a
+  refreshed total if anything changed in between.
+- **Overlap warning** — the same person in two sections whose events run at the
+  same time gets a warning, never a block (childcare-then-event is legitimate).
+- **Submit** — `POST …/submit` with an `Idempotency-Key`; a retry after a network
+  blip replays the same result. When the invoice total is above $0 the browser goes to
+  `data-checkout-url?id=<Invoice_GUID>` (the native Invoice Details & Payment page; the
+  registration is *Awaiting Payment* until it pays, and MP releases unpaid seats after about an
+  hour). When it
+  is $0 (2026-09-16) the widget stays put and shows "You're registered" with the people and
+  sessions, where the confirmation email goes, and "Register someone else" / "Back to
+  events" — the checkout page would only show a $0 invoice, and MP's Registrant Message job
+  sends the confirmation either way.
+- **Coming back** — the checkout's "Make Changes" returns with
+  `?id=<eventId>&invoiceid=<guid>`; the widget offers to continue that checkout
+  or start over.
+- **Not supported** — File Upload form fields (a required one closes the
+  section), secondary households, and form fields that also write attributes or
+  opportunity responses (answers are stored; the side effect is not).
+
+## Layout
+
+Designed phone-first (2026-09-16) after the Great Wolf Lodge "Packages" pattern, then widened.
+Container-query thresholds are written in px (`@min-[480px]:`, `@min-[768px]:`) because the
+build's rem→px rewrite does not touch `@container` params.
+
+| | Phone (< 480px) | Tablet (480–767px) | Desktop (≥ 768px) |
+| --- | --- | --- | --- |
+| Hero | full-bleed 16:9 image, description clipped behind "Read more" | same | `max-h-80` image, full description |
+| Summary | sticky bar at the top: count badge, total when prices show, chevron opens the review | same | review column on the right, sticky |
+| Sections | one list in `Position` order; tappable image-led cards with badges, title, "View details", price and the `Button_Text` label + chevron | same | left column, two cards per row from 1024px |
+| Editor | bottom sheet (`<dialog>` + `showModal()`, top layer) | same | inline in the card |
+| Contact | inside the summary bar's expanded panel, under the total ("Contact for this registration": name · email · phone, Edit); the bar opens itself when email/phone or a required address is missing | same | inside the review column, between the total and the submit |
+| Submit | sticky bottom CTA: "Add someone to continue" → "Continue to your details" (guests) → "Fix N issues" → submit | same | button in the review column |
+
+- **Contact for this registration** (2026-09-16) — part of the review (who gets the receipt
+  sits with the total and the submit), not a card among the events. Signed in, the purchaser's
+  name, email and phone from MP show as one line with an Edit button; the fields appear only
+  on request or when the record lacks email/phone or the quote requires an address. The
+  "update my record" opt-in appears once something has changed and defaults to on. Guests
+  give their name, email and phone inside the editor on their first add ("Your details");
+  the line then shows what they entered. Wording avoids "Registering as": the purchaser is
+  usually not the one attending.
+- **Card images** — `/api/event-image/{Event_ID}` for the section's own event, then the hub
+  event's image, then `data-default-image-url`; when all three fail the card drops the picture
+  and keeps a navy left rule (`data-slot="section-card-noimage"`). Child events without an
+  image all show the hub image, so give each a picture in MP to tell them apart.
+- **The sheet** sits in the browser's top layer, so a host page's fixed header or a
+  `transform` on a wrapper cannot trap or cover it. While it is open the host body is
+  scroll-locked, Escape and the backdrop close it, and focus returns to the button that opened
+  it. Its "Add to registration" row sticks to the sheet's bottom edge with safe-area padding.
+- **Sticky bars are `position: sticky` inside the widget**, so a host ancestor with
+  `overflow: hidden` turns them static (see `packages/embed-lab/pages/narrow.html`), and a
+  fixed host header needs `data-sticky-top-offset` or the summary bar slides under it.
+  Safe-area padding at the bottom needs `viewport-fit=cover` on the host's viewport meta.
+- **As few buttons as possible** — the card is the control (a stretched button behind the
+  footer label, so screen readers still hear `Button_Text`); the sheet has a close X and its
+  save button, no Cancel; the CTA is one button. Edit/remove icons and "View details" are the
+  only other controls.
+- **Touch targets** are at least 44px on phones: the card label, submit, the edit/remove
+  icons, checkbox and radio rows, "View details", the sheet's close button.
+- **Tests** — `tests/app.test.tsx` runs the desktop branch (jsdom reports a 0px width, which
+  the breakpoint hook treats as "not measured"); `tests/mobile.test.tsx` pushes 343px through a
+  controllable `ResizeObserver` mock and covers the bar, the CTA states, the sheet and the
+  image chain.
+
+## Data source
+
+perimeter-api `RegistrationController` — `docs/domains/event-registration.md`
+and the table-by-table `docs/WRITE-CONTRACT.md` in that repo.
+
+## Testing it locally
+
+Writes are refused by perimeter-api unless its `REGISTRATION_*` guard allows the
+event — dry runs included — so local testing needs a hidden test event on the
+allowlist. `pnpm embed-lab` → `local-event-registration.html?id=<Event_ID>`
+against a local perimeter-api on :5500; set `mpp-widgets_AuthToken` in
+localStorage to see the household roster.

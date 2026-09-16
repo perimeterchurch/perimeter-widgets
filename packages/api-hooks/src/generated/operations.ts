@@ -1252,6 +1252,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/registration/events/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Event details plus registration sections (parent + bp_Related_Events) with products, availability and form fields */
+    get: operations['getRegistrationEvent'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/registration/events/{id}/roster': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** The signed-in viewer's primary household with per-section eligibility */
+    get: operations['getRegistrationRoster'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/registration/events/{id}/quote': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Price a registration plan without writing anything */
+    post: operations['quoteRegistration'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/registration/events/{id}/submit': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Write a registration plan to MP as the native widget would (or report it with dryRun); requires an Idempotency-Key UUID header */
+    post: operations['submitRegistration'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/org-chart': {
     parameters: {
       query?: never;
@@ -6639,6 +6707,815 @@ export interface operations {
       400: components['responses']['BadRequest'];
       401: components['responses']['Unauthorized'];
       403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getRegistrationEvent: {
+    parameters: {
+      query?: {
+        page?: string;
+      };
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              eventId: number;
+              title: string;
+              descriptionHtml: string | null;
+              startDate: string;
+              endDate: string;
+              /** @description IANA zone of the event congregation. */
+              timeZone: string;
+              congregationId: number;
+              imageUrl: string | null;
+              location: {
+                name: string | null;
+                addressLine1: string | null;
+                addressLine2: string | null;
+                city: string | null;
+                state: string | null;
+                postalCode: string | null;
+                directionsUrl: string | null;
+                rooms: string[];
+              } | null;
+              primaryContact: {
+                displayName: string;
+                emailAddress: string | null;
+              } | null;
+              visibilityLevelId: number;
+              viewable: boolean;
+              cancelled: boolean;
+              externalRegistrationUrl: string | null;
+              viewer: {
+                signedIn: boolean;
+                contactId: number | null;
+                loginRequired: boolean;
+                canGuestRegister: boolean;
+                isStaff: boolean;
+              };
+              sections: {
+                /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                key: string;
+                relatedEventId: number | null;
+                displayName: string;
+                enableLabelHtml: string | null;
+                instructionsHtml: string | null;
+                buttonText: string;
+                position: number;
+                showHouseholdPositionId: number | null;
+                forGenderId: number | null;
+                isParentEvent: boolean;
+                audience: {
+                  minAge: number | null;
+                  maxAge: number | null;
+                  minGrade: number | null;
+                  maxGrade: number | null;
+                  genderId: number | null;
+                  householdPositionId: number | null;
+                  minorsOnly: boolean;
+                  adultsOnly: boolean;
+                };
+                event: {
+                  eventId: number;
+                  title: string;
+                  /** @description MP naive-local ISO, congregation time zone. */
+                  startDate: string;
+                  endDate: string;
+                  meetingInstructionsHtml: string | null;
+                  minorRegistration: boolean;
+                  participantsExpected: number | null;
+                  remaining: number | null;
+                  registrationStart: string | null;
+                  registrationEnd: string | null;
+                  externalRegistrationUrl: string | null;
+                };
+                product: {
+                  productId: number;
+                  name: string;
+                  descriptionHtml: string | null;
+                  basePrice: number;
+                  depositPrice: number | null;
+                  groups: {
+                    productOptionGroupId: number;
+                    name: string;
+                    descriptionHtml: string | null;
+                    required: boolean;
+                    mutuallyExclusive: boolean;
+                    noteLabel: string | null;
+                    formFieldId: number | null;
+                    omitFromSummary: boolean;
+                    exhausted: boolean;
+                    prices: {
+                      productOptionPriceId: number;
+                      title: string;
+                      /** @description Option_Price; negative for discounts. */
+                      price: number;
+                      qtyAllowed: number;
+                      minQty: number;
+                      maxQty: number | null;
+                      remaining: number | null;
+                      attendingOnline: boolean;
+                      addsToGroupId: number | null;
+                      hidden: boolean;
+                      isPromo: boolean;
+                      sortOrder: number | null;
+                      placement: {
+                        minAgeMonths: number | null;
+                        maxAgeMonths: number | null;
+                        minGrade: number | null;
+                        maxGrade: number | null;
+                      } | null;
+                    }[];
+                  }[];
+                } | null;
+                form: {
+                  formId: number;
+                  title: string;
+                  instructionsHtml: string | null;
+                  forceLogin: boolean;
+                  fields: {
+                    formFieldId: number;
+                    order: number;
+                    label: string;
+                    alternateLabelHtml: string | null;
+                    fieldTypeId: number;
+                    values: string[];
+                    required: boolean;
+                    dependsOnFieldId: number | null;
+                    dependsOnValue: string | null;
+                    omitFromSummary: boolean;
+                    hasSideEffects: boolean;
+                  }[];
+                  blockedByFileUpload: boolean;
+                  fileUploadFieldIds: number[];
+                } | null;
+                open: boolean;
+                closedReason:
+                  | (
+                      | 'not_active'
+                      | 'not_yet_open'
+                      | 'closed'
+                      | 'cancelled'
+                      | 'not_approved'
+                      | 'no_product'
+                      | 'external_url'
+                      | 'full'
+                      | 'required_options_exhausted'
+                      | 'file_upload_required'
+                    )
+                  | null;
+              }[];
+              registrationOpen: boolean;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getRegistrationRoster: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              householdId: number;
+              viewer: {
+                contactId: number;
+                firstName: string;
+                lastName: string;
+                email: string | null;
+                phone: string | null;
+                address: {
+                  line1: string | null;
+                  line2: string | null;
+                  city: string | null;
+                  state: string | null;
+                  postalCode: string | null;
+                } | null;
+              };
+              members: {
+                contactId: number;
+                firstName: string;
+                lastName: string;
+                displayName: string;
+                householdPositionId: number | null;
+                genderId: number | null;
+                dateOfBirth: string | null;
+                age: number | null;
+                grade: number | null;
+                isMinorPosition: boolean;
+                isViewer: boolean;
+                hasParticipantRecord: boolean;
+                prefill: {
+                  formFieldId: number;
+                  response: string;
+                  since: string | null;
+                }[];
+                eligibility: {
+                  /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                  sectionKey: string;
+                  eligible: boolean;
+                  reason:
+                    | (
+                        | 'household_position'
+                        | 'gender'
+                        | 'minors_only'
+                        | 'too_young'
+                        | 'too_old'
+                        | 'wrong_grade'
+                        | 'already_registered'
+                        | 'section_closed'
+                      )
+                    | null;
+                  requires: ('birth_date' | 'grade')[];
+                  existingEventParticipantId: number | null;
+                }[];
+              }[];
+              creatablePositionIds: number[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  quoteRegistration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          purchaser:
+            | {
+                /** @constant */
+                kind: 'session';
+              }
+            | {
+                /** @constant */
+                kind: 'guest';
+                firstName: string;
+                lastName: string;
+                /** Format: email */
+                email: string;
+                phone: string;
+                address?: {
+                  line1: string;
+                  line2?: string;
+                  city: string;
+                  state: string;
+                  postalCode: string;
+                };
+              };
+          registrations: {
+            /** @description 'parent' or 'related:<Related_Event_ID>'. */
+            sectionKey: string;
+            attendee:
+              | {
+                  /** @constant */
+                  kind: 'contact';
+                  contactId: number;
+                  /** @description yyyy-MM-dd */
+                  dateOfBirth?: string;
+                  grade?: number;
+                }
+              | {
+                  /** @constant */
+                  kind: 'new';
+                  firstName: string;
+                  lastName: string;
+                  /** @description yyyy-MM-dd */
+                  dateOfBirth?: string;
+                  genderId?: number;
+                  grade?: number;
+                  householdPositionId: number;
+                  /** Format: email */
+                  email?: string;
+                  phone?: string;
+                }
+              | {
+                  /** @constant */
+                  kind: 'purchaser';
+                };
+            /** @default [] */
+            options: {
+              productOptionPriceId: number;
+              /** @default 1 */
+              quantity: number;
+              note?: string;
+            }[];
+            promoCode?: string;
+            /** @default [] */
+            answers: {
+              formFieldId: number;
+              response: string;
+            }[];
+          }[];
+          /** @default false */
+          payDeposit: boolean;
+          /** @default false */
+          updateMyRecord: boolean;
+          contact?: {
+            /** Format: email */
+            email?: string;
+            phone?: string;
+            address?: {
+              line1: string;
+              line2?: string;
+              city: string;
+              state: string;
+              postalCode: string;
+            };
+          };
+          captchaToken?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              eventId: number;
+              registrations: {
+                registrationIndex: number;
+                /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                sectionKey: string;
+                eventId: number;
+                contactId: number | null;
+                attendeeName: string;
+                isMinor: boolean;
+                lines: {
+                  /** @enum {string} */
+                  kind: 'base' | 'option' | 'promo';
+                  productId: number;
+                  productOptionPriceId: number | null;
+                  title: string;
+                  quantity: number;
+                  unitPrice: number;
+                  lineTotal: number;
+                  itemNote: string | null;
+                  depositRequested: boolean;
+                }[];
+                subtotal: number;
+                optionsSummary: string | null;
+                answerSummary: string | null;
+                attendingOnline: boolean;
+                addsToGroupIds: number[];
+                overlapsWithRegistrationIndexes: number[];
+                resolvedOptions: {
+                  productOptionGroupId: number;
+                  groupName: string;
+                  productOptionPriceId: number;
+                  title: string;
+                }[];
+              }[];
+              invoiceTotal: number;
+              depositRequested: boolean;
+              participationStatusId: number;
+              invoiceStatusId: number;
+              addressRequired: boolean;
+              problems: {
+                /** @enum {string} */
+                code:
+                  | 'SECTION_INELIGIBLE'
+                  | 'SECTION_CLOSED'
+                  | 'ALREADY_REGISTERED'
+                  | 'DUPLICATE_IN_PLAN'
+                  | 'OPTION_UNAVAILABLE'
+                  | 'OPTION_HIDDEN'
+                  | 'REQUIRED_OPTION_MISSING'
+                  | 'MUTUALLY_EXCLUSIVE_CONFLICT'
+                  | 'QUANTITY_OUT_OF_RANGE'
+                  | 'INVALID_PROMO_CODE'
+                  | 'FORM_INCOMPLETE'
+                  | 'FORM_FIELD_INVALID'
+                  | 'FILE_UPLOAD_REQUIRED'
+                  | 'CAPACITY_EXCEEDED'
+                  | 'ADDRESS_REQUIRED'
+                  | 'GUEST_NOT_ALLOWED'
+                  | 'LOGIN_REQUIRED'
+                  | 'MINOR_REQUIRED'
+                  | 'BIRTH_DATE_REQUIRED'
+                  | 'GRADE_REQUIRED'
+                  | 'CHOOSE_OPTION';
+                message: string;
+                registrationIndex: number | null;
+                details?: {
+                  [key: string]: unknown;
+                };
+              }[];
+              submittable: boolean;
+              quoteHash: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  submitRegistration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          purchaser:
+            | {
+                /** @constant */
+                kind: 'session';
+              }
+            | {
+                /** @constant */
+                kind: 'guest';
+                firstName: string;
+                lastName: string;
+                /** Format: email */
+                email: string;
+                phone: string;
+                address?: {
+                  line1: string;
+                  line2?: string;
+                  city: string;
+                  state: string;
+                  postalCode: string;
+                };
+              };
+          registrations: {
+            /** @description 'parent' or 'related:<Related_Event_ID>'. */
+            sectionKey: string;
+            attendee:
+              | {
+                  /** @constant */
+                  kind: 'contact';
+                  contactId: number;
+                  /** @description yyyy-MM-dd */
+                  dateOfBirth?: string;
+                  grade?: number;
+                }
+              | {
+                  /** @constant */
+                  kind: 'new';
+                  firstName: string;
+                  lastName: string;
+                  /** @description yyyy-MM-dd */
+                  dateOfBirth?: string;
+                  genderId?: number;
+                  grade?: number;
+                  householdPositionId: number;
+                  /** Format: email */
+                  email?: string;
+                  phone?: string;
+                }
+              | {
+                  /** @constant */
+                  kind: 'purchaser';
+                };
+            /** @default [] */
+            options: {
+              productOptionPriceId: number;
+              /** @default 1 */
+              quantity: number;
+              note?: string;
+            }[];
+            promoCode?: string;
+            /** @default [] */
+            answers: {
+              formFieldId: number;
+              response: string;
+            }[];
+          }[];
+          /** @default false */
+          payDeposit: boolean;
+          /** @default false */
+          updateMyRecord: boolean;
+          contact?: {
+            /** Format: email */
+            email?: string;
+            phone?: string;
+            address?: {
+              line1: string;
+              line2?: string;
+              city: string;
+              state: string;
+              postalCode: string;
+            };
+          };
+          captchaToken?: string;
+          /** @default false */
+          dryRun: boolean;
+          expectedQuoteHash?: string;
+          checkout?: {
+            /** Format: uri */
+            url: string;
+            /** @default id */
+            invoiceParam: string;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data:
+              | {
+                  /** @constant */
+                  dryRun: false;
+                  idempotencyKey: string;
+                  replayed: boolean;
+                  invoiceId: number;
+                  invoiceGuid: string;
+                  invoiceTotal: number;
+                  invoiceStatusId: number;
+                  checkoutUrl: string;
+                  participants: {
+                    registrationIndex: number;
+                    /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                    sectionKey: string;
+                    eventId: number;
+                    contactId: number;
+                    participantId: number;
+                    eventParticipantId: number;
+                    participationStatusId: number;
+                    formResponseId: number | null;
+                    groupParticipantId: number | null;
+                    contactCreated: boolean;
+                  }[];
+                  quote: {
+                    eventId: number;
+                    registrations: {
+                      registrationIndex: number;
+                      /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                      sectionKey: string;
+                      eventId: number;
+                      contactId: number | null;
+                      attendeeName: string;
+                      isMinor: boolean;
+                      lines: {
+                        /** @enum {string} */
+                        kind: 'base' | 'option' | 'promo';
+                        productId: number;
+                        productOptionPriceId: number | null;
+                        title: string;
+                        quantity: number;
+                        unitPrice: number;
+                        lineTotal: number;
+                        itemNote: string | null;
+                        depositRequested: boolean;
+                      }[];
+                      subtotal: number;
+                      optionsSummary: string | null;
+                      answerSummary: string | null;
+                      attendingOnline: boolean;
+                      addsToGroupIds: number[];
+                      overlapsWithRegistrationIndexes: number[];
+                      resolvedOptions: {
+                        productOptionGroupId: number;
+                        groupName: string;
+                        productOptionPriceId: number;
+                        title: string;
+                      }[];
+                    }[];
+                    invoiceTotal: number;
+                    depositRequested: boolean;
+                    participationStatusId: number;
+                    invoiceStatusId: number;
+                    addressRequired: boolean;
+                    problems: {
+                      /** @enum {string} */
+                      code:
+                        | 'SECTION_INELIGIBLE'
+                        | 'SECTION_CLOSED'
+                        | 'ALREADY_REGISTERED'
+                        | 'DUPLICATE_IN_PLAN'
+                        | 'OPTION_UNAVAILABLE'
+                        | 'OPTION_HIDDEN'
+                        | 'REQUIRED_OPTION_MISSING'
+                        | 'MUTUALLY_EXCLUSIVE_CONFLICT'
+                        | 'QUANTITY_OUT_OF_RANGE'
+                        | 'INVALID_PROMO_CODE'
+                        | 'FORM_INCOMPLETE'
+                        | 'FORM_FIELD_INVALID'
+                        | 'FILE_UPLOAD_REQUIRED'
+                        | 'CAPACITY_EXCEEDED'
+                        | 'ADDRESS_REQUIRED'
+                        | 'GUEST_NOT_ALLOWED'
+                        | 'LOGIN_REQUIRED'
+                        | 'MINOR_REQUIRED'
+                        | 'BIRTH_DATE_REQUIRED'
+                        | 'GRADE_REQUIRED'
+                        | 'CHOOSE_OPTION';
+                      message: string;
+                      registrationIndex: number | null;
+                      details?: {
+                        [key: string]: unknown;
+                      };
+                    }[];
+                    submittable: boolean;
+                    quoteHash: string;
+                  };
+                }
+              | {
+                  /** @constant */
+                  dryRun: true;
+                  idempotencyKey: string;
+                  eventId: number;
+                  eventIds: number[];
+                  quote: {
+                    eventId: number;
+                    registrations: {
+                      registrationIndex: number;
+                      /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                      sectionKey: string;
+                      eventId: number;
+                      contactId: number | null;
+                      attendeeName: string;
+                      isMinor: boolean;
+                      lines: {
+                        /** @enum {string} */
+                        kind: 'base' | 'option' | 'promo';
+                        productId: number;
+                        productOptionPriceId: number | null;
+                        title: string;
+                        quantity: number;
+                        unitPrice: number;
+                        lineTotal: number;
+                        itemNote: string | null;
+                        depositRequested: boolean;
+                      }[];
+                      subtotal: number;
+                      optionsSummary: string | null;
+                      answerSummary: string | null;
+                      attendingOnline: boolean;
+                      addsToGroupIds: number[];
+                      overlapsWithRegistrationIndexes: number[];
+                      resolvedOptions: {
+                        productOptionGroupId: number;
+                        groupName: string;
+                        productOptionPriceId: number;
+                        title: string;
+                      }[];
+                    }[];
+                    invoiceTotal: number;
+                    depositRequested: boolean;
+                    participationStatusId: number;
+                    invoiceStatusId: number;
+                    addressRequired: boolean;
+                    problems: {
+                      /** @enum {string} */
+                      code:
+                        | 'SECTION_INELIGIBLE'
+                        | 'SECTION_CLOSED'
+                        | 'ALREADY_REGISTERED'
+                        | 'DUPLICATE_IN_PLAN'
+                        | 'OPTION_UNAVAILABLE'
+                        | 'OPTION_HIDDEN'
+                        | 'REQUIRED_OPTION_MISSING'
+                        | 'MUTUALLY_EXCLUSIVE_CONFLICT'
+                        | 'QUANTITY_OUT_OF_RANGE'
+                        | 'INVALID_PROMO_CODE'
+                        | 'FORM_INCOMPLETE'
+                        | 'FORM_FIELD_INVALID'
+                        | 'FILE_UPLOAD_REQUIRED'
+                        | 'CAPACITY_EXCEEDED'
+                        | 'ADDRESS_REQUIRED'
+                        | 'GUEST_NOT_ALLOWED'
+                        | 'LOGIN_REQUIRED'
+                        | 'MINOR_REQUIRED'
+                        | 'BIRTH_DATE_REQUIRED'
+                        | 'GRADE_REQUIRED'
+                        | 'CHOOSE_OPTION';
+                      message: string;
+                      registrationIndex: number | null;
+                      details?: {
+                        [key: string]: unknown;
+                      };
+                    }[];
+                    submittable: boolean;
+                    quoteHash: string;
+                  };
+                  writes: {
+                    seq: number;
+                    table: string;
+                    /** @enum {string} */
+                    op: 'create' | 'update' | 'proc';
+                    placeholderId: number | null;
+                    rows: {
+                      [key: string]: unknown;
+                    }[];
+                    primaryKey: string | null;
+                    targetId: number | null;
+                  }[];
+                  /** @description checkoutUrl with a placeholder GUID. */
+                  wouldRedirectTo: string;
+                };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      404: components['responses']['NotFound'];
       500: components['responses']['InternalError'];
     };
   };
