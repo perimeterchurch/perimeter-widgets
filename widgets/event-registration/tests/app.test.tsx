@@ -110,11 +110,24 @@ describe('event-registration widget', () => {
     expect(screen.getByText('5 spots left')).toBeInTheDocument();
   });
 
-  it('pre-fills the signed-in purchaser from the roster', () => {
+  it('shows the signed-in purchaser as a one-line contact, with fields behind Edit', () => {
     render(<App config={config} auth={authStub(true)} />);
-    expect(screen.getByText(/Registering as/)).toHaveTextContent('Jen Cano');
+    const contact = screen.getByRole('region', { name: 'Your contact information' });
+    expect(within(contact).getByText('Contact for this registration')).toBeInTheDocument();
+    expect(within(contact).getByText('Jen Cano')).toBeInTheDocument();
+    expect(within(contact).getByText('jen@example.com')).toBeInTheDocument();
+    expect(screen.queryByText(/Registering as/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Email *')).not.toBeInTheDocument();
+
+    fireEvent.click(within(contact).getByRole('button', { name: 'Edit' }));
     expect(screen.getByLabelText('Email *')).toHaveValue('jen@example.com');
     expect(screen.getByLabelText('Address')).toHaveValue('5088 Bridgeport Way');
+    // Nothing changed yet, so there is nothing to write back.
+    expect(screen.queryByLabelText(/update my record/)).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Phone *'), { target: { value: '770-555-0000' } });
+    expect(screen.getByLabelText(/update my record/)).toBeChecked();
+    fireEvent.click(within(contact).getByRole('button', { name: 'Done' }));
+    expect(within(contact).getByText('770-555-0000')).toBeInTheDocument();
   });
 
   it('does not gate a section behind its Enable_Label question: the card itself is the opt-in', () => {
@@ -395,11 +408,16 @@ describe('event-registration widget', () => {
     expect(screen.getAllByText(/\$\d/).length).toBeGreaterThan(0);
   });
 
-  it('shows the sign-in notice and the guest form when signed out', () => {
+  it('shows the sign-in notice and asks a guest for their details in the editor', () => {
     hooks.roster.data = undefined;
     render(<App config={config} auth={authStub(false)} />);
     expect(screen.getByText('Sign in to register your family.')).toBeInTheDocument();
-    expect(screen.getByLabelText('First name *')).toBeInTheDocument();
+    // No standalone contact form until they pick an event.
+    expect(screen.queryByLabelText('First name *')).not.toBeInTheDocument();
+    const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
+    expect(within(card).getByText('Your details')).toBeInTheDocument();
+    expect(within(card).getByLabelText('First name *')).toBeInTheDocument();
   });
 
   it('requires sign-in when the event forces login', () => {

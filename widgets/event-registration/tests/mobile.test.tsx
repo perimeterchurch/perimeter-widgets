@@ -293,17 +293,36 @@ describe('event-registration widget on a phone', () => {
     expect(screen.queryByText('Total')).not.toBeInTheDocument();
   });
 
-  it('points a guest at their details before the quote can run', () => {
+  it("collects a guest's details in the sheet and shows them as the contact line", () => {
     hooks.roster.data = undefined;
     renderPhone(false);
+    expect(
+      screen.queryByRole('region', { name: 'Your contact information' }),
+    ).not.toBeInTheDocument();
     const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
     fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
     const sheet = screen.getByRole('dialog');
     fireEvent.click(within(sheet).getByRole('button', { name: 'Add to registration' }));
-    const cta = screen.getByRole('button', { name: 'Continue to your details' });
-    expect(cta).toBeEnabled();
-    fireEvent.click(cta);
-    expect(document.activeElement).toBe(screen.getByLabelText('First name *'));
+    expect(
+      within(sheet).getByText('Please fill in your name, email and phone.'),
+    ).toBeInTheDocument();
+    fireEvent.change(within(sheet).getByLabelText('First name *'), { target: { value: 'Sam' } });
+    fireEvent.change(within(sheet).getByLabelText('Last name *'), { target: { value: 'Guest' } });
+    fireEvent.change(within(sheet).getByLabelText('Email *'), {
+      target: { value: 'sam@example.com' },
+    });
+    fireEvent.change(within(sheet).getByLabelText('Phone *'), {
+      target: { value: '770-555-1234' },
+    });
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Add to registration' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    const contact = screen.getByRole('region', { name: 'Your contact information' });
+    expect(within(contact).getByText('Sam Guest')).toBeInTheDocument();
+    expect(within(contact).getByText('sam@example.com')).toBeInTheDocument();
+    expect(within(card).getByText('Sam Guest')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Continue to your details' }),
+    ).not.toBeInTheDocument();
   });
 
   it('falls back from the section image to the hub image, then to a compact card', () => {

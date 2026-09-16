@@ -11,6 +11,7 @@ import { Button } from '@perimeter/ui/button';
 import { Input } from '@perimeter/ui/input';
 import { Label } from '@perimeter/ui/label';
 import { OptionGroupField } from './OptionGroupField';
+import { GuestContactForm } from './PurchaserForm';
 import {
   isPlacementGroup,
   placementHint,
@@ -19,7 +20,12 @@ import {
 } from '../lib/placement';
 import { FIELD_TYPE, FormFieldInput, isFieldActive } from './FormFieldInput';
 import { RichText } from './RichText';
-import { attendeeIdentity, newLocalId, type DraftRegistration } from '../lib/draft';
+import {
+  attendeeIdentity,
+  newLocalId,
+  type DraftRegistration,
+  type GuestDetails,
+} from '../lib/draft';
 import { GRADE_OPTIONS, formatAge, formatGrade, formatPrice, parseEventDate } from '../lib/format';
 
 /** `Household_Positions` a new member may be created with. */
@@ -43,6 +49,11 @@ export interface RegistrantEditorProps {
   /** Guest viewers register themself; signed-in viewers pick from the roster or add a member. */
   mode: 'household' | 'guest';
   guestName: string;
+  /** Guest path: the purchaser's own details are collected here, on the first add. */
+  guest?: GuestDetails | undefined;
+  onGuestChange?: ((patch: Partial<GuestDetails>) => void) | undefined;
+  /** The quote says the product needs a postal address. */
+  addressRequired?: boolean;
   /** Problems the last quote reported for this registration, if any. */
   problems: QuoteProblem[];
   /** Congregation time zone; ages for room placement are taken on the event's start date. */
@@ -112,6 +123,9 @@ export function RegistrantEditor({
   takenIdentities,
   mode,
   guestName,
+  guest,
+  onGuestChange,
+  addressRequired = false,
   problems,
   timeZone,
   showPrices,
@@ -370,6 +384,23 @@ export function RegistrantEditor({
     const out: DraftRegistration[] = [];
 
     if (views.length === 0) errors.set('who', 'Choose who this registration is for.');
+
+    if (mode === 'guest' && guest) {
+      const blank = (v: string) => v.trim().length === 0;
+      if ([guest.firstName, guest.lastName, guest.email, guest.phone].some(blank)) {
+        errors.set('guest', 'Please fill in your name, email and phone.');
+      } else if (
+        addressRequired &&
+        [
+          guest.address.line1,
+          guest.address.city,
+          guest.address.state,
+          guest.address.postalCode,
+        ].some(blank)
+      ) {
+        errors.set('guest', 'Please fill in your address.');
+      }
+    }
 
     for (const view of views) {
       const state = stateOf(view.key);
@@ -747,6 +778,7 @@ export function RegistrantEditor({
   return (
     <form
       onSubmit={handleSave}
+      noValidate
       className={
         embedded
           ? 'grid gap-5 bg-bg'
@@ -761,12 +793,30 @@ export function RegistrantEditor({
 
       {/* ── Who ─────────────────────────────────────────────────────── */}
       {mode === 'guest' ? (
-        <p className="font-sans text-sm text-fg">
-          Registering: <strong>{guestName || 'you'}</strong>
-        </p>
+        <fieldset className="grid gap-3">
+          <legend className="mb-1 font-sans text-sm font-medium text-fg">
+            Your details <span className="text-destructive">*</span>
+            <span className="ml-2 font-normal text-muted-fg">
+              The receipt and confirmation go here.
+            </span>
+          </legend>
+          {guest && onGuestChange && (
+            <GuestContactForm
+              idPrefix={`${idPrefix}-guest`}
+              guest={guest}
+              addressRequired={addressRequired}
+              onChange={onGuestChange}
+            />
+          )}
+          {localErrors.get('guest') && (
+            <p role="alert" className="font-sans text-xs text-destructive">
+              {localErrors.get('guest')}
+            </p>
+          )}
+        </fieldset>
       ) : existing ? (
         <p className="font-sans text-sm text-fg">
-          Registering: <strong>{existing.attendeeLabel}</strong>
+          For <strong>{existing.attendeeLabel}</strong>
         </p>
       ) : (
         <fieldset className="grid gap-2">

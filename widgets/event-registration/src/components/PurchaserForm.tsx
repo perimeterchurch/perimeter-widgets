@@ -81,28 +81,26 @@ function AddressFields({
 }
 
 export interface SignedInContactFormProps {
-  viewerName: string;
   contact: ContactDraft;
   addressRequired: boolean;
+  /** The values differ from the MP record: offer to write them back. */
+  dirty: boolean;
   onChange: (patch: Partial<ContactDraft>) => void;
 }
 
 /**
- * The signed-in purchaser's contact block: pre-filled from MP, editable, with
- * the native "use this to update my record" opt-in. Address is required
- * only for a paid registration, matching the native widget.
+ * The signed-in purchaser's contact fields: pre-filled from MP, editable,
+ * with the native "use this to update my record" opt-in shown once something
+ * has actually changed. Address is required only when the quote says so.
  */
 export function SignedInContactForm({
-  viewerName,
   contact,
   addressRequired,
+  dirty,
   onChange,
 }: SignedInContactFormProps): React.JSX.Element {
   return (
     <div className="grid gap-4">
-      <p className="font-sans text-sm text-fg">
-        Registering as <strong>{viewerName}</strong>
-      </p>
       <div className="grid gap-3 @min-[480px]:grid-cols-2">
         <div className="grid gap-1">
           <Label htmlFor="purchaser-email">Email *</Label>
@@ -135,19 +133,21 @@ export function SignedInContactForm({
         required={addressRequired}
         onChange={(address) => onChange({ address })}
       />
-      <label
-        htmlFor="purchaser-update-record"
-        className="inline-flex cursor-pointer items-start gap-2 font-sans text-sm text-fg select-none"
-      >
-        <input
-          id="purchaser-update-record"
-          type="checkbox"
-          checked={contact.updateMyRecord}
-          onChange={(e) => onChange({ updateMyRecord: e.target.checked })}
-          className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary"
-        />
-        Use the contact and address information above to update my record on file.
-      </label>
+      {dirty && (
+        <label
+          htmlFor="purchaser-update-record"
+          className="inline-flex min-h-11 cursor-pointer items-start gap-2 py-2 font-sans text-sm text-fg select-none"
+        >
+          <input
+            id="purchaser-update-record"
+            type="checkbox"
+            checked={contact.updateMyRecord}
+            onChange={(e) => onChange({ updateMyRecord: e.target.checked })}
+            className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary"
+          />
+          Also update my record on file with these details.
+        </label>
+      )}
     </div>
   );
 }
@@ -156,6 +156,8 @@ export interface GuestContactFormProps {
   guest: GuestDetails;
   addressRequired: boolean;
   onChange: (patch: Partial<GuestDetails>) => void;
+  /** Distinct ids when the form appears in the editor and in the contact line at once. */
+  idPrefix?: string;
 }
 
 /** The blank form for a visitor who is not signed in. */
@@ -163,14 +165,15 @@ export function GuestContactForm({
   guest,
   addressRequired,
   onChange,
+  idPrefix = 'guest',
 }: GuestContactFormProps): React.JSX.Element {
   return (
     <div className="grid gap-4">
       <div className="grid gap-3 @min-[480px]:grid-cols-2">
         <div className="grid gap-1">
-          <Label htmlFor="guest-first">First name *</Label>
+          <Label htmlFor={`${idPrefix}-first`}>First name *</Label>
           <Input
-            id="guest-first"
+            id={`${idPrefix}-first`}
             value={guest.firstName}
             maxLength={50}
             autoComplete="given-name"
@@ -179,9 +182,9 @@ export function GuestContactForm({
           />
         </div>
         <div className="grid gap-1">
-          <Label htmlFor="guest-last">Last name *</Label>
+          <Label htmlFor={`${idPrefix}-last`}>Last name *</Label>
           <Input
-            id="guest-last"
+            id={`${idPrefix}-last`}
             value={guest.lastName}
             maxLength={50}
             autoComplete="family-name"
@@ -190,9 +193,9 @@ export function GuestContactForm({
           />
         </div>
         <div className="grid gap-1">
-          <Label htmlFor="guest-email">Email *</Label>
+          <Label htmlFor={`${idPrefix}-email`}>Email *</Label>
           <Input
-            id="guest-email"
+            id={`${idPrefix}-email`}
             type="email"
             value={guest.email}
             maxLength={254}
@@ -202,9 +205,9 @@ export function GuestContactForm({
           />
         </div>
         <div className="grid gap-1">
-          <Label htmlFor="guest-phone">Phone *</Label>
+          <Label htmlFor={`${idPrefix}-phone`}>Phone *</Label>
           <Input
-            id="guest-phone"
+            id={`${idPrefix}-phone`}
             type="tel"
             value={guest.phone}
             maxLength={50}
@@ -215,7 +218,7 @@ export function GuestContactForm({
         </div>
       </div>
       <AddressFields
-        idPrefix="guest"
+        idPrefix={`${idPrefix}-address`}
         address={guest.address}
         required={addressRequired}
         onChange={(address) => onChange({ address })}

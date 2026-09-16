@@ -17,6 +17,7 @@ import { EventDetails } from './components/EventDetails';
 import { SectionCard } from './components/SectionCard';
 import { RegistrantEditor } from './components/RegistrantEditor';
 import { GuestContactForm, SignedInContactForm } from './components/PurchaserForm';
+import { ContactSummary } from './components/ContactSummary';
 import { ReviewPanel, submitLabel } from './components/ReviewPanel';
 import { ReviewBody } from './components/ReviewBody';
 import { SummaryBar } from './components/SummaryBar';
@@ -103,6 +104,9 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   const { ref: rootRef, breakpoint } = useContainerBreakpoint();
   const compact = breakpoint !== 'desktop';
   const [summaryOpen, setSummaryOpen] = React.useState(false);
+  // The contact line opens into fields on request, or on its own when
+  // something the invoice needs is missing.
+  const [contactOpen, setContactOpen] = React.useState(false);
   const contactRef = React.useRef<HTMLElement>(null);
 
   // Pre-fill the signed-in purchaser's contact block once the roster arrives.
@@ -336,6 +340,9 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       takenIdentities={identitiesByEvent.get(section.event.eventId) ?? new Set()}
       mode={signedIn ? 'household' : 'guest'}
       guestName={guestName}
+      guest={signedIn ? undefined : draft.guest}
+      onGuestChange={signedIn ? undefined : (guest) => dispatch({ type: 'set-guest', guest })}
+      addressRequired={addressRequired}
       timeZone={event.timeZone}
       showPrices={showPrices}
       embedded={embedded}
@@ -386,13 +393,17 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   }
 
   const goToContactForm = (): void => {
-    const el = contactRef.current;
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    const inputs = Array.from(
-      el.querySelectorAll<HTMLInputElement>('input:not([type="checkbox"])'),
-    );
-    (inputs.find((i) => i.value.trim() === '') ?? inputs[0])?.focus();
+    setContactOpen(true);
+    // The fields mount on the next render.
+    setTimeout(() => {
+      const el = contactRef.current;
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const inputs = Array.from(
+        el.querySelectorAll<HTMLInputElement>('input:not([type="checkbox"])'),
+      );
+      (inputs.find((i) => i.value.trim() === '') ?? inputs[0])?.focus();
+    }, 0);
   };
 
   const sectionImageSources = (section: (typeof sections)[number]) => [
@@ -401,16 +412,48 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
     config.defaultImageUrl,
   ];
 
-  const contactBlock = (
-    <section
+  // ── Contact for the registration: one line unless something is missing ──
+  const viewer = roster?.viewer ?? null;
+  const same = (a: string, b: string | null | undefined) => a.trim() === (b ?? '').trim();
+  const contactDirty =
+    viewer !== null &&
+    !(
+      same(draft.contact.email, viewer.email) &&
+      same(draft.contact.phone, viewer.phone) &&
+      same(draft.contact.address.line1, viewer.address?.line1) &&
+      same(draft.contact.address.line2, viewer.address?.line2) &&
+      same(draft.contact.address.city, viewer.address?.city) &&
+      same(draft.contact.address.state, viewer.address?.state) &&
+      same(draft.contact.address.postalCode, viewer.address?.postalCode)
+    );
+  const contactMissing = signedIn
+    ? roster !== null && (!draft.contact.email.trim() || !draft.contact.phone.trim())
+    : !guestContactComplete;
+  const contactCanCollapse =
+    !contactMissing && !addressRequired && (signedIn ? roster !== null : true);
+  const contactEditing = contactOpen || !contactCanCollapse;
+  // Guests give their details in the editor; the line appears once they have added someone.
+  const showContact = signedIn || draft.registrations.length > 0 || contactOpen;
+  const contactName = signedIn
+    ? viewer
+      ? `${viewer.firstName} ${viewer.lastName}`.trim()
+      : ''
+    : guestName;
+
+  const contactBlock = showContact ? (
+    <ContactSummary
       ref={contactRef}
-      className="grid gap-4 border border-border bg-bg p-4 @min-[480px]:p-6"
-      aria-label="Your contact information"
+      name={contactName}
+      email={signedIn ? draft.contact.email : draft.guest.email}
+      phone={signedIn ? draft.contact.phone : draft.guest.phone}
+      editing={contactEditing}
+      canCollapse={contactCanCollapse}
+      onEdit={() => setContactOpen(true)}
+      onDone={() => setContactOpen(false)}
     >
-      <h3 className="font-sans text-xl font-bold text-fg">Your information</h3>
       {signedIn ? (
         rosterQuery.isLoading ? (
-          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-6 w-2/3" />
         ) : rosterQuery.isError ? (
           <p className="font-sans text-sm text-destructive" role="alert">
             {rosterQuery.error instanceof ApiError && rosterQuery.error.isAuthError
@@ -419,10 +462,22 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
           </p>
         ) : roster ? (
           <SignedInContactForm
-            viewerName={`${roster.viewer.firstName} ${roster.viewer.lastName}`.trim()}
             contact={draft.contact}
             addressRequired={addressRequired}
-            onChange={(contact) => dispatch({ type: 'set-contact', contact })}
+            dirty={contactDirty}
+            onChange={(contact) =>
+              dispatch({
+                type: 'set-contact',
+                contact: {
+                  ...contact,
+                  // The first real edit opts into writing the record back; the
+                  // checkbox that then appears lets them opt out.
+                  ...(contact.updateMyRecord === undefined && !contactDirty
+                    ? { updateMyRecord: true }
+                    : {}),
+                },
+              })
+            }
           />
         ) : null
       ) : (
@@ -432,8 +487,8 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
           onChange={(guest) => dispatch({ type: 'set-guest', guest })}
         />
       )}
-    </section>
-  );
+    </ContactSummary>
+  ) : null;
 
   return (
     <>
