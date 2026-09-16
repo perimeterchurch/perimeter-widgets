@@ -111,3 +111,28 @@ export function eventIsFree(event: {
         s.product.groups.every((g) => g.prices.every((p) => p.price === 0))),
   );
 }
+
+/**
+ * "$10" + "00" for the card footer's large price with superscript cents.
+ * Negative and fractional amounts round the way `formatMoney` does.
+ */
+export function formatMoneyParts(amount: number): { whole: string; cents: string } {
+  const [whole, cents = '00'] = formatMoney(amount).split('.');
+  return { whole: whole ?? '$0', cents };
+}
+
+/**
+ * Staff HTML collapsed to one line of plain text for a card summary. Parsing
+ * with DOMParser is inert (no scripts run, nothing is attached to the page);
+ * the full markup is still rendered through DOMPurify when expanded.
+ */
+export function htmlToText(html: string | null | undefined): string {
+  if (!html) return '';
+  if (typeof DOMParser === 'undefined')
+    return html
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim();
+}

@@ -7,7 +7,8 @@ import {
   type DraftRegistration,
 } from '../src/lib/draft';
 import { buildCheckoutUrl, readPageContext } from '../src/lib/page-url';
-import { formatEventRange, formatPrice } from '../src/lib/format';
+import { formatEventRange, formatMoneyParts, formatPrice, htmlToText } from '../src/lib/format';
+import { bucketFor } from '../src/lib/breakpoint';
 
 const reg = (over: Partial<DraftRegistration> = {}): DraftRegistration => ({
   localId: 'a',
@@ -151,5 +152,29 @@ describe('formatting', () => {
   it('formats an event range in the congregation zone with the zone label', () => {
     const text = formatEventRange('2026-09-27T18:00:00', '2026-09-27T20:00:00', 'America/New_York');
     expect(text).toBe('Sun, Sep 27, 2026, 6:00 PM – 8:00 PM EDT');
+  });
+});
+
+describe('mobile layout helpers', () => {
+  it('buckets a container width at 480 and 768', () => {
+    expect(bucketFor(343)).toBe('phone');
+    expect(bucketFor(479)).toBe('phone');
+    expect(bucketFor(480)).toBe('tablet');
+    expect(bucketFor(767)).toBe('tablet');
+    expect(bucketFor(768)).toBe('desktop');
+  });
+
+  it('splits a price into whole dollars and cents', () => {
+    expect(formatMoneyParts(10)).toEqual({ whole: '$10', cents: '00' });
+    expect(formatMoneyParts(12.5)).toEqual({ whole: '$12', cents: '50' });
+    expect(formatMoneyParts(1234.56)).toEqual({ whole: '$1,234', cents: '56' });
+  });
+
+  it('collapses staff HTML to one line of text', () => {
+    expect(htmlToText('<p>Bring a <b>friend</b>.</p> <p>Doors open at 5.</p>')).toBe(
+      'Bring a friend. Doors open at 5.',
+    );
+    expect(htmlToText(null)).toBe('');
+    expect(htmlToText('   ')).toBe('');
   });
 });
