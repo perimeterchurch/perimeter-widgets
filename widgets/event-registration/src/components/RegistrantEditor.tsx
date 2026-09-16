@@ -878,15 +878,11 @@ export function RegistrantEditor({
         <Button type="submit" size="lg" className={embedded ? 'w-full @min-[480px]:w-auto' : ''}>
           {saveLabel}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          className={embedded ? 'w-full @min-[480px]:w-auto' : ''}
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
+        {!embedded && (
+          <Button type="button" variant="outline" size="lg" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
       </div>
     </form>
   );

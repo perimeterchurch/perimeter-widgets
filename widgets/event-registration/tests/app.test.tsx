@@ -117,19 +117,20 @@ describe('event-registration widget', () => {
     expect(screen.getByLabelText('Address')).toHaveValue('5088 Bridgeport Way');
   });
 
-  it('keeps a section with an Enable_Label collapsed behind its prompt', () => {
+  it('does not gate a section behind its Enable_Label question: the card itself is the opt-in', () => {
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
-    expect(within(card).getByText('Registering a student?')).toBeInTheDocument();
-    expect(within(card).queryByRole('button', { name: 'Add a student' })).not.toBeInTheDocument();
-    fireEvent.click(within(card).getByRole('checkbox'));
+    expect(within(card).queryByText('Registering a student?')).not.toBeInTheDocument();
+    expect(within(card).queryByRole('checkbox')).not.toBeInTheDocument();
+    // One control per card: the section's Button_Text, stretched over the card.
+    expect(within(card).getAllByRole('button')).toHaveLength(1);
     expect(within(card).getByRole('button', { name: 'Add a student' })).toBeInTheDocument();
+    expect(card).toHaveAttribute('data-tappable', 'true');
   });
 
   it('opens the editor with roster eligibility applied, and saves a registration', () => {
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
 
     // Jen is an adult (minors only), Max is already registered, William is eligible.
@@ -210,7 +211,6 @@ describe('event-registration widget', () => {
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
     expect(within(card).getByText('Grades 6th–12th')).toBeInTheDocument();
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     tick(card, /William Cano/);
     // Two things are labelled "Grade": our select and the form's own question.
@@ -275,7 +275,6 @@ describe('event-registration widget', () => {
     hooks.event.data = withRooms([room(8101, 'Infants', 0, 24), room(8102, 'Kids 8-12', 96, 156)]);
     const { unmount } = render(<App config={config} auth={authStub(true)} />);
     let card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     tick(card, /William Cano/);
     expect(within(card).getByText(/Kids 8-12/)).toBeInTheDocument();
@@ -287,7 +286,6 @@ describe('event-registration widget', () => {
     hooks.event.data = withRooms([room(8101, 'Infants', 0, 24), room(8103, 'Toddlers', 24, 48)]);
     render(<App config={config} auth={authStub(true)} />);
     card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     tick(card, /William Cano/);
     expect(within(card).getByLabelText(/Infants/)).toBeInTheDocument();
@@ -351,7 +349,6 @@ describe('event-registration widget', () => {
     });
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     tick(card, /William Cano/);
     expect(within(card).getByLabelText(/Grade/)).toHaveValue('7th');
@@ -388,7 +385,6 @@ describe('event-registration widget', () => {
     expect(screen.queryByText('Free')).not.toBeInTheDocument();
     expect(screen.queryByText(/\$\d/)).not.toBeInTheDocument();
     const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     expect(within(card).queryByText(/Registration price/)).not.toBeInTheDocument();
     expect(screen.queryByText('Total')).not.toBeInTheDocument();

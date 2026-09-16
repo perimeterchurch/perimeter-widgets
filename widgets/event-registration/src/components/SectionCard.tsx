@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { ChevronRight, Pencil, Trash2 } from 'lucide-react';
 import type { QuotedRegistration, RegistrationSection } from '@perimeter/api-hooks';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
@@ -65,11 +65,13 @@ function closedReasonText(section: RegistrationSection, timeZone: string): strin
 
 /**
  * One registration section — the parent event or one `bp_Related_Events`
- * row — as an image-led card: picture, badges, title, a one-line summary
- * behind "View details", the people added so far, and a footer with the
- * price and the add button (labelled by `Button_Text`). With an
- * `Enable_Label` the footer holds the native "Do you want to register anyone
- * for…?" opt-in instead until it is ticked.
+ * row — as a tappable, image-led card: picture, badges, title, a one-line
+ * summary behind "View details", the people added so far, and a footer with
+ * the price and the section's `Button_Text`. The whole card is the control:
+ * the footer label is a real button whose hit area is stretched over the
+ * card, so selecting the event needs no separate "Add" button. The native
+ * widget's `Enable_Label` opt-in question is not rendered — tapping the card
+ * is the opt-in.
  */
 export function SectionCard({
   section,
@@ -84,12 +86,6 @@ export function SectionCard({
   onEdit,
   onRemove,
 }: SectionCardProps): React.JSX.Element {
-  const [enabled, setEnabled] = React.useState(
-    section.enableLabelHtml === null || registrations.length > 0,
-  );
-  React.useEffect(() => {
-    if (registrations.length > 0) setEnabled(true);
-  }, [registrations.length]);
   const [noImage, setNoImage] = React.useState(
     () => !imageSources.some((s) => !!s && s.length > 0),
   );
@@ -102,6 +98,7 @@ export function SectionCard({
   const summary =
     htmlToText(section.instructionsHtml) || htmlToText(section.event.meetingInstructionsHtml);
   const price = section.product ? formatMoneyParts(section.product.basePrice) : null;
+  const tappable = section.open && canAdd && !editor;
 
   // Tablet puts the picture beside the copy; phone and desktop stack it on top.
   const withImage = !noImage;
@@ -109,14 +106,21 @@ export function SectionCard({
     ? '@min-[480px]:grid-cols-[160px_minmax(0,1fr)] @min-[768px]:grid-cols-1'
     : '';
   const spanRight = withImage ? '@min-[480px]:col-start-2 @min-[768px]:col-start-auto' : '';
+  // Anything interactive inside the card sits above the stretched add button.
+  const above = 'relative z-10';
 
   return (
     <section
-      className={`grid border bg-bg ${
+      className={`relative grid border bg-bg transition-colors ${
         noImage ? 'border-border border-l-4 border-l-secondary' : 'border-border'
-      } ${sideBySide}`}
+      } ${sideBySide} ${
+        tappable
+          ? 'hover:border-secondary hover:shadow-sm has-[button[data-stretched]:focus-visible]:ring-2 has-[button[data-stretched]:focus-visible]:ring-ring has-[button[data-stretched]:active]:bg-muted/40'
+          : ''
+      }`}
       aria-labelledby={`section-${section.key}-title`}
       data-slot={noImage ? 'section-card-noimage' : 'section-card'}
+      data-tappable={tappable ? 'true' : undefined}
     >
       {withImage && (
         <FallbackImage
@@ -176,18 +180,16 @@ export function SectionCard({
           )}
         </div>
 
-        {(section.open && enabled) || !section.open ? (
-          <ExpandableText summary={summary}>
-            <RichText html={section.instructionsHtml} className="text-sm" />
-            <RichText
-              html={section.event.meetingInstructionsHtml}
-              className="mt-2 text-sm text-muted-fg"
-            />
-          </ExpandableText>
-        ) : null}
+        <ExpandableText summary={summary} className={above}>
+          <RichText html={section.instructionsHtml} className="text-sm" />
+          <RichText
+            html={section.event.meetingInstructionsHtml}
+            className="mt-2 text-sm text-muted-fg"
+          />
+        </ExpandableText>
 
-        {section.open && enabled && registrations.length > 0 && (
-          <ul className="grid gap-2">
+        {section.open && registrations.length > 0 && (
+          <ul className={`grid gap-2 ${above}`}>
             {registrations.map((r) => {
               const quoted = quotedByLocalId.get(r.localId);
               return (
@@ -246,7 +248,7 @@ export function SectionCard({
         {!section.open ? (
           <p className="font-sans text-sm text-muted-fg">{closedReasonText(section, timeZone)}</p>
         ) : (
-          <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
             {showPrices && price ? (
               <div className="grid font-sans leading-none">
                 {section.product && section.product.basePrice > 0 ? (
@@ -264,29 +266,23 @@ export function SectionCard({
             ) : (
               <span />
             )}
-            {!enabled ? (
-              <label className="inline-flex min-h-11 cursor-pointer items-start gap-3 py-1 font-sans text-base text-fg select-none">
-                <input
-                  type="checkbox"
-                  checked={false}
-                  onChange={() => setEnabled(true)}
-                  className="mt-1 size-4 shrink-0 cursor-pointer accent-primary"
-                />
-                <RichText html={section.enableLabelHtml} />
-              </label>
-            ) : (
-              !editor &&
-              canAdd && (
-                <Button type="button" variant="secondary" size="lg" onClick={onAdd}>
-                  {section.buttonText}
-                </Button>
-              )
+            {tappable && (
+              // The visible label; its hit area is the whole card (`after:inset-0`).
+              <button
+                type="button"
+                data-stretched
+                onClick={onAdd}
+                className="inline-flex min-h-11 items-center gap-1 font-sans text-sm font-semibold text-secondary outline-hidden after:absolute after:inset-0 after:cursor-pointer after:content-['']"
+              >
+                {section.buttonText}
+                <ChevronRight aria-hidden className="size-5" />
+              </button>
             )}
           </div>
         )}
       </div>
 
-      {editor && <div className={`border-t border-border p-4 ${spanRight}`}>{editor}</div>}
+      {editor && <div className={`border-t border-border p-4 ${spanRight} ${above}`}>{editor}</div>}
     </section>
   );
 }

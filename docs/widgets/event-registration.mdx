@@ -59,10 +59,12 @@ widget so members can sign in for the household roster:
 ## Behavior
 
 - **Sections** — `GET /api/registration/events/{id}` returns the parent (when it
-  has a product) and each related row in `Position` order. A section with an
-  `Enable_Label` starts collapsed behind that prompt; `Instructions` render
-  above the list; `Button_Text` labels the add button. Closed sections say why
-  (not open yet, closed, full, cancelled, sold out).
+  has a product) and each related row in `Position` order. Each is a tappable
+  card: `Button_Text` is the card's label and the whole card is its hit area.
+  The native widget's `Enable_Label` opt-in question is NOT rendered (2026-09-16,
+  Dana: tapping the card is the opt-in); `Instructions` render as the card's
+  one-line summary behind "View details". Closed sections say why (not open
+  yet, closed, full, cancelled, sold out) and are not tappable.
 - **Who can go where** — `GET …/roster` returns the household with per-section
   eligibility. `Show_Household_Position_ID` and `For_Gender_ID` filter members;
   **`Minor_Registration = 1` lists only children**, `0`/blank lists everyone.
@@ -125,7 +127,7 @@ build's rem→px rewrite does not touch `@container` params.
 | --- | --- | --- | --- |
 | Hero | full-bleed 16:9 image, description clipped behind "Read more" | same | `max-h-80` image, full description |
 | Summary | sticky bar at the top: count badge, total when prices show, chevron opens the review | same | review column on the right, sticky |
-| Sections | one list in `Position` order; image-led cards with badges, title, "View details", price + add | same, picture beside the copy | left column, two cards per row from 1024px |
+| Sections | one list in `Position` order; tappable image-led cards with badges, title, "View details", price and the `Button_Text` label + chevron | same, picture beside the copy | left column, two cards per row from 1024px |
 | Editor | bottom sheet (`<dialog>` + `showModal()`, top layer) | same | inline in the card |
 | Submit | sticky bottom CTA: "Add someone to continue" → "Continue to your details" (guests) → "Fix N issues" → submit | same | button in the review column |
 
@@ -141,8 +143,12 @@ build's rem→px rewrite does not touch `@container` params.
   `overflow: hidden` turns them static (see `packages/embed-lab/pages/narrow.html`), and a
   fixed host header needs `data-sticky-top-offset` or the summary bar slides under it.
   Safe-area padding at the bottom needs `viewport-fit=cover` on the host's viewport meta.
-- **Touch targets** are at least 44px on phones: add/submit buttons, the edit/remove icons,
-  checkbox and radio rows, "View details", the sheet's close button.
+- **As few buttons as possible** — the card is the control (a stretched button behind the
+  footer label, so screen readers still hear `Button_Text`); the sheet has a close X and its
+  save button, no Cancel; the CTA is one button. Edit/remove icons and "View details" are the
+  only other controls.
+- **Touch targets** are at least 44px on phones: the card label, submit, the edit/remove
+  icons, checkbox and radio rows, "View details", the sheet's close button.
 - **Tests** — `tests/app.test.tsx` runs the desktop branch (jsdom reports a 0px width, which
   the breakpoint hook treats as "not measured"); `tests/mobile.test.tsx` pushes 343px through a
   controllable `ResizeObserver` mock and covers the bar, the CTA states, the sheet and the

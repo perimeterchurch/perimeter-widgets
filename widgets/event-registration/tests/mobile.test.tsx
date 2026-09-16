@@ -196,7 +196,6 @@ describe('event-registration widget on a phone', () => {
   it('opens the editor in a bottom sheet, saves from it, and hands focus back', () => {
     renderPhone();
     const card = studentCard();
-    fireEvent.click(within(card).getByRole('checkbox'));
     const add = within(card).getByRole('button', { name: 'Add a student' });
     add.focus();
     fireEvent.click(add);
@@ -223,7 +222,6 @@ describe('event-registration widget on a phone', () => {
   it('closes the sheet on Escape, the close button, and unmount', () => {
     const { unmount } = renderPhone();
     const card = studentCard();
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     let sheet = screen.getByRole('dialog');
     fireEvent(sheet, new Event('cancel', { cancelable: true }));
@@ -249,7 +247,6 @@ describe('event-registration widget on a phone', () => {
     );
     renderPhone();
     const card = studentCard();
-    fireEvent.click(within(card).getByRole('checkbox'));
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     const sheet = screen.getByRole('dialog');
     tick(sheet, /William Cano/);
