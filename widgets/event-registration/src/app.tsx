@@ -346,6 +346,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       timeZone={event.timeZone}
       showPrices={showPrices}
       embedded={embedded}
+      framed={false}
       problems={editingExisting ? (problemsByLocalId.get(editingExisting.localId) ?? []) : []}
       onSave={(registrations: DraftRegistration[]) =>
         dispatch({ type: 'save-many', registrations })

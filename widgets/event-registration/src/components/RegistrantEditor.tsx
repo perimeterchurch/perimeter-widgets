@@ -66,6 +66,8 @@ export interface RegistrantEditorProps {
    * heading, and the action row sticks to the sheet's bottom edge.
    */
   embedded?: boolean;
+  /** False when the host (a section card) already draws the border and padding. */
+  framed?: boolean;
   /** One registration per person picked — several at once when adding, exactly one when editing. */
   onSave: (registrations: DraftRegistration[]) => void;
   onCancel: () => void;
@@ -131,6 +133,7 @@ export function RegistrantEditor({
   timeZone,
   showPrices,
   embedded = false,
+  framed = true,
   onSave,
   onCancel,
 }: RegistrantEditorProps): React.JSX.Element {
@@ -922,7 +925,9 @@ export function RegistrantEditor({
       className={
         embedded
           ? 'grid gap-5 bg-bg'
-          : 'grid gap-5 border border-secondary bg-bg p-4 @min-[480px]:p-6'
+          : framed
+            ? 'grid gap-5 border border-secondary bg-bg p-4 @min-[480px]:p-6'
+            : 'grid gap-5 bg-bg'
       }
     >
       {!embedded && (

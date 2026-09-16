@@ -239,43 +239,45 @@ export function SectionCard({
         )}
       </div>
 
-      <div className="border-t border-border px-4 py-3">
-        {!section.open ? (
-          <p className="font-sans text-sm text-muted-fg">{closedReasonText(section, timeZone)}</p>
-        ) : (
-          <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
-            {showPrices && price ? (
-              <div className="grid font-sans leading-none">
-                {section.product && section.product.basePrice > 0 ? (
-                  <span className="text-2xl font-bold text-fg">
-                    {price.whole}
-                    <sup className="ml-0.5 align-super text-xs font-semibold">{price.cents}</sup>
+      {(!section.open || (showPrices && price) || tappable) && (
+        <div className="border-t border-border px-4 py-3">
+          {!section.open ? (
+            <p className="font-sans text-sm text-muted-fg">{closedReasonText(section, timeZone)}</p>
+          ) : (
+            <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
+              {showPrices && price ? (
+                <div className="grid font-sans leading-none">
+                  {section.product && section.product.basePrice > 0 ? (
+                    <span className="text-2xl font-bold text-fg">
+                      {price.whole}
+                      <sup className="ml-0.5 align-super text-xs font-semibold">{price.cents}</sup>
+                    </span>
+                  ) : (
+                    <span className="text-2xl font-bold text-fg">Free</span>
+                  )}
+                  <span className="mt-1 text-xs text-muted-fg">
+                    {section.product && section.product.basePrice > 0 ? 'per person' : 'no charge'}
                   </span>
-                ) : (
-                  <span className="text-2xl font-bold text-fg">Free</span>
-                )}
-                <span className="mt-1 text-xs text-muted-fg">
-                  {section.product && section.product.basePrice > 0 ? 'per person' : 'no charge'}
-                </span>
-              </div>
-            ) : (
-              <span />
-            )}
-            {tappable && (
-              // The visible label; its hit area is the whole card (`after:inset-0`).
-              <button
-                type="button"
-                data-stretched
-                onClick={onAdd}
-                className="inline-flex min-h-11 items-center gap-1 font-sans text-sm font-semibold text-secondary outline-hidden after:absolute after:inset-0 after:cursor-pointer after:content-['']"
-              >
-                {section.buttonText}
-                <ChevronRight aria-hidden className="size-5" />
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+                </div>
+              ) : (
+                <span />
+              )}
+              {tappable && (
+                // The visible label; its hit area is the whole card (`after:inset-0`).
+                <button
+                  type="button"
+                  data-stretched
+                  onClick={onAdd}
+                  className="inline-flex min-h-11 items-center gap-1 font-sans text-sm font-semibold text-secondary outline-hidden after:absolute after:inset-0 after:cursor-pointer after:content-['']"
+                >
+                  {section.buttonText}
+                  <ChevronRight aria-hidden className="size-5" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {editor && <div className={`border-t border-border p-4 ${above}`}>{editor}</div>}
     </section>
