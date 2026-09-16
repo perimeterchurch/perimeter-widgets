@@ -105,7 +105,9 @@ describe('MissionTripFinderConfigSchema', () => {
 
   it('defaults the CTA templates to the legacy destinations', () => {
     const config = MissionTripFinderConfigSchema.parse({});
-    expect(config.registerUrl).toContain('mission-trip-application/?pledgecampaignid={id}');
+    expect(config.registerUrl).toBe(
+      'https://www.perimeter.org/global-outreach/go-journey-application/?pledgecampaignid={id}',
+    );
     // The giving form needs its `#!/` fragment AFTER the campaign ID, which is
     // why these are templates rather than base URLs.
     expect(config.supportUrl).toBe(
