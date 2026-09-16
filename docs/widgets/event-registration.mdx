@@ -53,6 +53,7 @@ widget so members can sign in for the household roster:
 | `data-default-image-url`  | No       | —                           | Fallback image when the event has none.                                                              |
 | `data-show-map`           | No       | `true`                      | Show "Get directions" when the location has an address.                                              |
 | `data-recaptcha-site-key` | No       | Perimeter's public site key | Used only for the guest (signed-out) path.                                                           |
+| `data-sticky-top-offset`  | No       | `0`                         | Height in px of a fixed host header, so the phone summary bar sticks below it instead of under it.   |
 | `data-api-url`            | No       | `https://api.perimeter.org` | Override the perimeter-api base URL (local dev).                                                     |
 
 ## Behavior
@@ -113,6 +114,39 @@ widget so members can sign in for the household roster:
 - **Not supported** — File Upload form fields (a required one closes the
   section), secondary households, and form fields that also write attributes or
   opportunity responses (answers are stored; the side effect is not).
+
+## Layout
+
+Designed phone-first (2026-09-16) after the Great Wolf Lodge "Packages" pattern, then widened.
+Container-query thresholds are written in px (`@min-[480px]:`, `@min-[768px]:`) because the
+build's rem→px rewrite does not touch `@container` params.
+
+| | Phone (< 480px) | Tablet (480–767px) | Desktop (≥ 768px) |
+| --- | --- | --- | --- |
+| Hero | full-bleed 16:9 image, description clipped behind "Read more" | same | `max-h-80` image, full description |
+| Summary | sticky bar at the top: count badge, total when prices show, chevron opens the review | same | review column on the right, sticky |
+| Sections | one list in `Position` order; image-led cards with badges, title, "View details", price + add | same, picture beside the copy | left column, two cards per row from 1024px |
+| Editor | bottom sheet (`<dialog>` + `showModal()`, top layer) | same | inline in the card |
+| Submit | sticky bottom CTA: "Add someone to continue" → "Continue to your details" (guests) → "Fix N issues" → submit | same | button in the review column |
+
+- **Card images** — `/api/event-image/{Event_ID}` for the section's own event, then the hub
+  event's image, then `data-default-image-url`; when all three fail the card drops the picture
+  and keeps a navy left rule (`data-slot="section-card-noimage"`). Child events without an
+  image all show the hub image, so give each a picture in MP to tell them apart.
+- **The sheet** sits in the browser's top layer, so a host page's fixed header or a
+  `transform` on a wrapper cannot trap or cover it. While it is open the host body is
+  scroll-locked, Escape and the backdrop close it, and focus returns to the button that opened
+  it. Its "Add to registration" row sticks to the sheet's bottom edge with safe-area padding.
+- **Sticky bars are `position: sticky` inside the widget**, so a host ancestor with
+  `overflow: hidden` turns them static (see `packages/embed-lab/pages/narrow.html`), and a
+  fixed host header needs `data-sticky-top-offset` or the summary bar slides under it.
+  Safe-area padding at the bottom needs `viewport-fit=cover` on the host's viewport meta.
+- **Touch targets** are at least 44px on phones: add/submit buttons, the edit/remove icons,
+  checkbox and radio rows, "View details", the sheet's close button.
+- **Tests** — `tests/app.test.tsx` runs the desktop branch (jsdom reports a 0px width, which
+  the breakpoint hook treats as "not measured"); `tests/mobile.test.tsx` pushes 343px through a
+  controllable `ResizeObserver` mock and covers the bar, the CTA states, the sheet and the
+  image chain.
 
 ## Data source
 
