@@ -17,7 +17,12 @@ import { EventDetails } from './components/EventDetails';
 import { SectionCard } from './components/SectionCard';
 import { RegistrantEditor } from './components/RegistrantEditor';
 import { GuestContactForm, SignedInContactForm } from './components/PurchaserForm';
-import { ReviewPanel } from './components/ReviewPanel';
+import { ReviewPanel, submitLabel } from './components/ReviewPanel';
+import { ReviewBody } from './components/ReviewBody';
+import { SummaryBar } from './components/SummaryBar';
+import { StickyCta, type CtaState } from './components/StickyCta';
+import { EditorSheet } from './components/EditorSheet';
+import { useContainerBreakpoint } from './hooks/use-container-breakpoint';
 import {
   ExternalRegistrationNotice,
   MessageState,
@@ -92,6 +97,13 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
 
   const [draft, dispatch] = React.useReducer(draftReducer, EMPTY_DRAFT);
   const [dismissedPendingInvoice, setDismissedPendingInvoice] = React.useState(false);
+
+  // Phone/tablet get the sticky summary bar, the bottom CTA and the sheet
+  // editor; desktop keeps the review column and the inline editor.
+  const { ref: rootRef, breakpoint } = useContainerBreakpoint();
+  const compact = breakpoint !== 'desktop';
+  const [summaryOpen, setSummaryOpen] = React.useState(false);
+  const contactRef = React.useRef<HTMLElement>(null);
 
   // Pre-fill the signed-in purchaser's contact block once the roster arrives.
   React.useEffect(() => {
@@ -263,6 +275,12 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       : 'household_only';
   const canRegister = event.registrationOpen && (signedIn || guestAllowed);
   const guestName = `${draft.guest.firstName} ${draft.guest.lastName}`.trim();
+  const guestContactComplete = Boolean(
+    draft.guest.firstName.trim() &&
+    draft.guest.lastName.trim() &&
+    draft.guest.email.trim() &&
+    draft.guest.phone.trim(),
+  );
   const showPendingInvoice = page.pendingInvoiceGuid !== null && !dismissedPendingInvoice;
 
   const quotedByLocalId = new Map<string, QuotedRegistration>();
@@ -293,158 +311,253 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   // On an all-free event "Free" badges and $0.00 amounts are noise.
   const showPrices = !eventIsFree(event);
   const addressRequired = quote?.addressRequired ?? false;
+  const sections = [...event.sections].sort((a, b) => a.position - b.position);
+
+  // ── The editor: inline in its card on desktop, in the sheet on phones ──
+  const editing = draft.editing;
+  const editingExisting =
+    editing.kind === 'existing'
+      ? (draft.registrations.find((r) => r.localId === editing.localId) ?? null)
+      : null;
+  const editingSectionKey =
+    editing.kind === 'new' ? editing.sectionKey : (editingExisting?.sectionKey ?? null);
+  const editingSection =
+    editingSectionKey !== null ? (sections.find((s) => s.key === editingSectionKey) ?? null) : null;
+
+  const renderEditor = (
+    section: (typeof sections)[number],
+    embedded: boolean,
+  ): React.JSX.Element => (
+    <RegistrantEditor
+      key={`${section.key}:${editingExisting?.localId ?? 'new'}`}
+      section={section}
+      existing={editingExisting}
+      members={roster?.members ?? []}
+      takenIdentities={identitiesByEvent.get(section.event.eventId) ?? new Set()}
+      mode={signedIn ? 'household' : 'guest'}
+      guestName={guestName}
+      timeZone={event.timeZone}
+      showPrices={showPrices}
+      embedded={embedded}
+      problems={editingExisting ? (problemsByLocalId.get(editingExisting.localId) ?? []) : []}
+      onSave={(registrations: DraftRegistration[]) =>
+        dispatch({ type: 'save-many', registrations })
+      }
+      onCancel={() => dispatch({ type: 'cancel-edit' })}
+    />
+  );
+
+  // ── Review / submit state shared by the desktop column and the phone bars ──
+  const quoteError = quoteMutation.isError
+    ? quoteMutation.error instanceof ApiError
+      ? quoteMutation.error.message
+      : 'Unable to price your registration right now.'
+    : null;
+  const problemCount = quote?.problems.length ?? 0;
+  const canSubmit = quote !== null && quote.submittable && editing.kind === 'none';
+  const reviewBody = {
+    quote,
+    quoting: quoteMutation.isPending,
+    quoteError,
+    registrationCount: draft.registrations.length,
+    depositAvailable,
+    showPrices,
+    payDeposit: draft.payDeposit,
+    onPayDepositChange: (payDeposit: boolean) => dispatch({ type: 'set-pay-deposit', payDeposit }),
+  };
+
+  let ctaState: CtaState;
+  let ctaLabel: string;
+  if (draft.registrations.length === 0) {
+    ctaState = 'empty';
+    ctaLabel = 'Add someone to continue';
+  } else if (isGuest && !guestContactComplete) {
+    ctaState = 'needs-contact';
+    ctaLabel = 'Continue to your details';
+  } else if (!quote) {
+    ctaState = 'quoting';
+    ctaLabel = 'Checking…';
+  } else if (!quote.submittable) {
+    ctaState = 'blocked';
+    ctaLabel = submitLabel(quote);
+  } else {
+    ctaState = 'ready';
+    ctaLabel = submitLabel(quote);
+  }
+
+  const goToContactForm = (): void => {
+    const el = contactRef.current;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const inputs = Array.from(
+      el.querySelectorAll<HTMLInputElement>('input:not([type="checkbox"])'),
+    );
+    (inputs.find((i) => i.value.trim() === '') ?? inputs[0])?.focus();
+  };
+
+  const sectionImageSources = (section: (typeof sections)[number]) => [
+    section.isParentEvent ? null : `${apiBase(config)}/api/event-image/${section.event.eventId}`,
+    imageUrl,
+    config.defaultImageUrl,
+  ];
+
+  const contactBlock = (
+    <section
+      ref={contactRef}
+      className="grid gap-4 border border-border bg-bg p-4 @min-[480px]:p-6"
+      aria-label="Your contact information"
+    >
+      <h3 className="font-sans text-xl font-bold text-fg">Your information</h3>
+      {signedIn ? (
+        rosterQuery.isLoading ? (
+          <Skeleton className="h-24 w-full" />
+        ) : rosterQuery.isError ? (
+          <p className="font-sans text-sm text-destructive" role="alert">
+            {rosterQuery.error instanceof ApiError && rosterQuery.error.isAuthError
+              ? 'Your session has expired. Please sign in again.'
+              : 'Unable to load your household right now.'}
+          </p>
+        ) : roster ? (
+          <SignedInContactForm
+            viewerName={`${roster.viewer.firstName} ${roster.viewer.lastName}`.trim()}
+            contact={draft.contact}
+            addressRequired={addressRequired}
+            onChange={(contact) => dispatch({ type: 'set-contact', contact })}
+          />
+        ) : null
+      ) : (
+        <GuestContactForm
+          guest={draft.guest}
+          addressRequired={addressRequired}
+          onChange={(guest) => dispatch({ type: 'set-guest', guest })}
+        />
+      )}
+    </section>
+  );
 
   return (
-    <div className="@container grid gap-8 p-4 text-left">
-      <EventDetails
-        event={event}
-        imageUrl={imageUrl}
-        fallbackImageUrl={config.defaultImageUrl}
-        showMap={config.showMap}
-        returnUrl={config.returnUrl}
-      />
-
-      {event.cancelled ? (
-        <MessageState>This event has been cancelled.</MessageState>
-      ) : event.externalRegistrationUrl ? (
-        <ExternalRegistrationNotice href={event.externalRegistrationUrl} />
-      ) : !event.registrationOpen ? (
-        <MessageState>Registration is not open for this event.</MessageState>
-      ) : showPendingInvoice && page.pendingInvoiceGuid ? (
-        <PendingInvoiceNotice
-          checkoutHref={buildCheckoutUrl(
-            config.checkoutUrl,
-            config.invoiceParam,
-            page.pendingInvoiceGuid,
-          )}
-          onStartOver={() => setDismissedPendingInvoice(true)}
+    <>
+      <div ref={rootRef} className="@container grid gap-6 p-4 text-left @min-[768px]:gap-8">
+        <EventDetails
+          event={event}
+          imageUrl={imageUrl}
+          fallbackImageUrl={config.defaultImageUrl}
+          showMap={config.showMap}
+          returnUrl={config.returnUrl}
         />
-      ) : (
-        <>
-          {isGuest && <SignInNotice reason={signInReason} />}
 
-          {canRegister && (
-            <div className="grid gap-6 @3xl:grid-cols-[minmax(0,1fr)_22rem] @3xl:items-start">
-              <div className="grid gap-6">
-                <section
-                  className="grid gap-4 border border-border bg-bg p-4 @md:p-6"
-                  aria-label="Your contact information"
-                >
-                  <h3 className="font-sans text-xl font-bold text-fg">Your information</h3>
-                  {signedIn ? (
-                    rosterQuery.isLoading ? (
-                      <Skeleton className="h-24 w-full" />
-                    ) : rosterQuery.isError ? (
-                      <p className="font-sans text-sm text-destructive" role="alert">
-                        {rosterQuery.error instanceof ApiError && rosterQuery.error.isAuthError
-                          ? 'Your session has expired. Please sign in again.'
-                          : 'Unable to load your household right now.'}
-                      </p>
-                    ) : roster ? (
-                      <SignedInContactForm
-                        viewerName={`${roster.viewer.firstName} ${roster.viewer.lastName}`.trim()}
-                        contact={draft.contact}
-                        addressRequired={addressRequired}
-                        onChange={(contact) => dispatch({ type: 'set-contact', contact })}
-                      />
-                    ) : null
-                  ) : (
-                    <GuestContactForm
-                      guest={draft.guest}
-                      addressRequired={addressRequired}
-                      onChange={(guest) => dispatch({ type: 'set-guest', guest })}
-                    />
-                  )}
-                </section>
+        {event.cancelled ? (
+          <MessageState>This event has been cancelled.</MessageState>
+        ) : event.externalRegistrationUrl ? (
+          <ExternalRegistrationNotice href={event.externalRegistrationUrl} />
+        ) : !event.registrationOpen ? (
+          <MessageState>Registration is not open for this event.</MessageState>
+        ) : showPendingInvoice && page.pendingInvoiceGuid ? (
+          <PendingInvoiceNotice
+            checkoutHref={buildCheckoutUrl(
+              config.checkoutUrl,
+              config.invoiceParam,
+              page.pendingInvoiceGuid,
+            )}
+            onStartOver={() => setDismissedPendingInvoice(true)}
+          />
+        ) : (
+          <>
+            {isGuest && <SignInNotice reason={signInReason} />}
 
-                {event.sections.map((section) => {
-                  const inSection = draft.registrations.filter((r) => r.sectionKey === section.key);
-                  const editingHere =
-                    draft.editing.kind === 'new'
-                      ? draft.editing.sectionKey === section.key
-                      : draft.editing.kind === 'existing'
-                        ? inSection.some(
-                            (r) => r.localId === (draft.editing as { localId: string }).localId,
-                          )
-                        : false;
-                  const existing =
-                    draft.editing.kind === 'existing'
-                      ? (inSection.find(
-                          (r) => r.localId === (draft.editing as { localId: string }).localId,
-                        ) ?? null)
-                      : null;
-                  // A guest is one person: once they're in a section, no more adds there.
-                  const canAdd = signedIn ? roster !== null : inSection.length === 0;
-                  return (
-                    <SectionCard
-                      key={section.key}
-                      section={section}
-                      timeZone={event.timeZone}
-                      registrations={inSection}
-                      quotedByLocalId={quotedByLocalId}
-                      showPrices={showPrices}
-                      canAdd={canAdd && draft.editing.kind === 'none'}
-                      onAdd={() => dispatch({ type: 'start-new', sectionKey: section.key })}
-                      onEdit={(localId) => dispatch({ type: 'edit', localId })}
-                      onRemove={(localId) => dispatch({ type: 'remove', localId })}
-                      editor={
-                        editingHere ? (
-                          <RegistrantEditor
-                            key={existing?.localId ?? 'new'}
+            {canRegister && (
+              <>
+                {compact && (
+                  <SummaryBar
+                    count={draft.registrations.length}
+                    total={quote?.invoiceTotal ?? null}
+                    quoting={quoteMutation.isPending}
+                    showPrices={showPrices}
+                    problemCount={problemCount}
+                    open={summaryOpen}
+                    onToggle={() => setSummaryOpen((o) => !o)}
+                    topOffset={config.stickyTopOffset}
+                  >
+                    <ReviewBody {...reviewBody} />
+                  </SummaryBar>
+                )}
+
+                <div className="grid gap-6 @min-[768px]:grid-cols-[minmax(0,1fr)_22rem] @min-[768px]:items-start">
+                  <div className="grid gap-6">
+                    <div className="grid gap-4 @min-[1024px]:grid-cols-2 @min-[1024px]:items-start">
+                      {sections.map((section) => {
+                        const inSection = draft.registrations.filter(
+                          (r) => r.sectionKey === section.key,
+                        );
+                        const editingHere = editingSection?.key === section.key;
+                        // A guest is one person: once they're in a section, no more adds there.
+                        const canAdd = signedIn ? roster !== null : inSection.length === 0;
+                        return (
+                          <SectionCard
+                            key={section.key}
                             section={section}
-                            existing={existing}
-                            members={roster?.members ?? []}
-                            takenIdentities={
-                              identitiesByEvent.get(section.event.eventId) ?? new Set()
-                            }
-                            mode={signedIn ? 'household' : 'guest'}
-                            guestName={guestName}
                             timeZone={event.timeZone}
+                            registrations={inSection}
+                            quotedByLocalId={quotedByLocalId}
                             showPrices={showPrices}
-                            problems={
-                              existing ? (problemsByLocalId.get(existing.localId) ?? []) : []
-                            }
-                            onSave={(registrations: DraftRegistration[]) =>
-                              dispatch({ type: 'save-many', registrations })
-                            }
-                            onCancel={() => dispatch({ type: 'cancel-edit' })}
+                            canAdd={canAdd && (compact || editing.kind === 'none')}
+                            imageSources={sectionImageSources(section)}
+                            onAdd={() => dispatch({ type: 'start-new', sectionKey: section.key })}
+                            onEdit={(localId) => dispatch({ type: 'edit', localId })}
+                            onRemove={(localId) => dispatch({ type: 'remove', localId })}
+                            editor={!compact && editingHere ? renderEditor(section, false) : null}
                           />
-                        ) : null
-                      }
-                    />
-                  );
-                })}
-              </div>
+                        );
+                      })}
+                    </div>
 
-              <div className="@3xl:sticky @3xl:top-4">
-                <ReviewPanel
-                  quote={quote}
-                  quoting={quoteMutation.isPending}
-                  quoteError={
-                    quoteMutation.isError
-                      ? quoteMutation.error instanceof ApiError
-                        ? quoteMutation.error.message
-                        : 'Unable to price your registration right now.'
-                      : null
-                  }
-                  registrationCount={draft.registrations.length}
-                  depositAvailable={depositAvailable}
-                  showPrices={showPrices}
-                  payDeposit={draft.payDeposit}
-                  onPayDepositChange={(payDeposit) =>
-                    dispatch({ type: 'set-pay-deposit', payDeposit })
-                  }
-                  submitting={submitMutation.isPending}
-                  submitError={submitError}
-                  canSubmit={quote !== null && quote.submittable && draft.editing.kind === 'none'}
-                  isGuest={isGuest}
-                  onSubmit={() => void handleSubmit()}
-                />
-              </div>
-            </div>
-          )}
-        </>
+                    {contactBlock}
+                  </div>
+
+                  {!compact && (
+                    <div className="@min-[768px]:sticky @min-[768px]:top-4">
+                      <ReviewPanel
+                        {...reviewBody}
+                        submitting={submitMutation.isPending}
+                        submitError={submitError}
+                        canSubmit={canSubmit}
+                        isGuest={isGuest}
+                        onSubmit={() => void handleSubmit()}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {compact && (
+                  <StickyCta
+                    state={ctaState}
+                    label={ctaLabel}
+                    problemCount={problemCount}
+                    submitting={submitMutation.isPending}
+                    submitError={submitError}
+                    isGuest={isGuest}
+                    onShowProblems={() => setSummaryOpen(true)}
+                    onPrimary={() => {
+                      if (ctaState === 'needs-contact') goToContactForm();
+                      else if (ctaState === 'ready') void handleSubmit();
+                    }}
+                  />
+                )}
+              </>
+            )}
+          </>
+        )}
+      </div>
+
+      {compact && canRegister && editingSection && (
+        <EditorSheet
+          title={`${editingExisting ? 'Edit registration' : 'New registration'} — ${editingSection.displayName}`}
+          titleId={`editor-${editingSection.key}-title`}
+          onClose={() => dispatch({ type: 'cancel-edit' })}
+        >
+          {renderEditor(editingSection, true)}
+        </EditorSheet>
       )}
-    </div>
+    </>
   );
 }

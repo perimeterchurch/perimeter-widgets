@@ -143,7 +143,7 @@ export function FormFieldInput({
                 <label
                   key={option}
                   htmlFor={optionId}
-                  className="inline-flex cursor-pointer items-center gap-2 font-sans text-sm text-fg select-none"
+                  className="inline-flex min-h-11 cursor-pointer items-center gap-2 py-2 font-sans text-sm text-fg select-none @min-[768px]:min-h-0 @min-[768px]:py-0"
                 >
                   <input
                     id={optionId}
@@ -194,7 +194,7 @@ export function FormFieldInput({
         <div className="grid gap-1">
           <label
             htmlFor={id}
-            className="inline-flex cursor-pointer items-start gap-2 font-sans text-sm text-fg select-none"
+            className="inline-flex min-h-11 cursor-pointer items-start gap-2 py-2 font-sans text-sm text-fg select-none @min-[768px]:min-h-0 @min-[768px]:py-0"
           >
             <input
               id={id}

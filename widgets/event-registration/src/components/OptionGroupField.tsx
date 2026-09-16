@@ -98,7 +98,7 @@ export function OptionGroupField({
           <li>
             <label
               htmlFor={`${idPrefix}-none`}
-              className="inline-flex cursor-pointer items-center gap-2 font-sans text-sm text-fg select-none"
+              className="inline-flex min-h-11 cursor-pointer items-center gap-2 py-2 font-sans text-sm text-fg select-none @min-[768px]:min-h-0 @min-[768px]:py-0"
             >
               <input
                 id={`${idPrefix}-none`}
@@ -123,7 +123,7 @@ export function OptionGroupField({
             <li key={price.productOptionPriceId} className="grid gap-2">
               <label
                 htmlFor={id}
-                className={`inline-flex items-center gap-2 font-sans text-sm select-none ${
+                className={`inline-flex min-h-11 items-center gap-2 py-2 font-sans text-sm select-none @min-[768px]:min-h-0 @min-[768px]:py-0 ${
                   soldOut ? 'cursor-not-allowed text-muted-fg' : 'cursor-pointer text-fg'
                 }`}
               >

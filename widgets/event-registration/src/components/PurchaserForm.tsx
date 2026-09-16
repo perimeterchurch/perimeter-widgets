@@ -41,7 +41,7 @@ function AddressFields({
           onChange={(e) => set({ line2: e.target.value })}
         />
       </div>
-      <div className="grid gap-3 @md:grid-cols-3">
+      <div className="grid gap-3 @min-[480px]:grid-cols-3">
         <div className="grid gap-1">
           <Label htmlFor={`${idPrefix}-city`}>City{star}</Label>
           <Input
@@ -103,7 +103,7 @@ export function SignedInContactForm({
       <p className="font-sans text-sm text-fg">
         Registering as <strong>{viewerName}</strong>
       </p>
-      <div className="grid gap-3 @md:grid-cols-2">
+      <div className="grid gap-3 @min-[480px]:grid-cols-2">
         <div className="grid gap-1">
           <Label htmlFor="purchaser-email">Email *</Label>
           <Input
@@ -166,7 +166,7 @@ export function GuestContactForm({
 }: GuestContactFormProps): React.JSX.Element {
   return (
     <div className="grid gap-4">
-      <div className="grid gap-3 @md:grid-cols-2">
+      <div className="grid gap-3 @min-[480px]:grid-cols-2">
         <div className="grid gap-1">
           <Label htmlFor="guest-first">First name *</Label>
           <Input

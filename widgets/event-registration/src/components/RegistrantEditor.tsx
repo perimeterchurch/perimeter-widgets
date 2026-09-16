@@ -49,6 +49,11 @@ export interface RegistrantEditorProps {
   timeZone: string;
   /** False on an all-free event: the price line is not shown. */
   showPrices: boolean;
+  /**
+   * Inside the phone bottom sheet: the sheet supplies the border and the
+   * heading, and the action row sticks to the sheet's bottom edge.
+   */
+  embedded?: boolean;
   /** One registration per person picked — several at once when adding, exactly one when editing. */
   onSave: (registrations: DraftRegistration[]) => void;
   onCancel: () => void;
@@ -110,6 +115,7 @@ export function RegistrantEditor({
   problems,
   timeZone,
   showPrices,
+  embedded = false,
   onSave,
   onCancel,
 }: RegistrantEditorProps): React.JSX.Element {
@@ -520,7 +526,7 @@ export function RegistrantEditor({
             <p className="font-sans text-xs text-muted-fg">
               They will be added to your household in our records.
             </p>
-            <div className="grid gap-3 @md:grid-cols-2">
+            <div className="grid gap-3 @min-[480px]:grid-cols-2">
               <div className="grid gap-1">
                 <Label htmlFor={`${pid}-first`}>First name *</Label>
                 <Input
@@ -739,10 +745,19 @@ export function RegistrantEditor({
   };
 
   return (
-    <form onSubmit={handleSave} className="grid gap-5 border border-secondary bg-bg p-4 @md:p-6">
-      <h4 className="font-sans text-lg font-bold text-fg">
-        {existing ? 'Edit registration' : 'New registration'} — {section.displayName}
-      </h4>
+    <form
+      onSubmit={handleSave}
+      className={
+        embedded
+          ? 'grid gap-5 bg-bg'
+          : 'grid gap-5 border border-secondary bg-bg p-4 @min-[480px]:p-6'
+      }
+    >
+      {!embedded && (
+        <h4 id={`editor-${section.key}-title`} className="font-sans text-lg font-bold text-fg">
+          {existing ? 'Edit registration' : 'New registration'} — {section.displayName}
+        </h4>
+      )}
 
       {/* ── Who ─────────────────────────────────────────────────────── */}
       {mode === 'guest' ? (
@@ -770,7 +785,7 @@ export function RegistrantEditor({
                 <label
                   key={m.contactId}
                   htmlFor={id}
-                  className={`inline-flex items-center gap-2 font-sans text-sm select-none ${
+                  className={`inline-flex min-h-11 items-center gap-2 py-2 font-sans text-sm select-none @min-[768px]:min-h-0 @min-[768px]:py-0 ${
                     disabled ? 'cursor-not-allowed text-muted-fg' : 'cursor-pointer text-fg'
                   }`}
                 >
@@ -805,7 +820,7 @@ export function RegistrantEditor({
             {canAddMember && (
               <label
                 htmlFor={`${idPrefix}-who-new`}
-                className="inline-flex cursor-pointer items-center gap-2 font-sans text-sm text-fg select-none"
+                className="inline-flex min-h-11 cursor-pointer items-center gap-2 py-2 font-sans text-sm text-fg select-none @min-[768px]:min-h-0 @min-[768px]:py-0"
               >
                 <input
                   id={`${idPrefix}-who-new`}
@@ -853,11 +868,23 @@ export function RegistrantEditor({
         </ul>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <Button type="submit" size="lg">
+      <div
+        className={
+          embedded
+            ? 'sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-border bg-bg px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] @min-[480px]:flex-row'
+            : 'flex flex-wrap gap-3'
+        }
+      >
+        <Button type="submit" size="lg" className={embedded ? 'w-full @min-[480px]:w-auto' : ''}>
           {saveLabel}
         </Button>
-        <Button type="button" variant="outline" size="lg" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className={embedded ? 'w-full @min-[480px]:w-auto' : ''}
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </div>

@@ -22,7 +22,7 @@ export function PendingInvoiceNotice({
   onStartOver: () => void;
 }): React.JSX.Element {
   return (
-    <div className="grid gap-3 border border-secondary bg-bg p-4 @md:p-6">
+    <div className="grid gap-3 border border-secondary bg-bg p-4 @min-[480px]:p-6">
       <p className="font-sans text-base font-bold text-fg">
         You have a registration waiting for payment.
       </p>
@@ -65,7 +65,7 @@ export function SignInNotice({ reason }: { reason: SignInReason }): React.JSX.El
     },
   }[reason];
   return (
-    <div className="grid gap-2 border border-secondary bg-bg p-4 @md:p-6">
+    <div className="grid gap-2 border border-secondary bg-bg p-4 @min-[480px]:p-6">
       <p className="font-sans text-base font-bold text-fg">{copy.title}</p>
       <p className="font-sans text-sm text-muted-fg">{copy.body}</p>
     </div>
@@ -74,7 +74,7 @@ export function SignInNotice({ reason }: { reason: SignInReason }): React.JSX.El
 
 export function ExternalRegistrationNotice({ href }: { href: string }): React.JSX.Element {
   return (
-    <div className="grid gap-3 border border-secondary bg-bg p-4 @md:p-6">
+    <div className="grid gap-3 border border-secondary bg-bg p-4 @min-[480px]:p-6">
       <p className="font-sans text-base text-fg">
         Registration for this event happens on another page.
       </p>

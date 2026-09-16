@@ -55,6 +55,14 @@ export const EventRegistrationConfigSchema = z.object({
     .string()
     .default(DEFAULT_RECAPTCHA_SITE_KEY)
     .describe('Google reCAPTCHA site key (public), used only for the guest path.'),
+  stickyTopOffset: z.coerce
+    .number()
+    .int()
+    .min(0)
+    .default(0)
+    .describe(
+      'Height in pixels of a fixed host-page header, so the sticky summary bar on phones sits below it instead of under it.',
+    ),
   apiUrl: z.string().optional().describe('Override the perimeter-api base URL (advanced).'),
 });
 

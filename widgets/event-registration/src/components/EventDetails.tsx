@@ -2,8 +2,10 @@ import * as React from 'react';
 import { CalendarDays, MapPin, UserRound } from 'lucide-react';
 import type { RegistrationEvent } from '@perimeter/api-hooks';
 import { Button } from '@perimeter/ui/button';
+import { ExpandableText } from './ExpandableText';
+import { FallbackImage } from './FallbackImage';
 import { RichText } from './RichText';
-import { formatEventRange } from '../lib/format';
+import { formatEventRange, htmlToText } from '../lib/format';
 
 export interface EventDetailsProps {
   event: RegistrationEvent;
@@ -13,42 +15,12 @@ export interface EventDetailsProps {
   returnUrl: string;
 }
 
-function EventImage({
-  src,
-  fallbackSrc,
-  alt,
-}: {
-  src: string;
-  fallbackSrc: string | undefined;
-  alt: string;
-}): React.JSX.Element | null {
-  const [current, setCurrent] = React.useState<string | null>(src);
-  const triedFallback = React.useRef(false);
-
-  if (current === null) return null;
-
-  return (
-    <img
-      src={current}
-      alt={alt}
-      className="max-h-80 w-full object-cover"
-      onError={() => {
-        if (!triedFallback.current && fallbackSrc) {
-          triedFallback.current = true;
-          setCurrent(fallbackSrc);
-        } else {
-          setCurrent(null);
-        }
-      }}
-    />
-  );
-}
-
 /**
  * The details block above the registration sections: image, title, when,
  * where (with rooms when the event shows them), who to contact, and the
- * event's description and meeting instructions. Mirrors what the native
- * details widget shows.
+ * event's description. On phones the image bleeds to the widget's edges and
+ * the description is clipped behind "Read more"; from 768px it is the full
+ * hero the native details widget shows.
  */
 export function EventDetails({
   event,
@@ -83,9 +55,16 @@ export function EventDetails({
         </Button>
       </div>
 
-      {imageUrl && <EventImage src={imageUrl} fallbackSrc={fallbackImageUrl} alt={event.title} />}
+      {imageUrl && (
+        <FallbackImage
+          sources={[imageUrl, fallbackImageUrl]}
+          alt={event.title}
+          className="-mx-4 aspect-video w-[calc(100%+32px)] @min-[768px]:mx-0 @min-[768px]:aspect-auto @min-[768px]:max-h-80 @min-[768px]:w-full"
+          imgClassName="@min-[768px]:max-h-80"
+        />
+      )}
 
-      <h1 className="font-serif text-3xl leading-tight font-bold text-balance text-fg">
+      <h1 className="font-serif text-2xl leading-tight font-normal text-balance text-fg @min-[768px]:text-3xl">
         {event.title}
       </h1>
 
@@ -106,7 +85,7 @@ export function EventDetails({
                   href={location.directionsUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-primary underline"
+                  className="inline-flex min-h-11 items-center text-primary underline @min-[768px]:min-h-0"
                 >
                   Get directions
                 </a>
@@ -135,7 +114,14 @@ export function EventDetails({
         )}
       </dl>
 
-      <RichText html={event.descriptionHtml} className="text-base leading-relaxed" />
+      <ExpandableText
+        summary={htmlToText(event.descriptionHtml)}
+        lines={3}
+        label="Read more"
+        desktopAlwaysOpen
+      >
+        <RichText html={event.descriptionHtml} className="text-base leading-relaxed" />
+      </ExpandableText>
     </header>
   );
 }

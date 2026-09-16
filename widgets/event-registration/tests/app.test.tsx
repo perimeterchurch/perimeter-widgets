@@ -73,6 +73,7 @@ const config = {
   invoiceParam: 'id',
   showMap: true,
   recaptchaSiteKey: 'site-key',
+  stickyTopOffset: 0,
 };
 
 beforeEach(() => {
