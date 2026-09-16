@@ -47,6 +47,8 @@ export interface RegistrantEditorProps {
   problems: QuoteProblem[];
   /** Congregation time zone; ages for room placement are taken on the event's start date. */
   timeZone: string;
+  /** False on an all-free event: the price line is not shown. */
+  showPrices: boolean;
   /** One registration per person picked — several at once when adding, exactly one when editing. */
   onSave: (registrations: DraftRegistration[]) => void;
   onCancel: () => void;
@@ -107,6 +109,7 @@ export function RegistrantEditor({
   guestName,
   problems,
   timeZone,
+  showPrices,
   onSave,
   onCancel,
 }: RegistrantEditorProps): React.JSX.Element {
@@ -824,7 +827,7 @@ export function RegistrantEditor({
       )}
 
       {/* ── Price ──────────────────────────────────────────────────── */}
-      {product && (
+      {product && showPrices && (
         <p className="font-sans text-sm text-fg">
           Registration price: <strong>{formatPrice(product.basePrice)}</strong>
           {multi && product.basePrice > 0 && (

@@ -367,6 +367,37 @@ describe('event-registration widget', () => {
     expect(within(card).getByLabelText(/Grade/)).toHaveValue('8th');
   });
 
+  it('hides "Free" badges and $0.00 amounts when nothing on the event costs anything', () => {
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) => ({
+        ...s,
+        product: s.product && {
+          ...s.product,
+          basePrice: 0,
+          depositPrice: null,
+          groups: s.product.groups.map((g) => ({
+            ...g,
+            prices: g.prices.map((p) => ({ ...p, price: 0 })),
+          })),
+        },
+      })),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    expect(screen.queryByText('Free')).not.toBeInTheDocument();
+    expect(screen.queryByText(/\$\d/)).not.toBeInTheDocument();
+    const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(card).getByRole('checkbox'));
+    fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
+    expect(within(card).queryByText(/Registration price/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Total')).not.toBeInTheDocument();
+  });
+
+  it('keeps prices visible when any section or option costs something', () => {
+    render(<App config={config} auth={authStub(true)} />);
+    expect(screen.getAllByText(/\$\d/).length).toBeGreaterThan(0);
+  });
+
   it('shows the sign-in notice and the guest form when signed out', () => {
     hooks.roster.data = undefined;
     render(<App config={config} auth={authStub(false)} />);

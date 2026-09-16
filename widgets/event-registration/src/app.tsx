@@ -33,6 +33,7 @@ import {
   type DraftRegistration,
 } from './lib/draft';
 import { buildCheckoutUrl, readPageContext } from './lib/page-url';
+import { eventIsFree } from './lib/format';
 
 export interface AppProps {
   config: EventRegistrationConfig;
@@ -289,6 +290,8 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   }
 
   const depositAvailable = event.sections.some((s) => (s.product?.depositPrice ?? 0) > 0);
+  // On an all-free event "Free" badges and $0.00 amounts are noise.
+  const showPrices = !eventIsFree(event);
   const addressRequired = quote?.addressRequired ?? false;
 
   return (
@@ -379,6 +382,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                       timeZone={event.timeZone}
                       registrations={inSection}
                       quotedByLocalId={quotedByLocalId}
+                      showPrices={showPrices}
                       canAdd={canAdd && draft.editing.kind === 'none'}
                       onAdd={() => dispatch({ type: 'start-new', sectionKey: section.key })}
                       onEdit={(localId) => dispatch({ type: 'edit', localId })}
@@ -396,6 +400,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                             mode={signedIn ? 'household' : 'guest'}
                             guestName={guestName}
                             timeZone={event.timeZone}
+                            showPrices={showPrices}
                             problems={
                               existing ? (problemsByLocalId.get(existing.localId) ?? []) : []
                             }
@@ -424,6 +429,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                   }
                   registrationCount={draft.registrations.length}
                   depositAvailable={depositAvailable}
+                  showPrices={showPrices}
                   payDeposit={draft.payDeposit}
                   onPayDepositChange={(payDeposit) =>
                     dispatch({ type: 'set-pay-deposit', payDeposit })

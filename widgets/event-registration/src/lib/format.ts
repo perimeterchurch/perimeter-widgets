@@ -88,3 +88,26 @@ export function formatAgeRange(min: number | null, max: number | null): string |
   if (max !== null) return `Up to age ${max}`;
   return null;
 }
+
+/**
+ * True when nothing on the page can cost anything: every section is free,
+ * offers no deposit, and every option is $0. Then "Free" badges and $0.00
+ * amounts are noise and the widget hides all money.
+ */
+export function eventIsFree(event: {
+  sections: ReadonlyArray<{
+    product: {
+      basePrice: number;
+      depositPrice: number | null;
+      groups: ReadonlyArray<{ prices: ReadonlyArray<{ price: number }> }>;
+    } | null;
+  }>;
+}): boolean {
+  return event.sections.every(
+    (s) =>
+      s.product === null ||
+      (s.product.basePrice === 0 &&
+        s.product.depositPrice === null &&
+        s.product.groups.every((g) => g.prices.every((p) => p.price === 0))),
+  );
+}

@@ -19,6 +19,8 @@ export interface SectionCardProps {
   timeZone: string;
   registrations: DraftRegistration[];
   quotedByLocalId: ReadonlyMap<string, QuotedRegistration>;
+  /** False on an all-free event: no price badge, no per-person amount. */
+  showPrices: boolean;
   /** Whether "add" is available at all (signed in, or guest allowed and nothing added yet). */
   canAdd: boolean;
   /** The editor for this section, when open. */
@@ -68,6 +70,7 @@ export function SectionCard({
   timeZone,
   registrations,
   quotedByLocalId,
+  showPrices,
   canAdd,
   editor,
   onAdd,
@@ -96,7 +99,7 @@ export function SectionCard({
           <h3 id={`section-${section.key}-title`} className="font-sans text-xl font-bold text-fg">
             {section.displayName}
           </h3>
-          {section.product && (
+          {section.product && showPrices && (
             <Badge variant="outline">{formatPrice(section.product.basePrice)}</Badge>
           )}
           {section.audience.adultsOnly ? (
@@ -166,7 +169,7 @@ export function SectionCard({
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      {quoted && (
+                      {quoted && showPrices && (
                         <span className="font-sans text-sm text-fg">
                           {formatMoney(quoted.subtotal)}
                         </span>
