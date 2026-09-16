@@ -325,16 +325,9 @@ describe('event-registration widget', () => {
     tick(card, /William Cano/);
     tick(card, /Max Cano/);
     expect(within(card).getByRole('button', { name: 'Add 3 to registration' })).toBeInTheDocument();
-    // Each ticked person gets their own block.
-    expect(
-      within(card)
-        .getAllByRole('heading', { level: 5 })
-        .map((h) => h.textContent),
-    ).toEqual([
-      'Jen Cano',
-      expect.stringContaining('William Cano'),
-      expect.stringContaining('Max Cano'),
-    ]);
+    // Nothing to ask for this section, so each ticked person collapses to a ready row.
+    expect(card.querySelectorAll('[data-drawer-state="complete"]')).toHaveLength(3);
+    expect(card.querySelectorAll('[data-drawer-state="open"]')).toHaveLength(0);
     fireEvent.click(within(card).getByRole('button', { name: 'Add 3 to registration' }));
     expect(within(card).getByRole('button', { name: 'Remove Jen Cano' })).toBeInTheDocument();
     expect(within(card).getByRole('button', { name: 'Remove William Cano' })).toBeInTheDocument();
@@ -364,9 +357,18 @@ describe('event-registration widget', () => {
     const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     tick(card, /William Cano/);
+    // Everything is already answered from his record, so William collapses to a summary row.
+    const row = card.querySelector('[data-drawer-state="complete"]');
+    expect(row).not.toBeNull();
+    expect(row).toHaveTextContent('7th');
+    expect(row).toHaveTextContent('No');
+    expect(within(card).queryByLabelText(/Grade/)).not.toBeInTheDocument();
+    fireEvent.click(within(card).getByRole('button', { name: 'Change answers for William' }));
     expect(within(card).getByLabelText(/Grade/)).toHaveValue('7th');
     expect(within(card).getByLabelText('No')).toBeChecked();
     expect(within(card).getByText(/Filled in from William's record/)).toBeInTheDocument();
+    fireEvent.click(within(card).getByRole('button', { name: 'Done with William' }));
+    expect(card.querySelector('[data-drawer-state="complete"]')).not.toBeNull();
     // Prefilled answers satisfy the required fields, so the save goes straight through.
     fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
     expect(within(card).getByRole('button', { name: 'Edit William Cano' })).toBeInTheDocument();

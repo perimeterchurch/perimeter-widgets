@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Copy } from 'lucide-react';
+import { Check, Copy, TriangleAlert } from 'lucide-react';
 import type {
   QuoteProblem,
   RegistrationAttendee,
@@ -379,6 +379,89 @@ export function RegistrantEditor({
     };
   }
 
+  /** Everything that stops one person from being saved, keyed like `localErrors`. */
+  function validatePerson(view: PersonView): Map<string, string> {
+    const errors = new Map<string, string>();
+    const state = stateOf(view.key);
+    const resolved = resolveAttendee(view);
+    if ('error' in resolved) {
+      errors.set(`${view.key}:attendee`, resolved.error);
+      return errors;
+    }
+    const identity = attendeeIdentity(resolved);
+    if (
+      takenIdentities.has(identity) &&
+      !(existing && attendeeIdentity(existing.attendee) === identity)
+    ) {
+      errors.set(
+        `${view.key}:attendee`,
+        `${view.label || 'That person'} is already in this registration for this event.`,
+      );
+    }
+
+    const decided = decidedGroupIdsFor(placementFor(view.key));
+    for (const group of product?.groups ?? []) {
+      if (!group.required || decided.has(group.productOptionGroupId)) continue;
+      const pickable = group.prices.filter((p) => !p.hidden && !p.isPromo);
+      if (pickable.length === 0) continue;
+      if (
+        !state.options.some((o) =>
+          pickable.some((p) => p.productOptionPriceId === o.productOptionPriceId),
+        )
+      ) {
+        errors.set(
+          `${view.key}:group:${group.productOptionGroupId}`,
+          `Choose an option in "${group.name}".`,
+        );
+      }
+    }
+
+    for (const field of form?.fields ?? []) {
+      if (
+        field.fieldTypeId === FIELD_TYPE.INSTRUCTIONS ||
+        field.fieldTypeId === FIELD_TYPE.FILE_UPLOAD
+      )
+        continue;
+      if (!isFieldActive(field, fieldsById, state.answers)) continue;
+      if (field.required && !(state.answers.get(field.formFieldId) ?? '').trim()) {
+        errors.set(`${view.key}:field:${field.formFieldId}`, 'This question is required.');
+      }
+    }
+    return errors;
+  }
+
+  /** One valid person as the draft registration the save produces. */
+  function buildRegistration(view: PersonView, resolved: RegistrationAttendee): DraftRegistration {
+    const state = stateOf(view.key);
+    const decided = decidedGroupIdsFor(placementFor(view.key));
+    const activeAnswers = [...state.answers.entries()]
+      .filter(([fieldId, value]) => {
+        const field = fieldsById.get(fieldId);
+        return (
+          field !== undefined &&
+          value.trim().length > 0 &&
+          isFieldActive(field, fieldsById, state.answers)
+        );
+      })
+      .map(([formFieldId, response]) => ({ formFieldId, response: response.trim() }));
+    return {
+      localId: existing?.localId ?? newLocalId(),
+      sectionKey: section.key,
+      attendee: resolved,
+      attendeeLabel: view.label || (view.key === 'purchaser' ? guestName || 'You' : ''),
+      options: state.options.filter((o) => {
+        const group = placementGroups.find((g) =>
+          g.prices.some((p) => p.productOptionPriceId === o.productOptionPriceId),
+        );
+        return !group || !decided.has(group.productOptionGroupId);
+      }),
+      promoCode: state.promoCode.trim() || undefined,
+      answers: activeAnswers,
+    };
+  }
+
+  const formRef = React.useRef<HTMLFormElement>(null);
+
   function handleSave(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     const errors = new Map<string, string>();
@@ -404,91 +487,103 @@ export function RegistrantEditor({
     }
 
     for (const view of views) {
-      const state = stateOf(view.key);
-      const resolved = resolveAttendee(view);
-      if ('error' in resolved) {
-        errors.set(`${view.key}:attendee`, resolved.error);
+      const personErrors = validatePerson(view);
+      if (personErrors.size > 0) {
+        personErrors.forEach((message, key) => errors.set(key, message));
         continue;
       }
-      const identity = attendeeIdentity(resolved);
-      if (
-        takenIdentities.has(identity) &&
-        !(existing && attendeeIdentity(existing.attendee) === identity)
-      ) {
-        errors.set(
-          `${view.key}:attendee`,
-          `${view.label || 'That person'} is already in this registration for this event.`,
-        );
-      }
-
-      const decided = decidedGroupIdsFor(placementFor(view.key));
-      for (const group of product?.groups ?? []) {
-        if (!group.required || decided.has(group.productOptionGroupId)) continue;
-        const pickable = group.prices.filter((p) => !p.hidden && !p.isPromo);
-        if (pickable.length === 0) continue;
-        if (
-          !state.options.some((o) =>
-            pickable.some((p) => p.productOptionPriceId === o.productOptionPriceId),
-          )
-        ) {
-          errors.set(
-            `${view.key}:group:${group.productOptionGroupId}`,
-            `Choose an option in "${group.name}".`,
-          );
-        }
-      }
-
-      for (const field of form?.fields ?? []) {
-        if (
-          field.fieldTypeId === FIELD_TYPE.INSTRUCTIONS ||
-          field.fieldTypeId === FIELD_TYPE.FILE_UPLOAD
-        )
-          continue;
-        if (!isFieldActive(field, fieldsById, state.answers)) continue;
-        if (field.required && !(state.answers.get(field.formFieldId) ?? '').trim()) {
-          errors.set(`${view.key}:field:${field.formFieldId}`, 'This question is required.');
-        }
-      }
-
-      const activeAnswers = [...state.answers.entries()]
-        .filter(([fieldId, value]) => {
-          const field = fieldsById.get(fieldId);
-          return (
-            field !== undefined &&
-            value.trim().length > 0 &&
-            isFieldActive(field, fieldsById, state.answers)
-          );
-        })
-        .map(([formFieldId, response]) => ({ formFieldId, response: response.trim() }));
-
-      out.push({
-        localId: existing?.localId ?? newLocalId(),
-        sectionKey: section.key,
-        attendee: resolved,
-        attendeeLabel: view.label || (view.key === 'purchaser' ? guestName || 'You' : ''),
-        options: state.options.filter((o) => {
-          const group = placementGroups.find((g) =>
-            g.prices.some((p) => p.productOptionPriceId === o.productOptionPriceId),
-          );
-          return !group || !decided.has(group.productOptionGroupId);
-        }),
-        promoCode: state.promoCode.trim() || undefined,
-        answers: activeAnswers,
-      });
+      const resolved = resolveAttendee(view);
+      if ('error' in resolved) continue;
+      out.push(buildRegistration(view, resolved));
     }
 
     setLocalErrors(errors);
-    if (errors.size > 0) return;
+    if (errors.size > 0) {
+      // Open the first drawer that still needs something and bring it into view.
+      const firstBad = views.find((v) => [...errors.keys()].some((k) => k.startsWith(`${v.key}:`)));
+      if (firstBad) {
+        setOpenKey(firstBad.key);
+        setTimeout(() => {
+          formRef.current
+            ?.querySelector(`[data-person="${firstBad.key}"]`)
+            ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, 0);
+      }
+      return;
+    }
     onSave(out);
   }
 
-  const toggleMember = (contactId: number, on: boolean): void =>
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (on) next.add(contactId);
-      else next.delete(contactId);
+  // ── Drawers: each ticked person answers right under their name ──────────
+  // `undefined` = nothing chosen yet, so the first incomplete person opens on
+  // their own; a person whose record already answers everything stays
+  // collapsed to a summary row.
+  const drawerMode = mode === 'household' && !existing;
+  const [openKey, setOpenKey] = React.useState<PersonKey | null | undefined>(undefined);
+  const isComplete = (view: PersonView): boolean => validatePerson(view).size === 0;
+  const openDrawer: PersonKey | null =
+    openKey === undefined ? (views.find((v) => !isComplete(v))?.key ?? null) : openKey;
+  const viewOf = (m: RosterMember): PersonView => ({
+    key: `c${m.contactId}`,
+    member: m,
+    firstName: m.firstName,
+    label: `${m.firstName} ${m.lastName}`.trim(),
+  });
+
+  /** What a collapsed row shows: the room, the options and the answers given so far. */
+  const summaryOf = (view: PersonView): string[] => {
+    const state = stateOf(view.key);
+    const chips: string[] = [];
+    const outcomes = placementFor(view.key);
+    const decided = decidedGroupIdsFor(outcomes);
+    for (const o of outcomes.values()) if (o.kind === 'resolved') chips.push(o.price.title);
+    for (const g of product?.groups ?? []) {
+      if (decided.has(g.productOptionGroupId)) continue;
+      for (const price of g.prices) {
+        if (state.options.some((o) => o.productOptionPriceId === price.productOptionPriceId))
+          chips.push(price.title);
+      }
+    }
+    for (const field of form?.fields ?? []) {
+      if (field.fieldTypeId === FIELD_TYPE.INSTRUCTIONS) continue;
+      const value = state.answers.get(field.formFieldId)?.trim();
+      if (value && isFieldActive(field, fieldsById, state.answers))
+        chips.push(value.length > 24 ? `${value.slice(0, 24)}…` : value);
+    }
+    return chips;
+  };
+
+  /** "Done" re-checks the person; with nothing missing the drawer collapses. */
+  const closeDrawer = (view: PersonView): void => {
+    const personErrors = validatePerson(view);
+    setLocalErrors((prev) => {
+      const next = new Map([...prev].filter(([k]) => !k.startsWith(`${view.key}:`)));
+      personErrors.forEach((m, k) => next.set(k, m));
       return next;
     });
+    if (personErrors.size === 0) setOpenKey(null);
+  };
+
+  const toggleMember = (m: RosterMember, on: boolean): void => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(m.contactId);
+      else next.delete(m.contactId);
+      return next;
+    });
+    const key = `c${m.contactId}`;
+    if (on) {
+      if (!isComplete(viewOf(m))) setOpenKey(key);
+    } else if (openDrawer === key) {
+      setOpenKey(null);
+    }
+  };
+
+  const toggleAddNew = (on: boolean): void => {
+    setAddNew(on);
+    if (on) setOpenKey('new');
+    else if (openDrawer === 'new') setOpenKey(null);
+  };
 
   /** Copy one block's form answers onto another — the second child usually matches the first. */
   const copyAnswers = (from: PersonKey, to: PersonKey): void =>
@@ -531,265 +626,297 @@ export function RegistrantEditor({
     const setAnswer = (fieldId: number, value: string) =>
       updatePerson(key, { answers: new Map(state.answers).set(fieldId, value) });
 
-    // Several people at once: each gets its own panel with a numbered,
-    // shaded header so two long forms never read as one.
-    const panel = multi || key === 'new';
     return (
-      <div
-        key={key}
-        className={panel ? 'grid border border-border bg-bg' : 'grid gap-4'}
-        data-person={key}
-      >
-        {multi && (
-          <div className="flex items-center gap-3 border-b border-border bg-muted px-4 py-2">
-            <span
-              aria-hidden
-              className="grid size-7 shrink-0 place-items-center bg-secondary font-sans text-xs font-bold text-secondary-fg"
-            >
-              {index + 1}
-            </span>
-            <h5 className="font-sans text-base font-semibold text-fg">
-              {view.label || 'New family member'}
-              {view.member?.isMinorPosition && view.member.age !== null && (
-                <span className="font-normal text-muted-fg"> · {formatAge(view.member.age)}</span>
-              )}
-            </h5>
-          </div>
+      <div key={key} className="grid gap-4" data-person={key}>
+        {err('attendee') && (
+          <p role="alert" className="font-sans text-xs text-destructive">
+            {err('attendee')}
+          </p>
         )}
-        <div className={panel ? 'grid gap-4 p-4' : 'contents'}>
-          {err('attendee') && (
-            <p role="alert" className="font-sans text-xs text-destructive">
-              {err('attendee')}
-            </p>
-          )}
 
-          {key === 'new' && (
-            <div className="grid gap-3">
-              <p className="font-sans text-xs text-muted-fg">
-                They will be added to your household in our records.
-              </p>
-              <div className="grid gap-3 @min-[480px]:grid-cols-2">
-                <div className="grid gap-1">
-                  <Label htmlFor={`${pid}-first`}>First name *</Label>
-                  <Input
-                    id={`${pid}-first`}
-                    value={newMember.firstName}
-                    maxLength={50}
-                    autoComplete="off"
-                    onChange={(e) => setNewMember({ ...newMember, firstName: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-1">
-                  <Label htmlFor={`${pid}-last`}>Last name *</Label>
-                  <Input
-                    id={`${pid}-last`}
-                    value={newMember.lastName}
-                    maxLength={50}
-                    autoComplete="off"
-                    onChange={(e) => setNewMember({ ...newMember, lastName: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-1">
-                  <Label htmlFor={`${pid}-dob`}>
-                    Date of birth{newMember.householdPositionId === 2 ? ' *' : ''}
-                  </Label>
-                  <Input
-                    id={`${pid}-dob`}
-                    type="date"
-                    value={newMember.dateOfBirth}
-                    onChange={(e) => setNewMember({ ...newMember, dateOfBirth: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-1">
-                  <Label htmlFor={`${pid}-gender`}>Gender</Label>
-                  <select
-                    id={`${pid}-gender`}
-                    value={newMember.genderId}
-                    onChange={(e) =>
-                      setNewMember({ ...newMember, genderId: e.target.value as '' | '1' | '2' })
-                    }
-                    className={SELECT_CLASS}
-                  >
-                    <option value="">Prefer not to say</option>
-                    <option value="1">Male</option>
-                    <option value="2">Female</option>
-                  </select>
-                </div>
-                {(asksGrade || placementNeedsGradeFor('new')) &&
-                  newMember.householdPositionId === 2 && (
-                    <div className="grid gap-1">
-                      <Label htmlFor={`${pid}-grade`}>Grade *</Label>
-                      <select
-                        id={`${pid}-grade`}
-                        value={newMember.grade}
-                        onChange={(e) => setNewMember({ ...newMember, grade: e.target.value })}
-                        className={SELECT_CLASS}
-                      >
-                        <option value="">Choose a grade</option>
-                        {GRADE_OPTIONS.map((g) => (
-                          <option key={g.value} value={g.value}>
-                            {g.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                {positionChoices.length > 1 && (
+        {key === 'new' && (
+          <div className="grid gap-3">
+            <p className="font-sans text-xs text-muted-fg">
+              They will be added to your household in our records.
+            </p>
+            <div className="grid gap-3 @min-[480px]:grid-cols-2">
+              <div className="grid gap-1">
+                <Label htmlFor={`${pid}-first`}>First name *</Label>
+                <Input
+                  id={`${pid}-first`}
+                  value={newMember.firstName}
+                  maxLength={50}
+                  autoComplete="off"
+                  onChange={(e) => setNewMember({ ...newMember, firstName: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor={`${pid}-last`}>Last name *</Label>
+                <Input
+                  id={`${pid}-last`}
+                  value={newMember.lastName}
+                  maxLength={50}
+                  autoComplete="off"
+                  onChange={(e) => setNewMember({ ...newMember, lastName: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor={`${pid}-dob`}>
+                  Date of birth{newMember.householdPositionId === 2 ? ' *' : ''}
+                </Label>
+                <Input
+                  id={`${pid}-dob`}
+                  type="date"
+                  value={newMember.dateOfBirth}
+                  onChange={(e) => setNewMember({ ...newMember, dateOfBirth: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor={`${pid}-gender`}>Gender</Label>
+                <select
+                  id={`${pid}-gender`}
+                  value={newMember.genderId}
+                  onChange={(e) =>
+                    setNewMember({ ...newMember, genderId: e.target.value as '' | '1' | '2' })
+                  }
+                  className={SELECT_CLASS}
+                >
+                  <option value="">Prefer not to say</option>
+                  <option value="1">Male</option>
+                  <option value="2">Female</option>
+                </select>
+              </div>
+              {(asksGrade || placementNeedsGradeFor('new')) &&
+                newMember.householdPositionId === 2 && (
                   <div className="grid gap-1">
-                    <Label htmlFor={`${pid}-position`}>Relationship</Label>
+                    <Label htmlFor={`${pid}-grade`}>Grade *</Label>
                     <select
-                      id={`${pid}-position`}
-                      value={newMember.householdPositionId}
-                      onChange={(e) =>
-                        setNewMember({
-                          ...newMember,
-                          householdPositionId: Number(e.target.value) as 2 | 3 | 4,
-                        })
-                      }
+                      id={`${pid}-grade`}
+                      value={newMember.grade}
+                      onChange={(e) => setNewMember({ ...newMember, grade: e.target.value })}
                       className={SELECT_CLASS}
                     >
-                      {positionChoices.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.label}
+                      <option value="">Choose a grade</option>
+                      {GRADE_OPTIONS.map((g) => (
+                        <option key={g.value} value={g.value}>
+                          {g.label}
                         </option>
                       ))}
                     </select>
                   </div>
                 )}
-              </div>
-            </div>
-          )}
-
-          {asksGradeFor(key) && (
-            <div className="grid gap-1">
-              <Label htmlFor={`${pid}-member-grade`}>Grade *</Label>
-              <select
-                id={`${pid}-member-grade`}
-                required
-                value={gradeFor(key)}
-                onChange={(e) => updatePerson(key, { grade: e.target.value })}
-                className={SELECT_CLASS}
-              >
-                <option value="">Choose a grade</option>
-                {GRADE_OPTIONS.map((g) => (
-                  <option key={g.value} value={g.value}>
-                    {g.label}
-                  </option>
-                ))}
-              </select>
-              <p className="font-sans text-xs text-muted-fg">
-                This school year. A change updates our records.
-              </p>
-            </div>
-          )}
-
-          {asksBirthDateFor(key) && (
-            <div className="grid gap-1">
-              <Label htmlFor={`${pid}-member-dob`}>Date of birth *</Label>
-              <Input
-                id={`${pid}-member-dob`}
-                type="date"
-                required
-                value={birthDateFor(key)}
-                onChange={(e) => updatePerson(key, { dateOfBirth: e.target.value })}
-              />
-              <p className="font-sans text-xs text-muted-fg">
-                Confirm or correct it — a change updates our records.
-              </p>
-            </div>
-          )}
-
-          {/* ── Options not tied to a form field ─────────────────────── */}
-          {standaloneGroups.map((group) => (
-            <div key={group.productOptionGroupId} className="grid gap-1">
-              {renderPlacement(group)}
-              {!decided.has(group.productOptionGroupId) && (
-                <OptionGroupField
-                  group={group}
-                  idPrefix={`${pid}-g${group.productOptionGroupId}`}
-                  selections={state.options}
-                  onChange={setOptions}
-                />
-              )}
-              {err(`group:${group.productOptionGroupId}`) && (
-                <p role="alert" className="font-sans text-xs text-destructive">
-                  {err(`group:${group.productOptionGroupId}`)}
-                </p>
-              )}
-            </div>
-          ))}
-
-          {/* ── Custom form ───────────────────────────────────────────── */}
-          {form && (
-            <div className="grid gap-4">
-              {index === 0 && <RichText html={form.instructionsHtml} className="text-sm" />}
-              {prefilledAnswers(key).size > 0 && (
-                <p className="font-sans text-xs text-muted-fg" data-prefilled="true">
-                  Filled in from {view.firstName}&apos;s record — check it&apos;s still right.
-                </p>
-              )}
-              {previous && stateOf(previous.key).answers.size > 0 && (
-                <div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyAnswers(previous.key, key)}
+              {positionChoices.length > 1 && (
+                <div className="grid gap-1">
+                  <Label htmlFor={`${pid}-position`}>Relationship</Label>
+                  <select
+                    id={`${pid}-position`}
+                    value={newMember.householdPositionId}
+                    onChange={(e) =>
+                      setNewMember({
+                        ...newMember,
+                        householdPositionId: Number(e.target.value) as 2 | 3 | 4,
+                      })
+                    }
+                    className={SELECT_CLASS}
                   >
-                    <Copy aria-hidden className="mr-1.5 size-4" />
-                    Copy {previous.firstName}&apos;s answers
-                  </Button>
+                    {positionChoices.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
-              {form.fields
-                .filter((field) => isFieldActive(field, fieldsById, state.answers))
-                .map((field) => (
-                  <React.Fragment key={field.formFieldId}>
-                    <FormFieldInput
-                      field={field}
-                      id={`${pid}-f${field.formFieldId}`}
-                      value={state.answers.get(field.formFieldId) ?? ''}
-                      onChange={(value) => setAnswer(field.formFieldId, value)}
-                      error={
-                        err(`field:${field.formFieldId}`) ??
-                        (existing ? serverErrorsByField.get(field.formFieldId) : undefined)
-                      }
-                    />
-                    {(groupsByFieldId.get(field.formFieldId) ?? []).map((group) => (
-                      <OptionGroupField
-                        key={group.productOptionGroupId}
-                        group={group}
-                        idPrefix={`${pid}-g${group.productOptionGroupId}`}
-                        selections={state.options}
-                        onChange={setOptions}
-                      />
-                    ))}
-                  </React.Fragment>
-                ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* ── Promo code ───────────────────────────────────────────── */}
-          {product && product.basePrice > 0 && (
-            <div className="grid gap-1">
-              <Label htmlFor={`${pid}-promo`}>Promo code</Label>
-              <Input
-                id={`${pid}-promo`}
-                value={state.promoCode}
-                maxLength={20}
-                autoComplete="off"
-                onChange={(e) => updatePerson(key, { promoCode: e.target.value })}
-                className="max-w-xs uppercase"
+        {asksGradeFor(key) && (
+          <div className="grid gap-1">
+            <Label htmlFor={`${pid}-member-grade`}>Grade *</Label>
+            <select
+              id={`${pid}-member-grade`}
+              required
+              value={gradeFor(key)}
+              onChange={(e) => updatePerson(key, { grade: e.target.value })}
+              className={SELECT_CLASS}
+            >
+              <option value="">Choose a grade</option>
+              {GRADE_OPTIONS.map((g) => (
+                <option key={g.value} value={g.value}>
+                  {g.label}
+                </option>
+              ))}
+            </select>
+            <p className="font-sans text-xs text-muted-fg">
+              This school year. A change updates our records.
+            </p>
+          </div>
+        )}
+
+        {asksBirthDateFor(key) && (
+          <div className="grid gap-1">
+            <Label htmlFor={`${pid}-member-dob`}>Date of birth *</Label>
+            <Input
+              id={`${pid}-member-dob`}
+              type="date"
+              required
+              value={birthDateFor(key)}
+              onChange={(e) => updatePerson(key, { dateOfBirth: e.target.value })}
+            />
+            <p className="font-sans text-xs text-muted-fg">
+              Confirm or correct it — a change updates our records.
+            </p>
+          </div>
+        )}
+
+        {/* ── Options not tied to a form field ─────────────────────── */}
+        {standaloneGroups.map((group) => (
+          <div key={group.productOptionGroupId} className="grid gap-1">
+            {renderPlacement(group)}
+            {!decided.has(group.productOptionGroupId) && (
+              <OptionGroupField
+                group={group}
+                idPrefix={`${pid}-g${group.productOptionGroupId}`}
+                selections={state.options}
+                onChange={setOptions}
               />
-            </div>
-          )}
+            )}
+            {err(`group:${group.productOptionGroupId}`) && (
+              <p role="alert" className="font-sans text-xs text-destructive">
+                {err(`group:${group.productOptionGroupId}`)}
+              </p>
+            )}
+          </div>
+        ))}
+
+        {/* ── Custom form ───────────────────────────────────────────── */}
+        {form && (
+          <div className="grid gap-4">
+            {index === 0 && <RichText html={form.instructionsHtml} className="text-sm" />}
+            {prefilledAnswers(key).size > 0 && (
+              <p className="font-sans text-xs text-muted-fg" data-prefilled="true">
+                Filled in from {view.firstName}&apos;s record — check it&apos;s still right.
+              </p>
+            )}
+            {previous && stateOf(previous.key).answers.size > 0 && (
+              <div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyAnswers(previous.key, key)}
+                >
+                  <Copy aria-hidden className="mr-1.5 size-4" />
+                  Copy {previous.firstName}&apos;s answers
+                </Button>
+              </div>
+            )}
+            {form.fields
+              .filter((field) => isFieldActive(field, fieldsById, state.answers))
+              .map((field) => (
+                <React.Fragment key={field.formFieldId}>
+                  <FormFieldInput
+                    field={field}
+                    id={`${pid}-f${field.formFieldId}`}
+                    value={state.answers.get(field.formFieldId) ?? ''}
+                    onChange={(value) => setAnswer(field.formFieldId, value)}
+                    error={
+                      err(`field:${field.formFieldId}`) ??
+                      (existing ? serverErrorsByField.get(field.formFieldId) : undefined)
+                    }
+                  />
+                  {(groupsByFieldId.get(field.formFieldId) ?? []).map((group) => (
+                    <OptionGroupField
+                      key={group.productOptionGroupId}
+                      group={group}
+                      idPrefix={`${pid}-g${group.productOptionGroupId}`}
+                      selections={state.options}
+                      onChange={setOptions}
+                    />
+                  ))}
+                </React.Fragment>
+              ))}
+          </div>
+        )}
+
+        {/* ── Promo code ───────────────────────────────────────────── */}
+        {product && product.basePrice > 0 && (
+          <div className="grid gap-1">
+            <Label htmlFor={`${pid}-promo`}>Promo code</Label>
+            <Input
+              id={`${pid}-promo`}
+              value={state.promoCode}
+              maxLength={20}
+              autoComplete="off"
+              onChange={(e) => updatePerson(key, { promoCode: e.target.value })}
+              className="max-w-xs uppercase"
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /** Under a ticked name: the open form, or a one-line summary with a way back in. */
+  const renderDrawer = (view: PersonView): React.JSX.Element => {
+    const index = views.findIndex((v) => v.key === view.key);
+    if (openDrawer === view.key) {
+      return (
+        <div
+          className="mb-2 ml-2 grid gap-4 border-l-2 border-secondary pt-1 pb-3 pl-4"
+          data-drawer-state="open"
+        >
+          {renderPerson(view, index)}
+          <div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-label={`Done with ${view.firstName}`}
+              onClick={() => closeDrawer(view)}
+            >
+              <Check aria-hidden className="mr-1.5 size-4" />
+              Done
+            </Button>
+          </div>
         </div>
+      );
+    }
+    const complete = isComplete(view);
+    const chips = summaryOf(view);
+    return (
+      <div
+        className="mb-1 ml-6 flex flex-wrap items-center justify-between gap-x-3 gap-y-1"
+        data-drawer-state={complete ? 'complete' : 'incomplete'}
+      >
+        <span className="inline-flex min-w-0 items-start gap-1.5 font-sans text-xs text-muted-fg">
+          {complete ? (
+            <Check aria-hidden className="mt-0.5 size-3.5 shrink-0 text-primary" />
+          ) : (
+            <TriangleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0 text-warning-fg" />
+          )}
+          <span>
+            {complete ? (chips.length > 0 ? chips.join(' · ') : 'Ready') : 'Needs answers'}
+          </span>
+        </span>
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="h-auto px-0"
+          aria-label={`${complete ? 'Change' : 'Add'} answers for ${view.firstName}`}
+          onClick={() => setOpenKey(view.key)}
+        >
+          {complete ? 'Change' : 'Answer'}
+        </Button>
       </div>
     );
   };
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSave}
       noValidate
       className={
@@ -841,56 +968,64 @@ export function RegistrantEditor({
               const taken = takenIdentities.has(`c${m.contactId}`);
               const disabled = !eligible || taken;
               const id = `${idPrefix}-who-${m.contactId}`;
+              const view = views.find((v) => v.key === `c${m.contactId}`);
               return (
-                <label
-                  key={m.contactId}
-                  htmlFor={id}
-                  className={`inline-flex min-h-11 items-center gap-2 py-2 font-sans text-sm select-none @min-[768px]:min-h-0 @min-[768px]:py-0 ${
-                    disabled ? 'cursor-not-allowed text-muted-fg' : 'cursor-pointer text-fg'
-                  }`}
-                >
-                  <input
-                    id={id}
-                    type="checkbox"
-                    disabled={disabled}
-                    checked={selected.has(m.contactId)}
-                    onChange={(e) => toggleMember(m.contactId, e.target.checked)}
-                    className="size-4 shrink-0 accent-primary"
-                  />
-                  <span>
-                    {m.firstName} {m.lastName}
-                    {m.isMinorPosition && m.age !== null && (
-                      <span className="text-muted-fg">
-                        {' '}
-                        · {formatAge(m.age)}
-                        {m.grade !== null ? `, ${formatGrade(m.grade)} grade` : ''}
-                      </span>
-                    )}
-                  </span>
-                  {taken ? (
-                    <span className="text-xs text-muted-fg">already added</span>
-                  ) : !eligible && eligibility?.reason ? (
-                    <span className="text-xs text-muted-fg">
-                      {eligibilityLabel(eligibility.reason)}
+                <div key={m.contactId} className="grid">
+                  <label
+                    htmlFor={id}
+                    className={`inline-flex min-h-11 items-center gap-2 py-2 font-sans text-sm select-none @min-[768px]:min-h-0 @min-[768px]:py-0 ${
+                      disabled ? 'cursor-not-allowed text-muted-fg' : 'cursor-pointer text-fg'
+                    }`}
+                  >
+                    <input
+                      id={id}
+                      type="checkbox"
+                      disabled={disabled}
+                      checked={selected.has(m.contactId)}
+                      onChange={(e) => toggleMember(m, e.target.checked)}
+                      className="size-4 shrink-0 accent-primary"
+                    />
+                    <span>
+                      {m.firstName} {m.lastName}
+                      {m.isMinorPosition && m.age !== null && (
+                        <span className="text-muted-fg">
+                          {' '}
+                          · {formatAge(m.age)}
+                          {m.grade !== null ? `, ${formatGrade(m.grade)} grade` : ''}
+                        </span>
+                      )}
                     </span>
-                  ) : null}
-                </label>
+                    {taken ? (
+                      <span className="text-xs text-muted-fg">already added</span>
+                    ) : !eligible && eligibility?.reason ? (
+                      <span className="text-xs text-muted-fg">
+                        {eligibilityLabel(eligibility.reason)}
+                      </span>
+                    ) : null}
+                  </label>
+                  {view && renderDrawer(view)}
+                </div>
               );
             })}
             {canAddMember && (
-              <label
-                htmlFor={`${idPrefix}-who-new`}
-                className="inline-flex min-h-11 cursor-pointer items-center gap-2 py-2 font-sans text-sm text-fg select-none @min-[768px]:min-h-0 @min-[768px]:py-0"
-              >
-                <input
-                  id={`${idPrefix}-who-new`}
-                  type="checkbox"
-                  checked={addNew}
-                  onChange={(e) => setAddNew(e.target.checked)}
-                  className="size-4 shrink-0 cursor-pointer accent-primary"
-                />
-                Someone not listed — add a family member
-              </label>
+              <div className="grid">
+                <label
+                  htmlFor={`${idPrefix}-who-new`}
+                  className="inline-flex min-h-11 cursor-pointer items-center gap-2 py-2 font-sans text-sm text-fg select-none @min-[768px]:min-h-0 @min-[768px]:py-0"
+                >
+                  <input
+                    id={`${idPrefix}-who-new`}
+                    type="checkbox"
+                    checked={addNew}
+                    onChange={(e) => toggleAddNew(e.target.checked)}
+                    className="size-4 shrink-0 cursor-pointer accent-primary"
+                  />
+                  Someone not listed — add a family member
+                </label>
+                {addNew &&
+                  views.some((v) => v.key === 'new') &&
+                  renderDrawer(views.find((v) => v.key === 'new')!)}
+              </div>
             )}
           </div>
           {localErrors.get('who') && (
@@ -918,7 +1053,7 @@ export function RegistrantEditor({
       )}
       <RichText html={product?.descriptionHtml} className="text-sm text-muted-fg" />
 
-      {views.map((view, index) => renderPerson(view, index))}
+      {!drawerMode && views.map((view, index) => renderPerson(view, index))}
 
       {serverErrorsGeneral.length > 0 && (
         <ul role="alert" className="grid gap-1 font-sans text-sm text-destructive">

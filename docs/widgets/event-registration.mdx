@@ -89,11 +89,14 @@ widget so members can sign in for the household roster:
   from) open with the child's current attribute as the answer: Toilet Training, Walking Status
   and Allergies for TOP Childcare. A note under the form says where it came from; the parent can
   change anything and only what they confirm is submitted.
-- **Several people at once** (2026-09-15) — the picker is a set of checkboxes. Every ticked
-  household member gets their own numbered panel (birth date, grade, resolved room, options,
-  form questions) and one button adds them all; a sole eligible member is pre-ticked. A "Copy
-  …'s answers" button copies the previous person's form answers. Editing an existing
-  registration stays single-person.
+- **Several people at once** (2026-09-15, drawers 2026-09-16) — the picker is a set of
+  checkboxes and each ticked person answers right under their own name. Ticking opens that
+  person's drawer (birth date, grade, resolved room, options, form questions) and collapses
+  any other; a person whose record already answers everything (prefill) stays collapsed to a
+  summary row ("7th · No ✓ Change"), an unfinished one shows "Needs answers". "Done"
+  re-checks and collapses; saving reopens the first drawer with a problem. One button adds
+  them all; a sole eligible member is pre-ticked. A "Copy …'s answers" button copies the
+  previous person's form answers. Editing an existing registration stays single-person.
 - **Add a family member** — a signed-in member may add someone not yet in MP;
   the contact and participant are created inside the submit, in their household.
 - **Guest path** — signed out, and only when neither the event nor any form
