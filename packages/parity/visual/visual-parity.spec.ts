@@ -17,10 +17,9 @@ function crop(src: PNG, width: number, height: number): PNG {
 
 for (const name of WIDGETS) {
   test(`visual parity: ${name}`, async ({ page }) => {
-    // Studio side: select the widget in the current UI (no routes yet — click the
-    // sidebar button), wait for the shadow-root mount to settle.
-    await page.goto('http://localhost:5173');
-    await page.getByRole('button', { name, exact: true }).click();
+    // Studio side: open the widget route and wait for the shadow-root mount to
+    // settle.
+    await page.goto(`http://localhost:5173/widgets/${name}?tab=dev`);
     const studioHost = page.locator('[data-perimeter-widget-preview]');
     // mount() attaches a shadow root and appends a react root element to it; a
     // plain `:scope > div` locator can't see across the shadow boundary, so wait

@@ -10,7 +10,7 @@
 | Tool    | Version       | Notes                                                      |
 | ------- | ------------- | ---------------------------------------------------------- |
 | Node.js | 22+           | `engines.node` is `>=22`                                   |
-| pnpm    | 10 (`10.32.1`) | Pinned via `packageManager`; `corepack enable` picks it up |
+| pnpm    | 10 (`10.34.5`) | Pinned via `packageManager`; `corepack enable` picks it up |
 
 Always use `pnpm` — never `npm` or `npx`.
 

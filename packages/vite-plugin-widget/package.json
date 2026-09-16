@@ -19,11 +19,11 @@
     "vite": "^6.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
-    "@vitest/coverage-v8": "^4.1.8",
-    "postcss": "^8.5.15",
-    "typescript": "^5.7.3",
-    "vite": "^6.0.7",
-    "vitest": "^4.1.8"
+    "@types/node": "^22.20.3",
+    "@vitest/coverage-v8": "^4.1.11",
+    "postcss": "^8.5.28",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.3",
+    "vitest": "^4.1.11"
   }
 }

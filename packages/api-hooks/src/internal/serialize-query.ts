@@ -1,11 +1,5 @@
 export type QueryValue =
-  | string
-  | number
-  | boolean
-  | Date
-  | null
-  | undefined
-  | ReadonlyArray<string | number | boolean>;
+  string | number | boolean | Date | null | undefined | ReadonlyArray<string | number | boolean>;
 
 export function serializeQuery(params: Record<string, QueryValue>): string {
   const parts: string[] = [];
