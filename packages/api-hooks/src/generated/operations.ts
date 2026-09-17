@@ -6775,6 +6775,7 @@ export interface operations {
                 enableLabelHtml: string | null;
                 instructionsHtml: string | null;
                 buttonText: string;
+                sectionGroup: string | null;
                 position: number;
                 showHouseholdPositionId: number | null;
                 forGenderId: number | null;

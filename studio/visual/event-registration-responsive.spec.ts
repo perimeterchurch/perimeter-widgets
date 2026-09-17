@@ -63,6 +63,9 @@ async function widgetState(page: Page) {
       overflow: container ? container.scrollWidth > container.clientWidth + 1 : false,
       cardCount: cards.length,
       cardTitles: cards.map((c) => c.querySelector('h3')?.textContent ?? ''),
+      groupHeadings: [...(sr?.querySelectorAll('[data-slot="section-group"] h2') ?? [])].map(
+        (h) => h.textContent ?? '',
+      ),
       cardGridCols: cols(cardGrid),
       // Phone/tablet stack the picture on top or beside the copy; either way one card per row.
       hasBar: !!bar,
@@ -120,6 +123,7 @@ test.describe('event-registration mobile-first layout', () => {
       'Student Night of Worship (Grades 6-12)',
       'Elementary Active (Grades K-5)',
     ]);
+    expect(s.groupHeadings, 'staff-set Section_Group headings').toEqual(['Adults', 'Kids']);
     for (const h of s.addButtons)
       expect(h, 'add buttons are at least 44px tall').toBeGreaterThanOrEqual(44);
   });

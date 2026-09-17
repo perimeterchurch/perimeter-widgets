@@ -1,6 +1,6 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type * as ApiHooks from '@perimeter/api-hooks';
 import type * as WidgetRuntime from '@perimeter/widget-runtime';
 import type { AuthProvider } from '@perimeter/auth';
@@ -130,6 +130,30 @@ describe('event-registration widget', () => {
     expect(screen.getByLabelText(/update my record/)).toBeChecked();
     fireEvent.click(within(contact).getByRole('button', { name: 'Done' }));
     expect(within(contact).getByText('770-555-0000')).toBeInTheDocument();
+  });
+
+  it('lists sections under the headings staff set, and under none when they set none', () => {
+    render(<App config={config} auth={authStub(true)} />);
+    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+    cleanup();
+
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.key === 'related:101' ? { ...s, sectionGroup: 'Adults' } : { ...s, sectionGroup: 'Kids' },
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const groups = screen.getAllByRole('group');
+    expect(groups.map((g) => g.getAttribute('aria-labelledby'))).toHaveLength(2);
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
+      'Adults',
+      'Kids',
+    ]);
+    expect(
+      within(groups[1]!).getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' }),
+    ).toBeInTheDocument();
   });
 
   it('does not gate a section behind its Enable_Label question: the card itself is the opt-in', () => {
