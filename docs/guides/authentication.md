@@ -81,9 +81,13 @@ The `App` component also receives the same provider directly via its `auth` prop
 
 ---
 
-## Token Expiry
+## Token Expiry and Silent Refresh
 
-If the token expires during an active session:
+MP's widget access token lives 30 minutes (`TM.Widgets` client; `mpp-widgets_ExpiresAfter` is written one minute early). MPWidgets renews it silently — a `credentials: include` GET of the OAuth authorize endpoint with `state=REAUTH`, which the `signin-oidc` callback answers with JSON `{ accessToken, idToken, expiresIn }` while the MP session cookie is valid — but only when one of MP's own widgets is about to call its API. A page with only our widgets used to sign out after 30 minutes while the login widget still showed the member's name (found on the event-registration page, 2026-09-16).
+
+`MPLocalStorageAuth` therefore performs the same renewal itself (2026-09-16): on its 1 s poll, when `ExpiresAfter` is within `refreshLeadSeconds` (default 120) or already past (up to a day), `mpp-widgets_IdToken` is present (the member has not signed out), and an MP app root is known — auto-detected from the `…/widgets/dist/MPWidgets.js` / `UserLogin.js` script tag, or passed as `mpAppRoot` (`false` disables). It fetches `<root>/Api/Auth` for the OAuth configuration, GETs the authorize URL with `state=REAUTH`, and writes the same three localStorage keys MPWidgets writes, sharing `window.mppw_refreshTokenPromise` so the two never race. A refused refresh (MP session gone) leaves the member signed out and backs off for a minute.
+
+If a token still expires during an active session (refresh disabled or MP session ended):
 
 - API requests will receive 401 responses
 - The API client throws `ApiError` with code `TOKEN_EXPIRED`
