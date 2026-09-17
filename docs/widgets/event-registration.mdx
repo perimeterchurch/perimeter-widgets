@@ -70,6 +70,9 @@ widget so members can sign in for the household roster:
   group's lowest `Position`; ungrouped sections (and the hub's own section) come first with no
   heading. Grouping happens only when staff set it — nothing is inferred from the audience —
   so an event with the column blank looks exactly as before. Names are matched case-insensitively.
+  Each group sits on a tinted band (`bg-muted/40`, hairline top and bottom) that bleeds to the
+  widget's edges on phones and becomes a bordered panel from 768px, so the boundary between
+  groups is visible even when a single card fills the screen.
 - **Who can go where** — `GET …/roster` returns the household with per-section
   eligibility. `Show_Household_Position_ID` and `For_Gender_ID` filter members;
   **`Minor_Registration = 1` lists only children**, `0`/blank lists everyone.
