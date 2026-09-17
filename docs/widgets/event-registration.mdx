@@ -65,6 +65,11 @@ widget so members can sign in for the household roster:
   Dana: tapping the card is the opt-in); `Instructions` render as the card's
   one-line summary behind "View details". Closed sections say why (not open
   yet, closed, full, cancelled, sold out) and are not tappable.
+- **Section headings** (2026-09-17) — when staff fill `bp_Related_Events.Section_Group`
+  ("Adults", "Kids", "Childcare"), the cards are listed under those headings, ordered by each
+  group's lowest `Position`; ungrouped sections (and the hub's own section) come first with no
+  heading. Grouping happens only when staff set it — nothing is inferred from the audience —
+  so an event with the column blank looks exactly as before. Names are matched case-insensitively.
 - **Who can go where** — `GET …/roster` returns the household with per-section
   eligibility. `Show_Household_Position_ID` and `For_Gender_ID` filter members;
   **`Minor_Registration = 1` lists only children**, `0`/blank lists everyone.

@@ -9,6 +9,8 @@ import {
 import { buildCheckoutUrl, readPageContext } from '../src/lib/page-url';
 import { formatEventRange, formatMoneyParts, formatPrice, htmlToText } from '../src/lib/format';
 import { bucketFor } from '../src/lib/breakpoint';
+import { groupSections } from '../src/lib/groups';
+import { familyNight } from './fixtures';
 
 const reg = (over: Partial<DraftRegistration> = {}): DraftRegistration => ({
   localId: 'a',
@@ -176,5 +178,29 @@ describe('mobile layout helpers', () => {
     );
     expect(htmlToText(null)).toBe('');
     expect(htmlToText('   ')).toBe('');
+  });
+
+  it('groups sections only under headings staff set, ungrouped first, groups by lowest position', () => {
+    const [a, b, c] = familyNight.sections;
+    const sections = [
+      { ...c!, position: 1, sectionGroup: 'Kids' },
+      { ...a!, position: 2, sectionGroup: null },
+      { ...b!, position: 3, sectionGroup: ' kids ' },
+      { ...a!, key: 'related:200', position: 4, sectionGroup: 'Adults' },
+    ];
+    const groups = groupSections(sections);
+    expect(groups.map((g) => g.label)).toEqual([null, 'Kids', 'Adults']);
+    expect(groups.map((g) => g.sections.map((s) => s.key))).toEqual([
+      ['related:101'],
+      ['related:104', 'related:103'],
+      ['related:200'],
+    ]);
+  });
+
+  it('yields one unlabelled run when no section has a group', () => {
+    const groups = groupSections(familyNight.sections);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]?.label).toBeNull();
+    expect(groups[0]?.sections).toHaveLength(3);
   });
 });

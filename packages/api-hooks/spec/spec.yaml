@@ -9634,6 +9634,10 @@ paths:
                                 - type: 'null'
                             buttonText:
                               type: string
+                            sectionGroup:
+                              anyOf:
+                                - type: string
+                                - type: 'null'
                             position:
                               type: integer
                               minimum: -9007199254740991
@@ -10052,6 +10056,7 @@ paths:
                             - enableLabelHtml
                             - instructionsHtml
                             - buttonText
+                            - sectionGroup
                             - position
                             - showHouseholdPositionId
                             - forGenderId
