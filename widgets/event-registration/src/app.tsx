@@ -43,6 +43,7 @@ import {
 } from './lib/draft';
 import { buildCheckoutUrl, readPageContext } from './lib/page-url';
 import { eventIsFree } from './lib/format';
+import { groupSections } from './lib/groups';
 
 export interface AppProps {
   config: EventRegistrationConfig;
@@ -343,6 +344,8 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   const showPrices = !eventIsFree(event);
   const addressRequired = quote?.addressRequired ?? false;
   const sections = [...event.sections].sort((a, b) => a.position - b.position);
+  // Headings only where staff set bp_Related_Events.Section_Group; otherwise one plain list.
+  const sectionGroups = groupSections(sections);
 
   // ── The editor: inline in its card on desktop, in the sheet on phones ──
   const editing = draft.editing;
@@ -528,7 +531,6 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
           imageUrl={imageUrl}
           fallbackImageUrl={config.defaultImageUrl}
           showMap={config.showMap}
-          returnUrl={config.returnUrl}
         />
 
         {event.cancelled ? (
@@ -580,8 +582,8 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
 
                   <div className="grid gap-6 @min-[768px]:grid-cols-[minmax(0,1fr)_22rem] @min-[768px]:items-start">
                     <div className="grid gap-6">
-                      <div className="grid gap-4 @min-[1024px]:grid-cols-2 @min-[1024px]:items-start">
-                        {sections.map((section) => {
+                      {sectionGroups.map((group, gi) => {
+                        const cards = group.sections.map((section) => {
                           const inSection = draft.registrations.filter(
                             (r) => r.sectionKey === section.key,
                           );
@@ -604,8 +606,30 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                               editor={!compact && editingHere ? renderEditor(section, false) : null}
                             />
                           );
-                        })}
-                      </div>
+                        });
+                        const grid = (
+                          <div className="grid gap-4 @min-[1024px]:grid-cols-2 @min-[1024px]:items-start">
+                            {cards}
+                          </div>
+                        );
+                        if (group.label === null)
+                          return <React.Fragment key="ungrouped">{grid}</React.Fragment>;
+                        const headingId = `section-group-${gi}`;
+                        return (
+                          <div
+                            key={group.label}
+                            role="group"
+                            aria-labelledby={headingId}
+                            className="grid gap-3"
+                            data-slot="section-group"
+                          >
+                            <h2 id={headingId} className="font-sans text-lg font-bold text-fg">
+                              {group.label}
+                            </h2>
+                            {grid}
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {!compact && (

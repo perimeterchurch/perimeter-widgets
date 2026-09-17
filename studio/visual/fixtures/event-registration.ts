@@ -18,6 +18,7 @@ function section(over: {
   buttonText?: string;
   showHouseholdPositionId?: number | null;
   remaining?: number | null;
+  sectionGroup?: string | null;
 }) {
   return {
     key: over.key,
@@ -26,6 +27,7 @@ function section(over: {
     enableLabelHtml: over.enableLabelHtml ?? null,
     instructionsHtml: '<p>Meet in the Fellowship Hall ten minutes early.</p>',
     buttonText: over.buttonText ?? 'Add registrant',
+    sectionGroup: over.sectionGroup ?? null,
     position: over.position,
     showHouseholdPositionId: over.showHouseholdPositionId ?? null,
     forGenderId: null,
@@ -111,6 +113,7 @@ export const familyNightEvent = {
         minorRegistration: false,
         position: 1,
         showHouseholdPositionId: 1,
+        sectionGroup: 'Adults',
       }),
       section({
         key: 'related:103',
@@ -123,6 +126,7 @@ export const familyNightEvent = {
         enableLabelHtml: '<b>Registering a student?</b>',
         buttonText: 'Add a student',
         remaining: 5,
+        sectionGroup: 'Kids',
       }),
       section({
         key: 'related:104',
@@ -131,6 +135,7 @@ export const familyNightEvent = {
         eventId: 900014,
         minorRegistration: true,
         position: 4,
+        sectionGroup: 'Kids',
       }),
     ],
   },

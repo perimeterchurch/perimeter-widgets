@@ -3462,12 +3462,7 @@ export interface operations {
               generationMembership: {
                 /** @enum {string} */
                 generation:
-                  | 'silentGreatest'
-                  | 'boomer'
-                  | 'genX'
-                  | 'millennial'
-                  | 'genZ'
-                  | 'genAlpha';
+                  'silentGreatest' | 'boomer' | 'genX' | 'millennial' | 'genZ' | 'genAlpha';
                 label: string;
                 birthRangeLabel: string;
                 currentCount: number;
@@ -6780,6 +6775,7 @@ export interface operations {
                 enableLabelHtml: string | null;
                 instructionsHtml: string | null;
                 buttonText: string;
+                sectionGroup: string | null;
                 position: number;
                 showHouseholdPositionId: number | null;
                 forGenderId: number | null;
@@ -11463,12 +11459,7 @@ export interface operations {
               processingStatus: 'queued' | 'processing' | 'ready_for_review' | 'failed';
               /** @enum {string} */
               stewardReviewStatus:
-                | 'pending'
-                | 'in_review'
-                | 'approved'
-                | 'rejected'
-                | 'published'
-                | 'archived';
+                'pending' | 'in_review' | 'approved' | 'rejected' | 'published' | 'archived';
               /** @enum {string} */
               redactionStatus: 'pending' | 'flagged' | 'cleared';
               assignedStewardId: number | null;
