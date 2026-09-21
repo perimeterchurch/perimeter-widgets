@@ -620,7 +620,9 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                             key={group.label}
                             role="group"
                             aria-labelledby={headingId}
-                            className="grid gap-3"
+                            // A tinted band per group: bleeds to the widget's edges on
+                            // phones, sits inside the column from 768px.
+                            className="-mx-4 grid gap-3 border-y border-border bg-muted/40 px-4 py-4 @min-[768px]:mx-0 @min-[768px]:border @min-[768px]:p-5"
                             data-slot="section-group"
                           >
                             <h2 id={headingId} className="font-sans text-lg font-bold text-fg">
