@@ -61,13 +61,20 @@ the list to a single card (its next date).
 
 For finer control, staff set **Series Rules** on the Events List record in MP
 (Events Lists → open the list → _Series Rules_ sub-page → New). Pick the series
-from the dropdown and set **Max Upcoming**:
+from the dropdown, leave **Include Series** checked, and set **Max Upcoming**:
 
 | Max Upcoming | Effect for that series on that list                          |
 | ------------ | ------------------------------------------------------------ |
 | blank        | Every upcoming date, even if the embed collapses series.     |
 | `1`          | One card — the next date.                                    |
 | `N`          | The next N dates.                                            |
+
+**Include Series** (checked by default) makes the rule itself put the series on
+the list: every date of the series shows in the finder (subject to Max
+Upcoming) without anyone adding dates to the list one by one, and new dates MP
+creates for the series appear automatically. Uncheck it only when a list
+deliberately holds a hand-picked subset of a series and you just want to cap
+those dates.
 
 Rules are per list, so the same study can be "every date" on the Women's
 Ministry page and "next date only" on a campus-wide page. A series with no rule
