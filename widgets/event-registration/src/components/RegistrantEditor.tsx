@@ -922,6 +922,11 @@ export function RegistrantEditor({
       ref={formRef}
       onSubmit={handleSave}
       noValidate
+      // Inside a card there is no visible heading (the event title sits right
+      // above), so name the form for screen readers; the card names the event.
+      aria-label={
+        !embedded && !framed ? (existing ? 'Edit registration' : 'New registration') : undefined
+      }
       className={
         embedded
           ? 'grid gap-5 bg-bg'
@@ -930,20 +935,11 @@ export function RegistrantEditor({
             : 'grid gap-5 bg-bg'
       }
     >
-      {!embedded &&
-        (framed ? (
-          <h4 id={`editor-${section.key}-title`} className="font-sans text-lg font-bold text-fg">
-            {existing ? 'Edit registration' : 'New registration'} — {section.displayName}
-          </h4>
-        ) : (
-          // Inside a card the event title sits right above; just say what this is.
-          <h4
-            id={`editor-${section.key}-title`}
-            className="font-sans text-2xs font-bold tracking-wide text-muted-fg uppercase"
-          >
-            {existing ? 'Edit registration' : 'New registration'}
-          </h4>
-        ))}
+      {!embedded && framed && (
+        <h4 id={`editor-${section.key}-title`} className="font-sans text-lg font-bold text-fg">
+          {existing ? 'Edit registration' : 'New registration'} — {section.displayName}
+        </h4>
+      )}
 
       {/* ── Who ─────────────────────────────────────────────────────── */}
       {mode === 'guest' ? (
@@ -1080,8 +1076,9 @@ export function RegistrantEditor({
       <div
         className={
           embedded
-            ? 'sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-border bg-bg px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] @min-[480px]:flex-row'
-            : 'flex flex-wrap gap-3'
+            ? 'sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-border bg-bg px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] @min-[480px]:flex-row @min-[480px]:justify-end'
+            : // Right-aligned like the card's add button (2026-09-22).
+              'flex flex-wrap justify-end gap-3'
         }
       >
         <Button type="submit" size="lg" className={embedded ? 'w-full @min-[480px]:w-auto' : ''}>

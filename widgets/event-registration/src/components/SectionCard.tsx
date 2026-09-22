@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronRight, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { QuotedRegistration, RegistrationSection } from '@perimeter/api-hooks';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
@@ -8,10 +8,8 @@ import { FallbackImage } from './FallbackImage';
 import { RichText } from './RichText';
 import type { DraftRegistration } from '../lib/draft';
 import {
-  formatAgeRange,
   formatDeadline,
   formatEventRange,
-  formatGradeRange,
   formatMoney,
   formatMoneyParts,
   htmlToText,
@@ -67,11 +65,13 @@ function closedReasonText(section: RegistrationSection, timeZone: string): strin
  * One registration section — the parent event or one `bp_Related_Events`
  * row — as a tappable, image-led card: picture, badges, title, a one-line
  * summary behind "View details", the people added so far, and a footer with
- * the price and the section's `Button_Text`. The whole card is the control:
- * the footer label is a real button whose hit area is stretched over the
- * card, so selecting the event needs no separate "Add" button. The native
- * widget's `Enable_Label` opt-in question is not rendered — tapping the card
- * is the opt-in.
+ * the price and an "I'm Attending" button — "Add a student" in a grade-bounded
+ * minors-only section; other minors-only sections keep their `Button_Text`,
+ * since the parent is adding a child, not attending. The whole card is the
+ * control: the button's hit area is stretched over the card, so selecting the
+ * event needs no separate "Add" button. The native widget's
+ * `Enable_Label` opt-in question is not rendered — tapping the card is the
+ * opt-in.
  */
 export function SectionCard({
   section,
@@ -93,15 +93,19 @@ export function SectionCard({
 
   const remaining = section.event.remaining;
   const showEventLine = !section.isParentEvent;
-  const ageRange = formatAgeRange(section.audience.minAge, section.audience.maxAge);
-  const gradeRange = formatGradeRange(section.audience.minGrade, section.audience.maxGrade);
   const summary =
     htmlToText(section.instructionsHtml) || htmlToText(section.event.meetingInstructionsHtml);
   const price = section.product ? formatMoneyParts(section.product.basePrice) : null;
   const tappable = section.open && canAdd && !editor;
+  const { minorsOnly, minGrade, maxGrade } = section.audience;
+  const addLabel = !minorsOnly
+    ? "I'm Attending"
+    : minGrade !== null || maxGrade !== null
+      ? 'Add a student'
+      : section.buttonText;
 
-  // The picture always sits on top: event banners are landscape, and a side
-  // column at tablet widths cropped them to a tall sliver.
+  // Picture on top below 768px, beside the copy from 768px (2026-09-22). Not at
+  // tablet widths: a side column there cropped landscape banners to a tall sliver.
   const withImage = !noImage;
   // Anything interactive inside the card sits above the stretched add button.
   const above = 'relative z-10';
@@ -109,7 +113,9 @@ export function SectionCard({
   return (
     <section
       className={`relative grid border bg-bg transition-colors ${
-        noImage ? 'border-border border-l-4 border-l-secondary' : 'border-border'
+        noImage
+          ? 'border-border border-l-4 border-l-secondary'
+          : 'border-border @min-[768px]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]'
       } ${
         tappable
           ? 'hover:border-secondary hover:shadow-sm has-[button[data-stretched]:focus-visible]:ring-2 has-[button[data-stretched]:focus-visible]:ring-ring has-[button[data-stretched]:active]:bg-muted/40'
@@ -123,33 +129,20 @@ export function SectionCard({
         <FallbackImage
           sources={imageSources}
           alt=""
-          className={`aspect-video w-full ${section.open ? '' : 'opacity-60'}`}
+          // From 768px the picture fills its column for the copy's full height;
+          // the absolute <img> keeps the picture from stretching the card.
+          className={`aspect-video w-full @min-[768px]:row-span-2 @min-[768px]:aspect-auto @min-[768px]:min-h-40 ${
+            section.open ? '' : 'opacity-60'
+          }`}
+          imgClassName="@min-[768px]:absolute @min-[768px]:inset-0"
           onExhausted={markNoImage}
         />
       )}
 
       <div className="grid gap-3 p-4">
         <div className="grid gap-1.5">
-          <div className="flex flex-wrap items-center gap-2">
-            {section.audience.adultsOnly ? (
-              <Badge variant="secondary" className="rounded-none">
-                Adults
-              </Badge>
-            ) : section.audience.minorsOnly ? (
-              <Badge variant="secondary" className="rounded-none">
-                Children
-              </Badge>
-            ) : null}
-            {!section.audience.adultsOnly && ageRange && (
-              <Badge variant="outline" className="rounded-none">
-                {ageRange}
-              </Badge>
-            )}
-            {gradeRange && (
-              <Badge variant="outline" className="rounded-none">
-                {gradeRange}
-              </Badge>
-            )}
+          {/* Status only (2026-09-22): the audience and grades live in the title. */}
+          <div className="flex flex-wrap items-center gap-2 empty:hidden">
             {section.open && remaining !== null && (
               <Badge variant={remaining <= 3 ? 'warning' : 'outline'} className="rounded-none">
                 {remaining} {remaining === 1 ? 'spot' : 'spots'} left
@@ -240,7 +233,7 @@ export function SectionCard({
       </div>
 
       {(!section.open || (showPrices && price) || tappable) && (
-        <div className="border-t border-border px-4 py-3">
+        <div className="px-4 pb-4">
           {!section.open ? (
             <p className="font-sans text-sm text-muted-fg">{closedReasonText(section, timeZone)}</p>
           ) : (
@@ -263,15 +256,17 @@ export function SectionCard({
                 <span />
               )}
               {tappable && (
-                // The visible label; its hit area is the whole card (`after:inset-0`).
+                // Looks like the primary button; its hit area is the whole card
+                // (`after:inset-0`). Described by the title, since every card may
+                // say "I'm Attending".
                 <button
                   type="button"
                   data-stretched
                   onClick={onAdd}
-                  className="inline-flex min-h-11 items-center gap-1 font-sans text-sm font-semibold text-secondary outline-hidden after:absolute after:inset-0 after:cursor-pointer after:content-['']"
+                  aria-describedby={`section-${section.key}-title`}
+                  className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 font-sans text-base font-medium text-primary-fg transition-colors outline-hidden hover:bg-primary/90 after:absolute after:inset-0 after:cursor-pointer after:content-['']"
                 >
-                  {section.buttonText}
-                  <ChevronRight aria-hidden className="size-5" />
+                  {addLabel}
                 </button>
               )}
             </div>
@@ -279,7 +274,11 @@ export function SectionCard({
         </div>
       )}
 
-      {editor && <div className={`border-t border-border bg-muted/30 p-4 ${above}`}>{editor}</div>}
+      {editor && (
+        <div className={`col-span-full border-t border-border bg-muted/30 p-4 ${above}`}>
+          {editor}
+        </div>
+      )}
     </section>
   );
 }
