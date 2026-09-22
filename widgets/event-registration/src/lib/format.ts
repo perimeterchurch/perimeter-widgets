@@ -70,25 +70,6 @@ export function formatGrade(grade: number): string {
   return `${grade}${suffix}`;
 }
 
-/** "Grades K–5", "Grade 6 and up", "Up to grade 8"; null when no grade bound. */
-export function formatGradeRange(min: number | null, max: number | null): string | null {
-  if (min !== null && max !== null)
-    return min === max
-      ? `Grade ${formatGrade(min)}`
-      : `Grades ${formatGrade(min)}–${formatGrade(max)}`;
-  if (min !== null) return `Grade ${formatGrade(min)} and up`;
-  if (max !== null) return `Up to grade ${formatGrade(max)}`;
-  return null;
-}
-
-/** "Ages 3–5", "Ages 18 and up", "Up to age 5"; null when no age bound. */
-export function formatAgeRange(min: number | null, max: number | null): string | null {
-  if (min !== null && max !== null) return min === max ? `Age ${min}` : `Ages ${min}–${max}`;
-  if (min !== null) return `Ages ${min} and up`;
-  if (max !== null) return `Up to age ${max}`;
-  return null;
-}
-
 /**
  * True when nothing on the page can cost anything: every section is free,
  * offers no deposit, and every option is $0. Then "Free" badges and $0.00

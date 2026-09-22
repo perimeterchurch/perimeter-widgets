@@ -580,7 +580,9 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                     </SummaryBar>
                   )}
 
-                  <div className="grid gap-6 @min-[768px]:grid-cols-[minmax(0,1fr)_22rem] @min-[768px]:items-start">
+                  {/* From 768px the review sits below every section (2026-09-22), not
+                      in a column beside them. */}
+                  <div className="grid gap-6">
                     <div className="grid gap-6">
                       {sectionGroups.map((group, gi) => {
                         const cards = group.sections.map((section) => {
@@ -607,11 +609,8 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                             />
                           );
                         });
-                        const grid = (
-                          <div className="grid gap-4 @min-[1024px]:grid-cols-2 @min-[1024px]:items-start">
-                            {cards}
-                          </div>
-                        );
+                        // One card per row: from 768px each card is a horizontal row.
+                        const grid = <div className="grid gap-4">{cards}</div>;
                         if (group.label === null)
                           return <React.Fragment key="ungrouped">{grid}</React.Fragment>;
                         const headingId = `section-group-${gi}`;
@@ -620,14 +619,17 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                             key={group.label}
                             role="group"
                             aria-labelledby={headingId}
-                            // A tinted band per group: bleeds to the widget's edges on
-                            // phones, sits inside the column from 768px.
-                            className="-mx-4 grid gap-3 border-y border-border bg-muted/40 px-4 py-4 @min-[768px]:mx-0 @min-[768px]:border @min-[768px]:p-5"
+                            // A tinted band per group, no border: bleeds to the widget's
+                            // edges on phones, sits inside the column from 768px.
+                            className="-mx-4 grid gap-3 bg-muted/40 px-4 py-4 @min-[768px]:mx-0 @min-[768px]:p-5"
                             data-slot="section-group"
                           >
-                            <h2 id={headingId} className="font-sans text-lg font-bold text-fg">
+                            <h1
+                              id={headingId}
+                              className="font-serif text-2xl leading-tight font-normal text-balance text-fg @min-[768px]:text-3xl"
+                            >
                               {group.label}
-                            </h2>
+                            </h1>
                             {grid}
                           </div>
                         );
@@ -635,17 +637,15 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                     </div>
 
                     {!compact && (
-                      <div className="@min-[768px]:sticky @min-[768px]:top-4">
-                        <ReviewPanel
-                          {...reviewBody}
-                          contact={contactBlock}
-                          submitting={submitMutation.isPending}
-                          submitError={submitError}
-                          canSubmit={canSubmit}
-                          isGuest={isGuest}
-                          onSubmit={() => void handleSubmit()}
-                        />
-                      </div>
+                      <ReviewPanel
+                        {...reviewBody}
+                        contact={contactBlock}
+                        submitting={submitMutation.isPending}
+                        submitError={submitError}
+                        canSubmit={canSubmit}
+                        isGuest={isGuest}
+                        onSubmit={() => void handleSubmit()}
+                      />
                     )}
                   </div>
 

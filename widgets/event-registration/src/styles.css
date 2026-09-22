@@ -2,3 +2,13 @@
 @import 'tw-animate-css';
 @import '@perimeter/theme/tailwind.css';
 @config '../tailwind.config.ts';
+
+/*
+ * White text on every blue (primary) button: the ministry's call (2026-09-22),
+ * knowingly below AA contrast on this light blue. The runtime's token sheet sets
+ * navy on :host and loads after this sheet, so override on the shadow tree's
+ * top-level elements instead; the inline tree and the phone sheet both inherit.
+ */
+:host > * {
+  --color-primary-fg: #fff;
+}

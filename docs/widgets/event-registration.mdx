@@ -60,7 +60,10 @@ widget so members can sign in for the household roster:
 
 - **Sections** — `GET /api/registration/events/{id}` returns the parent (when it
   has a product) and each related row in `Position` order. Each is a tappable
-  card: `Button_Text` is the card's label and the whole card is its hit area.
+  card whose footer is a blue "I'm Attending" button, and the whole card is its hit area
+  (2026-09-22). A minors-only section with a grade range says "Add a student"; any other
+  minors-only section keeps its `Button_Text` (e.g. "Add a child" for childcare), since the
+  parent is adding a child, not attending.
   The native widget's `Enable_Label` opt-in question is NOT rendered (2026-09-16,
   Dana: tapping the card is the opt-in); `Instructions` render as the card's
   one-line summary behind "View details". Closed sections say why (not open
@@ -70,16 +73,19 @@ widget so members can sign in for the household roster:
   group's lowest `Position`; ungrouped sections (and the hub's own section) come first with no
   heading. Grouping happens only when staff set it — nothing is inferred from the audience —
   so an event with the column blank looks exactly as before. Names are matched case-insensitively.
-  Each group sits on a tinted band (`bg-muted/40`, hairline top and bottom) that bleeds to the
-  widget's edges on phones and becomes a bordered panel from 768px, so the boundary between
-  groups is visible even when a single card fills the screen.
+  Each group sits on a tinted band (`bg-muted/40`) that bleeds to the widget's edges on phones
+  and sits inside the column from 768px, so the boundary between groups is visible even when a
+  single card fills the screen. The heading is serif, sized like the event title (2026-09-22),
+  and the band has no border (2026-09-22: the tint alone separates the groups).
 - **Who can go where** — `GET …/roster` returns the household with per-section
   eligibility. `Show_Household_Position_ID` and `For_Gender_ID` filter members;
   **`Minor_Registration = 1` lists only children**, `0`/blank lists everyone.
   **Audience rules on the Event** (2026-09-15): `Registration_Min_Age` / `Max_Age` (years on
   event day), `Registration_Min_Grade` / `Max_Grade` (Pre-K–12), gender and household position.
-  Adults-only sections carry an **Adults** badge and offer only adult relationships when adding
-  someone; grade-bounded sections show a **Grade** select, prefilled from the child's graduation
+  Adults-only sections offer only adult relationships when adding someone. The cards carry no
+  audience, age or grade badges (2026-09-22: the section titles already say who and which
+  grades), only status ones ("N spots left", "Closed"), so put the grades in the title;
+  grade-bounded sections show a **Grade** select, prefilled from the child's graduation
   year, and never ask a child whose age rules the grade out. Ineligible members read "too young",
   "too old" or "not this grade".
   **Room placement** (2026-09-15): when an option group's rooms carry `Placement_*` bounds on
@@ -141,11 +147,11 @@ build's rem→px rewrite does not touch `@container` params.
 | | Phone (< 480px) | Tablet (480–767px) | Desktop (≥ 768px) |
 | --- | --- | --- | --- |
 | Hero | full-bleed 16:9 image, description clipped behind "Read more" | same | `max-h-80` image, full description |
-| Summary | sticky bar at the top: count badge, total when prices show, chevron opens the review | same | review column on the right, sticky |
-| Sections | one list in `Position` order; tappable image-led cards with badges, title, "View details", price and the `Button_Text` label + chevron | same | left column, two cards per row from 1024px |
+| Summary | sticky bar at the top: count badge, total when prices show, chevron opens the review | same | review box below every section (2026-09-22) |
+| Sections | one list in `Position` order; tappable cards, picture on top, with status badges, title, "View details", price and the blue add button | same | one card per row, picture beside the copy (2026-09-22) |
 | Editor | bottom sheet (`<dialog>` + `showModal()`, top layer) | same | inline in the card |
-| Contact | inside the summary bar's expanded panel, under the total ("Contact for this registration": name · email · phone, Edit); the bar opens itself when email/phone or a required address is missing | same | inside the review column, between the total and the submit |
-| Submit | sticky bottom CTA: "Add someone to continue" → "Continue to your details" (guests) → "Fix N issues" → submit | same | button in the review column |
+| Contact | inside the summary bar's expanded panel, under the total ("Contact for this registration": name · email · phone, Edit); the bar opens itself when email/phone or a required address is missing | same | inside the review box, between the total and the submit |
+| Submit | sticky bottom CTA: "Add someone to continue" → "Continue to your details" (guests) → "Fix N issues" → submit | same | button in the review box |
 
 - **Contact for this registration** (2026-09-16) — part of the review (who gets the receipt
   sits with the total and the submit), not a card among the events. Signed in, the purchaser's
@@ -167,11 +173,16 @@ build's rem→px rewrite does not touch `@container` params.
   `overflow: hidden` turns them static (see `packages/embed-lab/pages/narrow.html`), and a
   fixed host header needs `data-sticky-top-offset` or the summary bar slides under it.
   Safe-area padding at the bottom needs `viewport-fit=cover` on the host's viewport meta.
-- **As few buttons as possible** — the card is the control (a stretched button behind the
-  footer label, so screen readers still hear `Button_Text`); the sheet has a close X and its
+- **As few buttons as possible** — the card is the control (the footer button's hit area is
+  stretched over the card; screen readers hear "I'm Attending" described by the section's
+  title, since several cards say the same thing); the sheet has a close X and its
   save button, no Cancel; the CTA is one button. Edit/remove icons and "View details" are the
   only other controls.
-- **Touch targets** are at least 44px on phones: the card label, submit, the edit/remove
+- **Blue buttons have white text** (2026-09-22, by request, knowingly below AA contrast on
+  this light blue): `src/styles.css` sets `--color-primary-fg` on the shadow tree's top-level
+  elements, because the runtime's token sheet sets navy on `:host` and loads after the widget's
+  CSS. The theme package itself keeps navy.
+- **Touch targets** are at least 44px on phones: the card button, submit, the edit/remove
   icons, checkbox and radio rows, "View details", the sheet's close button.
 - **Tests** — `tests/app.test.tsx` runs the desktop branch (jsdom reports a 0px width, which
   the breakpoint hook treats as "not measured"); `tests/mobile.test.tsx` pushes 343px through a

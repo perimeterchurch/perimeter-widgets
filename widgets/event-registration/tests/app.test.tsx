@@ -135,7 +135,10 @@ describe('event-registration widget', () => {
   it('lists sections under the headings staff set, and under none when they set none', () => {
     render(<App config={config} auth={authStub(true)} />);
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
-    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+    // The event title is the only h1 until staff set a group.
+    expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual([
+      'Family Night',
+    ]);
     cleanup();
 
     hooks.event.data = envelope({
@@ -147,13 +150,40 @@ describe('event-registration widget', () => {
     render(<App config={config} auth={authStub(true)} />);
     const groups = screen.getAllByRole('group');
     expect(groups.map((g) => g.getAttribute('aria-labelledby'))).toHaveLength(2);
-    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
+    expect(groups.map((g) => within(g).getByRole('heading', { level: 1 }).textContent)).toEqual([
       'Adults',
       'Kids',
     ]);
     expect(
       within(groups[1]!).getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' }),
     ).toBeInTheDocument();
+  });
+
+  it("labels the button I'm Attending, Add a student when grade-bounded, else Button_Text", () => {
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.key === 'related:104'
+          ? { ...s, audience: { ...s.audience, minGrade: 0, maxGrade: 5 } }
+          : s.key === 'related:103'
+            ? { ...s, buttonText: 'Add a child' }
+            : s,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const adults = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    const attending = within(adults).getByRole('button', { name: "I'm Attending" });
+    expect(attending).toHaveAccessibleDescription('Elementary + Early Years Focus');
+    // Grade-bounded: "Add a student" whatever staff typed ("Add … registrant" here).
+    const elementary = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    expect(within(elementary).getByRole('button', { name: 'Add a student' })).toBeInTheDocument();
+    // No grade bounds: the staff-set Button_Text stands.
+    const students = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    expect(within(students).getByRole('button', { name: 'Add a child' })).toBeInTheDocument();
+    // No audience or grade badges; the status badge stays.
+    expect(within(elementary).queryByText('Grades K–5th')).not.toBeInTheDocument();
+    expect(within(students).queryByText('Children')).not.toBeInTheDocument();
+    expect(within(students).getByText('5 spots left')).toBeInTheDocument();
   });
 
   it('does not gate a section behind its Enable_Label question: the card itself is the opt-in', () => {
@@ -203,7 +233,7 @@ describe('event-registration widget', () => {
     expect(within(card).getByLabelText(/Date of birth/)).toHaveValue('2015-03-22');
   });
 
-  it('marks an adults-only section and offers only adult relationships when adding someone', () => {
+  it('offers only adult relationships when adding someone to an adults-only section', () => {
     hooks.event.data = envelope({
       ...familyNight,
       sections: familyNight.sections.map((s) =>
@@ -214,8 +244,12 @@ describe('event-registration widget', () => {
     });
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
-    expect(within(card).getByText('Adults')).toBeInTheDocument();
-    fireEvent.click(within(card).getByRole('button', { name: /Add/ }));
+    // No dark audience badge (2026-09-22): the group heading says who it is for.
+    expect(within(card).queryByText('Adults')).not.toBeInTheDocument();
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
+    // No visible "New registration" label under the card (2026-09-22); the form keeps the name.
+    expect(within(card).queryByText('New registration')).not.toBeInTheDocument();
+    expect(within(card).getByRole('form', { name: 'New registration' })).toBeInTheDocument();
     fireEvent.click(within(card).getByLabelText(/Someone not listed/));
     const relationship = within(card).getByLabelText<HTMLSelectElement>('Relationship');
     expect([...relationship.options].map((o) => o.textContent)).toEqual([
@@ -249,7 +283,8 @@ describe('event-registration widget', () => {
     });
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
-    expect(within(card).getByText('Grades 6th–12th')).toBeInTheDocument();
+    // The grades are in the title, so there is no grade badge (2026-09-22).
+    expect(within(card).queryByText('Grades 6th–12th')).not.toBeInTheDocument();
     fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
     tick(card, /William Cano/);
     // Two things are labelled "Grade": our select and the form's own question.
@@ -345,7 +380,7 @@ describe('event-registration widget', () => {
     });
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
-    fireEvent.click(within(card).getByRole('button', { name: /Add/ }));
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
     // Three are eligible, so nobody is pre-ticked; tick all three.
     tick(card, /Jen Cano/);
     tick(card, /William Cano/);
@@ -359,7 +394,7 @@ describe('event-registration widget', () => {
     expect(within(card).getByRole('button', { name: 'Remove William Cano' })).toBeInTheDocument();
     expect(within(card).getByRole('button', { name: 'Remove Max Cano' })).toBeInTheDocument();
     // Untick nobody and try to add again: they are now "already added" and the picker says so.
-    fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
     expect(within(card).getByRole('checkbox', { name: /Jen Cano/ })).toBeDisabled();
     expect(within(card).getAllByText('already added')).toHaveLength(3);
   });
@@ -460,7 +495,7 @@ describe('event-registration widget', () => {
     );
     render(<App config={config} auth={authStub(true)} />);
     const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
-    fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
     fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
     act(() => {
       vi.advanceTimersByTime(400);
@@ -528,7 +563,7 @@ describe('event-registration widget', () => {
     // No standalone contact form until they pick an event.
     expect(screen.queryByLabelText('First name *')).not.toBeInTheDocument();
     const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
-    fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
     expect(within(card).getByText('Your details')).toBeInTheDocument();
     expect(within(card).getByLabelText('First name *')).toBeInTheDocument();
   });
