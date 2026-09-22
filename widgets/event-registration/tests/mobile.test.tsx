@@ -304,7 +304,7 @@ describe('event-registration widget on a phone', () => {
       screen.queryByRole('region', { name: 'Your contact information' }),
     ).not.toBeInTheDocument();
     const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
-    fireEvent.click(within(card).getByRole('button', { name: /^Add/ }));
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
     const sheet = screen.getByRole('dialog');
     fireEvent.click(within(sheet).getByRole('button', { name: 'Add to registration' }));
     expect(

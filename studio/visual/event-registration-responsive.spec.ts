@@ -11,9 +11,9 @@ import {
  * the studio viewport presets (Mobile ≈ 343px, Tablet ≈ 702px, Desktop ≈ 1100px
  * after the HostFrame gutter ramp) and asserts the breakpoint branches:
  *   - phone/tablet: sticky summary bar + sticky CTA, no review column, one card
- *     per section in one column (tablet: still one column, picture beside copy)
- *   - desktop: review `<aside>` in a sticky right column, two cards per row
- *     from 1024px, no sticky bars
+ *     per section in one column, picture on top of the copy
+ *   - desktop: one horizontal card per row (picture beside the copy), the
+ *     review `<aside>` below every section, no sticky bars
  * The bottom-sheet editor is a top-layer `<dialog>`, so only its presence is
  * asserted here: its geometry escapes the studio frame to the test viewport,
  * exactly like the sermons date-range overlay. Verify the sheet on embed-lab.
@@ -63,24 +63,29 @@ async function widgetState(page: Page) {
       overflow: container ? container.scrollWidth > container.clientWidth + 1 : false,
       cardCount: cards.length,
       cardTitles: cards.map((c) => c.querySelector('h3')?.textContent ?? ''),
-      groupHeadings: [...(sr?.querySelectorAll('[data-slot="section-group"] h2') ?? [])].map(
+      groupHeadings: [...(sr?.querySelectorAll('[data-slot="section-group"] h1') ?? [])].map(
         (h) => h.textContent ?? '',
       ),
       cardGridCols: cols(cardGrid),
-      // Phone/tablet stack the picture on top or beside the copy; either way one card per row.
+      // 1 = picture on top of the copy (phone/tablet), 2 = beside it (desktop).
+      cardCols: cols(cards[0] ?? null),
       hasBar: !!bar,
       barPosition: bar ? getComputedStyle(bar).position : null,
       hasCta: !!cta,
       ctaPosition: cta ? getComputedStyle(cta).position : null,
       ctaText: cta?.textContent ?? '',
       hasAside: !!aside,
-      asidePosition: aside ? getComputedStyle(aside.parentElement as Element).position : null,
+      asideBelowCards:
+        !!aside &&
+        cards.every(
+          (c) => aside.getBoundingClientRect().top >= c.getBoundingClientRect().bottom - 1,
+        ),
       hasDialog: !!sr?.querySelector('dialog[open]'),
       hasConfirmation: !!sr?.querySelector('[data-slot="registration-complete"]'),
       confirmationText: sr?.querySelector('[data-slot="registration-complete"]')?.textContent ?? '',
-      addButtons: [...(sr?.querySelectorAll('button') ?? [])]
-        .filter((b) => /^Add/.test(b.textContent?.trim() ?? ''))
-        .map((b) => Math.round(b.getBoundingClientRect().height)),
+      addButtons: [
+        ...(sr?.querySelectorAll('section[aria-labelledby] button[data-stretched]') ?? []),
+      ].map((b) => Math.round(b.getBoundingClientRect().height)),
     };
   }, PREVIEW);
 }
@@ -139,17 +144,17 @@ test.describe('event-registration mobile-first layout', () => {
         { timeout: 10_000 },
       )
       .toBe(true);
-    // The card is the control: its footer label is a button stretched over the card.
+    // The card is the control: its footer button is stretched over the card.
     const clickAdd = () =>
       page.evaluate((host) => {
         const sr = (document.querySelector(host) as HTMLElement).shadowRoot!;
         const btn = [...sr.querySelectorAll('section[aria-labelledby] button')].find(
-          (b) => b.textContent?.trim() === 'Add registrant',
+          (b) => b.textContent?.trim() === "I'm Attending",
         ) as HTMLButtonElement | undefined;
         btn?.click();
         return !!btn;
       }, PREVIEW);
-    await expect.poll(clickAdd, { message: 'Add registrant present', timeout: 10_000 }).toBe(true);
+    await expect.poll(clickAdd, { message: "I'm Attending present", timeout: 10_000 }).toBe(true);
     await expect
       .poll(async () => (await widgetState(page)).hasDialog, { timeout: 10_000 })
       .toBe(true);
@@ -188,7 +193,7 @@ test.describe('event-registration mobile-first layout', () => {
         { host: PREVIEW, src: match.toString() },
       );
     await expect
-      .poll(() => clickInShadow((b) => b.textContent?.trim() === 'Add registrant'), {
+      .poll(() => clickInShadow((b) => b.textContent?.trim() === "I'm Attending"), {
         timeout: 10_000,
       })
       .toBe(true);
@@ -252,6 +257,7 @@ test.describe('event-registration mobile-first layout', () => {
           if (s.hasAside) return 'review column present';
           if (s.overflow) return 'horizontal overflow';
           if (s.cardGridCols !== 1) return `${s.cardGridCols} card columns`;
+          if (s.cardCols !== 1) return 'picture beside the copy';
           return 'settled';
         },
         { message: 'tablet layout settled', timeout: 10_000 },
@@ -259,7 +265,9 @@ test.describe('event-registration mobile-first layout', () => {
       .toBe('settled');
   });
 
-  test('desktop: sticky review column, two cards per row, no sticky bars', async ({ page }) => {
+  test('desktop: horizontal cards one per row, review below them, no sticky bars', async ({
+    page,
+  }) => {
     await selectPreset(page, 'Desktop');
     await expect
       .poll(async () => (await widgetState(page)).hasAside, { timeout: 10_000 })
@@ -269,7 +277,8 @@ test.describe('event-registration mobile-first layout', () => {
     expect(s.overflow).toBe(false);
     expect(s.hasBar, 'no summary bar on desktop').toBe(false);
     expect(s.hasCta, 'no sticky CTA on desktop').toBe(false);
-    expect(s.asidePosition, 'review column sticks').toBe('sticky');
-    expect(s.cardGridCols, 'two cards per row from 1024px').toBe(2);
+    expect(s.asideBelowCards, 'review sits below every section').toBe(true);
+    expect(s.cardGridCols, 'one card per row').toBe(1);
+    expect(s.cardCols, 'picture beside the copy').toBe(2);
   });
 });
