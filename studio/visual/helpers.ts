@@ -129,14 +129,14 @@ export async function waitForShadowMount(page: Page): Promise<void> {
 /**
  * Wait for the sermon grid cards to actually render — `waitForShadowMount` only
  * proves the React root mounted; the cards arrive a tick later when the mocked
- * `useSermons` query resolves. Poll until at least `min` grid buttons exist so
- * reads don't race the React Query mount.
+ * `useSermons` query resolves. Poll until at least `min` grid cards (one
+ * `<article>` each) exist so reads don't race the React Query mount.
  */
 export async function waitForSermonCards(page: Page, min = 1): Promise<void> {
   await page.waitForFunction(
     ({ sel, want }) => {
       const host = document.querySelector(sel) as HTMLElement | null;
-      return (host?.shadowRoot?.querySelectorAll('.grid button').length ?? 0) >= want;
+      return (host?.shadowRoot?.querySelectorAll('.grid article').length ?? 0) >= want;
     },
     { sel: PREVIEW_HOST, want: min },
     { timeout: 30_000 },
