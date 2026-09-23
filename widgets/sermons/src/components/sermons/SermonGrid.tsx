@@ -1,8 +1,8 @@
 import type { SermonListViewProps, SermonsConfig } from '../../types';
-import { formatDate, sermonImageUrl } from '../../lib/format';
+import { sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
 import { ResultsEmpty } from '../ui/ResultsState';
-import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
+import { sermonCardMeta } from './SermonInfo';
 
 export type { SermonListViewProps };
 
@@ -10,13 +10,19 @@ interface SermonGridProps extends SermonListViewProps {
   config: SermonsConfig;
 }
 
-export function SermonGrid({ sermons, onSermonClick, config }: SermonGridProps) {
+export function SermonGrid({
+  sermons,
+  onSermonClick,
+  onSeriesClick,
+  onSpeakerClick,
+  config,
+}: SermonGridProps) {
   if (sermons.length === 0) {
     return <ResultsEmpty noun="sermons" />;
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3">
       {sermons.map((sermon) => (
         <MediaCard
           key={sermon.id}
@@ -25,10 +31,7 @@ export function SermonGrid({ sermons, onSermonClick, config }: SermonGridProps) 
           imageAlt={sermon.title}
           title={sermon.title}
           description={sermon.shortDescription}
-          topLeft={<DateLabel date={formatDate(sermon.date)} />}
-          topRight={<SeriesPill name={sermon.series.title} />}
-          bottomLeft={<SpeakerLabel name={sermon.speaker.name} />}
-          bottomRight={sermon.book?.name ? <BookLabel name={sermon.book.name} /> : undefined}
+          {...sermonCardMeta(sermon, { onSeriesClick, onSpeakerClick })}
           onClick={() => onSermonClick(sermon.id)}
         />
       ))}

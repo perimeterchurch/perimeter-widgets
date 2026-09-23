@@ -95,6 +95,41 @@ describe('useSermonFilters', () => {
     expect(result.current.selectedSpeakerIds).toEqual([]);
   });
 
+  it('showOnly pins one series and clears the other filters', () => {
+    const { result } = renderFilters();
+    act(() => {
+      result.current.setSpeakerIds([7]);
+      result.current.setSearch('grace');
+    });
+    act(() => result.current.showOnly('series', 12));
+    expect(result.current.selectedSeriesIds).toEqual([12]);
+    expect(result.current.selectedSpeakerIds).toEqual([]);
+    expect(result.current.search).toBe('');
+  });
+
+  it('showOnly leaves a locked dimension alone', () => {
+    const { result } = renderFilters({ speakerId: '7' });
+    act(() => result.current.showOnly('speaker', 9));
+    expect(result.current.selectedSpeakerIds).toEqual([7]);
+  });
+
+  it('showOnly returns from a sermon detail to the sermons list', () => {
+    const { result } = renderFilters();
+    act(() => result.current.setSermonFromSeries(5, 12));
+    expect(result.current.screen).toBe('detail');
+    act(() => result.current.showOnly('speaker', 3));
+    expect(result.current.tab).toBe('sermons');
+    expect(result.current.screen).toBe('browse');
+    expect(result.current.selectedSpeakerIds).toEqual([3]);
+  });
+
+  it('canShowOnly is off when the filter bar is hidden or the dimension is locked', () => {
+    expect(renderFilters().result.current.canShowOnly('series')).toBe(true);
+    expect(renderFilters({ display: 'compact' }).result.current.canShowOnly('series')).toBe(false);
+    expect(renderFilters({ seriesId: '9' }).result.current.canShowOnly('series')).toBe(false);
+    expect(renderFilters({ tab: 'series' }).result.current.canShowOnly('speaker')).toBe(false);
+  });
+
   it('uses defaultTab for initial tab value', () => {
     const { result } = renderFilters({ defaultTab: 'series' });
     expect(result.current.tab).toBe('series');

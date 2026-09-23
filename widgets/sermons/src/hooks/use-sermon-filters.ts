@@ -210,7 +210,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     void setParams({ page });
   };
 
-  const clearFilters = () => {
+  const clearedFilterParams = () => {
     // Locked dimensions are omitted entirely (a `null` would clear their
     // pinned value); only unlocked dimensions are reset to `null`.
     const next: Parameters<typeof setParams>[0] = {
@@ -226,7 +226,11 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     if (!config.seriesTypeId) next.seriesType = null;
     if (!config.from) next.from = null;
     if (!config.to) next.to = null;
-    void setParams(next);
+    return next;
+  };
+
+  const clearFilters = () => {
+    void setParams(clearedFilterParams());
   };
 
   const collapsibleFilterActive = [
@@ -254,6 +258,31 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   if (config.to || config.hideDate) lockedFilters.add('to');
   if (config.hideSearch) lockedFilters.add('search');
 
+  // A series / speaker link (on a card or the sermon detail header) sets that
+  // filter on the sermons list, so it only links when the filter bar shows
+  // (display 'full'), the dimension isn't locked or hidden, and the embed
+  // hasn't locked the widget to the series tab — otherwise the click would
+  // apply a filter the viewer can't see or clear.
+  const canShowOnly = (dimension: 'series' | 'speaker') =>
+    (config.display ?? 'full') === 'full' &&
+    !lockedFilters.has(dimension) &&
+    (!config.tab || config.tab === 'sermons');
+
+  // "Every sermon in this series" (or by this speaker): back to the sermons
+  // list with the other filters reset and the one dimension pinned — in a
+  // single URL update, so Back returns to where the viewer clicked.
+  const showOnly = (dimension: 'series' | 'speaker', id: number) => {
+    if (!canShowOnly(dimension)) return;
+    void setParams({
+      ...clearedFilterParams(),
+      [dimension]: String(id),
+      tab: 'sermons',
+      screen: 'browse',
+      id: null,
+      fromSeriesId: null,
+    });
+  };
+
   return {
     ...params,
     view: effectiveView,
@@ -280,6 +309,8 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     setView,
     setPage,
     clearFilters,
+    canShowOnly,
+    showOnly,
     hasActiveFilters,
     activeFilterCount,
     lockedFilters,

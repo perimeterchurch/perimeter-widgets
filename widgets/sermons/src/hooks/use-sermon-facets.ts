@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import {
   useBooks,
   useSeries,
+  useSeriesDetails,
   useSeriesTypes,
   useServiceTypes,
   useSpeakers,
@@ -219,6 +220,41 @@ export function useSermonFacets({ config, filters, labelCache }: UseSermonFacets
       seriesTypes.map((s) => ({ id: s.id, label: s.name })),
     );
   }, [seriesTypes, labelCache]);
+
+  // A selected series beyond both 50-item alphabetical pages (a deep link, or a
+  // card's series link after a reload) has no label source above — the list
+  // endpoint can't filter by id — so its dropdown and chip read "Series 1360".
+  // Once both pages have settled, fetch just those series by id.
+  const listedSeriesIds = useMemo(
+    () => new Set([...allSeriesItems, ...series].map((s) => s.id)),
+    [allSeriesItems, series],
+  );
+  const seriesPagesSettled = !allSeriesQuery.isPending && !seriesQuery.isPending;
+  const unlabeledSeriesIds = seriesPagesSettled
+    ? filters.selectedSeriesIds.filter(
+        (id) => !listedSeriesIds.has(id) && labelCache.getLabel('series', id) === undefined,
+      )
+    : [];
+  const seriesDetails = useSeriesDetails(unlabeledSeriesIds);
+  const fetchedSeriesLabels = seriesDetails.flatMap((q) => {
+    const detail = q.data?.data;
+    return detail ? [{ id: detail.id, label: detail.displayTitle ?? detail.title }] : [];
+  });
+  // The cache is a ref, so absorbing alone wouldn't repaint the chip; re-render
+  // once when new labels land. Keyed on the labels themselves so it settles
+  // (the next render finds them cached and fetches nothing).
+  const [, repaint] = useReducer((n: number) => n + 1, 0);
+  const fetchedSeriesKey = fetchedSeriesLabels.map((l) => `${l.id}:${l.label}`).join('|');
+  useEffect(() => {
+    const fresh = fetchedSeriesLabels.filter(
+      (l) => labelCache.getLabel('series', l.id) !== l.label,
+    );
+    if (fresh.length === 0) return;
+    labelCache.absorb('series', fresh);
+    repaint();
+    // fetchedSeriesKey stands in for fetchedSeriesLabels (a new array each render).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedSeriesKey, labelCache]);
 
   return {
     speakers,

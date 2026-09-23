@@ -55,6 +55,7 @@ vi.mock('@perimeter/api-hooks', async () => {
   return {
     ...actual,
     useSermons: (...args: unknown[]) => useSermons(...(args as [])),
+    useSeriesDetails: () => [],
     useSeries: (...args: unknown[]) => useSeries(...(args as [])),
     useSermonDetail: () => queryResult({ data: { success: true, data: null } }),
     useSeriesDetail: () => queryResult({ data: { success: true, data: null } }),

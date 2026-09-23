@@ -1,26 +1,9 @@
 import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
-import { BookOpen, Library } from 'lucide-react';
 import type { TabId } from '../types';
 
-const TAB_DEFS: { id: TabId; label: React.ReactNode }[] = [
-  {
-    id: 'sermons',
-    label: (
-      <>
-        <BookOpen className="h-4 w-4" />
-        Sermons
-      </>
-    ),
-  },
-  {
-    id: 'series',
-    label: (
-      <>
-        <Library className="h-4 w-4" />
-        Series
-      </>
-    ),
-  },
+const TAB_DEFS: { id: TabId; label: string }[] = [
+  { id: 'sermons', label: 'Sermons' },
+  { id: 'series', label: 'Series' },
 ];
 
 export interface SermonTabsProps {
@@ -29,15 +12,16 @@ export interface SermonTabsProps {
 }
 
 /**
- * The sermons/series tab row. Uses the shared `@perimeter/ui` SegmentedTabs
- * control (rounded `bg-muted` track, lifted active segment that reads clearly
- * in both light and dark) — the same control as the studio inspector. This
- * replaces the `@perimeter/ui` Tabs `line` variant, whose underline indicator
- * was visually fragile across themes.
+ * The sermons/series tab row: the shared `@perimeter/ui` SegmentedTabs in its
+ * `underline` variant — bold labels over a rule with a brand-blue bar under the
+ * active tab, the same control as the sermon detail's Watch / Listen / PDF.
+ * The bar is a plain per-tab border, not the measured, ResizeObserver-driven
+ * indicator of the old Tabs `line` variant that proved fragile across themes.
  */
 export function SermonTabs({ activeTab, onTabChange }: SermonTabsProps) {
   return (
     <SegmentedTabs
+      variant="underline"
       items={TAB_DEFS}
       value={activeTab}
       onChange={(id) => onTabChange(id as TabId)}

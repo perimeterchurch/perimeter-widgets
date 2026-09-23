@@ -33,6 +33,7 @@ vi.mock('@perimeter/api-hooks', () => ({
   useBooks: () => queryResult({ success: true, data: [] }),
   useServiceTypes: () => queryResult({ success: true, data: [] }),
   useSeriesTypes: () => queryResult({ success: true, data: [] }),
+  useSeriesDetails: () => [],
   useSeries: () =>
     queryResult({
       success: true,

@@ -25,6 +25,7 @@ vi.mock('@perimeter/api-hooks', () => ({
       success: true,
       data: { sermons: [], pagination: { page: 1, perPage: 12, total: 0, totalPages: 0 } },
     }),
+  useSeriesDetails: () => [],
   useSeries: () =>
     queryResult({
       success: true,
