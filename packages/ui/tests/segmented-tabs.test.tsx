@@ -113,3 +113,19 @@ describe('SegmentedTabs', () => {
     expect(screen.getByRole('tab', { name: 'Two' })).toHaveFocus();
   });
 });
+
+describe('SegmentedTabs variant', () => {
+  it('renders the rounded track by default', () => {
+    render(<SegmentedTabs items={ITEMS} value="one" onChange={() => {}} />);
+    expect(screen.getByRole('tablist')).toHaveClass('rounded-lg', 'bg-muted');
+  });
+
+  it('underline: a ruled row with a primary bar under only the selected tab', () => {
+    render(<SegmentedTabs items={ITEMS} value="two" onChange={() => {}} variant="underline" />);
+    expect(screen.getByRole('tablist')).toHaveClass('border-b');
+    expect(screen.getByRole('tablist')).not.toHaveClass('bg-muted');
+    const [one, two] = screen.getAllByRole('tab');
+    expect(two).toHaveClass('border-primary');
+    expect(one).toHaveClass('border-transparent');
+  });
+});

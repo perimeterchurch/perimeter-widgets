@@ -95,3 +95,21 @@ describe('SortSelect compact', () => {
     expect(screen.getByText('Date')).toBeTruthy();
   });
 });
+
+describe('SortSelect variant', () => {
+  const props = {
+    sortField: 'date',
+    sortDirection: 'desc' as const,
+    fields,
+    onSortFieldChange: () => {},
+    onSortDirectionChange: () => {},
+  };
+  it('draws a bordered trigger by default', () => {
+    render(<SortSelect {...props} />);
+    expect(screen.getAllByRole('button')[0]).toHaveClass('border');
+  });
+  it('drops the border for the ghost variant', () => {
+    render(<SortSelect {...props} variant="ghost" />);
+    expect(screen.getAllByRole('button')[0]).not.toHaveClass('border');
+  });
+});

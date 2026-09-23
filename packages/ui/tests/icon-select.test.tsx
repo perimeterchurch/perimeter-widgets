@@ -64,3 +64,15 @@ describe('IconSelect compact', () => {
     expect(screen.getByText('Grid')).toBeTruthy();
   });
 });
+
+describe('IconSelect variant', () => {
+  const props = { value: 'grid', onChange: () => {}, options, label: 'View:', icon: null };
+  it('draws a bordered trigger by default', () => {
+    render(<IconSelect {...props} />);
+    expect(screen.getAllByRole('button')[0]).toHaveClass('border');
+  });
+  it('drops the border for the ghost variant', () => {
+    render(<IconSelect {...props} variant="ghost" />);
+    expect(screen.getAllByRole('button')[0]).not.toHaveClass('border');
+  });
+});
