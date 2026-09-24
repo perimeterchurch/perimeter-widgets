@@ -7,12 +7,14 @@ import {
 } from '@perimeter/ui/input-group';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
+import { cn } from '@perimeter/ui/utils/cn';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
 import { X, Search } from 'lucide-react';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { CollapsibleFilters } from '../ui/CollapsibleFilters';
 import { groupBooksByTestament } from '../../lib/bible-books';
+import { SQUARE_CORNERS } from '../../lib/square-corners';
 import type { FilterLabelCache } from '../../hooks/use-filter-label-cache';
 import type { ContainerBreakpoint } from '../../lib/breakpoint';
 import type {
@@ -153,7 +155,7 @@ export function SermonFilters(props: SermonFiltersProps) {
   );
 
   return (
-    <div className="space-y-3">
+    <div className={cn('space-y-3', SQUARE_CORNERS)}>
       {/* Row 1: Search */}
       {!props.lockedFilters.has('search') && (
         <InputGroup className="w-full">

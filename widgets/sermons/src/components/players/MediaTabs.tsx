@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SegmentedTabs } from '@perimeter/ui/segmented-tabs';
 import { Spinner } from '@perimeter/ui/spinner';
-import { Video, Headphones, FileText, FileX } from 'lucide-react';
+import { FileX } from 'lucide-react';
 import { AudioPlayer } from './AudioPlayer';
 import type { SermonLink } from '../../types';
 
@@ -29,36 +29,15 @@ export interface MediaTabsProps {
 
 type MediaTab = 'video' | 'audio' | 'document';
 
-const iconClass = 'h-4 w-4';
-
 export function MediaTabs({ links }: MediaTabsProps) {
   const videoLink = links.find((l) => l.mediaType === 'video');
   const audioLink = links.find((l) => l.mediaType === 'audio');
   const docLink = links.find((l) => l.mediaType === 'document');
 
-  const availableTabs: {
-    id: MediaTab;
-    label: string;
-    icon: React.ReactNode;
-  }[] = [];
-  if (videoLink)
-    availableTabs.push({
-      id: 'video',
-      label: 'Watch',
-      icon: <Video className={iconClass} />,
-    });
-  if (audioLink)
-    availableTabs.push({
-      id: 'audio',
-      label: 'Listen',
-      icon: <Headphones className={iconClass} />,
-    });
-  if (docLink)
-    availableTabs.push({
-      id: 'document',
-      label: 'PDF',
-      icon: <FileText className={iconClass} />,
-    });
+  const availableTabs: { id: MediaTab; label: string }[] = [];
+  if (videoLink) availableTabs.push({ id: 'video', label: 'Watch' });
+  if (audioLink) availableTabs.push({ id: 'audio', label: 'Listen' });
+  if (docLink) availableTabs.push({ id: 'document', label: 'PDF' });
 
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0]?.id ?? 'video');
 
@@ -67,7 +46,7 @@ export function MediaTabs({ links }: MediaTabsProps) {
   // media is expected but not yet available.
   if (availableTabs.length === 0) {
     return (
-      <div className="flex items-center gap-2 rounded-lg border border-border bg-muted p-4 text-sm text-muted-fg">
+      <div className="flex items-center gap-2 border border-border bg-muted p-4 text-sm text-muted-fg">
         <FileX className="h-4 w-4 shrink-0" aria-hidden="true" />
         No media available yet for this sermon.
       </div>
@@ -75,24 +54,17 @@ export function MediaTabs({ links }: MediaTabsProps) {
   }
 
   return (
-    <div className="space-y-2">
-      {/* Shared SegmentedTabs control — matches the sermons/series tab switcher
-          (SermonTabs) for a consistent look across the widget. */}
+    <div className="space-y-4">
+      {/* The underline tabs: bold labels over a rule, like the card meta bands
+          and perimeter.org's own pages, rather than the rounded pill track. */}
       <SegmentedTabs
-        items={availableTabs.map((tab) => ({
-          id: tab.id,
-          label: (
-            <>
-              {tab.icon}
-              {tab.label}
-            </>
-          ),
-        }))}
+        variant="underline"
+        items={availableTabs}
         value={activeTab}
         onChange={setActiveTab}
         aria-label="Sermon media"
       />
-      <div className="overflow-hidden rounded-lg border border-border min-h-[300px]">
+      <div className="overflow-hidden border border-border min-h-[300px]">
         <AnimatePresence mode="wait">
           {activeTab === 'video' && videoLink && (
             <motion.div key="video" {...fade} className="aspect-video">

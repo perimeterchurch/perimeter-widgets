@@ -69,6 +69,18 @@ export function SermonsView({ config, filters, breakpoint }: SermonsViewProps) {
   const showFilters = display === 'full';
   const showSortView = display !== 'headless';
 
+  // A card's series / speaker link pins that filter (see canShowOnly). The
+  // clicked label is cached so the dropdown names the selection before its
+  // facets reload.
+  const showSeries = (id: number, title: string) => {
+    labelCache.absorb('series', [{ id, label: title }]);
+    filters.showOnly('series', id);
+  };
+  const showSpeaker = (id: number, name: string) => {
+    labelCache.absorb('speaker', [{ id, label: name }]);
+    filters.showOnly('speaker', id);
+  };
+
   // Config-pinned series type (e.g. the "Sunday Morning Sermon" default)
   // narrows every sermon query as a baseline.
   const pinnedSeriesTypeId = config.seriesTypeId || undefined;
@@ -190,6 +202,8 @@ export function SermonsView({ config, filters, breakpoint }: SermonsViewProps) {
             <ViewComponent
               sermons={sermons}
               onSermonClick={(id: number) => filters.setScreen('detail', id)}
+              onSeriesClick={filters.canShowOnly('series') ? showSeries : undefined}
+              onSpeakerClick={filters.canShowOnly('speaker') ? showSpeaker : undefined}
               config={config}
             />
           )}

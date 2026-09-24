@@ -18,6 +18,8 @@ interface IconSelectProps {
   icon: ReactNode;
   className?: string;
   compact?: boolean;
+  /** Trigger chrome: `outline` draws a border; `ghost` drops it for a quieter toolbar. */
+  variant?: 'outline' | 'ghost';
 }
 
 export function IconSelect({
@@ -28,6 +30,7 @@ export function IconSelect({
   icon,
   className,
   compact = false,
+  variant = 'outline',
 }: IconSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -45,9 +48,9 @@ export function IconSelect({
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          'inline-flex h-8 max-w-full items-center gap-1.5 rounded-lg border px-2.5 text-sm',
-          'border-border bg-transparent text-muted-fg',
-          'transition-colors hover:bg-muted/30',
+          'inline-flex h-8 max-w-full items-center gap-1.5 rounded-lg px-2.5 text-sm',
+          'bg-transparent text-muted-fg transition-colors',
+          variant === 'outline' ? 'border border-border hover:bg-muted/30' : 'hover:bg-muted',
         )}
       >
         <span className="flex shrink-0 items-center">{icon}</span>

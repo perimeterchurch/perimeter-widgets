@@ -8,7 +8,7 @@ vi.mock('@perimeter/widget-runtime', () => ({
   useApiClient: () => ({ fetch: mockFetch }),
 }));
 
-import { useSeriesDetail } from '../../src/sermons/use-series-detail';
+import { useSeriesDetail, useSeriesDetails } from '../../src/sermons/use-series-detail';
 
 function wrap(qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })) {
   return ({ children }: { children: React.ReactNode }) => (
@@ -55,5 +55,24 @@ describe('useSeriesDetail', () => {
     await waitFor(() => expect(result.current.fetchStatus).toBe('idle'));
     expect(mockFetch).not.toHaveBeenCalled();
     expect(result.current.isPending).toBe(true);
+  });
+});
+
+describe('useSeriesDetails', () => {
+  it('fetches each id and returns one result per id, in order', async () => {
+    mockFetch.mockImplementation((path: string) =>
+      Promise.resolve(ok({ success: true, data: { id: Number(path.split('/').pop()) } })),
+    );
+    const { result } = renderHook(() => useSeriesDetails([7, 9]), { wrapper: wrap() });
+    await waitFor(() => expect(result.current.every((q) => q.isSuccess)).toBe(true));
+    expect(mockFetch).toHaveBeenCalledWith('/api/sermons/series/7');
+    expect(mockFetch).toHaveBeenCalledWith('/api/sermons/series/9');
+    expect(result.current.map((q) => q.data?.data.id)).toEqual([7, 9]);
+  });
+
+  it('fetches nothing for an empty id list', () => {
+    const { result } = renderHook(() => useSeriesDetails([]), { wrapper: wrap() });
+    expect(result.current).toEqual([]);
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 });

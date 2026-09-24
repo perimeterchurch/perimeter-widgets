@@ -5,11 +5,11 @@ import { SermonTabs } from '../../src/components/SermonTabs';
 
 /**
  * The sermons/series tab row uses the shared `@perimeter/ui` SegmentedTabs
- * control (a `role="tablist"` of `role="tab"` buttons, the active one lifted to
- * read clearly in both themes) — the same control as the studio inspector,
- * replacing the visually-fragile Tabs `line` underline. These tests assert the
- * selected-state markers and that clicking a tab reports the change; the actual
- * contrast is covered by the Playwright visual harness.
+ * control in its `underline` variant (a `role="tablist"` of `role="tab"`
+ * buttons, a brand-blue bar under the active one) — the same control as the
+ * sermon detail's media tabs. These tests assert the selected-state markers and
+ * that clicking a tab reports the change; the actual contrast is covered by the
+ * Playwright visual harness.
  */
 describe('SermonTabs selected state', () => {
   it('renders a tablist with both tabs and marks exactly the active one', () => {

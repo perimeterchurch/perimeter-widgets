@@ -71,6 +71,34 @@ describe('SermonGrid', () => {
     expect(onClick).toHaveBeenCalledWith(1);
   });
 
+  it('links the series and speaker to their filters when handlers are given', async () => {
+    const onSeriesClick = vi.fn();
+    const onSpeakerClick = vi.fn();
+    render(
+      <SermonGrid
+        sermons={mockSermons}
+        onSermonClick={() => {}}
+        onSeriesClick={onSeriesClick}
+        onSpeakerClick={onSpeakerClick}
+        config={config}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Grace Series' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Jane Doe' }));
+
+    expect(onSeriesClick).toHaveBeenCalledWith(1, 'Grace Series');
+    expect(onSpeakerClick).toHaveBeenCalledWith(2, 'Jane Doe');
+  });
+
+  it('renders the series and speaker as plain text without handlers', () => {
+    render(<SermonGrid sermons={mockSermons} onSermonClick={() => {}} config={config} />);
+
+    expect(screen.getByText('Grace Series')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Grace Series' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'John Smith' })).toBeNull();
+  });
+
   // Container-query reflow: the grid must use explicit arbitrary container
   // breakpoints (`@[<rem>]:`) the v0.1.1 @tailwindcss/container-queries plugin
   // actually emits CSS for — `@min-[…]:` emits nothing. happy-dom can't do real

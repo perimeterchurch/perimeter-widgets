@@ -6,6 +6,7 @@ import {
 } from '@perimeter/ui/input-group';
 import { Button } from '@perimeter/ui/button';
 import { MultiCombobox } from '@perimeter/ui/multi-combobox';
+import { cn } from '@perimeter/ui/utils/cn';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { Search, X, Calendar, Type, Hash, LayoutGrid, List, Rows3 } from 'lucide-react';
@@ -13,6 +14,7 @@ import { useSeries, useSeriesTypes } from '@perimeter/api-hooks';
 import type { SermonsConfig, SortField } from '../../types';
 import type { ContainerBreakpoint } from '../../lib/breakpoint';
 import { DateRangePicker } from '../ui/DateRangePicker';
+import { SQUARE_CORNERS } from '../../lib/square-corners';
 import { CollapsibleFilters } from '../ui/CollapsibleFilters';
 import { SeriesGrid } from './SeriesGrid';
 import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
@@ -110,71 +112,75 @@ export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
 
   return (
     <div className="space-y-4">
-      {/* Row 1: Search */}
-      {showSearch && (
-        <InputGroup>
-          <InputGroupAddon align="inline-start">
-            <Search />
-          </InputGroupAddon>
-          <InputGroupInput
-            value={filters.search}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => filters.setSearch(e.target.value)}
-            placeholder="Search series..."
-          />
-          {filters.search && (
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                size="icon-xs"
-                aria-label="Clear search"
-                onClick={() => filters.setSearch('')}
-              >
-                <X />
-              </InputGroupButton>
-            </InputGroupAddon>
-          )}
-        </InputGroup>
-      )}
-
-      <CollapsibleFilters
-        breakpoint={breakpoint}
-        activeFilterCount={filters.activeFilterCount}
-        hasActive={filters.hasActiveFilters}
-        onClear={filters.clearFilters}
-      >
-        {/* Row 2: Series Type filter */}
-        {showSeriesTypeFilter && (
-          <div className="flex items-center gap-2">
-            <MultiCombobox
-              options={seriesTypeOptions}
-              value={filters.selectedSeriesTypeIds.map(String)}
-              onValueChange={(v: string[]) => filters.setSeriesTypeIds(v.map(Number))}
-              placeholder="All Series Types"
-              selectedLabel="Series Types"
-              disabled={seriesTypesLoading}
-              className="flex-1"
-              multiple
-            />
-          </div>
-        )}
-
-        {/* Row 3: Date range + clear all */}
+      <div className={cn('space-y-4', SQUARE_CORNERS)}>
+        {/* Row 1: Search */}
         {showSearch && (
-          <div className="flex items-center gap-3">
-            <DateRangePicker
-              from={filters.from ?? ''}
-              to={filters.to ?? ''}
-              onRangeChange={(from, to) => filters.setDateRange(from || null, to || null)}
+          <InputGroup>
+            <InputGroupAddon align="inline-start">
+              <Search />
+            </InputGroupAddon>
+            <InputGroupInput
+              value={filters.search}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                filters.setSearch(e.target.value)
+              }
+              placeholder="Search series..."
             />
-            <div className="flex-1" />
-            {breakpoint !== 'phone' && filters.hasActiveFilters && (
-              <Button variant="outline" size="sm" onClick={filters.clearFilters}>
-                <X className="h-3.5 w-3.5" />
-                Clear All
-              </Button>
+            {filters.search && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  size="icon-xs"
+                  aria-label="Clear search"
+                  onClick={() => filters.setSearch('')}
+                >
+                  <X />
+                </InputGroupButton>
+              </InputGroupAddon>
             )}
-          </div>
+          </InputGroup>
         )}
-      </CollapsibleFilters>
+
+        <CollapsibleFilters
+          breakpoint={breakpoint}
+          activeFilterCount={filters.activeFilterCount}
+          hasActive={filters.hasActiveFilters}
+          onClear={filters.clearFilters}
+        >
+          {/* Row 2: Series Type filter */}
+          {showSeriesTypeFilter && (
+            <div className="flex items-center gap-2">
+              <MultiCombobox
+                options={seriesTypeOptions}
+                value={filters.selectedSeriesTypeIds.map(String)}
+                onValueChange={(v: string[]) => filters.setSeriesTypeIds(v.map(Number))}
+                placeholder="All Series Types"
+                selectedLabel="Series Types"
+                disabled={seriesTypesLoading}
+                className="flex-1"
+                multiple
+              />
+            </div>
+          )}
+
+          {/* Row 3: Date range + clear all */}
+          {showSearch && (
+            <div className="flex items-center gap-3">
+              <DateRangePicker
+                from={filters.from ?? ''}
+                to={filters.to ?? ''}
+                onRangeChange={(from, to) => filters.setDateRange(from || null, to || null)}
+              />
+              <div className="flex-1" />
+              {breakpoint !== 'phone' && filters.hasActiveFilters && (
+                <Button variant="outline" size="sm" onClick={filters.clearFilters}>
+                  <X className="h-3.5 w-3.5" />
+                  Clear All
+                </Button>
+              )}
+            </div>
+          )}
+        </CollapsibleFilters>
+      </div>
 
       {/* Results header: count + sort + view (shared extract) */}
       {showSortView && (

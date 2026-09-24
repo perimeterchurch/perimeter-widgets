@@ -35,6 +35,12 @@ export interface SegmentedTabsProps {
   panelId?: string;
   /** Extra classes on the track. */
   className?: string;
+  /**
+   * `segmented` (default) is the rounded muted track with a lifted active tab;
+   * `underline` is a ruled row of bold labels with a brand-blue bar under the
+   * active one — the flatter, editorial look of the perimeter.org pages.
+   */
+  variant?: 'segmented' | 'underline';
 }
 
 /**
@@ -74,7 +80,9 @@ export function SegmentedTabs({
   idBase,
   panelId,
   className,
+  variant = 'segmented',
 }: SegmentedTabsProps) {
+  const underline = variant === 'underline';
   const generatedId = useId();
   const baseId = idBase ?? generatedId;
   const tabId = (id: string) => segmentedTabId(baseId, id);
@@ -113,7 +121,12 @@ export function SegmentedTabs({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={cn('flex w-full gap-1 rounded-lg bg-muted p-[3px]', className)}
+      className={cn(
+        underline
+          ? 'flex w-full gap-6 border-b border-border'
+          : 'flex w-full gap-1 rounded-lg bg-muted p-[3px]',
+        className,
+      )}
     >
       {items.map(({ id, label }, index) => {
         const selected = value === id;
@@ -132,11 +145,22 @@ export function SegmentedTabs({
             onClick={() => onChange(id)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium whitespace-nowrap transition-colors',
+              'flex items-center justify-center gap-1.5 text-sm whitespace-nowrap transition-colors',
               'focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-              selected
-                ? 'bg-bg text-fg shadow-xs'
-                : 'text-fg/70 hover:text-fg dark:text-muted-fg dark:hover:text-fg',
+              underline
+                ? cn(
+                    // -mb-px lays the active bar over the track's rule.
+                    '-mb-px border-b-2 py-2.5 font-bold',
+                    selected
+                      ? 'border-primary text-fg'
+                      : 'border-transparent text-muted-fg hover:text-fg',
+                  )
+                : cn(
+                    'flex-1 rounded-md px-2 py-1 font-medium',
+                    selected
+                      ? 'bg-bg text-fg shadow-xs'
+                      : 'text-fg/70 hover:text-fg dark:text-muted-fg dark:hover:text-fg',
+                  ),
             )}
           >
             {label}

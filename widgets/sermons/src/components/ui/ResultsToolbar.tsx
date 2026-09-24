@@ -68,6 +68,7 @@ export function ResultsToolbar({
       <div className="flex items-center gap-2">
         <SortSelect
           compact={compact}
+          variant="ghost"
           sortField={sortField}
           sortDirection={sortDirection}
           onSortFieldChange={onSortFieldChange}
@@ -76,6 +77,7 @@ export function ResultsToolbar({
         />
         <IconSelect
           compact={compact}
+          variant="ghost"
           value={viewMode}
           onChange={onViewModeChange}
           options={viewOptions}

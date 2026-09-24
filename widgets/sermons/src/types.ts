@@ -149,6 +149,10 @@ export type PaginatedSermonsResponse = ListSermonsResponse['data'];
 export interface SermonListViewProps {
   sermons: SermonListItem[];
   onSermonClick: (id: number) => void;
+  /** Show every sermon in a series. Omitted when the series filter is locked or hidden. */
+  onSeriesClick?: ((id: number, title: string) => void) | undefined;
+  /** Show every sermon by a speaker. Omitted when the speaker filter is locked or hidden. */
+  onSpeakerClick?: ((id: number, name: string) => void) | undefined;
 }
 
 /* ------------------------------------------------------------------ */

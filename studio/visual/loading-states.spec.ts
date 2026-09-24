@@ -97,14 +97,14 @@ test.describe('sermons loading skeletons — viewMode-aware', () => {
           '[data-perimeter-widget-preview]',
         ) as HTMLElement | null;
         return (
-          (host?.shadowRoot?.querySelectorAll('.grid button .animate-pulse.absolute').length ??
+          (host?.shadowRoot?.querySelectorAll('.grid article .animate-pulse.absolute').length ??
             0) >= 1
         );
       },
       undefined,
       { timeout: 10_000 },
     );
-    const skeletonsOverImages = await shadowCount(page, '.grid button .animate-pulse.absolute');
+    const skeletonsOverImages = await shadowCount(page, '.grid article .animate-pulse.absolute');
     expect(skeletonsOverImages, 'per-image skeletons present pre-load').toBeGreaterThanOrEqual(1);
     await snapshotPreview(page, 'sermons-image-loading');
 
@@ -116,14 +116,14 @@ test.describe('sermons loading skeletons — viewMode-aware', () => {
         ) as HTMLElement | null;
         const root = host?.shadowRoot;
         const skeletons =
-          root?.querySelectorAll('.grid button .animate-pulse.absolute').length ?? 0;
-        const imgs = root?.querySelectorAll('.grid button img').length ?? 0;
+          root?.querySelectorAll('.grid article .animate-pulse.absolute').length ?? 0;
+        const imgs = root?.querySelectorAll('.grid article img').length ?? 0;
         return skeletons === 0 && imgs >= 1;
       },
       undefined,
       { timeout: 10_000 },
     );
-    const imgs = await shadowCount(page, '.grid button img');
+    const imgs = await shadowCount(page, '.grid article img');
     expect(imgs, 'real imgs after load').toBeGreaterThanOrEqual(1);
     await snapshotPreview(page, 'sermons-image-loaded');
   });

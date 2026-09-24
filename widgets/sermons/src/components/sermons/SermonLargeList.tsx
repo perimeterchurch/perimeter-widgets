@@ -1,8 +1,8 @@
 import type { SermonListViewProps, SermonsConfig } from '../../types';
-import { formatDate, sermonImageUrl } from '../../lib/format';
+import { sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
 import { ResultsEmpty } from '../ui/ResultsState';
-import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
+import { sermonCardMeta } from './SermonInfo';
 
 export type { SermonListViewProps };
 
@@ -10,7 +10,13 @@ interface SermonLargeListProps extends SermonListViewProps {
   config: SermonsConfig;
 }
 
-export function SermonLargeList({ sermons, onSermonClick, config }: SermonLargeListProps) {
+export function SermonLargeList({
+  sermons,
+  onSermonClick,
+  onSeriesClick,
+  onSpeakerClick,
+  config,
+}: SermonLargeListProps) {
   if (sermons.length === 0) {
     return <ResultsEmpty noun="sermons" />;
   }
@@ -25,10 +31,7 @@ export function SermonLargeList({ sermons, onSermonClick, config }: SermonLargeL
           imageAlt={sermon.title}
           title={sermon.title}
           description={sermon.shortDescription}
-          topLeft={<DateLabel date={formatDate(sermon.date)} />}
-          topRight={<SeriesPill name={sermon.series.title} />}
-          bottomLeft={<SpeakerLabel name={sermon.speaker.name} />}
-          bottomRight={sermon.book?.name ? <BookLabel name={sermon.book.name} /> : undefined}
+          {...sermonCardMeta(sermon, { onSeriesClick, onSpeakerClick })}
           onClick={() => onSermonClick(sermon.id)}
         />
       ))}

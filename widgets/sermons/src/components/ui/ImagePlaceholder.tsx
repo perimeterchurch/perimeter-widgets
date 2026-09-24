@@ -3,6 +3,7 @@ import { cn } from '@perimeter/ui/utils/cn';
 interface ImagePlaceholderProps {
   className?: string | undefined;
   style?: React.CSSProperties | undefined;
+  onClick?: (() => void) | undefined;
 }
 
 /**
@@ -16,11 +17,12 @@ interface ImagePlaceholderProps {
  * anyway — and a missing-artwork glyph adds nothing for a screen reader). The
  * accessible name for the media comes from the card's own text.
  */
-export function ImagePlaceholder({ className, style }: ImagePlaceholderProps) {
+export function ImagePlaceholder({ className, style, onClick }: ImagePlaceholderProps) {
   return (
     <div
       className={cn('flex items-center justify-center bg-muted text-muted-fg', className)}
       style={style}
+      onClick={onClick}
       aria-hidden="true"
     >
       <svg
