@@ -202,21 +202,23 @@ All under the `(public)` route group in perimeter-api — no authentication requ
 
 ## URL State
 
-The widget uses nuqs to sync state to the URL query string. Parameters:
+The widget uses nuqs to sync state to the URL query string, so every view is a shareable deep link. Every param carries a `sermons-` prefix (e.g. `sermons-tab`) **except `id`**, which is always the bare `?id=`.
 
-| Param     | Values                  | Description         |
-| --------- | ----------------------- | ------------------- |
-| `tab`     | `sermons`, `series`     | Active tab          |
-| `view`    | `grid`, `list`, `large` | Sermon list layout  |
-| `screen`  | `browse`, `detail`      | Current screen      |
-| `id`      | number                  | Sermon ID in detail |
-| `page`    | number                  | Current page        |
-| `search`  | string                  | Search query        |
-| `speaker` | number                  | Speaker filter      |
-| `book`    | number                  | Book filter         |
-| `series`  | number                  | Series filter       |
-| `sort`    | `date`, `title`         | Sort field          |
-| `order`   | `asc`, `desc`           | Sort direction      |
+That keeps a sermon's link the same shape as perimeter.org's existing ones: opening a sermon on `/sermons/` gives `/sermons/?id=5621`, and a page that embeds the widget (e.g. `/sermons/sermon-details/`) opens `?id=5621` straight to that sermon, so existing `/sermons/sermon-details/?id=…` links (and the Latest Sermon widget's default link) keep working.
+
+| Param                   | Values                  | Description                                                   |
+| ----------------------- | ----------------------- | ------------------------------------------------------------- |
+| `id`                    | number                  | The open sermon, or the open series on the Series tab          |
+| `sermons-tab`           | `sermons`, `series`     | Active tab                                                    |
+| `sermons-fromSeriesId`  | number                  | Series a sermon was opened from (drives Back)                 |
+| `sermons-view`          | `grid`, `list`          | Results layout (`large` still reads as `list`)                |
+| `sermons-page`          | number                  | Current page                                                  |
+| `sermons-search`        | string                  | Search query                                                  |
+| `sermons-series`        | comma-separated ids     | Series filter                                                 |
+| `sermons-speaker`       | comma-separated ids     | Speaker filter                                                |
+| `sermons-book`          | comma-separated ids     | Book filter                                                   |
+| `sermons-sort`          | `date`, `title`         | Sort field                                                    |
+| `sermons-order`         | `asc`, `desc`           | Sort direction                                                |
 
 ---
 

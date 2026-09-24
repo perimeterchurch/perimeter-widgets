@@ -39,7 +39,8 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   const sermonParams = useMemo(
     () => ({
       tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(defaultTab),
-      screen: parseAsStringLiteral(['browse', 'detail'] as const).withDefault('browse'),
+      // The open sermon (or series, on the series tab). Its URL key is the bare
+      // `id`, unprefixed — see urlKeys.
       id: parseAsInteger,
       fromSeriesId: parseAsInteger,
       search: parseAsString.withDefault(''),
@@ -62,12 +63,17 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   );
 
   // Map each state key to a prefixed URL param so multiple embeds don't
-  // collide. With no prefix the keys map to themselves (identity).
+  // collide. With no prefix the keys map to themselves (identity). The one
+  // exception is `id`, always the bare `?id=`: an open sermon's URL is then
+  // `/sermons/?id=5621`, the same shape as perimeter.org's existing
+  // `/sermons/sermon-details/?id=5621` links, so the widget embedded on that
+  // page opens them as-is.
   const urlKeys = useMemo(() => {
     if (!prefix) return undefined;
-    return Object.fromEntries(
-      Object.keys(sermonParams).map((key) => [key, `${prefix}${key}`]),
-    ) as Record<keyof typeof sermonParams, string>;
+    return {
+      ...Object.fromEntries(Object.keys(sermonParams).map((key) => [key, `${prefix}${key}`])),
+      id: 'id',
+    } as Record<keyof typeof sermonParams, string>;
   }, [prefix, sermonParams]);
 
   const [params, setParams] = useQueryStates(sermonParams, {
@@ -78,6 +84,8 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   // Override return values for locked params.
   // Empty strings from data-* attributes mean "not set" — treat as falsy.
   const tab = config.tab || params.tab;
+  // A detail is open whenever there's an id; no separate `screen` param.
+  const screen: ScreenMode = params.id != null ? 'detail' : 'browse';
   const from = config.from || params.from;
   const to = config.to || params.to;
 
@@ -110,21 +118,19 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     : (newTab: TabId) => {
         void setParams({
           tab: newTab,
-          screen: 'browse',
           id: null,
           page: 1,
         });
       };
 
   const setScreen = (screen: ScreenMode, id?: number) => {
-    void setParams({ screen, id: id ?? null, fromSeriesId: null });
+    void setParams({ id: screen === 'detail' ? (id ?? null) : null, fromSeriesId: null });
   };
 
   /** Navigate from a series detail to a sermon detail, remembering the series */
   const setSermonFromSeries = (sermonId: number, seriesId: number) => {
     void setParams({
       tab: config.tab || 'series',
-      screen: 'detail',
       id: sermonId,
       fromSeriesId: seriesId,
     });
@@ -134,7 +140,6 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   const setSeriesDetail = (seriesId: number) => {
     void setParams({
       tab: config.tab || 'series',
-      screen: 'detail',
       id: seriesId,
       fromSeriesId: null,
     });
@@ -275,7 +280,6 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
       ...clearedFilterParams(),
       [dimension]: String(id),
       tab: 'sermons',
-      screen: 'browse',
       id: null,
       fromSeriesId: null,
     });
@@ -283,6 +287,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
 
   return {
     ...params,
+    screen,
     view: effectiveView,
     tab,
     from,
