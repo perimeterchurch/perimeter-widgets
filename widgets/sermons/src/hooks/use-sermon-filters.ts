@@ -7,7 +7,6 @@ import {
   useQueryStates,
 } from 'nuqs';
 import type { SermonsConfig, SortField, SortOrder, TabId, ScreenMode, ViewMode } from '../types';
-import type { ContainerBreakpoint } from '../lib/breakpoint';
 
 /**
  * Per-embed URL-key prefix. nuqs v2's adapter exposes no global prefix, so we
@@ -17,7 +16,6 @@ import type { ContainerBreakpoint } from '../lib/breakpoint';
  */
 export interface UseSermonFiltersOptions {
   prefix?: string | undefined;
-  breakpoint?: ContainerBreakpoint | undefined;
 }
 
 /** Parse comma-separated IDs string into number array */
@@ -35,7 +33,7 @@ function serializeIds(ids: number[]): string | null {
 }
 
 export function useSermonFilters(config: SermonsConfig, options: UseSermonFiltersOptions = {}) {
-  const { prefix, breakpoint } = options;
+  const { prefix } = options;
   const defaultTab = config.defaultTab ?? 'sermons';
   const defaultView = config.defaultView ?? 'grid';
   const sermonParams = useMemo(
@@ -56,6 +54,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
       order: parseAsStringLiteral(['asc', 'desc'] as const).withDefault('desc'),
       // Layout preference — persisted to the URL (like sort) so it survives a
       // reload or a tab switch instead of resetting to the default each time.
+      // `large` is the pre-1.6 name of `list`, still read from old links.
       view: parseAsStringLiteral(['grid', 'list', 'large'] as const),
       page: parseAsInteger.withDefault(1),
     }),
@@ -82,10 +81,9 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   const from = config.from || params.from;
   const to = config.to || params.to;
 
-  // Default view follows the container: phone → compact list, else the config
-  // default ('grid'). An explicit choice (user click or ?view=) is a non-null
-  // params.view and always wins, even on a phone.
-  const effectiveView: ViewMode = params.view ?? (breakpoint === 'phone' ? 'list' : defaultView);
+  // An explicit choice (user click or ?view=) wins; otherwise the config default.
+  const urlView: ViewMode | null = params.view === 'large' ? 'list' : params.view;
+  const effectiveView: ViewMode = urlView ?? defaultView;
 
   // Parse comma-separated IDs for multi-select filters, with config overrides.
   // Config values may be numbers (from parseDataAttributes coercion) — coerce to string.

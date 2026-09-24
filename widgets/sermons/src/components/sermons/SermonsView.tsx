@@ -1,13 +1,12 @@
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
-import { Calendar, Type, LayoutGrid, List, Rows3 } from 'lucide-react';
+import { Calendar, Type, LayoutGrid, Rows3 } from 'lucide-react';
 import { useSermons } from '@perimeter/api-hooks';
 import type { SermonsConfig, ViewMode, SortField, SortOrder } from '../../types';
 import { useSermonFacets } from '../../hooks/use-sermon-facets';
 import { useFilterLabelCache } from '../../hooks/use-filter-label-cache';
 import { SermonFilters } from './SermonFilters';
 import { SermonGrid } from './SermonGrid';
-import { SermonSmallList } from './SermonSmallList';
-import { SermonLargeList } from './SermonLargeList';
+import { SermonList } from './SermonList';
 import { ResultsError, ResultsEmpty } from '../ui/ResultsState';
 import { ResultsToolbar } from '../ui/ResultsToolbar';
 import { ResultsPagination } from '../ui/ResultsPagination';
@@ -30,12 +29,7 @@ const VIEW_OPTIONS = [
   },
   {
     value: 'list',
-    label: 'Small List',
-    icon: <List className="h-3.5 w-3.5" />,
-  },
-  {
-    value: 'large',
-    label: 'Large List',
+    label: 'List',
     icon: <Rows3 className="h-3.5 w-3.5" />,
   },
 ];
@@ -116,8 +110,7 @@ export function SermonsView({ config, filters, breakpoint }: SermonsViewProps) {
     filters.setSort(filters.sort, direction);
   };
 
-  const ViewComponent =
-    viewMode === 'list' ? SermonSmallList : viewMode === 'large' ? SermonLargeList : SermonGrid;
+  const ViewComponent = viewMode === 'list' ? SermonList : SermonGrid;
 
   return (
     <div className="space-y-4">

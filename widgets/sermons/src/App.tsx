@@ -41,7 +41,7 @@ interface SermonsWidgetProps {
 function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const breakpoint = useContainerBreakpoint(containerRef);
-  const filters = useSermonFilters(config, { prefix: NUQS_PREFIX, breakpoint });
+  const filters = useSermonFilters(config, { prefix: NUQS_PREFIX });
 
   // Build a unique key for AnimatePresence based on the current "page"
   const viewKey =

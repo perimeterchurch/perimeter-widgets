@@ -203,27 +203,12 @@ describe('SermonsView results states', () => {
     expect(sk.querySelectorAll('[data-slot="sermon-skeleton-item"]')).toHaveLength(6);
   });
 
-  it('list loading skeleton uses a stacked (non-grid) layout', () => {
-    useSermons.mockReturnValue(queryResult({ isLoading: true }));
-    const { container } = render(
-      <SermonsView
-        config={config({ perPage: 4 })}
-        filters={makeFilters({ view: 'list' })}
-        breakpoint="desktop"
-      />,
-    );
-    const sk = container.querySelector('[data-slot="sermon-skeleton"]') as HTMLElement;
-    expect(sk).toBeTruthy();
-    expect(sk).not.toHaveClass('grid');
-    expect(sk.querySelectorAll('[data-slot="sermon-skeleton-item"]')).toHaveLength(4);
-  });
-
-  it('large loading skeleton uses the vertical-stack layout', () => {
+  it('list loading skeleton uses the vertical-stack layout', () => {
     useSermons.mockReturnValue(queryResult({ isLoading: true }));
     const { container } = render(
       <SermonsView
         config={config({ perPage: 3 })}
-        filters={makeFilters({ view: 'large' })}
+        filters={makeFilters({ view: 'list' })}
         breakpoint="desktop"
       />,
     );

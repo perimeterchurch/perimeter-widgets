@@ -1,22 +1,28 @@
 import type { SermonListViewProps, SermonsConfig } from '../../types';
-import { formatDate, sermonImageUrl } from '../../lib/format';
+import { sermonImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
 import { ResultsEmpty } from '../ui/ResultsState';
-import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
+import { sermonCardMeta } from './SermonInfo';
 
 export type { SermonListViewProps };
 
-interface SermonSmallListProps extends SermonListViewProps {
+interface SermonListProps extends SermonListViewProps {
   config: SermonsConfig;
 }
 
-export function SermonSmallList({ sermons, onSermonClick, config }: SermonSmallListProps) {
+export function SermonList({
+  sermons,
+  onSermonClick,
+  onSeriesClick,
+  onSpeakerClick,
+  config,
+}: SermonListProps) {
   if (sermons.length === 0) {
     return <ResultsEmpty noun="sermons" />;
   }
 
   return (
-    <div>
+    <div className="space-y-4">
       {sermons.map((sermon) => (
         <MediaCard
           key={sermon.id}
@@ -25,10 +31,7 @@ export function SermonSmallList({ sermons, onSermonClick, config }: SermonSmallL
           imageAlt={sermon.title}
           title={sermon.title}
           description={sermon.shortDescription}
-          topLeft={<DateLabel date={formatDate(sermon.date)} />}
-          topRight={<SeriesPill name={sermon.series.title} />}
-          bottomLeft={<SpeakerLabel name={sermon.speaker.name} />}
-          bottomRight={sermon.book?.name ? <BookLabel name={sermon.book.name} /> : undefined}
+          {...sermonCardMeta(sermon, { onSeriesClick, onSpeakerClick })}
           onClick={() => onSermonClick(sermon.id)}
         />
       ))}

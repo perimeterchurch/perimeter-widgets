@@ -43,7 +43,6 @@ test.describe('sermons loading skeletons — viewMode-aware', () => {
   for (const { view, expectGrid, label } of [
     { view: 'grid', expectGrid: true, label: 'grid' },
     { view: 'list', expectGrid: false, label: 'list' },
-    { view: 'large', expectGrid: false, label: 'large' },
   ] as const) {
     test(`${label}: loading skeleton matches the ${label} layout, then loads cards`, async ({
       page,
@@ -62,7 +61,7 @@ test.describe('sermons loading skeletons — viewMode-aware', () => {
         expect(skClass).toContain('grid');
         expect(skClass).toContain('@[48rem]:grid-cols-3');
       } else {
-        // list/large skeletons are stacked, never the responsive grid.
+        // the list skeleton is stacked, never the responsive grid.
         expect(skClass).not.toMatch(/\bgrid\b/);
       }
       const items = await shadowCount(page, SKELETON_ITEM);
