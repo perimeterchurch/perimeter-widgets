@@ -327,4 +327,46 @@ describe('useSermonFilters', () => {
       expect(r.hasActiveFilters).toBe(true);
     });
   });
+  // Kept LAST: nuqs's URL-write rate limiter is module-level state, so a write
+  // here shifts the timing the search-debounce tests above assert on.
+  describe('sermon link shape (?id=, like perimeter.org/sermons/sermon-details/?id=5621)', () => {
+    it('opens a sermon from a bare ?id= even when the embed is prefixed', () => {
+      const { result } = renderWithParams('?id=5621', { prefix: 'sermons-' });
+      expect(result.current.screen).toBe('detail');
+      expect(result.current.id).toBe(5621);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('writes exactly ?id=<sermon> when a sermon opens, and clears it on back', async () => {
+      vi.useFakeTimers();
+      const events: UrlUpdateEvent[] = [];
+      const { result } = renderHook(() => useSermonFilters(baseConfig, { prefix: 'sermons-' }), {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <NuqsTestingAdapter onUrlUpdate={(e) => events.push(e)} rateLimitFactor={1} hasMemory>
+            {children}
+          </NuqsTestingAdapter>
+        ),
+      });
+      // Drain nuqs's throttle queue (a timer + promise chain) after each write.
+      // Generous on purpose: the module-level rate limiter still carries the
+      // last-flush time the earlier fake-timer tests recorded.
+      const flush = () =>
+        act(async () => {
+          await vi.advanceTimersByTimeAsync(2000);
+        });
+
+      act(() => result.current.setScreen('detail', 5621));
+      await flush();
+      expect(events.at(-1)!.queryString).toBe('?id=5621');
+      expect(result.current.screen).toBe('detail');
+
+      act(() => result.current.setScreen('browse'));
+      await flush();
+      expect(events.at(-1)!.queryString).toBe('');
+      expect(result.current.screen).toBe('browse');
+    });
+  });
 });

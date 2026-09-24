@@ -52,8 +52,8 @@ export function SermonDetail({
   const { copied, flash } = useCopiedFlash(2000);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
-  // The selected sermon is already encoded in the URL via nuqs (screen=detail,
-  // id=…), so the current href is a shareable deep link. Copy it to the
+  // The selected sermon is already encoded in the URL via nuqs (`?id=…`), so
+  // the current href is a shareable deep link. Copy it to the
   // clipboard and flash a confirmation.
   const handleCopyLink = () => {
     void navigator.clipboard?.writeText(window.location.href);
