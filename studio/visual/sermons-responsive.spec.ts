@@ -5,8 +5,9 @@ import { STUDIO_URL, mockSermonsApi, waitForShadowMount, waitForSermonCards } fr
  * Responsive overhaul verification. Drives the studio viewport presets (which,
  * after the HostFrame gutter ramp, yield realistic widget widths) and asserts the
  * widget's container-query + breakpoint behavior end to end:
- *   - Mobile preset → ~343px container (phone): compact `list` default, filters
- *     collapsed behind the Filters toggle, Sort/View labels compacted, no overflow.
+ *   - Mobile preset → ~343px container (phone): 1-col grid (the config default —
+ *     phones no longer switch views), filters collapsed behind the Filters toggle,
+ *     Sort/View labels compacted, no overflow.
  *   - Tablet preset → ~702px (tablet): 2-col grid, inline filters, full labels.
  *   - Desktop preset → ~1100px (desktop): 3-col grid.
  * The date-range modal is intentionally not asserted here — it is a viewport-fixed
@@ -85,18 +86,13 @@ test.describe('sermons responsive overhaul', () => {
       .toBeGreaterThanOrEqual(768);
   });
 
-  test('phone: compact list default, collapsed filters, compact labels, no overflow', async ({
-    page,
-  }) => {
+  test('phone: 1-col grid, collapsed filters, compact labels, no overflow', async ({ page }) => {
     await selectPreset(page, 'Mobile');
-    // Wait for the breakpoint→list re-render (grid container disappears).
-    await expect
-      .poll(async () => (await widgetState(page)).hasGrid, { timeout: 10_000 })
-      .toBe(false);
+    // Wait for the container query to settle the grid to one column.
+    await expect.poll(async () => (await widgetState(page)).gridCols, { timeout: 10_000 }).toBe(1);
     const s = await widgetState(page);
 
     expect(s.containerWidth, 'phone width').toBeLessThan(480);
-    expect(s.hasGrid, 'no SermonGrid on phone (list default)').toBe(false);
     expect(s.overflow, 'no horizontal overflow on phone').toBe(false);
     // Filters collapsed: the toggle is present and the dropdowns are not rendered.
     expect(s.hasFiltersToggle, 'Filters toggle present on phone').toBe(true);

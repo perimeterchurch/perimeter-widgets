@@ -17,10 +17,10 @@ interface MediaCardProps {
   bottomLeft?: ReactNode | undefined;
   bottomRight?: ReactNode | undefined;
   onClick: () => void;
-  viewMode: 'grid' | 'list' | 'large' | 'row';
+  viewMode: 'grid' | 'list' | 'row';
 }
 
-// Grid / large cards are plain containers, not one big button: the image and
+// Grid / list cards are plain containers, not one big button: the image and
 // title open the sermon, and the meta slots can hold their own links (series,
 // speaker), which a button could not contain.
 const CARD_BASE = 'overflow-hidden text-left border border-border bg-bg text-fg';
@@ -63,22 +63,6 @@ function FallbackImage({
         onError={() => setFailed(true)}
       />
     </div>
-  );
-}
-
-function CardButton({
-  onClick,
-  className,
-  children,
-}: {
-  onClick: () => void;
-  className: string;
-  children: ReactNode;
-}) {
-  return (
-    <button type="button" onClick={onClick} className={className}>
-      {children}
-    </button>
   );
 }
 
@@ -220,40 +204,6 @@ export function MediaCard({
   };
 
   const hasCornersLayout = topLeft || topRight || bottomLeft || bottomRight;
-  // Compact list keeps only date (topLeft) + speaker (bottomLeft).
-  const compactMeta = [topLeft, bottomLeft].filter(Boolean);
-
-  if (viewMode === 'list') {
-    return (
-      <CardButton
-        onClick={onClick}
-        className="flex w-full items-center gap-3 px-1 py-2 text-left cursor-pointer border-b border-border last:border-b-0 transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/50"
-      >
-        <FallbackImage
-          key={imageUrl}
-          src={imageUrl}
-          alt={imageAlt}
-          className="h-10 w-10 shrink-0 rounded-sm"
-        />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{title}</p>
-          <div className="flex min-w-0 items-center gap-x-2 text-xs text-muted-fg">
-            {/* Compact list trims to the two most scannable slots
-                (date · speaker) with a separator so they don't run together;
-                the series pill (topRight) and book (bottomRight) are dropped
-                to keep the single line legible. */}
-            {compactMeta.map((item, i) => (
-              <span key={i} className="flex min-w-0 items-center gap-2">
-                {i > 0 && <span aria-hidden="true">·</span>}
-                {item}
-              </span>
-            ))}
-            {!hasCornersLayout && subtitle && <span className="truncate">{subtitle}</span>}
-          </div>
-        </div>
-      </CardButton>
-    );
-  }
 
   if (viewMode === 'row') {
     // A roomier list row (the sermon detail's "More from this series"): the
@@ -287,7 +237,7 @@ export function MediaCard({
     );
   }
 
-  if (viewMode === 'large') {
+  if (viewMode === 'list') {
     return (
       <article className={cn('flex w-full flex-row', CARD_BASE)}>
         <FallbackImage

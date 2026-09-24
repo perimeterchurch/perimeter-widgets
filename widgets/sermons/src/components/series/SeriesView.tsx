@@ -9,9 +9,9 @@ import { MultiCombobox } from '@perimeter/ui/multi-combobox';
 import { cn } from '@perimeter/ui/utils/cn';
 import type { MultiComboboxOption } from '@perimeter/ui/multi-combobox';
 import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
-import { Search, X, Calendar, Type, Hash, LayoutGrid, List, Rows3 } from 'lucide-react';
+import { Search, X, Calendar, Type, Hash, LayoutGrid, Rows3 } from 'lucide-react';
 import { useSeries, useSeriesTypes } from '@perimeter/api-hooks';
-import type { SermonsConfig, SortField } from '../../types';
+import type { SermonsConfig, SortField, ViewMode } from '../../types';
 import type { ContainerBreakpoint } from '../../lib/breakpoint';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { SQUARE_CORNERS } from '../../lib/square-corners';
@@ -30,8 +30,6 @@ interface SeriesViewProps {
   /** Container breakpoint; on `phone` the inline filter rows collapse behind a toggle. */
   breakpoint: ContainerBreakpoint;
 }
-
-type SeriesViewMode = 'grid' | 'list' | 'large';
 
 const SORT_FIELDS = [
   {
@@ -59,12 +57,7 @@ const VIEW_OPTIONS = [
   },
   {
     value: 'list',
-    label: 'Small List',
-    icon: <List className="h-3.5 w-3.5" />,
-  },
-  {
-    value: 'large',
-    label: 'Large List',
+    label: 'List',
     icon: <Rows3 className="h-3.5 w-3.5" />,
   },
 ];
@@ -185,8 +178,6 @@ export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
       {/* Results header: count + sort + view (shared extract) */}
       {showSortView && (
         <ResultsToolbar
-          count={pagination ? pagination.total : null}
-          noun="series"
           sortField={filters.sort}
           sortDirection={filters.order}
           sortFields={SORT_FIELDS}
@@ -194,7 +185,7 @@ export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
           onSortDirectionChange={(direction) => filters.setSort(filters.sort, direction)}
           viewMode={viewMode}
           viewOptions={VIEW_OPTIONS}
-          onViewModeChange={(v) => filters.setView(v as SeriesViewMode)}
+          onViewModeChange={(v) => filters.setView(v as ViewMode)}
           breakpoint={breakpoint}
         />
       )}

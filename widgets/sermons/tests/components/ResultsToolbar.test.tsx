@@ -6,10 +6,8 @@ import { ResultsToolbar } from '../../src/components/ui/ResultsToolbar';
 import { ResultsPagination } from '../../src/components/ui/ResultsPagination';
 
 /**
- * Shared results-header (count + sort + view) and pager extract (Task 12).
- * jsdom can't measure layout, so we assert structure + handler wiring, not
- * geometry. The toolbar wrap behaviour is verified by class presence, not by
- * a rendered reflow.
+ * Shared results-header (sort + view) and pager extract (Task 12). jsdom can't
+ * measure layout, so we assert structure + handler wiring, not geometry.
  */
 
 const SORT_FIELDS = [
@@ -24,8 +22,6 @@ const VIEW_OPTIONS = [
 function renderToolbar(over: Partial<Parameters<typeof ResultsToolbar>[0]> = {}) {
   return render(
     <ResultsToolbar
-      count={42}
-      noun="sermons"
       sortField="date"
       sortDirection="desc"
       sortFields={SORT_FIELDS}
@@ -41,25 +37,13 @@ function renderToolbar(over: Partial<Parameters<typeof ResultsToolbar>[0]> = {})
 }
 
 describe('ResultsToolbar', () => {
-  it('renders the count with the noun', () => {
-    const { container } = renderToolbar({ count: 42, noun: 'sermons' });
-    const countLine = container.querySelector('[data-slot="results-count"]') as HTMLElement;
-    expect(countLine).toBeInTheDocument();
-    expect(countLine).toHaveTextContent('42 sermons');
-  });
-
-  it('reserves the count line (renders a placeholder) when count is null', () => {
-    const { container } = renderToolbar({ count: null });
-    const countLine = container.querySelector('[data-slot="results-count"]') as HTMLElement;
-    // Always occupies a line so the row does not reflow when results arrive.
-    expect(countLine).toBeInTheDocument();
-    expect(countLine).not.toHaveTextContent(/sermons/);
-  });
-
-  it('wraps at narrow container widths (flex-wrap on the row)', () => {
+  it('shows only the sort and view controls, right-aligned (no result count)', () => {
     const { container } = renderToolbar();
     const row = container.querySelector('[data-slot="results-toolbar"]') as HTMLElement;
-    expect(row.className).toContain('flex-wrap');
+    expect(row).toHaveClass('justify-end');
+    expect(container.querySelector('[data-slot="results-count"]')).toBeNull();
+    expect(row).toHaveTextContent(/Sort by:/);
+    expect(row).toHaveTextContent(/View:/);
   });
 
   it('forwards a view-mode change from the view control', () => {

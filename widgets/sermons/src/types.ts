@@ -18,10 +18,12 @@ export const SermonsConfigSchema = z
       .enum(['sermons', 'series'])
       .default('sermons')
       .describe('Which tab is selected on first load.'),
+    // `large` is the pre-1.6 name of today's `list` (the old compact list was
+    // removed), kept as an alias so existing embeds keep working.
     defaultView: z
-      .enum(['grid', 'list', 'large'])
+      .preprocess((v) => (v === 'large' ? 'list' : v), z.enum(['grid', 'list']))
       .default('grid')
-      .describe('Initial layout of the results list.'),
+      .describe('Initial layout of the results: grid or list.'),
     apiUrl: z.string().optional().describe('Override the perimeter-api base URL (advanced).'),
     // Display and tab lock
     tab: z
@@ -161,7 +163,7 @@ export interface SermonListViewProps {
 
 export type TabId = 'sermons' | 'series';
 export type ScreenMode = 'browse' | 'detail';
-export type ViewMode = 'grid' | 'list' | 'large';
+export type ViewMode = 'grid' | 'list';
 export type SortField = 'date' | 'title' | 'count';
 export type SortOrder = 'asc' | 'desc';
 
