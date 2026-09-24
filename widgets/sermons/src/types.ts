@@ -16,7 +16,7 @@ export const SermonsConfigSchema = z
       .describe('Number of results shown per page.'),
     defaultTab: z
       .enum(['sermons', 'series'])
-      .default('sermons')
+      .default('series')
       .describe('Which tab is selected on first load.'),
     // `large` is the pre-1.6 name of today's `list` (the old compact list was
     // removed), kept as an alias so existing embeds keep working.
@@ -52,6 +52,12 @@ export const SermonsConfigSchema = z
     hideDate: z.coerce.boolean().optional().describe('Hide the date-range filter.'),
     hideSearch: z.coerce.boolean().optional().describe('Hide the search input.'),
     hidePagination: z.coerce.boolean().optional().describe('Hide the pagination controls.'),
+    hideBack: z.coerce
+      .boolean()
+      .optional()
+      .describe(
+        "Hide the Back button on a sermon's page — for a sermon-details page with its own back link.",
+      ),
     // Opt-in to show service-type / series-type dropdowns. Both default
     // to hidden because the embedded sermons widget is generally for
     // end-user consumption of one cohort (Sunday Morning), not internal

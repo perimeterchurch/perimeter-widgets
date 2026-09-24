@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { STUDIO_URL, mockSermonsApi, waitForShadowMount, waitForSermonCards } from './helpers';
+import { SERMONS_TAB_URL, mockSermonsApi, waitForShadowMount, waitForSermonCards } from './helpers';
 
 /**
  * Responsive overhaul verification. Drives the studio viewport presets (which,
@@ -53,7 +53,7 @@ async function widgetState(page: Page) {
 test.describe('sermons responsive overhaul', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
+    await page.goto(SERMONS_TAB_URL);
     await waitForShadowMount(page);
     // Default viewport is fluid (wide) → desktop → grid; cards settle here before
     // we switch presets (switching the preset changes the view branch).

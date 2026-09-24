@@ -10,6 +10,12 @@ const CDN_DIR = fileURLToPath(new URL('../../cdn', import.meta.url));
 
 export const STUDIO_URL = 'http://localhost:5173';
 export const PREVIEW_HOST = '[data-perimeter-widget-preview]';
+/**
+ * The sermons widget's Dev preview opened on its SERMONS tab. Series is the
+ * widget's default tab, so specs that exercise sermon cards, filters or
+ * pagination pin the tab through the widget's own URL param.
+ */
+export const SERMONS_TAB_URL = `${STUDIO_URL}/widgets/sermons?tab=dev&sermons-tab=sermons`;
 
 /** A 1×1 transparent PNG so mocked sermon images resolve (no real perimeter-api). */
 const TINY_PNG = Buffer.from(

@@ -93,7 +93,7 @@ Any functional break → fix on a branch, `pnpm release sermons` a patch version
 ```
 
 - **Defaults:** sermons tab, grid view, 12 per page.
-- **Config attributes** (real schema — verify against `widgets/sermons/src/types.ts`): `data-per-page="24"`, `data-default-view="grid|list"`, `data-default-tab="sermons|series"`, `data-series-id="…"`, `data-display="full|compact|headless"`, `data-api-url="…"`. There is **no** `data-limit` / `data-initial-view` / `data-campus`.
+- **Config attributes** (real schema — verify against `widgets/sermons/src/types.ts`): `data-per-page="24"`, `data-default-view="grid|list"`, `data-default-tab="series|sermons"` (default `series`), `data-series-id="…"`, `data-display="full|compact|headless"`, `data-api-url="…"`. There is **no** `data-limit` / `data-initial-view` / `data-campus`.
 - **Auto-update vs pinned:** use `…/sermons/latest.js` to pick up future promotions automatically (~1 min after a manifest change), or the pinned `…/sermons/1.0.0/index.js` for an immutable launch.
 - **Auth:** sermons is public (`auth: 'none'`) — no login/token needed. Authenticated widgets would require the host page to set `localStorage['mpp-widgets_AuthToken']`.
 

@@ -75,19 +75,23 @@ function digest(violations: Awaited<ReturnType<typeof widgetViolations>>) {
 }
 
 test.describe('axe-core: sermons widget has no WCAG A/AA violations', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
-    await waitForShadowMount(page);
-    await waitForResultsLoaded(page);
-  });
-
-  for (const theme of ['light', 'dark'] as const) {
-    test(`${theme} theme`, async ({ page }) => {
-      await setWidgetTheme(page, theme);
-      await waitForAnimationsSettled(page);
-      const violations = await widgetViolations(page);
-      expect(violations, `axe violations in ${theme}:\n${digest(violations)}`).toEqual([]);
-    });
+  // Both tabs: Series is the default a visitor lands on; Sermons carries the
+  // cards, filters and brand-blue links.
+  for (const widgetTab of ['series', 'sermons'] as const) {
+    for (const theme of ['light', 'dark'] as const) {
+      test(`${widgetTab} tab, ${theme} theme`, async ({ page }) => {
+        await mockSermonsApi(page);
+        await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev&sermons-tab=${widgetTab}`);
+        await waitForShadowMount(page);
+        await waitForResultsLoaded(page);
+        await setWidgetTheme(page, theme);
+        await waitForAnimationsSettled(page);
+        const violations = await widgetViolations(page);
+        expect(
+          violations,
+          `axe violations on ${widgetTab} in ${theme}:\n${digest(violations)}`,
+        ).toEqual([]);
+      });
+    }
   }
 });

@@ -132,7 +132,8 @@ test('built bundle fetches its sibling pdf worker and renders a PDF page', async
   });
 
   // Real production path: loader.js → manifest → built IIFE.
-  await page.goto('http://localhost:4173/sermons.html');
+  // Series is the default tab; these specs need sermon cards.
+  await page.goto('http://localhost:4173/sermons.html?sermons-tab=sermons');
   const host = page.locator('[data-perimeter-widget="sermons"]');
 
   // Playwright locators pierce open shadow roots: click into the detail view.

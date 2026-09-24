@@ -3,6 +3,7 @@ import { SlidersHorizontal, ChevronDown, X } from 'lucide-react';
 import { Badge } from '@perimeter/ui/badge';
 import { Button } from '@perimeter/ui/button';
 import type { ContainerBreakpoint } from '../../lib/breakpoint';
+import { ICON_GAP } from '../../lib/button-styles';
 
 interface Props {
   breakpoint: ContainerBreakpoint;
@@ -40,6 +41,7 @@ export function CollapsibleFilters({
           aria-expanded={open}
           aria-controls={bodyId}
           onClick={() => setOpen((v) => !v)}
+          className={ICON_GAP}
         >
           <SlidersHorizontal className="h-3.5 w-3.5" />
           Filters
@@ -48,7 +50,7 @@ export function CollapsibleFilters({
         </Button>
         <div className="flex-1" />
         {hasActive && (
-          <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+          <Button type="button" variant="ghost" size="sm" onClick={onClear} className={ICON_GAP}>
             <X className="h-3.5 w-3.5" />
             Clear
           </Button>

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import {
-  STUDIO_URL,
+  SERMONS_TAB_URL,
   mockSermonsApi,
   waitForShadowMount,
   waitForSermonCards,
@@ -22,7 +22,7 @@ import {
 test.describe('studio visual harness — sermons', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
+    await page.goto(SERMONS_TAB_URL);
     await waitForShadowMount(page);
     // The shadow root mounts before the mocked query resolves — wait for the
     // cards so theme toggles + computed-color reads don't race the data mount.

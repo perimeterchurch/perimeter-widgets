@@ -8,6 +8,8 @@ import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { useSeriesDetail } from '@perimeter/api-hooks';
 import type { SermonsConfig } from '../../types';
 import { formatDate } from '../../lib/format';
+import { BRAND_BUTTON } from '../../lib/button-styles';
+import { cn } from '@perimeter/ui/utils/cn';
 
 interface SeriesDetailProps {
   id: number;
@@ -28,7 +30,7 @@ export function SeriesDetail({ id, onBack, onSermonClick }: SeriesDetailProps) {
   if (error) {
     return (
       <div>
-        <Button variant="outline" size="sm" onClick={onBack} className="mb-4">
+        <Button variant="primary" size="sm" onClick={onBack} className={cn('mb-4', BRAND_BUTTON)}>
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
         <Empty>
@@ -45,7 +47,7 @@ export function SeriesDetail({ id, onBack, onSermonClick }: SeriesDetailProps) {
 
   return (
     <div>
-      <Button variant="outline" size="sm" onClick={onBack} className="mb-4">
+      <Button variant="primary" size="sm" onClick={onBack} className={cn('mb-4', BRAND_BUTTON)}>
         <ArrowLeft className="h-4 w-4" /> Back
       </Button>
       <SkeletonTransition

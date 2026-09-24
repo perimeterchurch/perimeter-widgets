@@ -11,11 +11,18 @@ import { SermonTabs } from '../../src/components/SermonTabs';
  * that clicking a tab reports the change; the actual contrast is covered by the
  * Playwright visual harness.
  */
+describe('SermonTabs order', () => {
+  it('lists Series first, then Sermons', () => {
+    render(<SermonTabs activeTab="series" onTabChange={() => {}} />);
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Series', 'Sermons']);
+  });
+});
+
 describe('SermonTabs selected state', () => {
   it('renders a tablist with both tabs and marks exactly the active one', () => {
     render(<SermonTabs activeTab="sermons" onTabChange={() => {}} />);
 
-    expect(screen.getByRole('tablist', { name: 'Sermons and series' })).toBeInTheDocument();
+    expect(screen.getByRole('tablist', { name: 'Series and sermons' })).toBeInTheDocument();
 
     const tabs = screen.getAllByRole('tab');
     expect(tabs).toHaveLength(2);
