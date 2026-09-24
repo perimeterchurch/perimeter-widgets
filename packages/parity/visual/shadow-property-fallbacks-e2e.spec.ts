@@ -59,7 +59,8 @@ async function mockApis(page: Page): Promise<void> {
 
 test('built bundle renders @property-dependent utilities on a bare host page', async ({ page }) => {
   await mockApis(page);
-  await page.goto('http://localhost:4173/sermons.html');
+  // Series is the default tab; these specs need sermon cards.
+  await page.goto('http://localhost:4173/sermons.html?sermons-tab=sermons');
 
   // Wait for the widget to mount and render the card grid.
   await page.waitForFunction(

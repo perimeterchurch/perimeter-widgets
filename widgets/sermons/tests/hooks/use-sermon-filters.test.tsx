@@ -4,7 +4,7 @@ import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import type { OnUrlUpdateFunction, UrlUpdateEvent } from 'nuqs/adapters/testing';
 import type { ReactNode } from 'react';
 import { useSermonFilters } from '../../src/hooks/use-sermon-filters';
-import type { SermonsConfig } from '../../src/types';
+import { SermonsConfigSchema, type SermonsConfig } from '../../src/types';
 
 function renderFilters(config: Partial<SermonsConfig> = {}) {
   const fullConfig: SermonsConfig = {
@@ -334,6 +334,29 @@ describe('useSermonFilters', () => {
       const { result } = renderWithParams('?id=5621', { prefix: 'sermons-' });
       expect(result.current.screen).toBe('detail');
       expect(result.current.id).toBe(5621);
+    });
+
+    it('?id= is always a sermon, even with Series as the default tab', () => {
+      // The real schema defaults (Series is the default tab): a bare
+      // perimeter.org link must still open the SERMON, never a series.
+      const { result } = renderHook(
+        () => useSermonFilters(SermonsConfigSchema.parse({}), { prefix: 'sermons-' }),
+        {
+          wrapper: ({ children }: { children: ReactNode }) => (
+            <NuqsTestingAdapter searchParams="?id=5621">{children}</NuqsTestingAdapter>
+          ),
+        },
+      );
+      expect(result.current.tab).toBe('series');
+      expect(result.current.id).toBe(5621);
+      expect(result.current.seriesId).toBeNull();
+    });
+
+    it('a series opens on its own key, never the sermon ?id=', () => {
+      const { result } = renderWithParams('?sermons-seriesId=1361', { prefix: 'sermons-' });
+      expect(result.current.screen).toBe('detail');
+      expect(result.current.seriesId).toBe(1361);
+      expect(result.current.id).toBeNull();
     });
 
     afterEach(() => {

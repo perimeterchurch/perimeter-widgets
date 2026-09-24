@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   STUDIO_URL,
+  SERMONS_TAB_URL,
   PREVIEW_HOST,
   mockSermonsApi,
   waitForShadowMount,
@@ -58,7 +59,7 @@ async function shadowTabStyle(
 test.describe('SegmentedTabs — sermons tab row (shadow DOM)', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
+    await page.goto(SERMONS_TAB_URL);
     await waitForShadowMount(page);
     await waitForSermonCards(page, 3);
   });
@@ -68,7 +69,7 @@ test.describe('SegmentedTabs — sermons tab row (shadow DOM)', () => {
       await setWidgetTheme(page, theme);
       await waitForSermonCards(page, 3);
 
-      // "Sermons" is the default-active tab; "Series" is inactive.
+      // "Sermons" is active (pinned via the URL); "Series" is inactive.
       const active = await shadowTabStyle(page, 'Sermons');
       const inactive = await shadowTabStyle(page, 'Series');
 

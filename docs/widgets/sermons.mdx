@@ -22,7 +22,7 @@ Public widget for searching and browsing sermons and sermon series on perimeter.
 <div
     data-perimeter-widget="sermons"
     data-per-page="12"
-    data-default-tab="sermons"
+    data-default-tab="series"
     data-default-view="grid"
 ></div>
 <script src="https://widgets.perimeter.org/sermons/latest.js" async></script>
@@ -39,7 +39,7 @@ Attributes below match `SermonsConfigSchema` in `widgets/sermons/src/types.ts`.
 | Attribute            | Type    | Default   | Description                                       |
 | -------------------- | ------- | --------- | ------------------------------------------------- |
 | `data-per-page`      | number  | `12`      | Sermons per page                                  |
-| `data-default-tab`   | enum    | `sermons` | Initial tab: `sermons` or `series`                |
+| `data-default-tab`   | enum    | `series`  | Initial tab: `series` or `sermons`                |
 | `data-default-view`  | enum    | `grid`    | Initial layout: `grid` or `list` (`large` still works as an alias for `list`) |
 | `data-display`       | enum    | `full`    | Chrome level: `full`, `compact`, or `headless`    |
 | `data-tab`           | enum    | _(none)_  | Lock to a single tab: `sermons` or `series`       |
@@ -49,6 +49,7 @@ Attributes below match `SermonsConfigSchema` in `widgets/sermons/src/types.ts`.
 | `data-service-type-id` | string | _(none)_ | Pin to a service type                             |
 | `data-series-type-id`  | string | _(none)_ | Pin to a series type                              |
 | `data-hide-search`   | boolean | _(none)_  | Hide the search box (one `data-hide-*` per filter; also `data-hide-series`, `-speaker`, `-book`, `-service-type`, `-series-type`, `-date`, `-pagination`) |
+| `data-hide-back`     | boolean | _(none)_  | Hide the Back button on a sermon's page — for a sermon-details page (e.g. `/sermons/sermon-details/`) that has its own "Back to All Sermons" link |
 | `data-show-service-type` | boolean | _(none)_ | Opt in to the service-type dropdown            |
 | `data-show-series-type`  | boolean | _(none)_ | Opt in to the series-type dropdown             |
 | `data-from`          | string  | _(none)_  | Start date filter (`YYYY-MM-DD`)                  |
@@ -208,7 +209,8 @@ That keeps a sermon's link the same shape as perimeter.org's existing ones: open
 
 | Param                   | Values                  | Description                                                   |
 | ----------------------- | ----------------------- | ------------------------------------------------------------- |
-| `id`                    | number                  | The open sermon, or the open series on the Series tab          |
+| `id`                    | number                  | The open sermon (always a sermon, on either tab)              |
+| `sermons-seriesId`      | number                  | The open series                                               |
 | `sermons-tab`           | `sermons`, `series`     | Active tab                                                    |
 | `sermons-fromSeriesId`  | number                  | Series a sermon was opened from (drives Back)                 |
 | `sermons-view`          | `grid`, `list`          | Results layout (`large` still reads as `list`)                |

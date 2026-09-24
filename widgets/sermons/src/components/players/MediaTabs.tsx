@@ -29,15 +29,21 @@ export interface MediaTabsProps {
 
 type MediaTab = 'video' | 'audio' | 'document';
 
+// H3-sized serif labels, matching the page's section headings ("More from
+// this series"), one step under the H2-sized Series / Sermons tabs.
+const tabLabel = (text: string) => (
+  <span className="font-serif text-2xl leading-tight font-normal">{text}</span>
+);
+
 export function MediaTabs({ links }: MediaTabsProps) {
   const videoLink = links.find((l) => l.mediaType === 'video');
   const audioLink = links.find((l) => l.mediaType === 'audio');
   const docLink = links.find((l) => l.mediaType === 'document');
 
-  const availableTabs: { id: MediaTab; label: string }[] = [];
-  if (videoLink) availableTabs.push({ id: 'video', label: 'Watch' });
-  if (audioLink) availableTabs.push({ id: 'audio', label: 'Listen' });
-  if (docLink) availableTabs.push({ id: 'document', label: 'PDF' });
+  const availableTabs: { id: MediaTab; label: React.ReactNode }[] = [];
+  if (videoLink) availableTabs.push({ id: 'video', label: tabLabel('Watch') });
+  if (audioLink) availableTabs.push({ id: 'audio', label: tabLabel('Listen') });
+  if (docLink) availableTabs.push({ id: 'document', label: tabLabel('PDF') });
 
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0]?.id ?? 'video');
 
@@ -55,10 +61,11 @@ export function MediaTabs({ links }: MediaTabsProps) {
 
   return (
     <div className="space-y-4">
-      {/* The underline tabs: bold labels over a rule, like the card meta bands
-          and perimeter.org's own pages, rather than the rounded pill track. */}
+      {/* The underline tabs: heading-sized labels over a rule, like the
+          Series / Sermons tabs, rather than the rounded pill track. */}
       <SegmentedTabs
         variant="underline"
+        className="gap-8"
         items={availableTabs}
         value={activeTab}
         onChange={setActiveTab}

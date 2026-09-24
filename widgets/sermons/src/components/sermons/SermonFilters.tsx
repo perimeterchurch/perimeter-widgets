@@ -26,6 +26,7 @@ import type {
   SortField,
   SortOrder,
 } from '../../types';
+import { ICON_GAP } from '../../lib/button-styles';
 
 function FilterChip({
   label,
@@ -278,7 +279,12 @@ export function SermonFilters(props: SermonFiltersProps) {
             )}
             <div className="flex-1" />
             {props.breakpoint !== 'phone' && props.hasActiveFilters && (
-              <Button variant="outline" size="sm" onClick={props.onClearFilters}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={props.onClearFilters}
+                className={ICON_GAP}
+              >
                 <X className="h-3.5 w-3.5" />
                 Clear All
               </Button>

@@ -88,3 +88,27 @@ describe('SermonDetail header meta', () => {
     expect(screen.queryByRole('button', { name: 'Pastor Jane' })).toBeNull();
   });
 });
+
+describe('SermonDetail Back button', () => {
+  it('shows Back by default, styled like Copy link (square, filled brand blue, white text, icon gap)', () => {
+    render(<SermonDetail id={42} config={config} onBack={() => {}} />);
+    const back = screen.getByRole('button', { name: /back/i });
+    const copy = screen.getByRole('button', { name: /copy link/i });
+    for (const button of [back, copy]) {
+      expect(button).toHaveClass('rounded-none', 'bg-primary', 'text-white', 'gap-2');
+    }
+  });
+
+  it('hides Back when hideBack is set (a sermon-details page with its own back link)', () => {
+    render(
+      <SermonDetail
+        id={42}
+        config={SermonsConfigSchema.parse({ hideBack: true })}
+        onBack={() => {}}
+      />,
+    );
+    expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
+    // The rest of the page is still there.
+    expect(screen.getByRole('button', { name: /copy link/i })).toBeInTheDocument();
+  });
+});

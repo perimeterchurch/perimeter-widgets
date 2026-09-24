@@ -34,14 +34,17 @@ function serializeIds(ids: number[]): string | null {
 
 export function useSermonFilters(config: SermonsConfig, options: UseSermonFiltersOptions = {}) {
   const { prefix } = options;
-  const defaultTab = config.defaultTab ?? 'sermons';
+  const defaultTab = config.defaultTab ?? 'series';
   const defaultView = config.defaultView ?? 'grid';
   const sermonParams = useMemo(
     () => ({
       tab: parseAsStringLiteral(['sermons', 'series'] as const).withDefault(defaultTab),
-      // The open sermon (or series, on the series tab). Its URL key is the bare
-      // `id`, unprefixed — see urlKeys.
+      // The open sermon. Its URL key is the bare `id`, unprefixed — see urlKeys.
+      // It always means a sermon (never a series), whichever tab is the
+      // default, so perimeter.org's `?id=5621` links always open that sermon.
       id: parseAsInteger,
+      // The open series (its own key, so it never collides with a sermon id).
+      seriesId: parseAsInteger,
       fromSeriesId: parseAsInteger,
       search: parseAsString.withDefault(''),
       series: parseAsString,
@@ -84,8 +87,8 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   // Override return values for locked params.
   // Empty strings from data-* attributes mean "not set" — treat as falsy.
   const tab = config.tab || params.tab;
-  // A detail is open whenever there's an id; no separate `screen` param.
-  const screen: ScreenMode = params.id != null ? 'detail' : 'browse';
+  // A detail is open whenever there's a sermon or series id; no `screen` param.
+  const screen: ScreenMode = params.id != null || params.seriesId != null ? 'detail' : 'browse';
   const from = config.from || params.from;
   const to = config.to || params.to;
 
@@ -119,12 +122,19 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
         void setParams({
           tab: newTab,
           id: null,
+          seriesId: null,
+          fromSeriesId: null,
           page: 1,
         });
       };
 
+  /** Open a sermon (`detail`) or return to the list (`browse`). */
   const setScreen = (screen: ScreenMode, id?: number) => {
-    void setParams({ id: screen === 'detail' ? (id ?? null) : null, fromSeriesId: null });
+    void setParams({
+      id: screen === 'detail' ? (id ?? null) : null,
+      seriesId: null,
+      fromSeriesId: null,
+    });
   };
 
   /** Navigate from a series detail to a sermon detail, remembering the series */
@@ -132,6 +142,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
     void setParams({
       tab: config.tab || 'series',
       id: sermonId,
+      seriesId: null,
       fromSeriesId: seriesId,
     });
   };
@@ -140,7 +151,8 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
   const setSeriesDetail = (seriesId: number) => {
     void setParams({
       tab: config.tab || 'series',
-      id: seriesId,
+      id: null,
+      seriesId,
       fromSeriesId: null,
     });
   };
@@ -281,6 +293,7 @@ export function useSermonFilters(config: SermonsConfig, options: UseSermonFilter
       [dimension]: String(id),
       tab: 'sermons',
       id: null,
+      seriesId: null,
       fromSeriesId: null,
     });
   };

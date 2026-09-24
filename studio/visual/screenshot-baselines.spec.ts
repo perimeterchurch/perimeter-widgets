@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import {
-  STUDIO_URL,
+  SERMONS_TAB_URL,
   PREVIEW_HOST,
   mockSermonsApi,
   waitForShadowMount,
@@ -60,7 +60,7 @@ async function waitForStablePaint(page: Page): Promise<void> {
 test.describe('sermons pixel baselines', () => {
   test.beforeEach(async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
+    await page.goto(SERMONS_TAB_URL);
     await waitForShadowMount(page);
     await waitForResultsLoaded(page);
   });

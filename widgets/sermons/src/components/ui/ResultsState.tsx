@@ -9,6 +9,7 @@ import {
   EmptyDescription,
   EmptyContent,
 } from '@perimeter/ui/empty';
+import { ICON_GAP } from '../../lib/button-styles';
 
 interface ResultsErrorProps {
   /** Plural noun for the resource, e.g. "sermons" or "series". */
@@ -43,7 +44,7 @@ export function ResultsError({ noun, onRetry, error }: ResultsErrorProps) {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button variant="outline" size="sm" onClick={onRetry}>
+        <Button variant="outline" size="sm" onClick={onRetry} className={ICON_GAP}>
           <RotateCw className="h-3.5 w-3.5" />
           Retry
         </Button>
@@ -80,7 +81,7 @@ export function ResultsEmpty({ noun, hasActiveFilters, onClearFilters }: Results
       </EmptyHeader>
       {hasActiveFilters && onClearFilters && (
         <EmptyContent>
-          <Button variant="outline" size="sm" onClick={onClearFilters}>
+          <Button variant="outline" size="sm" onClick={onClearFilters} className={ICON_GAP}>
             <X className="h-3.5 w-3.5" />
             Clear filters
           </Button>
