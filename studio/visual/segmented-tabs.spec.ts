@@ -11,16 +11,19 @@ import {
 } from './helpers';
 
 /**
- * Visual proof for the shared SegmentedTabs control (Task 4). jsdom can't see
- * rendered color, so assert COMPUTED backgrounds in a real browser: the active
- * segment must read distinctly from an inactive one (lifted `bg-bg` over the
- * `bg-muted` track) in BOTH light and dark — the failure mode the old line
- * underline had. Covers the sermons tab row (shadow DOM) and the studio
- * inspector tabs (light DOM) so both consumers are verified.
+ * Visual proof for the shared SegmentedTabs control. jsdom can't see rendered
+ * color, so assert COMPUTED styles in a real browser, in BOTH light and dark:
+ * the sermons tab row (shadow DOM, `underline` variant) must draw a visible
+ * brand-blue bar under the active tab only — the old Tabs `line` underline
+ * collapsed to no visible indicator — and the studio inspector tabs (light DOM,
+ * default `segmented` variant) must lift the active segment.
  */
 
-/** Computed background of a tab inside the widget shadow root, by accessible label. */
-async function shadowTabBg(page: import('@playwright/test').Page, label: string): Promise<string> {
+/** Computed style of a tab inside the widget shadow root, by accessible label. */
+async function shadowTabStyle(
+  page: import('@playwright/test').Page,
+  label: string,
+): Promise<{ bar: string; barWidth: string; hostBg: string }> {
   return page.evaluate(
     ({ hostSel, name }) => {
       const host = document.querySelector(hostSel) as HTMLElement | null;
@@ -30,7 +33,23 @@ async function shadowTabBg(page: import('@playwright/test').Page, label: string)
         ?.querySelectorAll<HTMLElement>('[role="tab"]');
       const match = tab && Array.from(tab).find((t) => (t.textContent ?? '').includes(name));
       if (!match) throw new Error(`shadow tab not found: ${name}`);
-      return getComputedStyle(match).backgroundColor;
+      const style = getComputedStyle(match);
+      // The surface the bar sits on: the nearest opaque background, crossing
+      // out of the shadow root to the host (and page) if needed.
+      let el: Element | null = match;
+      let surface = 'rgb(255, 255, 255)';
+      while (el) {
+        const bg = getComputedStyle(el).backgroundColor;
+        if (bg !== 'transparent' && !bg.startsWith('rgba(0, 0, 0, 0')) {
+          surface = bg;
+          break;
+        }
+        el =
+          el.parentElement ??
+          ((el.getRootNode() as ShadowRoot).host as Element | undefined) ??
+          null;
+      }
+      return { bar: style.borderBottomColor, barWidth: style.borderBottomWidth, hostBg: surface };
     },
     { hostSel: PREVIEW_HOST, name: label },
   );
@@ -45,25 +64,24 @@ test.describe('SegmentedTabs — sermons tab row (shadow DOM)', () => {
   });
 
   for (const theme of ['light', 'dark'] as const) {
-    test(`active segment background differs from inactive (${theme})`, async ({ page }) => {
+    test(`active tab carries a visible underline bar (${theme})`, async ({ page }) => {
       await setWidgetTheme(page, theme);
       await waitForSermonCards(page, 3);
 
       // "Sermons" is the default-active tab; "Series" is inactive.
-      const activeBg = await shadowTabBg(page, 'Sermons');
-      const inactiveBg = await shadowTabBg(page, 'Series');
+      const active = await shadowTabStyle(page, 'Sermons');
+      const inactive = await shadowTabStyle(page, 'Series');
 
+      expect(active.barWidth).toBe('2px');
       expect(
-        activeBg,
-        `active (${activeBg}) and inactive (${inactiveBg}) segment backgrounds must differ in ${theme}`,
-      ).not.toBe(inactiveBg);
+        active.bar,
+        `active (${active.bar}) and inactive (${inactive.bar}) bars must differ in ${theme}`,
+      ).not.toBe(inactive.bar);
 
-      // The lifted active segment (bg-bg) sits over the muted track behind the
-      // inactive tab; the gap is wider in light than dark, but must be a real,
-      // non-zero separation in both (the failure mode of the old line underline,
-      // which collapsed to no visible indicator).
-      const gap = Math.abs(luminance(activeBg) - luminance(inactiveBg));
-      expect(gap, `luminance gap ${gap} too small in ${theme}`).toBeGreaterThan(0.005);
+      // The bar must stand off the widget surface in both themes — the failure
+      // mode of the old line underline, which collapsed to no visible indicator.
+      const gap = Math.abs(luminance(active.bar) - luminance(active.hostBg));
+      expect(gap, `bar/surface luminance gap ${gap} too small in ${theme}`).toBeGreaterThan(0.1);
 
       await snapshotPreview(page, `segmented-sermons-${theme}`);
     });

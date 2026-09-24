@@ -54,6 +54,7 @@ vi.mock('@perimeter/api-hooks', () => ({
     seriesTypesCalls.push(params);
     return queryResult({ success: true, data: seriesTypes });
   },
+  useSeriesDetails: () => [],
   useSeries: (params: unknown) => {
     seriesCalls.push(params);
     return queryResult({

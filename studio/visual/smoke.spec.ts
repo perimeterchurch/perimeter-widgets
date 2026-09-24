@@ -30,8 +30,8 @@ test.describe('studio visual harness — sermons', () => {
   });
 
   test('renders sermon cards from the mocked API', async ({ page }) => {
-    // MediaCard grid view renders a clickable button per sermon; the fixture has 3.
-    const cards = await shadowCount(page, '.grid button');
+    // MediaCard grid view renders one <article> card per sermon; the fixture has 3.
+    const cards = await shadowCount(page, '.grid article');
     expect(cards).toBeGreaterThanOrEqual(3);
     await snapshotPreview(page, 'sermons-light');
   });
@@ -41,14 +41,14 @@ test.describe('studio visual harness — sermons', () => {
     // Toggling the host's data-theme can remount the preview; re-settle the cards.
     await waitForSermonCards(page, 3);
 
-    // Card title (a font-medium <p> inside a grid card) must read light on dark.
+    // Card title (the <h3> inside a grid card) must read light on dark.
     // Poll: a late preview remount can momentarily drop the card between
     // waitForSermonCards and a one-shot read (pre-existing suite flake class).
     await expect
       .poll(
         async () => {
           try {
-            return luminance(await readComputedColor(page, '.grid button p.font-medium'));
+            return luminance(await readComputedColor(page, '.grid article h3'));
           } catch {
             return -1;
           }

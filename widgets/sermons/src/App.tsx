@@ -86,6 +86,12 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
               ? filters.setSermonFromSeries(sermonId, filters.fromSeriesId)
               : filters.setScreen('detail', sermonId)
           }
+          onSeriesClick={
+            filters.canShowOnly('series') ? (id) => filters.showOnly('series', id) : undefined
+          }
+          onSpeakerClick={
+            filters.canShowOnly('speaker') ? (id) => filters.showOnly('speaker', id) : undefined
+          }
         />
       );
     }

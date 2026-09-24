@@ -21,6 +21,11 @@ import {
  *    axe catches roughly half of WCAG issues, so this is a floor, not a cert.
  *  - Scanned in BOTH themes because color-contrast is theme-dependent (the
  *    dark-surface bug class this audit round started from).
+ *  - One deliberate exemption: the sermon cards' series / speaker links
+ *    (`data-slot="brand-link"`) use the brand blue #60bbe9 to match
+ *    perimeter.org's own links, a product decision taken knowing it is 2.15:1
+ *    on white. Only `color-contrast` results on exactly those nodes are
+ *    dropped; every other rule and node still fails the sweep.
  *  - Animations must settle before analyze: the widget's AnimatePresence
  *    entrance fades leave ancestors at fractional opacity for ~200ms, and axe
  *    composites that opacity into its measured foreground color — mid-fade
@@ -51,7 +56,11 @@ async function widgetViolations(page: import('@playwright/test').Page) {
     .include(PREVIEW_HOST)
     .withTags(['wcag2a', 'wcag2aa'])
     .analyze();
-  return results.violations;
+  return results.violations.flatMap((v) => {
+    if (v.id !== 'color-contrast') return [v];
+    const nodes = v.nodes.filter((n) => !n.html.includes('data-slot="brand-link"'));
+    return nodes.length > 0 ? [{ ...v, nodes }] : [];
+  });
 }
 
 /** Human-readable digest so a failure names the rule, impact, and offending nodes. */

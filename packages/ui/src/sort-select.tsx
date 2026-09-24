@@ -18,6 +18,8 @@ interface SortSelectProps {
   fields: SortFieldOption[];
   className?: string;
   compact?: boolean;
+  /** Trigger chrome: `outline` draws a border; `ghost` drops it for a quieter toolbar. */
+  variant?: 'outline' | 'ghost';
 }
 
 export function SortSelect({
@@ -28,6 +30,7 @@ export function SortSelect({
   fields,
   className,
   compact = false,
+  variant = 'outline',
 }: SortSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -46,9 +49,9 @@ export function SortSelect({
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          'inline-flex h-8 max-w-full items-center gap-1.5 rounded-lg border px-2.5 text-sm',
-          'border-border bg-transparent text-muted-fg',
-          'transition-colors hover:bg-muted/30',
+          'inline-flex h-8 max-w-full items-center gap-1.5 rounded-lg px-2.5 text-sm',
+          'bg-transparent text-muted-fg transition-colors',
+          variant === 'outline' ? 'border border-border hover:bg-muted/30' : 'hover:bg-muted',
         )}
       >
         <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />

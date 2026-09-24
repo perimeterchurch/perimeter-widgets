@@ -59,11 +59,11 @@ export function AudioPlayer({ url }: { url: string }) {
       aria-label="Audio player"
       onKeyDown={handleKeyDown}
     >
-      <div className="flex w-full max-w-[500px] items-center gap-3 rounded-xl bg-muted px-5 py-3 shadow-lg">
+      <div className="flex w-full max-w-[500px] items-center gap-3 bg-muted px-5 py-3">
         <button
           type="button"
           onClick={togglePlay}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-fg transition-colors hover:bg-primary/90"
+          className="flex h-10 w-10 shrink-0 items-center justify-center bg-primary text-primary-fg transition-colors hover:bg-primary/90"
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}

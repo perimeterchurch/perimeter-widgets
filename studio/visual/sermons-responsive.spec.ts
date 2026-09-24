@@ -29,7 +29,7 @@ async function widgetState(page: Page) {
   return page.evaluate((host) => {
     const sr = (document.querySelector(host) as HTMLElement | null)?.shadowRoot;
     const container = sr?.querySelector('[class~="@container"]') as HTMLElement | null;
-    const grid = sr?.querySelector('div.grid.gap-4') as HTMLElement | null; // SermonGrid only
+    const grid = sr?.querySelector('div.grid:has(> article)') as HTMLElement | null; // the card grid
     const toolbar = sr?.querySelector('[data-slot="results-toolbar"]') as HTMLElement | null;
     const gridCols = grid
       ? getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).filter(Boolean).length

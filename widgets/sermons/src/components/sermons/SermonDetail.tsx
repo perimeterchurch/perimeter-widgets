@@ -8,14 +8,14 @@ import { SkeletonTransition } from '@perimeter/ui/skeleton-transition';
 import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
 import { useCopiedFlash } from '@perimeter/ui/hooks/use-copied-flash';
 import { useSermonDetail, useSermons } from '@perimeter/api-hooks';
-import type { SermonsConfig, SortField, SortOrder } from '../../types';
-import { formatDate, sermonImageUrl } from '../../lib/format';
+import type { SermonListViewProps, SermonsConfig, SortField, SortOrder } from '../../types';
+import { sermonImageUrl } from '../../lib/format';
 import { defined } from '../../lib/query-params';
 import { MediaTabs } from '../players/MediaTabs';
-import { MediaCard } from '../ui/MediaCard';
-import { DateLabel, SeriesPill, SpeakerLabel, BookLabel } from './SermonInfo';
+import { DateSpeakerLine, MediaCard } from '../ui/MediaCard';
+import { sermonCardMeta } from './SermonInfo';
 
-interface SermonDetailProps {
+interface SermonDetailProps extends Pick<SermonListViewProps, 'onSeriesClick' | 'onSpeakerClick'> {
   id: number;
   config: SermonsConfig;
   onBack: () => void;
@@ -35,7 +35,14 @@ const SORT_FIELDS = [
   },
 ];
 
-export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetailProps) {
+export function SermonDetail({
+  id,
+  config,
+  onBack,
+  onSermonClick,
+  onSeriesClick,
+  onSpeakerClick,
+}: SermonDetailProps) {
   const { data, isLoading, error } = useSermonDetail(id);
   const sermon = data?.data;
   const safeDescription = useSafeHtml(sermon?.description);
@@ -74,6 +81,9 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
   );
 
   const relatedSermons = (seriesData?.data.sermons ?? []).filter((s) => s.id !== id);
+  // Same meta as the cards: series, then bold date · speaker, linked when the
+  // filter can be shown.
+  const headerMeta = sermon ? sermonCardMeta(sermon, { onSeriesClick, onSpeakerClick }) : null;
 
   if (error) {
     return (
@@ -116,7 +126,7 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
                 <h2
                   ref={titleRef}
                   tabIndex={-1}
-                  className="text-xl font-bold text-fg outline-hidden"
+                  className="font-serif text-[32px] font-normal leading-tight text-fg outline-hidden"
                 >
                   {sermon.title}
                 </h2>
@@ -131,19 +141,22 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
                   {copied ? 'Copied' : 'Copy link'}
                 </Button>
               </div>
-              <p className="text-sm text-muted-fg mt-1">
-                {sermon.speaker.name} · {formatDate(sermon.date)} · {sermon.series.title}
-              </p>
+              <div className="mt-2 truncate text-sm text-muted-fg">{headerMeta?.topRight}</div>
+              <DateSpeakerLine
+                date={headerMeta?.topLeft}
+                speaker={headerMeta?.bottomLeft}
+                className="mt-1.5"
+              />
               {sermon.scriptureLinks && (
-                <p className="text-xs text-muted-fg mt-1">Scripture: {sermon.scriptureLinks}</p>
+                <p className="mt-1.5 text-sm text-muted-fg">Scripture: {sermon.scriptureLinks}</p>
               )}
             </div>
             <MediaTabs links={sermon.links} />
             {sermon.description && (
               <div className="rounded-lg bg-muted p-4">
-                <h3 className="font-semibold text-sm mb-2">About this sermon</h3>
+                <h3 className="mb-2 font-serif text-2xl font-normal">About this sermon</h3>
                 <div
-                  className="text-sm text-muted-fg [&_a]:text-primary [&_a]:underline [&_li]:my-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
+                  className="text-base leading-relaxed text-muted-fg [&_a]:text-primary [&_a]:underline [&_li]:my-0.5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
                   dangerouslySetInnerHTML={safeDescription}
                 />
               </div>
@@ -161,8 +174,9 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
             {showRelated && !relatedError && relatedSermons.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm">More from this series</h3>
+                  <h3 className="font-serif text-2xl font-normal">More from this series</h3>
                   <SortSelect
+                    variant="ghost"
                     sortField={sortField}
                     sortDirection={sortDirection}
                     onSortFieldChange={(f: string) => setSortField(f as SortField)}
@@ -174,15 +188,12 @@ export function SermonDetail({ id, config, onBack, onSermonClick }: SermonDetail
                   {relatedSermons.map((s) => (
                     <MediaCard
                       key={s.id}
-                      viewMode="list"
+                      viewMode="row"
                       imageUrl={s.bannerUrl ?? sermonImageUrl(s.id, config.apiUrl)}
                       imageAlt={s.title}
                       title={s.title}
                       description={s.shortDescription}
-                      topLeft={<DateLabel date={formatDate(s.date)} />}
-                      topRight={<SeriesPill name={s.series.title} />}
-                      bottomLeft={<SpeakerLabel name={s.speaker.name} />}
-                      bottomRight={s.book?.name ? <BookLabel name={s.book.name} /> : undefined}
+                      {...sermonCardMeta(s, {})}
                       onClick={() => onSermonClick?.(s.id)}
                     />
                   ))}

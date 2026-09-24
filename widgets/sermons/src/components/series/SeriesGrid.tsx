@@ -1,4 +1,4 @@
-import { Calendar, Layers, BookOpen } from 'lucide-react';
+import { Calendar, Layers } from 'lucide-react';
 import type { SeriesListItem, SermonsConfig } from '../../types';
 import { formatDate, seriesImageUrl } from '../../lib/format';
 import { MediaCard } from '../ui/MediaCard';
@@ -22,20 +22,15 @@ function DateLabel({ date }: { date: string }) {
   );
 }
 
+function sermonCount(count: number) {
+  return `${count} sermon${count !== 1 ? 's' : ''}`;
+}
+
 function SermonCountLabel({ count }: { count: number }) {
   return (
     <span className="flex items-center gap-1">
       <Layers className={iconClass} />
-      {count} sermon{count !== 1 ? 's' : ''}
-    </span>
-  );
-}
-
-function BookLabel({ name }: { name: string }) {
-  return (
-    <span className="flex items-center gap-1">
-      <BookOpen className={iconClass} />
-      {name}
+      {sermonCount(count)}
     </span>
   );
 }
@@ -45,31 +40,37 @@ export function SeriesGrid({ series, viewMode = 'grid', onSeriesClick, config }:
     return <ResultsEmpty noun="series" />;
   }
 
+  // The compact list keeps its icon labels; the grid and large cards style
+  // plain text in their ruled meta bands.
+  const compact = viewMode === 'list';
   const wrapperClass =
     viewMode === 'list'
       ? 'divide-y divide-border'
       : viewMode === 'large'
         ? 'space-y-4'
-        : 'grid grid-cols-1 gap-4 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3';
+        : 'grid grid-cols-1 gap-6 @[30rem]:grid-cols-2 @[48rem]:grid-cols-3';
 
   return (
     <div className={wrapperClass}>
-      {series.map((s) => (
-        <MediaCard
-          key={s.id}
-          viewMode={viewMode}
-          imageUrl={seriesImageUrl(s.id, config.apiUrl)}
-          imageAlt={s.displayTitle ?? s.title}
-          title={s.displayTitle ?? s.title}
-          description={s.subtitle}
-          topLeft={
-            s.latestSermonDate ? <DateLabel date={formatDate(s.latestSermonDate)} /> : undefined
-          }
-          bottomLeft={<SermonCountLabel count={s.sermonCount} />}
-          bottomRight={s.book ? <BookLabel name={s.book.name} /> : undefined}
-          onClick={() => onSeriesClick(s.id)}
-        />
-      ))}
+      {series.map((s) => {
+        const date = s.latestSermonDate ? formatDate(s.latestSermonDate) : undefined;
+        return (
+          <MediaCard
+            key={s.id}
+            viewMode={viewMode}
+            imageUrl={seriesImageUrl(s.id, config.apiUrl)}
+            imageAlt={s.displayTitle ?? s.title}
+            title={s.displayTitle ?? s.title}
+            description={s.subtitle}
+            topLeft={date && compact ? <DateLabel date={date} /> : date}
+            bottomLeft={
+              compact ? <SermonCountLabel count={s.sermonCount} /> : sermonCount(s.sermonCount)
+            }
+            bottomRight={s.book ? `Book: ${s.book.name}` : undefined}
+            onClick={() => onSeriesClick(s.id)}
+          />
+        );
+      })}
     </div>
   );
 }

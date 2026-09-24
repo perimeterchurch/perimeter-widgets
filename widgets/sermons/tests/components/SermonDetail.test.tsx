@@ -58,3 +58,33 @@ describe('SermonDetail share link', () => {
     expect(writeText).toHaveBeenCalledWith(window.location.href);
   });
 });
+
+describe('SermonDetail header meta', () => {
+  it('links the series and speaker when handlers are given', () => {
+    const onSeriesClick = vi.fn();
+    const onSpeakerClick = vi.fn();
+    render(
+      <SermonDetail
+        id={42}
+        config={config}
+        onBack={() => {}}
+        onSeriesClick={onSeriesClick}
+        onSpeakerClick={onSpeakerClick}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Romans' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pastor Jane' }));
+
+    expect(onSeriesClick).toHaveBeenCalledWith(9, 'Romans');
+    expect(onSpeakerClick).toHaveBeenCalledWith(1, 'Pastor Jane');
+  });
+
+  it('shows the series and speaker as plain text without handlers', () => {
+    render(<SermonDetail id={42} config={config} onBack={() => {}} />);
+
+    expect(screen.getByText('Pastor Jane')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Romans' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Pastor Jane' })).toBeNull();
+  });
+});

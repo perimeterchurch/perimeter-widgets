@@ -97,7 +97,7 @@ test.describe('chrome theme drives the gallery stage + widget preview', () => {
       { timeout: 10_000 },
     );
     await waitForSermonCards(page, 3);
-    const titleColor = await readComputedColor(page, '.grid button p.font-medium');
+    const titleColor = await readComputedColor(page, '.grid article h3');
     expect(
       luminance(titleColor),
       `card title color ${titleColor} should be light under dark chrome`,

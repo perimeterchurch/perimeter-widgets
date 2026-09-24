@@ -1,7 +1,11 @@
 export { useSermons, type UseSermonsParams, type UseSermonsResponse } from './sermons/use-sermons';
 export { useSermonDetail, type UseSermonDetailResponse } from './sermons/use-sermon-detail';
 export { useSeries, type UseSeriesParams, type UseSeriesResponse } from './sermons/use-series';
-export { useSeriesDetail, type UseSeriesDetailResponse } from './sermons/use-series-detail';
+export {
+  useSeriesDetail,
+  useSeriesDetails,
+  type UseSeriesDetailResponse,
+} from './sermons/use-series-detail';
 export {
   useSpeakers,
   type UseSpeakersParams,

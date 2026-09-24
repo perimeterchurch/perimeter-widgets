@@ -48,5 +48,6 @@ When the tabs drive a single panel (rather than sibling views), pass `idBase` + 
 | `aria-label` | `string`                        | Accessible label for the tablist.                                            |
 | `idBase`     | `string`                        | Base for each tab's DOM id; pair with `panelId` to wire an associated panel. |
 | `panelId`    | `string`                        | The `role="tabpanel"` id these tabs control (adds `aria-controls`).          |
+| `variant`    | `'segmented' \| 'underline'`    | `segmented` (default): rounded muted track. `underline`: a ruled row of bold labels with a brand-blue bar under the active tab. |
 
 Keyboard: ArrowLeft/ArrowRight wrap between tabs, Home/End jump to the first/last — each moving focus and selection together.
