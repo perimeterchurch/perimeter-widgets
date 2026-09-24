@@ -157,8 +157,6 @@ export function SermonsView({ config, filters, breakpoint }: SermonsViewProps) {
       {/* Results header: count + sort + view (shared extract) */}
       {showSortView && (
         <ResultsToolbar
-          count={pagination ? pagination.total : null}
-          noun="sermons"
           sortField={filters.sort}
           sortDirection={filters.order}
           sortFields={SORT_FIELDS}

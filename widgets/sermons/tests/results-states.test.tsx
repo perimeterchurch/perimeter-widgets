@@ -172,21 +172,10 @@ describe('SermonsView results states', () => {
     expect(clearFilters).toHaveBeenCalledTimes(1);
   });
 
-  it('reserves the result-count line while loading so the toolbar does not reflow', () => {
-    useSermons.mockReturnValue(queryResult({ isLoading: true }));
-    const { container } = render(
-      <SermonsView config={config()} filters={makeFilters()} breakpoint="desktop" />,
-    );
-    const countLine = container.querySelector('[data-slot="results-count"]') as HTMLElement;
-    expect(countLine).toBeTruthy();
-    // Always occupies a line: rendered even with no pagination yet.
-    expect(countLine).toBeInTheDocument();
-  });
-
   // The loading skeleton must mirror the LOADED layout per viewMode so the
   // results region doesn't jump shape when data arrives. The skeleton wrapper
   // carries the same container class the corresponding view component uses
-  // (grid → .grid with @[…] cols, list → stacked rows, large → space-y-4),
+  // (grid → .grid with @[…] cols, list → space-y-4),
   // and renders `perPage` placeholder items.
   it('grid loading skeleton mirrors the grid layout with perPage items', () => {
     useSermons.mockReturnValue(queryResult({ isLoading: true }));
