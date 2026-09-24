@@ -73,3 +73,18 @@ describe('SermonsConfigSchema — display modes', () => {
     expect(SermonsConfigSchema.parse({ perPage: '12' }).perPage).toBe(12);
   });
 });
+
+describe('SermonsConfigSchema — defaultView', () => {
+  it('accepts grid and list', () => {
+    expect(SermonsConfigSchema.parse({ defaultView: 'grid' }).defaultView).toBe('grid');
+    expect(SermonsConfigSchema.parse({ defaultView: 'list' }).defaultView).toBe('list');
+  });
+
+  it('reads the legacy `large` as list so existing embeds keep working', () => {
+    expect(SermonsConfigSchema.parse({ defaultView: 'large' }).defaultView).toBe('list');
+  });
+
+  it('rejects anything else', () => {
+    expect(() => SermonsConfigSchema.parse({ defaultView: 'small' })).toThrow();
+  });
+});

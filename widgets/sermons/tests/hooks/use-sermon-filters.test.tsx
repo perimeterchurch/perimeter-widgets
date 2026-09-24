@@ -5,7 +5,6 @@ import type { OnUrlUpdateFunction, UrlUpdateEvent } from 'nuqs/adapters/testing'
 import type { ReactNode } from 'react';
 import { useSermonFilters } from '../../src/hooks/use-sermon-filters';
 import type { SermonsConfig } from '../../src/types';
-import type { ContainerBreakpoint } from '../../src/lib/breakpoint';
 
 function renderFilters(config: Partial<SermonsConfig> = {}) {
   const fullConfig: SermonsConfig = {
@@ -142,8 +141,8 @@ describe('useSermonFilters', () => {
 
   describe('view-mode persistence', () => {
     it('defaults the view to config.defaultView', () => {
-      const { result } = renderFilters({ defaultView: 'large' });
-      expect(result.current.view).toBe('large');
+      const { result } = renderFilters({ defaultView: 'list' });
+      expect(result.current.view).toBe('list');
     });
 
     it('reads the view from the URL when present', () => {
@@ -163,9 +162,9 @@ describe('useSermonFilters', () => {
 
     it('clearFilters does not reset the view (it is a layout preference, not a filter)', () => {
       const { result } = renderFilters();
-      act(() => result.current.setView('large'));
+      act(() => result.current.setView('list'));
       act(() => result.current.clearFilters());
-      expect(result.current.view).toBe('large');
+      expect(result.current.view).toBe('list');
     });
   });
 
@@ -278,10 +277,10 @@ describe('useSermonFilters', () => {
     });
   });
 
-  describe('responsive default view + activeFilterCount', () => {
+  describe('default view + activeFilterCount', () => {
     function renderResponsive(
       config: Partial<SermonsConfig>,
-      opts: { breakpoint?: ContainerBreakpoint; searchParams?: string } = {},
+      opts: { searchParams?: string } = {},
     ) {
       const fullConfig: SermonsConfig = {
         perPage: 12,
@@ -290,27 +289,27 @@ describe('useSermonFilters', () => {
         display: 'full',
         ...config,
       };
-      return renderHook(() => useSermonFilters(fullConfig, { breakpoint: opts.breakpoint }), {
+      return renderHook(() => useSermonFilters(fullConfig), {
         wrapper: ({ children }: { children: ReactNode }) => (
           <NuqsTestingAdapter searchParams={opts.searchParams ?? ''}>{children}</NuqsTestingAdapter>
         ),
       });
     }
 
-    it('defaults view to list on phone when unset', () => {
-      expect(renderResponsive({}, { breakpoint: 'phone' }).result.current.view).toBe('list');
+    it('defaults the view to the config default when unset', () => {
+      expect(renderResponsive({}).result.current.view).toBe('grid');
+      expect(renderResponsive({ defaultView: 'list' }).result.current.view).toBe('list');
     });
-    it('defaults view to the config default on tablet/desktop when unset', () => {
-      expect(renderResponsive({}, { breakpoint: 'tablet' }).result.current.view).toBe('grid');
+    it('an explicit ?view= wins over the config default', () => {
       expect(
-        renderResponsive({ defaultView: 'large' }, { breakpoint: 'desktop' }).result.current.view,
-      ).toBe('large');
-    });
-    it('preserves an explicit ?view= even on phone', () => {
-      expect(
-        renderResponsive({}, { breakpoint: 'phone', searchParams: '?view=grid' }).result.current
+        renderResponsive({ defaultView: 'list' }, { searchParams: '?view=grid' }).result.current
           .view,
       ).toBe('grid');
+    });
+    it('reads the legacy ?view=large as list', () => {
+      expect(renderResponsive({}, { searchParams: '?view=large' }).result.current.view).toBe(
+        'list',
+      );
     });
     it('activeFilterCount counts collapsible dims (date range once), excludes search + locked', () => {
       const r = renderResponsive(
@@ -326,6 +325,48 @@ describe('useSermonFilters', () => {
       const r = renderResponsive({}, { searchParams: '?search=x' }).result.current;
       expect(r.activeFilterCount).toBe(0);
       expect(r.hasActiveFilters).toBe(true);
+    });
+  });
+  // Kept LAST: nuqs's URL-write rate limiter is module-level state, so a write
+  // here shifts the timing the search-debounce tests above assert on.
+  describe('sermon link shape (?id=, like perimeter.org/sermons/sermon-details/?id=5621)', () => {
+    it('opens a sermon from a bare ?id= even when the embed is prefixed', () => {
+      const { result } = renderWithParams('?id=5621', { prefix: 'sermons-' });
+      expect(result.current.screen).toBe('detail');
+      expect(result.current.id).toBe(5621);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('writes exactly ?id=<sermon> when a sermon opens, and clears it on back', async () => {
+      vi.useFakeTimers();
+      const events: UrlUpdateEvent[] = [];
+      const { result } = renderHook(() => useSermonFilters(baseConfig, { prefix: 'sermons-' }), {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <NuqsTestingAdapter onUrlUpdate={(e) => events.push(e)} rateLimitFactor={1} hasMemory>
+            {children}
+          </NuqsTestingAdapter>
+        ),
+      });
+      // Drain nuqs's throttle queue (a timer + promise chain) after each write.
+      // Generous on purpose: the module-level rate limiter still carries the
+      // last-flush time the earlier fake-timer tests recorded.
+      const flush = () =>
+        act(async () => {
+          await vi.advanceTimersByTimeAsync(2000);
+        });
+
+      act(() => result.current.setScreen('detail', 5621));
+      await flush();
+      expect(events.at(-1)!.queryString).toBe('?id=5621');
+      expect(result.current.screen).toBe('detail');
+
+      act(() => result.current.setScreen('browse'));
+      await flush();
+      expect(events.at(-1)!.queryString).toBe('');
+      expect(result.current.screen).toBe('browse');
     });
   });
 });

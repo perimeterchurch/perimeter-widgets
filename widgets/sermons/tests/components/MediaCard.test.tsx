@@ -41,8 +41,8 @@ describe('MediaCard grid bands', () => {
     );
   });
 
-  it('keeps the same order in the large list', () => {
-    render(<MediaCard viewMode="large" imageUrl="" imageAlt="" onClick={() => {}} {...slots} />);
+  it('keeps the same order in the list', () => {
+    render(<MediaCard viewMode="list" imageUrl="" imageAlt="" onClick={() => {}} {...slots} />);
 
     expectDocumentOrder(
       ['Amazing Grace', 'Grace Series', 'Jan 15, 2026', 'John Smith', 'Book: Ephesians'].map(
@@ -90,18 +90,5 @@ describe('MediaCard roomy row', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Amazing Grace' }));
     fireEvent.click(screen.getByAltText('art'));
     expect(onClick).toHaveBeenCalledTimes(2);
-  });
-});
-
-describe('MediaCard compact list legibility', () => {
-  it('keeps date + speaker but drops the series and book so slots do not run together', () => {
-    render(<MediaCard viewMode="list" imageUrl="" imageAlt="" onClick={() => {}} {...slots} />);
-
-    expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
-    expect(screen.getByText('Jan 15, 2026')).toBeInTheDocument();
-    expect(screen.getByText('John Smith')).toBeInTheDocument();
-    // Trimmed out of the compact line to stay legible.
-    expect(screen.queryByTestId('series')).toBeNull();
-    expect(screen.queryByText('Book: Ephesians')).toBeNull();
   });
 });
