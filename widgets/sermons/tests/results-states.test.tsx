@@ -1,6 +1,6 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { SermonsView } from '../src/components/sermons/SermonsView';
 import { SeriesView } from '../src/components/series/SeriesView';
 import { SermonsConfigSchema, type SermonsConfig } from '../src/types';
@@ -96,6 +96,7 @@ function makeFilters(over: Partial<ReturnType<typeof useSermonFilters>> = {}) {
     setSort: vi.fn(),
     setPage: vi.fn(),
     setScreen: vi.fn(),
+    setSeriesDetail: vi.fn(),
     clearFilters: vi.fn(),
     ...over,
   } as unknown as ReturnType<typeof useSermonFilters>;
@@ -210,6 +211,59 @@ describe('SermonsView results states', () => {
 });
 
 describe('SeriesView results states', () => {
+  const oneSeries = {
+    success: true,
+    data: {
+      series: [
+        {
+          id: 1361,
+          title: 'The Outward Facing Church',
+          displayTitle: null,
+          subtitle: null,
+          sermonCount: 2,
+          latestSermonDate: '2026-09-20',
+          book: null,
+        },
+      ],
+      pagination: { page: 1, perPage: 12, total: 1, totalPages: 1 },
+    },
+  };
+
+  it('opens a series as the Sermons tab filtered to it', () => {
+    const showOnly = vi.fn();
+    const setSeriesDetail = vi.fn();
+    const setScreen = vi.fn();
+    useSeries.mockReturnValue(queryResult({ data: oneSeries }));
+    render(
+      <SeriesView
+        config={config()}
+        filters={makeFilters({ canShowOnly: () => true, showOnly, setSeriesDetail, setScreen })}
+        breakpoint="desktop"
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'The Outward Facing Church' }));
+    expect(showOnly).toHaveBeenCalledWith('series', 1361);
+    expect(setSeriesDetail).not.toHaveBeenCalled();
+    // Never the sermon ?id= route.
+    expect(setScreen).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the series page when the series filter cannot be shown', () => {
+    const showOnly = vi.fn();
+    const setSeriesDetail = vi.fn();
+    useSeries.mockReturnValue(queryResult({ data: oneSeries }));
+    render(
+      <SeriesView
+        config={config()}
+        filters={makeFilters({ canShowOnly: () => false, showOnly, setSeriesDetail })}
+        breakpoint="desktop"
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'The Outward Facing Church' }));
+    expect(setSeriesDetail).toHaveBeenCalledWith(1361);
+    expect(showOnly).not.toHaveBeenCalled();
+  });
+
   it('renders a distinct error block with a retry that refetches', () => {
     const refetch = vi.fn();
     useSeries.mockReturnValue(queryResult({ error: new Error('boom'), refetch }));

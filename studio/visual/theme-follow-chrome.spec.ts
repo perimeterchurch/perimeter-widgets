@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   STUDIO_URL,
+  SERMONS_TAB_URL,
   PREVIEW_HOST,
   mockSermonsApi,
   waitForShadowMount,
@@ -85,7 +86,7 @@ test.describe('chrome theme drives the gallery stage + widget preview', () => {
 
   test('sermons: the preview follows chrome dark with no canvas toggle', async ({ page }) => {
     await mockSermonsApi(page);
-    await page.goto(`${STUDIO_URL}/widgets/sermons?tab=dev`);
+    await page.goto(SERMONS_TAB_URL);
     await waitForShadowMount(page);
     await waitForSermonCards(page, 3);
 

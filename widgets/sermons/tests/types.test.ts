@@ -6,7 +6,7 @@ describe('SermonsConfigSchema', () => {
     const result = SermonsConfigSchema.parse({});
     expect(result).toEqual({
       perPage: 12,
-      defaultTab: 'sermons',
+      defaultTab: 'series',
       defaultView: 'grid',
       display: 'full',
     });

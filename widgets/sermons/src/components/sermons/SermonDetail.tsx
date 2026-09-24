@@ -14,6 +14,8 @@ import { defined } from '../../lib/query-params';
 import { MediaTabs } from '../players/MediaTabs';
 import { DateSpeakerLine, MediaCard } from '../ui/MediaCard';
 import { sermonCardMeta } from './SermonInfo';
+import { BRAND_BUTTON } from '../../lib/button-styles';
+import { cn } from '@perimeter/ui/utils/cn';
 
 interface SermonDetailProps extends Pick<SermonListViewProps, 'onSeriesClick' | 'onSpeakerClick'> {
   id: number;
@@ -84,13 +86,18 @@ export function SermonDetail({
   // Same meta as the cards: series, then bold date · speaker, linked when the
   // filter can be shown.
   const headerMeta = sermon ? sermonCardMeta(sermon, { onSeriesClick, onSpeakerClick }) : null;
+  // `hideBack` is for a dedicated sermon-details page that has its own "Back to
+  // All Sermons" link, so the widget shouldn't add a second one.
+  const backButton = config.hideBack ? null : (
+    <Button variant="primary" size="sm" onClick={onBack} className={cn('mb-4', BRAND_BUTTON)}>
+      <ArrowLeft className="h-4 w-4" /> Back
+    </Button>
+  );
 
   if (error) {
     return (
       <div>
-        <Button variant="outline" size="sm" onClick={onBack} className="mb-4">
-          <ArrowLeft className="h-4 w-4" /> Back
-        </Button>
+        {backButton}
         <Empty>
           <EmptyHeader>
             <EmptyTitle>Sermon not found</EmptyTitle>
@@ -105,9 +112,7 @@ export function SermonDetail({
 
   return (
     <div>
-      <Button variant="outline" size="sm" onClick={onBack} className="mb-4">
-        <ArrowLeft className="h-4 w-4" /> Back
-      </Button>
+      {backButton}
       <SkeletonTransition
         isLoading={isLoading}
         skeleton={
@@ -131,11 +136,11 @@ export function SermonDetail({
                   {sermon.title}
                 </h2>
                 <Button
-                  variant="outline"
+                  variant="primary"
                   size="sm"
                   onClick={handleCopyLink}
                   aria-label="Copy link to this sermon"
-                  className="shrink-0"
+                  className={cn('shrink-0', BRAND_BUTTON)}
                 >
                   {copied ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
                   {copied ? 'Copied' : 'Copy link'}

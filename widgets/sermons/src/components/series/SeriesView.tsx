@@ -23,6 +23,7 @@ import { ResultsPagination } from '../ui/ResultsPagination';
 import { SermonSkeleton } from '../ui/SermonSkeleton';
 import type { useSermonFilters } from '../../hooks/use-sermon-filters';
 import { defined, idsParam } from '../../lib/query-params';
+import { ICON_GAP } from '../../lib/button-styles';
 
 interface SeriesViewProps {
   config: SermonsConfig;
@@ -165,7 +166,12 @@ export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
               />
               <div className="flex-1" />
               {breakpoint !== 'phone' && filters.hasActiveFilters && (
-                <Button variant="outline" size="sm" onClick={filters.clearFilters}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={filters.clearFilters}
+                  className={ICON_GAP}
+                >
                   <X className="h-3.5 w-3.5" />
                   Clear All
                 </Button>
@@ -215,7 +221,14 @@ export function SeriesView({ config, filters, breakpoint }: SeriesViewProps) {
             <SeriesGrid
               series={seriesList}
               viewMode={viewMode}
-              onSeriesClick={(id: number) => filters.setScreen('detail', id)}
+              // A series opens as the Sermons tab filtered to it. The series page
+              // is only the fallback when that filter can't be shown (the embed
+              // locks the Series tab or hides the filter bar).
+              onSeriesClick={(id: number) =>
+                filters.canShowOnly('series')
+                  ? filters.showOnly('series', id)
+                  : filters.setSeriesDetail(id)
+              }
               config={config}
             />
           )}

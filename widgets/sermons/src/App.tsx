@@ -44,29 +44,16 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
   const filters = useSermonFilters(config, { prefix: NUQS_PREFIX });
 
   // Build a unique key for AnimatePresence based on the current "page"
-  const viewKey =
-    filters.screen === 'detail' && filters.id
-      ? `detail-${filters.tab}-${filters.id}`
+  const viewKey = filters.id
+    ? `sermon-${filters.id}`
+    : filters.seriesId
+      ? `series-${filters.seriesId}`
       : `browse-${filters.tab}`;
 
   // Determine which content to render
   const renderContent = () => {
-    if (filters.screen === 'detail' && filters.id) {
-      // Viewing a series detail
-      if (filters.tab === 'series' && !filters.fromSeriesId) {
-        return (
-          <SeriesDetail
-            id={filters.id}
-            config={config}
-            onBack={() => filters.setScreen('browse')}
-            onSermonClick={(sermonId) => {
-              // Navigate to sermon detail, remembering which series we came from
-              filters.setSermonFromSeries(sermonId, filters.id!);
-            }}
-          />
-        );
-      }
-      // Viewing a sermon detail
+    // A sermon (`?id=`) wins over everything, on either tab.
+    if (filters.id) {
       return (
         <SermonDetail
           id={filters.id}
@@ -79,9 +66,8 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
             }
           }}
           onSermonClick={(sermonId) =>
-            // On the series tab the breadcrumb must survive: setScreen nulls
-            // fromSeriesId while tab stays 'series', and the next render would
-            // route the SERMON id into <SeriesDetail> ("Series not found").
+            // Opened from a series: keep that breadcrumb so Back still returns
+            // to the series (setScreen would drop fromSeriesId).
             filters.fromSeriesId
               ? filters.setSermonFromSeries(sermonId, filters.fromSeriesId)
               : filters.setScreen('detail', sermonId)
@@ -92,6 +78,21 @@ function SermonsWidget({ config }: SermonsWidgetProps): React.JSX.Element {
           onSpeakerClick={
             filters.canShowOnly('speaker') ? (id) => filters.showOnly('speaker', id) : undefined
           }
+        />
+      );
+    }
+
+    if (filters.seriesId) {
+      const seriesId = filters.seriesId;
+      return (
+        <SeriesDetail
+          id={seriesId}
+          config={config}
+          onBack={() => filters.setScreen('browse')}
+          onSermonClick={(sermonId) => {
+            // Navigate to sermon detail, remembering which series we came from
+            filters.setSermonFromSeries(sermonId, seriesId);
+          }}
         />
       );
     }
