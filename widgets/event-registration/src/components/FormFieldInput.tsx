@@ -58,8 +58,9 @@ export function FormFieldInput({
   onChange,
   error,
 }: FormFieldInputProps): React.JSX.Element {
+  // Inline, or the required mark wraps onto its own line under a block label.
   const labelNode = field.alternateLabelHtml ? (
-    <RichText html={field.alternateLabelHtml} className="text-sm font-medium" />
+    <RichText inline html={field.alternateLabelHtml} className="text-sm font-medium" />
   ) : (
     <span>{field.label}</span>
   );
