@@ -11,12 +11,27 @@ import { useSafeHtml } from '@perimeter/ui/hooks/use-safe-html';
 export function RichText({
   html,
   className = '',
+  inline = false,
 }: {
   html: string | null | undefined;
   className?: string;
+  /**
+   * Render as a `<span>` with paragraphs flattened, for text that must stay
+   * in the line it sits in (a field label followed by its required mark).
+   */
+  inline?: boolean;
 }): React.JSX.Element | null {
   const safe = useSafeHtml(html);
   if (!html || html.trim().length === 0) return null;
+
+  if (inline) {
+    return (
+      <span
+        className={`text-fg [&_a]:text-primary [&_a]:underline [&_b]:font-semibold [&_p]:inline [&_strong]:font-semibold ${className}`}
+        dangerouslySetInnerHTML={safe}
+      />
+    );
+  }
 
   return (
     <div
