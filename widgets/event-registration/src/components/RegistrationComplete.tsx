@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { CircleCheck } from 'lucide-react';
 import type { RegistrationEvent, RegistrationSubmitResult } from '@perimeter/api-hooks';
-import { Button } from '@perimeter/ui/button';
 import { formatEventRange } from '../lib/format';
 
 export interface RegistrationCompleteProps {
@@ -10,21 +9,25 @@ export interface RegistrationCompleteProps {
   result: Extract<RegistrationSubmitResult, { dryRun: false }>;
   /** Where the confirmation email goes; empty when unknown. */
   contactEmail: string;
-  returnUrl: string;
+  /** Bring the event cards back for a forgotten family member. */
   onRegisterMore: () => void;
 }
 
 /**
  * The in-widget confirmation for a registration that owes nothing. A paid
  * registration goes to the native Invoice Details & Payment page; sending a
- * free one there only shows a $0 invoice, so the widget confirms in place
- * and offers to register someone else.
+ * free one there only shows a $0 invoice, so the widget confirms in place.
+ *
+ * It ends on the confirmation: the family registered in one pass, so there
+ * is no next step to push. A muted "Forgot someone?" line brings the cards
+ * back for the one case that needs it (decided 2026-10-02; the earlier
+ * "Register someone else" / "Back to events" buttons read as unfinished
+ * business on a page reached by direct link).
  */
 export function RegistrationComplete({
   event,
   result,
   contactEmail,
-  returnUrl,
   onRegisterMore,
 }: RegistrationCompleteProps): React.JSX.Element {
   const sectionName = new Map(event.sections.map((s) => [s.key, s.displayName]));
@@ -67,14 +70,16 @@ export function RegistrationComplete({
         </p>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <Button type="button" variant="secondary" size="lg" onClick={onRegisterMore}>
-          Register someone else
-        </Button>
-        <Button variant="outline" size="lg" nativeButton={false} render={<a href={returnUrl} />}>
-          Back to events
-        </Button>
-      </div>
+      <p className="font-sans text-sm text-muted-fg">
+        Forgot someone?{' '}
+        <button
+          type="button"
+          onClick={onRegisterMore}
+          className="font-medium text-primary underline underline-offset-4 hover:no-underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+        >
+          Add another family member
+        </button>
+      </p>
     </section>
   );
 }

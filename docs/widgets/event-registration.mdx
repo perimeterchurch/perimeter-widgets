@@ -25,7 +25,6 @@ by setting its `External_Registration_URL` to this page.
 <div
   data-perimeter-widget="event-registration"
   data-checkout-url="https://www.perimeter.org/event-checkout/"
-  data-return-url="https://www.perimeter.org/events"
 ></div>
 ```
 
@@ -46,7 +45,6 @@ widget so members can sign in for the household roster:
 | Attribute                 | Required | Default                     | Description                                                                                          |
 | ------------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `data-checkout-url`       | No       | perimeter.org `/event-checkout/` | The native Invoice Details & Payment page. After a submit the browser goes to `…?id=<Invoice_GUID>`. |
-| `data-return-url`         | No       | `/events`                   | Where the confirmation's "Back to events" button goes (the hero has no back link; the host page's own does that). |
 | `data-id-param`           | No       | `id`                        | Query-string key carrying the `Event_ID` (MP's `EventDetailWidgetIdParameterName`).                 |
 | `data-event-id`           | No       | —                           | Pin the event instead of reading the query string (studio preview, single-event pages).             |
 | `data-invoice-param`      | No       | `id`                        | Query-string key the checkout page reads (MP's `InvoiceDetailWidgetIdParameterName`).               |
@@ -130,9 +128,12 @@ widget so members can sign in for the household roster:
   registration is *Awaiting Payment* until it pays, and MP releases unpaid seats after about an
   hour). When it
   is $0 (2026-09-16) the widget stays put and shows "You're registered" with the people and
-  sessions, where the confirmation email goes, and "Register someone else" / "Back to
-  events" — the checkout page would only show a $0 invoice, and MP's Registrant Message job
-  sends the confirmation either way.
+  sessions and where the confirmation email goes — the checkout page would only show a $0
+  invoice, and MP's Registrant Message job sends the confirmation either way. The
+  confirmation ends there (2026-10-02): no "Register someone else" / "Back to events"
+  buttons, since the family registered in one pass and the page is reached by direct link;
+  a muted "Forgot someone? Add another family member" link brings the cards back.
+  `data-return-url` is gone with the button.
 - **Coming back** — the checkout's "Make Changes" returns with
   `?id=<eventId>&invoiceid=<guid>`; the widget offers to continue that checkout
   or start over.
