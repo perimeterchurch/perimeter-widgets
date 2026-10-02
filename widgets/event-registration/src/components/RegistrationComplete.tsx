@@ -7,8 +7,6 @@ export interface RegistrationCompleteProps {
   event: RegistrationEvent;
   /** The successful submit; `dryRun` results never reach this component. */
   result: Extract<RegistrationSubmitResult, { dryRun: false }>;
-  /** Where the confirmation email goes; empty when unknown. */
-  contactEmail: string;
   /** Bring the event cards back for a forgotten family member. */
   onRegisterMore: () => void;
 }
@@ -27,7 +25,6 @@ export interface RegistrationCompleteProps {
 export function RegistrationComplete({
   event,
   result,
-  contactEmail,
   onRegisterMore,
 }: RegistrationCompleteProps): React.JSX.Element {
   const sectionName = new Map(event.sections.map((s) => [s.key, s.displayName]));
@@ -64,11 +61,9 @@ export function RegistrationComplete({
         ))}
       </ul>
 
-      {contactEmail.trim().length > 0 && (
-        <p className="font-sans text-sm text-muted-fg">
-          A confirmation will be sent to <span className="text-fg">{contactEmail}</span>.
-        </p>
-      )}
+      {/* No "a confirmation will be sent to …" line: MP's Registrant Message
+          (per section, per its template) decides whether anything is sent and
+          to whom, and the widget cannot see either (2026-10-02). */}
 
       <p className="font-sans text-sm text-muted-fg">
         Forgot someone?{' '}

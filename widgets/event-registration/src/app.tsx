@@ -79,8 +79,6 @@ function contactFromRoster(roster: RegistrationRoster) {
 
 type CompletedSubmit = {
   result: Extract<RegistrationSubmitResult, { dryRun: false }>;
-  /** Captured before the draft is cleared, so the guest's email survives the reset. */
-  email: string;
 };
 
 function LoadingState(): React.JSX.Element {
@@ -216,10 +214,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
           if (result.data.dryRun) return;
           if (result.data.invoiceTotal === 0) {
             // Nothing to pay: the checkout page would only show a $0 invoice.
-            setCompleted({
-              result: result.data,
-              email: signedIn ? draft.contact.email : draft.guest.email,
-            });
+            setCompleted({ result: result.data });
             setQuote(null);
             dispatch({ type: 'reset' });
             if (roster) dispatch({ type: 'prefill-contact', contact: contactFromRoster(roster) });
@@ -556,7 +551,6 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
               <RegistrationComplete
                 event={event}
                 result={completed.result}
-                contactEmail={completed.email}
                 onRegisterMore={() => setCompleted(null)}
               />
             ) : (

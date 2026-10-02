@@ -511,7 +511,9 @@ describe('event-registration widget', () => {
     const done = screen.getByRole('region', { name: "You're registered" });
     expect(within(done).getByText('Jen Cano')).toBeInTheDocument();
     expect(within(done).getByText('Elementary + Early Years Focus')).toBeInTheDocument();
-    expect(within(done).getByText(/jen@example.com/)).toBeInTheDocument();
+    // No claim about who gets an email: MP's Registrant Message decides that, per section.
+    expect(within(done).queryByText(/confirmation will be sent/i)).not.toBeInTheDocument();
+    expect(within(done).queryByText(/jen@example.com/)).not.toBeInTheDocument();
     // No buttons after "You're registered": the cards are gone until the muted
     // "Forgot someone?" link brings them back.
     expect(within(done).queryByRole('link', { name: 'Back to events' })).not.toBeInTheDocument();
