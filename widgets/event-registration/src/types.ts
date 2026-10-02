@@ -22,12 +22,6 @@ export const EventRegistrationConfigSchema = z.object({
     .describe(
       'The native Invoice Details & Payment page. The browser is sent to `<checkoutUrl>?<invoiceParam>=<Invoice_GUID>` after a successful submit. Defaults to the perimeter.org checkout page.',
     ),
-  returnUrl: z
-    .string()
-    .default('/events')
-    .describe(
-      'Where the "Back to events" button on the post-registration confirmation goes. Relative or absolute.',
-    ),
   idParam: z
     .string()
     .default('id')
