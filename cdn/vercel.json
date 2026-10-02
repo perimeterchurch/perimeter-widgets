@@ -15,7 +15,7 @@
     },
     {
       "source": "/event-registration/latest.js",
-      "destination": "/event-registration/0.2.2/index.js"
+      "destination": "/event-registration/0.2.3/index.js"
     },
     {
       "source": "/example/latest.js",
