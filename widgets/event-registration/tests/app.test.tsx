@@ -429,7 +429,7 @@ describe('event-registration widget', () => {
     const row = card.querySelector('[data-drawer-state="complete"]');
     expect(row).not.toBeNull();
     expect(row).toHaveTextContent('Grade: 7th');
-    expect(row).toHaveTextContent('Any allergies we should know about: No');
+    expect(row).toHaveTextContent('Allergies: No');
     expect(within(card).queryByLabelText(/Grade/)).not.toBeInTheDocument();
     fireEvent.click(within(card).getByRole('button', { name: 'Change answers for William' }));
     expect(within(card).getByLabelText(/Grade/)).toHaveValue('7th');
