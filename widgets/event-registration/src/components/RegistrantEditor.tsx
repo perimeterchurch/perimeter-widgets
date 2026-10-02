@@ -27,7 +27,14 @@ import {
   type DraftRegistration,
   type GuestDetails,
 } from '../lib/draft';
-import { GRADE_OPTIONS, formatAge, formatGrade, formatPrice, parseEventDate } from '../lib/format';
+import {
+  GRADE_OPTIONS,
+  formatAge,
+  formatGrade,
+  formatPrice,
+  htmlToText,
+  parseEventDate,
+} from '../lib/format';
 
 /** `Household_Positions` a new member may be created with. */
 const NEW_MEMBER_POSITIONS = [
@@ -519,13 +526,25 @@ export function RegistrantEditor({
 
   // ── Drawers: each ticked person answers right under their name ──────────
   // `undefined` = nothing chosen yet, so the first incomplete person opens on
-  // their own; a person whose record already answers everything stays
-  // collapsed to a summary row.
+  // their own. Ticking always opens the drawer when there is anything in it,
+  // even when the record already answers everything (decided 2026-10-02): a
+  // parent reads "Trained · Walking" with the questions in front of them, not
+  // as bare values on a summary row. Only a section with nothing to ask
+  // collapses straight to a ready row.
   const drawerMode = mode === 'household' && !existing;
   const [openKey, setOpenKey] = React.useState<PersonKey | null | undefined>(undefined);
   const isComplete = (view: PersonView): boolean => validatePerson(view).size === 0;
+  /** Whether the drawer would show anything beyond the Done button. */
+  const hasQuestions = (key: PersonKey): boolean =>
+    (form?.fields ?? []).some((f) => f.fieldTypeId !== FIELD_TYPE.INSTRUCTIONS) ||
+    standaloneGroups.length > 0 ||
+    placementGroups.length > 0 ||
+    asksBirthDateFor(key) ||
+    asksGradeFor(key);
   const openDrawer: PersonKey | null =
-    openKey === undefined ? (views.find((v) => !isComplete(v))?.key ?? null) : openKey;
+    openKey === undefined
+      ? ((views.find((v) => !isComplete(v)) ?? views.find((v) => hasQuestions(v.key)))?.key ?? null)
+      : openKey;
   const viewOf = (m: RosterMember): PersonView => ({
     key: `c${m.contactId}`,
     member: m,
@@ -533,7 +552,7 @@ export function RegistrantEditor({
     label: `${m.firstName} ${m.lastName}`.trim(),
   });
 
-  /** What a collapsed row shows: the room, the options and the answers given so far. */
+  /** What a collapsed row shows: the room, the options and the answers given so far, each answer with its question. */
   const summaryOf = (view: PersonView): string[] => {
     const state = stateOf(view.key);
     const chips: string[] = [];
@@ -550,8 +569,12 @@ export function RegistrantEditor({
     for (const field of form?.fields ?? []) {
       if (field.fieldTypeId === FIELD_TYPE.INSTRUCTIONS) continue;
       const value = state.answers.get(field.formFieldId)?.trim();
-      if (value && isFieldActive(field, fieldsById, state.answers))
-        chips.push(value.length > 24 ? `${value.slice(0, 24)}…` : value);
+      if (value && isFieldActive(field, fieldsById, state.answers)) {
+        const label = (htmlToText(field.alternateLabelHtml) || field.label).replace(/[:?]\s*$/, '');
+        const shortLabel = label.length > 28 ? `${label.slice(0, 28)}…` : label;
+        const shortValue = value.length > 24 ? `${value.slice(0, 24)}…` : value;
+        chips.push(`${shortLabel}: ${shortValue}`);
+      }
     }
     return chips;
   };
@@ -576,7 +599,7 @@ export function RegistrantEditor({
     });
     const key = `c${m.contactId}`;
     if (on) {
-      if (!isComplete(viewOf(m))) setOpenKey(key);
+      if (hasQuestions(key) || !isComplete(viewOf(m))) setOpenKey(key);
     } else if (openDrawer === key) {
       setOpenKey(null);
     }
