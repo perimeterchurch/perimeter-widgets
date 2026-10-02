@@ -67,7 +67,6 @@ function authStub(signedIn: boolean): AuthProvider {
 
 const config = {
   checkoutUrl: 'https://www.perimeter.org/event-checkout/',
-  returnUrl: '/events',
   idParam: 'id',
   eventId: 900001,
   invoiceParam: 'id',
@@ -513,11 +512,16 @@ describe('event-registration widget', () => {
     expect(within(done).getByText('Jen Cano')).toBeInTheDocument();
     expect(within(done).getByText('Elementary + Early Years Focus')).toBeInTheDocument();
     expect(within(done).getByText(/jen@example.com/)).toBeInTheDocument();
-    // The event cards are gone until they ask to register someone else.
+    // No buttons after "You're registered": the cards are gone until the muted
+    // "Forgot someone?" link brings them back.
+    expect(within(done).queryByRole('link', { name: 'Back to events' })).not.toBeInTheDocument();
+    expect(
+      within(done).queryByRole('button', { name: 'Register someone else' }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('region', { name: 'Student Night of Worship (Grades 6-12)' }),
     ).not.toBeInTheDocument();
-    fireEvent.click(within(done).getByRole('button', { name: 'Register someone else' }));
+    fireEvent.click(within(done).getByRole('button', { name: 'Add another family member' }));
     expect(
       screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' }),
     ).toBeInTheDocument();

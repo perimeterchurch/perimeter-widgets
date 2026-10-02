@@ -70,7 +70,6 @@ function authStub(signedIn: boolean): AuthProvider {
 
 const config = {
   checkoutUrl: 'https://www.perimeter.org/event-checkout/',
-  returnUrl: '/events',
   idParam: 'id',
   eventId: 900001,
   invoiceParam: 'id',

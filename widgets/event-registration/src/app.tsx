@@ -557,7 +557,6 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                 event={event}
                 result={completed.result}
                 contactEmail={completed.email}
-                returnUrl={config.returnUrl}
                 onRegisterMore={() => setCompleted(null)}
               />
             ) : (
