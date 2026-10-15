@@ -98,6 +98,12 @@ export function SectionCard({
     htmlToText(section.instructionsHtml) || htmlToText(section.event.meetingInstructionsHtml);
   const price = section.product ? cardPrice(section.product) : null;
   const amount = price?.kind === 'amount' ? formatMoneyParts(price.amount) : null;
+  // A free card says nothing about money (Dana, 2026-10-15): "Free · no charge"
+  // on every session was noise once the pizza order made the event paid.
+  const showPrice =
+    showPrices &&
+    price !== null &&
+    (amount !== null || (price.kind === 'free' && price.paidOptions));
   const tappable = section.open && canAdd && !editor;
   const { minorsOnly, minGrade, maxGrade } = section.audience;
   const addLabel = !minorsOnly
@@ -234,13 +240,13 @@ export function SectionCard({
         )}
       </div>
 
-      {(!section.open || (showPrices && price) || tappable) && (
+      {(!section.open || showPrice || tappable) && (
         <div className="px-4 pb-4">
           {!section.open ? (
             <p className="font-sans text-sm text-muted-fg">{closedReasonText(section, timeZone)}</p>
           ) : (
             <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
-              {showPrices && price ? (
+              {showPrice && price ? (
                 <div className="grid font-sans leading-none" data-slot="card-price">
                   {amount ? (
                     <span className="text-2xl font-bold text-fg">
@@ -250,15 +256,9 @@ export function SectionCard({
                       {amount.whole}
                       <sup className="ml-0.5 align-super text-xs font-semibold">{amount.cents}</sup>
                     </span>
-                  ) : (
-                    <span className="text-2xl font-bold text-fg">Free</span>
-                  )}
-                  <span className="mt-1 text-xs text-muted-fg">
-                    {amount
-                      ? 'per person'
-                      : price.kind === 'free' && price.paidOptions
-                        ? 'paid options available'
-                        : 'no charge'}
+                  ) : null}
+                  <span className={amount ? 'mt-1 text-xs text-muted-fg' : 'text-sm text-muted-fg'}>
+                    {amount ? 'per person' : 'Paid options available'}
                   </span>
                 </div>
               ) : (

@@ -757,7 +757,7 @@ describe('extras: the hub product as a household order', () => {
 });
 
 describe('card price', () => {
-  it('says "from $12" for a $0 base with a required paid option, and "Free · paid options available" for optional add-ons', () => {
+  it('says "from $12" for a $0 base with a required paid option, "Paid options available" for optional add-ons, and nothing when free', () => {
     const [first, second] = familyNight.sections;
     const price = (id: number, title: string, amount: number) => ({
       ...pizzaExtras.groups[0]!.prices[0]!,
@@ -812,6 +812,11 @@ describe('card price', () => {
     expect(within(meal).queryByText('Free')).not.toBeInTheDocument();
     const shirt = screen.getByRole('region', { name: second!.displayName });
     const shirtPrice = shirt.querySelector('[data-slot="card-price"]')!;
-    expect(shirtPrice.textContent?.replace(/\s+/g, '')).toBe('Freepaidoptionsavailable');
+    expect(shirtPrice.textContent?.replace(/\s+/g, '')).toBe('Paidoptionsavailable');
+    // The remaining sections are $0 with $0 options: no price block at all, no "Free".
+    const free = screen.getByRole('region', { name: familyNight.sections[2]!.displayName });
+    expect(free.querySelector('[data-slot="card-price"]')).toBeNull();
+    expect(screen.queryByText('Free')).not.toBeInTheDocument();
+    expect(screen.queryByText('no charge')).not.toBeInTheDocument();
   });
 });
