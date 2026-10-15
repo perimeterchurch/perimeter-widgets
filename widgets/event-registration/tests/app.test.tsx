@@ -1,11 +1,11 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type * as ApiHooks from '@perimeter/api-hooks';
 import type * as WidgetRuntime from '@perimeter/widget-runtime';
 import type { AuthProvider } from '@perimeter/auth';
 import { App } from '../src/app';
-import { canoHousehold, envelope, familyNight } from './fixtures';
+import { canoHousehold, envelope, familyNight, pizzaExtras } from './fixtures';
 
 /**
  * Renders the widget against the Family Night fixture with every api-hook
@@ -647,5 +647,111 @@ describe('event-registration widget', () => {
     render(<App config={config} auth={authStub(true)} />);
     expect(screen.getByText(/Your sign-in has expired/)).toBeInTheDocument();
     expect(screen.queryByText(/Unable to load this event/)).not.toBeInTheDocument();
+  });
+});
+
+describe('extras: the hub product as a household order', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('shows no extras card when the hub has no product', () => {
+    render(<App config={config} auth={authStub(true)} />);
+    expect(
+      screen.queryByRole('region', { name: 'Family Night Pizza Order' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('offers the hub product with quantities and no people picker, prices it, and lists it in the review', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    hooks.event.data = envelope({ ...familyNight, extras: pizzaExtras });
+    hooks.quote.mutate.mockImplementation(
+      (
+        plan: { extras: { productOptionPriceId: number; quantity: number }[] },
+        opts: { onSuccess: (r: { data: unknown }) => void },
+      ) => {
+        const qty = plan.extras.reduce((n, e) => n + e.quantity, 0);
+        opts.onSuccess({
+          data: {
+            eventId: 900001,
+            registrations: [],
+            extras: {
+              registrationIndex: 0,
+              sectionKey: 'extras',
+              eventId: 900001,
+              contactId: 684077,
+              attendeeName: 'Jen Cano',
+              isMinor: false,
+              lines: [
+                {
+                  kind: 'base',
+                  productId: 2099,
+                  productOptionPriceId: null,
+                  title: 'Family Night Pizza Order',
+                  quantity: 1,
+                  unitPrice: 0,
+                  lineTotal: 0,
+                  itemNote: null,
+                  depositRequested: false,
+                },
+                ...plan.extras.map((e) => ({
+                  kind: 'option' as const,
+                  productId: 2099,
+                  productOptionPriceId: e.productOptionPriceId,
+                  title: e.productOptionPriceId === 9325 ? 'Cheese' : 'Pepperoni',
+                  quantity: e.quantity,
+                  unitPrice: 12,
+                  lineTotal: 12 * e.quantity,
+                  itemNote: null,
+                  depositRequested: false,
+                })),
+              ],
+              subtotal: 12 * qty,
+              optionsSummary: 'Cheese',
+              answerSummary: null,
+              attendingOnline: false,
+              addsToGroupIds: [],
+              overlapsWithRegistrationIndexes: [],
+              resolvedOptions: [],
+            },
+            invoiceTotal: 12 * qty,
+            depositRequested: false,
+            participationStatusId: 21,
+            invoiceStatusId: 1,
+            addressRequired: true,
+            problems: [],
+            submittable: true,
+            quoteHash: 'h'.repeat(64),
+          },
+        });
+      },
+    );
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Family Night Pizza Order' });
+    // No "Who is this for?" picker: the order is the household's.
+    expect(within(card).queryByRole('checkbox', { name: /Cano/ })).not.toBeInTheDocument();
+    expect(within(card).getByText(/Large pizzas, \$12 each/)).toBeInTheDocument();
+
+    fireEvent.click(within(card).getByRole('checkbox', { name: /Cheese/ }));
+    const qty = within(card).getByLabelText(/Quantity/);
+    fireEvent.change(qty, { target: { value: '2' } });
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+    const lastPlan = hooks.quote.mutate.mock.calls.at(-1)![0] as {
+      registrations: unknown[];
+      extras: unknown[];
+    };
+    expect(lastPlan.registrations).toEqual([]);
+    expect(lastPlan.extras).toEqual([{ productOptionPriceId: 9325, quantity: 2 }]);
+
+    // The review lists the order and the submit is available with nobody registered.
+    await waitFor(() => expect(within(card).getByText('$24.00')).toBeInTheDocument());
+    const review = screen.getByRole('complementary', { name: 'Your registration' });
+    expect(within(review).getByText('Family Night Pizza Order')).toBeInTheDocument();
+    expect(within(review).getByText('Cheese × 2')).toBeInTheDocument();
+    expect(
+      within(review).getByRole('button', { name: 'Register and continue to payment' }),
+    ).toBeEnabled();
   });
 });

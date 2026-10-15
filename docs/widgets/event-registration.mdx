@@ -56,8 +56,8 @@ widget so members can sign in for the household roster:
 
 ## Behavior
 
-- **Sections** — `GET /api/registration/events/{id}` returns the parent (when it
-  has a product) and each related row in `Position` order. Each is a tappable
+- **Sections** — `GET /api/registration/events/{id}` returns each related row in
+  `Position` order (the hub itself is never a section; see **Extras**). Each is a tappable
   card whose footer is a blue "I'm Attending" button, and the whole card is its hit area
   (2026-09-22). A minors-only section with a grade range says "Add a student"; any other
   minors-only section keeps its `Button_Text` (e.g. "Add a child" for childcare), since the
@@ -66,6 +66,16 @@ widget so members can sign in for the household roster:
   Dana: tapping the card is the opt-in); `Instructions` render as the card's
   one-line summary behind "View details". Closed sections say why (not open
   yet, closed, full, cancelled, sold out) and are not tappable.
+- **Extras** (2026-10-15) — a product on the hub event itself (`event.extras`, e.g. product
+  2099 "Family Night Pizza Order") is a household order, not a session: one card after the
+  sections with the product's option groups (checkbox + quantity, exactly as a section's
+  options render) and no people picker. Quantities travel in `plan.extras`; the server prices
+  them against the purchaser in `quote.extras` and writes one participant row on the hub with
+  the invoice lines, so the kitchen counts them like any option. The review and the
+  confirmation list the order under the people; the phone summary bar names it; an order
+  with nobody registered is a valid submit. A purchaser who already holds a hub participant
+  sees the server's "already have an order" message on the card. Decided by Dana over a
+  separate child event ("noise in the database, confusing to the registering user").
 - **Section headings** (2026-09-17) — when staff fill `bp_Related_Events.Section_Group`
   ("Adults", "Kids", "Childcare"), the cards are listed under those headings, ordered by each
   group's lowest `Position`; ungrouped sections (and the hub's own section) come first with no

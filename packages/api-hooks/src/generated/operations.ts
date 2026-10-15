@@ -4,11573 +4,13003 @@
  */
 
 export interface paths {
-  '/api/auth/roles': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Returns the authenticated caller's MP security Role_IDs so sibling frontend apps can re-check authorization per request */
-    get: operations['getRoles'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Returns the authenticated caller (userId, email, isAgent, isAdmin, workspaces) for RBAC checks in sibling frontend apps */
-    get: operations['getMe'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List sermons with pagination and filtering */
-    get: operations['listSermons'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/latest': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the latest Sunday worship-service sermon with series artwork */
-    get: operations['getLatestSundaySermon'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/sermon/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get sermon detail by ID */
-    get: operations['getSermon'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/sermon/{id}/image': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get default image for a sermon */
-    get: operations['getSermonImage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/series': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List sermon series with pagination */
-    get: operations['listSeries'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/series/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get series detail with sermons */
-    get: operations['getSeriesDetail'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/series/{id}/image': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get default image for a series */
-    get: operations['getSeriesImage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/speakers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List speakers; narrows by sermon facets when provided */
-    get: operations['listSpeakers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/books': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List books referenced by sermons; narrows by sermon facets when provided */
-    get: operations['listBooks'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/service-types': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List sermon service types; narrows by sermon facets when provided */
-    get: operations['listServiceTypes'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/sermons/series-types': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List sermon series types; narrows by sermon facets when provided */
-    get: operations['listSeriesTypes'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/events': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List events by Events List for the event-finder widget */
-    get: operations['listEvents'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/event-image/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the default image for an event */
-    get: operations['getEventImage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/event-metrics': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get attendance metrics for a date range, plus optional comparison-year shifts */
-    get: operations['getEventMetrics'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/event-metrics/summary': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get pre-computed attendance summary for a Sunday */
-    get: operations['getAttendanceSummary'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/events/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get event details by ID */
-    get: operations['getEvent'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/events/{id}/participants': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List all participants for an event */
-    get: operations['getEventParticipants'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/events/{id}/actions/register': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Register a contact for an event */
-    post: operations['registerForEvent'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/member-demographics': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Annual member age-band aggregates plus Membership-by-Generation cards for the demographics dashboard */
-    get: operations['getMemberDemographics'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/member-demographics/generation-trend': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Per-year generation counts (opt-in time series) for the generations-over-time line chart */
-    get: operations['getMemberDemographicsGenerationTrend'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/member-demographics/new-by-year': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Per-year member inflow/outflow (distinct Contact_ID diff vs the prior year-end snapshot) for the Member Flow chart */
-    get: operations['getMemberDemographicsNewByYear'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/contacts': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Search contacts by name, email, or household */
-    get: operations['searchContacts'];
-    put?: never;
-    /** Create a new contact */
-    post: operations['createContact'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/contacts/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a single contact by ID */
-    get: operations['getContact'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/contacts/search': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Search contacts with enriched data (household, address, user) */
-    get: operations['searchContactsEnriched'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/contacts/actions/check-exists': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Check if a contact exists matching the provided criteria */
-    post: operations['checkContactExists'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/available': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List active instruments visible to a contact. Visibility level 5 instruments only appear when the contact has at least one taker for them. */
-    get: operations['listAvailableInstruments'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/public/results': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get public assessment results by taker GUID (no auth required) */
-    get: operations['getPublicAssessmentResults'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/takers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List assessment takers for a contact */
-    get: operations['listTakers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/{instrumentId}/questions': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get formatted assessment questions for an instrument */
-    get: operations['getQuestions'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/{instrumentId}/answers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get all answers for a taker */
-    get: operations['getAnswers'];
-    put?: never;
-    /** Submit answers for a taker (automatically creates or updates) */
-    post: operations['submitAnswers'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/{instrumentId}/results': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get assessment results (dimension scores and metadata) */
-    get: operations['getResults'];
-    put?: never;
-    /** Calculate assessment dimensions and mark taker as complete */
-    post: operations['calculateResults'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/{instrumentId}/takers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get or create a taker for a contact and instrument, with metadata */
-    get: operations['getOrCreateTaker'];
-    put?: never;
-    /** Create a new taker. Rejects 409 if user has an Incomplete taker for this instrument, or if instrument is not repeatable and a Complete taker exists. */
-    post: operations['createNewTaker'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/{instrumentId}/instrument': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a single instrument by ID (no totalAnswerable enrichment). Used by the assessments app for the ?new=true deep-link splash fallback. */
-    get: operations['getInstrument'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/by-slug/{slug}/instrument': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Resolve an active instrument by its URL_Slug. Backs the assessments app generic dynamic survey route (/forms/[slug]); 404 when no active instrument carries the slug. */
-    get: operations['getInstrumentBySlug'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/{instrumentId}/answers/files': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List files attached to a (taker, question) answer. The taker is supplied via the x-taker-id header and the question via x-question-id. */
-    get: operations['listAnswerFiles'];
-    put?: never;
-    /** Upload one or more files to a (taker, question) answer (multipart/form-data). Ensures the answer row exists. Taker via x-taker-id header, question via x-question-id. */
-    post: operations['uploadAnswerFiles'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/{instrumentId}/answers/files/{fileId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete a file from a (taker, question) answer; deletes the answer row too if it is left empty. Taker via x-taker-id header, question via x-question-id. */
-    delete: operations['deleteAnswerFile'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Admin gate check: 200 when the caller holds the MP assessment-admin role, 403 otherwise */
-    get: operations['getAssessmentAdminMe'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/overview': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Dashboard aggregates: per-instrument completed/in-progress counts, completion rates, distinct people, and active assessments */
-    get: operations['getAssessmentAdminOverview'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/people': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Respondent browser: everyone with at least one non-archived taker, name-sorted. `q` searches only within the respondent set; paging applies after filtering. */
-    get: operations['listAssessmentAdminPeople'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/people/{contactId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** One respondent's full picture: every attempt across instruments, Archived included (so archived attempts can be Restored). 404 when the contact has no takers at all, archived included. */
-    get: operations['getAssessmentAdminPerson'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/instruments/{id}/takers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Paginated roster of attempts for one instrument, enriched with contact name/email. `q` filters the full attempt set before paging; totalCount is then the post-filter match total. */
-    get: operations['getAssessmentAdminInstrumentRoster'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/instruments/{id}/gift-distribution': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Dominant-gift distribution for a scored instrument: each completed taker's top dimension, tallied */
-    get: operations['getAssessmentAdminGiftDistribution'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/instruments/{id}/export': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Stream the roster or flattened-answers CSV for one instrument (text/csv attachment). The answers export omits non-reviewable questions (Assessment_Questions.Reviewable = false) entirely. Rate-limited; 429 when another export is already running for this admin. */
-    get: operations['exportAssessmentAdminCsv'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/takers/{takerId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Submission viewer payload: the taker plus its dimensions, answers, and question metadata. Non-reviewable questions (Assessment_Questions.Reviewable = false) and their answers are omitted, and groups left empty are dropped. Reading answers emits an admin audit record. */
-    get: operations['getAssessmentAdminTakerDetail'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/takers/{takerId}/reset': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Reset a taker back to Incomplete (clears End_Date) so the person can retake. Returns the updated taker. */
-    post: operations['resetAssessmentAdminTaker'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/takers/{takerId}/archive': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Archive a taker (status 3, reversible soft-delete), removing it from admin aggregates and the taking-app active-taker lookup. Returns the updated taker. */
-    post: operations['archiveAssessmentAdminTaker'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/takers/{takerId}/restore': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Restore an archived taker to Complete/Incomplete (by End_Date). Returns the updated taker. */
-    post: operations['restoreAssessmentAdminTaker'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/takers/{takerId}/files': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Admin override of the owner file-list route: lists the files attached to a (taker, question) answer for any taker. The question id is supplied via the x-question-id header. */
-    get: operations['listAssessmentAdminAnswerFiles'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/assessments/admin/takers/{takerId}/files/{fileId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Admin override of the owner file-download route: downloads a single file from a (taker, question) answer for any taker. The question id is supplied via the x-question-id header. */
-    get: operations['downloadAssessmentAdminAnswerFile'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the currently authenticated user profile */
-    get: operations['getCurrentUser'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a user by ID */
-    get: operations['getUser'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update a user */
-    patch: operations['updateUser'];
-    trace?: never;
-  };
-  '/api/giving/pledges': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Create a new giving pledge */
-    post: operations['createPledge'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/giving/history': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the authenticated user's household giving history */
-    get: operations['getGivingHistory'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/shepherds': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Returns the authenticated user's currently assigned shepherds/elders (active Shepherd_Household_Assignments rows plus the household's deacon/shepherdess) */
-    get: operations['getShepherds'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/mission-trips': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List GO Journey mission trips for the mission-trip-finder widget */
-    get: operations['listMissionTrips'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/mission-trips/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get one GO Journey mission trip with its team roster */
-    get: operations['getMissionTrip'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/mission-trips/{id}/participant/{pledgeId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a trip participant's letter and fundraising progress */
-    get: operations['getMissionTripParticipant'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/mission-trips/{id}/participant/{pledgeId}/image': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a trip participant's profile photo */
-    get: operations['getMissionTripParticipantPhoto'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/missions/my-trips': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the authenticated member's own mission trips */
-    get: operations['getMyMissionTrips'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/missions/my-trips/{pledgeId}/letter': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** Replace one pledge's support letter */
-    put: operations['saveMissionLetter'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/community-groups': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List community groups for the community-group-finder widget */
-    get: operations['listCommunityGroups'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/community-groups/facets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List filter options for the community-group-finder widget */
-    get: operations['listCommunityGroupFacets'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/group-image/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the default image for a group */
-    get: operations['getGroupImage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/staff-contact/{guid}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a staff member (by Contact GUID) for the staff-contact widget */
-    get: operations['getStaffContactMember'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/staff-contact/{guid}/photo': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a staff member's photo for the staff-contact widget */
-    get: operations['getStaffContactPhoto'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/staff-contact': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Send a message to a staff member via the staff-contact widget */
-    post: operations['submitStaffContact'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/staff-directory': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List staff for the staff-directory widget */
-    get: operations['listStaffDirectory'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/staff-directory/facets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List filter options for the staff-directory widget */
-    get: operations['listStaffDirectoryFacets'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/prayer-wall/requests': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List staff-approved, publicly shared prayer requests from the last 60 days */
-    get: operations['listPrayerRequests'];
-    put?: never;
-    /** Submit a prayer or praise request (pending staff approval before it appears) */
-    post: operations['submitPrayerRequest'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/prayer-wall/requests/{id}/prayer': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Record that someone prayed for a request ("I Prayed") */
-    post: operations['recordPrayerForRequest'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/prayer-wall/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the signed-in caller's name for the prayer-wall form's "Me" field */
-    get: operations['getPrayerWallIdentity'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/registration/events/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Event details plus registration sections (parent + bp_Related_Events) with products, availability and form fields */
-    get: operations['getRegistrationEvent'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/registration/events/{id}/roster': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** The signed-in viewer's primary household with per-section eligibility */
-    get: operations['getRegistrationRoster'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/registration/events/{id}/quote': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Price a registration plan without writing anything */
-    post: operations['quoteRegistration'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/registration/events/{id}/submit': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Write a registration plan to MP as the native widget would (or report it with dryRun); requires an Idempotency-Key UUID header */
-    post: operations['submitRegistration'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/org-chart': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the staff reporting tree */
-    get: operations['getOrgChart'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/invoices/{guid}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get invoice details by GUID (public, no auth required) */
-    get: operations['getInvoice'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/info': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the running build's version and deployment identity */
-    get: operations['getInfo'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get overall health status for all services */
-    get: operations['getOverallHealth'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/health/services/{service}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get health status for a specific service */
-    get: operations['getServiceHealth'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/health/services/{service}/actions/check': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Force a fresh health check for a specific service */
-    post: operations['runHealthCheck'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/mail/folders': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List mail folders from the helpdesk Graph mailbox */
-    get: operations['listMailFolders'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/mail/messages': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List messages from the helpdesk Graph mailbox */
-    get: operations['listMailMessages'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/mail/messages/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a single message by ID */
-    get: operations['getMailMessage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/mail/messages/{id}/attachments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List attachments for a message */
-    get: operations['listMailMessageAttachments'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/mail/messages/{id}/actions/ingest': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Manually ingest a Graph email into the helpdesk system */
-    post: operations['ingestMailMessage'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/subscriptions': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List all subscriptions with calculated status */
-    get: operations['listGraphSubscriptions'];
-    put?: never;
-    /** Create a new Graph webhook subscription */
-    post: operations['createGraphSubscription'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/subscriptions/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a specific subscription by ID */
-    get: operations['getGraphSubscription'];
-    put?: never;
-    post?: never;
-    /** Delete a subscription by ID */
-    delete: operations['deleteGraphSubscription'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/subscriptions/{id}/actions/renew': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Renew a subscription by ID */
-    post: operations['renewGraphSubscription'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/subscriptions/config': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get subscription configuration */
-    get: operations['getGraphSubscriptionConfig'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/subscriptions/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Check subscription health by comparing notifications to inbox activity */
-    get: operations['getGraphSubscriptionHealth'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/notifications': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List notification log entries with optional filters */
-    get: operations['listGraphNotifications'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/notifications/metrics': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get aggregated notification metrics */
-    get: operations['getGraphNotificationMetrics'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/notifications/lifecycle': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List lifecycle event log entries with optional filters */
-    get: operations['listGraphLifecycleEvents'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/notifications/dead-letter': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List all dead-letter queue entries */
-    get: operations['listGraphDeadLetterEntries'];
-    put?: never;
-    post?: never;
-    /** Remove a single dead-letter entry */
-    delete: operations['removeGraphDeadLetterEntry'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/graph/notifications/actions/retry': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Retry dead-letter entries (single by ID or all non-exhausted) */
-    post: operations['retryGraphNotifications'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List tickets with filters and pagination */
-    get: operations['listTickets'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get ticket with conversations */
-    get: operations['getTicket'];
-    put?: never;
-    post?: never;
-    /** Delete ticket with cascade */
-    delete: operations['deleteTicket'];
-    options?: never;
-    head?: never;
-    /** Update a ticket */
-    patch: operations['updateTicket'];
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/actions/search': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Advanced search with filters, sorting, and pagination */
-    post: operations['searchTickets'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/actions/bulk-update': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Bulk update multiple tickets */
-    post: operations['bulkUpdateTickets'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/actions/bulk-delete': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Bulk delete multiple tickets */
-    post: operations['bulkDeleteTickets'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}/actions/reply': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Reply to a ticket via email */
-    post: operations['replyToTicket'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}/actions/note': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add an internal note to a ticket */
-    post: operations['addInternalNote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}/actions/resync': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Resync a single ticket from email source */
-    post: operations['resyncTicket'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}/contacts/search': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Search contacts matching the ticket submitter email */
-    get: operations['searchTicketContacts'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}/contacts/actions/assign': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Assign a contact to a ticket */
-    post: operations['assignContactToTicket'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}/conversations/{conversationId}/actions/forward': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Forward a conversation to external email addresses */
-    post: operations['forwardConversation'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/tickets/{id}/conversations/{conversationId}/actions/retry-send': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Retry sending a failed email for a conversation */
-    post: operations['retrySendConversation'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/admin/stats': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get aggregated admin dashboard stats with trends and user performance */
-    get: operations['getHelpdeskStats'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/admin/stale-tickets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get tickets exceeding staleness thresholds */
-    get: operations['getStaleTickets'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/admin/actions/clear-cache': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Clear all helpdesk system caches */
-    post: operations['clearHelpdeskCache'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/actions/rebuild': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Run a full helpdesk email rebuild */
-    post: operations['runRebuild'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/actions/rebuild-audit': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Query rebuild audit logs (runs, run detail, or entries) */
-    get: operations['getRebuildAudit'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/agents': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List helpdesk agents, optionally filtered by workspace */
-    get: operations['listAgents'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/agents/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the current user agent profile */
-    get: operations['getCurrentAgent'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/agents/me/signature': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update the current agent email signature */
-    patch: operations['updateSignature'];
-    trace?: never;
-  };
-  '/api/helpdesk/agents/me/signature/images': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Upload an image for the agent email signature */
-    post: operations['uploadSignatureImage'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/conversations/{conversationId}/attachments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List attachments for a conversation */
-    get: operations['listConversationAttachments'];
-    put?: never;
-    /** Upload attachments to a conversation */
-    post: operations['uploadAttachments'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/groups': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List all active helpdesk groups */
-    get: operations['listGroups'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/users': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List users with the helpdesk role */
-    get: operations['listHelpdeskUsers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/helpdesk/workspaces': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List all active helpdesk workspaces */
-    get: operations['listWorkspaces'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/kb/articles': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Browse and keyword-search knowledge base articles */
-    get: operations['listKbArticles'];
-    put?: never;
-    /** Create a knowledge base article */
-    post: operations['createKbArticle'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/kb/articles/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a single knowledge base article (Markdown body) */
-    get: operations['getKbArticle'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Edit, publish, or archive an article */
-    patch: operations['updateKbArticle'];
-    trace?: never;
-  };
-  '/api/kb/me/capabilities': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Resolve the current user's KB capabilities */
-    get: operations['getKbCapabilities'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/kb/categories': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List knowledge base categories */
-    get: operations['listKbCategories'];
-    put?: never;
-    /** Create a category (admin only) */
-    post: operations['createKbCategory'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/kb/categories/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update a category (admin only) */
-    patch: operations['updateKbCategory'];
-    trace?: never;
-  };
-  '/api/kb/permissions': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List KB role assignments (admin only) */
-    get: operations['listKbPermissions'];
-    put?: never;
-    /** Grant a KB role to a contact (admin only) */
-    post: operations['createKbPermission'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/kb/intake': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Submit a knowledge capture session from any channel (queued for AI processing) */
-    post: operations['submitKbCapture'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/kb/intake/{draftId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a capture draft (submitter, assigned steward, or admin only) */
-    get: operations['getKbDraft'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/kb/intake/{draftId}/attachments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Upload media binaries for a capture draft (filename-matched to declared media) */
-    post: operations['uploadKbCaptureMedia'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/auth/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns the authenticated caller's MP security Role_IDs so sibling frontend apps can re-check authorization per request */
+        get: operations["getRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns the authenticated caller (userId, email, isAgent, isAdmin, workspaces) for RBAC checks in sibling frontend apps */
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List sermons with pagination and filtering */
+        get: operations["listSermons"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the latest Sunday worship-service sermon with series artwork */
+        get: operations["getLatestSundaySermon"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/sermon/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get sermon detail by ID */
+        get: operations["getSermon"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/sermon/{id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get default image for a sermon */
+        get: operations["getSermonImage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List sermon series with pagination */
+        get: operations["listSeries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/series/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get series detail with sermons */
+        get: operations["getSeriesDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/series/{id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get default image for a series */
+        get: operations["getSeriesImage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/speakers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List speakers; narrows by sermon facets when provided */
+        get: operations["listSpeakers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/books": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List books referenced by sermons; narrows by sermon facets when provided */
+        get: operations["listBooks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/service-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List sermon service types; narrows by sermon facets when provided */
+        get: operations["listServiceTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sermons/series-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List sermon series types; narrows by sermon facets when provided */
+        get: operations["listSeriesTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List events by Events List for the event-finder widget */
+        get: operations["listEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/event-image/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the default image for an event */
+        get: operations["getEventImage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/event-metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get attendance metrics for a date range, plus optional comparison-year shifts */
+        get: operations["getEventMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/event-metrics/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get pre-computed attendance summary for a Sunday */
+        get: operations["getAttendanceSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get event details by ID */
+        get: operations["getEvent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/{id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all participants for an event */
+        get: operations["getEventParticipants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/{id}/actions/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register a contact for an event */
+        post: operations["registerForEvent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/member-demographics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Annual member age-band aggregates plus Membership-by-Generation cards for the demographics dashboard */
+        get: operations["getMemberDemographics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/member-demographics/generation-trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per-year generation counts (opt-in time series) for the generations-over-time line chart */
+        get: operations["getMemberDemographicsGenerationTrend"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/member-demographics/new-by-year": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per-year member inflow/outflow (distinct Contact_ID diff vs the prior year-end snapshot) for the Member Flow chart */
+        get: operations["getMemberDemographicsNewByYear"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search contacts by name, email, or household */
+        get: operations["searchContacts"];
+        put?: never;
+        /** Create a new contact */
+        post: operations["createContact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contacts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single contact by ID */
+        get: operations["getContact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contacts/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search contacts with enriched data (household, address, user) */
+        get: operations["searchContactsEnriched"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contacts/actions/check-exists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check if a contact exists matching the provided criteria */
+        post: operations["checkContactExists"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/available": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active instruments visible to a contact. Visibility level 5 instruments only appear when the contact has at least one taker for them. */
+        get: operations["listAvailableInstruments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/public/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get public assessment results by taker GUID (no auth required) */
+        get: operations["getPublicAssessmentResults"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/takers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List assessment takers for a contact */
+        get: operations["listTakers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/{instrumentId}/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get formatted assessment questions for an instrument */
+        get: operations["getQuestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/{instrumentId}/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all answers for a taker */
+        get: operations["getAnswers"];
+        put?: never;
+        /** Submit answers for a taker (automatically creates or updates) */
+        post: operations["submitAnswers"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/{instrumentId}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get assessment results (dimension scores and metadata) */
+        get: operations["getResults"];
+        put?: never;
+        /** Calculate assessment dimensions and mark taker as complete */
+        post: operations["calculateResults"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/{instrumentId}/takers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get or create a taker for a contact and instrument, with metadata */
+        get: operations["getOrCreateTaker"];
+        put?: never;
+        /** Create a new taker. Rejects 409 if user has an Incomplete taker for this instrument, or if instrument is not repeatable and a Complete taker exists. */
+        post: operations["createNewTaker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/{instrumentId}/instrument": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single instrument by ID (no totalAnswerable enrichment). Used by the assessments app for the ?new=true deep-link splash fallback. */
+        get: operations["getInstrument"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/by-slug/{slug}/instrument": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resolve an active instrument by its URL_Slug. Backs the assessments app generic dynamic survey route (/forms/[slug]); 404 when no active instrument carries the slug. */
+        get: operations["getInstrumentBySlug"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/{instrumentId}/answers/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List files attached to a (taker, question) answer. The taker is supplied via the x-taker-id header and the question via x-question-id. */
+        get: operations["listAnswerFiles"];
+        put?: never;
+        /** Upload one or more files to a (taker, question) answer (multipart/form-data). Ensures the answer row exists. Taker via x-taker-id header, question via x-question-id. */
+        post: operations["uploadAnswerFiles"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/{instrumentId}/answers/files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a file from a (taker, question) answer; deletes the answer row too if it is left empty. Taker via x-taker-id header, question via x-question-id. */
+        delete: operations["deleteAnswerFile"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin gate check: 200 when the caller holds the MP assessment-admin role, 403 otherwise */
+        get: operations["getAssessmentAdminMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dashboard aggregates: per-instrument completed/in-progress counts, completion rates, distinct people, and active assessments */
+        get: operations["getAssessmentAdminOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Respondent browser: everyone with at least one non-archived taker, name-sorted. `q` searches only within the respondent set; paging applies after filtering. */
+        get: operations["listAssessmentAdminPeople"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/people/{contactId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One respondent's full picture: every attempt across instruments, Archived included (so archived attempts can be Restored). 404 when the contact has no takers at all, archived included. */
+        get: operations["getAssessmentAdminPerson"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/instruments/{id}/takers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Paginated roster of attempts for one instrument, enriched with contact name/email. `q` filters the full attempt set before paging; totalCount is then the post-filter match total. */
+        get: operations["getAssessmentAdminInstrumentRoster"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/instruments/{id}/gift-distribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dominant-gift distribution for a scored instrument: each completed taker's top dimension, tallied */
+        get: operations["getAssessmentAdminGiftDistribution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/instruments/{id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream the roster or flattened-answers CSV for one instrument (text/csv attachment). The answers export omits non-reviewable questions (Assessment_Questions.Reviewable = false) entirely. Rate-limited; 429 when another export is already running for this admin. */
+        get: operations["exportAssessmentAdminCsv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/takers/{takerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Submission viewer payload: the taker plus its dimensions, answers, and question metadata. Non-reviewable questions (Assessment_Questions.Reviewable = false) and their answers are omitted, and groups left empty are dropped. Reading answers emits an admin audit record. */
+        get: operations["getAssessmentAdminTakerDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/takers/{takerId}/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset a taker back to Incomplete (clears End_Date) so the person can retake. Returns the updated taker. */
+        post: operations["resetAssessmentAdminTaker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/takers/{takerId}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a taker (status 3, reversible soft-delete), removing it from admin aggregates and the taking-app active-taker lookup. Returns the updated taker. */
+        post: operations["archiveAssessmentAdminTaker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/takers/{takerId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived taker to Complete/Incomplete (by End_Date). Returns the updated taker. */
+        post: operations["restoreAssessmentAdminTaker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/takers/{takerId}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin override of the owner file-list route: lists the files attached to a (taker, question) answer for any taker. The question id is supplied via the x-question-id header. */
+        get: operations["listAssessmentAdminAnswerFiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assessments/admin/takers/{takerId}/files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin override of the owner file-download route: downloads a single file from a (taker, question) answer for any taker. The question id is supplied via the x-question-id header. */
+        get: operations["downloadAssessmentAdminAnswerFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the currently authenticated user profile */
+        get: operations["getCurrentUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user by ID */
+        get: operations["getUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a user */
+        patch: operations["updateUser"];
+        trace?: never;
+    };
+    "/api/giving/pledges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new giving pledge */
+        post: operations["createPledge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/giving/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated user's household giving history */
+        get: operations["getGivingHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shepherds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns the authenticated user's currently assigned shepherds/elders (active Shepherd_Household_Assignments rows plus the household's deacon/shepherdess) */
+        get: operations["getShepherds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shepherds/me/flock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns the authenticated shepherd's own flock — the households on an active Shepherd_Household_Assignments row, with heads of household and shepherding-note recency. 404s when the user has no active shepherd record. */
+        get: operations["getMyFlock"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shepherds/me/flock/{householdId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns one household's family detail — members with demographics, address, area pastor, shepherd, deacon, shepherdess, and shepherding-note history. Scoped to the caller's own flock: a household they are not actively assigned to 404s exactly as a nonexistent one does. */
+        get: operations["getMyFlockHousehold"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shepherds/me/flock/{householdId}/members/{contactId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns one household member's profile — demographics, contact details, current groups, milestones, and prayer/pastoral-care requests. Scoped twice: the household must be one the caller actively shepherds, and the contact must live in it. Every failure returns the same 404. */
+        get: operations["getMyFlockHouseholdMember"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shepherds/me/flock/{householdId}/caregivers/{contactId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns one of a household's caregivers — area pastor, shepherd, deacon or shepherdess — as a contact card: name, photo, mobile phone and email. Scoped twice: the household must be one the caller actively shepherds, and the contact must be one of its caregivers. Every failure returns the same 404. */
+        get: operations["getMyFlockHouseholdCaregiver"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shepherds/me/flock/{householdId}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Files a shepherding note against one household of the caller's flock, as the caller's own shepherd record and stamped with the current time. Covers New Note and the change requests (household update, membership status change, flock change), which are notes of a fixed type. A household the caller is not actively assigned to 404s exactly as a nonexistent one does; note text containing HTML is refused with 400. */
+        post: operations["fileMyFlockHouseholdNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/school/contacts/{contactId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** School sync: set approved contact fields, each checked against the value reviewed (Perimeter Sync's x-school-sync-key) */
+        patch: operations["schoolUpdateContact"];
+        trace?: never;
+    };
+    "/api/school/households/{householdId}/address": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** School sync: set a household's address, or create one (Perimeter Sync's x-school-sync-key) */
+        put: operations["schoolUpdateHouseholdAddress"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/school/participation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** School sync: add a contact to PCS Students or PCS Parents (Perimeter Sync's x-school-sync-key) */
+        post: operations["schoolJoinGroup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/school/participation/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** School sync: end-date a contact's PCS Students or PCS Parents membership (Perimeter Sync's x-school-sync-key) */
+        post: operations["schoolLeaveGroup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/school/links/{schoolPersonId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** School sync: point an existing School_People link at the right contact, or none (Perimeter Sync's x-school-sync-key) */
+        patch: operations["schoolRepointLink"];
+        trace?: never;
+    };
+    "/api/school/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** School sync: create somebody FACTS has and MP does not -- household, contact, participant, PCS group, link (Perimeter Sync's x-school-sync-key) */
+        post: operations["schoolCreatePerson"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/school/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** School sync: link a FACTS person to a contact in School_People (Perimeter Sync's x-school-sync-key) */
+        post: operations["schoolCreateLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mission-trips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List GO Journey mission trips for the mission-trip-finder widget */
+        get: operations["listMissionTrips"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mission-trips/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one GO Journey mission trip with its team roster */
+        get: operations["getMissionTrip"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mission-trips/{id}/participant/{pledgeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a trip participant's letter and fundraising progress */
+        get: operations["getMissionTripParticipant"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mission-trips/{id}/participant/{pledgeId}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a trip participant's profile photo */
+        get: operations["getMissionTripParticipantPhoto"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/missions/my-trips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated member's own mission trips */
+        get: operations["getMyMissionTrips"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/missions/my-trips/{pledgeId}/letter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace one pledge's support letter */
+        put: operations["saveMissionLetter"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/community-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List community groups for the community-group-finder widget */
+        get: operations["listCommunityGroups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/community-groups/facets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List filter options for the community-group-finder widget */
+        get: operations["listCommunityGroupFacets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/group-image/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the default image for a group */
+        get: operations["getGroupImage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/staff-contact/{guid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a staff member (by Contact GUID) for the staff-contact widget */
+        get: operations["getStaffContactMember"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/staff-contact/{guid}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a staff member's photo for the staff-contact widget */
+        get: operations["getStaffContactPhoto"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/staff-contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a message to a staff member via the staff-contact widget */
+        post: operations["submitStaffContact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/staff-directory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List staff for the staff-directory widget */
+        get: operations["listStaffDirectory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/staff-directory/facets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List filter options for the staff-directory widget */
+        get: operations["listStaffDirectoryFacets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prayer-wall/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List staff-approved, publicly shared prayer requests from the last 60 days */
+        get: operations["listPrayerRequests"];
+        put?: never;
+        /** Submit a prayer or praise request (pending staff approval before it appears) */
+        post: operations["submitPrayerRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prayer-wall/requests/{id}/prayer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record that someone prayed for a request ("I Prayed") */
+        post: operations["recordPrayerForRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prayer-wall/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the signed-in caller's name for the prayer-wall form's "Me" field */
+        get: operations["getPrayerWallIdentity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/registration/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Event details plus registration sections (parent + bp_Related_Events) with products, availability and form fields */
+        get: operations["getRegistrationEvent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/registration/events/{id}/roster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The signed-in viewer's primary household with per-section eligibility */
+        get: operations["getRegistrationRoster"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/registration/events/{id}/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Price a registration plan without writing anything */
+        post: operations["quoteRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/registration/events/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Write a registration plan to MP as the native widget would (or report it with dryRun); requires an Idempotency-Key UUID header */
+        post: operations["submitRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org-chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the staff reporting tree */
+        get: operations["getOrgChart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/invoices/{guid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get invoice details by GUID (public, no auth required) */
+        get: operations["getInvoice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the running build's version and deployment identity */
+        get: operations["getInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get overall health status for all services */
+        get: operations["getOverallHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/health/services/{service}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get health status for a specific service */
+        get: operations["getServiceHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/health/services/{service}/actions/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Force a fresh health check for a specific service */
+        post: operations["runHealthCheck"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/mail/folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List mail folders from the helpdesk Graph mailbox */
+        get: operations["listMailFolders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/mail/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List messages from the helpdesk Graph mailbox */
+        get: operations["listMailMessages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/mail/messages/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single message by ID */
+        get: operations["getMailMessage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/mail/messages/{id}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List attachments for a message */
+        get: operations["listMailMessageAttachments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/mail/messages/{id}/actions/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Manually ingest a Graph email into the helpdesk system */
+        post: operations["ingestMailMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all subscriptions with calculated status */
+        get: operations["listGraphSubscriptions"];
+        put?: never;
+        /** Create a new Graph webhook subscription */
+        post: operations["createGraphSubscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/subscriptions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a specific subscription by ID */
+        get: operations["getGraphSubscription"];
+        put?: never;
+        post?: never;
+        /** Delete a subscription by ID */
+        delete: operations["deleteGraphSubscription"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/subscriptions/{id}/actions/renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renew a subscription by ID */
+        post: operations["renewGraphSubscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/subscriptions/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get subscription configuration */
+        get: operations["getGraphSubscriptionConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/subscriptions/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check subscription health by comparing notifications to inbox activity */
+        get: operations["getGraphSubscriptionHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List notification log entries with optional filters */
+        get: operations["listGraphNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/notifications/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get aggregated notification metrics */
+        get: operations["getGraphNotificationMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/notifications/lifecycle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List lifecycle event log entries with optional filters */
+        get: operations["listGraphLifecycleEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/notifications/dead-letter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all dead-letter queue entries */
+        get: operations["listGraphDeadLetterEntries"];
+        put?: never;
+        post?: never;
+        /** Remove a single dead-letter entry */
+        delete: operations["removeGraphDeadLetterEntry"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/graph/notifications/actions/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry dead-letter entries (single by ID or all non-exhausted) */
+        post: operations["retryGraphNotifications"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tickets with filters and pagination */
+        get: operations["listTickets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get ticket with conversations */
+        get: operations["getTicket"];
+        put?: never;
+        post?: never;
+        /** Delete ticket with cascade */
+        delete: operations["deleteTicket"];
+        options?: never;
+        head?: never;
+        /** Update a ticket */
+        patch: operations["updateTicket"];
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/actions/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Advanced search with filters, sorting, and pagination */
+        post: operations["searchTickets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/actions/bulk-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bulk update multiple tickets */
+        post: operations["bulkUpdateTickets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/actions/bulk-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bulk delete multiple tickets */
+        post: operations["bulkDeleteTickets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}/actions/reply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reply to a ticket via email */
+        post: operations["replyToTicket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}/actions/note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an internal note to a ticket */
+        post: operations["addInternalNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}/actions/resync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Describe what a single-ticket resync does on this API (static; older APIs answer 405) */
+        get: operations["getResyncMode"];
+        put?: never;
+        /** Resync a single ticket from email source */
+        post: operations["resyncTicket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}/contacts/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search contacts matching the ticket submitter email */
+        get: operations["searchTicketContacts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}/contacts/actions/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assign a contact to a ticket */
+        post: operations["assignContactToTicket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}/conversations/{conversationId}/actions/forward": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Forward a conversation to external email addresses */
+        post: operations["forwardConversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/tickets/{id}/conversations/{conversationId}/actions/retry-send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry sending a failed email for a conversation */
+        post: operations["retrySendConversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/admin/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get aggregated admin dashboard stats with trends and user performance */
+        get: operations["getHelpdeskStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/admin/stale-tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get tickets exceeding staleness thresholds */
+        get: operations["getStaleTickets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/admin/actions/clear-cache": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear all helpdesk system caches */
+        post: operations["clearHelpdeskCache"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/actions/rebuild": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run a full helpdesk email rebuild */
+        post: operations["runRebuild"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/actions/rebuild-audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Query rebuild audit logs (runs, run detail, or entries) */
+        get: operations["getRebuildAudit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List helpdesk agents, optionally filtered by workspace */
+        get: operations["listAgents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/agents/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the current user agent profile */
+        get: operations["getCurrentAgent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/agents/me/signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update the current agent email signature */
+        patch: operations["updateSignature"];
+        trace?: never;
+    };
+    "/api/helpdesk/agents/me/signature/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload an image for the agent email signature */
+        post: operations["uploadSignatureImage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/conversations/{conversationId}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List attachments for a conversation */
+        get: operations["listConversationAttachments"];
+        put?: never;
+        /** Upload attachments to a conversation */
+        post: operations["uploadAttachments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all active helpdesk groups */
+        get: operations["listGroups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List users with the helpdesk role */
+        get: operations["listHelpdeskUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/helpdesk/workspaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all active helpdesk workspaces */
+        get: operations["listWorkspaces"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kb/articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Browse and keyword-search knowledge base articles */
+        get: operations["listKbArticles"];
+        put?: never;
+        /** Create a knowledge base article */
+        post: operations["createKbArticle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kb/articles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single knowledge base article (Markdown body) */
+        get: operations["getKbArticle"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit, publish, or archive an article */
+        patch: operations["updateKbArticle"];
+        trace?: never;
+    };
+    "/api/kb/me/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resolve the current user's KB capabilities */
+        get: operations["getKbCapabilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kb/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List knowledge base categories */
+        get: operations["listKbCategories"];
+        put?: never;
+        /** Create a category (admin only) */
+        post: operations["createKbCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kb/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a category (admin only) */
+        patch: operations["updateKbCategory"];
+        trace?: never;
+    };
+    "/api/kb/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List KB role assignments (admin only) */
+        get: operations["listKbPermissions"];
+        put?: never;
+        /** Grant a KB role to a contact (admin only) */
+        post: operations["createKbPermission"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kb/intake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit a knowledge capture session from any channel (staff only; queued for AI processing) */
+        post: operations["submitKbCapture"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kb/intake/{draftId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a capture draft (staff only; submitter, assigned steward, or admin) */
+        get: operations["getKbDraft"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kb/intake/{draftId}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload media binaries for a capture draft (staff only; filename-matched to declared media) */
+        post: operations["uploadKbCaptureMedia"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/retrieval/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Permission-scoped semantic search (KB articles). Dependency outages return 200 with degraded=true and an errorCode */
+        post: operations["searchRetrieval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/retrieval/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record an outcome event (result opened, vote, draft accepted, ...) on a retrieval issued to the caller */
+        post: operations["recordRetrievalEvent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    ApiErrorBody: {
-      /** @constant */
-      success: false;
-      error: {
-        code: string;
-        message: string;
-        details?: unknown;
-      };
+    schemas: {
+        ApiErrorBody: {
+            /** @constant */
+            success: false;
+            error: {
+                code: string;
+                message: string;
+                details?: unknown;
+            };
+        };
     };
-  };
-  responses: {
-    /** @description Validation error */
-    BadRequest: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ApiErrorBody'];
-      };
+    responses: {
+        /** @description Validation error */
+        BadRequest: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ApiErrorBody"];
+            };
+        };
+        /** @description Missing or invalid authentication */
+        Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ApiErrorBody"];
+            };
+        };
+        /** @description Insufficient permissions */
+        Forbidden: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ApiErrorBody"];
+            };
+        };
+        /** @description Resource not found */
+        NotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ApiErrorBody"];
+            };
+        };
+        /** @description Internal server error */
+        InternalError: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ApiErrorBody"];
+            };
+        };
     };
-    /** @description Missing or invalid authentication */
-    Unauthorized: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ApiErrorBody'];
-      };
-    };
-    /** @description Insufficient permissions */
-    Forbidden: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ApiErrorBody'];
-      };
-    };
-    /** @description Resource not found */
-    NotFound: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ApiErrorBody'];
-      };
-    };
-    /** @description Internal server error */
-    InternalError: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ApiErrorBody'];
-      };
-    };
-  };
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  getRoles: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            /** @description Authenticated caller's MinistryPlatform security Role_IDs from dp_User_Roles, for apps gating on MP's own role model */
-            data: {
-              userId: number;
-              roleIds: number[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMe: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            /** @description Authenticated caller identity with helpdesk agent + admin status sourced from Helpdesk_Agents and Helpdesk_Agent_Workspaces */
-            data: {
-              userId: number;
-              email: string;
-              isAgent: boolean;
-              isAdmin: boolean;
-              workspaces: {
-                agentWorkspaceID: number;
-                workspaceID: number;
-                agentID: number;
-                isAdmin: boolean;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listSermons: {
-    parameters: {
-      query?: {
-        search?: string;
-        seriesId?: string;
-        speakerId?: string;
-        bookId?: string;
-        congregationId?: number;
-        serviceTypeId?: string;
-        seriesTypeId?: string;
-        from?: string;
-        to?: string;
-        page?: number;
-        perPage?: number;
-        sort?: 'date' | 'title';
-        order?: 'asc' | 'desc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              sermons: {
-                id: number;
-                title: string;
-                subtitle: string | null;
-                shortDescription: string | null;
-                date: string;
-                bannerUrl: string | null;
-                speaker: {
-                  id: number;
-                  name: string;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                series: {
-                  id: number;
-                  title: string;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        /** @description Authenticated caller's MinistryPlatform security Role_IDs from dp_User_Roles, for apps gating on MP's own role model */
+                        data: {
+                            userId: number;
+                            roleIds: number[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                congregation: {
-                  id: number;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                book: {
-                  id: number;
-                  name: string;
-                } | null;
-              }[];
-              pagination: {
-                page: number;
-                perPage: number;
-                total: number;
-                totalPages: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getLatestSundaySermon: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              title: string;
-              subtitle: string | null;
-              shortDescription: string | null;
-              date: string;
-              bannerUrl: string | null;
-              speaker: {
-                id: number;
-                name: string;
-                bio: string | null;
-              };
-              series: {
-                id: number;
-                title: string;
-              };
-              congregation: {
-                id: number;
-              };
-              book: {
-                id: number;
-                name: string;
-              } | null;
-              description: string | null;
-              transcript: string | null;
-              scriptureLinks: string | null;
-              links: {
-                id: number;
-                url: string;
-                type: string;
-                /** @enum {string} */
-                mediaType: 'video' | 'audio' | 'document';
-                duration: string | null;
-                position: number | null;
-              }[];
-              seriesImageUrl: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getSermon: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              title: string;
-              subtitle: string | null;
-              shortDescription: string | null;
-              date: string;
-              bannerUrl: string | null;
-              speaker: {
-                id: number;
-                name: string;
-                bio: string | null;
-              };
-              series: {
-                id: number;
-                title: string;
-              };
-              congregation: {
-                id: number;
-              };
-              book: {
-                id: number;
-                name: string;
-              } | null;
-              description: string | null;
-              transcript: string | null;
-              scriptureLinks: string | null;
-              links: {
-                id: number;
-                url: string;
-                type: string;
-                /** @enum {string} */
-                mediaType: 'video' | 'audio' | 'document';
-                duration: string | null;
-                position: number | null;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getSermonImage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listSeries: {
-    parameters: {
-      query?: {
-        search?: string;
-        seriesTypeId?: string;
-        speakerId?: string;
-        bookId?: string;
-        congregationId?: number;
-        serviceTypeId?: string;
-        from?: string;
-        to?: string;
-        page?: number;
-        perPage?: number;
-        sort?: 'date' | 'title' | 'count';
-        order?: 'asc' | 'desc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              series: {
-                id: number;
-                title: string;
-                displayTitle: string | null;
-                subtitle: string | null;
-                description: string | null;
-                latestSermonDate: string | null;
-                sermonCount: number;
-                book: {
-                  id: number;
-                  name: string;
-                } | null;
-                seriesType: {
-                  id: number;
-                  name: string;
-                } | null;
-              }[];
-              pagination: {
-                page: number;
-                perPage: number;
-                total: number;
-                totalPages: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getSeriesDetail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              title: string;
-              displayTitle: string | null;
-              subtitle: string | null;
-              description: string | null;
-              latestSermonDate: string | null;
-              sermonCount: number;
-              book: {
-                id: number;
-                name: string;
-              } | null;
-              seriesType: {
-                id: number;
-                name: string;
-              } | null;
-              sermons: {
-                id: number;
-                title: string;
-                subtitle: string | null;
-                shortDescription: string | null;
-                date: string;
-                bannerUrl: string | null;
-                speaker: {
-                  id: number;
-                  name: string;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        /** @description Authenticated caller identity with helpdesk agent + admin status sourced from Helpdesk_Agents and Helpdesk_Agent_Workspaces */
+                        data: {
+                            userId: number;
+                            email: string;
+                            isAgent: boolean;
+                            isAdmin: boolean;
+                            workspaces: {
+                                agentWorkspaceID: number;
+                                workspaceID: number;
+                                agentID: number;
+                                isAdmin: boolean;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                series: {
-                  id: number;
-                  title: string;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listSermons: {
+        parameters: {
+            query?: {
+                search?: string;
+                seriesId?: string;
+                speakerId?: string;
+                bookId?: string;
+                congregationId?: number;
+                serviceTypeId?: string;
+                seriesTypeId?: string;
+                from?: string;
+                to?: string;
+                page?: number;
+                perPage?: number;
+                sort?: "date" | "title";
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                congregation: {
-                  id: number;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            sermons: {
+                                id: number;
+                                title: string;
+                                subtitle: string | null;
+                                shortDescription: string | null;
+                                date: string;
+                                bannerUrl: string | null;
+                                speaker: {
+                                    id: number;
+                                    name: string;
+                                };
+                                series: {
+                                    id: number;
+                                    title: string;
+                                };
+                                congregation: {
+                                    id: number;
+                                };
+                                book: {
+                                    id: number;
+                                    name: string;
+                                } | null;
+                            }[];
+                            pagination: {
+                                page: number;
+                                perPage: number;
+                                total: number;
+                                totalPages: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                book: {
-                  id: number;
-                  name: string;
-                } | null;
-              }[];
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getLatestSundaySermon: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            title: string;
+                            subtitle: string | null;
+                            shortDescription: string | null;
+                            date: string;
+                            bannerUrl: string | null;
+                            speaker: {
+                                id: number;
+                                name: string;
+                                bio: string | null;
+                            };
+                            series: {
+                                id: number;
+                                title: string;
+                            };
+                            congregation: {
+                                id: number;
+                            };
+                            book: {
+                                id: number;
+                                name: string;
+                            } | null;
+                            description: string | null;
+                            transcript: string | null;
+                            scriptureLinks: string | null;
+                            links: {
+                                id: number;
+                                url: string;
+                                type: string;
+                                /** @enum {string} */
+                                mediaType: "video" | "audio" | "document";
+                                duration: string | null;
+                                position: number | null;
+                            }[];
+                            seriesImageUrl: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
     };
-  };
-  getSeriesImage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listSpeakers: {
-    parameters: {
-      query?: {
-        search?: string;
-        seriesId?: string;
-        bookId?: string;
-        congregationId?: number;
-        serviceTypeId?: string;
-        seriesTypeId?: string;
-        from?: string;
-        to?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              name: string;
-              bio: string | null;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listBooks: {
-    parameters: {
-      query?: {
-        search?: string;
-        seriesId?: string;
-        speakerId?: string;
-        congregationId?: number;
-        serviceTypeId?: string;
-        seriesTypeId?: string;
-        from?: string;
-        to?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              name: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listServiceTypes: {
-    parameters: {
-      query?: {
-        search?: string;
-        seriesId?: string;
-        speakerId?: string;
-        bookId?: string;
-        congregationId?: number;
-        seriesTypeId?: string;
-        from?: string;
-        to?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              name: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listSeriesTypes: {
-    parameters: {
-      query?: {
-        search?: string;
-        seriesId?: string;
-        speakerId?: string;
-        bookId?: string;
-        congregationId?: number;
-        serviceTypeId?: string;
-        from?: string;
-        to?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              name: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listEvents: {
-    parameters: {
-      query: {
-        listId: string;
-        congregationId?: number;
-        programId?: number;
-        tierId?: string;
-        featured?: 'true' | 'false';
-        signupType?: '1' | '2';
-        month?: number;
-        keyword?: string;
-        maxEvents?: number;
-        from?: string;
-        to?: string;
-        includePast?: 'true' | 'false';
-        showFullSeries?: 'true' | 'false';
-        page?: number;
-        perPage?: number;
-        order?: 'asc' | 'desc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              events: {
+    getSermon: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
-                title: string;
-                /** @description HTML description, or null. */
-                description: string | null;
-                /** @description Location name (from Locations.Location_Name), or null. */
-                location: string | null;
-                /** @description Event start, ISO 8601. */
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            title: string;
+                            subtitle: string | null;
+                            shortDescription: string | null;
+                            date: string;
+                            bannerUrl: string | null;
+                            speaker: {
+                                id: number;
+                                name: string;
+                                bio: string | null;
+                            };
+                            series: {
+                                id: number;
+                                title: string;
+                            };
+                            congregation: {
+                                id: number;
+                            };
+                            book: {
+                                id: number;
+                                name: string;
+                            } | null;
+                            description: string | null;
+                            transcript: string | null;
+                            scriptureLinks: string | null;
+                            links: {
+                                id: number;
+                                url: string;
+                                type: string;
+                                /** @enum {string} */
+                                mediaType: "video" | "audio" | "document";
+                                duration: string | null;
+                                position: number | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSermonImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listSeries: {
+        parameters: {
+            query?: {
+                search?: string;
+                seriesTypeId?: string;
+                speakerId?: string;
+                bookId?: string;
+                congregationId?: number;
+                serviceTypeId?: string;
+                from?: string;
+                to?: string;
+                page?: number;
+                perPage?: number;
+                sort?: "date" | "title" | "count";
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            series: {
+                                id: number;
+                                title: string;
+                                displayTitle: string | null;
+                                subtitle: string | null;
+                                description: string | null;
+                                latestSermonDate: string | null;
+                                sermonCount: number;
+                                book: {
+                                    id: number;
+                                    name: string;
+                                } | null;
+                                seriesType: {
+                                    id: number;
+                                    name: string;
+                                } | null;
+                            }[];
+                            pagination: {
+                                page: number;
+                                perPage: number;
+                                total: number;
+                                totalPages: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSeriesDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            title: string;
+                            displayTitle: string | null;
+                            subtitle: string | null;
+                            description: string | null;
+                            latestSermonDate: string | null;
+                            sermonCount: number;
+                            book: {
+                                id: number;
+                                name: string;
+                            } | null;
+                            seriesType: {
+                                id: number;
+                                name: string;
+                            } | null;
+                            sermons: {
+                                id: number;
+                                title: string;
+                                subtitle: string | null;
+                                shortDescription: string | null;
+                                date: string;
+                                bannerUrl: string | null;
+                                speaker: {
+                                    id: number;
+                                    name: string;
+                                };
+                                series: {
+                                    id: number;
+                                    title: string;
+                                };
+                                congregation: {
+                                    id: number;
+                                };
+                                book: {
+                                    id: number;
+                                    name: string;
+                                } | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSeriesImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listSpeakers: {
+        parameters: {
+            query?: {
+                search?: string;
+                seriesId?: string;
+                bookId?: string;
+                congregationId?: number;
+                serviceTypeId?: string;
+                seriesTypeId?: string;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            name: string;
+                            bio: string | null;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listBooks: {
+        parameters: {
+            query?: {
+                search?: string;
+                seriesId?: string;
+                speakerId?: string;
+                congregationId?: number;
+                serviceTypeId?: string;
+                seriesTypeId?: string;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            name: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listServiceTypes: {
+        parameters: {
+            query?: {
+                search?: string;
+                seriesId?: string;
+                speakerId?: string;
+                bookId?: string;
+                congregationId?: number;
+                seriesTypeId?: string;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            name: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listSeriesTypes: {
+        parameters: {
+            query?: {
+                search?: string;
+                seriesId?: string;
+                speakerId?: string;
+                bookId?: string;
+                congregationId?: number;
+                serviceTypeId?: string;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            name: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listEvents: {
+        parameters: {
+            query: {
+                listId: string;
+                congregationId?: number;
+                programId?: number;
+                tierId?: string;
+                featured?: "true" | "false";
+                signupType?: "1" | "2";
+                month?: number;
+                keyword?: string;
+                maxEvents?: number;
+                from?: string;
+                to?: string;
+                includePast?: "true" | "false";
+                showFullSeries?: "true" | "false";
+                page?: number;
+                perPage?: number;
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            events: {
+                                id: number;
+                                title: string;
+                                /** @description HTML description, or null. */
+                                description: string | null;
+                                /** @description Location name (from Locations.Location_Name), or null. */
+                                location: string | null;
+                                /** @description Event start, ISO 8601. */
+                                startDate: string;
+                                /** @description Event end, ISO 8601. */
+                                endDate: string;
+                                /** @description Event detail type label, e.g. "Free"/"Paid"/"Tickets". */
+                                detailType: string | null;
+                                /** @description Public "see details" URL (Event_Detail_Types.URL + event id), or null when the event has no detail type. */
+                                detailsUrl: string | null;
+                            }[];
+                            pagination: {
+                                page: number;
+                                perPage: number;
+                                total: number;
+                                totalPages: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getEventImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getEventMetrics: {
+        parameters: {
+            query: {
                 startDate: string;
-                /** @description Event end, ISO 8601. */
                 endDate: string;
-                /** @description Event detail type label, e.g. "Free"/"Paid"/"Tickets". */
-                detailType: string | null;
-                /** @description Public "see details" URL (Event_Detail_Types.URL + event id), or null when the event has no detail type. */
-                detailsUrl: string | null;
-              }[];
-              pagination: {
-                page: number;
-                perPage: number;
-                total: number;
-                totalPages: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getEventImage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getEventMetrics: {
-    parameters: {
-      query: {
-        startDate: string;
-        endDate: string;
-        comparisonYears?: string;
-        aggregate?: 'weekly';
-        includeAllTimes?: 'true' | 'false';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            meta: {
-              startDate: string;
-              endDate: string;
-              comparisonYears: number[];
-              includeAllTimes?: boolean;
-            };
-            data: {
-              year: number;
-              weekStart: string;
-              eventId: number;
-              eventMetricId: number;
-              eventStartDate: string;
-              metricTitle: string;
-              service: string;
-              /** @description Top-level location of the attendance reading: 'Sanctuary', 'Chapel', 'Hangar', or 'Online'. */
-              venue: string;
-              /** @description Deprecated alias for `venue`; same value. Will be removed after consumers migrate to `venue`. */
-              location: string;
-              level: string;
-              value: number;
-              /** @description MP Metric_ID. The Greater_Observation flag is only meaningful when this is between 11 and 28 (Sanctuary section attendance counters). */
-              metricId: number;
-              /** @description True when MP marks this row as the canonical observation for its (event, metric) pair. Used to dedupe duplicate counter readings. */
-              greaterObservation: boolean;
-              sermonId: number | null;
-              /** @description Per-section seat count from Metrics.Numeric_Benchmark_Value. Populated for the Sanctuary section metrics (Metric_ID 11..28) and null elsewhere. */
-              numericBenchmarkValue: number | null;
-            }[];
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAttendanceSummary: {
-    parameters: {
-      query: {
-        date: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              date: string;
-              services: {
-                time: string;
-                total: number;
-                capacityPct: number;
-                location: string;
-              }[];
-              online: {
-                viewers: number;
-                peakConcurrent: number | null;
-              };
-              yoyChange: {
-                pct: number;
-                /** @enum {string} */
-                direction: 'up' | 'down' | 'flat';
-                streak: number;
-              };
-              grandTotal: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getEvent: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              eventID: number;
-              eventTitle: string;
-              eventTypeID: number;
-              /** Format: date-time */
-              eventStartDate: string;
-              /** Format: date-time */
-              eventEndDate: string;
-              /** @default null */
-              locationID: number | null;
-              description?: string;
-              maxParticipants?: number;
-              /** Format: date-time */
-              registrationStartDate?: string;
-              /** Format: date-time */
-              registrationEndDate?: string;
-              /** @default false */
-              isCancelled: boolean;
-              /** Format: date-time */
-              createdAt: string;
-              /** Format: date-time */
-              updatedAt: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getEventParticipants: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              eventParticipantId: number;
-              participantId: number;
-              eventId: number;
-              participationStatusId: number;
-              createdAt: string;
-              updatedAt: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  registerForEvent: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          contactId: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              eventId: number;
-              contactId: number;
-              registered: boolean;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMemberDemographics: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              years: number[];
-              totalByYear: number[];
-              avgAgeByYear: number[];
-              bandsByYear: {
-                '0-9': number[];
-                '10-19': number[];
-                '20-29': number[];
-                '30-39': number[];
-                '40-49': number[];
-                '50-59': number[];
-                '60-69': number[];
-                '70-79': number[];
-                '80-89': number[];
-                '90+': number[];
-              };
-              shareUnder30: number[];
-              share30to59: number[];
-              share60Plus: number[];
-              generationMembership: {
-                /** @enum {string} */
-                generation:
-                  'silentGreatest' | 'boomer' | 'genX' | 'millennial' | 'genZ' | 'genAlpha';
-                label: string;
-                birthRangeLabel: string;
-                currentCount: number;
-                comparisonCount: number;
-                pctChange: number;
-              }[];
-              generationComparisonYear: number | null;
-              generationCurrentYear: number | null;
-              metrics: {
-                totalLatest: number;
-                totalPctChangeFromBaseline: number;
-                avgAgeLatest: number;
-                avgAgeYearsAddedFromBaseline: number;
-                share60PlusLatest: number;
-                share60PlusBaseline: number;
-                share30to59Latest: number;
-                share30to59Baseline: number;
-              };
-              latestSnapshotDate: string;
-              isPartialYear: boolean;
-              latestFullYear: number;
-              baselineYear: number;
-              unknownAgeCountLatest: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMemberDemographicsGenerationTrend: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              years: number[];
-              byGeneration: {
-                silentGreatest: number[];
-                boomer: number[];
-                genX: number[];
-                millennial: number[];
-                genZ: number[];
-                genAlpha: number[];
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMemberDemographicsNewByYear: {
-    parameters: {
-      query?: {
-        participantTypeIds?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              rows: {
-                year: number;
-                newMembers: number;
-                lostMembers: number;
-                snapshotDate: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  searchContacts: {
-    parameters: {
-      query?: {
-        email?: string;
-        name?: string;
-        householdId?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              contactID: number;
-              displayName: string;
-              firstName?: string;
-              nickname?: string;
-              lastName?: string;
-              /** Format: email */
-              emailAddress?: string;
-              mobilePhone?: string;
-              companyPhone?: string;
-              householdID?: number;
-              householdName?: string;
-              householdPhone?: string;
-              dateOfBirth?: string;
-              genderID?: number;
-              maritalStatusID?: number;
-              contactStatusID: number;
-              userAccount?: number;
-              participantRecord?: number;
-              household: {
-                householdID: number;
-                householdName: string;
-                homePhone?: string;
-                addressID?: number;
-              } | null;
-              address: {
-                addressID: number;
-                addressLine1: string;
-                addressLine2?: string;
-                city?: string;
-                state?: string;
-                postalCode?: string;
-              } | null;
-              user: {
-                userID: number;
-                userName: string;
-              } | null;
-              /** @default 0 */
-              householdMemberCount: number;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  createContact: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          displayName: string;
-          /** Format: email */
-          emailAddress?: string;
-          firstName?: string;
-          lastName?: string;
-          mobilePhone?: string;
-          householdId?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              contactId: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getContact: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              contactID: number;
-              displayName: string;
-              firstName?: string;
-              nickname?: string;
-              lastName?: string;
-              /** Format: email */
-              emailAddress?: string;
-              mobilePhone?: string;
-              companyPhone?: string;
-              householdID?: number;
-              householdName?: string;
-              householdPhone?: string;
-              dateOfBirth?: string;
-              genderID?: number;
-              maritalStatusID?: number;
-              contactStatusID: number;
-              userAccount?: number;
-              participantRecord?: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  searchContactsEnriched: {
-    parameters: {
-      query: {
-        query: string;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              contactID: number;
-              displayName: string;
-              firstName?: string;
-              nickname?: string;
-              lastName?: string;
-              /** Format: email */
-              emailAddress?: string;
-              mobilePhone?: string;
-              companyPhone?: string;
-              householdID?: number;
-              householdName?: string;
-              householdPhone?: string;
-              dateOfBirth?: string;
-              genderID?: number;
-              maritalStatusID?: number;
-              contactStatusID: number;
-              userAccount?: number;
-              participantRecord?: number;
-              household: {
-                householdID: number;
-                householdName: string;
-                homePhone?: string;
-                addressID?: number;
-              } | null;
-              address: {
-                addressID: number;
-                addressLine1: string;
-                addressLine2?: string;
-                city?: string;
-                state?: string;
-                postalCode?: string;
-              } | null;
-              user: {
-                userID: number;
-                userName: string;
-              } | null;
-              /** @default 0 */
-              householdMemberCount: number;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  checkContactExists: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          firstName?: string;
-          lastName?: string;
-          email: string;
-          phone: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              hasMatch: boolean;
-              contactId?: number;
-              donorId?: number;
-              matchType?: string;
-              confidence?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listAvailableInstruments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              version: number;
-              name: string;
-              description: string;
-              visibilityLevelID: number;
-              startDate: string;
-              endDate?: string;
-              splashPageText?: string;
-              reviewableResults: boolean;
-              repeatable: boolean;
-              urlSlug?: string;
-              completionText?: string;
-              totalAnswerable?: number;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getPublicAssessmentResults: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              dimensions: {
-                ID: number;
-                takerID: number;
-                dimensionID: number;
-                name: string;
-                description: string;
-                score: number;
-              }[];
-              user: {
-                firstName: string;
-                lastName: string;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listTakers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              GUID: string;
-              contactID: number;
-              statusID: number;
-              instrumentID: number;
-              startDate: string;
-              endDate?: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getQuestions: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              groups: {
-                ID: number;
-                title: string | null;
-                sortOrder: number;
-                parentID: number | null;
-                questions: {
-                  ID: number;
-                  typeID: number;
-                  sortOrder: number;
-                  number: number;
-                  title: string | null;
-                  text: string;
-                  required: boolean;
-                  reviewable: boolean;
-                  allowMergeTags: boolean;
-                  choiceOptions?: {
-                    ID: number;
-                    sortOrder: number;
-                    text: string;
-                    value: number;
-                  }[];
-                }[];
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAnswers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID?: number;
-              takerID: number;
-              questionID: number;
-              textResponse?: string;
-              choiceOptionIDs?: number[];
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  submitAnswers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          takerID: number;
-          answers: {
-            ID?: number;
-            takerID: number;
-            questionID: number;
-            textResponse?: string;
-            choiceOptionIDs?: number[];
-          }[];
-          userID: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              created: number;
-              updated: number;
-              total: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getResults: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              dimensions: {
-                ID: number;
-                takerID: number;
-                dimensionID: number;
-                name: string;
-                description: string;
-                score: number;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  calculateResults: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          takerID: number;
-          userID: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              GUID: string;
-              contactID: number;
-              statusID: number;
-              instrumentID: number;
-              startDate: string;
-              endDate?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getOrCreateTaker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              GUID: string;
-              contactID: number;
-              statusID: number;
-              instrumentID: number;
-              startDate: string;
-              endDate?: string;
-              instrumentName: string;
-              instrumentDescription: string;
-              splashPageText?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  createNewTaker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          contactID: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              GUID: string;
-              contactID: number;
-              statusID: number;
-              instrumentID: number;
-              startDate: string;
-              endDate?: string;
-              instrumentName: string;
-              instrumentDescription: string;
-              splashPageText?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getInstrument: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              version: number;
-              name: string;
-              description: string;
-              visibilityLevelID: number;
-              startDate: string;
-              endDate?: string;
-              splashPageText?: string;
-              reviewableResults: boolean;
-              repeatable: boolean;
-              urlSlug?: string;
-              completionText?: string;
-              totalAnswerable?: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getInstrumentBySlug: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        slug: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              version: number;
-              name: string;
-              description: string;
-              visibilityLevelID: number;
-              startDate: string;
-              endDate?: string;
-              splashPageText?: string;
-              reviewableResults: boolean;
-              repeatable: boolean;
-              urlSlug?: string;
-              completionText?: string;
-              totalAnswerable?: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listAnswerFiles: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              takerAnswerID: number | null;
-              files: {
-                fileId: number;
-                fileName: string;
-                sizeBytes: number;
-                contentType: string | null;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  uploadAnswerFiles: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /** @description File uploads */
-          files: string[];
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              takerAnswerID: number;
-              files: {
-                fileId: number;
-                fileName: string;
-                sizeBytes: number;
-                contentType: string | null;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  deleteAnswerFile: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        instrumentId: number;
-        fileId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              deletedAnswerRow: boolean;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAssessmentAdminMe: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            isAssessmentAdmin: boolean;
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAssessmentAdminOverview: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              instruments: {
-                instrumentId: number;
-                /** @description Null when the instrument row is missing from MP */
-                name: string | null;
-                completed: number;
-                inProgress: number;
-                total: number;
-                /** @description completed / total, 0 when there are no takers */
-                completionRate: number;
-              }[];
-              /** @description Distinct contacts with at least one non-archived taker, across all instruments */
-              distinctPeople: number;
-              /** @description Instruments with at least one non-archived taker */
-              activeAssessments: number;
-              /** @description ISO timestamp of when this overview was computed */
-              lastUpdated: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listAssessmentAdminPeople: {
-    parameters: {
-      query?: {
-        q?: string;
-        skip?: number;
-        take?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              people: {
-                contactId: number;
-                displayName: string;
-                email: string | null;
-              }[];
-              /** @description Respondents matching q (before paging) */
-              totalCount: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAssessmentAdminPerson: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        contactId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              contactId: number;
-              displayName: string | null;
-              email: string | null;
-              takers: {
-                ID: number;
-                GUID: string;
-                contactID: number;
-                statusID: number;
-                instrumentID: number;
-                startDate: string;
-                endDate?: string;
-                instrumentName: string | null;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAssessmentAdminInstrumentRoster: {
-    parameters: {
-      query?: {
-        skip?: number;
-        take?: number;
-        status?: number;
-        q?: string;
-      };
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              entries: {
-                takerId: number;
-                contactId: number;
-                /** @description Nickname-lastname when a nickname exists; null when the contact is missing from MP */
-                displayName: string | null;
-                email: string | null;
-                statusId: number;
-                startDate: string;
-                endDate: string | null;
-              }[];
-              /** @description Total attempts matching instrument + status — and, when q is supplied, the post-filter match total */
-              totalCount: number;
-              /** @description Present only when q was supplied: legacy alias equal to totalCount */
-              filteredCount?: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAssessmentAdminGiftDistribution: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              dimensionId: number;
-              name: string;
-              count: number;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  exportAssessmentAdminCsv: {
-    parameters: {
-      query?: {
-        type?: 'roster' | 'answers';
-      };
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getAssessmentAdminTakerDetail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        takerId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              takerId: number;
-              instrumentId: number;
-              taker: {
-                ID: number;
-                GUID: string;
-                contactID: number;
-                statusID: number;
-                instrumentID: number;
-                startDate: string;
-                endDate?: string;
-              };
-              dimensions: {
-                ID: number;
-                takerID: number;
-                dimensionID: number;
-                name: string;
-                description: string;
-                score: number;
-              }[];
-              answers: {
-                ID?: number;
-                takerID: number;
-                questionID: number;
-                textResponse?: string;
-                choiceOptionIDs?: number[];
-              }[];
-              questions: {
-                groups: {
-                  ID: number;
-                  title: string | null;
-                  sortOrder: number;
-                  parentID: number | null;
-                  questions: {
-                    ID: number;
-                    typeID: number;
-                    sortOrder: number;
-                    number: number;
-                    title: string | null;
-                    text: string;
-                    required: boolean;
-                    reviewable: boolean;
-                    allowMergeTags: boolean;
-                    choiceOptions?: {
-                      ID: number;
-                      sortOrder: number;
-                      text: string;
-                      value: number;
-                    }[];
-                  }[];
-                }[];
-              };
-              /** @description Status-keyed caching: true for Complete takers (immutable answers); false means the response was served fresh with Cache-Control: no-store */
-              cacheable: boolean;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  resetAssessmentAdminTaker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        takerId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              GUID: string;
-              contactID: number;
-              statusID: number;
-              instrumentID: number;
-              startDate: string;
-              endDate?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  archiveAssessmentAdminTaker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        takerId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              GUID: string;
-              contactID: number;
-              statusID: number;
-              instrumentID: number;
-              startDate: string;
-              endDate?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  restoreAssessmentAdminTaker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        takerId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ID: number;
-              GUID: string;
-              contactID: number;
-              statusID: number;
-              instrumentID: number;
-              startDate: string;
-              endDate?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listAssessmentAdminAnswerFiles: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        takerId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              takerAnswerID: number | null;
-              files: {
-                fileId: number;
-                fileName: string;
-                sizeBytes: number;
-                contentType: string | null;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  downloadAssessmentAdminAnswerFile: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        takerId: number;
-        fileId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getCurrentUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              userID: number;
-              displayName: string;
-              /** @default null */
-              email: string | null;
-              contactID: number;
-              userName?: string;
-              canImpersonate?: boolean;
-              nickname?: string;
-              firstName?: string;
-              lastName?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              userID: number;
-              displayName: string;
-              /** @default null */
-              email: string | null;
-              contactID: number;
-              userName?: string;
-              canImpersonate?: boolean;
-              nickname?: string;
-              firstName?: string;
-              lastName?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  updateUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          isActive?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              message: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  createPledge: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          firstName: string;
-          spouse?: string;
-          lastName: string;
-          /** Format: email */
-          email: string;
-          phone: string;
-          pledge: number;
-          notes?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              pledgeId: number;
-              amount: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getGivingHistory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              items: {
-                distributionId: number;
-                donationId: number;
+                comparisonYears?: string;
+                aggregate?: "weekly";
+                includeAllTimes?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        meta: {
+                            startDate: string;
+                            endDate: string;
+                            comparisonYears: number[];
+                            includeAllTimes?: boolean;
+                        };
+                        data: {
+                            year: number;
+                            weekStart: string;
+                            eventId: number;
+                            eventMetricId: number;
+                            eventStartDate: string;
+                            metricTitle: string;
+                            service: string;
+                            /** @description Top-level location of the attendance reading: 'Sanctuary', 'Chapel', 'Hangar', or 'Online'. */
+                            venue: string;
+                            /** @description Deprecated alias for `venue`; same value. Will be removed after consumers migrate to `venue`. */
+                            location: string;
+                            level: string;
+                            value: number;
+                            /** @description MP Metric_ID. The Greater_Observation flag is only meaningful when this is between 11 and 28 (Sanctuary section attendance counters). */
+                            metricId: number;
+                            /** @description True when MP marks this row as the canonical observation for its (event, metric) pair. Used to dedupe duplicate counter readings. */
+                            greaterObservation: boolean;
+                            sermonId: number | null;
+                            /** @description Per-section seat count from Metrics.Numeric_Benchmark_Value. Populated for the Sanctuary section metrics (Metric_ID 11..28) and null elsewhere. */
+                            numericBenchmarkValue: number | null;
+                        }[];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAttendanceSummary: {
+        parameters: {
+            query: {
                 date: string;
-                amount: number;
-                donorName: string;
-                softCreditSource: string | null;
-                paymentType: string;
-                programName: string;
-              }[];
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getShepherds: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              shepherds: {
-                Elder_Name: string;
-                Mobile_Phone: string | null;
-                Email_Address: string | null;
-                /** @enum {string} */
-                Elder_Type: 'Shepherd' | 'Deacon' | 'Shepherdess';
-                Elder_Photo_URL: string | null;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listMissionTrips: {
-    parameters: {
-      query?: {
-        destinationId?: number;
-        keyword?: string;
-        includePast?: 'true' | 'false';
-        includeHidden?: 'true' | 'false';
-        includeFull?: 'true' | 'false';
-        page?: number;
-        perPage?: number;
-        order?: 'asc' | 'desc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              trips: {
-                /** @description Pledge_Campaigns.Pledge_Campaign_ID. */
-                id: number;
-                /** @description Public trip name (Pledge_Campaigns.Nickname, falling back to Campaign_Name). */
-                name: string;
-                /** @description Journey_Destinations.Destination_Name, or null. */
-                destination: string | null;
-                destinationId: number | null;
-                description: string | null;
-                /** @description Journey_Destinations.Website_Banner, or null. */
-                bannerUrl: string | null;
-                /** @description Trip start (Trip_Start_Date), ISO 8601, or null when unset. */
-                startDate: string | null;
-                /** @description Trip end (Trip_End_Date), ISO 8601, or null when unset. */
-                endDate: string | null;
-                /** @description Campaign close (End_Date), ISO 8601, or null. */
-                registrationEndDate: string | null;
-                /** @description Per-participant fundraising target (Fundraising_Goal), or null. */
-                cost: number | null;
-                /** @description Active or completed pledges on the campaign (Pledge_Status_ID <= 2). */
-                registrantCount: number;
-                maximumRegistrants: number | null;
-                /** @description True when the campaign has a cap and registrantCount has reached it. */
-                registrationFull: boolean;
-                invitationOnly: boolean;
-              }[];
-              pagination: {
-                page: number;
-                perPage: number;
-                total: number;
-                totalPages: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMissionTrip: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              /** @description Pledge_Campaigns.Pledge_Campaign_ID. */
-              id: number;
-              /** @description Public trip name (Pledge_Campaigns.Nickname, falling back to Campaign_Name). */
-              name: string;
-              /** @description Journey_Destinations.Destination_Name, or null. */
-              destination: string | null;
-              destinationId: number | null;
-              description: string | null;
-              /** @description Journey_Destinations.Website_Banner, or null. */
-              bannerUrl: string | null;
-              /** @description Trip start (Trip_Start_Date), ISO 8601, or null when unset. */
-              startDate: string | null;
-              /** @description Trip end (Trip_End_Date), ISO 8601, or null when unset. */
-              endDate: string | null;
-              /** @description Campaign close (End_Date), ISO 8601, or null. */
-              registrationEndDate: string | null;
-              /** @description Per-participant fundraising target (Fundraising_Goal), or null. */
-              cost: number | null;
-              /** @description Active or completed pledges on the campaign (Pledge_Status_ID <= 2). */
-              registrantCount: number;
-              maximumRegistrants: number | null;
-              /** @description True when the campaign has a cap and registrantCount has reached it. */
-              registrationFull: boolean;
-              invitationOnly: boolean;
-              /** @description Pledge_Campaigns.Long_Description — the long-form trip write-up. Staff-authored HTML from the MP editor (`<p>`, `<b>`, `<em>`), NOT plain text: render it sanitized. The list endpoint's `description` is the plain-text teaser. */
-              longDescription: string | null;
-              /** @description The trip team, sorted by last name. Same seat-holding pledge statuses that `registrantCount` counts, so the two always agree. */
-              participants: {
-                /** @description Pledges.Pledge_ID — the participant's seat on this trip. */
-                pledgeId: number;
-                /** @description Display name: Pledges.Beneficiary when set (it carries couples, e.g. "Sue and Brett Swanson"), otherwise the donor contact's nickname + last name. */
-                name: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMissionTripParticipant: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-        pledgeId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              pledgeId: number;
-              /** @description The campaign this pledge belongs to. */
-              tripId: number;
-              /** @description Display name, same rules as the roster (Beneficiary wins). */
-              name: string;
-              /** @description The donor contact's given name on its own, for the "Support Sally" call to action. Resolved from the contact rather than from `name`, so it stays a single first name even when `name` is a Beneficiary string covering two people ("Samantha and Jack Morgan" -> "Samantha"). */
-              firstName: string | null;
-              /** @description Pledges.Letter — the participant's support letter. Staff/participant-authored HTML from the MP editor, so render it sanitized. Null when unwritten, which is the common case. */
-              letter: string | null;
-              /** @description Money actually received against this pledge (sum of Donation_Distributions.Amount). NOT Pledges.Total_Pledge, which is a different figure and is 0 for most rows. */
-              raised: number;
-              /** @description The campaign's per-participant Fundraising_Goal, or null when the campaign has none. Every participant on a trip shares the same goal. */
-              goal: number | null;
-              tripLeader: boolean;
-              facebookUrl: string | null;
-              xUrl: string | null;
-              instagramUrl: string | null;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMissionTripParticipantPhoto: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-        pledgeId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getMyMissionTrips: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              trips: {
-                pledgeId: number;
-                campaignId: number;
-                /** @description Pledge_Campaigns.Nickname, falling back to "Destination: start – end" from Journey_Destinations, then Campaign_Name. */
-                name: string;
-                /** @description Pledge_Campaigns.Long_Description, sanitized. Staff-authored HTML. */
-                longDescription: string | null;
-                /** @description Trip_Start_Date, ISO 8601. */
-                startDate: string | null;
-                /** @description Trip_End_Date, ISO 8601. */
-                endDate: string | null;
-                /** @description True once the CAMPAIGN has closed (Pledge_Campaigns.End_Date <= now), not when the trip has travelled. The campaign window stays open for months after a trip returns while giving is still being settled, and the legacy proc drew the Current/Past line here too. */
-                past: boolean;
-                /** @description True when the pledge is the viewer's own; false for a household member's pledge surfaced because the viewer is a head of household. */
-                mine: boolean;
-                /** @description Whose pledge this is, rendered "nickname lastname". */
-                participantName: string;
-                /** @description Pledge_Statuses.Pledge_Status — "Active" or "Completed". */
-                pledgeStatus: string;
-                /** @description Pledges.Total_Pledge — this participant's fundraising goal. */
-                totalPledge: number;
-                /** @description Sum of Donation_Distributions.Amount against this pledge. MP stores no such column; it is rolled up per request. */
-                totalDonations: number;
-                lastDonationDate: string | null;
-                /** @description Pledges.Letter, sanitized — the support letter. Null on a past trip, and null when unwritten. */
-                letter: string | null;
-                /** @description Pledges.Trip_Leader on this pledge. */
-                isLeader: boolean;
-                leaders: {
-                  name: string;
-                  email: string | null;
-                  /** @description The leader's own pledge on this campaign. Feed it to `/api/mission-trips/{campaignId}/participant/{pledgeId}/image` for the photo. */
-                  pledgeId: number;
-                }[];
-                donations: {
-                  /** @description Donations.Donation_Date, ISO 8601. */
-                  date: string;
-                  /** @description Donation_Distributions.Amount — this split of the gift, not the whole donation. */
-                  amount: number;
-                  /** @description Donations.Anonymous. */
-                  anonymous: boolean;
-                  /** @description Rendered "nickname lastname", the organization name for a company contact, or "Anonymous" when the gift is anonymous. */
-                  donorName: string;
-                  email: string | null;
-                  phone: string | null;
-                  /** @description Null for an anonymous gift, and for a donor with no household address. */
-                  address: {
-                    line1: string | null;
-                    line2: string | null;
-                    city: string | null;
-                    /** @description Addresses.[State/Region]. */
-                    state: string | null;
-                    postalCode: string | null;
-                  } | null;
-                }[];
-                leaderSummary: {
-                  /** @description The viewer's own email — the From address for the widget's "Email All Participants" mailto. */
-                  email: string | null;
-                  /** @description Raised across every seat-holding pledge on the campaign. */
-                  totalDonations: number;
-                  /** @description Sum of every seat-holding pledge's Total_Pledge on the campaign. */
-                  totalGoal: number;
-                } | null;
-                participants: {
-                  pledgeId: number;
-                  name: string;
-                  email: string | null;
-                  /** @description Pledges.Total_Pledge — this participant's own goal. */
-                  totalPledge: number;
-                  totalDonations: number;
-                }[];
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  saveMissionLetter: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        pledgeId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @description The support letter as HTML. */
-          letter: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              pledgeId: number;
-              /** @description The letter as stored, after sanitization. */
-              letter: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listCommunityGroups: {
-    parameters: {
-      query?: {
-        groupTypeId?: number;
-        ministryIds?: string;
-        neighborhoodIds?: string;
-        focusIds?: string;
-        lifeStageIds?: string;
-        meetingDayIds?: string;
-        meetingTimes?: string;
-        location?: string;
-        keyword?: string;
-        meetsOnline?: 'true' | 'false';
-        includeFull?: 'true' | 'false';
-        countGroupInquiries?: 'true' | 'false';
-        showFutureGroups?: 'true' | 'false';
-        includeHidden?: 'true' | 'false';
-        includeEnded?: 'true' | 'false';
-        page?: number;
-        perPage?: number;
-        sort?: 'name' | 'neighborhood' | 'startDate';
-        order?: 'asc' | 'desc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              groups: {
-                /** @description Groups.Group_ID. */
-                id: number;
-                /** @description Groups.Group_Name. */
-                name: string;
-                description: string | null;
-                /** @description Ministries.Ministry_Name — the ministry that owns the group. */
-                ministry: string | null;
-                /** @description Groups.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response. */
-                ministryId: number | null;
-                /** @description City_Ministries.City_Ministry, or null. */
-                neighborhood: string | null;
-                neighborhoodId: number | null;
-                /** @description Group_Focuses.Group_Focus, or null. */
-                groupFocus: string | null;
-                groupFocusId: number | null;
-                /** @description Life_Stages.Life_Stage. */
-                lifeStage: string | null;
-                lifeStageId: number | null;
-                /** @description Meeting_Days.Meeting_Day. */
-                meetingDay: string | null;
-                meetingDayId: number | null;
-                /** @description Groups.Meeting_Time as "HH:mm:ss", or null. Midnight is treated as unset — staff enter 00:00:00 as a placeholder. */
-                meetingTime: string | null;
-                /** @description Bucket derived from meetingTime, or null when there is no time. */
-                meetingTimeOfDay: ('morning' | 'lunchtime' | 'afternoon' | 'evening') | null;
-                /** @description Meeting_Frequencies.Meeting_Frequency. */
-                meetingFrequency: string | null;
-                meetingFrequencyId: number | null;
-                /** @description Meeting address city. The street line is never returned. */
-                city: string | null;
-                /** @description Meeting address state or region. */
-                state: string | null;
-                meetsOnline: boolean;
-                /** @description True when Groups.Group_Is_Full is set, OR the group has a Target_Size that its participants have reached. Matches how the MP group-finder widget defines full. */
-                isFull: boolean;
-                /** @description Groups.Start_Date, ISO 8601, or null. */
-                startDate: string | null;
-                /** @description Groups.Current_Group_Participants, or null. */
-                participantCount: number | null;
-                /** @description Groups.Target_Size. */
-                targetSize: number | null;
-                /** @description Group_Inquiries on this group that have not been Placed, or null when countGroupInquiries is off. Exposed so the `isFull` decision is reproducible from the response. */
-                pendingInquiryCount: number | null;
-              }[];
-              pagination: {
-                page: number;
-                perPage: number;
-                total: number;
-                totalPages: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listCommunityGroupFacets: {
-    parameters: {
-      query?: {
-        groupTypeId?: number;
-        ministryIds?: string;
-        includeHidden?: 'true' | 'false';
-        includeEnded?: 'true' | 'false';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              neighborhoods: {
-                id: number;
-                name: string;
-              }[];
-              focuses: {
-                id: number;
-                name: string;
-              }[];
-              lifeStages: {
-                id: number;
-                name: string;
-              }[];
-              meetingDays: {
-                id: number;
-                name: string;
-              }[];
-              meetingTimes: {
-                /** @enum {string} */
-                id: 'morning' | 'lunchtime' | 'afternoon' | 'evening';
-                name: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getGroupImage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getStaffContactMember: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        guid: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              name: string;
-              jobTitle: string | null;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getStaffContactPhoto: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        guid: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': string;
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  submitStaffContact: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** Format: uuid */
-          contactGuid: string;
-          senderName: string;
-          /** Format: email */
-          senderEmail: string;
-          subject?: string;
-          message: string;
-          recaptchaToken: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              /** @constant */
-              submitted: true;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listStaffDirectory: {
-    parameters: {
-      query?: {
-        ministryIds?: string;
-        personnelTypeIds?: string;
-        contactIds?: string;
-        keyword?: string;
-        includeHidden?: 'true' | 'false';
-        includeEnded?: 'true' | 'false';
-        page?: number;
-        perPage?: number;
-        sort?: 'name' | 'ministry' | 'startDate';
-        order?: 'asc' | 'desc';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              staff: {
-                /** @description HR_Personnel.Personnel_ID. */
-                personnelId: number;
-                /** @description Contacts.Contact_ID. */
-                contactId: number;
-                /** @description Contacts.Contact_GUID — the identifier the staff-contact form takes (`/staff-contact/?contactGuid=…`). Null when MP has no GUID on the record, in which case the card cannot link anywhere. */
-                contactGuid: string | null;
-                /** @description Display name: nickname + last name when a nickname exists, otherwise first + last. */
-                name: string;
-                firstName: string | null;
-                lastName: string | null;
-                nickname: string | null;
-                /** @description The staff headshot, served from MP's public files endpoint, or null when the person has no photo on file (the widget then renders a placeholder avatar). */
-                photoUrl: string | null;
-                /** @description HR_Personnel_Types.Personnel_Type. */
-                personnelType: string | null;
-                personnelTypeId: number | null;
-                /** @description HR_Personnel.Personnel_Start_Date, ISO 8601, or null. */
-                startDate: string | null;
-                /** @description Every website-visible position, ordered longest-held first. Never empty — a person with no visible position is not in the directory at all. */
-                positions: {
-                  /** @description HR_Positions.Position_ID. */
-                  id: number;
-                  /** @description HR_Positions.Position_Title. */
-                  title: string;
-                  /** @description Ministries.Ministry_Name — the ministry the position sits in. */
-                  ministry: string | null;
-                  /** @description HR_Positions.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response. */
-                  ministryId: number | null;
-                  /** @description HR_Positions.Department_Head. */
-                  isDepartmentHead: boolean;
-                  /** @description HR_Positions.Division_Head. */
-                  isDivisionHead: boolean;
-                  /** @description HR_Positions.Position_Start, ISO 8601, or null. */
-                  startDate: string | null;
-                }[];
-              }[];
-              pagination: {
-                page: number;
-                perPage: number;
-                total: number;
-                totalPages: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listStaffDirectoryFacets: {
-    parameters: {
-      query?: {
-        ministryIds?: string;
-        personnelTypeIds?: string;
-        includeHidden?: 'true' | 'false';
-        includeEnded?: 'true' | 'false';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ministries: {
-                id: number;
-                name: string;
-              }[];
-              personnelTypes: {
-                id: number;
-                name: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listPrayerRequests: {
-    parameters: {
-      query?: {
-        page?: number;
-        perPage?: number;
-        days?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              requests: {
-                /** @description Feedback_Entries.Feedback_Entry_ID. */
-                id: number;
-                /** @description The submitter's nickname or first name — never a full name — or 'Anonymous' when the request was shared anonymously. */
-                submittedBy: string;
-                /** @description Feedback_Entries.Date_Submitted, ISO 8601, America/New_York. */
-                submittedAt: string;
-                /** @description Feedback_Entries.Description. */
-                request: string;
-                /** @description Feedback_Entries.Prayer_Count — how many times someone has pressed "I Prayed". */
-                prayerCount: number;
-              }[];
-              pagination: {
-                page: number;
-                perPage: number;
-                total: number;
-                totalPages: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  submitPrayerRequest: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          firstName?: string;
-          lastName?: string;
-          /** Format: email */
-          email?: string;
-          /** @description The request itself. Capped at 2000 characters to match Feedback_Entries.Description. */
-          request: string;
-          /** @enum {string} */
-          privacy: 'online' | 'staff' | 'anonymous';
-          /**
-           * @description Sets Feedback_Entries.Prayer_Notifications — "Email Me When Someone Prays".
-           * @default false
-           */
-          notifyMe: boolean;
-          recaptchaToken: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              /** @constant */
-              submitted: true;
-              /** @constant */
-              pendingApproval: true;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  recordPrayerForRequest: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              prayerCount: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getPrayerWallIdentity: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              /** @description Nickname (or first name) plus last name. */
-              name: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getRegistrationEvent: {
-    parameters: {
-      query?: {
-        page?: string;
-      };
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              eventId: number;
-              title: string;
-              descriptionHtml: string | null;
-              startDate: string;
-              endDate: string;
-              /** @description IANA zone of the event congregation. */
-              timeZone: string;
-              congregationId: number;
-              imageUrl: string | null;
-              location: {
-                name: string | null;
-                addressLine1: string | null;
-                addressLine2: string | null;
-                city: string | null;
-                state: string | null;
-                postalCode: string | null;
-                directionsUrl: string | null;
-                rooms: string[];
-              } | null;
-              primaryContact: {
-                displayName: string;
-                emailAddress: string | null;
-              } | null;
-              visibilityLevelId: number;
-              viewable: boolean;
-              cancelled: boolean;
-              externalRegistrationUrl: string | null;
-              viewer: {
-                signedIn: boolean;
-                contactId: number | null;
-                loginRequired: boolean;
-                canGuestRegister: boolean;
-                isStaff: boolean;
-              };
-              sections: {
-                /** @description 'parent' or 'related:<Related_Event_ID>'. */
-                key: string;
-                relatedEventId: number | null;
-                displayName: string;
-                enableLabelHtml: string | null;
-                instructionsHtml: string | null;
-                buttonText: string;
-                sectionGroup: string | null;
-                position: number;
-                showHouseholdPositionId: number | null;
-                forGenderId: number | null;
-                isParentEvent: boolean;
-                audience: {
-                  minAge: number | null;
-                  maxAge: number | null;
-                  minGrade: number | null;
-                  maxGrade: number | null;
-                  genderId: number | null;
-                  householdPositionId: number | null;
-                  minorsOnly: boolean;
-                  adultsOnly: boolean;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                event: {
-                  eventId: number;
-                  title: string;
-                  /** @description MP naive-local ISO, congregation time zone. */
-                  startDate: string;
-                  endDate: string;
-                  meetingInstructionsHtml: string | null;
-                  minorRegistration: boolean;
-                  participantsExpected: number | null;
-                  remaining: number | null;
-                  registrationStart: string | null;
-                  registrationEnd: string | null;
-                  externalRegistrationUrl: string | null;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            date: string;
+                            services: {
+                                time: string;
+                                total: number;
+                                capacityPct: number;
+                                location: string;
+                            }[];
+                            online: {
+                                viewers: number;
+                                peakConcurrent: number | null;
+                            };
+                            yoyChange: {
+                                pct: number;
+                                /** @enum {string} */
+                                direction: "up" | "down" | "flat";
+                                streak: number;
+                            };
+                            grandTotal: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                product: {
-                  productId: number;
-                  name: string;
-                  descriptionHtml: string | null;
-                  basePrice: number;
-                  depositPrice: number | null;
-                  groups: {
-                    productOptionGroupId: number;
-                    name: string;
-                    descriptionHtml: string | null;
-                    required: boolean;
-                    mutuallyExclusive: boolean;
-                    noteLabel: string | null;
-                    formFieldId: number | null;
-                    omitFromSummary: boolean;
-                    exhausted: boolean;
-                    prices: {
-                      productOptionPriceId: number;
-                      title: string;
-                      /** @description Option_Price; negative for discounts. */
-                      price: number;
-                      qtyAllowed: number;
-                      minQty: number;
-                      maxQty: number | null;
-                      remaining: number | null;
-                      attendingOnline: boolean;
-                      addsToGroupId: number | null;
-                      hidden: boolean;
-                      isPromo: boolean;
-                      sortOrder: number | null;
-                      placement: {
-                        minAgeMonths: number | null;
-                        maxAgeMonths: number | null;
-                        minGrade: number | null;
-                        maxGrade: number | null;
-                      } | null;
-                    }[];
-                  }[];
-                } | null;
-                form: {
-                  formId: number;
-                  title: string;
-                  instructionsHtml: string | null;
-                  forceLogin: boolean;
-                  fields: {
-                    formFieldId: number;
-                    order: number;
-                    label: string;
-                    alternateLabelHtml: string | null;
-                    fieldTypeId: number;
-                    values: string[];
-                    required: boolean;
-                    dependsOnFieldId: number | null;
-                    dependsOnValue: string | null;
-                    omitFromSummary: boolean;
-                    hasSideEffects: boolean;
-                  }[];
-                  blockedByFileUpload: boolean;
-                  fileUploadFieldIds: number[];
-                } | null;
-                open: boolean;
-                closedReason:
-                  | (
-                      | 'not_active'
-                      | 'not_yet_open'
-                      | 'closed'
-                      | 'cancelled'
-                      | 'not_approved'
-                      | 'no_product'
-                      | 'external_url'
-                      | 'full'
-                      | 'required_options_exhausted'
-                      | 'file_upload_required'
-                    )
-                  | null;
-              }[];
-              registrationOpen: boolean;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
     };
-  };
-  getRegistrationRoster: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              householdId: number;
-              viewer: {
-                contactId: number;
-                firstName: string;
-                lastName: string;
-                email: string | null;
-                phone: string | null;
-                address: {
-                  line1: string | null;
-                  line2: string | null;
-                  city: string | null;
-                  state: string | null;
-                  postalCode: string | null;
-                } | null;
-              };
-              members: {
-                contactId: number;
-                firstName: string;
-                lastName: string;
-                displayName: string;
-                householdPositionId: number | null;
-                genderId: number | null;
-                dateOfBirth: string | null;
-                age: number | null;
-                grade: number | null;
-                isMinorPosition: boolean;
-                isViewer: boolean;
-                hasParticipantRecord: boolean;
-                prefill: {
-                  formFieldId: number;
-                  response: string;
-                  since: string | null;
-                }[];
-                eligibility: {
-                  /** @description 'parent' or 'related:<Related_Event_ID>'. */
-                  sectionKey: string;
-                  eligible: boolean;
-                  reason:
-                    | (
-                        | 'household_position'
-                        | 'gender'
-                        | 'minors_only'
-                        | 'too_young'
-                        | 'too_old'
-                        | 'wrong_grade'
-                        | 'already_registered'
-                        | 'section_closed'
-                      )
-                    | null;
-                  requires: ('birth_date' | 'grade')[];
-                  existingEventParticipantId: number | null;
-                }[];
-              }[];
-              creatablePositionIds: number[];
+    getEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
+            cookie?: never;
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  quoteRegistration: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          purchaser:
-            | {
-                /** @constant */
-                kind: 'session';
-              }
-            | {
-                /** @constant */
-                kind: 'guest';
-                firstName: string;
-                lastName: string;
-                /** Format: email */
-                email: string;
-                phone: string;
-                address?: {
-                  line1: string;
-                  line2?: string;
-                  city: string;
-                  state: string;
-                  postalCode: string;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-              };
-          registrations: {
-            /** @description 'parent' or 'related:<Related_Event_ID>'. */
-            sectionKey: string;
-            attendee:
-              | {
-                  /** @constant */
-                  kind: 'contact';
-                  contactId: number;
-                  /** @description yyyy-MM-dd */
-                  dateOfBirth?: string;
-                  grade?: number;
-                }
-              | {
-                  /** @constant */
-                  kind: 'new';
-                  firstName: string;
-                  lastName: string;
-                  /** @description yyyy-MM-dd */
-                  dateOfBirth?: string;
-                  genderId?: number;
-                  grade?: number;
-                  householdPositionId: number;
-                  /** Format: email */
-                  email?: string;
-                  phone?: string;
-                }
-              | {
-                  /** @constant */
-                  kind: 'purchaser';
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            eventID: number;
+                            eventTitle: string;
+                            eventTypeID: number;
+                            /** Format: date-time */
+                            eventStartDate: string;
+                            /** Format: date-time */
+                            eventEndDate: string;
+                            /** @default null */
+                            locationID: number | null;
+                            description?: string;
+                            maxParticipants?: number;
+                            /** Format: date-time */
+                            registrationStartDate?: string;
+                            /** Format: date-time */
+                            registrationEndDate?: string;
+                            /** @default false */
+                            isCancelled: boolean;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-            /** @default [] */
-            options: {
-              productOptionPriceId: number;
-              /** @default 1 */
-              quantity: number;
-              note?: string;
-            }[];
-            promoCode?: string;
-            /** @default [] */
-            answers: {
-              formFieldId: number;
-              response: string;
-            }[];
-          }[];
-          /** @default false */
-          payDeposit: boolean;
-          /** @default false */
-          updateMyRecord: boolean;
-          contact?: {
-            /** Format: email */
-            email?: string;
-            phone?: string;
-            address?: {
-              line1: string;
-              line2?: string;
-              city: string;
-              state: string;
-              postalCode: string;
             };
-          };
-          captchaToken?: string;
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
     };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getEventParticipants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              eventId: number;
-              registrations: {
-                registrationIndex: number;
-                /** @description 'parent' or 'related:<Related_Event_ID>'. */
-                sectionKey: string;
-                eventId: number;
-                contactId: number | null;
-                attendeeName: string;
-                isMinor: boolean;
-                lines: {
-                  /** @enum {string} */
-                  kind: 'base' | 'option' | 'promo';
-                  productId: number;
-                  productOptionPriceId: number | null;
-                  title: string;
-                  quantity: number;
-                  unitPrice: number;
-                  lineTotal: number;
-                  itemNote: string | null;
-                  depositRequested: boolean;
-                }[];
-                subtotal: number;
-                optionsSummary: string | null;
-                answerSummary: string | null;
-                attendingOnline: boolean;
-                addsToGroupIds: number[];
-                overlapsWithRegistrationIndexes: number[];
-                resolvedOptions: {
-                  productOptionGroupId: number;
-                  groupName: string;
-                  productOptionPriceId: number;
-                  title: string;
-                }[];
-              }[];
-              invoiceTotal: number;
-              depositRequested: boolean;
-              participationStatusId: number;
-              invoiceStatusId: number;
-              addressRequired: boolean;
-              problems: {
-                /** @enum {string} */
-                code:
-                  | 'SECTION_INELIGIBLE'
-                  | 'SECTION_CLOSED'
-                  | 'ALREADY_REGISTERED'
-                  | 'DUPLICATE_IN_PLAN'
-                  | 'OPTION_UNAVAILABLE'
-                  | 'OPTION_HIDDEN'
-                  | 'REQUIRED_OPTION_MISSING'
-                  | 'MUTUALLY_EXCLUSIVE_CONFLICT'
-                  | 'QUANTITY_OUT_OF_RANGE'
-                  | 'INVALID_PROMO_CODE'
-                  | 'FORM_INCOMPLETE'
-                  | 'FORM_FIELD_INVALID'
-                  | 'FILE_UPLOAD_REQUIRED'
-                  | 'CAPACITY_EXCEEDED'
-                  | 'ADDRESS_REQUIRED'
-                  | 'GUEST_NOT_ALLOWED'
-                  | 'LOGIN_REQUIRED'
-                  | 'MINOR_REQUIRED'
-                  | 'BIRTH_DATE_REQUIRED'
-                  | 'GRADE_REQUIRED'
-                  | 'CHOOSE_OPTION';
-                message: string;
-                registrationIndex: number | null;
-                details?: {
-                  [key: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-              }[];
-              submittable: boolean;
-              quoteHash: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  submitRegistration: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          purchaser:
-            | {
-                /** @constant */
-                kind: 'session';
-              }
-            | {
-                /** @constant */
-                kind: 'guest';
-                firstName: string;
-                lastName: string;
-                /** Format: email */
-                email: string;
-                phone: string;
-                address?: {
-                  line1: string;
-                  line2?: string;
-                  city: string;
-                  state: string;
-                  postalCode: string;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            eventParticipantId: number;
+                            participantId: number;
+                            eventId: number;
+                            participationStatusId: number;
+                            createdAt: string;
+                            updatedAt: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-              };
-          registrations: {
-            /** @description 'parent' or 'related:<Related_Event_ID>'. */
-            sectionKey: string;
-            attendee:
-              | {
-                  /** @constant */
-                  kind: 'contact';
-                  contactId: number;
-                  /** @description yyyy-MM-dd */
-                  dateOfBirth?: string;
-                  grade?: number;
-                }
-              | {
-                  /** @constant */
-                  kind: 'new';
-                  firstName: string;
-                  lastName: string;
-                  /** @description yyyy-MM-dd */
-                  dateOfBirth?: string;
-                  genderId?: number;
-                  grade?: number;
-                  householdPositionId: number;
-                  /** Format: email */
-                  email?: string;
-                  phone?: string;
-                }
-              | {
-                  /** @constant */
-                  kind: 'purchaser';
-                };
-            /** @default [] */
-            options: {
-              productOptionPriceId: number;
-              /** @default 1 */
-              quantity: number;
-              note?: string;
-            }[];
-            promoCode?: string;
-            /** @default [] */
-            answers: {
-              formFieldId: number;
-              response: string;
-            }[];
-          }[];
-          /** @default false */
-          payDeposit: boolean;
-          /** @default false */
-          updateMyRecord: boolean;
-          contact?: {
-            /** Format: email */
-            email?: string;
-            phone?: string;
-            address?: {
-              line1: string;
-              line2?: string;
-              city: string;
-              state: string;
-              postalCode: string;
             };
-          };
-          captchaToken?: string;
-          /** @default false */
-          dryRun: boolean;
-          expectedQuoteHash?: string;
-          checkout?: {
-            /** Format: uri */
-            url: string;
-            /** @default id */
-            invoiceParam: string;
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
     };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
+    registerForEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data:
-              | {
-                  /** @constant */
-                  dryRun: false;
-                  idempotencyKey: string;
-                  replayed: boolean;
-                  invoiceId: number;
-                  invoiceGuid: string;
-                  invoiceTotal: number;
-                  invoiceStatusId: number;
-                  checkoutUrl: string;
-                  participants: {
-                    registrationIndex: number;
-                    /** @description 'parent' or 'related:<Related_Event_ID>'. */
-                    sectionKey: string;
-                    eventId: number;
+        requestBody: {
+            content: {
+                "application/json": {
                     contactId: number;
-                    participantId: number;
-                    eventParticipantId: number;
-                    participationStatusId: number;
-                    formResponseId: number | null;
-                    groupParticipantId: number | null;
-                    contactCreated: boolean;
-                  }[];
-                  quote: {
-                    eventId: number;
-                    registrations: {
-                      registrationIndex: number;
-                      /** @description 'parent' or 'related:<Related_Event_ID>'. */
-                      sectionKey: string;
-                      eventId: number;
-                      contactId: number | null;
-                      attendeeName: string;
-                      isMinor: boolean;
-                      lines: {
-                        /** @enum {string} */
-                        kind: 'base' | 'option' | 'promo';
-                        productId: number;
-                        productOptionPriceId: number | null;
-                        title: string;
-                        quantity: number;
-                        unitPrice: number;
-                        lineTotal: number;
-                        itemNote: string | null;
-                        depositRequested: boolean;
-                      }[];
-                      subtotal: number;
-                      optionsSummary: string | null;
-                      answerSummary: string | null;
-                      attendingOnline: boolean;
-                      addsToGroupIds: number[];
-                      overlapsWithRegistrationIndexes: number[];
-                      resolvedOptions: {
-                        productOptionGroupId: number;
-                        groupName: string;
-                        productOptionPriceId: number;
-                        title: string;
-                      }[];
-                    }[];
-                    invoiceTotal: number;
-                    depositRequested: boolean;
-                    participationStatusId: number;
-                    invoiceStatusId: number;
-                    addressRequired: boolean;
-                    problems: {
-                      /** @enum {string} */
-                      code:
-                        | 'SECTION_INELIGIBLE'
-                        | 'SECTION_CLOSED'
-                        | 'ALREADY_REGISTERED'
-                        | 'DUPLICATE_IN_PLAN'
-                        | 'OPTION_UNAVAILABLE'
-                        | 'OPTION_HIDDEN'
-                        | 'REQUIRED_OPTION_MISSING'
-                        | 'MUTUALLY_EXCLUSIVE_CONFLICT'
-                        | 'QUANTITY_OUT_OF_RANGE'
-                        | 'INVALID_PROMO_CODE'
-                        | 'FORM_INCOMPLETE'
-                        | 'FORM_FIELD_INVALID'
-                        | 'FILE_UPLOAD_REQUIRED'
-                        | 'CAPACITY_EXCEEDED'
-                        | 'ADDRESS_REQUIRED'
-                        | 'GUEST_NOT_ALLOWED'
-                        | 'LOGIN_REQUIRED'
-                        | 'MINOR_REQUIRED'
-                        | 'BIRTH_DATE_REQUIRED'
-                        | 'GRADE_REQUIRED'
-                        | 'CHOOSE_OPTION';
-                      message: string;
-                      registrationIndex: number | null;
-                      details?: {
-                        [key: string]: unknown;
-                      };
-                    }[];
-                    submittable: boolean;
-                    quoteHash: string;
-                  };
-                }
-              | {
-                  /** @constant */
-                  dryRun: true;
-                  idempotencyKey: string;
-                  eventId: number;
-                  eventIds: number[];
-                  quote: {
-                    eventId: number;
-                    registrations: {
-                      registrationIndex: number;
-                      /** @description 'parent' or 'related:<Related_Event_ID>'. */
-                      sectionKey: string;
-                      eventId: number;
-                      contactId: number | null;
-                      attendeeName: string;
-                      isMinor: boolean;
-                      lines: {
-                        /** @enum {string} */
-                        kind: 'base' | 'option' | 'promo';
-                        productId: number;
-                        productOptionPriceId: number | null;
-                        title: string;
-                        quantity: number;
-                        unitPrice: number;
-                        lineTotal: number;
-                        itemNote: string | null;
-                        depositRequested: boolean;
-                      }[];
-                      subtotal: number;
-                      optionsSummary: string | null;
-                      answerSummary: string | null;
-                      attendingOnline: boolean;
-                      addsToGroupIds: number[];
-                      overlapsWithRegistrationIndexes: number[];
-                      resolvedOptions: {
-                        productOptionGroupId: number;
-                        groupName: string;
-                        productOptionPriceId: number;
-                        title: string;
-                      }[];
-                    }[];
-                    invoiceTotal: number;
-                    depositRequested: boolean;
-                    participationStatusId: number;
-                    invoiceStatusId: number;
-                    addressRequired: boolean;
-                    problems: {
-                      /** @enum {string} */
-                      code:
-                        | 'SECTION_INELIGIBLE'
-                        | 'SECTION_CLOSED'
-                        | 'ALREADY_REGISTERED'
-                        | 'DUPLICATE_IN_PLAN'
-                        | 'OPTION_UNAVAILABLE'
-                        | 'OPTION_HIDDEN'
-                        | 'REQUIRED_OPTION_MISSING'
-                        | 'MUTUALLY_EXCLUSIVE_CONFLICT'
-                        | 'QUANTITY_OUT_OF_RANGE'
-                        | 'INVALID_PROMO_CODE'
-                        | 'FORM_INCOMPLETE'
-                        | 'FORM_FIELD_INVALID'
-                        | 'FILE_UPLOAD_REQUIRED'
-                        | 'CAPACITY_EXCEEDED'
-                        | 'ADDRESS_REQUIRED'
-                        | 'GUEST_NOT_ALLOWED'
-                        | 'LOGIN_REQUIRED'
-                        | 'MINOR_REQUIRED'
-                        | 'BIRTH_DATE_REQUIRED'
-                        | 'GRADE_REQUIRED'
-                        | 'CHOOSE_OPTION';
-                      message: string;
-                      registrationIndex: number | null;
-                      details?: {
-                        [key: string]: unknown;
-                      };
-                    }[];
-                    submittable: boolean;
-                    quoteHash: string;
-                  };
-                  writes: {
-                    seq: number;
-                    table: string;
-                    /** @enum {string} */
-                    op: 'create' | 'update' | 'proc';
-                    placeholderId: number | null;
-                    rows: {
-                      [key: string]: unknown;
-                    }[];
-                    primaryKey: string | null;
-                    targetId: number | null;
-                  }[];
-                  /** @description checkoutUrl with a placeholder GUID. */
-                  wouldRedirectTo: string;
                 };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
             };
-          };
         };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getOrgChart: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            eventId: number;
+                            contactId: number;
+                            registered: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              nodes: {
-                /** @description HR_Personnel.Personnel_ID. */
-                personnelId: number;
-                /** @description Contacts.Contact_ID. */
+    };
+    getMemberDemographics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            years: number[];
+                            totalByYear: number[];
+                            avgAgeByYear: number[];
+                            bandsByYear: {
+                                "0-9": number[];
+                                "10-19": number[];
+                                "20-29": number[];
+                                "30-39": number[];
+                                "40-49": number[];
+                                "50-59": number[];
+                                "60-69": number[];
+                                "70-79": number[];
+                                "80-89": number[];
+                                "90+": number[];
+                            };
+                            shareUnder30: number[];
+                            share30to59: number[];
+                            share60Plus: number[];
+                            generationMembership: {
+                                /** @enum {string} */
+                                generation: "silentGreatest" | "boomer" | "genX" | "millennial" | "genZ" | "genAlpha";
+                                label: string;
+                                birthRangeLabel: string;
+                                currentCount: number;
+                                comparisonCount: number;
+                                pctChange: number;
+                            }[];
+                            generationComparisonYear: number | null;
+                            generationCurrentYear: number | null;
+                            metrics: {
+                                totalLatest: number;
+                                totalPctChangeFromBaseline: number;
+                                avgAgeLatest: number;
+                                avgAgeYearsAddedFromBaseline: number;
+                                share60PlusLatest: number;
+                                share60PlusBaseline: number;
+                                share30to59Latest: number;
+                                share30to59Baseline: number;
+                            };
+                            latestSnapshotDate: string;
+                            isPartialYear: boolean;
+                            latestFullYear: number;
+                            baselineYear: number;
+                            unknownAgeCountLatest: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMemberDemographicsGenerationTrend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            years: number[];
+                            byGeneration: {
+                                silentGreatest: number[];
+                                boomer: number[];
+                                genX: number[];
+                                millennial: number[];
+                                genZ: number[];
+                                genAlpha: number[];
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMemberDemographicsNewByYear: {
+        parameters: {
+            query?: {
+                participantTypeIds?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            rows: {
+                                year: number;
+                                newMembers: number;
+                                lostMembers: number;
+                                snapshotDate: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    searchContacts: {
+        parameters: {
+            query?: {
+                email?: string;
+                name?: string;
+                householdId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            contactID: number;
+                            displayName: string;
+                            firstName?: string;
+                            nickname?: string;
+                            lastName?: string;
+                            /** Format: email */
+                            emailAddress?: string;
+                            mobilePhone?: string;
+                            companyPhone?: string;
+                            householdID?: number;
+                            householdName?: string;
+                            householdPhone?: string;
+                            dateOfBirth?: string;
+                            genderID?: number;
+                            maritalStatusID?: number;
+                            contactStatusID: number;
+                            userAccount?: number;
+                            participantRecord?: number;
+                            household: {
+                                householdID: number;
+                                householdName: string;
+                                homePhone?: string;
+                                addressID?: number;
+                            } | null;
+                            address: {
+                                addressID: number;
+                                addressLine1: string;
+                                addressLine2?: string;
+                                city?: string;
+                                state?: string;
+                                postalCode?: string;
+                            } | null;
+                            user: {
+                                userID: number;
+                                userName: string;
+                            } | null;
+                            /** @default 0 */
+                            householdMemberCount: number;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createContact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    displayName: string;
+                    /** Format: email */
+                    emailAddress?: string;
+                    firstName?: string;
+                    lastName?: string;
+                    mobilePhone?: string;
+                    householdId?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            contactId: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getContact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            contactID: number;
+                            displayName: string;
+                            firstName?: string;
+                            nickname?: string;
+                            lastName?: string;
+                            /** Format: email */
+                            emailAddress?: string;
+                            mobilePhone?: string;
+                            companyPhone?: string;
+                            householdID?: number;
+                            householdName?: string;
+                            householdPhone?: string;
+                            dateOfBirth?: string;
+                            genderID?: number;
+                            maritalStatusID?: number;
+                            contactStatusID: number;
+                            userAccount?: number;
+                            participantRecord?: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    searchContactsEnriched: {
+        parameters: {
+            query: {
+                query: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            contactID: number;
+                            displayName: string;
+                            firstName?: string;
+                            nickname?: string;
+                            lastName?: string;
+                            /** Format: email */
+                            emailAddress?: string;
+                            mobilePhone?: string;
+                            companyPhone?: string;
+                            householdID?: number;
+                            householdName?: string;
+                            householdPhone?: string;
+                            dateOfBirth?: string;
+                            genderID?: number;
+                            maritalStatusID?: number;
+                            contactStatusID: number;
+                            userAccount?: number;
+                            participantRecord?: number;
+                            household: {
+                                householdID: number;
+                                householdName: string;
+                                homePhone?: string;
+                                addressID?: number;
+                            } | null;
+                            address: {
+                                addressID: number;
+                                addressLine1: string;
+                                addressLine2?: string;
+                                city?: string;
+                                state?: string;
+                                postalCode?: string;
+                            } | null;
+                            user: {
+                                userID: number;
+                                userName: string;
+                            } | null;
+                            /** @default 0 */
+                            householdMemberCount: number;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    checkContactExists: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    firstName?: string;
+                    lastName?: string;
+                    email: string;
+                    phone: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            hasMatch: boolean;
+                            contactId?: number;
+                            donorId?: number;
+                            matchType?: string;
+                            confidence?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAvailableInstruments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            version: number;
+                            name: string;
+                            description: string;
+                            visibilityLevelID: number;
+                            startDate: string;
+                            endDate?: string;
+                            splashPageText?: string;
+                            reviewableResults: boolean;
+                            repeatable: boolean;
+                            urlSlug?: string;
+                            completionText?: string;
+                            totalAnswerable?: number;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getPublicAssessmentResults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dimensions: {
+                                ID: number;
+                                takerID: number;
+                                dimensionID: number;
+                                name: string;
+                                description: string;
+                                score: number;
+                            }[];
+                            user: {
+                                firstName: string;
+                                lastName: string;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTakers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            GUID: string;
+                            contactID: number;
+                            statusID: number;
+                            instrumentID: number;
+                            startDate: string;
+                            endDate?: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getQuestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            groups: {
+                                ID: number;
+                                title: string | null;
+                                sortOrder: number;
+                                parentID: number | null;
+                                questions: {
+                                    ID: number;
+                                    typeID: number;
+                                    sortOrder: number;
+                                    number: number;
+                                    title: string | null;
+                                    text: string;
+                                    required: boolean;
+                                    reviewable: boolean;
+                                    allowMergeTags: boolean;
+                                    choiceOptions?: {
+                                        ID: number;
+                                        sortOrder: number;
+                                        text: string;
+                                        value: number;
+                                    }[];
+                                }[];
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAnswers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID?: number;
+                            takerID: number;
+                            questionID: number;
+                            textResponse?: string;
+                            choiceOptionIDs?: number[];
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitAnswers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    takerID: number;
+                    answers: {
+                        ID?: number;
+                        takerID: number;
+                        questionID: number;
+                        textResponse?: string;
+                        choiceOptionIDs?: number[];
+                    }[];
+                    userID: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            created: number;
+                            updated: number;
+                            total: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getResults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dimensions: {
+                                ID: number;
+                                takerID: number;
+                                dimensionID: number;
+                                name: string;
+                                description: string;
+                                score: number;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    calculateResults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    takerID: number;
+                    userID: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            GUID: string;
+                            contactID: number;
+                            statusID: number;
+                            instrumentID: number;
+                            startDate: string;
+                            endDate?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getOrCreateTaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            GUID: string;
+                            contactID: number;
+                            statusID: number;
+                            instrumentID: number;
+                            startDate: string;
+                            endDate?: string;
+                            instrumentName: string;
+                            instrumentDescription: string;
+                            splashPageText?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createNewTaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    contactID: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            GUID: string;
+                            contactID: number;
+                            statusID: number;
+                            instrumentID: number;
+                            startDate: string;
+                            endDate?: string;
+                            instrumentName: string;
+                            instrumentDescription: string;
+                            splashPageText?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getInstrument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            version: number;
+                            name: string;
+                            description: string;
+                            visibilityLevelID: number;
+                            startDate: string;
+                            endDate?: string;
+                            splashPageText?: string;
+                            reviewableResults: boolean;
+                            repeatable: boolean;
+                            urlSlug?: string;
+                            completionText?: string;
+                            totalAnswerable?: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getInstrumentBySlug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            version: number;
+                            name: string;
+                            description: string;
+                            visibilityLevelID: number;
+                            startDate: string;
+                            endDate?: string;
+                            splashPageText?: string;
+                            reviewableResults: boolean;
+                            repeatable: boolean;
+                            urlSlug?: string;
+                            completionText?: string;
+                            totalAnswerable?: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAnswerFiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            takerAnswerID: number | null;
+                            files: {
+                                fileId: number;
+                                fileName: string;
+                                sizeBytes: number;
+                                contentType: string | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    uploadAnswerFiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** @description File uploads */
+                    files: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            takerAnswerID: number;
+                            files: {
+                                fileId: number;
+                                fileName: string;
+                                sizeBytes: number;
+                                contentType: string | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteAnswerFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrumentId: number;
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            deletedAnswerRow: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAssessmentAdminMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        isAssessmentAdmin: boolean;
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAssessmentAdminOverview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            instruments: {
+                                instrumentId: number;
+                                /** @description Null when the instrument row is missing from MP */
+                                name: string | null;
+                                completed: number;
+                                inProgress: number;
+                                total: number;
+                                /** @description completed / total, 0 when there are no takers */
+                                completionRate: number;
+                            }[];
+                            /** @description Distinct contacts with at least one non-archived taker, across all instruments */
+                            distinctPeople: number;
+                            /** @description Instruments with at least one non-archived taker */
+                            activeAssessments: number;
+                            /** @description ISO timestamp of when this overview was computed */
+                            lastUpdated: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAssessmentAdminPeople: {
+        parameters: {
+            query?: {
+                q?: string;
+                skip?: number;
+                take?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            people: {
+                                contactId: number;
+                                displayName: string;
+                                email: string | null;
+                            }[];
+                            /** @description Respondents matching q (before paging) */
+                            totalCount: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAssessmentAdminPerson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
                 contactId: number;
-                /** @description Contacts.Contact_GUID. Null when MP has no GUID on the record. */
-                contactGuid: string | null;
-                /** @description Display name: nickname + last name when a nickname exists, otherwise first + last. */
-                name: string;
-                firstName: string | null;
-                lastName: string | null;
-                nickname: string | null;
-                /** @description The staff headshot from MP's public files endpoint, or null when the person has no photo on file. */
-                photoUrl: string | null;
-                /** @description Resolved HR_Personnel.Personnel_ID of the supervisor. Null identifies a root. NOT the raw HR_Personnel.Supervisor value — a stale pointer left behind by a promotion is remapped to the same person's current record first. */
-                supervisorPersonnelId: number | null;
-                /** @description Positions held, current ones first. May be empty when MP has no position row for the person at all. */
-                positions: {
-                  /** @description HR_Positions.Position_ID. */
-                  id: number;
-                  /** @description HR_Positions.Position_Title. */
-                  title: string;
-                  /** @description Ministries.Ministry_Name — the ministry the position sits in. */
-                  ministry: string | null;
-                  /** @description HR_Positions.Ministry_ID. */
-                  ministryId: number | null;
-                  /** @description HR_Positions.Department_Head. */
-                  isDepartmentHead: boolean;
-                  /** @description HR_Positions.Division_Head. */
-                  isDivisionHead: boolean;
-                  /** @description HR_Positions.Position_End has passed. */
-                  isEnded: boolean;
-                }[];
-                /** @description HR_Personnel_Types.Personnel_Type, e.g. "Full Time Exempt", "Unpaid Volunteer". */
-                personnelType: string | null;
-                personnelTypeId: number | null;
-                /** @description HR_Personnel.Personnel_End_Date is unset or still in the future. */
-                isCurrentPersonnel: boolean;
-                directReportCount: number;
-                /** @description Everyone beneath this node, at any depth — the whole subtree. */
-                totalReportCount: number;
-                /** @description Distance from the root; the root is 1. */
-                depth: number;
-              }[];
-              /** @description Nodes with no supervisor. Normally exactly one (the Senior Pastor); more than one means MP has reporting lines that no longer reach the top. */
-              rootPersonnelIds: number[];
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            contactId: number;
+                            displayName: string | null;
+                            email: string | null;
+                            takers: {
+                                ID: number;
+                                GUID: string;
+                                contactID: number;
+                                statusID: number;
+                                instrumentID: number;
+                                startDate: string;
+                                endDate?: string;
+                                instrumentName: string | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAssessmentAdminInstrumentRoster: {
+        parameters: {
+            query?: {
                 skip?: number;
-              };
+                take?: number;
+                status?: number;
+                q?: string;
             };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getInvoice: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        guid: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              Invoice_ID: number;
-              Invoice_GUID?: string;
-              Purchaser_Contact_ID?: number;
-              Invoice_Status_ID?: number;
-              Invoice_Total?: number;
-              Invoice_Date?: string;
-              Notes?: string;
-              Currency?: string;
-              Congregation_ID?: number;
+            header?: never;
+            path: {
+                id: number;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            entries: {
+                                takerId: number;
+                                contactId: number;
+                                /** @description Nickname-lastname when a nickname exists; null when the contact is missing from MP */
+                                displayName: string | null;
+                                email: string | null;
+                                statusId: number;
+                                startDate: string;
+                                endDate: string | null;
+                            }[];
+                            /** @description Total attempts matching instrument + status — and, when q is supplied, the post-filter match total */
+                            totalCount: number;
+                            /** @description Present only when q was supplied: legacy alias equal to totalCount */
+                            filteredCount?: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
     };
-  };
-  getInfo: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getAssessmentAdminGiftDistribution: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': {
-            version: string | null;
-            /** @description Vercel environment ("production" | "preview" | "development"); "development" off Vercel. */
-            environment: string;
-            /** @description Git commit the running deployment was built from. Compare against origin/main to confirm a deploy actually landed. */
-            commitSha: string | null;
-            /** @description Git branch the running deployment was built from. */
-            branch: string | null;
-            /** @description Vercel deployment ID serving this request. */
-            deploymentId: string | null;
-            /** @description Current server time, ISO 8601. Not a deployment timestamp. */
-            serverTime: string;
-          };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dimensionId: number;
+                            name: string;
+                            count: number;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
     };
-  };
-  getOverallHealth: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    exportAssessmentAdminCsv: {
+        parameters: {
+            query?: {
+                type?: "roster" | "answers";
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              services: {
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAssessmentAdminTakerDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                takerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            takerId: number;
+                            instrumentId: number;
+                            taker: {
+                                ID: number;
+                                GUID: string;
+                                contactID: number;
+                                statusID: number;
+                                instrumentID: number;
+                                startDate: string;
+                                endDate?: string;
+                            };
+                            dimensions: {
+                                ID: number;
+                                takerID: number;
+                                dimensionID: number;
+                                name: string;
+                                description: string;
+                                score: number;
+                            }[];
+                            answers: {
+                                ID?: number;
+                                takerID: number;
+                                questionID: number;
+                                textResponse?: string;
+                                choiceOptionIDs?: number[];
+                            }[];
+                            questions: {
+                                groups: {
+                                    ID: number;
+                                    title: string | null;
+                                    sortOrder: number;
+                                    parentID: number | null;
+                                    questions: {
+                                        ID: number;
+                                        typeID: number;
+                                        sortOrder: number;
+                                        number: number;
+                                        title: string | null;
+                                        text: string;
+                                        required: boolean;
+                                        reviewable: boolean;
+                                        allowMergeTags: boolean;
+                                        choiceOptions?: {
+                                            ID: number;
+                                            sortOrder: number;
+                                            text: string;
+                                            value: number;
+                                        }[];
+                                    }[];
+                                }[];
+                            };
+                            /** @description Status-keyed caching: true for Complete takers (immutable answers); false means the response was served fresh with Cache-Control: no-store */
+                            cacheable: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    resetAssessmentAdminTaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                takerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            GUID: string;
+                            contactID: number;
+                            statusID: number;
+                            instrumentID: number;
+                            startDate: string;
+                            endDate?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    archiveAssessmentAdminTaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                takerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            GUID: string;
+                            contactID: number;
+                            statusID: number;
+                            instrumentID: number;
+                            startDate: string;
+                            endDate?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    restoreAssessmentAdminTaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                takerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ID: number;
+                            GUID: string;
+                            contactID: number;
+                            statusID: number;
+                            instrumentID: number;
+                            startDate: string;
+                            endDate?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAssessmentAdminAnswerFiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                takerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            takerAnswerID: number | null;
+                            files: {
+                                fileId: number;
+                                fileName: string;
+                                sizeBytes: number;
+                                contentType: string | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    downloadAssessmentAdminAnswerFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                takerId: number;
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            userID: number;
+                            displayName: string;
+                            /** @default null */
+                            email: string | null;
+                            contactID: number;
+                            userName?: string;
+                            canImpersonate?: boolean;
+                            nickname?: string;
+                            firstName?: string;
+                            lastName?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            userID: number;
+                            displayName: string;
+                            /** @default null */
+                            email: string | null;
+                            contactID: number;
+                            userName?: string;
+                            canImpersonate?: boolean;
+                            nickname?: string;
+                            firstName?: string;
+                            lastName?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    isActive?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            message: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createPledge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    firstName: string;
+                    spouse?: string;
+                    lastName: string;
+                    /** Format: email */
+                    email: string;
+                    phone: string;
+                    pledge: number;
+                    notes?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            pledgeId: number;
+                            amount: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getGivingHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            items: {
+                                distributionId: number;
+                                donationId: number;
+                                date: string;
+                                amount: number;
+                                donorName: string;
+                                softCreditSource: string | null;
+                                paymentType: string;
+                                programName: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getShepherds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            shepherds: {
+                                Elder_Name: string;
+                                Mobile_Phone: string | null;
+                                Email_Address: string | null;
+                                /** @enum {string} */
+                                Elder_Type: "Shepherd" | "Deacon" | "Shepherdess";
+                                Elder_Photo_URL: string | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMyFlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            shepherd: {
+                                Shepherd_ID: number;
+                                Contact_ID: number;
+                                Name: string;
+                                Shepherd_Type: string | null;
+                                Parish_Name: string | null;
+                            };
+                            households: {
+                                Household_ID: number;
+                                Household_GUID: string | null;
+                                Display_Name: string;
+                                Parish_Name: string | null;
+                                Heads_Of_Household: {
+                                    Contact_ID: number;
+                                    Name: string;
+                                    Mobile_Phone: string | null;
+                                    Email_Address: string | null;
+                                }[];
+                                Members: {
+                                    Contact_ID: number;
+                                    Name: string;
+                                    Photo_URL: string | null;
+                                }[];
+                                Last_Note_Date: string | null;
+                                Days_Since_Note: number | null;
+                                /** @enum {string} */
+                                Note_Status: "none" | "current" | "due" | "overdue";
+                                Shepherdess_Contact: ("recent" | "not_recent") | null;
+                                Location: {
+                                    Latitude: number;
+                                    Longitude: number;
+                                } | null;
+                                Address: {
+                                    Address_Line_1: string | null;
+                                    Address_Line_2: string | null;
+                                    City: string | null;
+                                    State: string | null;
+                                    Postal_Code: string | null;
+                                } | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMyFlockHousehold: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                householdId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            Household_ID: number;
+                            Household_GUID: string | null;
+                            Display_Name: string;
+                            Parish_Name: string | null;
+                            Home_Phone: string | null;
+                            Address: {
+                                Address_Line_1: string | null;
+                                Address_Line_2: string | null;
+                                City: string | null;
+                                State: string | null;
+                                Postal_Code: string | null;
+                            } | null;
+                            Members: {
+                                Contact_ID: number;
+                                Name: string;
+                                Household_Position: string | null;
+                                Gender: string | null;
+                                Age: number | null;
+                                Activity_Level: string | null;
+                                Participant_Type: string | null;
+                                Photo_URL: string | null;
+                            }[];
+                            Area_Pastor: {
+                                Contact_ID: number;
+                                Name: string;
+                                Photo_URL: string | null;
+                            } | null;
+                            Shepherd: {
+                                Contact_ID: number;
+                                Name: string;
+                                Photo_URL: string | null;
+                            } | null;
+                            Deacon: {
+                                Contact_ID: number;
+                                Name: string;
+                                Photo_URL: string | null;
+                            } | null;
+                            Shepherdess: {
+                                Contact_ID: number;
+                                Name: string;
+                                Photo_URL: string | null;
+                            } | null;
+                            Last_Note_Date: string | null;
+                            Days_Since_Note: number | null;
+                            /** @enum {string} */
+                            Note_Status: "none" | "current" | "due" | "overdue";
+                            Notes: {
+                                Shepherding_Note_ID: number;
+                                Contact_Date: string;
+                                Notes: string | null;
+                                Note_Type: string | null;
+                                Contact_Method: string | null;
+                                Author: string | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMyFlockHouseholdMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                householdId: number;
+                contactId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            Contact_ID: number;
+                            Household_ID: number;
+                            Name: string;
+                            Household_Position: string | null;
+                            Contact_Status: string | null;
+                            Gender: string | null;
+                            Age: number | null;
+                            Date_of_Birth: string | null;
+                            Activity_Level: string | null;
+                            Participant_Type: string | null;
+                            Mobile_Phone: string | null;
+                            Email_Address: string | null;
+                            Photo_URL: string | null;
+                            Anniversary_Date: string | null;
+                            Membership_Date: string | null;
+                            How_Received: string | null;
+                            Employment: {
+                                Occupation: string | null;
+                                Industry: string | null;
+                                Employer: string | null;
+                            } | null;
+                            Groups: {
+                                Group_Participant_ID: number;
+                                Group_ID: number;
+                                Group_Name: string;
+                                Start_Date: string | null;
+                            }[];
+                            Milestones: {
+                                Participant_Milestone_ID: number;
+                                Milestone_ID: number;
+                                Milestone_Title: string;
+                                Date_Accomplished: string | null;
+                            }[];
+                            Prayer_Requests: {
+                                Feedback_Entry_ID: number;
+                                Description: string | null;
+                                Date_Submitted: string | null;
+                                Feedback_Type: string | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMyFlockHouseholdCaregiver: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                householdId: number;
+                contactId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            Contact_ID: number;
+                            Name: string;
+                            Photo_URL: string | null;
+                            Mobile_Phone: string | null;
+                            Email_Address: string | null;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    fileMyFlockHouseholdNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                householdId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description `Shepherd_Note_Types.Shepherd_Note_Type_ID`.
+                     * @enum {number}
+                     */
+                    noteTypeId: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
+                    /**
+                     * @description `Contact_Log_Types.Contact_Log_Type_ID` — how they were contacted.
+                     * @enum {number}
+                     */
+                    contactMethodId: 1 | 2 | 3 | 4 | 6 | 10 | 21 | 22;
+                    /** @description Plain text, trimmed. Refused if it contains markup: `<` followed by a letter, `/`, `!` or `?`. */
+                    note: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            Shepherding_Note_ID: number;
+                            Household_ID: number;
+                            Shepherd_Note_Type_ID: number;
+                            Contact_Log_Type_ID: number;
+                            Contact_Date: string;
+                            Notes: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    schoolUpdateContact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contactId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    set: {
+                        First_Name?: string;
+                        Last_Name?: string;
+                        Nickname?: string;
+                        Date_of_Birth?: string;
+                        Gender_ID?: 1 | 2;
+                        /** Format: email */
+                        Email_Address?: string;
+                        Mobile_Phone?: string;
+                        HS_Graduation_Year?: number;
+                        Current_School?: string | null;
+                        Perimeter_School_ID?: number;
+                        Display_Name?: string;
+                        /** @constant */
+                        Contact_Status_ID?: 1;
+                    };
+                    expected: {
+                        [key: string]: string | number | null;
+                    };
+                    dryRun?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dryRun: boolean;
+                            alreadyCurrent: boolean;
+                            replayed?: boolean;
+                            steps: {
+                                table: string;
+                                /** @enum {string} */
+                                action: "create" | "update";
+                                id?: number;
+                                fields: string[];
+                            }[];
+                            notes: string[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    schoolUpdateHouseholdAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                householdId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    set: {
+                        Address_Line_1?: string;
+                        Address_Line_2?: string | null;
+                        City?: string;
+                        "State/Region"?: string;
+                        Postal_Code?: string;
+                    };
+                    expected: {
+                        [key: string]: string | number | null;
+                    };
+                    dryRun?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dryRun: boolean;
+                            alreadyCurrent: boolean;
+                            replayed?: boolean;
+                            steps: {
+                                table: string;
+                                /** @enum {string} */
+                                action: "create" | "update";
+                                id?: number;
+                                fields: string[];
+                            }[];
+                            notes: string[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    schoolJoinGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    contactId: number;
+                    /** @enum {string} */
+                    group: "students" | "parents";
+                    dryRun?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dryRun: boolean;
+                            alreadyCurrent: boolean;
+                            replayed?: boolean;
+                            steps: {
+                                table: string;
+                                /** @enum {string} */
+                                action: "create" | "update";
+                                id?: number;
+                                fields: string[];
+                            }[];
+                            notes: string[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    schoolLeaveGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    contactId: number;
+                    /** @enum {string} */
+                    group: "students" | "parents";
+                    endDate: string;
+                    dryRun?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dryRun: boolean;
+                            alreadyCurrent: boolean;
+                            replayed?: boolean;
+                            steps: {
+                                table: string;
+                                /** @enum {string} */
+                                action: "create" | "update";
+                                id?: number;
+                                fields: string[];
+                            }[];
+                            notes: string[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    schoolRepointLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schoolPersonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    contactId: number | null;
+                    expected: {
+                        contactId: number | null;
+                    };
+                    dryRun?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dryRun: boolean;
+                            alreadyCurrent: boolean;
+                            replayed?: boolean;
+                            steps: {
+                                table: string;
+                                /** @enum {string} */
+                                action: "create" | "update";
+                                id?: number;
+                                fields: string[];
+                            }[];
+                            notes: string[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    schoolCreatePerson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    person: {
+                        First_Name: string;
+                        Last_Name: string;
+                        Nickname?: string | null;
+                        Date_of_Birth?: string | null;
+                        Gender_ID?: (1 | 2) | null;
+                        Email_Address?: string | null;
+                        Mobile_Phone?: string | null;
+                        HS_Graduation_Year?: number | null;
+                        Current_School?: string | null;
+                    };
+                    household: {
+                        householdId: number;
+                    } | {
+                        create: {
+                            name: string;
+                            address?: {
+                                Address_Line_1: string;
+                                Address_Line_2: string | null;
+                                City: string;
+                                "State/Region": string;
+                                Postal_Code: string;
+                            } | null;
+                        };
+                    };
+                    householdPositionId: 1 | 2 | 3 | 4;
+                    group: ("students" | "parents") | null;
+                    link: {
+                        personId: number;
+                        roles: {
+                            parent: boolean;
+                            student: boolean;
+                        };
+                    };
+                    dryRun?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dryRun: boolean;
+                            alreadyCurrent: boolean;
+                            replayed?: boolean;
+                            steps: {
+                                table: string;
+                                /** @enum {string} */
+                                action: "create" | "update";
+                                id?: number;
+                                fields: string[];
+                            }[];
+                            notes: string[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    schoolCreateLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    personId: number;
+                    contactId: number;
+                    roles: {
+                        parent: boolean;
+                        student: boolean;
+                    };
+                    person?: {
+                        First_Name?: string | null;
+                        Middle_Name?: string | null;
+                        Nickname?: string | null;
+                        Last_Name?: string | null;
+                        Date_of_Birth?: string | null;
+                        Gender_ID?: (1 | 2) | null;
+                        Email_Address?: string | null;
+                        Mobile_Phone?: string | null;
+                    };
+                    dryRun?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            dryRun: boolean;
+                            alreadyCurrent: boolean;
+                            replayed?: boolean;
+                            steps: {
+                                table: string;
+                                /** @enum {string} */
+                                action: "create" | "update";
+                                id?: number;
+                                fields: string[];
+                            }[];
+                            notes: string[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listMissionTrips: {
+        parameters: {
+            query?: {
+                destinationId?: number;
+                keyword?: string;
+                includePast?: "true" | "false";
+                includeHidden?: "true" | "false";
+                includeFull?: "true" | "false";
+                page?: number;
+                perPage?: number;
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            trips: {
+                                /** @description Pledge_Campaigns.Pledge_Campaign_ID. */
+                                id: number;
+                                /** @description Public trip name (Pledge_Campaigns.Nickname, falling back to Campaign_Name). */
+                                name: string;
+                                /** @description Journey_Destinations.Destination_Name, or null. */
+                                destination: string | null;
+                                destinationId: number | null;
+                                description: string | null;
+                                /** @description Journey_Destinations.Website_Banner, or null. */
+                                bannerUrl: string | null;
+                                /** @description Trip start (Trip_Start_Date), ISO 8601, or null when unset. */
+                                startDate: string | null;
+                                /** @description Trip end (Trip_End_Date), ISO 8601, or null when unset. */
+                                endDate: string | null;
+                                /** @description Campaign close (End_Date), ISO 8601, or null. */
+                                registrationEndDate: string | null;
+                                /** @description Per-participant fundraising target (Fundraising_Goal), or null. */
+                                cost: number | null;
+                                /** @description Active or completed pledges on the campaign (Pledge_Status_ID <= 2). */
+                                registrantCount: number;
+                                maximumRegistrants: number | null;
+                                /** @description True when the campaign has a cap and registrantCount has reached it. */
+                                registrationFull: boolean;
+                                invitationOnly: boolean;
+                            }[];
+                            pagination: {
+                                page: number;
+                                perPage: number;
+                                total: number;
+                                totalPages: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMissionTrip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /** @description Pledge_Campaigns.Pledge_Campaign_ID. */
+                            id: number;
+                            /** @description Public trip name (Pledge_Campaigns.Nickname, falling back to Campaign_Name). */
+                            name: string;
+                            /** @description Journey_Destinations.Destination_Name, or null. */
+                            destination: string | null;
+                            destinationId: number | null;
+                            description: string | null;
+                            /** @description Journey_Destinations.Website_Banner, or null. */
+                            bannerUrl: string | null;
+                            /** @description Trip start (Trip_Start_Date), ISO 8601, or null when unset. */
+                            startDate: string | null;
+                            /** @description Trip end (Trip_End_Date), ISO 8601, or null when unset. */
+                            endDate: string | null;
+                            /** @description Campaign close (End_Date), ISO 8601, or null. */
+                            registrationEndDate: string | null;
+                            /** @description Per-participant fundraising target (Fundraising_Goal), or null. */
+                            cost: number | null;
+                            /** @description Active or completed pledges on the campaign (Pledge_Status_ID <= 2). */
+                            registrantCount: number;
+                            maximumRegistrants: number | null;
+                            /** @description True when the campaign has a cap and registrantCount has reached it. */
+                            registrationFull: boolean;
+                            invitationOnly: boolean;
+                            /** @description Pledge_Campaigns.Long_Description — the long-form trip write-up. Staff-authored HTML from the MP editor (`<p>`, `<b>`, `<em>`), NOT plain text: render it sanitized. The list endpoint's `description` is the plain-text teaser. */
+                            longDescription: string | null;
+                            /** @description The trip team, sorted by last name. Same seat-holding pledge statuses that `registrantCount` counts, so the two always agree. */
+                            participants: {
+                                /** @description Pledges.Pledge_ID — the participant's seat on this trip. */
+                                pledgeId: number;
+                                /** @description Display name: Pledges.Beneficiary when set (it carries couples, e.g. "Sue and Brett Swanson"), otherwise the donor contact's nickname + last name. */
+                                name: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMissionTripParticipant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                pledgeId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            pledgeId: number;
+                            /** @description The campaign this pledge belongs to. */
+                            tripId: number;
+                            /** @description Display name, same rules as the roster (Beneficiary wins). */
+                            name: string;
+                            /** @description The donor contact's given name on its own, for the "Support Sally" call to action. Resolved from the contact rather than from `name`, so it stays a single first name even when `name` is a Beneficiary string covering two people ("Samantha and Jack Morgan" -> "Samantha"). */
+                            firstName: string | null;
+                            /** @description Pledges.Letter — the participant's support letter. Staff/participant-authored HTML from the MP editor, so render it sanitized. Null when unwritten, which is the common case. */
+                            letter: string | null;
+                            /** @description Money actually received against this pledge (sum of Donation_Distributions.Amount). NOT Pledges.Total_Pledge, which is a different figure and is 0 for most rows. */
+                            raised: number;
+                            /** @description The campaign's per-participant Fundraising_Goal, or null when the campaign has none. Every participant on a trip shares the same goal. */
+                            goal: number | null;
+                            tripLeader: boolean;
+                            facebookUrl: string | null;
+                            xUrl: string | null;
+                            instagramUrl: string | null;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMissionTripParticipantPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                pledgeId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMyMissionTrips: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            trips: {
+                                pledgeId: number;
+                                campaignId: number;
+                                /** @description Pledge_Campaigns.Nickname, falling back to "Destination: start – end" from Journey_Destinations, then Campaign_Name. */
+                                name: string;
+                                /** @description Pledge_Campaigns.Long_Description, sanitized. Staff-authored HTML. */
+                                longDescription: string | null;
+                                /** @description Trip_Start_Date, ISO 8601. */
+                                startDate: string | null;
+                                /** @description Trip_End_Date, ISO 8601. */
+                                endDate: string | null;
+                                /** @description True once the CAMPAIGN has closed (Pledge_Campaigns.End_Date <= now), not when the trip has travelled. The campaign window stays open for months after a trip returns while giving is still being settled, and the legacy proc drew the Current/Past line here too. */
+                                past: boolean;
+                                /** @description True when the pledge is the viewer's own; false for a household member's pledge surfaced because the viewer is a head of household. */
+                                mine: boolean;
+                                /** @description Whose pledge this is, rendered "nickname lastname". */
+                                participantName: string;
+                                /** @description Pledge_Statuses.Pledge_Status — "Active" or "Completed". */
+                                pledgeStatus: string;
+                                /** @description Pledges.Total_Pledge — this participant's fundraising goal. */
+                                totalPledge: number;
+                                /** @description Sum of Donation_Distributions.Amount against this pledge. MP stores no such column; it is rolled up per request. */
+                                totalDonations: number;
+                                lastDonationDate: string | null;
+                                /** @description Pledges.Letter, sanitized — the support letter. Null on a past trip, and null when unwritten. */
+                                letter: string | null;
+                                /** @description Pledges.Trip_Leader on this pledge. */
+                                isLeader: boolean;
+                                leaders: {
+                                    name: string;
+                                    email: string | null;
+                                    /** @description The leader's own pledge on this campaign. Feed it to `/api/mission-trips/{campaignId}/participant/{pledgeId}/image` for the photo. */
+                                    pledgeId: number;
+                                }[];
+                                donations: {
+                                    /** @description Donations.Donation_Date, ISO 8601. */
+                                    date: string;
+                                    /** @description Donation_Distributions.Amount — this split of the gift, not the whole donation. */
+                                    amount: number;
+                                    /** @description Donations.Anonymous. */
+                                    anonymous: boolean;
+                                    /** @description Rendered "nickname lastname", the organization name for a company contact, or "Anonymous" when the gift is anonymous. */
+                                    donorName: string;
+                                    email: string | null;
+                                    phone: string | null;
+                                    /** @description Null for an anonymous gift, and for a donor with no household address. */
+                                    address: {
+                                        line1: string | null;
+                                        line2: string | null;
+                                        city: string | null;
+                                        /** @description Addresses.[State/Region]. */
+                                        state: string | null;
+                                        postalCode: string | null;
+                                    } | null;
+                                }[];
+                                leaderSummary: {
+                                    /** @description The viewer's own email — the From address for the widget's "Email All Participants" mailto. */
+                                    email: string | null;
+                                    /** @description Raised across every seat-holding pledge on the campaign. */
+                                    totalDonations: number;
+                                    /** @description Sum of every seat-holding pledge's Total_Pledge on the campaign. */
+                                    totalGoal: number;
+                                } | null;
+                                participants: {
+                                    pledgeId: number;
+                                    name: string;
+                                    email: string | null;
+                                    /** @description Pledges.Total_Pledge — this participant's own goal. */
+                                    totalPledge: number;
+                                    totalDonations: number;
+                                }[];
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    saveMissionLetter: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pledgeId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The support letter as HTML. */
+                    letter: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            pledgeId: number;
+                            /** @description The letter as stored, after sanitization. */
+                            letter: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listCommunityGroups: {
+        parameters: {
+            query?: {
+                groupTypeId?: number;
+                ministryIds?: string;
+                neighborhoodIds?: string;
+                focusIds?: string;
+                lifeStageIds?: string;
+                meetingDayIds?: string;
+                meetingTimes?: string;
+                location?: string;
+                keyword?: string;
+                meetsOnline?: "true" | "false";
+                includeFull?: "true" | "false";
+                countGroupInquiries?: "true" | "false";
+                showFutureGroups?: "true" | "false";
+                includeHidden?: "true" | "false";
+                includeEnded?: "true" | "false";
+                page?: number;
+                perPage?: number;
+                sort?: "name" | "neighborhood" | "startDate";
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            groups: {
+                                /** @description Groups.Group_ID. */
+                                id: number;
+                                /** @description Groups.Group_Name. */
+                                name: string;
+                                description: string | null;
+                                /** @description Ministries.Ministry_Name — the ministry that owns the group. */
+                                ministry: string | null;
+                                /** @description Groups.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response. */
+                                ministryId: number | null;
+                                /** @description City_Ministries.City_Ministry, or null. */
+                                neighborhood: string | null;
+                                neighborhoodId: number | null;
+                                /** @description Group_Focuses.Group_Focus, or null. */
+                                groupFocus: string | null;
+                                groupFocusId: number | null;
+                                /** @description Life_Stages.Life_Stage. */
+                                lifeStage: string | null;
+                                lifeStageId: number | null;
+                                /** @description Meeting_Days.Meeting_Day. */
+                                meetingDay: string | null;
+                                meetingDayId: number | null;
+                                /** @description Groups.Meeting_Time as "HH:mm:ss", or null. Midnight is treated as unset — staff enter 00:00:00 as a placeholder. */
+                                meetingTime: string | null;
+                                /** @description Bucket derived from meetingTime, or null when there is no time. */
+                                meetingTimeOfDay: ("morning" | "lunchtime" | "afternoon" | "evening") | null;
+                                /** @description Meeting_Frequencies.Meeting_Frequency. */
+                                meetingFrequency: string | null;
+                                meetingFrequencyId: number | null;
+                                /** @description Meeting address city. The street line is never returned. */
+                                city: string | null;
+                                /** @description Meeting address state or region. */
+                                state: string | null;
+                                meetsOnline: boolean;
+                                /** @description True when Groups.Group_Is_Full is set, OR the group has a Target_Size that its participants have reached. Matches how the MP group-finder widget defines full. */
+                                isFull: boolean;
+                                /** @description Groups.Start_Date, ISO 8601, or null. */
+                                startDate: string | null;
+                                /** @description Groups.Current_Group_Participants, or null. */
+                                participantCount: number | null;
+                                /** @description Groups.Target_Size. */
+                                targetSize: number | null;
+                                /** @description Group_Inquiries on this group that have not been Placed, or null when countGroupInquiries is off. Exposed so the `isFull` decision is reproducible from the response. */
+                                pendingInquiryCount: number | null;
+                            }[];
+                            pagination: {
+                                page: number;
+                                perPage: number;
+                                total: number;
+                                totalPages: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listCommunityGroupFacets: {
+        parameters: {
+            query?: {
+                groupTypeId?: number;
+                ministryIds?: string;
+                includeHidden?: "true" | "false";
+                includeEnded?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            neighborhoods: {
+                                id: number;
+                                name: string;
+                            }[];
+                            focuses: {
+                                id: number;
+                                name: string;
+                            }[];
+                            lifeStages: {
+                                id: number;
+                                name: string;
+                            }[];
+                            meetingDays: {
+                                id: number;
+                                name: string;
+                            }[];
+                            meetingTimes: {
+                                /** @enum {string} */
+                                id: "morning" | "lunchtime" | "afternoon" | "evening";
+                                name: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getGroupImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getStaffContactMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            name: string;
+                            jobTitle: string | null;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getStaffContactPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitStaffContact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    contactGuid: string;
+                    senderName: string;
+                    /** Format: email */
+                    senderEmail: string;
+                    subject?: string;
+                    message: string;
+                    recaptchaToken: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /** @constant */
+                            submitted: true;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listStaffDirectory: {
+        parameters: {
+            query?: {
+                ministryIds?: string;
+                personnelTypeIds?: string;
+                contactIds?: string;
+                keyword?: string;
+                includeHidden?: "true" | "false";
+                includeEnded?: "true" | "false";
+                page?: number;
+                perPage?: number;
+                sort?: "name" | "ministry" | "startDate";
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            staff: {
+                                /** @description HR_Personnel.Personnel_ID. */
+                                personnelId: number;
+                                /** @description Contacts.Contact_ID. */
+                                contactId: number;
+                                /** @description Contacts.Contact_GUID — the identifier the staff-contact form takes (`/staff-contact/?contactGuid=…`). Null when MP has no GUID on the record, in which case the card cannot link anywhere. */
+                                contactGuid: string | null;
+                                /** @description Display name: nickname + last name when a nickname exists, otherwise first + last. */
+                                name: string;
+                                firstName: string | null;
+                                lastName: string | null;
+                                nickname: string | null;
+                                /** @description The staff headshot, served from MP's public files endpoint, or null when the person has no photo on file (the widget then renders a placeholder avatar). */
+                                photoUrl: string | null;
+                                /** @description HR_Personnel_Types.Personnel_Type. */
+                                personnelType: string | null;
+                                personnelTypeId: number | null;
+                                /** @description HR_Personnel.Personnel_Start_Date, ISO 8601, or null. */
+                                startDate: string | null;
+                                /** @description Every website-visible position, ordered longest-held first. Never empty — a person with no visible position is not in the directory at all. */
+                                positions: {
+                                    /** @description HR_Positions.Position_ID. */
+                                    id: number;
+                                    /** @description HR_Positions.Position_Title. */
+                                    title: string;
+                                    /** @description Ministries.Ministry_Name — the ministry the position sits in. */
+                                    ministry: string | null;
+                                    /** @description HR_Positions.Ministry_ID. Returned so the effect of a ministryIds filter is reproducible from the response. */
+                                    ministryId: number | null;
+                                    /** @description HR_Positions.Department_Head. */
+                                    isDepartmentHead: boolean;
+                                    /** @description HR_Positions.Division_Head. */
+                                    isDivisionHead: boolean;
+                                    /** @description HR_Positions.Position_Start, ISO 8601, or null. */
+                                    startDate: string | null;
+                                }[];
+                            }[];
+                            pagination: {
+                                page: number;
+                                perPage: number;
+                                total: number;
+                                totalPages: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listStaffDirectoryFacets: {
+        parameters: {
+            query?: {
+                ministryIds?: string;
+                personnelTypeIds?: string;
+                includeHidden?: "true" | "false";
+                includeEnded?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ministries: {
+                                id: number;
+                                name: string;
+                            }[];
+                            personnelTypes: {
+                                id: number;
+                                name: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listPrayerRequests: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            requests: {
+                                /** @description Feedback_Entries.Feedback_Entry_ID. */
+                                id: number;
+                                /** @description The submitter's nickname or first name — never a full name — or 'Anonymous' when the request was shared anonymously. */
+                                submittedBy: string;
+                                /** @description Feedback_Entries.Date_Submitted, ISO 8601, America/New_York. */
+                                submittedAt: string;
+                                /** @description Feedback_Entries.Description. */
+                                request: string;
+                                /** @description Feedback_Entries.Prayer_Count — how many times someone has pressed "I Prayed". */
+                                prayerCount: number;
+                            }[];
+                            pagination: {
+                                page: number;
+                                perPage: number;
+                                total: number;
+                                totalPages: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitPrayerRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    firstName?: string;
+                    lastName?: string;
+                    /** Format: email */
+                    email?: string;
+                    /** @description The request itself. Capped at 2000 characters to match Feedback_Entries.Description. */
+                    request: string;
+                    /** @enum {string} */
+                    privacy: "online" | "staff" | "anonymous";
+                    /**
+                     * @description Sets Feedback_Entries.Prayer_Notifications — "Email Me When Someone Prays".
+                     * @default false
+                     */
+                    notifyMe: boolean;
+                    recaptchaToken: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /** @constant */
+                            submitted: true;
+                            /** @constant */
+                            pendingApproval: true;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    recordPrayerForRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            prayerCount: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getPrayerWallIdentity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /** @description Nickname (or first name) plus last name. */
+                            name: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRegistrationEvent: {
+        parameters: {
+            query?: {
+                page?: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            eventId: number;
+                            title: string;
+                            descriptionHtml: string | null;
+                            startDate: string;
+                            endDate: string;
+                            /** @description IANA zone of the event congregation. */
+                            timeZone: string;
+                            congregationId: number;
+                            imageUrl: string | null;
+                            location: {
+                                name: string | null;
+                                addressLine1: string | null;
+                                addressLine2: string | null;
+                                city: string | null;
+                                state: string | null;
+                                postalCode: string | null;
+                                directionsUrl: string | null;
+                                rooms: string[];
+                            } | null;
+                            primaryContact: {
+                                displayName: string;
+                                emailAddress: string | null;
+                            } | null;
+                            visibilityLevelId: number;
+                            viewable: boolean;
+                            cancelled: boolean;
+                            externalRegistrationUrl: string | null;
+                            viewer: {
+                                signedIn: boolean;
+                                contactId: number | null;
+                                loginRequired: boolean;
+                                canGuestRegister: boolean;
+                                isStaff: boolean;
+                            };
+                            sections: {
+                                /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                key: string;
+                                relatedEventId: number | null;
+                                displayName: string;
+                                enableLabelHtml: string | null;
+                                instructionsHtml: string | null;
+                                buttonText: string;
+                                sectionGroup: string | null;
+                                position: number;
+                                showHouseholdPositionId: number | null;
+                                forGenderId: number | null;
+                                isParentEvent: boolean;
+                                audience: {
+                                    minAge: number | null;
+                                    maxAge: number | null;
+                                    minGrade: number | null;
+                                    maxGrade: number | null;
+                                    genderId: number | null;
+                                    householdPositionId: number | null;
+                                    minorsOnly: boolean;
+                                    adultsOnly: boolean;
+                                };
+                                event: {
+                                    eventId: number;
+                                    title: string;
+                                    /** @description MP naive-local ISO, congregation time zone. */
+                                    startDate: string;
+                                    endDate: string;
+                                    meetingInstructionsHtml: string | null;
+                                    minorRegistration: boolean;
+                                    participantsExpected: number | null;
+                                    remaining: number | null;
+                                    registrationStart: string | null;
+                                    registrationEnd: string | null;
+                                    externalRegistrationUrl: string | null;
+                                };
+                                product: {
+                                    productId: number;
+                                    name: string;
+                                    descriptionHtml: string | null;
+                                    basePrice: number;
+                                    depositPrice: number | null;
+                                    groups: {
+                                        productOptionGroupId: number;
+                                        name: string;
+                                        descriptionHtml: string | null;
+                                        required: boolean;
+                                        mutuallyExclusive: boolean;
+                                        noteLabel: string | null;
+                                        formFieldId: number | null;
+                                        omitFromSummary: boolean;
+                                        exhausted: boolean;
+                                        prices: {
+                                            productOptionPriceId: number;
+                                            title: string;
+                                            /** @description Option_Price; negative for discounts. */
+                                            price: number;
+                                            qtyAllowed: number;
+                                            minQty: number;
+                                            maxQty: number | null;
+                                            remaining: number | null;
+                                            attendingOnline: boolean;
+                                            addsToGroupId: number | null;
+                                            hidden: boolean;
+                                            isPromo: boolean;
+                                            sortOrder: number | null;
+                                            placement: {
+                                                minAgeMonths: number | null;
+                                                maxAgeMonths: number | null;
+                                                minGrade: number | null;
+                                                maxGrade: number | null;
+                                            } | null;
+                                        }[];
+                                    }[];
+                                } | null;
+                                form: {
+                                    formId: number;
+                                    title: string;
+                                    instructionsHtml: string | null;
+                                    forceLogin: boolean;
+                                    fields: {
+                                        formFieldId: number;
+                                        order: number;
+                                        label: string;
+                                        alternateLabelHtml: string | null;
+                                        fieldTypeId: number;
+                                        values: string[];
+                                        required: boolean;
+                                        dependsOnFieldId: number | null;
+                                        dependsOnValue: string | null;
+                                        omitFromSummary: boolean;
+                                        hasSideEffects: boolean;
+                                    }[];
+                                    blockedByFileUpload: boolean;
+                                    fileUploadFieldIds: number[];
+                                } | null;
+                                open: boolean;
+                                closedReason: ("not_active" | "not_yet_open" | "closed" | "cancelled" | "not_approved" | "no_product" | "external_url" | "full" | "required_options_exhausted" | "file_upload_required") | null;
+                            }[];
+                            extras: {
+                                productId: number;
+                                name: string;
+                                descriptionHtml: string | null;
+                                basePrice: number;
+                                depositPrice: number | null;
+                                groups: {
+                                    productOptionGroupId: number;
+                                    name: string;
+                                    descriptionHtml: string | null;
+                                    required: boolean;
+                                    mutuallyExclusive: boolean;
+                                    noteLabel: string | null;
+                                    formFieldId: number | null;
+                                    omitFromSummary: boolean;
+                                    exhausted: boolean;
+                                    prices: {
+                                        productOptionPriceId: number;
+                                        title: string;
+                                        /** @description Option_Price; negative for discounts. */
+                                        price: number;
+                                        qtyAllowed: number;
+                                        minQty: number;
+                                        maxQty: number | null;
+                                        remaining: number | null;
+                                        attendingOnline: boolean;
+                                        addsToGroupId: number | null;
+                                        hidden: boolean;
+                                        isPromo: boolean;
+                                        sortOrder: number | null;
+                                        placement: {
+                                            minAgeMonths: number | null;
+                                            maxAgeMonths: number | null;
+                                            minGrade: number | null;
+                                            maxGrade: number | null;
+                                        } | null;
+                                    }[];
+                                }[];
+                            } | null;
+                            registrationOpen: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRegistrationRoster: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            householdId: number;
+                            viewer: {
+                                contactId: number;
+                                firstName: string;
+                                lastName: string;
+                                email: string | null;
+                                phone: string | null;
+                                address: {
+                                    line1: string | null;
+                                    line2: string | null;
+                                    city: string | null;
+                                    state: string | null;
+                                    postalCode: string | null;
+                                } | null;
+                            };
+                            members: {
+                                contactId: number;
+                                firstName: string;
+                                lastName: string;
+                                displayName: string;
+                                householdPositionId: number | null;
+                                genderId: number | null;
+                                dateOfBirth: string | null;
+                                age: number | null;
+                                grade: number | null;
+                                isMinorPosition: boolean;
+                                isViewer: boolean;
+                                hasParticipantRecord: boolean;
+                                prefill: {
+                                    formFieldId: number;
+                                    response: string;
+                                    since: string | null;
+                                }[];
+                                eligibility: {
+                                    /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                    sectionKey: string;
+                                    eligible: boolean;
+                                    reason: ("household_position" | "gender" | "minors_only" | "too_young" | "too_old" | "wrong_grade" | "already_registered" | "section_closed") | null;
+                                    requires: ("birth_date" | "grade")[];
+                                    existingEventParticipantId: number | null;
+                                }[];
+                            }[];
+                            creatablePositionIds: number[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    quoteRegistration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    purchaser: {
+                        /** @constant */
+                        kind: "session";
+                    } | {
+                        /** @constant */
+                        kind: "guest";
+                        firstName: string;
+                        lastName: string;
+                        /** Format: email */
+                        email: string;
+                        phone: string;
+                        address?: {
+                            line1: string;
+                            line2?: string;
+                            city: string;
+                            state: string;
+                            postalCode: string;
+                        };
+                    };
+                    registrations: {
+                        /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                        sectionKey: string;
+                        attendee: {
+                            /** @constant */
+                            kind: "contact";
+                            contactId: number;
+                            /** @description yyyy-MM-dd */
+                            dateOfBirth?: string;
+                            grade?: number;
+                        } | {
+                            /** @constant */
+                            kind: "new";
+                            firstName: string;
+                            lastName: string;
+                            /** @description yyyy-MM-dd */
+                            dateOfBirth?: string;
+                            genderId?: number;
+                            grade?: number;
+                            householdPositionId: number;
+                            /** Format: email */
+                            email?: string;
+                            phone?: string;
+                        } | {
+                            /** @constant */
+                            kind: "purchaser";
+                        };
+                        /** @default [] */
+                        options: {
+                            productOptionPriceId: number;
+                            /** @default 1 */
+                            quantity: number;
+                            note?: string;
+                        }[];
+                        promoCode?: string;
+                        /** @default [] */
+                        answers: {
+                            formFieldId: number;
+                            response: string;
+                        }[];
+                    }[];
+                    /** @default [] */
+                    extras: {
+                        productOptionPriceId: number;
+                        /** @default 1 */
+                        quantity: number;
+                        note?: string;
+                    }[];
+                    /** @default false */
+                    payDeposit: boolean;
+                    /** @default false */
+                    updateMyRecord: boolean;
+                    contact?: {
+                        /** Format: email */
+                        email?: string;
+                        phone?: string;
+                        address?: {
+                            line1: string;
+                            line2?: string;
+                            city: string;
+                            state: string;
+                            postalCode: string;
+                        };
+                    };
+                    captchaToken?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            eventId: number;
+                            registrations: {
+                                registrationIndex: number;
+                                /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                sectionKey: string;
+                                eventId: number;
+                                contactId: number | null;
+                                attendeeName: string;
+                                isMinor: boolean;
+                                lines: {
+                                    /** @enum {string} */
+                                    kind: "base" | "option" | "promo";
+                                    productId: number;
+                                    productOptionPriceId: number | null;
+                                    title: string;
+                                    quantity: number;
+                                    unitPrice: number;
+                                    lineTotal: number;
+                                    itemNote: string | null;
+                                    depositRequested: boolean;
+                                }[];
+                                subtotal: number;
+                                optionsSummary: string | null;
+                                answerSummary: string | null;
+                                attendingOnline: boolean;
+                                addsToGroupIds: number[];
+                                overlapsWithRegistrationIndexes: number[];
+                                resolvedOptions: {
+                                    productOptionGroupId: number;
+                                    groupName: string;
+                                    productOptionPriceId: number;
+                                    title: string;
+                                }[];
+                            }[];
+                            extras: {
+                                registrationIndex: number;
+                                /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                sectionKey: string;
+                                eventId: number;
+                                contactId: number | null;
+                                attendeeName: string;
+                                isMinor: boolean;
+                                lines: {
+                                    /** @enum {string} */
+                                    kind: "base" | "option" | "promo";
+                                    productId: number;
+                                    productOptionPriceId: number | null;
+                                    title: string;
+                                    quantity: number;
+                                    unitPrice: number;
+                                    lineTotal: number;
+                                    itemNote: string | null;
+                                    depositRequested: boolean;
+                                }[];
+                                subtotal: number;
+                                optionsSummary: string | null;
+                                answerSummary: string | null;
+                                attendingOnline: boolean;
+                                addsToGroupIds: number[];
+                                overlapsWithRegistrationIndexes: number[];
+                                resolvedOptions: {
+                                    productOptionGroupId: number;
+                                    groupName: string;
+                                    productOptionPriceId: number;
+                                    title: string;
+                                }[];
+                            } | null;
+                            invoiceTotal: number;
+                            depositRequested: boolean;
+                            participationStatusId: number;
+                            invoiceStatusId: number;
+                            addressRequired: boolean;
+                            problems: {
+                                /** @enum {string} */
+                                code: "SECTION_INELIGIBLE" | "SECTION_CLOSED" | "ALREADY_REGISTERED" | "DUPLICATE_IN_PLAN" | "OPTION_UNAVAILABLE" | "OPTION_HIDDEN" | "REQUIRED_OPTION_MISSING" | "MUTUALLY_EXCLUSIVE_CONFLICT" | "QUANTITY_OUT_OF_RANGE" | "INVALID_PROMO_CODE" | "FORM_INCOMPLETE" | "FORM_FIELD_INVALID" | "FILE_UPLOAD_REQUIRED" | "CAPACITY_EXCEEDED" | "ADDRESS_REQUIRED" | "GUEST_NOT_ALLOWED" | "LOGIN_REQUIRED" | "MINOR_REQUIRED" | "BIRTH_DATE_REQUIRED" | "GRADE_REQUIRED" | "CHOOSE_OPTION";
+                                message: string;
+                                registrationIndex: number | null;
+                                details?: {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            submittable: boolean;
+                            quoteHash: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitRegistration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    purchaser: {
+                        /** @constant */
+                        kind: "session";
+                    } | {
+                        /** @constant */
+                        kind: "guest";
+                        firstName: string;
+                        lastName: string;
+                        /** Format: email */
+                        email: string;
+                        phone: string;
+                        address?: {
+                            line1: string;
+                            line2?: string;
+                            city: string;
+                            state: string;
+                            postalCode: string;
+                        };
+                    };
+                    registrations: {
+                        /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                        sectionKey: string;
+                        attendee: {
+                            /** @constant */
+                            kind: "contact";
+                            contactId: number;
+                            /** @description yyyy-MM-dd */
+                            dateOfBirth?: string;
+                            grade?: number;
+                        } | {
+                            /** @constant */
+                            kind: "new";
+                            firstName: string;
+                            lastName: string;
+                            /** @description yyyy-MM-dd */
+                            dateOfBirth?: string;
+                            genderId?: number;
+                            grade?: number;
+                            householdPositionId: number;
+                            /** Format: email */
+                            email?: string;
+                            phone?: string;
+                        } | {
+                            /** @constant */
+                            kind: "purchaser";
+                        };
+                        /** @default [] */
+                        options: {
+                            productOptionPriceId: number;
+                            /** @default 1 */
+                            quantity: number;
+                            note?: string;
+                        }[];
+                        promoCode?: string;
+                        /** @default [] */
+                        answers: {
+                            formFieldId: number;
+                            response: string;
+                        }[];
+                    }[];
+                    /** @default [] */
+                    extras: {
+                        productOptionPriceId: number;
+                        /** @default 1 */
+                        quantity: number;
+                        note?: string;
+                    }[];
+                    /** @default false */
+                    payDeposit: boolean;
+                    /** @default false */
+                    updateMyRecord: boolean;
+                    contact?: {
+                        /** Format: email */
+                        email?: string;
+                        phone?: string;
+                        address?: {
+                            line1: string;
+                            line2?: string;
+                            city: string;
+                            state: string;
+                            postalCode: string;
+                        };
+                    };
+                    captchaToken?: string;
+                    /** @default false */
+                    dryRun: boolean;
+                    expectedQuoteHash?: string;
+                    checkout?: {
+                        /** Format: uri */
+                        url: string;
+                        /** @default id */
+                        invoiceParam: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /** @constant */
+                            dryRun: false;
+                            idempotencyKey: string;
+                            replayed: boolean;
+                            invoiceId: number;
+                            invoiceGuid: string;
+                            invoiceTotal: number;
+                            invoiceStatusId: number;
+                            checkoutUrl: string;
+                            participants: {
+                                registrationIndex: number;
+                                /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                sectionKey: string;
+                                eventId: number;
+                                contactId: number;
+                                participantId: number;
+                                eventParticipantId: number;
+                                participationStatusId: number;
+                                formResponseId: number | null;
+                                groupParticipantId: number | null;
+                                contactCreated: boolean;
+                            }[];
+                            quote: {
+                                eventId: number;
+                                registrations: {
+                                    registrationIndex: number;
+                                    /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                    sectionKey: string;
+                                    eventId: number;
+                                    contactId: number | null;
+                                    attendeeName: string;
+                                    isMinor: boolean;
+                                    lines: {
+                                        /** @enum {string} */
+                                        kind: "base" | "option" | "promo";
+                                        productId: number;
+                                        productOptionPriceId: number | null;
+                                        title: string;
+                                        quantity: number;
+                                        unitPrice: number;
+                                        lineTotal: number;
+                                        itemNote: string | null;
+                                        depositRequested: boolean;
+                                    }[];
+                                    subtotal: number;
+                                    optionsSummary: string | null;
+                                    answerSummary: string | null;
+                                    attendingOnline: boolean;
+                                    addsToGroupIds: number[];
+                                    overlapsWithRegistrationIndexes: number[];
+                                    resolvedOptions: {
+                                        productOptionGroupId: number;
+                                        groupName: string;
+                                        productOptionPriceId: number;
+                                        title: string;
+                                    }[];
+                                }[];
+                                extras: {
+                                    registrationIndex: number;
+                                    /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                    sectionKey: string;
+                                    eventId: number;
+                                    contactId: number | null;
+                                    attendeeName: string;
+                                    isMinor: boolean;
+                                    lines: {
+                                        /** @enum {string} */
+                                        kind: "base" | "option" | "promo";
+                                        productId: number;
+                                        productOptionPriceId: number | null;
+                                        title: string;
+                                        quantity: number;
+                                        unitPrice: number;
+                                        lineTotal: number;
+                                        itemNote: string | null;
+                                        depositRequested: boolean;
+                                    }[];
+                                    subtotal: number;
+                                    optionsSummary: string | null;
+                                    answerSummary: string | null;
+                                    attendingOnline: boolean;
+                                    addsToGroupIds: number[];
+                                    overlapsWithRegistrationIndexes: number[];
+                                    resolvedOptions: {
+                                        productOptionGroupId: number;
+                                        groupName: string;
+                                        productOptionPriceId: number;
+                                        title: string;
+                                    }[];
+                                } | null;
+                                invoiceTotal: number;
+                                depositRequested: boolean;
+                                participationStatusId: number;
+                                invoiceStatusId: number;
+                                addressRequired: boolean;
+                                problems: {
+                                    /** @enum {string} */
+                                    code: "SECTION_INELIGIBLE" | "SECTION_CLOSED" | "ALREADY_REGISTERED" | "DUPLICATE_IN_PLAN" | "OPTION_UNAVAILABLE" | "OPTION_HIDDEN" | "REQUIRED_OPTION_MISSING" | "MUTUALLY_EXCLUSIVE_CONFLICT" | "QUANTITY_OUT_OF_RANGE" | "INVALID_PROMO_CODE" | "FORM_INCOMPLETE" | "FORM_FIELD_INVALID" | "FILE_UPLOAD_REQUIRED" | "CAPACITY_EXCEEDED" | "ADDRESS_REQUIRED" | "GUEST_NOT_ALLOWED" | "LOGIN_REQUIRED" | "MINOR_REQUIRED" | "BIRTH_DATE_REQUIRED" | "GRADE_REQUIRED" | "CHOOSE_OPTION";
+                                    message: string;
+                                    registrationIndex: number | null;
+                                    details?: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                submittable: boolean;
+                                quoteHash: string;
+                            };
+                        } | {
+                            /** @constant */
+                            dryRun: true;
+                            idempotencyKey: string;
+                            eventId: number;
+                            eventIds: number[];
+                            quote: {
+                                eventId: number;
+                                registrations: {
+                                    registrationIndex: number;
+                                    /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                    sectionKey: string;
+                                    eventId: number;
+                                    contactId: number | null;
+                                    attendeeName: string;
+                                    isMinor: boolean;
+                                    lines: {
+                                        /** @enum {string} */
+                                        kind: "base" | "option" | "promo";
+                                        productId: number;
+                                        productOptionPriceId: number | null;
+                                        title: string;
+                                        quantity: number;
+                                        unitPrice: number;
+                                        lineTotal: number;
+                                        itemNote: string | null;
+                                        depositRequested: boolean;
+                                    }[];
+                                    subtotal: number;
+                                    optionsSummary: string | null;
+                                    answerSummary: string | null;
+                                    attendingOnline: boolean;
+                                    addsToGroupIds: number[];
+                                    overlapsWithRegistrationIndexes: number[];
+                                    resolvedOptions: {
+                                        productOptionGroupId: number;
+                                        groupName: string;
+                                        productOptionPriceId: number;
+                                        title: string;
+                                    }[];
+                                }[];
+                                extras: {
+                                    registrationIndex: number;
+                                    /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                                    sectionKey: string;
+                                    eventId: number;
+                                    contactId: number | null;
+                                    attendeeName: string;
+                                    isMinor: boolean;
+                                    lines: {
+                                        /** @enum {string} */
+                                        kind: "base" | "option" | "promo";
+                                        productId: number;
+                                        productOptionPriceId: number | null;
+                                        title: string;
+                                        quantity: number;
+                                        unitPrice: number;
+                                        lineTotal: number;
+                                        itemNote: string | null;
+                                        depositRequested: boolean;
+                                    }[];
+                                    subtotal: number;
+                                    optionsSummary: string | null;
+                                    answerSummary: string | null;
+                                    attendingOnline: boolean;
+                                    addsToGroupIds: number[];
+                                    overlapsWithRegistrationIndexes: number[];
+                                    resolvedOptions: {
+                                        productOptionGroupId: number;
+                                        groupName: string;
+                                        productOptionPriceId: number;
+                                        title: string;
+                                    }[];
+                                } | null;
+                                invoiceTotal: number;
+                                depositRequested: boolean;
+                                participationStatusId: number;
+                                invoiceStatusId: number;
+                                addressRequired: boolean;
+                                problems: {
+                                    /** @enum {string} */
+                                    code: "SECTION_INELIGIBLE" | "SECTION_CLOSED" | "ALREADY_REGISTERED" | "DUPLICATE_IN_PLAN" | "OPTION_UNAVAILABLE" | "OPTION_HIDDEN" | "REQUIRED_OPTION_MISSING" | "MUTUALLY_EXCLUSIVE_CONFLICT" | "QUANTITY_OUT_OF_RANGE" | "INVALID_PROMO_CODE" | "FORM_INCOMPLETE" | "FORM_FIELD_INVALID" | "FILE_UPLOAD_REQUIRED" | "CAPACITY_EXCEEDED" | "ADDRESS_REQUIRED" | "GUEST_NOT_ALLOWED" | "LOGIN_REQUIRED" | "MINOR_REQUIRED" | "BIRTH_DATE_REQUIRED" | "GRADE_REQUIRED" | "CHOOSE_OPTION";
+                                    message: string;
+                                    registrationIndex: number | null;
+                                    details?: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                submittable: boolean;
+                                quoteHash: string;
+                            };
+                            writes: {
+                                seq: number;
+                                table: string;
+                                /** @enum {string} */
+                                op: "create" | "update" | "proc";
+                                placeholderId: number | null;
+                                rows: {
+                                    [key: string]: unknown;
+                                }[];
+                                primaryKey: string | null;
+                                targetId: number | null;
+                            }[];
+                            /** @description checkoutUrl with a placeholder GUID. */
+                            wouldRedirectTo: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getOrgChart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            nodes: {
+                                /** @description HR_Personnel.Personnel_ID. */
+                                personnelId: number;
+                                /** @description Contacts.Contact_ID. */
+                                contactId: number;
+                                /** @description Contacts.Contact_GUID. Null when MP has no GUID on the record. */
+                                contactGuid: string | null;
+                                /** @description Display name: nickname + last name when a nickname exists, otherwise first + last. */
+                                name: string;
+                                firstName: string | null;
+                                lastName: string | null;
+                                nickname: string | null;
+                                /** @description The staff headshot from MP's public files endpoint, or null when the person has no photo on file. */
+                                photoUrl: string | null;
+                                /** @description Resolved HR_Personnel.Personnel_ID of the supervisor. Null identifies a root. NOT the raw HR_Personnel.Supervisor value — a stale pointer left behind by a promotion is remapped to the same person's current record first. */
+                                supervisorPersonnelId: number | null;
+                                /** @description Positions held, current ones first. May be empty when MP has no position row for the person at all. */
+                                positions: {
+                                    /** @description HR_Positions.Position_ID. */
+                                    id: number;
+                                    /** @description HR_Positions.Position_Title. */
+                                    title: string;
+                                    /** @description Ministries.Ministry_Name — the ministry the position sits in. */
+                                    ministry: string | null;
+                                    /** @description HR_Positions.Ministry_ID. */
+                                    ministryId: number | null;
+                                    /** @description HR_Positions.Department_Head. */
+                                    isDepartmentHead: boolean;
+                                    /** @description HR_Positions.Division_Head. */
+                                    isDivisionHead: boolean;
+                                    /** @description HR_Positions.Position_End has passed. */
+                                    isEnded: boolean;
+                                }[];
+                                /** @description HR_Personnel_Types.Personnel_Type, e.g. "Full Time Exempt", "Unpaid Volunteer". */
+                                personnelType: string | null;
+                                personnelTypeId: number | null;
+                                /** @description HR_Personnel.Personnel_End_Date is unset or still in the future. */
+                                isCurrentPersonnel: boolean;
+                                directReportCount: number;
+                                /** @description Everyone beneath this node, at any depth — the whole subtree. */
+                                totalReportCount: number;
+                                /** @description Distance from the root; the root is 1. */
+                                depth: number;
+                            }[];
+                            /** @description Nodes with no supervisor. Normally exactly one (the Senior Pastor); more than one means MP has reporting lines that no longer reach the top. */
+                            rootPersonnelIds: number[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            Invoice_ID: number;
+                            Invoice_GUID?: string;
+                            Purchaser_Contact_ID?: number;
+                            Invoice_Status_ID?: number;
+                            Invoice_Total?: number;
+                            Invoice_Date?: string;
+                            Notes?: string;
+                            Currency?: string;
+                            Congregation_ID?: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        version: string | null;
+                        /** @description Vercel environment ("production" | "preview" | "development"); "development" off Vercel. */
+                        environment: string;
+                        /** @description Git commit the running deployment was built from. Compare against origin/main to confirm a deploy actually landed. */
+                        commitSha: string | null;
+                        /** @description Git branch the running deployment was built from. */
+                        branch: string | null;
+                        /** @description Vercel deployment ID serving this request. */
+                        deploymentId: string | null;
+                        /** @description Current server time, ISO 8601. Not a deployment timestamp. */
+                        serverTime: string;
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getOverallHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            services: {
+                                service: string;
+                                /** @enum {string} */
+                                status: "operational" | "degraded" | "down";
+                                checks: {
+                                    name: string;
+                                    /** @enum {string} */
+                                    status: "operational" | "degraded" | "down";
+                                    responseTime?: number;
+                                    error?: string;
+                                    lastCheck?: string;
+                                }[];
+                                responseTime: number;
+                                uptime: {
+                                    last24h: number | null;
+                                    last7d: number | null;
+                                    last30d: number | null;
+                                };
+                                incidents: {
+                                    count: number;
+                                    totalDowntimeMs: number;
+                                    lastIncident?: string;
+                                };
+                                lastCheck: string;
+                                lastFailure?: string;
+                                monitoringSince: string;
+                            }[];
+                            /** @enum {string} */
+                            overall: "operational" | "degraded" | "down";
+                            overallUptime: {
+                                last24h: number | null;
+                                last7d: number | null;
+                                last30d: number | null;
+                            };
+                            totalIncidents: number;
+                            lastUpdated: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getServiceHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
                 service: string;
-                /** @enum {string} */
-                status: 'operational' | 'degraded' | 'down';
-                checks: {
-                  name: string;
-                  /** @enum {string} */
-                  status: 'operational' | 'degraded' | 'down';
-                  responseTime?: number;
-                  error?: string;
-                  lastCheck?: string;
-                }[];
-                responseTime: number;
-                uptime: {
-                  last24h: number | null;
-                  last7d: number | null;
-                  last30d: number | null;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                incidents: {
-                  count: number;
-                  totalDowntimeMs: number;
-                  lastIncident?: string;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            service: string;
+                            /** @enum {string} */
+                            status: "operational" | "degraded" | "down";
+                            checks: {
+                                name: string;
+                                /** @enum {string} */
+                                status: "operational" | "degraded" | "down";
+                                responseTime?: number;
+                                error?: string;
+                                lastCheck?: string;
+                            }[];
+                            responseTime: number;
+                            timestamp: string;
+                            error?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                lastCheck: string;
-                lastFailure?: string;
-                monitoringSince: string;
-              }[];
-              /** @enum {string} */
-              overall: 'operational' | 'degraded' | 'down';
-              overallUptime: {
-                last24h: number | null;
-                last7d: number | null;
-                last30d: number | null;
-              };
-              totalIncidents: number;
-              lastUpdated: string;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    runHealthCheck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service: string;
             };
-          };
+            cookie?: never;
         };
-      };
-      400: components['responses']['BadRequest'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getServiceHealth: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        service: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              service: string;
-              /** @enum {string} */
-              status: 'operational' | 'degraded' | 'down';
-              checks: {
-                name: string;
-                /** @enum {string} */
-                status: 'operational' | 'degraded' | 'down';
-                responseTime?: number;
-                error?: string;
-                lastCheck?: string;
-              }[];
-              responseTime: number;
-              timestamp: string;
-              error?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  runHealthCheck: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        service: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              service: string;
-              /** @enum {string} */
-              status: 'operational' | 'degraded' | 'down';
-              checks: {
-                name: string;
-                /** @enum {string} */
-                status: 'operational' | 'degraded' | 'down';
-                responseTime?: number;
-                error?: string;
-                lastCheck?: string;
-              }[];
-              responseTime: number;
-              timestamp: string;
-              error?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listMailFolders: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              folders: {
-                id: string;
-                displayName: string;
-                totalItemCount: number;
-                unreadItemCount: number;
-                parentFolderId?: string;
-                childFolderCount: number;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listMailMessages: {
-    parameters: {
-      query?: {
-        folder?: string;
-        top?: number;
-        skip?: number;
-        filter?: string;
-        search?: string;
-        orderBy?: string;
-        select?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              messages: {
-                id: string;
-                subject: string;
-                bodyPreview: string;
-                from: {
-                  emailAddress: {
-                    name: string;
-                    address: string;
-                  };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                toRecipients: {
-                  emailAddress: {
-                    name: string;
-                    address: string;
-                  };
-                }[];
-                body: {
-                  /** @enum {string} */
-                  contentType: 'text' | 'html';
-                  content: string;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            service: string;
+                            /** @enum {string} */
+                            status: "operational" | "degraded" | "down";
+                            checks: {
+                                name: string;
+                                /** @enum {string} */
+                                status: "operational" | "degraded" | "down";
+                                responseTime?: number;
+                                error?: string;
+                                lastCheck?: string;
+                            }[];
+                            responseTime: number;
+                            timestamp: string;
+                            error?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                receivedDateTime: string;
-                hasAttachments: boolean;
-                isRead?: boolean;
-                importance?: string;
-                internetMessageId?: string;
-                conversationId?: string;
-                webLink?: string;
-              }[];
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
     };
-  };
-  getMailMessage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    listMailFolders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              message: {
-                id: string;
-                subject: string;
-                bodyPreview: string;
-                from: {
-                  emailAddress: {
-                    name: string;
-                    address: string;
-                  };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                toRecipients: {
-                  emailAddress: {
-                    name: string;
-                    address: string;
-                  };
-                }[];
-                body: {
-                  /** @enum {string} */
-                  contentType: 'text' | 'html';
-                  content: string;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            folders: {
+                                id: string;
+                                displayName: string;
+                                totalItemCount: number;
+                                unreadItemCount: number;
+                                parentFolderId?: string;
+                                childFolderCount: number;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                receivedDateTime: string;
-                hasAttachments: boolean;
-                isRead?: boolean;
-                importance?: string;
-                internetMessageId?: string;
-                conversationId?: string;
-                webLink?: string;
-              };
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listMailMessages: {
+        parameters: {
+            query?: {
+                folder?: string;
                 top?: number;
                 skip?: number;
-              };
+                filter?: string;
+                search?: string;
+                orderBy?: string;
+                select?: string;
             };
-          };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listMailMessageAttachments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              attachments: {
-                id: string;
-                name: string;
-                contentType: string;
-                size: number;
-                isInline: boolean;
-                contentId?: string;
-                contentBytes?: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  ingestMailMessage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticketId: number;
-              conversationId: number | null;
-              isNewTicket: boolean;
-              /** @enum {string} */
-              direction: 'Inbound' | 'Outbound';
-              attachmentsDownloaded: number;
-              attachmentsFailed: number;
-              from: string;
-              fromName?: string;
-              subject: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listGraphSubscriptions: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              subscriptions: {
-                id: string;
-                resource: string;
-                changeType: string;
-                notificationUrl: string;
-                expirationDateTime: string;
-                clientState?: string;
-                lifecycleNotificationUrl?: string;
-                /** @enum {string} */
-                status: 'active' | 'expiring' | 'expired';
-                hoursRemaining: number;
-                needsRenewal: boolean;
-              }[];
-              count: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  createGraphSubscription: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          resource?: string;
-          changeType?: string;
-          notificationUrl?: string;
-          lifecycleUrl?: string;
-          expirationMinutes?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              subscription: {
-                id: string;
-                resource: string;
-                changeType: string;
-                notificationUrl: string;
-                expirationDateTime: string;
-                clientState?: string;
-                lifecycleNotificationUrl?: string;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getGraphSubscription: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              subscription: {
-                id: string;
-                resource: string;
-                changeType: string;
-                notificationUrl: string;
-                expirationDateTime: string;
-                clientState?: string;
-                lifecycleNotificationUrl?: string;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  deleteGraphSubscription: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              message: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  renewGraphSubscription: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              subscription: {
-                id: string;
-                resource: string;
-                changeType: string;
-                notificationUrl: string;
-                expirationDateTime: string;
-                clientState?: string;
-                lifecycleNotificationUrl?: string;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getGraphSubscriptionConfig: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              config: {
-                webhookUrl?: string;
-                lifecycleWebhookUrl?: string;
-                clientState?: string;
-                renewalThresholdHours: number;
-                maxRenewalAttempts: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getGraphSubscriptionHealth: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              /** @enum {string} */
-              status: 'healthy' | 'unhealthy' | 'unknown';
-              lastNotificationAt: string | null;
-              recentInboxCount?: number;
-              checkedAt?: string;
-              error?: string;
-              timestamp?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listGraphNotifications: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-        status?: string;
-        subscriptionId?: string;
-        since?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              entries: {
-                id: string;
-                subscriptionId: string;
-                messageId: string;
-                changeType: string;
-                receivedAt: string;
-                /** @enum {string} */
-                status: 'success' | 'failed' | 'skipped' | 'retrying';
-                processingMs?: number;
-                ticketId?: number;
-                conversationId?: number;
-                isNewTicket?: boolean;
-                ticketSubject?: string;
-                /** @enum {string} */
-                action?: 'created' | 'added';
-                error?: string;
-                retryCount?: number;
-              }[];
-              total: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getGraphNotificationMetrics: {
-    parameters: {
-      query?: {
-        subscriptionId?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              total24h: number;
-              total7d: number;
-              total30d: number;
-              successRate24h: number;
-              successRate7d: number;
-              avgLatencyMs24h: number;
-              p95LatencyMs24h: number;
-              deadLetterDepth: number;
-              hourlyBuckets: {
-                hour: string;
-                total: number;
-                success: number;
-                failed: number;
-                avgLatencyMs: number;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listGraphLifecycleEvents: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-        subscriptionId?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              entries: {
-                id: string;
-                subscriptionId: string;
-                /** @enum {string} */
-                event: 'reauthorizationRequired' | 'subscriptionRemoved' | 'missed';
-                receivedAt: string;
-                action: string;
-                success: boolean;
-                error?: string;
-              }[];
-              total: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listGraphDeadLetterEntries: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              entries: {
-                id: string;
-                messageId: string;
-                subscriptionId: string;
-                error: string;
-                failedAt: string;
-                retryCount: number;
-                nextRetryAt?: string;
-                /** @enum {string} */
-                status: 'pending' | 'retrying' | 'exhausted';
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  removeGraphDeadLetterEntry: {
-    parameters: {
-      query: {
-        id: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              removed: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  retryGraphNotifications: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          id?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data:
-              | {
-                  success: boolean;
-                  error?: string;
-                }
-              | {
-                  retried: number;
-                  succeeded: number;
-                  failed: number;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            messages: {
+                                id: string;
+                                subject: string;
+                                bodyPreview: string;
+                                from: {
+                                    emailAddress: {
+                                        name: string;
+                                        address: string;
+                                    };
+                                };
+                                toRecipients: {
+                                    emailAddress: {
+                                        name: string;
+                                        address: string;
+                                    };
+                                }[];
+                                body: {
+                                    /** @enum {string} */
+                                    contentType: "text" | "html";
+                                    content: string;
+                                };
+                                receivedDateTime: string;
+                                hasAttachments: boolean;
+                                isRead?: boolean;
+                                importance?: string;
+                                internetMessageId?: string;
+                                conversationId?: string;
+                                webLink?: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
     };
-  };
-  listTickets: {
-    parameters: {
-      query?: {
-        workspaceId?: number;
-        groupId?: string;
-        statusId?: string;
-        priorityId?: string;
-        assignedUserId?: string;
-        search?: string;
-        searchMode?: 'id' | 'email' | 'name_subject' | 'general';
-        createdAfter?: string;
-        createdBefore?: string;
-        updatedAfter?: string;
-        updatedBefore?: string;
-        sortField?: string;
-        sortDirection?: string;
-        top?: number;
-        skip?: number;
-        refresh?: 'true';
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              tickets: {
-                ticketID: number;
-                subject: string;
-                statusID: number;
-                priorityID: number;
-                workspaceID: number;
-                /** @default null */
-                groupID: number | null;
-                /** @default null */
-                assignedUserID: number | null;
-                /** @default null */
-                assignedToFirstName: string | null;
-                /** @default null */
-                assignedToLastName: string | null;
-                /** @default null */
-                assignedToNickname: string | null;
-                /** @default null */
-                categoryID: number | null;
-                /** @default null */
-                stateID: number | null;
-                /** @default null */
-                sourceChannel: string | null;
-                /** @default null */
-                aiSummary: string | null;
-                /** @default null */
-                submittedBy: number | null;
-                /** @default null */
-                submittedByEmail: string | null;
-                /** @default null */
-                submittedByFirstName: string | null;
-                /** @default null */
-                submittedByLastName: string | null;
-                /** @default null */
-                submittedByNickname: string | null;
-                /** @default null */
-                submittedByDisplayName: string | null;
-                /** Format: date-time */
-                createdAt: string;
-                /** Format: date-time */
-                updatedAt: string;
-                /** @default null */
-                resolvedAt: string | null;
-                /** @default null */
-                dueDate: string | null;
-                /** @default null */
-                responseDueDate: string | null;
-                /** @default null */
-                resolveDueDate: string | null;
-                /** @default null */
-                lastActivityAt: string | null;
-                inMentionScope?: boolean;
-              }[];
-              count: number;
+    getMailMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            message: {
+                                id: string;
+                                subject: string;
+                                bodyPreview: string;
+                                from: {
+                                    emailAddress: {
+                                        name: string;
+                                        address: string;
+                                    };
+                                };
+                                toRecipients: {
+                                    emailAddress: {
+                                        name: string;
+                                        address: string;
+                                    };
+                                }[];
+                                body: {
+                                    /** @enum {string} */
+                                    contentType: "text" | "html";
+                                    content: string;
+                                };
+                                receivedDateTime: string;
+                                hasAttachments: boolean;
+                                isRead?: boolean;
+                                importance?: string;
+                                internetMessageId?: string;
+                                conversationId?: string;
+                                webLink?: string;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
     };
-  };
-  getTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticket: {
-                ticketID: number;
-                subject: string;
-                statusID: number;
-                priorityID: number;
-                workspaceID: number;
-                /** @default null */
-                groupID: number | null;
-                /** @default null */
-                assignedUserID: number | null;
-                /** @default null */
-                assignedToFirstName: string | null;
-                /** @default null */
-                assignedToLastName: string | null;
-                /** @default null */
-                assignedToNickname: string | null;
-                /** @default null */
-                categoryID: number | null;
-                /** @default null */
-                stateID: number | null;
-                /** @default null */
-                sourceChannel: string | null;
-                /** @default null */
-                aiSummary: string | null;
-                /** @default null */
-                submittedBy: number | null;
-                /** @default null */
-                submittedByEmail: string | null;
-                /** @default null */
-                submittedByFirstName: string | null;
-                /** @default null */
-                submittedByLastName: string | null;
-                /** @default null */
-                submittedByNickname: string | null;
-                /** @default null */
-                submittedByDisplayName: string | null;
-                /** Format: date-time */
-                createdAt: string;
-                /** Format: date-time */
-                updatedAt: string;
-                /** @default null */
-                resolvedAt: string | null;
-                /** @default null */
-                dueDate: string | null;
-                /** @default null */
-                responseDueDate: string | null;
-                /** @default null */
-                resolveDueDate: string | null;
-                /** @default null */
-                lastActivityAt: string | null;
-                inMentionScope?: boolean;
-              } | null;
-              conversations: {
-                conversationID: number;
-                ticketID: number;
-                parentConversationID?: number;
-                /** @enum {string} */
-                direction?: 'Inbound' | 'Outbound' | 'Internal';
-                isPublic?: boolean;
-                isForward?: boolean;
-                body: string;
-                bodyHtml?: string;
-                bodyText?: string;
-                fromEmail: string;
-                fromDisplay?: string;
-                toEmail?: string;
-                /** @default null */
-                toEmails: string[] | null;
-                /** @default null */
-                ccEmails: string[] | null;
-                /** @default null */
-                bccEmails: string[] | null;
-                subject?: string;
-                /** @default false */
-                isFromContact: boolean;
-                messageID?: string;
-                inReplyTo?: string;
-                /** @default false */
-                hasAttachments: boolean;
-                emailSent?: boolean;
-                /** @default null */
-                graphMessageID: string | null;
-                /** @default null */
-                graphConversationID: string | null;
-                /** Format: date-time */
-                createdAt: string;
-                createdByUserID?: number;
-                /** Format: date-time */
-                updatedAt?: string;
-              }[];
+    listMailMessageAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            attachments: {
+                                id: string;
+                                name: string;
+                                contentType: string;
+                                size: number;
+                                isInline: boolean;
+                                contentId?: string;
+                                contentBytes?: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
     };
-  };
-  deleteTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticketId: number;
-              conversationsDeleted: number;
-              attachmentsDeleted: number;
+    ingestMailMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticketId: number;
+                            conversationId: number | null;
+                            isNewTicket: boolean;
+                            /** @enum {string} */
+                            direction: "Inbound" | "Outbound";
+                            attachmentsDownloaded: number;
+                            attachmentsFailed: number;
+                            from: string;
+                            fromName?: string;
+                            subject: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
     };
-  };
-  updateTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          subject?: string;
-          statusID?: number;
-          priorityID?: number;
-          workspaceID?: number;
-          groupID?: number | null;
-          assignedUserID?: number | null;
-          categoryID?: number | null;
-          stateID?: number | null;
-          sourceChannel?: string | null;
-          aiSummary?: string | null;
-          dueDate?: string | null;
-          responseDueDate?: string | null;
-          resolveDueDate?: string | null;
+    listGraphSubscriptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticket: {
-                ticketID: number;
-                subject: string;
-                statusID: number;
-                priorityID: number;
-                workspaceID: number;
-                /** @default null */
-                groupID: number | null;
-                /** @default null */
-                assignedUserID: number | null;
-                /** @default null */
-                assignedToFirstName: string | null;
-                /** @default null */
-                assignedToLastName: string | null;
-                /** @default null */
-                assignedToNickname: string | null;
-                /** @default null */
-                categoryID: number | null;
-                /** @default null */
-                stateID: number | null;
-                /** @default null */
-                sourceChannel: string | null;
-                /** @default null */
-                aiSummary: string | null;
-                /** @default null */
-                submittedBy: number | null;
-                /** @default null */
-                submittedByEmail: string | null;
-                /** @default null */
-                submittedByFirstName: string | null;
-                /** @default null */
-                submittedByLastName: string | null;
-                /** @default null */
-                submittedByNickname: string | null;
-                /** @default null */
-                submittedByDisplayName: string | null;
-                /** Format: date-time */
-                createdAt: string;
-                /** Format: date-time */
-                updatedAt: string;
-                /** @default null */
-                resolvedAt: string | null;
-                /** @default null */
-                dueDate: string | null;
-                /** @default null */
-                responseDueDate: string | null;
-                /** @default null */
-                resolveDueDate: string | null;
-                /** @default null */
-                lastActivityAt: string | null;
-                inMentionScope?: boolean;
-              };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            subscriptions: {
+                                id: string;
+                                resource: string;
+                                changeType: string;
+                                notificationUrl: string;
+                                expirationDateTime: string;
+                                clientState?: string;
+                                lifecycleNotificationUrl?: string;
+                                /** @enum {string} */
+                                status: "active" | "expiring" | "expired";
+                                hoursRemaining: number;
+                                needsRenewal: boolean;
+                            }[];
+                            count: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createGraphSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    resource?: string;
+                    changeType?: string;
+                    notificationUrl?: string;
+                    lifecycleUrl?: string;
+                    expirationMinutes?: number;
+                };
             };
-          };
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  searchTickets: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          query?: string;
-          filters?: {
-            statusIds?: number[];
-            priorityIds?: number[];
-            categoryIds?: number[];
-            assignedToUserId?: number | 'unassigned';
-            workspaceId?: number;
-            groupId?: number;
-            dateRange?: {
-              /** @enum {string} */
-              field: 'Created_Date' | 'Updated_Date' | 'Resolved_Date';
-              from?: string;
-              to?: string;
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            subscription: {
+                                id: string;
+                                resource: string;
+                                changeType: string;
+                                notificationUrl: string;
+                                expirationDateTime: string;
+                                clientState?: string;
+                                lifecycleNotificationUrl?: string;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
-          sort?: {
-            field: string;
-            /** @enum {string} */
-            direction: 'ASC' | 'DESC';
-          };
-          pagination?: {
-            top?: number;
-            skip?: number;
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
         };
-      };
     };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getGraphSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              tickets: {
-                ticketID: number;
-                subject: string;
-                statusID: number;
-                priorityID: number;
-                workspaceID: number;
-                /** @default null */
-                groupID: number | null;
-                /** @default null */
-                assignedUserID: number | null;
-                /** @default null */
-                assignedToFirstName: string | null;
-                /** @default null */
-                assignedToLastName: string | null;
-                /** @default null */
-                assignedToNickname: string | null;
-                /** @default null */
-                categoryID: number | null;
-                /** @default null */
-                stateID: number | null;
-                /** @default null */
-                sourceChannel: string | null;
-                /** @default null */
-                aiSummary: string | null;
-                /** @default null */
-                submittedBy: number | null;
-                /** @default null */
-                submittedByEmail: string | null;
-                /** @default null */
-                submittedByFirstName: string | null;
-                /** @default null */
-                submittedByLastName: string | null;
-                /** @default null */
-                submittedByNickname: string | null;
-                /** @default null */
-                submittedByDisplayName: string | null;
-                /** Format: date-time */
-                createdAt: string;
-                /** Format: date-time */
-                updatedAt: string;
-                /** @default null */
-                resolvedAt: string | null;
-                /** @default null */
-                dueDate: string | null;
-                /** @default null */
-                responseDueDate: string | null;
-                /** @default null */
-                resolveDueDate: string | null;
-                /** @default null */
-                lastActivityAt: string | null;
-                inMentionScope?: boolean;
-              }[];
-              query: string | null;
-              filters?: {
-                statusIds?: number[];
-                priorityIds?: number[];
-                categoryIds?: number[];
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            subscription: {
+                                id: string;
+                                resource: string;
+                                changeType: string;
+                                notificationUrl: string;
+                                expirationDateTime: string;
+                                clientState?: string;
+                                lifecycleNotificationUrl?: string;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteGraphSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            message: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    renewGraphSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            subscription: {
+                                id: string;
+                                resource: string;
+                                changeType: string;
+                                notificationUrl: string;
+                                expirationDateTime: string;
+                                clientState?: string;
+                                lifecycleNotificationUrl?: string;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getGraphSubscriptionConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            config: {
+                                webhookUrl?: string;
+                                lifecycleWebhookUrl?: string;
+                                clientState?: string;
+                                renewalThresholdHours: number;
+                                maxRenewalAttempts: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getGraphSubscriptionHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /** @enum {string} */
+                            status: "healthy" | "unhealthy" | "unknown";
+                            lastNotificationAt: string | null;
+                            recentInboxCount?: number;
+                            checkedAt?: string;
+                            error?: string;
+                            timestamp?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listGraphNotifications: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                status?: string;
+                subscriptionId?: string;
+                since?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            entries: {
+                                id: string;
+                                subscriptionId: string;
+                                messageId: string;
+                                changeType: string;
+                                receivedAt: string;
+                                /** @enum {string} */
+                                status: "success" | "failed" | "skipped" | "retrying";
+                                processingMs?: number;
+                                ticketId?: number;
+                                conversationId?: number;
+                                isNewTicket?: boolean;
+                                ticketSubject?: string;
+                                /** @enum {string} */
+                                action?: "created" | "added";
+                                error?: string;
+                                retryCount?: number;
+                            }[];
+                            total: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getGraphNotificationMetrics: {
+        parameters: {
+            query?: {
+                subscriptionId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            total24h: number;
+                            total7d: number;
+                            total30d: number;
+                            successRate24h: number;
+                            successRate7d: number;
+                            avgLatencyMs24h: number;
+                            p95LatencyMs24h: number;
+                            deadLetterDepth: number;
+                            hourlyBuckets: {
+                                hour: string;
+                                total: number;
+                                success: number;
+                                failed: number;
+                                avgLatencyMs: number;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listGraphLifecycleEvents: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                subscriptionId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            entries: {
+                                id: string;
+                                subscriptionId: string;
+                                /** @enum {string} */
+                                event: "reauthorizationRequired" | "subscriptionRemoved" | "missed";
+                                receivedAt: string;
+                                action: string;
+                                success: boolean;
+                                error?: string;
+                            }[];
+                            total: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listGraphDeadLetterEntries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            entries: {
+                                id: string;
+                                messageId: string;
+                                subscriptionId: string;
+                                error: string;
+                                failedAt: string;
+                                retryCount: number;
+                                nextRetryAt?: string;
+                                /** @enum {string} */
+                                status: "pending" | "retrying" | "exhausted";
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    removeGraphDeadLetterEntry: {
+        parameters: {
+            query: {
+                id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            removed: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    retryGraphNotifications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            success: boolean;
+                            error?: string;
+                        } | {
+                            retried: number;
+                            succeeded: number;
+                            failed: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTickets: {
+        parameters: {
+            query?: {
                 workspaceId?: number;
-                groupId?: number;
-                assignedToUserId?: number | 'unassigned';
-              };
-              sort?: {
-                field: string;
-                /** @enum {string} */
-                direction: 'ASC' | 'DESC';
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
+                groupId?: string;
+                statusId?: string;
+                priorityId?: string;
+                assignedUserId?: string;
+                search?: string;
+                searchMode?: "id" | "email" | "name_subject" | "general";
+                createdAfter?: string;
+                createdBefore?: string;
+                updatedAfter?: string;
+                updatedBefore?: string;
+                sortField?: string;
+                sortDirection?: string;
                 top?: number;
                 skip?: number;
-              };
+                refresh?: "true";
             };
-          };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  bulkUpdateTickets: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          ticketIds: number[];
-          updates: {
-            subject?: string;
-            statusID?: number;
-            priorityID?: number;
-            workspaceID?: number;
-            groupID?: number | null;
-            assignedUserID?: number | null;
-            categoryID?: number | null;
-            stateID?: number | null;
-            sourceChannel?: string | null;
-            aiSummary?: string | null;
-            dueDate?: string | null;
-            responseDueDate?: string | null;
-            resolveDueDate?: string | null;
-          };
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              results: {
-                ticketId: number;
-                success: boolean;
-                error?: string;
-              }[];
-              summary: {
-                total: number;
-                successful: number;
-                failed: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  bulkDeleteTickets: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          ticketIds: number[];
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              succeeded: number[];
-              failed: {
-                ticketId: number;
-                error: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  replyToTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          content: string;
-          /** @description JSON array of emails */
-          toRecipients?: string;
-          /** @description JSON array of emails */
-          cc?: string;
-          /** @description JSON array of emails */
-          bcc?: string;
-          messageId?: string;
-          /** @description "true" or "false" */
-          includeSignature?: string;
-          /** @description File uploads */
-          files?: string[];
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticketId: number;
-              conversationId: number;
-              emailSent: boolean;
-              threadingFailed?: boolean;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  addInternalNote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          content: string;
-          parentConversationId?: string;
-          /** @description File uploads */
-          files?: string[];
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticketId: number;
-              conversationId: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  resyncTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              syncId: string;
-              summary: {
-                total: number;
-                ingested: number;
-                skipped: number;
-                failed: number;
-                purged: number;
-              };
-              error?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  searchTicketContacts: {
-    parameters: {
-      query?: {
-        query?: string;
-      };
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              contacts: {
-                contactID: number;
-                displayName: string;
-                firstName?: string;
-                nickname?: string;
-                lastName?: string;
-                /** Format: email */
-                emailAddress?: string;
-                mobilePhone?: string;
-                companyPhone?: string;
-                householdID?: number;
-                householdName?: string;
-                householdPhone?: string;
-                dateOfBirth?: string;
-                genderID?: number;
-                maritalStatusID?: number;
-                contactStatusID: number;
-                userAccount?: number;
-                participantRecord?: number;
-                household: {
-                  householdID: number;
-                  householdName: string;
-                  homePhone?: string;
-                  addressID?: number;
-                } | null;
-                address: {
-                  addressID: number;
-                  addressLine1: string;
-                  addressLine2?: string;
-                  city?: string;
-                  state?: string;
-                  postalCode?: string;
-                } | null;
-                user: {
-                  userID: number;
-                  userName: string;
-                } | null;
-                /** @default 0 */
-                householdMemberCount: number;
-              }[];
-              ticketId: number;
-              email: string | null;
-              currentContactId: number | null;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  assignContactToTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          contactId: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticket: {
-                ticketID: number;
-                subject: string;
-                statusID: number;
-                priorityID: number;
-                workspaceID: number;
-                /** @default null */
-                groupID: number | null;
-                /** @default null */
-                assignedUserID: number | null;
-                /** @default null */
-                assignedToFirstName: string | null;
-                /** @default null */
-                assignedToLastName: string | null;
-                /** @default null */
-                assignedToNickname: string | null;
-                /** @default null */
-                categoryID: number | null;
-                /** @default null */
-                stateID: number | null;
-                /** @default null */
-                sourceChannel: string | null;
-                /** @default null */
-                aiSummary: string | null;
-                /** @default null */
-                submittedBy: number | null;
-                /** @default null */
-                submittedByEmail: string | null;
-                /** @default null */
-                submittedByFirstName: string | null;
-                /** @default null */
-                submittedByLastName: string | null;
-                /** @default null */
-                submittedByNickname: string | null;
-                /** @default null */
-                submittedByDisplayName: string | null;
-                /** Format: date-time */
-                createdAt: string;
-                /** Format: date-time */
-                updatedAt: string;
-                /** @default null */
-                resolvedAt: string | null;
-                /** @default null */
-                dueDate: string | null;
-                /** @default null */
-                responseDueDate: string | null;
-                /** @default null */
-                resolveDueDate: string | null;
-                /** @default null */
-                lastActivityAt: string | null;
-                inMentionScope?: boolean;
-              } | null;
-              assignedContact: {
-                contactID: number;
-                displayName: string;
-                firstName?: string;
-                nickname?: string;
-                lastName?: string;
-                /** Format: email */
-                emailAddress?: string;
-                mobilePhone?: string;
-                companyPhone?: string;
-                householdID?: number;
-                householdName?: string;
-                householdPhone?: string;
-                dateOfBirth?: string;
-                genderID?: number;
-                maritalStatusID?: number;
-                contactStatusID: number;
-                userAccount?: number;
-                participantRecord?: number;
-                household: {
-                  householdID: number;
-                  householdName: string;
-                  homePhone?: string;
-                  addressID?: number;
-                } | null;
-                address: {
-                  addressID: number;
-                  addressLine1: string;
-                  addressLine2?: string;
-                  city?: string;
-                  state?: string;
-                  postalCode?: string;
-                } | null;
-                user: {
-                  userID: number;
-                  userName: string;
-                } | null;
-                /** @default 0 */
-                householdMemberCount: number;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  forwardConversation: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-        conversationId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          to: string[];
-          cc?: string[];
-          bcc?: string[];
-          comment?: string;
-          includeHistory?: boolean;
-          includeAttachments?: boolean;
-          includeSignature?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              success: boolean;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  retrySendConversation: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-        conversationId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              conversationId: number;
-              emailSent: boolean;
-              threadingFailed?: boolean;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getHelpdeskStats: {
-    parameters: {
-      query: {
-        from: string;
-        to: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              overview: {
-                total: number;
-                /** @description Map of statusID to count */
-                byStatus: Record<string, never>;
-                /** @description Map of priorityID to count */
-                byPriority: Record<string, never>;
-              };
-              trends: {
-                date: string;
-                created: number;
-                resolved: number;
-              }[];
-              userPerformance: {
-                userID: number;
-                displayName: string;
-                assignedCount: number;
-                openCount: number;
-                resolvedCount: number;
-                avgResolutionTimeHours: number | null;
-              }[];
-              previousOverview: {
-                total: number;
-                /** @description Map of statusID to count */
-                byStatus: Record<string, never>;
-                /** @description Map of priorityID to count */
-                byPriority: Record<string, never>;
-              };
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getStaleTickets: {
-    parameters: {
-      query?: {
-        thresholds?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              ticket: {
-                ticketID: number;
-                subject: string;
-                statusID: number;
-                priorityID: number;
-                workspaceID: number;
-                /** @default null */
-                groupID: number | null;
-                /** @default null */
-                assignedUserID: number | null;
-                /** @default null */
-                assignedToFirstName: string | null;
-                /** @default null */
-                assignedToLastName: string | null;
-                /** @default null */
-                assignedToNickname: string | null;
-                /** @default null */
-                categoryID: number | null;
-                /** @default null */
-                stateID: number | null;
-                /** @default null */
-                sourceChannel: string | null;
-                /** @default null */
-                aiSummary: string | null;
-                /** @default null */
-                submittedBy: number | null;
-                /** @default null */
-                submittedByEmail: string | null;
-                /** @default null */
-                submittedByFirstName: string | null;
-                /** @default null */
-                submittedByLastName: string | null;
-                /** @default null */
-                submittedByNickname: string | null;
-                /** @default null */
-                submittedByDisplayName: string | null;
-                /** Format: date-time */
-                createdAt: string;
-                /** Format: date-time */
-                updatedAt: string;
-                /** @default null */
-                resolvedAt: string | null;
-                /** @default null */
-                dueDate: string | null;
-                /** @default null */
-                responseDueDate: string | null;
-                /** @default null */
-                resolveDueDate: string | null;
-                /** @default null */
-                lastActivityAt: string | null;
-                inMentionScope?: boolean;
-              };
-              ageInDays: number;
-              /** @enum {string} */
-              severity: 'warning' | 'critical';
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  clearHelpdeskCache: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              cleared: string[];
-              count: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  runRebuild: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          ticketId?: number;
-          purge?: boolean;
-          markAsRead?: boolean;
-          /** Format: date-time */
-          since?: string;
-          /** Format: date-time */
-          until?: string;
-          limit?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              syncId: string;
-              summary: {
-                total: number;
-                ingested: number;
-                skipped: number;
-                failed: number;
-                purged: number;
-              };
-              error?: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getRebuildAudit: {
-    parameters: {
-      query: {
-        action: 'runs' | 'run' | 'entries';
-        syncId?: string;
-        chunk?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              runs?: {
-                syncId: string;
-                /** @enum {string} */
-                status: 'running' | 'completed' | 'failed';
-                source: string;
-                startedAt: string;
-                endedAt?: string;
-                summary?: {
-                  total: number;
-                  ingested: number;
-                  skipped: number;
-                  failed: number;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
-                error?: string;
-              }[];
-              run?: {
-                syncId: string;
-                /** @enum {string} */
-                status: 'running' | 'completed' | 'failed';
-                source: string;
-                startedAt: string;
-                endedAt?: string;
-                summary?: {
-                  total: number;
-                  ingested: number;
-                  skipped: number;
-                  failed: number;
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            tickets: {
+                                ticketID: number;
+                                subject: string;
+                                statusID: number;
+                                priorityID: number;
+                                workspaceID: number;
+                                /** @default null */
+                                groupID: number | null;
+                                /** @default null */
+                                assignedUserID: number | null;
+                                /** @default null */
+                                assignedToFirstName: string | null;
+                                /** @default null */
+                                assignedToLastName: string | null;
+                                /** @default null */
+                                assignedToNickname: string | null;
+                                /** @default null */
+                                categoryID: number | null;
+                                /** @default null */
+                                stateID: number | null;
+                                /** @default null */
+                                sourceChannel: string | null;
+                                /** @default null */
+                                aiSummary: string | null;
+                                /** @default null */
+                                submittedBy: number | null;
+                                /** @default null */
+                                submittedByEmail: string | null;
+                                /** @default null */
+                                submittedByFirstName: string | null;
+                                /** @default null */
+                                submittedByLastName: string | null;
+                                /** @default null */
+                                submittedByNickname: string | null;
+                                /** @default null */
+                                submittedByDisplayName: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                /** @default null */
+                                resolvedAt: string | null;
+                                /** @default null */
+                                dueDate: string | null;
+                                /** @default null */
+                                responseDueDate: string | null;
+                                /** @default null */
+                                resolveDueDate: string | null;
+                                /** @default null */
+                                lastActivityAt: string | null;
+                                inMentionScope?: boolean;
+                            }[];
+                            count: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
                 };
-                error?: string;
-              };
-              entries?: Record<string, never>[];
-              chunk?: number;
-              totalEntries?: number;
-              entriesPerChunk?: number;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
     };
-  };
-  listAgents: {
-    parameters: {
-      query?: {
-        workspaceId?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              agentID: number;
-              userID: number;
-              /** @default null */
-              emailSignature: string | null;
-              firstName: string;
-              lastName: string;
-              /** @default null */
-              nickname: string | null;
-              email: string;
-              /** @default [] */
-              workspaces: {
-                agentWorkspaceID: number;
-                workspaceID: number;
-                agentID: number;
-                isAdmin: boolean;
-              }[];
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getCurrentAgent: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              agentID: number;
-              userID: number;
-              /** @default null */
-              emailSignature: string | null;
-              firstName: string;
-              lastName: string;
-              /** @default null */
-              nickname: string | null;
-              email: string;
-              /** @default [] */
-              workspaces: {
-                agentWorkspaceID: number;
-                workspaceID: number;
-                agentID: number;
-                isAdmin: boolean;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  updateSignature: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          signature: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              updated: boolean;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  uploadSignatureImage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /** @description Image file upload */
-          file: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              fileId: number;
-              url: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listConversationAttachments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        conversationId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              attachments: {
-                mpFileId: number | null;
-                fileName: string;
-                fileSize: number;
-                contentType?: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  uploadAttachments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        conversationId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /** @description File uploads */
-          files: string[];
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              attachmentIds: number[];
-              conversationId: number;
-              errors?: {
-                fileName: string;
-                error: string;
-              }[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listGroups: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              groupId: number;
-              workspaceId: number;
-              groupName: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listHelpdeskUsers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              userID: number;
-              displayName: string;
-              /** @default null */
-              email: string | null;
-              contactID: number;
-              userName?: string;
-              canImpersonate?: boolean;
-              nickname?: string;
-              firstName?: string;
-              lastName?: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listWorkspaces: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              workspaceId: number;
-              workspaceName: string;
-              emailAlias?: string;
-              description?: string;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listKbArticles: {
-    parameters: {
-      query?: {
-        q?: string;
-        category?: number;
-        status?: 'draft' | 'published' | 'archived';
-        top?: number;
-        skip?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              title: string;
-              excerpt: string | null;
-              category: {
+    getTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
-                name: string;
-              } | null;
-              tags: string[];
-              /** @enum {string} */
-              status: 'draft' | 'published' | 'archived';
-              /** @default 0 */
-              displayOrder: number;
-              updatedAt: string;
-              updatedBy: string | null;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
             };
-          };
+            cookie?: never;
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  createKbArticle: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          title: string;
-          body: string;
-          categoryId?: number | null;
-          /** @default [] */
-          tags: string[];
-          /**
-           * @default draft
-           * @enum {string}
-           */
-          status: 'draft' | 'published' | 'archived';
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticket: {
+                                ticketID: number;
+                                subject: string;
+                                statusID: number;
+                                priorityID: number;
+                                workspaceID: number;
+                                /** @default null */
+                                groupID: number | null;
+                                /** @default null */
+                                assignedUserID: number | null;
+                                /** @default null */
+                                assignedToFirstName: string | null;
+                                /** @default null */
+                                assignedToLastName: string | null;
+                                /** @default null */
+                                assignedToNickname: string | null;
+                                /** @default null */
+                                categoryID: number | null;
+                                /** @default null */
+                                stateID: number | null;
+                                /** @default null */
+                                sourceChannel: string | null;
+                                /** @default null */
+                                aiSummary: string | null;
+                                /** @default null */
+                                submittedBy: number | null;
+                                /** @default null */
+                                submittedByEmail: string | null;
+                                /** @default null */
+                                submittedByFirstName: string | null;
+                                /** @default null */
+                                submittedByLastName: string | null;
+                                /** @default null */
+                                submittedByNickname: string | null;
+                                /** @default null */
+                                submittedByDisplayName: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                /** @default null */
+                                resolvedAt: string | null;
+                                /** @default null */
+                                dueDate: string | null;
+                                /** @default null */
+                                responseDueDate: string | null;
+                                /** @default null */
+                                resolveDueDate: string | null;
+                                /** @default null */
+                                lastActivityAt: string | null;
+                                inMentionScope?: boolean;
+                            } | null;
+                            conversations: {
+                                conversationID: number;
+                                ticketID: number;
+                                parentConversationID?: number;
+                                /** @enum {string} */
+                                direction?: "Inbound" | "Outbound" | "Internal";
+                                isPublic?: boolean;
+                                isForward?: boolean;
+                                body: string;
+                                bodyHtml?: string;
+                                bodyText?: string;
+                                fromEmail: string;
+                                fromDisplay?: string;
+                                toEmail?: string;
+                                /** @default null */
+                                toEmails: string[] | null;
+                                /** @default null */
+                                ccEmails: string[] | null;
+                                /** @default null */
+                                bccEmails: string[] | null;
+                                subject?: string;
+                                /** @default false */
+                                isFromContact: boolean;
+                                messageID?: string;
+                                inReplyTo?: string;
+                                /** @default false */
+                                hasAttachments: boolean;
+                                emailSent?: boolean;
+                                /** @default null */
+                                graphMessageID: string | null;
+                                /** @default null */
+                                graphConversationID: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                createdByUserID?: number;
+                                /** Format: date-time */
+                                updatedAt?: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
     };
-  };
-  getKbArticle: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              title: string;
-              excerpt: string | null;
-              category: {
+    deleteTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
-                name: string;
-              } | null;
-              tags: string[];
-              /** @enum {string} */
-              status: 'draft' | 'published' | 'archived';
-              /** @default 0 */
-              displayOrder: number;
-              updatedAt: string;
-              updatedBy: string | null;
-              body: string;
-              createdAt: string;
-              createdBy: string | null;
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticketId: number;
+                            conversationsDeleted: number;
+                            attachmentsDeleted: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
     };
-  };
-  updateKbArticle: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          title?: string;
-          body?: string;
-          categoryId?: number | null;
-          tags?: string[];
-          /** @enum {string} */
-          status?: 'draft' | 'published' | 'archived';
-          changeSummary?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              message: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getKbCapabilities: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              /** @enum {string} */
-              role: 'viewer' | 'restricted_viewer' | 'unrestricted_viewer' | 'author' | 'admin';
-              isAdmin: boolean;
-              isStaff: boolean;
-              canReadUnrestricted: boolean;
-              canReadAllRestricted: boolean;
-              isRestrictedToGrants: boolean;
-              scopedCategoryIds: number[];
-              grantedCategoryIds: number[];
-              grantedArticleIds: number[];
-              canManageCategories: boolean;
-              canManageScopedCategories: boolean;
-              canManagePermissions: boolean;
-              /** @default false */
-              isPersonnel: boolean;
-              /** @default [] */
-              ministryMemberIds: number[];
-              /** @default [] */
-              ministryLedIds: number[];
-              /** @default [] */
-              managedCompilationIds: number[];
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listKbCategories: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              name: string;
-              parentId: number | null;
-              ministryId: number | null;
-              /** @default 0 */
-              displayOrder: number;
-              /** @default false */
-              isRestricted: boolean;
-              articleCount?: number;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  createKbCategory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          name: string;
-          parentId?: number | null;
-          ministryId?: number | null;
-          description?: string;
-          displayOrder?: number;
-          isRestricted?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  updateKbCategory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          name?: string;
-          parentId?: number | null;
-          ministryId?: number | null;
-          description?: string;
-          displayOrder?: number;
-          isRestricted?: boolean;
-          archived?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              message: string;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  listKbPermissions: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              contactId: number;
-              contactName: string | null;
-              /** @enum {string} */
-              role: 'viewer' | 'restricted_viewer' | 'unrestricted_viewer' | 'author' | 'admin';
-              categoryId: number | null;
-              categoryName: string | null;
-              articleId: number | null;
-              articleTitle: string | null;
-              grantedBy: string | null;
-              grantedDate: string | null;
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  createKbPermission: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          contactId: number;
-          /** @enum {string} */
-          role: 'viewer' | 'restricted_viewer' | 'unrestricted_viewer' | 'author' | 'admin';
-          categoryId?: number | null;
-          articleId?: number | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-            };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
-            };
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  submitKbCapture: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          channel:
-            | 'email'
-            | 'extension'
-            | 'voice'
-            | 'interview'
-            | 'drop'
-            | 'teams'
-            | 'ticket'
-            | 'document'
-            | 'legacy';
-          submittedBy?: {
-            contactId?: number;
-            /** Format: email */
-            email?: string;
-          };
-          rawText?: string;
-          /** @default [] */
-          media: {
-            filename: string;
-            contentType: string;
-            /** @enum {string} */
-            attachmentType: 'inline_image' | 'video' | 'audio' | 'transcript' | 'resource';
-            contentBase64?: string;
-            anchorStep?: number;
-            caption?: string;
-          }[];
-          /** @default [] */
-          steps: {
-            seq: number;
-            /** @enum {string} */
-            action: 'click' | 'input' | 'navigate' | 'tab_switch' | 'note';
-            elementName?: string;
-            elementRole?: string;
-            url?: string;
-            pageTitle?: string;
-            screenshotRef?: string;
-            typedValueMasked?: string | null;
-            userNote?: string | null;
-          }[];
-          targetArticleId?: number;
-          dedupeKey?: string;
-          metadata?: {
-            [key: string]: unknown;
-          };
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              draftId: number;
-              finishUrl: string;
-              deduplicated: boolean;
-              /** @default [] */
-              attachments: {
+    updateTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
-                fileName: string;
-              }[];
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    subject?: string;
+                    statusID?: number;
+                    priorityID?: number;
+                    workspaceID?: number;
+                    groupID?: number | null;
+                    assignedUserID?: number | null;
+                    categoryID?: number | null;
+                    stateID?: number | null;
+                    sourceChannel?: string | null;
+                    aiSummary?: string | null;
+                    dueDate?: string | null;
+                    responseDueDate?: string | null;
+                    resolveDueDate?: string | null;
+                };
             };
-          };
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  getKbDraft: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        draftId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticket: {
+                                ticketID: number;
+                                subject: string;
+                                statusID: number;
+                                priorityID: number;
+                                workspaceID: number;
+                                /** @default null */
+                                groupID: number | null;
+                                /** @default null */
+                                assignedUserID: number | null;
+                                /** @default null */
+                                assignedToFirstName: string | null;
+                                /** @default null */
+                                assignedToLastName: string | null;
+                                /** @default null */
+                                assignedToNickname: string | null;
+                                /** @default null */
+                                categoryID: number | null;
+                                /** @default null */
+                                stateID: number | null;
+                                /** @default null */
+                                sourceChannel: string | null;
+                                /** @default null */
+                                aiSummary: string | null;
+                                /** @default null */
+                                submittedBy: number | null;
+                                /** @default null */
+                                submittedByEmail: string | null;
+                                /** @default null */
+                                submittedByFirstName: string | null;
+                                /** @default null */
+                                submittedByLastName: string | null;
+                                /** @default null */
+                                submittedByNickname: string | null;
+                                /** @default null */
+                                submittedByDisplayName: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                /** @default null */
+                                resolvedAt: string | null;
+                                /** @default null */
+                                dueDate: string | null;
+                                /** @default null */
+                                responseDueDate: string | null;
+                                /** @default null */
+                                resolveDueDate: string | null;
+                                /** @default null */
+                                lastActivityAt: string | null;
+                                inMentionScope?: boolean;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
         };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              /** @enum {string} */
-              channel:
-                | 'email'
-                | 'extension'
-                | 'voice'
-                | 'interview'
-                | 'drop'
-                | 'teams'
-                | 'ticket'
-                | 'document'
-                | 'legacy';
-              submittedByContactId: number | null;
-              submittedByEmail: string | null;
-              submittedAt: string;
-              rawContent: string | null;
-              draftTitle: string | null;
-              draftBody: string | null;
-              suggestedCategoryId: number | null;
-              classification: ('new' | 'duplicate' | 'update' | 'contradiction') | null;
-              classificationArticleId: number | null;
-              gapQuestions: {
-                question: string;
-                answer: string | null;
-              }[];
-              /** @enum {string} */
-              processingStatus: 'queued' | 'processing' | 'ready_for_review' | 'failed';
-              /** @enum {string} */
-              stewardReviewStatus:
-                'pending' | 'in_review' | 'approved' | 'rejected' | 'published' | 'archived';
-              /** @enum {string} */
-              redactionStatus: 'pending' | 'flagged' | 'cleared';
-              assignedStewardId: number | null;
-              targetArticleId: number | null;
-              publishedArticleId: number | null;
-              attachments: {
+    };
+    searchTickets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    query?: string;
+                    filters?: {
+                        statusIds?: number[];
+                        priorityIds?: number[];
+                        categoryIds?: number[];
+                        assignedToUserId?: number | "unassigned";
+                        workspaceId?: number;
+                        groupId?: number;
+                        dateRange?: {
+                            /** @enum {string} */
+                            field: "Created_Date" | "Updated_Date" | "Resolved_Date";
+                            from?: string;
+                            to?: string;
+                        };
+                    };
+                    sort?: {
+                        field: string;
+                        /** @enum {string} */
+                        direction: "ASC" | "DESC";
+                    };
+                    pagination?: {
+                        top?: number;
+                        skip?: number;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            tickets: {
+                                ticketID: number;
+                                subject: string;
+                                statusID: number;
+                                priorityID: number;
+                                workspaceID: number;
+                                /** @default null */
+                                groupID: number | null;
+                                /** @default null */
+                                assignedUserID: number | null;
+                                /** @default null */
+                                assignedToFirstName: string | null;
+                                /** @default null */
+                                assignedToLastName: string | null;
+                                /** @default null */
+                                assignedToNickname: string | null;
+                                /** @default null */
+                                categoryID: number | null;
+                                /** @default null */
+                                stateID: number | null;
+                                /** @default null */
+                                sourceChannel: string | null;
+                                /** @default null */
+                                aiSummary: string | null;
+                                /** @default null */
+                                submittedBy: number | null;
+                                /** @default null */
+                                submittedByEmail: string | null;
+                                /** @default null */
+                                submittedByFirstName: string | null;
+                                /** @default null */
+                                submittedByLastName: string | null;
+                                /** @default null */
+                                submittedByNickname: string | null;
+                                /** @default null */
+                                submittedByDisplayName: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                /** @default null */
+                                resolvedAt: string | null;
+                                /** @default null */
+                                dueDate: string | null;
+                                /** @default null */
+                                responseDueDate: string | null;
+                                /** @default null */
+                                resolveDueDate: string | null;
+                                /** @default null */
+                                lastActivityAt: string | null;
+                                inMentionScope?: boolean;
+                            }[];
+                            query: string | null;
+                            filters?: {
+                                statusIds?: number[];
+                                priorityIds?: number[];
+                                categoryIds?: number[];
+                                workspaceId?: number;
+                                groupId?: number;
+                                assignedToUserId?: number | "unassigned";
+                            };
+                            sort?: {
+                                field: string;
+                                /** @enum {string} */
+                                direction: "ASC" | "DESC";
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    bulkUpdateTickets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ticketIds: number[];
+                    updates: {
+                        subject?: string;
+                        statusID?: number;
+                        priorityID?: number;
+                        workspaceID?: number;
+                        groupID?: number | null;
+                        assignedUserID?: number | null;
+                        categoryID?: number | null;
+                        stateID?: number | null;
+                        sourceChannel?: string | null;
+                        aiSummary?: string | null;
+                        dueDate?: string | null;
+                        responseDueDate?: string | null;
+                        resolveDueDate?: string | null;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            results: {
+                                ticketId: number;
+                                success: boolean;
+                                error?: string;
+                            }[];
+                            summary: {
+                                total: number;
+                                successful: number;
+                                failed: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    bulkDeleteTickets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ticketIds: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            succeeded: number[];
+                            failed: {
+                                ticketId: number;
+                                error: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    replyToTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
                 id: number;
-                fileName: string;
-                contentType: string | null;
-                sizeBytes: number | null;
-                /** @enum {string} */
-                attachmentType: 'inline_image' | 'video' | 'audio' | 'transcript' | 'resource';
-                anchorStep: number | null;
-                displayOrder: number;
-                /** @enum {string} */
-                redactionStatus: 'pending' | 'flagged' | 'cleared';
-                visionDescription: string | null;
-                redactionRegions: {
-                  id: string;
-                  bbox: {
-                    x: number;
-                    y: number;
-                    w: number;
-                    h: number;
-                  };
-                  category: string;
-                  confidence: number;
-                  label?: string | null;
-                  source: string;
-                  /** @enum {string} */
-                  action: 'blur' | 'reveal';
-                  overridden: boolean;
-                  overridden_by: number | null;
-                  overridden_at: string | null;
-                }[];
-                redactionRenderMode: ('full' | 'regions') | null;
-              }[];
             };
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    content: string;
+                    /** @description JSON array of emails */
+                    toRecipients?: string;
+                    /** @description JSON array of emails */
+                    cc?: string;
+                    /** @description JSON array of emails */
+                    bcc?: string;
+                    messageId?: string;
+                    /** @description "true" or "false" */
+                    includeSignature?: string;
+                    /** @description File uploads */
+                    files?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticketId: number;
+                            conversationId: number;
+                            emailSent: boolean;
+                            threadingFailed?: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    addInternalNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    content: string;
+                    parentConversationId?: string;
+                    /** @description File uploads */
+                    files?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticketId: number;
+                            conversationId: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getResyncMode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /**
+                             * @description in-place: POST on this path refreshes matched emails under their existing Conversation_IDs, adds missing ones and keeps internal notes and other messages; it deletes nothing. An API from before the in-place resync has no GET here (405), and its POST deletes every conversation on the ticket, so a client must not offer a resync unless this returns in-place
+                             * @enum {string}
+                             */
+                            mode: "in-place";
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    resyncTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            syncId: string;
+                            summary: {
+                                total: number;
+                                /** @description Fetched emails the ticket already stored, refreshed in place under their existing Conversation_IDs */
+                                refreshed: number;
+                                ingested: number;
+                                skipped: number;
+                                failed: number;
+                                /** @description Always 0: a resync never deletes the ticket or any of its conversations */
+                                purged: number;
+                            };
+                            error?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description REBUILD_IN_PROGRESS: another resync of this ticket or a date-range rebuild is running; nothing was changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    searchTicketContacts: {
+        parameters: {
+            query?: {
+                query?: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            contacts: {
+                                contactID: number;
+                                displayName: string;
+                                firstName?: string;
+                                nickname?: string;
+                                lastName?: string;
+                                /** Format: email */
+                                emailAddress?: string;
+                                mobilePhone?: string;
+                                companyPhone?: string;
+                                householdID?: number;
+                                householdName?: string;
+                                householdPhone?: string;
+                                dateOfBirth?: string;
+                                genderID?: number;
+                                maritalStatusID?: number;
+                                contactStatusID: number;
+                                userAccount?: number;
+                                participantRecord?: number;
+                                household: {
+                                    householdID: number;
+                                    householdName: string;
+                                    homePhone?: string;
+                                    addressID?: number;
+                                } | null;
+                                address: {
+                                    addressID: number;
+                                    addressLine1: string;
+                                    addressLine2?: string;
+                                    city?: string;
+                                    state?: string;
+                                    postalCode?: string;
+                                } | null;
+                                user: {
+                                    userID: number;
+                                    userName: string;
+                                } | null;
+                                /** @default 0 */
+                                householdMemberCount: number;
+                            }[];
+                            ticketId: number;
+                            email: string | null;
+                            currentContactId: number | null;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    assignContactToTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    contactId: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticket: {
+                                ticketID: number;
+                                subject: string;
+                                statusID: number;
+                                priorityID: number;
+                                workspaceID: number;
+                                /** @default null */
+                                groupID: number | null;
+                                /** @default null */
+                                assignedUserID: number | null;
+                                /** @default null */
+                                assignedToFirstName: string | null;
+                                /** @default null */
+                                assignedToLastName: string | null;
+                                /** @default null */
+                                assignedToNickname: string | null;
+                                /** @default null */
+                                categoryID: number | null;
+                                /** @default null */
+                                stateID: number | null;
+                                /** @default null */
+                                sourceChannel: string | null;
+                                /** @default null */
+                                aiSummary: string | null;
+                                /** @default null */
+                                submittedBy: number | null;
+                                /** @default null */
+                                submittedByEmail: string | null;
+                                /** @default null */
+                                submittedByFirstName: string | null;
+                                /** @default null */
+                                submittedByLastName: string | null;
+                                /** @default null */
+                                submittedByNickname: string | null;
+                                /** @default null */
+                                submittedByDisplayName: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                /** @default null */
+                                resolvedAt: string | null;
+                                /** @default null */
+                                dueDate: string | null;
+                                /** @default null */
+                                responseDueDate: string | null;
+                                /** @default null */
+                                resolveDueDate: string | null;
+                                /** @default null */
+                                lastActivityAt: string | null;
+                                inMentionScope?: boolean;
+                            } | null;
+                            assignedContact: {
+                                contactID: number;
+                                displayName: string;
+                                firstName?: string;
+                                nickname?: string;
+                                lastName?: string;
+                                /** Format: email */
+                                emailAddress?: string;
+                                mobilePhone?: string;
+                                companyPhone?: string;
+                                householdID?: number;
+                                householdName?: string;
+                                householdPhone?: string;
+                                dateOfBirth?: string;
+                                genderID?: number;
+                                maritalStatusID?: number;
+                                contactStatusID: number;
+                                userAccount?: number;
+                                participantRecord?: number;
+                                household: {
+                                    householdID: number;
+                                    householdName: string;
+                                    homePhone?: string;
+                                    addressID?: number;
+                                } | null;
+                                address: {
+                                    addressID: number;
+                                    addressLine1: string;
+                                    addressLine2?: string;
+                                    city?: string;
+                                    state?: string;
+                                    postalCode?: string;
+                                } | null;
+                                user: {
+                                    userID: number;
+                                    userName: string;
+                                } | null;
+                                /** @default 0 */
+                                householdMemberCount: number;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    forwardConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                conversationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    to: string[];
+                    cc?: string[];
+                    bcc?: string[];
+                    comment?: string;
+                    includeHistory?: boolean;
+                    includeAttachments?: boolean;
+                    includeSignature?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            success: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    retrySendConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                conversationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            conversationId: number;
+                            emailSent: boolean;
+                            threadingFailed?: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getHelpdeskStats: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            overview: {
+                                total: number;
+                                /** @description Map of statusID to count */
+                                byStatus: Record<string, never>;
+                                /** @description Map of priorityID to count */
+                                byPriority: Record<string, never>;
+                            };
+                            trends: {
+                                date: string;
+                                created: number;
+                                resolved: number;
+                            }[];
+                            userPerformance: {
+                                userID: number;
+                                displayName: string;
+                                assignedCount: number;
+                                openCount: number;
+                                resolvedCount: number;
+                                avgResolutionTimeHours: number | null;
+                            }[];
+                            previousOverview: {
+                                total: number;
+                                /** @description Map of statusID to count */
+                                byStatus: Record<string, never>;
+                                /** @description Map of priorityID to count */
+                                byPriority: Record<string, never>;
+                            };
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getStaleTickets: {
+        parameters: {
+            query?: {
+                thresholds?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            ticket: {
+                                ticketID: number;
+                                subject: string;
+                                statusID: number;
+                                priorityID: number;
+                                workspaceID: number;
+                                /** @default null */
+                                groupID: number | null;
+                                /** @default null */
+                                assignedUserID: number | null;
+                                /** @default null */
+                                assignedToFirstName: string | null;
+                                /** @default null */
+                                assignedToLastName: string | null;
+                                /** @default null */
+                                assignedToNickname: string | null;
+                                /** @default null */
+                                categoryID: number | null;
+                                /** @default null */
+                                stateID: number | null;
+                                /** @default null */
+                                sourceChannel: string | null;
+                                /** @default null */
+                                aiSummary: string | null;
+                                /** @default null */
+                                submittedBy: number | null;
+                                /** @default null */
+                                submittedByEmail: string | null;
+                                /** @default null */
+                                submittedByFirstName: string | null;
+                                /** @default null */
+                                submittedByLastName: string | null;
+                                /** @default null */
+                                submittedByNickname: string | null;
+                                /** @default null */
+                                submittedByDisplayName: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                /** @default null */
+                                resolvedAt: string | null;
+                                /** @default null */
+                                dueDate: string | null;
+                                /** @default null */
+                                responseDueDate: string | null;
+                                /** @default null */
+                                resolveDueDate: string | null;
+                                /** @default null */
+                                lastActivityAt: string | null;
+                                inMentionScope?: boolean;
+                            };
+                            ageInDays: number;
+                            /** @enum {string} */
+                            severity: "warning" | "critical";
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    clearHelpdeskCache: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            cleared: string[];
+                            count: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    runRebuild: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ticketId?: number;
+                    /**
+                     * @deprecated
+                     * @description Disabled. `true` is refused with 400 PURGE_DISABLED before any work: the purge deleted tickets by Created_Date and re-created them under new Ticket_IDs. Omit it or send false; message-id dedup makes a re-run safe.
+                     */
+                    purge?: boolean;
+                    markAsRead?: boolean;
+                    /** Format: date-time */
+                    since?: string;
+                    /** Format: date-time */
+                    until?: string;
+                    limit?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            syncId: string;
+                            summary: {
+                                total: number;
+                                /** @description With ticketId: emails the ticket already stored, refreshed in place. Always 0 for a date-range rebuild */
+                                refreshed: number;
+                                ingested: number;
+                                skipped: number;
+                                failed: number;
+                                /** @description Always 0: purge is disabled */
+                                purged: number;
+                            };
+                            error?: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Validation error, or PURGE_DISABLED when `purge` is true (refused before any work) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorBody"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRebuildAudit: {
+        parameters: {
+            query: {
+                action: "runs" | "run" | "entries";
+                syncId?: string;
+                chunk?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            runs?: {
+                                syncId: string;
+                                /** @enum {string} */
+                                status: "running" | "completed" | "failed";
+                                source: string;
+                                startedAt: string;
+                                endedAt?: string;
+                                summary?: {
+                                    total: number;
+                                    /** @description Set by single-ticket resync runs only: emails the ticket already stored, refreshed in place */
+                                    refreshed?: number;
+                                    ingested: number;
+                                    skipped: number;
+                                    failed: number;
+                                };
+                                error?: string;
+                            }[];
+                            run?: {
+                                syncId: string;
+                                /** @enum {string} */
+                                status: "running" | "completed" | "failed";
+                                source: string;
+                                startedAt: string;
+                                endedAt?: string;
+                                summary?: {
+                                    total: number;
+                                    /** @description Set by single-ticket resync runs only: emails the ticket already stored, refreshed in place */
+                                    refreshed?: number;
+                                    ingested: number;
+                                    skipped: number;
+                                    failed: number;
+                                };
+                                error?: string;
+                            };
+                            entries?: Record<string, never>[];
+                            chunk?: number;
+                            totalEntries?: number;
+                            entriesPerChunk?: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAgents: {
+        parameters: {
+            query?: {
+                workspaceId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            agentID: number;
+                            userID: number;
+                            /** @default null */
+                            emailSignature: string | null;
+                            firstName: string;
+                            lastName: string;
+                            /** @default null */
+                            nickname: string | null;
+                            email: string;
+                            /** @default [] */
+                            workspaces: {
+                                agentWorkspaceID: number;
+                                workspaceID: number;
+                                agentID: number;
+                                isAdmin: boolean;
+                            }[];
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getCurrentAgent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            agentID: number;
+                            userID: number;
+                            /** @default null */
+                            emailSignature: string | null;
+                            firstName: string;
+                            lastName: string;
+                            /** @default null */
+                            nickname: string | null;
+                            email: string;
+                            /** @default [] */
+                            workspaces: {
+                                agentWorkspaceID: number;
+                                workspaceID: number;
+                                agentID: number;
+                                isAdmin: boolean;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateSignature: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    signature: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            updated: boolean;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    uploadSignatureImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** @description Image file upload */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            fileId: number;
+                            url: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listConversationAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            attachments: {
+                                mpFileId: number | null;
+                                fileName: string;
+                                fileSize: number;
+                                contentType?: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    uploadAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** @description File uploads */
+                    files: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            attachmentIds: number[];
+                            conversationId: number;
+                            errors?: {
+                                fileName: string;
+                                error: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listGroups: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            groupId: number;
+                            workspaceId: number;
+                            groupName: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listHelpdeskUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            userID: number;
+                            displayName: string;
+                            /** @default null */
+                            email: string | null;
+                            contactID: number;
+                            userName?: string;
+                            canImpersonate?: boolean;
+                            nickname?: string;
+                            firstName?: string;
+                            lastName?: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listWorkspaces: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            workspaceId: number;
+                            workspaceName: string;
+                            emailAlias?: string;
+                            description?: string;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listKbArticles: {
+        parameters: {
+            query?: {
+                q?: string;
+                category?: number;
+                status?: "draft" | "published" | "archived";
                 top?: number;
                 skip?: number;
-              };
+                surface?: "kb_search";
             };
-          };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
-    };
-  };
-  uploadKbCaptureMedia: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        draftId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /** @description File uploads */
-          files: string[];
-        };
-      };
-    };
-    responses: {
-      /** @description Successful response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @constant */
-            success: true;
-            data: {
-              id: number;
-              fileName: string;
-              fileUrl: string;
-              sizeBytes: number;
-              /** @enum {string} */
-              attachmentType: 'inline_image' | 'video' | 'audio' | 'transcript' | 'resource';
-            }[];
-            meta?: {
-              count?: number;
-              cached?: boolean;
-              /** Format: date-time */
-              timestamp?: string;
-              pagination?: {
-                top?: number;
-                skip?: number;
-              };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            title: string;
+                            excerpt: string | null;
+                            category: {
+                                id: number;
+                                name: string;
+                            } | null;
+                            tags: string[];
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            /** @default 0 */
+                            displayOrder: number;
+                            updatedAt: string;
+                            updatedBy: string | null;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
             };
-          };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
         };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-      500: components['responses']['InternalError'];
     };
-  };
+    createKbArticle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string;
+                    body: string;
+                    categoryId?: number | null;
+                    /** @default [] */
+                    tags: string[];
+                    /**
+                     * @default draft
+                     * @enum {string}
+                     */
+                    status: "draft" | "published" | "archived";
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getKbArticle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            title: string;
+                            excerpt: string | null;
+                            category: {
+                                id: number;
+                                name: string;
+                            } | null;
+                            tags: string[];
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            /** @default 0 */
+                            displayOrder: number;
+                            updatedAt: string;
+                            updatedBy: string | null;
+                            body: string;
+                            createdAt: string;
+                            createdBy: string | null;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateKbArticle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title?: string;
+                    body?: string;
+                    categoryId?: number | null;
+                    tags?: string[];
+                    /** @enum {string} */
+                    status?: "draft" | "published" | "archived";
+                    changeSummary?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            message: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getKbCapabilities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            /** @enum {string} */
+                            role: "viewer" | "restricted_viewer" | "unrestricted_viewer" | "author" | "admin";
+                            isAdmin: boolean;
+                            isStaff: boolean;
+                            canReadUnrestricted: boolean;
+                            canReadAllRestricted: boolean;
+                            isRestrictedToGrants: boolean;
+                            scopedCategoryIds: number[];
+                            grantedCategoryIds: number[];
+                            grantedArticleIds: number[];
+                            canManageCategories: boolean;
+                            canManageScopedCategories: boolean;
+                            canManagePermissions: boolean;
+                            /** @default false */
+                            isPersonnel: boolean;
+                            /** @default [] */
+                            ministryMemberIds: number[];
+                            /** @default [] */
+                            ministryLedIds: number[];
+                            /** @default [] */
+                            managedCompilationIds: number[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listKbCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            name: string;
+                            parentId: number | null;
+                            ministryId: number | null;
+                            /** @default 0 */
+                            displayOrder: number;
+                            /** @default false */
+                            isRestricted: boolean;
+                            articleCount?: number;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createKbCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    parentId?: number | null;
+                    ministryId?: number | null;
+                    description?: string;
+                    displayOrder?: number;
+                    isRestricted?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateKbCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    parentId?: number | null;
+                    ministryId?: number | null;
+                    description?: string;
+                    displayOrder?: number;
+                    isRestricted?: boolean;
+                    archived?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            message: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listKbPermissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            contactId: number;
+                            contactName: string | null;
+                            /** @enum {string} */
+                            role: "viewer" | "restricted_viewer" | "unrestricted_viewer" | "author" | "admin";
+                            categoryId: number | null;
+                            categoryName: string | null;
+                            articleId: number | null;
+                            articleTitle: string | null;
+                            grantedBy: string | null;
+                            grantedDate: string | null;
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createKbPermission: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    contactId: number;
+                    /** @enum {string} */
+                    role: "viewer" | "restricted_viewer" | "unrestricted_viewer" | "author" | "admin";
+                    categoryId?: number | null;
+                    articleId?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitKbCapture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    channel: "email" | "extension" | "voice" | "interview" | "drop" | "teams" | "ticket" | "document" | "legacy";
+                    submittedBy?: {
+                        contactId?: number;
+                        /** Format: email */
+                        email?: string;
+                    };
+                    rawText?: string;
+                    /** @default [] */
+                    media: {
+                        filename: string;
+                        contentType: string;
+                        /** @enum {string} */
+                        attachmentType: "inline_image" | "video" | "audio" | "transcript" | "resource";
+                        contentBase64?: string;
+                        anchorStep?: number;
+                        caption?: string;
+                    }[];
+                    /** @default [] */
+                    steps: {
+                        seq: number;
+                        /** @enum {string} */
+                        action: "click" | "input" | "navigate" | "tab_switch" | "note";
+                        elementName?: string;
+                        elementRole?: string;
+                        url?: string;
+                        pageTitle?: string;
+                        screenshotRef?: string;
+                        typedValueMasked?: string | null;
+                        userNote?: string | null;
+                    }[];
+                    targetArticleId?: number;
+                    dedupeKey?: string;
+                    metadata?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            draftId: number;
+                            finishUrl: string;
+                            deduplicated: boolean;
+                            /** @default [] */
+                            attachments: {
+                                id: number;
+                                fileName: string;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getKbDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                draftId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            /** @enum {string} */
+                            channel: "email" | "extension" | "voice" | "interview" | "drop" | "teams" | "ticket" | "document" | "legacy";
+                            submittedByContactId: number | null;
+                            submittedByEmail: string | null;
+                            submittedAt: string;
+                            rawContent: string | null;
+                            draftTitle: string | null;
+                            draftBody: string | null;
+                            suggestedCategoryId: number | null;
+                            classification: ("new" | "duplicate" | "update" | "contradiction") | null;
+                            classificationArticleId: number | null;
+                            gapQuestions: {
+                                question: string;
+                                answer: string | null;
+                            }[];
+                            /** @enum {string} */
+                            processingStatus: "queued" | "processing" | "ready_for_review" | "failed";
+                            /** @enum {string} */
+                            stewardReviewStatus: "pending" | "in_review" | "approved" | "rejected" | "published" | "archived";
+                            /** @enum {string} */
+                            redactionStatus: "pending" | "flagged" | "cleared";
+                            assignedStewardId: number | null;
+                            targetArticleId: number | null;
+                            publishedArticleId: number | null;
+                            attachments: {
+                                id: number;
+                                fileName: string;
+                                contentType: string | null;
+                                sizeBytes: number | null;
+                                /** @enum {string} */
+                                attachmentType: "inline_image" | "video" | "audio" | "transcript" | "resource";
+                                anchorStep: number | null;
+                                displayOrder: number;
+                                /** @enum {string} */
+                                redactionStatus: "pending" | "flagged" | "cleared";
+                                visionDescription: string | null;
+                                redactionRegions: {
+                                    id: string;
+                                    bbox: {
+                                        x: number;
+                                        y: number;
+                                        w: number;
+                                        h: number;
+                                    };
+                                    category: string;
+                                    confidence: number;
+                                    label?: string | null;
+                                    source: string;
+                                    /** @enum {string} */
+                                    action: "blur" | "reveal";
+                                    overridden: boolean;
+                                    overridden_by: number | null;
+                                    overridden_at: string | null;
+                                }[];
+                                redactionRenderMode: ("full" | "regions") | null;
+                            }[];
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    uploadKbCaptureMedia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                draftId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** @description File uploads */
+                    files: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            id: number;
+                            fileName: string;
+                            fileUrl: string;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            attachmentType: "inline_image" | "video" | "audio" | "transcript" | "resource";
+                        }[];
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    searchRetrieval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    query: string;
+                    sourceTypes: ("kb_article" | "helpdesk_ticket")[];
+                    /** @default 10 */
+                    k?: number;
+                    /** @enum {string} */
+                    surface: "kb_search" | "capture_resolution_prompt" | "helpdesk_panel" | "helpdesk_composer" | "deflection_email" | "api";
+                    context?: {
+                        /** @enum {string} */
+                        type: "kb_draft" | "kb_article" | "helpdesk_ticket";
+                        id: number;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            retrievalId: string;
+                            retrievalVersion: string;
+                            /** @constant */
+                            degraded: false;
+                            results: {
+                                /** @enum {string} */
+                                sourceType: "kb_article" | "helpdesk_ticket";
+                                sourceId: number;
+                                title: string;
+                                snippet: string;
+                                score: number;
+                                rank: number;
+                                url: string;
+                                freshness: {
+                                    /** @enum {string} */
+                                    verificationState: "verified" | "review_due" | "unverified";
+                                    lastVerifiedAt: string | null;
+                                    lastVerifiedByContactId: number | null;
+                                    reviewBy: string | null;
+                                    lastModifiedAt: string | null;
+                                } | null;
+                            }[];
+                        } | {
+                            retrievalId: string;
+                            retrievalVersion: string;
+                            /** @constant */
+                            degraded: true;
+                            results: {
+                                /** @enum {string} */
+                                sourceType: "kb_article" | "helpdesk_ticket";
+                                sourceId: number;
+                                title: string;
+                                snippet: string;
+                                score: number;
+                                rank: number;
+                                url: string;
+                                freshness: {
+                                    /** @enum {string} */
+                                    verificationState: "verified" | "review_due" | "unverified";
+                                    lastVerifiedAt: string | null;
+                                    lastVerifiedByContactId: number | null;
+                                    reviewBy: string | null;
+                                    lastModifiedAt: string | null;
+                                } | null;
+                            }[];
+                            /** @enum {string} */
+                            errorCode: "RETRIEVAL_EMBED_UNAVAILABLE" | "RETRIEVAL_VECTOR_STORE_UNAVAILABLE" | "RETRIEVAL_HYDRATE_UNAVAILABLE";
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    recordRetrievalEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    retrievalId: string;
+                    /** @constant */
+                    eventType: "result_opened";
+                    /** @enum {string} */
+                    sourceType: "kb_article" | "helpdesk_ticket";
+                    sourceId: number;
+                    context?: {
+                        /** @enum {string} */
+                        type: "kb_draft" | "kb_article" | "helpdesk_ticket";
+                        id: number;
+                    };
+                } | {
+                    retrievalId: string;
+                    /** @constant */
+                    eventType: "result_inserted";
+                    /** @enum {string} */
+                    sourceType: "kb_article" | "helpdesk_ticket";
+                    sourceId: number;
+                    context?: {
+                        /** @enum {string} */
+                        type: "kb_draft" | "kb_article" | "helpdesk_ticket";
+                        id: number;
+                    };
+                } | {
+                    retrievalId: string;
+                    /** @constant */
+                    eventType: "draft_accepted";
+                    /** @enum {string} */
+                    sourceType?: "kb_article" | "helpdesk_ticket";
+                    sourceId?: number;
+                    value: number;
+                    context?: {
+                        /** @enum {string} */
+                        type: "kb_draft" | "kb_article" | "helpdesk_ticket";
+                        id: number;
+                    };
+                } | {
+                    retrievalId: string;
+                    /** @constant */
+                    eventType: "draft_discarded";
+                    /** @enum {string} */
+                    sourceType?: "kb_article" | "helpdesk_ticket";
+                    sourceId?: number;
+                    context?: {
+                        /** @enum {string} */
+                        type: "kb_draft" | "kb_article" | "helpdesk_ticket";
+                        id: number;
+                    };
+                } | {
+                    retrievalId: string;
+                    /** @constant */
+                    eventType: "helpful_vote";
+                    /** @enum {string} */
+                    sourceType: "kb_article" | "helpdesk_ticket";
+                    sourceId: number;
+                    value: 1 | -1;
+                    context?: {
+                        /** @enum {string} */
+                        type: "kb_draft" | "kb_article" | "helpdesk_ticket";
+                        id: number;
+                    };
+                } | {
+                    retrievalId: string;
+                    /** @constant */
+                    eventType: "query_reformulated";
+                    value: {
+                        followUpRetrievalId: string;
+                    };
+                    context?: {
+                        /** @enum {string} */
+                        type: "kb_draft" | "kb_article" | "helpdesk_ticket";
+                        id: number;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        data: {
+                            eventId: string;
+                        };
+                        meta?: {
+                            count?: number;
+                            cached?: boolean;
+                            /** Format: date-time */
+                            timestamp?: string;
+                            pagination?: {
+                                top?: number;
+                                skip?: number;
+                            };
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
 }

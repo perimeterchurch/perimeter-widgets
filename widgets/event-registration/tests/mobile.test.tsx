@@ -113,6 +113,7 @@ function quoteFor(attendeeName: string): RegistrationQuote {
         resolvedOptions: [],
       },
     ],
+    extras: null,
     invoiceTotal: 10,
     depositRequested: false,
     participationStatusId: 2,
