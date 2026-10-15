@@ -872,3 +872,35 @@ describe('Event_Rooms placement', () => {
     expect(within(card2).getByRole('checkbox', { name: /William Cano/ })).toBeDisabled();
   });
 });
+
+describe('links in staff HTML', () => {
+  it('opens the waiver link in a new tab, as field 53342 asks and DOMPurify would otherwise drop', () => {
+    const waiverField = {
+      ...familyNight.sections.find((s) => s.form)!.form!.fields[0]!,
+      formFieldId: 53342,
+      order: 9,
+      label: 'Waiver Statement',
+      alternateLabelHtml:
+        'Click here to view the waiver.&nbsp; (Link opens in a new tab.)<br><a href="https://perimetercdnstorage.blob.core.windows.net/widgets/Family%20Night%20Waiver%20and%20Release.pdf" target="_blank" rel="noopener"><b>Perimeter Church Waiver</b></a>',
+      fieldTypeId: 6,
+      values: [],
+      required: false,
+      dependsOnFieldId: null,
+      dependsOnValue: null,
+    };
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.form ? { ...s, form: { ...s.form, fields: [...s.form.fields, waiverField] } } : s,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
+    tick(card, /William Cano/);
+    const link = within(card).getByRole('link', { name: 'Perimeter Church Waiver' });
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link).toHaveAttribute('href', expect.stringContaining('Waiver%20and%20Release.pdf'));
+  });
+});
