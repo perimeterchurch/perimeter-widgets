@@ -109,6 +109,25 @@ describe('MPLocalStorageAuth', () => {
     expect(cb).toHaveBeenCalledWith('polled');
   });
 
+  it('stops polling instead of throwing from the timer when storage is gone', () => {
+    // A studio test tears its window down with the poll still armed; the
+    // next tick used to throw from localStorage and fail the whole run as
+    // an unhandled error.
+    vi.useFakeTimers();
+    const auth = new MPLocalStorageAuth({ pollIntervalMs: 100 });
+    const getItem = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('window torn down');
+    });
+    expect(() => vi.advanceTimersByTime(150)).not.toThrow();
+    const calls = getItem.mock.calls.length;
+    expect(calls).toBeGreaterThan(0);
+    // The interval is cleared: later ticks never touch storage again.
+    vi.advanceTimersByTime(1000);
+    expect(getItem.mock.calls.length).toBe(calls);
+    getItem.mockRestore();
+    auth.dispose();
+  });
+
   it('respects custom token/expires keys', () => {
     localStorage.setItem('custom_token', 'X');
     localStorage.setItem('custom_exp', String(Date.now() + 60_000));

@@ -132,6 +132,7 @@ export class MPLocalStorageAuth implements AuthProvider {
   dispose(): void {
     window.removeEventListener('storage', this.storageHandler);
     if (this.pollHandle != null) clearInterval(this.pollHandle);
+    this.pollHandle = null;
     this.listeners.clear();
   }
 
@@ -216,9 +217,18 @@ export class MPLocalStorageAuth implements AuthProvider {
     localStorage.setItem(this.expiresKey, expires.toString());
   }
 
+  /**
+   * The poll. Runs from a timer, so nothing may escape it: if the page's
+   * storage is gone (a test window torn down, a document being discarded)
+   * the poll stops itself instead of throwing where nobody can catch it.
+   */
   private tick(): void {
-    if (this.shouldRefresh()) void this.refresh();
-    this.maybeNotify();
+    try {
+      if (this.shouldRefresh()) void this.refresh();
+      this.maybeNotify();
+    } catch {
+      this.dispose();
+    }
   }
 
   private maybeNotify(): void {

@@ -75,22 +75,27 @@ export function formatGrade(grade: number): string {
  * offers no deposit, and every option is $0. Then "Free" badges and $0.00
  * amounts are noise and the widget hides all money.
  */
-export function eventIsFree(event: {
-  sections: ReadonlyArray<{
-    product: {
-      basePrice: number;
-      depositPrice: number | null;
-      groups: ReadonlyArray<{ prices: ReadonlyArray<{ price: number }> }>;
-    } | null;
-  }>;
-}): boolean {
-  return event.sections.every(
-    (s) =>
-      s.product === null ||
-      (s.product.basePrice === 0 &&
-        s.product.depositPrice === null &&
-        s.product.groups.every((g) => g.prices.every((p) => p.price === 0))),
+type PricedProduct = {
+  basePrice: number;
+  depositPrice: number | null;
+  groups: ReadonlyArray<{ prices: ReadonlyArray<{ price: number }> }>;
+};
+
+function productIsFree(product: PricedProduct | null | undefined): boolean {
+  return (
+    !product ||
+    (product.basePrice === 0 &&
+      product.depositPrice === null &&
+      product.groups.every((g) => g.prices.every((p) => p.price === 0)))
   );
+}
+
+export function eventIsFree(event: {
+  sections: ReadonlyArray<{ product: PricedProduct | null }>;
+  /** The hub's own product (household extras), when offered. */
+  extras?: PricedProduct | null;
+}): boolean {
+  return event.sections.every((s) => productIsFree(s.product)) && productIsFree(event.extras);
 }
 
 /**

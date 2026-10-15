@@ -962,6 +962,210 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/shepherds/me/flock': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Returns the authenticated shepherd's own flock — the households on an active Shepherd_Household_Assignments row, with heads of household and shepherding-note recency. 404s when the user has no active shepherd record. */
+    get: operations['getMyFlock'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/shepherds/me/flock/{householdId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Returns one household's family detail — members with demographics, address, area pastor, shepherd, deacon, shepherdess, and shepherding-note history. Scoped to the caller's own flock: a household they are not actively assigned to 404s exactly as a nonexistent one does. */
+    get: operations['getMyFlockHousehold'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/shepherds/me/flock/{householdId}/members/{contactId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Returns one household member's profile — demographics, contact details, current groups, milestones, and prayer/pastoral-care requests. Scoped twice: the household must be one the caller actively shepherds, and the contact must live in it. Every failure returns the same 404. */
+    get: operations['getMyFlockHouseholdMember'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/shepherds/me/flock/{householdId}/caregivers/{contactId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Returns one of a household's caregivers — area pastor, shepherd, deacon or shepherdess — as a contact card: name, photo, mobile phone and email. Scoped twice: the household must be one the caller actively shepherds, and the contact must be one of its caregivers. Every failure returns the same 404. */
+    get: operations['getMyFlockHouseholdCaregiver'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/shepherds/me/flock/{householdId}/notes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Files a shepherding note against one household of the caller's flock, as the caller's own shepherd record and stamped with the current time. Covers New Note and the change requests (household update, membership status change, flock change), which are notes of a fixed type. A household the caller is not actively assigned to 404s exactly as a nonexistent one does; note text containing HTML is refused with 400. */
+    post: operations['fileMyFlockHouseholdNote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school/contacts/{contactId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** School sync: set approved contact fields, each checked against the value reviewed (Perimeter Sync's x-school-sync-key) */
+    patch: operations['schoolUpdateContact'];
+    trace?: never;
+  };
+  '/api/school/households/{householdId}/address': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** School sync: set a household's address, or create one (Perimeter Sync's x-school-sync-key) */
+    put: operations['schoolUpdateHouseholdAddress'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school/participation': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** School sync: add a contact to PCS Students or PCS Parents (Perimeter Sync's x-school-sync-key) */
+    post: operations['schoolJoinGroup'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school/participation/end': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** School sync: end-date a contact's PCS Students or PCS Parents membership (Perimeter Sync's x-school-sync-key) */
+    post: operations['schoolLeaveGroup'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school/links/{schoolPersonId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** School sync: point an existing School_People link at the right contact, or none (Perimeter Sync's x-school-sync-key) */
+    patch: operations['schoolRepointLink'];
+    trace?: never;
+  };
+  '/api/school/people': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** School sync: create somebody FACTS has and MP does not -- household, contact, participant, PCS group, link (Perimeter Sync's x-school-sync-key) */
+    post: operations['schoolCreatePerson'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/school/links': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** School sync: link a FACTS person to a contact in School_People (Perimeter Sync's x-school-sync-key) */
+    post: operations['schoolCreateLink'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/mission-trips': {
     parameters: {
       query?: never;
@@ -1808,7 +2012,8 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** Describe what a single-ticket resync does on this API (static; older APIs answer 405) */
+    get: operations['getResyncMode'];
     put?: never;
     /** Resync a single ticket from email source */
     post: operations['resyncTicket'];
@@ -2223,7 +2428,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Submit a knowledge capture session from any channel (queued for AI processing) */
+    /** Submit a knowledge capture session from any channel (staff only; queued for AI processing) */
     post: operations['submitKbCapture'];
     delete?: never;
     options?: never;
@@ -2238,7 +2443,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get a capture draft (submitter, assigned steward, or admin only) */
+    /** Get a capture draft (staff only; submitter, assigned steward, or admin) */
     get: operations['getKbDraft'];
     put?: never;
     post?: never;
@@ -2257,8 +2462,42 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Upload media binaries for a capture draft (filename-matched to declared media) */
+    /** Upload media binaries for a capture draft (staff only; filename-matched to declared media) */
     post: operations['uploadKbCaptureMedia'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/retrieval/search': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Permission-scoped semantic search (KB articles). Dependency outages return 200 with degraded=true and an errorCode */
+    post: operations['searchRetrieval'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/retrieval/events': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Record an outcome event (result opened, vote, draft accepted, ...) on a retrieval issued to the caller */
+    post: operations['recordRetrievalEvent'];
     delete?: never;
     options?: never;
     head?: never;
@@ -5654,6 +5893,869 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  getMyFlock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              shepherd: {
+                Shepherd_ID: number;
+                Contact_ID: number;
+                Name: string;
+                Shepherd_Type: string | null;
+                Parish_Name: string | null;
+              };
+              households: {
+                Household_ID: number;
+                Household_GUID: string | null;
+                Display_Name: string;
+                Parish_Name: string | null;
+                Heads_Of_Household: {
+                  Contact_ID: number;
+                  Name: string;
+                  Mobile_Phone: string | null;
+                  Email_Address: string | null;
+                }[];
+                Members: {
+                  Contact_ID: number;
+                  Name: string;
+                  Photo_URL: string | null;
+                }[];
+                Last_Note_Date: string | null;
+                Days_Since_Note: number | null;
+                /** @enum {string} */
+                Note_Status: 'none' | 'current' | 'due' | 'overdue';
+                Shepherdess_Contact: ('recent' | 'not_recent') | null;
+                Location: {
+                  Latitude: number;
+                  Longitude: number;
+                } | null;
+                Address: {
+                  Address_Line_1: string | null;
+                  Address_Line_2: string | null;
+                  City: string | null;
+                  State: string | null;
+                  Postal_Code: string | null;
+                } | null;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getMyFlockHousehold: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        householdId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              Household_ID: number;
+              Household_GUID: string | null;
+              Display_Name: string;
+              Parish_Name: string | null;
+              Home_Phone: string | null;
+              Address: {
+                Address_Line_1: string | null;
+                Address_Line_2: string | null;
+                City: string | null;
+                State: string | null;
+                Postal_Code: string | null;
+              } | null;
+              Members: {
+                Contact_ID: number;
+                Name: string;
+                Household_Position: string | null;
+                Gender: string | null;
+                Age: number | null;
+                Activity_Level: string | null;
+                Participant_Type: string | null;
+                Photo_URL: string | null;
+              }[];
+              Area_Pastor: {
+                Contact_ID: number;
+                Name: string;
+                Photo_URL: string | null;
+              } | null;
+              Shepherd: {
+                Contact_ID: number;
+                Name: string;
+                Photo_URL: string | null;
+              } | null;
+              Deacon: {
+                Contact_ID: number;
+                Name: string;
+                Photo_URL: string | null;
+              } | null;
+              Shepherdess: {
+                Contact_ID: number;
+                Name: string;
+                Photo_URL: string | null;
+              } | null;
+              Last_Note_Date: string | null;
+              Days_Since_Note: number | null;
+              /** @enum {string} */
+              Note_Status: 'none' | 'current' | 'due' | 'overdue';
+              Notes: {
+                Shepherding_Note_ID: number;
+                Contact_Date: string;
+                Notes: string | null;
+                Note_Type: string | null;
+                Contact_Method: string | null;
+                Author: string | null;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getMyFlockHouseholdMember: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        householdId: number;
+        contactId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              Contact_ID: number;
+              Household_ID: number;
+              Name: string;
+              Household_Position: string | null;
+              Contact_Status: string | null;
+              Gender: string | null;
+              Age: number | null;
+              Date_of_Birth: string | null;
+              Activity_Level: string | null;
+              Participant_Type: string | null;
+              Mobile_Phone: string | null;
+              Email_Address: string | null;
+              Photo_URL: string | null;
+              Anniversary_Date: string | null;
+              Membership_Date: string | null;
+              How_Received: string | null;
+              Employment: {
+                Occupation: string | null;
+                Industry: string | null;
+                Employer: string | null;
+              } | null;
+              Groups: {
+                Group_Participant_ID: number;
+                Group_ID: number;
+                Group_Name: string;
+                Start_Date: string | null;
+              }[];
+              Milestones: {
+                Participant_Milestone_ID: number;
+                Milestone_ID: number;
+                Milestone_Title: string;
+                Date_Accomplished: string | null;
+              }[];
+              Prayer_Requests: {
+                Feedback_Entry_ID: number;
+                Description: string | null;
+                Date_Submitted: string | null;
+                Feedback_Type: string | null;
+              }[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  getMyFlockHouseholdCaregiver: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        householdId: number;
+        contactId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              Contact_ID: number;
+              Name: string;
+              Photo_URL: string | null;
+              Mobile_Phone: string | null;
+              Email_Address: string | null;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  fileMyFlockHouseholdNote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        householdId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /**
+           * @description `Shepherd_Note_Types.Shepherd_Note_Type_ID`.
+           * @enum {number}
+           */
+          noteTypeId: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
+          /**
+           * @description `Contact_Log_Types.Contact_Log_Type_ID` — how they were contacted.
+           * @enum {number}
+           */
+          contactMethodId: 1 | 2 | 3 | 4 | 6 | 10 | 21 | 22;
+          /** @description Plain text, trimmed. Refused if it contains markup: `<` followed by a letter, `/`, `!` or `?`. */
+          note: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              Shepherding_Note_ID: number;
+              Household_ID: number;
+              Shepherd_Note_Type_ID: number;
+              Contact_Log_Type_ID: number;
+              Contact_Date: string;
+              Notes: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolUpdateContact: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        contactId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          set: {
+            First_Name?: string;
+            Last_Name?: string;
+            Nickname?: string;
+            Date_of_Birth?: string;
+            Gender_ID?: 1 | 2;
+            /** Format: email */
+            Email_Address?: string;
+            Mobile_Phone?: string;
+            HS_Graduation_Year?: number;
+            Current_School?: string | null;
+            Perimeter_School_ID?: number;
+            Display_Name?: string;
+            /** @constant */
+            Contact_Status_ID?: 1;
+          };
+          expected: {
+            [key: string]: string | number | null;
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolUpdateHouseholdAddress: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        householdId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          set: {
+            Address_Line_1?: string;
+            Address_Line_2?: string | null;
+            City?: string;
+            'State/Region'?: string;
+            Postal_Code?: string;
+          };
+          expected: {
+            [key: string]: string | number | null;
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolJoinGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          contactId: number;
+          /** @enum {string} */
+          group: 'students' | 'parents';
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolLeaveGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          contactId: number;
+          /** @enum {string} */
+          group: 'students' | 'parents';
+          endDate: string;
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolRepointLink: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        schoolPersonId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          contactId: number | null;
+          expected: {
+            contactId: number | null;
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolCreatePerson: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          person: {
+            First_Name: string;
+            Last_Name: string;
+            Nickname?: string | null;
+            Date_of_Birth?: string | null;
+            Gender_ID?: (1 | 2) | null;
+            Email_Address?: string | null;
+            Mobile_Phone?: string | null;
+            HS_Graduation_Year?: number | null;
+            Current_School?: string | null;
+          };
+          household:
+            | {
+                householdId: number;
+              }
+            | {
+                create: {
+                  name: string;
+                  address?: {
+                    Address_Line_1: string;
+                    Address_Line_2: string | null;
+                    City: string;
+                    'State/Region': string;
+                    Postal_Code: string;
+                  } | null;
+                };
+              };
+          householdPositionId: 1 | 2 | 3 | 4;
+          group: ('students' | 'parents') | null;
+          link: {
+            personId: number;
+            roles: {
+              parent: boolean;
+              student: boolean;
+            };
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolCreateLink: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          personId: number;
+          contactId: number;
+          roles: {
+            parent: boolean;
+            student: boolean;
+          };
+          person?: {
+            First_Name?: string | null;
+            Middle_Name?: string | null;
+            Nickname?: string | null;
+            Last_Name?: string | null;
+            Date_of_Birth?: string | null;
+            Gender_ID?: (1 | 2) | null;
+            Email_Address?: string | null;
+            Mobile_Phone?: string | null;
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
   listMissionTrips: {
     parameters: {
       query?: {
@@ -6768,7 +7870,7 @@ export interface operations {
                 isStaff: boolean;
               };
               sections: {
-                /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
                 key: string;
                 relatedEventId: number | null;
                 displayName: string;
@@ -6880,6 +7982,45 @@ export interface operations {
                     )
                   | null;
               }[];
+              extras: {
+                productId: number;
+                name: string;
+                descriptionHtml: string | null;
+                basePrice: number;
+                depositPrice: number | null;
+                groups: {
+                  productOptionGroupId: number;
+                  name: string;
+                  descriptionHtml: string | null;
+                  required: boolean;
+                  mutuallyExclusive: boolean;
+                  noteLabel: string | null;
+                  formFieldId: number | null;
+                  omitFromSummary: boolean;
+                  exhausted: boolean;
+                  prices: {
+                    productOptionPriceId: number;
+                    title: string;
+                    /** @description Option_Price; negative for discounts. */
+                    price: number;
+                    qtyAllowed: number;
+                    minQty: number;
+                    maxQty: number | null;
+                    remaining: number | null;
+                    attendingOnline: boolean;
+                    addsToGroupId: number | null;
+                    hidden: boolean;
+                    isPromo: boolean;
+                    sortOrder: number | null;
+                    placement: {
+                      minAgeMonths: number | null;
+                      maxAgeMonths: number | null;
+                      minGrade: number | null;
+                      maxGrade: number | null;
+                    } | null;
+                  }[];
+                }[];
+              } | null;
               registrationOpen: boolean;
             };
             meta?: {
@@ -6955,7 +8096,7 @@ export interface operations {
                   since: string | null;
                 }[];
                 eligibility: {
-                  /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                  /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
                   sectionKey: string;
                   eligible: boolean;
                   reason:
@@ -7030,7 +8171,7 @@ export interface operations {
                 };
               };
           registrations: {
-            /** @description 'parent' or 'related:<Related_Event_ID>'. */
+            /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
             sectionKey: string;
             attendee:
               | {
@@ -7073,6 +8214,13 @@ export interface operations {
               response: string;
             }[];
           }[];
+          /** @default [] */
+          extras: {
+            productOptionPriceId: number;
+            /** @default 1 */
+            quantity: number;
+            note?: string;
+          }[];
           /** @default false */
           payDeposit: boolean;
           /** @default false */
@@ -7107,7 +8255,7 @@ export interface operations {
               eventId: number;
               registrations: {
                 registrationIndex: number;
-                /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
                 sectionKey: string;
                 eventId: number;
                 contactId: number | null;
@@ -7138,6 +8286,39 @@ export interface operations {
                   title: string;
                 }[];
               }[];
+              extras: {
+                registrationIndex: number;
+                /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                sectionKey: string;
+                eventId: number;
+                contactId: number | null;
+                attendeeName: string;
+                isMinor: boolean;
+                lines: {
+                  /** @enum {string} */
+                  kind: 'base' | 'option' | 'promo';
+                  productId: number;
+                  productOptionPriceId: number | null;
+                  title: string;
+                  quantity: number;
+                  unitPrice: number;
+                  lineTotal: number;
+                  itemNote: string | null;
+                  depositRequested: boolean;
+                }[];
+                subtotal: number;
+                optionsSummary: string | null;
+                answerSummary: string | null;
+                attendingOnline: boolean;
+                addsToGroupIds: number[];
+                overlapsWithRegistrationIndexes: number[];
+                resolvedOptions: {
+                  productOptionGroupId: number;
+                  groupName: string;
+                  productOptionPriceId: number;
+                  title: string;
+                }[];
+              } | null;
               invoiceTotal: number;
               depositRequested: boolean;
               participationStatusId: number;
@@ -7228,7 +8409,7 @@ export interface operations {
                 };
               };
           registrations: {
-            /** @description 'parent' or 'related:<Related_Event_ID>'. */
+            /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
             sectionKey: string;
             attendee:
               | {
@@ -7270,6 +8451,13 @@ export interface operations {
               formFieldId: number;
               response: string;
             }[];
+          }[];
+          /** @default [] */
+          extras: {
+            productOptionPriceId: number;
+            /** @default 1 */
+            quantity: number;
+            note?: string;
           }[];
           /** @default false */
           payDeposit: boolean;
@@ -7323,7 +8511,7 @@ export interface operations {
                   checkoutUrl: string;
                   participants: {
                     registrationIndex: number;
-                    /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                    /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
                     sectionKey: string;
                     eventId: number;
                     contactId: number;
@@ -7338,7 +8526,7 @@ export interface operations {
                     eventId: number;
                     registrations: {
                       registrationIndex: number;
-                      /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                      /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
                       sectionKey: string;
                       eventId: number;
                       contactId: number | null;
@@ -7369,6 +8557,39 @@ export interface operations {
                         title: string;
                       }[];
                     }[];
+                    extras: {
+                      registrationIndex: number;
+                      /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                      sectionKey: string;
+                      eventId: number;
+                      contactId: number | null;
+                      attendeeName: string;
+                      isMinor: boolean;
+                      lines: {
+                        /** @enum {string} */
+                        kind: 'base' | 'option' | 'promo';
+                        productId: number;
+                        productOptionPriceId: number | null;
+                        title: string;
+                        quantity: number;
+                        unitPrice: number;
+                        lineTotal: number;
+                        itemNote: string | null;
+                        depositRequested: boolean;
+                      }[];
+                      subtotal: number;
+                      optionsSummary: string | null;
+                      answerSummary: string | null;
+                      attendingOnline: boolean;
+                      addsToGroupIds: number[];
+                      overlapsWithRegistrationIndexes: number[];
+                      resolvedOptions: {
+                        productOptionGroupId: number;
+                        groupName: string;
+                        productOptionPriceId: number;
+                        title: string;
+                      }[];
+                    } | null;
                     invoiceTotal: number;
                     depositRequested: boolean;
                     participationStatusId: number;
@@ -7418,7 +8639,7 @@ export interface operations {
                     eventId: number;
                     registrations: {
                       registrationIndex: number;
-                      /** @description 'parent' or 'related:<Related_Event_ID>'. */
+                      /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
                       sectionKey: string;
                       eventId: number;
                       contactId: number | null;
@@ -7449,6 +8670,39 @@ export interface operations {
                         title: string;
                       }[];
                     }[];
+                    extras: {
+                      registrationIndex: number;
+                      /** @description 'related:<Related_Event_ID>'; 'extras' is the household order on the hub product (quote.extras only); 'parent' is legacy. */
+                      sectionKey: string;
+                      eventId: number;
+                      contactId: number | null;
+                      attendeeName: string;
+                      isMinor: boolean;
+                      lines: {
+                        /** @enum {string} */
+                        kind: 'base' | 'option' | 'promo';
+                        productId: number;
+                        productOptionPriceId: number | null;
+                        title: string;
+                        quantity: number;
+                        unitPrice: number;
+                        lineTotal: number;
+                        itemNote: string | null;
+                        depositRequested: boolean;
+                      }[];
+                      subtotal: number;
+                      optionsSummary: string | null;
+                      answerSummary: string | null;
+                      attendingOnline: boolean;
+                      addsToGroupIds: number[];
+                      overlapsWithRegistrationIndexes: number[];
+                      resolvedOptions: {
+                        productOptionGroupId: number;
+                        groupName: string;
+                        productOptionPriceId: number;
+                        title: string;
+                      }[];
+                    } | null;
                     invoiceTotal: number;
                     depositRequested: boolean;
                     participationStatusId: number;
@@ -9603,6 +10857,53 @@ export interface operations {
       500: components['responses']['InternalError'];
     };
   };
+  getResyncMode: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              /**
+               * @description in-place: POST on this path refreshes matched emails under their existing Conversation_IDs, adds missing ones and keeps internal notes and other messages; it deletes nothing. An API from before the in-place resync has no GET here (405), and its POST deletes every conversation on the ticket, so a client must not offer a resync unless this returns in-place
+               * @enum {string}
+               */
+              mode: 'in-place';
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
   resyncTicket: {
     parameters: {
       query?: never;
@@ -9627,9 +10928,12 @@ export interface operations {
               syncId: string;
               summary: {
                 total: number;
+                /** @description Fetched emails the ticket already stored, refreshed in place under their existing Conversation_IDs */
+                refreshed: number;
                 ingested: number;
                 skipped: number;
                 failed: number;
+                /** @description Always 0: a resync never deletes the ticket or any of its conversations */
                 purged: number;
               };
               error?: string;
@@ -9651,6 +10955,15 @@ export interface operations {
       401: components['responses']['Unauthorized'];
       403: components['responses']['Forbidden'];
       404: components['responses']['NotFound'];
+      /** @description REBUILD_IN_PROGRESS: another resync of this ticket or a date-range rebuild is running; nothing was changed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiErrorBody'];
+        };
+      };
       500: components['responses']['InternalError'];
     };
   };
@@ -10200,6 +11513,10 @@ export interface operations {
       content: {
         'application/json': {
           ticketId?: number;
+          /**
+           * @deprecated
+           * @description Disabled. `true` is refused with 400 PURGE_DISABLED before any work: the purge deleted tickets by Created_Date and re-created them under new Ticket_IDs. Omit it or send false; message-id dedup makes a re-run safe.
+           */
           purge?: boolean;
           markAsRead?: boolean;
           /** Format: date-time */
@@ -10224,9 +11541,12 @@ export interface operations {
               syncId: string;
               summary: {
                 total: number;
+                /** @description With ticketId: emails the ticket already stored, refreshed in place. Always 0 for a date-range rebuild */
+                refreshed: number;
                 ingested: number;
                 skipped: number;
                 failed: number;
+                /** @description Always 0: purge is disabled */
                 purged: number;
               };
               error?: string;
@@ -10244,7 +11564,15 @@ export interface operations {
           };
         };
       };
-      400: components['responses']['BadRequest'];
+      /** @description Validation error, or PURGE_DISABLED when `purge` is true (refused before any work) */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiErrorBody'];
+        };
+      };
       401: components['responses']['Unauthorized'];
       403: components['responses']['Forbidden'];
       500: components['responses']['InternalError'];
@@ -10282,6 +11610,8 @@ export interface operations {
                 endedAt?: string;
                 summary?: {
                   total: number;
+                  /** @description Set by single-ticket resync runs only: emails the ticket already stored, refreshed in place */
+                  refreshed?: number;
                   ingested: number;
                   skipped: number;
                   failed: number;
@@ -10297,6 +11627,8 @@ export interface operations {
                 endedAt?: string;
                 summary?: {
                   total: number;
+                  /** @description Set by single-ticket resync runs only: emails the ticket already stored, refreshed in place */
+                  refreshed?: number;
                   ingested: number;
                   skipped: number;
                   failed: number;
@@ -10778,6 +12110,7 @@ export interface operations {
         status?: 'draft' | 'published' | 'archived';
         top?: number;
         skip?: number;
+        surface?: 'kb_search';
       };
       header?: never;
       path?: never;
@@ -11570,6 +12903,243 @@ export interface operations {
       401: components['responses']['Unauthorized'];
       403: components['responses']['Forbidden'];
       404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  searchRetrieval: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          query: string;
+          sourceTypes: ('kb_article' | 'helpdesk_ticket')[];
+          /** @default 10 */
+          k?: number;
+          /** @enum {string} */
+          surface:
+            | 'kb_search'
+            | 'capture_resolution_prompt'
+            | 'helpdesk_panel'
+            | 'helpdesk_composer'
+            | 'deflection_email'
+            | 'api';
+          context?: {
+            /** @enum {string} */
+            type: 'kb_draft' | 'kb_article' | 'helpdesk_ticket';
+            id: number;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data:
+              | {
+                  retrievalId: string;
+                  retrievalVersion: string;
+                  /** @constant */
+                  degraded: false;
+                  results: {
+                    /** @enum {string} */
+                    sourceType: 'kb_article' | 'helpdesk_ticket';
+                    sourceId: number;
+                    title: string;
+                    snippet: string;
+                    score: number;
+                    rank: number;
+                    url: string;
+                    freshness: {
+                      /** @enum {string} */
+                      verificationState: 'verified' | 'review_due' | 'unverified';
+                      lastVerifiedAt: string | null;
+                      lastVerifiedByContactId: number | null;
+                      reviewBy: string | null;
+                      lastModifiedAt: string | null;
+                    } | null;
+                  }[];
+                }
+              | {
+                  retrievalId: string;
+                  retrievalVersion: string;
+                  /** @constant */
+                  degraded: true;
+                  results: {
+                    /** @enum {string} */
+                    sourceType: 'kb_article' | 'helpdesk_ticket';
+                    sourceId: number;
+                    title: string;
+                    snippet: string;
+                    score: number;
+                    rank: number;
+                    url: string;
+                    freshness: {
+                      /** @enum {string} */
+                      verificationState: 'verified' | 'review_due' | 'unverified';
+                      lastVerifiedAt: string | null;
+                      lastVerifiedByContactId: number | null;
+                      reviewBy: string | null;
+                      lastModifiedAt: string | null;
+                    } | null;
+                  }[];
+                  /** @enum {string} */
+                  errorCode:
+                    | 'RETRIEVAL_EMBED_UNAVAILABLE'
+                    | 'RETRIEVAL_VECTOR_STORE_UNAVAILABLE'
+                    | 'RETRIEVAL_HYDRATE_UNAVAILABLE';
+                };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  recordRetrievalEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json':
+          | {
+              retrievalId: string;
+              /** @constant */
+              eventType: 'result_opened';
+              /** @enum {string} */
+              sourceType: 'kb_article' | 'helpdesk_ticket';
+              sourceId: number;
+              context?: {
+                /** @enum {string} */
+                type: 'kb_draft' | 'kb_article' | 'helpdesk_ticket';
+                id: number;
+              };
+            }
+          | {
+              retrievalId: string;
+              /** @constant */
+              eventType: 'result_inserted';
+              /** @enum {string} */
+              sourceType: 'kb_article' | 'helpdesk_ticket';
+              sourceId: number;
+              context?: {
+                /** @enum {string} */
+                type: 'kb_draft' | 'kb_article' | 'helpdesk_ticket';
+                id: number;
+              };
+            }
+          | {
+              retrievalId: string;
+              /** @constant */
+              eventType: 'draft_accepted';
+              /** @enum {string} */
+              sourceType?: 'kb_article' | 'helpdesk_ticket';
+              sourceId?: number;
+              value: number;
+              context?: {
+                /** @enum {string} */
+                type: 'kb_draft' | 'kb_article' | 'helpdesk_ticket';
+                id: number;
+              };
+            }
+          | {
+              retrievalId: string;
+              /** @constant */
+              eventType: 'draft_discarded';
+              /** @enum {string} */
+              sourceType?: 'kb_article' | 'helpdesk_ticket';
+              sourceId?: number;
+              context?: {
+                /** @enum {string} */
+                type: 'kb_draft' | 'kb_article' | 'helpdesk_ticket';
+                id: number;
+              };
+            }
+          | {
+              retrievalId: string;
+              /** @constant */
+              eventType: 'helpful_vote';
+              /** @enum {string} */
+              sourceType: 'kb_article' | 'helpdesk_ticket';
+              sourceId: number;
+              value: 1 | -1;
+              context?: {
+                /** @enum {string} */
+                type: 'kb_draft' | 'kb_article' | 'helpdesk_ticket';
+                id: number;
+              };
+            }
+          | {
+              retrievalId: string;
+              /** @constant */
+              eventType: 'query_reformulated';
+              value: {
+                followUpRetrievalId: string;
+              };
+              context?: {
+                /** @enum {string} */
+                type: 'kb_draft' | 'kb_article' | 'helpdesk_ticket';
+                id: number;
+              };
+            };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              eventId: string;
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
       500: components['responses']['InternalError'];
     };
   };

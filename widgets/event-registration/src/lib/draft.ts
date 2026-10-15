@@ -52,6 +52,8 @@ export interface ContactDraft {
 
 export interface Draft {
   registrations: DraftRegistration[];
+  /** Quantities on the hub's own product (`event.extras`): pizzas, not people. */
+  extras: RegistrationPlanInput['extras'];
   /** Which registration is open in the editor, or a new one for a section. */
   editing:
     { kind: 'none' } | { kind: 'existing'; localId: string } | { kind: 'new'; sectionKey: string };
@@ -70,6 +72,7 @@ export const EMPTY_ADDRESS: AddressDraft = {
 
 export const EMPTY_DRAFT: Draft = {
   registrations: [],
+  extras: [],
   editing: { kind: 'none' },
   guest: { firstName: '', lastName: '', email: '', phone: '', address: EMPTY_ADDRESS },
   contact: { email: '', phone: '', address: EMPTY_ADDRESS, updateMyRecord: false },
@@ -86,6 +89,7 @@ export type DraftAction =
   | { type: 'set-guest'; guest: Partial<GuestDetails> }
   | { type: 'set-contact'; contact: Partial<ContactDraft> }
   | { type: 'set-pay-deposit'; payDeposit: boolean }
+  | { type: 'set-extras'; extras: Draft['extras'] }
   | { type: 'prefill-contact'; contact: Omit<ContactDraft, 'updateMyRecord'> }
   | { type: 'reset' };
 
@@ -145,6 +149,8 @@ export function draftReducer(state: Draft, action: DraftAction): Draft {
       };
     case 'set-pay-deposit':
       return { ...state, payDeposit: action.payDeposit };
+    case 'set-extras':
+      return { ...state, extras: action.extras };
     case 'reset':
       return EMPTY_DRAFT;
     default:
@@ -219,6 +225,7 @@ export function buildPlan(draft: Draft, signedIn: boolean): RegistrationPlanInpu
         answers: r.answers.filter((a) => a.response.trim().length > 0),
       };
     }),
+    extras: draft.extras,
     payDeposit: draft.payDeposit,
     updateMyRecord: signedIn && draft.contact.updateMyRecord,
     ...(signedIn ? { contact } : {}),
