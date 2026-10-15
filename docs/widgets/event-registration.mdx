@@ -96,10 +96,20 @@ widget so members can sign in for the household roster:
   grade-bounded sections show a **Grade** select, prefilled from the child's graduation
   year, and never ask a child whose age rules the grade out. Ineligible members read "too young",
   "too old" or "not this grade".
-  **Room placement** (2026-09-15): when an option group's rooms carry `Placement_*` bounds on
-  the Group record, the widget places the child from their birth date (and grade when a room
-  asks for it), shows the room as a line instead of radios, and the server re-derives it on every
-  quote and submit. The radios return only when no room fits, two fit, or the fit is full.
+  **Room placement from Event_Rooms** (2026-10-15): a section whose event has `Event_Rooms`
+  rows naming a group with `Placement_*` rules (`section.rooms`) places the child from their
+  birth date (and grade only where rooms overlap), shows "Room: SEC 1 year olds — from Max's
+  birth date" as a line, and never offers a room choice; the product's own room options are not
+  shown. A child nothing fits, or whose fits are full, is refused in the drawer and by the quote
+  (`NO_ROOM` / `ROOM_FULL`, with the event contact), and the picker reads "no room for this age"
+  when the roster already knows. Capacity is `Event_Rooms.Checkin_Capacity` (blank = unlimited);
+  two rooms that both fit go to the one with more seats left, then the lower `Balance_Priority`.
+  The server re-derives on every quote and submit and stamps the room on the participant.
+  **Room placement through option prices** (2026-09-15, events without ruled rooms): when an
+  option group's rooms carry `Placement_*` bounds on the Group record, the widget places the
+  child from their birth date (and grade when a room asks for it), shows the room as a line
+  instead of radios, and the server re-derives it on every quote and submit. The radios return
+  only when no room fits, two fit, or the fit is full.
   In a minors-only section the editor also shows a required **Date of birth** for the chosen child, prefilled from their record. The confirmed date is sent with the registration; the API requires one and writes a correction back to the child's contact, so a birth-date question on the custom form is redundant and can be removed.
   Someone already registered in a section's event is grayed out (blocked, not
   warned). Children show their age so parents can pick the right grade band.
