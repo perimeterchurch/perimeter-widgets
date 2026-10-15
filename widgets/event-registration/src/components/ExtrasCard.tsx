@@ -50,9 +50,6 @@ export function ExtrasCard({
           {product.name}
         </h2>
         <RichText html={product.descriptionHtml} className="text-sm" />
-        <p className="font-sans text-xs text-muted-fg">
-          For your whole family; it goes on the same order.
-        </p>
       </div>
 
       <div className="grid gap-4">
