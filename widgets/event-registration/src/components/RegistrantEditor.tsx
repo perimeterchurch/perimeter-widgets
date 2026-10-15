@@ -56,7 +56,8 @@ export interface RegistrantEditorProps {
   /** Household roster (signed in) or empty for a guest. */
   members: RosterMember[];
   /** Identities already in the draft for this section's event, so the picker can gray them out. */
-  takenIdentities: ReadonlySet<string>;
+  /** Identities a save here may not add: in the draft for this event (`same`) or for one running at the same time (`concurrent`). */
+  takenIdentities: ReadonlyMap<string, 'same' | 'concurrent'>;
   /** Guest viewers register themself; signed-in viewers pick from the roster or add a member. */
   mode: 'household' | 'guest';
   guestName: string;
@@ -414,13 +415,13 @@ export function RegistrantEditor({
       return errors;
     }
     const identity = attendeeIdentity(resolved);
-    if (
-      takenIdentities.has(identity) &&
-      !(existing && attendeeIdentity(existing.attendee) === identity)
-    ) {
+    const taken = takenIdentities.get(identity);
+    if (taken && !(existing && attendeeIdentity(existing.attendee) === identity)) {
       errors.set(
         `${view.key}:attendee`,
-        `${view.label || 'That person'} is already in this registration for this event.`,
+        taken === 'same'
+          ? `${view.label || 'That person'} is already in this registration for this event.`
+          : `${view.label || 'That person'} is already in another session at this time.`,
       );
     }
 
@@ -1029,8 +1030,8 @@ export function RegistrantEditor({
             {members.map((m) => {
               const eligibility = m.eligibility.find((e) => e.sectionKey === section.key);
               const eligible = eligibility?.eligible ?? false;
-              const taken = takenIdentities.has(`c${m.contactId}`);
-              const disabled = !eligible || taken;
+              const taken = takenIdentities.get(`c${m.contactId}`);
+              const disabled = !eligible || taken !== undefined;
               const id = `${idPrefix}-who-${m.contactId}`;
               const view = views.find((v) => v.key === `c${m.contactId}`);
               return (
@@ -1060,7 +1061,9 @@ export function RegistrantEditor({
                       )}
                     </span>
                     {taken ? (
-                      <span className="text-xs text-muted-fg">already added</span>
+                      <span className="text-xs text-muted-fg">
+                        {taken === 'same' ? 'already added' : 'in another session at this time'}
+                      </span>
                     ) : !eligible && eligibility?.reason ? (
                       <span className="text-xs text-muted-fg">
                         {eligibilityLabel(eligibility.reason)}
@@ -1169,6 +1172,8 @@ function eligibilityLabel(
       return 'closed';
     case 'no_room':
       return 'no room for this age';
+    case 'time_conflict':
+      return 'in another session at this time';
     default:
       return '';
   }

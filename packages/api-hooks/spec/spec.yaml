@@ -12649,6 +12649,7 @@ paths:
                                           - already_registered
                                           - section_closed
                                           - no_room
+                                          - time_conflict
                                       - type: 'null'
                                   requires:
                                     type: array
@@ -13134,6 +13135,7 @@ paths:
                                 - CHOOSE_OPTION
                                 - NO_ROOM
                                 - ROOM_FULL
+                                - TIME_CONFLICT
                             message:
                               type: string
                             registrationIndex:
@@ -13970,6 +13972,7 @@ paths:
                                         - CHOOSE_OPTION
                                         - NO_ROOM
                                         - ROOM_FULL
+                                        - TIME_CONFLICT
                                     message:
                                       type: string
                                     registrationIndex:
@@ -14414,6 +14417,7 @@ paths:
                                         - CHOOSE_OPTION
                                         - NO_ROOM
                                         - ROOM_FULL
+                                        - TIME_CONFLICT
                                     message:
                                       type: string
                                     registrationIndex:

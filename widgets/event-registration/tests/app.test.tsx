@@ -873,6 +873,54 @@ describe('Event_Rooms placement', () => {
   });
 });
 
+describe('one session per person at a time', () => {
+  it('will not let a child already in a concurrent section be ticked again, and names the reason', () => {
+    // Every fixture session runs 6-8 pm; Elementary Active and Student Night overlap.
+    render(<App config={config} auth={authStub(true)} />);
+    const elementary = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    fireEvent.click(within(elementary).getByRole('button', { name: /^Add / }));
+    tick(elementary, /William Cano/);
+    fireEvent.click(
+      within(elementary).getByRole('button', {
+        name: /Add .* to registration|Add to registration/,
+      }),
+    );
+    expect(
+      within(elementary).getByRole('button', { name: 'Remove William Cano' }),
+    ).toBeInTheDocument();
+
+    const students = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(students).getByRole('button', { name: 'Add a student' }));
+    const box = within(students).getByRole('checkbox', { name: /William Cano/ });
+    expect(box).toBeDisabled();
+    expect(within(students).getByText('in another session at this time')).toBeInTheDocument();
+    expect(within(students).queryByText('already added')).not.toBeInTheDocument();
+  });
+
+  it("shows the roster's time_conflict reason in the picker", () => {
+    hooks.roster.data = envelope({
+      ...canoHousehold,
+      members: canoHousehold.members.map((m) =>
+        m.contactId === 698112
+          ? {
+              ...m,
+              eligibility: m.eligibility.map((e) =>
+                e.sectionKey === 'related:103'
+                  ? { ...e, eligible: false, reason: 'time_conflict' as const }
+                  : e,
+              ),
+            }
+          : m,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const students = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(students).getByRole('button', { name: 'Add a student' }));
+    expect(within(students).getByRole('checkbox', { name: /William Cano/ })).toBeDisabled();
+    expect(within(students).getByText('in another session at this time')).toBeInTheDocument();
+  });
+});
+
 describe('links in staff HTML', () => {
   it('opens the waiver link in a new tab, as field 53342 asks and DOMPurify would otherwise drop', () => {
     const waiverField = {
