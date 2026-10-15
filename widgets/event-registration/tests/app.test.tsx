@@ -820,3 +820,55 @@ describe('card price', () => {
     expect(screen.queryByText('no charge')).not.toBeInTheDocument();
   });
 });
+
+describe('Event_Rooms placement', () => {
+  const bigKids = {
+    groupId: 13634,
+    groupName: 'SEC K-11yrs',
+    roomId: 328,
+    roomName: 'Midtown Auditorium',
+    placement: { minAgeMonths: 36, maxAgeMonths: 144, minGrade: null, maxGrade: null },
+    remaining: null,
+    balancePriority: null,
+  };
+
+  it('shows the placed room as a line, never as a choice, and the picker says when no room fits', () => {
+    // Elementary Active (related:104) gets rooms; Max (born 2017-05-16) is 9.
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.key === 'related:104' ? { ...s, rooms: [bigKids] } : s,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    fireEvent.click(within(card).getByRole('button', { name: /^Add / }));
+    tick(card, /Max Cano/);
+    expect(within(card).getByText('SEC K-11yrs')).toBeInTheDocument();
+    expect(within(card).getByText(/from Max's birth date/)).toBeInTheDocument();
+    expect(within(card).queryByRole('radio')).not.toBeInTheDocument();
+
+    // The server's roster says no room takes William (as it would for a 12-year-old).
+    cleanup();
+    hooks.roster.data = envelope({
+      ...canoHousehold,
+      members: canoHousehold.members.map((m) =>
+        m.contactId === 698112
+          ? {
+              ...m,
+              eligibility: m.eligibility.map((e) =>
+                e.sectionKey === 'related:104'
+                  ? { ...e, eligible: false, reason: 'no_room' as const }
+                  : e,
+              ),
+            }
+          : m,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card2 = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    fireEvent.click(within(card2).getByRole('button', { name: /^Add / }));
+    expect(within(card2).getByText('no room for this age')).toBeInTheDocument();
+    expect(within(card2).getByRole('checkbox', { name: /William Cano/ })).toBeDisabled();
+  });
+});

@@ -7966,6 +7966,20 @@ export interface operations {
                   blockedByFileUpload: boolean;
                   fileUploadFieldIds: number[];
                 } | null;
+                rooms: {
+                  groupId: number;
+                  groupName: string;
+                  roomId: number;
+                  roomName: string;
+                  placement: {
+                    minAgeMonths: number | null;
+                    maxAgeMonths: number | null;
+                    minGrade: number | null;
+                    maxGrade: number | null;
+                  };
+                  remaining: number | null;
+                  balancePriority: number | null;
+                }[];
                 open: boolean;
                 closedReason:
                   | (
@@ -8109,6 +8123,7 @@ export interface operations {
                         | 'wrong_grade'
                         | 'already_registered'
                         | 'section_closed'
+                        | 'no_room'
                       )
                     | null;
                   requires: ('birth_date' | 'grade')[];
@@ -8279,6 +8294,12 @@ export interface operations {
                 attendingOnline: boolean;
                 addsToGroupIds: number[];
                 overlapsWithRegistrationIndexes: number[];
+                room: {
+                  groupId: number;
+                  groupName: string;
+                  roomId: number;
+                  roomName: string;
+                } | null;
                 resolvedOptions: {
                   productOptionGroupId: number;
                   groupName: string;
@@ -8312,6 +8333,12 @@ export interface operations {
                 attendingOnline: boolean;
                 addsToGroupIds: number[];
                 overlapsWithRegistrationIndexes: number[];
+                room: {
+                  groupId: number;
+                  groupName: string;
+                  roomId: number;
+                  roomName: string;
+                } | null;
                 resolvedOptions: {
                   productOptionGroupId: number;
                   groupName: string;
@@ -8347,7 +8374,9 @@ export interface operations {
                   | 'MINOR_REQUIRED'
                   | 'BIRTH_DATE_REQUIRED'
                   | 'GRADE_REQUIRED'
-                  | 'CHOOSE_OPTION';
+                  | 'CHOOSE_OPTION'
+                  | 'NO_ROOM'
+                  | 'ROOM_FULL';
                 message: string;
                 registrationIndex: number | null;
                 details?: {
@@ -8550,6 +8579,12 @@ export interface operations {
                       attendingOnline: boolean;
                       addsToGroupIds: number[];
                       overlapsWithRegistrationIndexes: number[];
+                      room: {
+                        groupId: number;
+                        groupName: string;
+                        roomId: number;
+                        roomName: string;
+                      } | null;
                       resolvedOptions: {
                         productOptionGroupId: number;
                         groupName: string;
@@ -8583,6 +8618,12 @@ export interface operations {
                       attendingOnline: boolean;
                       addsToGroupIds: number[];
                       overlapsWithRegistrationIndexes: number[];
+                      room: {
+                        groupId: number;
+                        groupName: string;
+                        roomId: number;
+                        roomName: string;
+                      } | null;
                       resolvedOptions: {
                         productOptionGroupId: number;
                         groupName: string;
@@ -8618,7 +8659,9 @@ export interface operations {
                         | 'MINOR_REQUIRED'
                         | 'BIRTH_DATE_REQUIRED'
                         | 'GRADE_REQUIRED'
-                        | 'CHOOSE_OPTION';
+                        | 'CHOOSE_OPTION'
+                        | 'NO_ROOM'
+                        | 'ROOM_FULL';
                       message: string;
                       registrationIndex: number | null;
                       details?: {
@@ -8663,6 +8706,12 @@ export interface operations {
                       attendingOnline: boolean;
                       addsToGroupIds: number[];
                       overlapsWithRegistrationIndexes: number[];
+                      room: {
+                        groupId: number;
+                        groupName: string;
+                        roomId: number;
+                        roomName: string;
+                      } | null;
                       resolvedOptions: {
                         productOptionGroupId: number;
                         groupName: string;
@@ -8696,6 +8745,12 @@ export interface operations {
                       attendingOnline: boolean;
                       addsToGroupIds: number[];
                       overlapsWithRegistrationIndexes: number[];
+                      room: {
+                        groupId: number;
+                        groupName: string;
+                        roomId: number;
+                        roomName: string;
+                      } | null;
                       resolvedOptions: {
                         productOptionGroupId: number;
                         groupName: string;
@@ -8731,7 +8786,9 @@ export interface operations {
                         | 'MINOR_REQUIRED'
                         | 'BIRTH_DATE_REQUIRED'
                         | 'GRADE_REQUIRED'
-                        | 'CHOOSE_OPTION';
+                        | 'CHOOSE_OPTION'
+                        | 'NO_ROOM'
+                        | 'ROOM_FULL';
                       message: string;
                       registrationIndex: number | null;
                       details?: {

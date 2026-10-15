@@ -110,6 +110,7 @@ function quoteFor(attendeeName: string): RegistrationQuote {
         attendingOnline: false,
         addsToGroupIds: [],
         overlapsWithRegistrationIndexes: [],
+        room: null,
         resolvedOptions: [],
       },
     ],

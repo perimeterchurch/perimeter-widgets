@@ -73,6 +73,11 @@ export function ReviewBody({
                       {showPrices && <span>{formatMoney(line.lineTotal)}</span>}
                     </li>
                   ))}
+                  {r.room && (
+                    <li className="flex justify-between gap-3" data-slot="review-room">
+                      <span>Room: {r.room.groupName}</span>
+                    </li>
+                  )}
                 </ul>
               </li>
             ))}
