@@ -98,6 +98,39 @@ export function eventIsFree(event: {
   return event.sections.every((s) => productIsFree(s.product)) && productIsFree(event.extras);
 }
 
+export type CardPrice =
+  /** Nothing to pay unless the visitor picks a paid optional add-on. */
+  | { kind: 'free'; paidOptions: boolean }
+  /** The least a person pays: base plus the cheapest choice in each required group. `from` when options can add to it. */
+  | { kind: 'amount'; amount: number; from: boolean };
+
+/**
+ * The price a section card advertises (2026-10-15). The old card looked only
+ * at `Base_Price`, so a $0 product whose required options cost money said
+ * "Free". Promo rows and hidden options are not offered, so they do not
+ * count; a required group with a $0 choice adds nothing to the minimum.
+ */
+export function cardPrice(product: {
+  basePrice: number;
+  groups: ReadonlyArray<{
+    required: boolean;
+    prices: ReadonlyArray<{ price: number; hidden: boolean; isPromo: boolean }>;
+  }>;
+}): CardPrice {
+  let minimum = product.basePrice;
+  let optionsCanAdd = false;
+  for (const group of product.groups) {
+    const offered = group.prices.filter((p) => !p.hidden && !p.isPromo);
+    if (offered.length === 0) continue;
+    const cheapest = Math.min(...offered.map((p) => p.price));
+    const dearest = Math.max(...offered.map((p) => p.price));
+    if (group.required) minimum += Math.max(0, cheapest);
+    if (dearest > Math.max(0, group.required ? cheapest : 0)) optionsCanAdd = true;
+  }
+  if (minimum > 0) return { kind: 'amount', amount: minimum, from: optionsCanAdd };
+  return { kind: 'free', paidOptions: optionsCanAdd };
+}
+
 /**
  * "$10" + "00" for the card footer's large price with superscript cents.
  * Negative and fractional amounts round the way `formatMoney` does.
