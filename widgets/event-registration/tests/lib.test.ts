@@ -7,7 +7,13 @@ import {
   type DraftRegistration,
 } from '../src/lib/draft';
 import { buildCheckoutUrl, readPageContext } from '../src/lib/page-url';
-import { formatEventRange, formatMoneyParts, formatPrice, htmlToText } from '../src/lib/format';
+import {
+  cardPrice,
+  formatEventRange,
+  formatMoneyParts,
+  formatPrice,
+  htmlToText,
+} from '../src/lib/format';
 import { bucketFor } from '../src/lib/breakpoint';
 import { groupSections } from '../src/lib/groups';
 import { familyNight } from './fixtures';
@@ -149,6 +155,42 @@ describe('formatting', () => {
   it('shows Free for zero and money otherwise', () => {
     expect(formatPrice(0)).toBe('Free');
     expect(formatPrice(12.5)).toBe('$12.50');
+  });
+
+  it('advertises the least a person pays, not the base price', () => {
+    const p = (price: number, over: Partial<{ hidden: boolean; isPromo: boolean }> = {}) => ({
+      price,
+      hidden: false,
+      isPromo: false,
+      ...over,
+    });
+    // $0 base, required $12 choice (a pizza-style product on a section): from $12.
+    expect(
+      cardPrice({ basePrice: 0, groups: [{ required: true, prices: [p(12), p(12)] }] }),
+    ).toEqual({ kind: 'amount', amount: 12, from: false });
+    // Required group with a $0 choice adds nothing; the paid choice makes it "from".
+    expect(
+      cardPrice({ basePrice: 10, groups: [{ required: true, prices: [p(0), p(5)] }] }),
+    ).toEqual({ kind: 'amount', amount: 10, from: true });
+    // Only optional paid add-ons: still free to attend, but say so.
+    expect(
+      cardPrice({ basePrice: 0, groups: [{ required: false, prices: [p(0), p(15)] }] }),
+    ).toEqual({ kind: 'free', paidOptions: true });
+    // Hidden and promo rows are not offered and do not count.
+    expect(
+      cardPrice({
+        basePrice: 0,
+        groups: [
+          { required: true, prices: [p(0), p(40, { hidden: true }), p(-5, { isPromo: true })] },
+        ],
+      }),
+    ).toEqual({ kind: 'free', paidOptions: false });
+    // Plain paid base with no options: exact, per person.
+    expect(cardPrice({ basePrice: 10, groups: [] })).toEqual({
+      kind: 'amount',
+      amount: 10,
+      from: false,
+    });
   });
 
   it('formats an event range in the congregation zone with the zone label', () => {

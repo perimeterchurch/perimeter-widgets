@@ -8,6 +8,7 @@ import { FallbackImage } from './FallbackImage';
 import { RichText } from './RichText';
 import type { DraftRegistration } from '../lib/draft';
 import {
+  cardPrice,
   formatDeadline,
   formatEventRange,
   formatMoney,
@@ -95,7 +96,14 @@ export function SectionCard({
   const showEventLine = !section.isParentEvent;
   const summary =
     htmlToText(section.instructionsHtml) || htmlToText(section.event.meetingInstructionsHtml);
-  const price = section.product ? formatMoneyParts(section.product.basePrice) : null;
+  const price = section.product ? cardPrice(section.product) : null;
+  const amount = price?.kind === 'amount' ? formatMoneyParts(price.amount) : null;
+  // A free card says nothing about money (Dana, 2026-10-15): "Free · no charge"
+  // on every session was noise once the pizza order made the event paid.
+  const showPrice =
+    showPrices &&
+    price !== null &&
+    (amount !== null || (price.kind === 'free' && price.paidOptions));
   const tappable = section.open && canAdd && !editor;
   const { minorsOnly, minGrade, maxGrade } = section.audience;
   const addLabel = !minorsOnly
@@ -232,24 +240,25 @@ export function SectionCard({
         )}
       </div>
 
-      {(!section.open || (showPrices && price) || tappable) && (
+      {(!section.open || showPrice || tappable) && (
         <div className="px-4 pb-4">
           {!section.open ? (
             <p className="font-sans text-sm text-muted-fg">{closedReasonText(section, timeZone)}</p>
           ) : (
             <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
-              {showPrices && price ? (
-                <div className="grid font-sans leading-none">
-                  {section.product && section.product.basePrice > 0 ? (
+              {showPrice && price ? (
+                <div className="grid font-sans leading-none" data-slot="card-price">
+                  {amount ? (
                     <span className="text-2xl font-bold text-fg">
-                      {price.whole}
-                      <sup className="ml-0.5 align-super text-xs font-semibold">{price.cents}</sup>
+                      {price.kind === 'amount' && price.from && (
+                        <span className="mr-1 text-sm font-medium text-muted-fg">from</span>
+                      )}
+                      {amount.whole}
+                      <sup className="ml-0.5 align-super text-xs font-semibold">{amount.cents}</sup>
                     </span>
-                  ) : (
-                    <span className="text-2xl font-bold text-fg">Free</span>
-                  )}
-                  <span className="mt-1 text-xs text-muted-fg">
-                    {section.product && section.product.basePrice > 0 ? 'per person' : 'no charge'}
+                  ) : null}
+                  <span className={amount ? 'mt-1 text-xs text-muted-fg' : 'text-sm text-muted-fg'}>
+                    {amount ? 'per person' : 'Paid options available'}
                   </span>
                 </div>
               ) : (

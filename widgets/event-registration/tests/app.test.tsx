@@ -755,3 +755,68 @@ describe('extras: the hub product as a household order', () => {
     ).toBeEnabled();
   });
 });
+
+describe('card price', () => {
+  it('says "from $12" for a $0 base with a required paid option, "Paid options available" for optional add-ons, and nothing when free', () => {
+    const [first, second] = familyNight.sections;
+    const price = (id: number, title: string, amount: number) => ({
+      ...pizzaExtras.groups[0]!.prices[0]!,
+      productOptionPriceId: id,
+      title,
+      price: amount,
+    });
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: [
+        {
+          ...first!,
+          product: {
+            ...first!.product!,
+            basePrice: 0,
+            groups: [
+              {
+                ...pizzaExtras.groups[0]!,
+                productOptionGroupId: 9101,
+                name: 'Meal',
+                required: true,
+                mutuallyExclusive: true,
+                prices: [price(9201, 'Chicken', 12), price(9202, 'Veggie', 14)],
+              },
+            ],
+          },
+        },
+        {
+          ...second!,
+          product: {
+            ...second!.product!,
+            basePrice: 0,
+            groups: [
+              {
+                ...pizzaExtras.groups[0]!,
+                productOptionGroupId: 9102,
+                name: 'T-shirt',
+                required: false,
+                prices: [price(9203, 'Shirt', 15)],
+              },
+            ],
+          },
+        },
+        ...familyNight.sections.slice(2),
+      ],
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const meal = screen.getByRole('region', { name: first!.displayName });
+    const mealPrice = meal.querySelector('[data-slot="card-price"]')!;
+    // Spacing between the parts is CSS, so compare without whitespace.
+    expect(mealPrice.textContent?.replace(/\s+/g, '')).toBe('from$1200perperson');
+    expect(within(meal).queryByText('Free')).not.toBeInTheDocument();
+    const shirt = screen.getByRole('region', { name: second!.displayName });
+    const shirtPrice = shirt.querySelector('[data-slot="card-price"]')!;
+    expect(shirtPrice.textContent?.replace(/\s+/g, '')).toBe('Paidoptionsavailable');
+    // The remaining sections are $0 with $0 options: no price block at all, no "Free".
+    const free = screen.getByRole('region', { name: familyNight.sections[2]!.displayName });
+    expect(free.querySelector('[data-slot="card-price"]')).toBeNull();
+    expect(screen.queryByText('Free')).not.toBeInTheDocument();
+    expect(screen.queryByText('no charge')).not.toBeInTheDocument();
+  });
+});
