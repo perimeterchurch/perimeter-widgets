@@ -8,6 +8,7 @@ import { FallbackImage } from './FallbackImage';
 import { RichText } from './RichText';
 import type { DraftRegistration } from '../lib/draft';
 import {
+  cardPrice,
   formatDeadline,
   formatEventRange,
   formatMoney,
@@ -95,7 +96,8 @@ export function SectionCard({
   const showEventLine = !section.isParentEvent;
   const summary =
     htmlToText(section.instructionsHtml) || htmlToText(section.event.meetingInstructionsHtml);
-  const price = section.product ? formatMoneyParts(section.product.basePrice) : null;
+  const price = section.product ? cardPrice(section.product) : null;
+  const amount = price?.kind === 'amount' ? formatMoneyParts(price.amount) : null;
   const tappable = section.open && canAdd && !editor;
   const { minorsOnly, minGrade, maxGrade } = section.audience;
   const addLabel = !minorsOnly
@@ -239,17 +241,24 @@ export function SectionCard({
           ) : (
             <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
               {showPrices && price ? (
-                <div className="grid font-sans leading-none">
-                  {section.product && section.product.basePrice > 0 ? (
+                <div className="grid font-sans leading-none" data-slot="card-price">
+                  {amount ? (
                     <span className="text-2xl font-bold text-fg">
-                      {price.whole}
-                      <sup className="ml-0.5 align-super text-xs font-semibold">{price.cents}</sup>
+                      {price.kind === 'amount' && price.from && (
+                        <span className="mr-1 text-sm font-medium text-muted-fg">from</span>
+                      )}
+                      {amount.whole}
+                      <sup className="ml-0.5 align-super text-xs font-semibold">{amount.cents}</sup>
                     </span>
                   ) : (
                     <span className="text-2xl font-bold text-fg">Free</span>
                   )}
                   <span className="mt-1 text-xs text-muted-fg">
-                    {section.product && section.product.basePrice > 0 ? 'per person' : 'no charge'}
+                    {amount
+                      ? 'per person'
+                      : price.kind === 'free' && price.paidOptions
+                        ? 'paid options available'
+                        : 'no charge'}
                   </span>
                 </div>
               ) : (
