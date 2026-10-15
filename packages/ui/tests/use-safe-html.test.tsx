@@ -13,6 +13,28 @@ describe('useSafeHtml', () => {
     expect(result.current.__html).not.toContain('onerror');
   });
 
+  it('drops target by default, and forces every link into a new tab when asked', () => {
+    const waiver =
+      '<a href="https://cdn.example.org/waiver.pdf" target="_blank" rel="noopener"><b>Waiver</b></a>';
+    const plain = '<a href="https://example.org/">site</a>';
+    expect(renderHook(() => useSafeHtml(waiver)).result.current.__html).not.toContain('target=');
+    const forced = renderHook(() => useSafeHtml(waiver, { linksInNewTab: true })).result.current
+      .__html;
+    expect(forced).toContain('target="_blank"');
+    expect(forced).toContain('rel="noopener noreferrer"');
+    expect(forced).toContain('<b>Waiver</b>');
+    expect(
+      renderHook(() => useSafeHtml(plain, { linksInNewTab: true })).result.current.__html,
+    ).toContain('target="_blank"');
+    // Still a sanitizer: a javascript: href is removed, target or not.
+    const bad = renderHook(() =>
+      useSafeHtml('<a href="javascript:alert(1)">x</a>', { linksInNewTab: true }),
+    ).result.current.__html;
+    expect(bad).not.toContain('javascript:');
+    // And the next default call is unaffected by the forced one.
+    expect(renderHook(() => useSafeHtml(plain)).result.current.__html).not.toContain('target=');
+  });
+
   it('returns empty string for nullish input', () => {
     const { result } = renderHook(() => useSafeHtml(null));
     expect(result.current.__html).toBe('');
