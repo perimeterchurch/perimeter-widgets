@@ -104,6 +104,7 @@ export const familyNightEvent = {
       isStaff: false,
     },
     registrationOpen: true,
+    extras: null,
     sections: [
       section({
         key: 'related:101',
@@ -150,6 +151,7 @@ export const parentGatheringSubmit = {
     replayed: false,
     invoiceId: 1,
     invoiceGuid: 'fixture-guid',
+    extras: null,
     invoiceTotal: 0,
     invoiceStatusId: 1,
     checkoutUrl: 'https://www.perimeter.org/event-checkout/?id=fixture-guid',
@@ -195,6 +197,7 @@ export const parentGatheringQuote = {
         resolvedOptions: [],
       },
     ],
+    extras: null,
     invoiceTotal: 0,
     depositRequested: false,
     participationStatusId: 2,

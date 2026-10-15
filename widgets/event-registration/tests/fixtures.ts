@@ -1,4 +1,5 @@
 import type {
+  RegistrationProduct,
   RegistrationEvent,
   RegistrationRoster,
   RegistrationSection,
@@ -92,6 +93,7 @@ export const familyNight: RegistrationEvent = {
     isStaff: false,
   },
   registrationOpen: true,
+  extras: null,
   sections: [
     section({
       key: 'related:101',
@@ -351,3 +353,45 @@ export function envelope<T>(data: T): { success: true; data: T; meta: { cached: 
 
 export type EventEnvelope = UseRegistrationEventResponse;
 export type RosterEnvelope = UseRegistrationRosterResponse;
+
+/** Product 2099 "Family Night Pizza Order" as the API serves it in `event.extras`. */
+const anyPrice = familyNight.sections
+  .flatMap((s) => s.product?.groups ?? [])
+  .flatMap((g) => g.prices)[0]!;
+const pizza = (id: number, title: string) => ({
+  ...anyPrice,
+  productOptionPriceId: id,
+  title,
+  price: 12,
+  qtyAllowed: 10,
+  minQty: 1,
+  maxQty: null,
+  remaining: null,
+  attendingOnline: false,
+  addsToGroupId: null,
+  hidden: false,
+  isPromo: false,
+  sortOrder: id === 9325 ? 1 : 2,
+  placement: null,
+});
+export const pizzaExtras: RegistrationProduct = {
+  productId: 2099,
+  name: 'Family Night Pizza Order',
+  descriptionHtml: '<p>Large pizzas, $12 each. Ready at 5:30.</p>',
+  basePrice: 0,
+  depositPrice: null,
+  groups: [
+    {
+      productOptionGroupId: 2774,
+      name: 'Large Pizzas:',
+      descriptionHtml: null,
+      required: false,
+      mutuallyExclusive: false,
+      noteLabel: null,
+      formFieldId: null,
+      omitFromSummary: false,
+      exhausted: false,
+      prices: [pizza(9325, 'Cheese'), pizza(9324, 'Pepperoni')],
+    },
+  ],
+};

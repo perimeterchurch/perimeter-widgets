@@ -59,6 +59,22 @@ export function RegistrationComplete({
             </span>
           </li>
         ))}
+        {result.quote.extras && (
+          <li
+            className="grid gap-0.5 border border-border bg-muted/40 px-3 py-2"
+            data-slot="complete-extras"
+          >
+            <span className="font-sans text-sm font-medium text-fg">
+              {result.quote.extras.lines[0]?.title ?? 'Extras'}
+            </span>
+            <span className="font-sans text-xs text-muted-fg">
+              {result.quote.extras.lines
+                .filter((l) => l.kind !== 'base')
+                .map((l) => `${l.title} × ${l.quantity}`)
+                .join(' · ')}
+            </span>
+          </li>
+        )}
       </ul>
 
       {/* No "a confirmation will be sent to …" line: MP's Registrant Message

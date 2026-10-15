@@ -21,6 +21,7 @@ import { RegistrantEditor } from './components/RegistrantEditor';
 import { GuestContactForm, SignedInContactForm } from './components/PurchaserForm';
 import { ContactSummary } from './components/ContactSummary';
 import { RegistrationComplete } from './components/RegistrationComplete';
+import { ExtrasCard } from './components/ExtrasCard';
 import { ReviewPanel, submitLabel } from './components/ReviewPanel';
 import { ReviewBody } from './components/ReviewBody';
 import { SummaryBar } from './components/SummaryBar';
@@ -151,7 +152,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   const quoteRef = React.useRef(quoteMutation.mutate);
   quoteRef.current = quoteMutation.mutate;
   const quoteEnabled =
-    draft.registrations.length > 0 &&
+    (draft.registrations.length > 0 || draft.extras.length > 0) &&
     event !== null &&
     (signedIn ||
       (draft.guest.firstName.trim() &&
@@ -392,7 +393,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
     quote,
     quoting: quoteMutation.isPending,
     quoteError,
-    registrationCount: draft.registrations.length,
+    registrationCount: draft.registrations.length + (draft.extras.length > 0 ? 1 : 0),
     depositAvailable,
     showPrices,
     payDeposit: draft.payDeposit,
@@ -426,7 +427,8 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
     !contactMissing && !addressRequired && (signedIn ? roster !== null : true);
   const contactEditing = contactOpen || !contactCanCollapse;
   // Guests give their details in the editor; the line appears once they have added someone.
-  const showContact = signedIn || draft.registrations.length > 0 || contactOpen;
+  const showContact =
+    signedIn || draft.registrations.length > 0 || draft.extras.length > 0 || contactOpen;
   const contactName = signedIn
     ? viewer
       ? `${viewer.firstName} ${viewer.lastName}`.trim()
@@ -435,7 +437,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
 
   let ctaState: CtaState;
   let ctaLabel: string;
-  if (draft.registrations.length === 0) {
+  if (draft.registrations.length === 0 && draft.extras.length === 0) {
     ctaState = 'empty';
     ctaLabel = 'Add someone to continue';
   } else if (contactMissing) {
@@ -559,11 +561,17 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                   {compact && (
                     <SummaryBar
                       count={draft.registrations.length}
+                      extrasLabel={
+                        draft.extras.length > 0 && event.extras ? event.extras.name : null
+                      }
                       total={quote?.invoiceTotal ?? null}
                       quoting={quoteMutation.isPending}
                       showPrices={showPrices}
                       problemCount={problemCount}
-                      needsContact={contactMissing && draft.registrations.length > 0}
+                      needsContact={
+                        contactMissing &&
+                        (draft.registrations.length > 0 || draft.extras.length > 0)
+                      }
                       open={summaryOpen}
                       onToggle={() => setSummaryOpen((o) => !o)}
                       topOffset={config.stickyTopOffset}
@@ -628,6 +636,18 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                         );
                       })}
                     </div>
+
+                    {/* The hub's own product: a household order, no people picker (2026-10-15). */}
+                    {event.extras && (
+                      <ExtrasCard
+                        product={event.extras}
+                        selections={draft.extras}
+                        onChange={(extras) => dispatch({ type: 'set-extras', extras })}
+                        showPrices={showPrices}
+                        quoted={quote?.extras ?? null}
+                        problems={quote?.problems ?? []}
+                      />
+                    )}
 
                     {!compact && (
                       <ReviewPanel

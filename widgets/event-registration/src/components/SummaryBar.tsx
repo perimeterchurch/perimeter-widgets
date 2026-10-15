@@ -6,6 +6,8 @@ import { formatMoney, pluralize } from '../lib/format';
 export interface SummaryBarProps {
   /** Registrants added so far. */
   count: number;
+  /** The extras product's name when the order holds extras; null otherwise. */
+  extrasLabel?: string | null;
   /** The quote's invoice total; null until a quote exists. */
   total: number | null;
   quoting: boolean;
@@ -30,6 +32,7 @@ export interface SummaryBarProps {
  */
 export function SummaryBar({
   count,
+  extrasLabel = null,
   total,
   quoting,
   showPrices,
@@ -83,7 +86,11 @@ export function SummaryBar({
           <span className="grid">
             <span className="font-bold">Your registration</span>
             <span className="text-xs text-muted-fg">
-              {count === 0 ? 'Nothing added yet' : `${pluralize(count, 'person', 'people')} added`}
+              {count === 0 && !extrasLabel
+                ? 'Nothing added yet'
+                : [count > 0 ? `${pluralize(count, 'person', 'people')} added` : null, extrasLabel]
+                    .filter(Boolean)
+                    .join(' · ')}
               {problemCount > 0 && (
                 <span className="text-destructive"> · {pluralize(problemCount, 'issue')}</span>
               )}
@@ -91,7 +98,7 @@ export function SummaryBar({
           </span>
         </span>
         <span className="flex items-center gap-2">
-          {showPrices && count > 0 && (
+          {showPrices && (count > 0 || extrasLabel) && (
             <span className="font-sans text-base font-bold text-fg">
               {quoting && total === null ? <Spinner /> : formatMoney(total ?? 0)}
             </span>

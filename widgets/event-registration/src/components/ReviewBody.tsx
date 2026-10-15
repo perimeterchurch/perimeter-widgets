@@ -8,6 +8,7 @@ export interface ReviewBodyProps {
   quote: RegistrationQuote | null;
   quoting: boolean;
   quoteError: string | null;
+  /** People added plus one when the order holds extras. */
   registrationCount: number;
   /** Any section product offers a deposit. */
   depositAvailable: boolean;
@@ -75,6 +76,34 @@ export function ReviewBody({
                 </ul>
               </li>
             ))}
+            {quote.extras && (
+              <li className="grid gap-1" data-slot="review-extras">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-sans text-sm font-medium text-fg">
+                    {quote.extras.lines[0]?.title ?? 'Extras'}
+                  </span>
+                  {showPrices && (
+                    <span className="font-sans text-sm text-fg">
+                      {formatMoney(quote.extras.subtotal)}
+                    </span>
+                  )}
+                </div>
+                <ul className="grid gap-0.5 pl-3 font-sans text-xs text-muted-fg">
+                  {quote.extras.lines
+                    .filter((line) => line.kind !== 'base' || line.lineTotal !== 0)
+                    .map((line, i) => (
+                      <li key={i} className="flex justify-between gap-3">
+                        <span>
+                          {line.kind === 'base'
+                            ? line.title
+                            : `${line.title}${line.quantity > 1 ? ` × ${line.quantity}` : ''}`}
+                        </span>
+                        {showPrices && <span>{formatMoney(line.lineTotal)}</span>}
+                      </li>
+                    ))}
+                </ul>
+              </li>
+            )}
           </ul>
         </div>
       )}
