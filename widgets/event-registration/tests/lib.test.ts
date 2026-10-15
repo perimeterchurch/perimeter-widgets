@@ -17,6 +17,7 @@ import {
 import { bucketFor } from '../src/lib/breakpoint';
 import { groupSections } from '../src/lib/groups';
 import { resolveRoom, roomRefusalText } from '../src/lib/placement';
+import { eventsOverlap } from '../src/lib/overlap';
 import { DateTime } from 'luxon';
 import { familyNight } from './fixtures';
 
@@ -320,5 +321,19 @@ describe('Event_Rooms placement mirror', () => {
     expect(resolveRoom(even, { dateOfBirth: '2025-03-01', grade: null }, START)).toMatchObject({
       room: { groupName: 'Green' },
     });
+  });
+});
+
+describe('eventsOverlap', () => {
+  const ev = (eventId: number, start: string, end: string) => ({
+    eventId,
+    startDate: `2026-11-01T${start}:00`,
+    endDate: `2026-11-01T${end}:00`,
+  });
+  it('is true when the windows intersect and false when they only touch or are the same event', () => {
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '16:30', '18:00'))).toBe(true);
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '17:30', '19:00'))).toBe(true);
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '18:00', '19:00'))).toBe(false);
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(1, '16:30', '18:00'))).toBe(false);
   });
 });

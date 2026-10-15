@@ -8124,6 +8124,7 @@ export interface operations {
                         | 'already_registered'
                         | 'section_closed'
                         | 'no_room'
+                        | 'time_conflict'
                       )
                     | null;
                   requires: ('birth_date' | 'grade')[];
@@ -8376,7 +8377,8 @@ export interface operations {
                   | 'GRADE_REQUIRED'
                   | 'CHOOSE_OPTION'
                   | 'NO_ROOM'
-                  | 'ROOM_FULL';
+                  | 'ROOM_FULL'
+                  | 'TIME_CONFLICT';
                 message: string;
                 registrationIndex: number | null;
                 details?: {
@@ -8661,7 +8663,8 @@ export interface operations {
                         | 'GRADE_REQUIRED'
                         | 'CHOOSE_OPTION'
                         | 'NO_ROOM'
-                        | 'ROOM_FULL';
+                        | 'ROOM_FULL'
+                        | 'TIME_CONFLICT';
                       message: string;
                       registrationIndex: number | null;
                       details?: {
@@ -8788,7 +8791,8 @@ export interface operations {
                         | 'GRADE_REQUIRED'
                         | 'CHOOSE_OPTION'
                         | 'NO_ROOM'
-                        | 'ROOM_FULL';
+                        | 'ROOM_FULL'
+                        | 'TIME_CONFLICT';
                       message: string;
                       registrationIndex: number | null;
                       details?: {
