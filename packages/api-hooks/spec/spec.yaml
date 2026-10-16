@@ -11726,7 +11726,9 @@ paths:
                                 - string
                                 - 'null'
                             buttonText:
-                              type: string
+                              type:
+                                - string
+                                - 'null'
                             sectionGroup:
                               type:
                                 - string
