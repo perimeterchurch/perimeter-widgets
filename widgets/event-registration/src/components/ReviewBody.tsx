@@ -55,7 +55,7 @@ export function ReviewBody({
               <li key={r.registrationIndex} className="grid gap-1">
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="font-sans text-sm font-medium text-fg">{r.attendeeName}</span>
-                  {showPrices && (
+                  {showPrices && r.subtotal !== 0 && (
                     <span className="font-sans text-sm text-fg">{formatMoney(r.subtotal)}</span>
                   )}
                 </div>
@@ -67,7 +67,9 @@ export function ReviewBody({
                           ? line.title
                           : `${line.title}${line.quantity > 1 ? ` × ${line.quantity}` : ''}`}
                       </span>
-                      {showPrices && <span>{formatMoney(line.lineTotal)}</span>}
+                      {showPrices && line.lineTotal !== 0 && (
+                        <span>{formatMoney(line.lineTotal)}</span>
+                      )}
                     </li>
                   ))}
                   {r.room && (
@@ -84,7 +86,7 @@ export function ReviewBody({
                   <span className="font-sans text-sm font-medium text-fg">
                     {quote.extras.lines[0]?.title ?? 'Extras'}
                   </span>
-                  {showPrices && (
+                  {showPrices && quote.extras.subtotal !== 0 && (
                     <span className="font-sans text-sm text-fg">
                       {formatMoney(quote.extras.subtotal)}
                     </span>
@@ -100,7 +102,9 @@ export function ReviewBody({
                             ? line.title
                             : `${line.title}${line.quantity > 1 ? ` × ${line.quantity}` : ''}`}
                         </span>
-                        {showPrices && <span>{formatMoney(line.lineTotal)}</span>}
+                        {showPrices && line.lineTotal !== 0 && (
+                          <span>{formatMoney(line.lineTotal)}</span>
+                        )}
                       </li>
                     ))}
                 </ul>
@@ -151,11 +155,12 @@ export function ReviewBody({
         </label>
       )}
 
-      {showPrices ? (
+      {/* A $0 total is not a price: the row shows while pricing or when something is owed (Dana, 2026-10-16). */}
+      {showPrices && (quote === null ? quoting : quote.invoiceTotal > 0) ? (
         <div className="flex items-baseline justify-between gap-3 border-t border-border pt-3">
           <span className="font-sans text-base font-bold text-fg">Total</span>
           <span className="font-sans text-xl font-bold text-fg">
-            {quoting && !quote ? <Spinner /> : formatMoney(quote?.invoiceTotal ?? 0)}
+            {quote === null ? <Spinner /> : formatMoney(quote.invoiceTotal)}
           </span>
         </div>
       ) : (

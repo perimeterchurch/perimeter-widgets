@@ -72,7 +72,7 @@ export function ExtrasCard({
         </ul>
       )}
 
-      {showPrices && quoted && selections.length > 0 && (
+      {showPrices && quoted && quoted.subtotal > 0 && selections.length > 0 && (
         <p className="font-sans text-sm text-fg">
           Subtotal <span className="font-bold">{formatMoney(quoted.subtotal)}</span>
         </p>
