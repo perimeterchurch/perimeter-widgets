@@ -14,6 +14,8 @@ export interface StickyCtaProps {
   onShowProblems: () => void;
   problemCount: number;
   submitting: boolean;
+  /** The registration is written and the browser is about to leave for payment. */
+  leaving?: boolean;
   submitError: string | null;
   isGuest: boolean;
 }
@@ -30,6 +32,7 @@ export function StickyCta({
   onShowProblems,
   problemCount,
   submitting,
+  leaving = false,
   submitError,
   isGuest,
 }: StickyCtaProps): React.JSX.Element {
@@ -66,7 +69,7 @@ export function StickyCta({
         {submitting || state === 'quoting' ? (
           <>
             <Spinner className="mr-2" />
-            {submitting ? 'Registering…' : 'Checking…'}
+            {submitting ? (leaving ? 'Taking you to payment…' : 'Registering…') : 'Checking…'}
           </>
         ) : (
           label

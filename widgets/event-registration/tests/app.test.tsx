@@ -1200,6 +1200,8 @@ describe('payment (straight to Online Giving and back)', () => {
       'https://perimeter.onlinegiving.org/donate/silent_sso?mp_token=jwt%3Atoken',
     );
     expect(ssoInit.credentials).toBe('include');
+    // Once, not twice: the one started with the submit is the one awaited.
+    expect(fetchMock.mock.calls.filter(([u]) => String(u).includes('silent_sso'))).toHaveLength(1);
     const [url] = fetchMock.mock.calls[1] as [string];
     const params = new URL(url).searchParams;
     expect(
@@ -1462,5 +1464,132 @@ describe('payment (straight to Online Giving and back)', () => {
       'href',
       `https://www.perimeter.org/event-checkout/?id=${GUID}`,
     );
+  });
+});
+
+describe('leaving for payment', () => {
+  const PAGE = 'https://www.perimeter.org/family-registration/';
+  const GUID = 'e8b7bf55-a16b-4ee9-a826-277d5d6ade43';
+  const assign = vi.fn();
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    assign.mockReset();
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+    vi.stubGlobal('location', {
+      href: `${PAGE}?id=900001`,
+      assign,
+      origin: 'https://www.perimeter.org',
+    });
+    localStorage.removeItem(PENDING_PAYMENT_KEY);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+    localStorage.removeItem(PENDING_PAYMENT_KEY);
+  });
+
+  it('says "Taking you to payment…" and stops re-pricing the draft once the registration is written', async () => {
+    const quote = {
+      eventId: 900001,
+      registrations: [
+        {
+          registrationIndex: 0,
+          sectionKey: 'related:101',
+          eventId: 900011,
+          contactId: 684077,
+          attendeeName: 'Jen Cano',
+          isMinor: false,
+          lines: [
+            {
+              kind: 'base',
+              productId: 9001,
+              productOptionPriceId: null,
+              title: 'Elementary + Early Years Focus',
+              quantity: 1,
+              unitPrice: 12,
+              lineTotal: 12,
+              itemNote: null,
+              depositRequested: false,
+            },
+          ],
+          subtotal: 12,
+          optionsSummary: null,
+          answerSummary: null,
+          attendingOnline: false,
+          addsToGroupIds: [],
+          overlapsWithRegistrationIndexes: [],
+          room: null,
+          resolvedOptions: [],
+        },
+      ],
+      extras: null,
+      invoiceTotal: 12,
+      depositRequested: false,
+      participationStatusId: 2,
+      invoiceStatusId: 1,
+      addressRequired: false,
+      problems: [],
+      submittable: true,
+      quoteHash: 'p'.repeat(64),
+    };
+    hooks.quote.mutate.mockImplementation(
+      (_plan: unknown, opts: { onSuccess: (r: { data: typeof quote }) => void }) =>
+        opts.onSuccess({ data: quote }),
+    );
+    // The token mint never resolves, so the widget stays in the leaving state.
+    let resolveSso: () => void = () => {};
+    fetchMock
+      .mockImplementationOnce(
+        () =>
+          new Promise<Response>((r) => {
+            resolveSso = () => r(new Response(null, { status: 200 }));
+          }),
+      )
+      .mockImplementationOnce(() => new Promise<Response>(() => {}));
+    hooks.submit.mutate.mockImplementation(
+      (_body: unknown, opts: { onSuccess: (r: { data: unknown }) => void }) =>
+        opts.onSuccess({
+          data: {
+            dryRun: false,
+            idempotencyKey: 'k',
+            replayed: false,
+            invoiceId: 1,
+            invoiceGuid: GUID,
+            invoiceTotal: 12,
+            invoiceStatusId: 1,
+            checkoutUrl: `https://www.perimeter.org/event-checkout/?id=${GUID}`,
+            participants: [],
+            quote,
+          },
+        }),
+    );
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
+    tick(card, /Jen Cano/);
+    fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+    const quotesBefore = hooks.quote.mutate.mock.calls.length;
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Register and continue to payment' }),
+    );
+    // The sign-on started with the submit, before the write came back.
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain('silent_sso');
+    await waitFor(() => expect(screen.getByText('Taking you to payment…')).toBeInTheDocument());
+    // The post-submit roster refetch re-prefills the contact; that must not re-price.
+    hooks.roster.data = envelope({ ...canoHousehold });
+    act(() => {
+      resolveSso();
+      vi.advanceTimersByTime(1000);
+    });
+    expect(hooks.quote.mutate.mock.calls.length).toBe(quotesBefore);
+    expect(screen.queryByText(/already/)).not.toBeInTheDocument();
+    expect(assign).not.toHaveBeenCalled();
   });
 });
