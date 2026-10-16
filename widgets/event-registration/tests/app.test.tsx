@@ -1267,9 +1267,9 @@ describe('payment (straight to Online Giving and back)', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('defaults to the native hand-off: the schema parses paymentFlow as native', async () => {
+  it('defaults to the direct hand-off: the schema parses paymentFlow as direct', async () => {
     const { EventRegistrationConfigSchema } = await import('../src/types');
-    expect(EventRegistrationConfigSchema.parse({}).paymentFlow).toBe('native');
+    expect(EventRegistrationConfigSchema.parse({}).paymentFlow).toBe('direct');
   });
 
   it('keeps the native hand-off when paymentFlow is native', async () => {
