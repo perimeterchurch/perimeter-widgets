@@ -289,6 +289,17 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
    * Invoice Details & Payment page when it cannot (no MP script on the
    * page, the API refused, or `paymentFlow` is `native`).
    */
+  // Online Giving's silent sign-on, started alongside the submit so its
+  // round trip overlaps the write (it added seconds after it, 2026-10-16).
+  const signOnRef = React.useRef<Promise<void> | null>(null);
+  function startSignOn(): void {
+    const mpToken = auth.getToken();
+    if (!checkout || !mpToken || signOnRef.current) return;
+    signOnRef.current = silentSignOn(config.paymentUrl, mpToken).finally(() => {
+      signOnRef.current = null;
+    });
+  }
+
   async function goToPayment(record: Omit<PendingPayment, 'savedAt'>): Promise<void> {
     const fallback = buildCheckoutUrl(config.checkoutUrl, config.invoiceParam, record.invoiceGuid);
     savePendingPayment(record);
@@ -302,7 +313,10 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       // signed-in member, done here right before leaving (2026-10-16): the
       // silent sign-on first, then the MP token on the payments URL as well.
       const mpToken = auth.getToken();
-      if (mpToken) await silentSignOn(config.paymentUrl, mpToken);
+      if (mpToken) {
+        if (!signOnRef.current) startSignOn();
+        await signOnRef.current;
+      }
       const token = await checkout.buildPaymentRequestToken({
         invoiceGuid: record.invoiceGuid,
         audienceUrl: config.paymentUrl,
@@ -339,11 +353,16 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       setQuote(null);
       return;
     }
+    // Once the registration is written and the browser is leaving for payment,
+    // the draft is history: the post-submit roster refetch re-prefills the
+    // contact, and re-pricing then reports the registration just made as
+    // "already registered" (seen 2026-10-16).
+    if (leavingForPayment) return;
     const timer = setTimeout(() => {
       quoteRef.current(plan, { onSuccess: (r) => setQuote(r.data) });
     }, 350);
     return () => clearTimeout(timer);
-  }, [plan, quoteEnabled]);
+  }, [plan, quoteEnabled, leavingForPayment]);
 
   // ── Submit ────────────────────────────────────────────────────────────
   const submitMutation = useSubmitRegistration(page.eventId);
@@ -372,6 +391,9 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
         return;
       }
     }
+
+    // A paid, deposit-free submit will leave for Online Giving: sign on now.
+    if (signedIn && quote.invoiceTotal > 0 && !quote.depositRequested) startSignOn();
 
     submitMutation.mutate(
       {
@@ -904,6 +926,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                         {...reviewBody}
                         contact={contactBlock}
                         submitting={submitMutation.isPending || leavingForPayment}
+                        leaving={leavingForPayment}
                         submitError={submitError}
                         canSubmit={canSubmit}
                         isGuest={isGuest}
@@ -918,6 +941,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                       label={ctaLabel}
                       problemCount={problemCount}
                       submitting={submitMutation.isPending || leavingForPayment}
+                      leaving={leavingForPayment}
                       submitError={submitError}
                       isGuest={isGuest}
                       onShowProblems={() => setSummaryOpen(true)}

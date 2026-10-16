@@ -7,6 +7,8 @@ export interface ReviewPanelProps extends ReviewBodyProps {
   /** The "Contact for this registration" line, shown between the total and the submit. */
   contact?: React.ReactNode;
   submitting: boolean;
+  /** The registration is written and the browser is about to leave for payment. */
+  leaving?: boolean;
   submitError: string | null;
   canSubmit: boolean;
   isGuest: boolean;
@@ -56,6 +58,7 @@ export function RecaptchaNotice({ className = '' }: { className?: string }): Rea
  */
 export function ReviewPanel({
   submitting,
+  leaving = false,
   submitError,
   canSubmit,
   isGuest,
@@ -94,7 +97,7 @@ export function ReviewPanel({
             {submitting ? (
               <>
                 <Spinner className="mr-2" />
-                Registering…
+                {leaving ? 'Taking you to payment…' : 'Registering…'}
               </>
             ) : (
               submitLabel(body.quote)
