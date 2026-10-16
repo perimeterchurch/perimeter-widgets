@@ -1238,6 +1238,11 @@ describe('payment (straight to Online Giving and back)', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('defaults to the native hand-off: the schema parses paymentFlow as native', async () => {
+    const { EventRegistrationConfigSchema } = await import('../src/types');
+    expect(EventRegistrationConfigSchema.parse({}).paymentFlow).toBe('native');
+  });
+
   it('keeps the native hand-off when paymentFlow is native', async () => {
     submitPaid();
     render(<App config={{ ...config, paymentFlow: 'native' }} auth={authStub(true)} />);

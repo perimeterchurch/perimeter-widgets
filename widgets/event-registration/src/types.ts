@@ -44,9 +44,9 @@ export const EventRegistrationConfigSchema = z.object({
     ),
   paymentFlow: z
     .enum(['direct', 'native'])
-    .default('direct')
+    .default('native')
     .describe(
-      "`direct` (default, 2026-10-16): after a paid submit the widget itself asks MP's checkout API for a payment token and sends the browser straight to Online Giving, then confirms the payment when Online Giving returns here. `native`: hand off to `checkoutUrl` as before. Deposits and any failure to reach MP's API use the native page either way.",
+      "`native` (default): after a paid submit hand the browser to `checkoutUrl`, the native Invoice Details & Payment page. `direct`: the widget itself asks MP's checkout API for a payment token, sends the browser straight to Online Giving and confirms the payment when it returns here. Direct was the default for a few hours on 2026-10-16 and got visitors' networks blocked by Online Giving's bot detection (their page spun, then every onlinegiving.org request from that IP was refused); it stays opt-in until Online Giving confirms what their payments page needs. Deposits and any failure to reach MP's API use the native page either way.",
     ),
   paymentUrl: z
     .string()

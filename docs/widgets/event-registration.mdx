@@ -47,7 +47,7 @@ widget so members can sign in for the household roster:
 | Attribute                 | Required | Default                     | Description                                                                                          |
 | ------------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `data-checkout-url`       | No       | perimeter.org `/event-checkout/` | The native Invoice Details & Payment page: the fallback when the widget cannot take the payment itself (`…?id=<Invoice_GUID>`). |
-| `data-payment-flow`       | No       | `direct`                    | `direct`: straight to Online Giving and back (below). `native`: hand off to `data-checkout-url` as before. |
+| `data-payment-flow`       | No       | `native`                    | `native`: hand off to `data-checkout-url`. `direct`: straight to Online Giving and back (below) — opt-in only, see **Payment**. |
 | `data-payment-url`        | No       | perimeter.onlinegiving.org `/mp/payments/` | Online Giving's MP payments page (the native `<mpp-checkout>`'s `paymentprocessortargeturl`). |
 | `data-mp-widgets-url`     | No       | detected                    | Root of the MP widgets app whose checkout API mints payment tokens; detected from the MPWidgets/UserLogin `<script>` on the page. |
 | `data-id-param`           | No       | `id`                        | Query-string key carrying the `Event_ID` (MP's `EventDetailWidgetIdParameterName`).                 |
@@ -171,7 +171,13 @@ widget so members can sign in for the household roster:
   a muted "Forgot someone? Add another family member" link brings the cards back.
   `data-return-url` is gone with the button.
 - **Payment** (2026-10-16, Dana: a payment state in this widget instead of the native
-  Invoice Details & Payment page) — nobody's widget collects the card, MP's included: the
+  Invoice Details & Payment page) — **`direct` is opt-in, not the default** (same day): with it on,
+  Online Giving's payments page spun forever for visitors and their network was then blocked by
+  Online Giving's bot detection (403 on every onlinegiving.org host). The native checkout page
+  loads Online Giving's `assets/mpsso.js`, which fires a credentialed `GET
+  <og>/donate/silent_sso?mp_token=jwt:<mpp-widgets_AuthToken>` before the hand-off; this widget
+  does not, and that is the known difference. Do not turn `direct` on again until Online Giving
+  support confirms what their payments page requires. The mechanics: nobody's widget collects the card, MP's included: the
   native page is a shell around MP's widgets Checkout API (`/Api/CheckoutApi/*`, read from
   `widgets/dist/Checkout.js`), and the card form lives on Online Giving's hosted page. This
   widget makes the same calls (`src/lib/mp-checkout.ts`), with the member's
