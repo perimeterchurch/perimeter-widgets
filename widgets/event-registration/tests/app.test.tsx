@@ -986,3 +986,79 @@ describe('Button_Text', () => {
     expect(within(elementary).getByRole('button', { name: 'Add a child' })).toBeInTheDocument();
   });
 });
+
+describe('$0 amounts', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('shows no $0.00 and no Total row for a free registration on a paid event', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    // Pizza makes the event "paid", so prices are on; Jen's parent gathering is still free.
+    hooks.event.data = envelope({ ...familyNight, extras: pizzaExtras });
+    hooks.quote.mutate.mockImplementation(
+      (_plan: unknown, opts: { onSuccess: (r: { data: unknown }) => void }) =>
+        opts.onSuccess({
+          data: {
+            eventId: 900001,
+            registrations: [
+              {
+                registrationIndex: 0,
+                sectionKey: 'related:101',
+                eventId: 900011,
+                contactId: 684077,
+                attendeeName: 'Jen Cano',
+                isMinor: false,
+                lines: [
+                  {
+                    kind: 'base',
+                    productId: 9001,
+                    productOptionPriceId: null,
+                    title: 'Elementary + Early Years Focus',
+                    quantity: 1,
+                    unitPrice: 0,
+                    lineTotal: 0,
+                    itemNote: null,
+                    depositRequested: false,
+                  },
+                ],
+                subtotal: 0,
+                optionsSummary: null,
+                answerSummary: null,
+                attendingOnline: false,
+                addsToGroupIds: [],
+                overlapsWithRegistrationIndexes: [],
+                room: null,
+                resolvedOptions: [],
+              },
+            ],
+            extras: null,
+            invoiceTotal: 0,
+            depositRequested: false,
+            participationStatusId: 2,
+            invoiceStatusId: 3,
+            addressRequired: false,
+            problems: [],
+            submittable: true,
+            quoteHash: 'z'.repeat(64),
+          },
+        }),
+    );
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
+    tick(card, /Jen Cano/);
+    fireEvent.click(
+      within(card).getByRole('button', { name: /Add .* to registration|Add to registration/ }),
+    );
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+    const review = screen.getByRole('complementary', { name: 'Your registration' });
+    // Jen appears as the registrant and on the contact line.
+    await waitFor(() => expect(within(review).getAllByText('Jen Cano').length).toBeGreaterThan(0));
+    expect(screen.queryByText('$0.00')).not.toBeInTheDocument();
+    expect(within(review).queryByText('Total')).not.toBeInTheDocument();
+    expect(within(review).getByRole('button', { name: 'Complete registration' })).toBeEnabled();
+  });
+});

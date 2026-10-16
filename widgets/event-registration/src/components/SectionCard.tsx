@@ -210,7 +210,7 @@ export function SectionCard({
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    {quoted && showPrices && (
+                    {quoted && showPrices && quoted.subtotal !== 0 && (
                       <span className="mr-1 font-sans text-sm text-fg">
                         {formatMoney(quoted.subtotal)}
                       </span>

@@ -98,11 +98,15 @@ export function SummaryBar({
           </span>
         </span>
         <span className="flex items-center gap-2">
-          {showPrices && (count > 0 || extrasLabel) && (
-            <span className="font-sans text-base font-bold text-fg">
-              {quoting && total === null ? <Spinner /> : formatMoney(total ?? 0)}
-            </span>
-          )}
+          {showPrices &&
+            (count > 0 || extrasLabel) &&
+            (quoting && total === null ? (
+              <span className="font-sans text-base font-bold text-fg">
+                <Spinner />
+              </span>
+            ) : total !== null && total > 0 ? (
+              <span className="font-sans text-base font-bold text-fg">{formatMoney(total)}</span>
+            ) : null)}
           <ChevronDown
             aria-hidden
             className={`size-5 shrink-0 transition-transform motion-reduce:transition-none ${
