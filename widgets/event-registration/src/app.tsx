@@ -7,6 +7,7 @@ import {
   useRegistrationRoster,
   useSubmitRegistration,
   type QuotedRegistration,
+  type RegistrationEvent,
   type RegistrationQuote,
   type RegistrationRoster,
   type RegistrationSubmitResult,
@@ -21,6 +22,7 @@ import { RegistrantEditor } from './components/RegistrantEditor';
 import { GuestContactForm, SignedInContactForm } from './components/PurchaserForm';
 import { ContactSummary } from './components/ContactSummary';
 import { RegistrationComplete } from './components/RegistrationComplete';
+import { PaymentReturn, type PaymentReturnState } from './components/PaymentReturn';
 import { ExtrasCard } from './components/ExtrasCard';
 import { ReviewPanel, submitLabel } from './components/ReviewPanel';
 import { ReviewBody } from './components/ReviewBody';
@@ -42,7 +44,14 @@ import {
   newLocalId,
   type DraftRegistration,
 } from './lib/draft';
-import { buildCheckoutUrl, readPageContext } from './lib/page-url';
+import { buildCheckoutUrl, readPageContext, withoutQueryParams } from './lib/page-url';
+import { MPCheckoutClient, paymentPageUrl, resolveMPAppRoot } from './lib/mp-checkout';
+import {
+  clearPendingPayment,
+  readPendingPayment,
+  savePendingPayment,
+  type PendingPayment,
+} from './lib/pending-payment';
 import { eventIsFree } from './lib/format';
 import { groupSections } from './lib/groups';
 import { eventsOverlap } from './lib/overlap';
@@ -83,6 +92,46 @@ type CompletedSubmit = {
   result: Extract<RegistrationSubmitResult, { dryRun: false }>;
 };
 
+/**
+ * What the return from Online Giving shows: the same people and sessions the
+ * free path's confirmation lists, saved before the browser leaves because the
+ * return URL carries nothing but the payment response.
+ */
+function pendingPaymentRecord(
+  eventId: number,
+  event: RegistrationEvent,
+  result: CompletedSubmit['result'],
+): Omit<PendingPayment, 'savedAt'> {
+  const sectionName = new Map(event.sections.map((s) => [s.key, s.displayName]));
+  const extras = result.quote.extras;
+  return {
+    eventId,
+    invoiceGuid: result.invoiceGuid,
+    invoiceTotal: result.invoiceTotal,
+    summary: {
+      attendees: result.quote.registrations.map((r) => ({
+        name: r.attendeeName,
+        detail:
+          (sectionName.get(r.sectionKey) ?? r.sectionKey) +
+          (r.optionsSummary ? ` · ${r.optionsSummary.split('<BR>').join(' · ')}` : ''),
+      })),
+      extras: extras
+        ? {
+            title: extras.lines[0]?.title ?? 'Extras',
+            detail: extras.lines
+              .filter((l) => l.kind !== 'base')
+              .map((l) => `${l.title} × ${l.quantity}`)
+              .join(' · '),
+          }
+        : null,
+    },
+  };
+}
+
+function navigateTo(url: string): void {
+  window.location.assign(url);
+}
+
 function LoadingState(): React.JSX.Element {
   return (
     <div className="grid gap-4" aria-busy="true">
@@ -104,9 +153,35 @@ function LoadingState(): React.JSX.Element {
  * visitor may register themself when nothing forces login.
  */
 export function App({ config, auth }: AppProps): React.JSX.Element {
-  const page = React.useMemo(
-    () => readPageContext(config.idParam, config.eventId),
-    [config.idParam, config.eventId],
+  // The registration this browser sent to Online Giving and has not finished
+  // paying for, if any. Read once: the record changes only through this widget.
+  const [pendingPayment, setPendingPayment] = React.useState<PendingPayment | null>(() =>
+    readPendingPayment(),
+  );
+  // The event the saved record names, fixed at mount: clearing the record
+  // later must not re-derive the page.
+  const recoveredEventId = React.useRef<number | null>(pendingPayment?.eventId ?? null);
+  const page = React.useMemo(() => {
+    const ctx = readPageContext(config.idParam, config.eventId);
+    // Online Giving returns to the page's bare URL: no `?id=`, so the event
+    // comes from the record saved before leaving.
+    if (ctx.eventId === null && ctx.paymentToken !== null && recoveredEventId.current !== null)
+      return { ...ctx, eventId: recoveredEventId.current };
+    return ctx;
+  }, [config.idParam, config.eventId]);
+
+  // MP's checkout API, reachable when the host page loads MP's widgets script
+  // (or the embed names the app root) and the direct flow is on.
+  const mpAppRoot = React.useMemo(
+    () => resolveMPAppRoot(config.mpWidgetsUrl),
+    [config.mpWidgetsUrl],
+  );
+  const checkout = React.useMemo(
+    () =>
+      config.paymentFlow === 'direct' && mpAppRoot !== null
+        ? new MPCheckoutClient(mpAppRoot, () => auth.getToken())
+        : null,
+    [config.paymentFlow, mpAppRoot, auth],
   );
 
   // The MP login widget writes its token after this widget mounts — watch it.
@@ -142,6 +217,94 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
 
   // A registration that owed nothing confirms in place instead of going to checkout.
   const [completed, setCompleted] = React.useState<CompletedSubmit | null>(null);
+
+  // ── Payment (2026-10-16): straight to Online Giving and back ─────────
+  // Leaving: a payment token is being minted and the browser is about to go.
+  const [leavingForPayment, setLeavingForPayment] = React.useState(false);
+  // Returning: Online Giving sent the browser back with `?token=`.
+  const [paymentReturn, setPaymentReturn] = React.useState<PaymentReturnState | null>(() =>
+    page.paymentToken !== null ? { status: 'processing' } : null,
+  );
+  // The record as it was when the browser came back: the confirmation shows
+  // it even after the stored copy is cleared, and clearing must not re-run
+  // the confirmation.
+  const returnedWithRef = React.useRef<PendingPayment | null>(pendingPayment);
+  const processedTokenRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    const token = page.paymentToken;
+    if (token === null || processedTokenRef.current === token) return;
+    processedTokenRef.current = token;
+    // A refresh must not post the same response again.
+    try {
+      window.history.replaceState(
+        window.history.state,
+        '',
+        withoutQueryParams(window.location.href, ['token']),
+      );
+    } catch {
+      // history unavailable: the ref above still guards this mount
+    }
+    const pending = returnedWithRef.current;
+    if (!checkout) {
+      setPaymentReturn({
+        status: 'failed',
+        message: 'We could not confirm your payment from this page.',
+        pending,
+      });
+      return;
+    }
+    const settle = (state: PaymentReturnState) => {
+      if (state.status === 'paid' || state.status === 'received') {
+        clearPendingPayment();
+        setPendingPayment(null);
+      }
+      setPaymentReturn(state);
+    };
+    checkout
+      .processPaymentResponse(token)
+      .then((result) => {
+        if (result.success) settle({ status: 'paid', pending });
+        else if (result.paymentReceived && !result.paymentNotified)
+          settle({ status: 'received', pending });
+        else settle({ status: 'failed', message: 'Your payment did not go through.', pending });
+      })
+      .catch(() => {
+        settle({
+          status: 'failed',
+          message:
+            'We could not confirm your payment. If your card was charged, it will show on your registration shortly.',
+          pending,
+        });
+      });
+  }, [page.paymentToken, checkout]);
+
+  /**
+   * Send the browser to pay `record`'s invoice: the widget's own token from
+   * MP's checkout API and Online Giving's page when it can, the native
+   * Invoice Details & Payment page when it cannot (no MP script on the
+   * page, the API refused, or `paymentFlow` is `native`).
+   */
+  async function goToPayment(record: Omit<PendingPayment, 'savedAt'>): Promise<void> {
+    const fallback = buildCheckoutUrl(config.checkoutUrl, config.invoiceParam, record.invoiceGuid);
+    savePendingPayment(record);
+    setLeavingForPayment(true);
+    if (!checkout || !page.pageUrl) {
+      navigateTo(fallback);
+      return;
+    }
+    try {
+      const token = await checkout.buildPaymentRequestToken({
+        invoiceGuid: record.invoiceGuid,
+        audienceUrl: config.paymentUrl,
+        returnUrl: page.pageUrl,
+        amountToPay: record.invoiceTotal,
+        paymentOption: 'full',
+      });
+      navigateTo(paymentPageUrl(config.paymentUrl, token));
+    } catch {
+      navigateTo(fallback);
+    }
+  }
 
   // ── Quote: the server prices the draft whenever it changes ────────────
   const quoteMutation = useRegistrationQuote(page.eventId);
@@ -224,7 +387,13 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
             void rosterQuery.refetch?.();
             return;
           }
-          window.location.assign(result.data.checkoutUrl);
+          // A deposit invoice offers amount choices the native page knows how
+          // to show; everything else goes straight to Online Giving.
+          if (result.data.quote.depositRequested || !event) {
+            navigateTo(result.data.checkoutUrl);
+            return;
+          }
+          void goToPayment(pendingPaymentRecord(result.data.quote.eventId, event, result.data));
         },
         onError: (error) => {
           if (error instanceof ApiError) {
@@ -245,6 +414,27 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
   }
 
   // ── Render ────────────────────────────────────────────────────────────
+  if (page.eventId === null && paymentReturn !== null) {
+    // Back from Online Giving with no way to know the event: still confirm
+    // the payment, which is what the visitor is waiting on.
+    return (
+      <div className="@container p-4 text-left">
+        <PaymentReturn
+          state={paymentReturn}
+          event={null}
+          checkoutHref={null}
+          onRetry={null}
+          retrying={false}
+          onRegisterMore={null}
+          onStartOver={() => {
+            clearPendingPayment();
+            setPendingPayment(null);
+            setPaymentReturn(null);
+          }}
+        />
+      </div>
+    );
+  }
   if (page.eventId === null) {
     return (
       <div className="@container p-4 text-left">
@@ -310,7 +500,14 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
     draft.guest.email.trim() &&
     draft.guest.phone.trim(),
   );
-  const showPendingInvoice = page.pendingInvoiceGuid !== null && !dismissedPendingInvoice;
+  const pendingHere =
+    pendingPayment && pendingPayment.eventId === page.eventId ? pendingPayment : null;
+  // A failed return can be retried for the invoice it was about, when known.
+  const failedPayment =
+    paymentReturn?.status === 'failed' && paymentReturn.pending ? paymentReturn.pending : null;
+  const pendingInvoiceGuid = page.pendingInvoiceGuid ?? pendingHere?.invoiceGuid ?? null;
+  const showPendingInvoice =
+    pendingInvoiceGuid !== null && !dismissedPendingInvoice && paymentReturn === null;
 
   const quotedByLocalId = new Map<string, QuotedRegistration>();
   if (quote) {
@@ -545,14 +742,48 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
           <ExternalRegistrationNotice href={event.externalRegistrationUrl} />
         ) : !event.registrationOpen ? (
           <MessageState>Registration is not open for this event.</MessageState>
-        ) : showPendingInvoice && page.pendingInvoiceGuid ? (
+        ) : showPendingInvoice && pendingInvoiceGuid ? (
           <PendingInvoiceNotice
             checkoutHref={buildCheckoutUrl(
               config.checkoutUrl,
               config.invoiceParam,
-              page.pendingInvoiceGuid,
+              pendingInvoiceGuid,
             )}
-            onStartOver={() => setDismissedPendingInvoice(true)}
+            // In place only for the widget's own record: the amount owed is
+            // part of the payment token, and a URL-only invoice has no amount.
+            onPayNow={pendingHere && checkout ? () => void goToPayment(pendingHere) : null}
+            paying={leavingForPayment}
+            onStartOver={() => {
+              clearPendingPayment();
+              setPendingPayment(null);
+              setDismissedPendingInvoice(true);
+            }}
+          />
+        ) : paymentReturn ? (
+          <PaymentReturn
+            state={paymentReturn}
+            event={event}
+            checkoutHref={
+              failedPayment
+                ? buildCheckoutUrl(
+                    config.checkoutUrl,
+                    config.invoiceParam,
+                    failedPayment.invoiceGuid,
+                  )
+                : null
+            }
+            onRetry={failedPayment && checkout ? () => void goToPayment(failedPayment) : null}
+            retrying={leavingForPayment}
+            onRegisterMore={() => {
+              setPaymentReturn(null);
+              void eventQuery.refetch?.();
+              void rosterQuery.refetch?.();
+            }}
+            onStartOver={() => {
+              clearPendingPayment();
+              setPendingPayment(null);
+              setPaymentReturn(null);
+            }}
           />
         ) : (
           <>
@@ -662,7 +893,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                       <ReviewPanel
                         {...reviewBody}
                         contact={contactBlock}
-                        submitting={submitMutation.isPending}
+                        submitting={submitMutation.isPending || leavingForPayment}
                         submitError={submitError}
                         canSubmit={canSubmit}
                         isGuest={isGuest}
@@ -676,7 +907,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
                       state={ctaState}
                       label={ctaLabel}
                       problemCount={problemCount}
-                      submitting={submitMutation.isPending}
+                      submitting={submitMutation.isPending || leavingForPayment}
                       submitError={submitError}
                       isGuest={isGuest}
                       onShowProblems={() => setSummaryOpen(true)}

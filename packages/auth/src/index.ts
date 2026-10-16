@@ -1,2 +1,6 @@
 export type { AuthProvider } from './types';
-export { MPLocalStorageAuth, type MPLocalStorageAuthOptions } from './mp-local-storage-auth';
+export {
+  MPLocalStorageAuth,
+  detectMPAppRoot,
+  type MPLocalStorageAuthOptions,
+} from './mp-local-storage-auth';

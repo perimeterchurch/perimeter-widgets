@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   attendeeIdentity,
   buildPlan,
@@ -6,7 +6,15 @@ import {
   EMPTY_DRAFT,
   type DraftRegistration,
 } from '../src/lib/draft';
-import { buildCheckoutUrl, readPageContext } from '../src/lib/page-url';
+import { buildCheckoutUrl, readPageContext, withoutQueryParams } from '../src/lib/page-url';
+import { MPCheckoutClient, paymentPageUrl, resolveMPAppRoot } from '../src/lib/mp-checkout';
+import {
+  PENDING_PAYMENT_KEY,
+  PENDING_PAYMENT_TTL_MS,
+  clearPendingPayment,
+  readPendingPayment,
+  savePendingPayment,
+} from '../src/lib/pending-payment';
 import {
   cardPrice,
   formatEventRange,
@@ -45,8 +53,29 @@ describe('page context', () => {
     expect(ctx).toEqual({
       eventId: 900001,
       pendingInvoiceGuid: 'e8b7bf55-a16b-4ee9-a826-277d5d6ade43',
+      paymentToken: null,
       pageUrl: 'https://www.perimeter.org/family-registration/',
     });
+  });
+
+  it("reads Online Giving's payment response token from the bare return URL", () => {
+    const ctx = readPageContext(
+      'id',
+      undefined,
+      'https://www.perimeter.org/family-registration/?token=abc.def',
+    );
+    expect(ctx.eventId).toBeNull();
+    expect(ctx.paymentToken).toBe('abc.def');
+    expect(ctx.pageUrl).toBe('https://www.perimeter.org/family-registration/');
+    expect(readPageContext('id', 1, 'https://x.test/?token=').paymentToken).toBeNull();
+  });
+
+  it('drops named query parameters without leaving a dangling ?', () => {
+    expect(withoutQueryParams('https://x.test/p/?token=abc', ['token'])).toBe('https://x.test/p/');
+    expect(withoutQueryParams('https://x.test/p/?id=1&token=abc', ['token'])).toBe(
+      'https://x.test/p/?id=1',
+    );
+    expect(withoutQueryParams('not a url', ['token'])).toBe('not a url');
   });
 
   it('prefers a pinned event id and ignores a malformed one', () => {
@@ -335,5 +364,132 @@ describe('eventsOverlap', () => {
     expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '17:30', '19:00'))).toBe(true);
     expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '18:00', '19:00'))).toBe(false);
     expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(1, '16:30', '18:00'))).toBe(false);
+  });
+});
+
+describe('MP checkout client', () => {
+  const ok = (body: unknown) =>
+    new Response(JSON.stringify(body), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+
+  it('mints a payment token with the bearer token and MP cookies when signed in', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(ok({ token: 'signed.token' }));
+    const client = new MPCheckoutClient('https://mp.example.org/widgets', () => 'tok', fetchImpl);
+    const token = await client.buildPaymentRequestToken({
+      invoiceGuid: 'e8b7bf55-a16b-4ee9-a826-277d5d6ade43',
+      audienceUrl: 'https://perimeter.onlinegiving.org/mp/payments/',
+      returnUrl: 'https://www.perimeter.org/family-registration/',
+      amountToPay: 12.5,
+      paymentOption: 'full',
+    });
+    expect(token).toBe('signed.token');
+    const [url, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
+    const u = new URL(url);
+    expect(u.pathname).toBe('/widgets/Api/CheckoutApi/BuildPaymentRequestToken');
+    expect(Object.fromEntries(u.searchParams)).toEqual({
+      invoiceId: 'e8b7bf55-a16b-4ee9-a826-277d5d6ade43',
+      audienceUrl: 'https://perimeter.onlinegiving.org/mp/payments/',
+      returnUrl: 'https://www.perimeter.org/family-registration/',
+      amountToPay: '12.50',
+      paymentOption: 'full',
+    });
+    expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok');
+    expect(init.credentials).toBe('include');
+  });
+
+  it('sends a guest request with neither a bearer token nor cookies, and fails on an empty token', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(ok({ token: null }));
+    const client = new MPCheckoutClient('https://mp.example.org/widgets', () => null, fetchImpl);
+    await expect(
+      client.buildPaymentRequestToken({
+        invoiceGuid: 'g',
+        audienceUrl: 'https://og.test/',
+        returnUrl: 'https://x.test/',
+        amountToPay: 1,
+        paymentOption: 'full',
+      }),
+    ).rejects.toThrow(/no payment token/);
+    const [, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
+    expect((init.headers as Record<string, string>).Authorization).toBeUndefined();
+    expect(init.credentials).toBeUndefined();
+  });
+
+  it("posts Online Giving's response token as form data with MP's CSRF header", async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(ok({ token: 'csrf-1', expiresAfterUtc: '2099-01-01T00:00:00Z' }))
+      .mockResolvedValueOnce(ok({ success: true, invoiceId: 'g' }));
+    const client = new MPCheckoutClient('https://mp.example.org/widgets', () => 'tok', fetchImpl);
+    const result = await client.processPaymentResponse('resp.token');
+    expect(result).toEqual({ success: true, invoiceId: 'g' });
+    expect(fetchImpl.mock.calls[0]?.[0]).toBe('https://mp.example.org/widgets/Home/CSRFToken');
+    const [url, init] = fetchImpl.mock.calls[1] as [string, RequestInit];
+    expect(url).toBe('https://mp.example.org/widgets/Api/CheckoutApi/ProcessPaymentResponse');
+    expect(init.method).toBe('POST');
+    expect((init.headers as Record<string, string>)['x-csrf-token']).toBe('csrf-1');
+    expect((init.body as FormData).get('text')).toBe('resp.token');
+  });
+
+  it('surfaces an HTTP failure as an error with its status', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(new Response('', { status: 401 }));
+    const client = new MPCheckoutClient('https://mp.example.org/widgets', () => 'tok', fetchImpl);
+    await expect(
+      client.buildPaymentRequestToken({
+        invoiceGuid: 'g',
+        audienceUrl: 'https://og.test/',
+        returnUrl: 'https://x.test/',
+        amountToPay: 1,
+        paymentOption: 'full',
+      }),
+    ).rejects.toMatchObject({ status: 401 });
+  });
+
+  it("builds Online Giving's page URL and resolves the app root from an override or the page's MP script", () => {
+    expect(paymentPageUrl('https://perimeter.onlinegiving.org/mp/payments/', 'a b')).toBe(
+      'https://perimeter.onlinegiving.org/mp/payments/?token=a%20b',
+    );
+    expect(paymentPageUrl('https://og.test/pay?x=1', 't')).toBe('https://og.test/pay?x=1&token=t');
+    expect(resolveMPAppRoot('https://mp.example.org/widgets/')).toBe(
+      'https://mp.example.org/widgets',
+    );
+    expect(resolveMPAppRoot(undefined)).toBeNull();
+    const script = document.createElement('script');
+    script.src = 'https://ministryplatform.perimeter.org/widgets/dist/UserLogin.js';
+    document.head.appendChild(script);
+    try {
+      expect(resolveMPAppRoot(undefined)).toBe('https://ministryplatform.perimeter.org/widgets');
+    } finally {
+      script.remove();
+    }
+  });
+});
+
+describe('pending payment record', () => {
+  const record = {
+    eventId: 900001,
+    invoiceGuid: 'e8b7bf55-a16b-4ee9-a826-277d5d6ade43',
+    invoiceTotal: 24,
+    summary: { attendees: [{ name: 'Jen Cano', detail: 'Elementary' }], extras: null },
+  };
+
+  it('round-trips through localStorage and expires after the TTL', () => {
+    clearPendingPayment();
+    savePendingPayment(record, 1_000);
+    expect(readPendingPayment(2_000)).toEqual({ ...record, savedAt: 1_000 });
+    expect(readPendingPayment(1_000 + PENDING_PAYMENT_TTL_MS + 1)).toBeNull();
+    // Expiry removes the record for good.
+    expect(localStorage.getItem(PENDING_PAYMENT_KEY)).toBeNull();
+  });
+
+  it('ignores garbage and a missing store', () => {
+    localStorage.setItem(PENDING_PAYMENT_KEY, '{"eventId":"x"}');
+    expect(readPendingPayment()).toBeNull();
+    localStorage.setItem(PENDING_PAYMENT_KEY, 'not json');
+    expect(readPendingPayment()).toBeNull();
+    clearPendingPayment();
+    expect(readPendingPayment(Date.now(), null)).toBeNull();
+    expect(() => savePendingPayment(record, Date.now(), null)).not.toThrow();
   });
 });
