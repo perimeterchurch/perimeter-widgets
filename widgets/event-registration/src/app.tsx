@@ -45,7 +45,12 @@ import {
   type DraftRegistration,
 } from './lib/draft';
 import { buildCheckoutUrl, readPageContext, withoutQueryParams } from './lib/page-url';
-import { MPCheckoutClient, paymentPageUrl, resolveMPAppRoot } from './lib/mp-checkout';
+import {
+  MPCheckoutClient,
+  paymentPageUrl,
+  resolveMPAppRoot,
+  silentSignOn,
+} from './lib/mp-checkout';
 import {
   clearPendingPayment,
   readPendingPayment,
@@ -293,6 +298,11 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       return;
     }
     try {
+      // The same handshake the native checkout page's mpsso.js performs for a
+      // signed-in member, done here right before leaving (2026-10-16): the
+      // silent sign-on first, then the MP token on the payments URL as well.
+      const mpToken = auth.getToken();
+      if (mpToken) await silentSignOn(config.paymentUrl, mpToken);
       const token = await checkout.buildPaymentRequestToken({
         invoiceGuid: record.invoiceGuid,
         audienceUrl: config.paymentUrl,
@@ -300,7 +310,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
         amountToPay: record.invoiceTotal,
         paymentOption: 'full',
       });
-      navigateTo(paymentPageUrl(config.paymentUrl, token));
+      navigateTo(paymentPageUrl(config.paymentUrl, token, mpToken));
     } catch {
       navigateTo(fallback);
     }

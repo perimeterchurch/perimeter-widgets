@@ -60,10 +60,68 @@ export function resolveMPAppRoot(override: string | undefined): string | null {
   return detectMPAppRoot();
 }
 
-/** `<processorUrl>?token=<token>`, respecting an existing query string. */
-export function paymentPageUrl(processorUrl: string, token: string): string {
+/**
+ * `<processorUrl>?token=<payment token>`, plus `mp_token=jwt:<MP token>` for a
+ * signed-in member, respecting an existing query string.
+ *
+ * The `mp_token` parameter is what Online Giving's own `assets/mpsso.js`
+ * appends to every onlinegiving.org link a signed-in member clicks, so
+ * their pages accept it as an inline sign-on (2026-10-16).
+ */
+export function paymentPageUrl(
+  processorUrl: string,
+  token: string,
+  mpToken: string | null = null,
+): string {
   const sep = processorUrl.includes('?') ? '&' : '?';
-  return `${processorUrl}${sep}token=${encodeURIComponent(token)}`;
+  const url = `${processorUrl}${sep}token=${encodeURIComponent(token)}`;
+  return mpToken ? `${url}&mp_token=${encodeURIComponent(`jwt:${mpToken}`)}` : url;
+}
+
+/** How long the silent sign-on may hold up the hand-off; it is best effort. */
+export const SILENT_SSO_TIMEOUT_MS = 4000;
+
+/**
+ * Online Giving's silent sign-on: a credentialed GET of
+ * `<og origin>/donate/silent_sso?mp_token=jwt:<MP token>`, exactly the
+ * request `assets/mpsso.js` fires on the native checkout page before
+ * `<mpp-checkout>` sends the browser to the payments page. It gives the
+ * browser an Online Giving session for the signed-in member. Without it
+ * (widgets 0.2.10, 2026-10-16) the payments page spun and the visitor's
+ * network was then blocked by Online Giving's bot detection.
+ *
+ * Fire-and-forget like the original: the response is opaque (`no-cors`), and
+ * a failure or timeout never stops the hand-off. Resolves when it is done.
+ */
+export async function silentSignOn(
+  processorUrl: string,
+  mpToken: string,
+  fetchImpl: typeof fetch = (...args) => fetch(...args),
+  timeoutMs: number = SILENT_SSO_TIMEOUT_MS,
+): Promise<void> {
+  let origin: string;
+  try {
+    origin = new URL(processorUrl).origin;
+  } catch {
+    return;
+  }
+  const controller = typeof AbortController === 'undefined' ? null : new AbortController();
+  const timer = setTimeout(() => controller?.abort(), timeoutMs);
+  try {
+    await fetchImpl(
+      `${origin}/donate/silent_sso?mp_token=${encodeURIComponent(`jwt:${mpToken}`)}`,
+      {
+        method: 'GET',
+        mode: 'no-cors',
+        credentials: 'include',
+        ...(controller ? { signal: controller.signal } : {}),
+      },
+    );
+  } catch {
+    // best effort: Online Giving may still accept the mp_token on the URL
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export class MPCheckoutClient {
