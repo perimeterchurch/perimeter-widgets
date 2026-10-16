@@ -402,6 +402,25 @@ describe('event-registration widget', () => {
     expect(within(card).getAllByText('already added')).toHaveLength(3);
   });
 
+  it('collapses a drawer to its summary row when the next person is ticked, with a way back in', () => {
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    fireEvent.click(within(card).getByRole('button', { name: /^Add / }));
+    tick(card, /William Cano/);
+    expect(card.querySelectorAll('[data-drawer-state="open"]')).toHaveLength(1);
+    expect(within(card).queryByRole('button', { name: /^Done/ })).not.toBeInTheDocument();
+    // Ticking Max opens his drawer and collapses William's to a summary row.
+    tick(card, /Max Cano/);
+    expect(card.querySelectorAll('[data-drawer-state="open"]')).toHaveLength(1);
+    const rows = card.querySelectorAll(
+      '[data-drawer-state="complete"], [data-drawer-state="incomplete"]',
+    );
+    expect(rows).toHaveLength(1);
+    fireEvent.click(within(card).getByRole('button', { name: /answers for William/ }));
+    expect(card.querySelectorAll('[data-drawer-state="open"]')).toHaveLength(1);
+    expect(within(card).getByRole('button', { name: /answers for Max/ })).toBeInTheDocument();
+  });
+
   it("opens a child's block with the answers MP already holds, and lets the parent change them", () => {
     hooks.roster.data = envelope({
       ...canoHousehold,
@@ -427,17 +446,8 @@ describe('event-registration widget', () => {
     expect(within(card).getByLabelText(/Grade/)).toHaveValue('7th');
     expect(within(card).getByLabelText('No')).toBeChecked();
     expect(within(card).getByText(/Filled in from William's record/)).toBeInTheDocument();
-    // Done collapses to a summary row that keeps the question with each answer.
-    fireEvent.click(within(card).getByRole('button', { name: 'Done with William' }));
-    const row = card.querySelector('[data-drawer-state="complete"]');
-    expect(row).not.toBeNull();
-    expect(row).toHaveTextContent('Grade: 7th');
-    expect(row).toHaveTextContent('Allergies: No');
-    expect(within(card).queryByLabelText(/Grade/)).not.toBeInTheDocument();
-    fireEvent.click(within(card).getByRole('button', { name: 'Change answers for William' }));
-    expect(within(card).getByLabelText(/Grade/)).toHaveValue('7th');
-    fireEvent.click(within(card).getByRole('button', { name: 'Done with William' }));
-    expect(card.querySelector('[data-drawer-state="complete"]')).not.toBeNull();
+    // No "Done" under the form (2026-10-16): the drawer stays open until the save.
+    expect(within(card).queryByRole('button', { name: /^Done/ })).not.toBeInTheDocument();
     // Prefilled answers satisfy the required fields, so the save goes straight through.
     fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
     expect(within(card).getByRole('button', { name: 'Edit William Cano' })).toBeInTheDocument();
