@@ -158,7 +158,7 @@ describe('event-registration widget', () => {
     ).toBeInTheDocument();
   });
 
-  it("labels the button I'm Attending, Add a student when grade-bounded, else Button_Text", () => {
+  it("labels the button I'm Attending, Add a student when grade-bounded, else Add a child; staff Button_Text always wins", () => {
     hooks.event.data = envelope({
       ...familyNight,
       sections: familyNight.sections.map((s) =>
@@ -173,10 +173,10 @@ describe('event-registration widget', () => {
     const adults = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
     const attending = within(adults).getByRole('button', { name: "I'm Attending" });
     expect(attending).toHaveAccessibleDescription('Elementary + Early Years Focus');
-    // Grade-bounded: "Add a student" whatever staff typed ("Add … registrant" here).
+    // Grade-bounded with no Button_Text: "Add a student".
     const elementary = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
     expect(within(elementary).getByRole('button', { name: 'Add a student' })).toBeInTheDocument();
-    // No grade bounds: the staff-set Button_Text stands.
+    // Staff Button_Text wins even where the default would say "Add a student".
     const students = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
     expect(within(students).getByRole('button', { name: 'Add a child' })).toBeInTheDocument();
     // No audience or grade badges; the status badge stays.
@@ -950,5 +950,39 @@ describe('links in staff HTML', () => {
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     expect(link).toHaveAttribute('href', expect.stringContaining('Waiver%20and%20Release.pdf'));
+  });
+});
+
+describe('Button_Text', () => {
+  it('overrides every default, including an adult section and a grade-bounded one', () => {
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.key === 'related:101'
+          ? { ...s, buttonText: 'Count me in' }
+          : s.key === 'related:104'
+            ? {
+                ...s,
+                buttonText: 'Sign up my kid',
+                audience: { ...s.audience, minGrade: 0, maxGrade: 5 },
+              }
+            : s,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const adults = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    expect(within(adults).getByRole('button', { name: 'Count me in' })).toBeInTheDocument();
+    expect(within(adults).queryByRole('button', { name: "I'm Attending" })).not.toBeInTheDocument();
+    const elementary = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    expect(within(elementary).getByRole('button', { name: 'Sign up my kid' })).toBeInTheDocument();
+    expect(
+      within(elementary).queryByRole('button', { name: 'Add a student' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('falls back to Add a child for a minors-only section with no grade bound and no Button_Text', () => {
+    render(<App config={config} auth={authStub(true)} />);
+    const elementary = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    expect(within(elementary).getByRole('button', { name: 'Add a child' })).toBeInTheDocument();
   });
 });

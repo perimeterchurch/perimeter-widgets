@@ -16,7 +16,7 @@ function section(
     relatedEventId: null,
     enableLabelHtml: null,
     instructionsHtml: null,
-    buttonText: `Add ${over.displayName} registrant`,
+    buttonText: null,
     sectionGroup: null,
     position: 1,
     showHouseholdPositionId: null,

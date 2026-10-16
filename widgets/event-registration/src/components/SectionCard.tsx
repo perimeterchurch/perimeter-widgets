@@ -106,11 +106,14 @@ export function SectionCard({
     (amount !== null || (price.kind === 'free' && price.paidOptions));
   const tappable = section.open && canAdd && !editor;
   const { minorsOnly, minGrade, maxGrade } = section.audience;
-  const addLabel = !minorsOnly
-    ? "I'm Attending"
-    : minGrade !== null || maxGrade !== null
-      ? 'Add a student'
-      : section.buttonText;
+  // Staff's Button_Text always wins (2026-10-16); the defaults apply only when it is unset.
+  const addLabel =
+    section.buttonText ??
+    (!minorsOnly
+      ? "I'm Attending"
+      : minGrade !== null || maxGrade !== null
+        ? 'Add a student'
+        : 'Add a child');
 
   // Picture on top below 768px, beside the copy from 768px (2026-09-22). Not at
   // tablet widths: a side column there cropped landscape banners to a tall sliver.
