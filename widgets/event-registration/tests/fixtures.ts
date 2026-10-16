@@ -41,6 +41,7 @@ function section(
       groups: [],
     },
     form: null,
+    rooms: [],
     open: true,
     closedReason: null,
     ...over,

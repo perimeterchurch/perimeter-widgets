@@ -45,6 +45,7 @@ import {
 import { buildCheckoutUrl, readPageContext } from './lib/page-url';
 import { eventIsFree } from './lib/format';
 import { groupSections } from './lib/groups';
+import { eventsOverlap } from './lib/overlap';
 
 export interface AppProps {
   config: EventRegistrationConfig;
@@ -326,13 +327,21 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
     problemsByLocalId.set(local.localId, [...(problemsByLocalId.get(local.localId) ?? []), p]);
   }
 
-  const identitiesByEvent = new Map<number, Set<string>>();
-  for (const r of draft.registrations) {
-    const section = event.sections.find((s) => s.key === r.sectionKey);
-    if (!section) continue;
-    const set = identitiesByEvent.get(section.event.eventId) ?? new Set<string>();
-    set.add(attendeeIdentity(r.attendee));
-    identitiesByEvent.set(section.event.eventId, set);
+  // Who a section may not take again: anyone already in the draft for the
+  // same event, or for an event that runs at the same time (one session per
+  // person at a time, decided 2026-10-15; the server refuses too).
+  const takenBySection = new Map<string, Map<string, 'same' | 'concurrent'>>();
+  for (const target of event.sections) {
+    const taken = new Map<string, 'same' | 'concurrent'>();
+    for (const r of draft.registrations) {
+      const from = event.sections.find((s) => s.key === r.sectionKey);
+      if (!from) continue;
+      const identity = attendeeIdentity(r.attendee);
+      if (from.event.eventId === target.event.eventId) taken.set(identity, 'same');
+      else if (eventsOverlap(from.event, target.event) && !taken.has(identity))
+        taken.set(identity, 'concurrent');
+    }
+    takenBySection.set(target.key, taken);
   }
 
   const depositAvailable = event.sections.some((s) => (s.product?.depositPrice ?? 0) > 0);
@@ -363,7 +372,7 @@ export function App({ config, auth }: AppProps): React.JSX.Element {
       section={section}
       existing={editingExisting}
       members={roster?.members ?? []}
-      takenIdentities={identitiesByEvent.get(section.event.eventId) ?? new Set()}
+      takenIdentities={takenBySection.get(section.key) ?? new Map()}
       mode={signedIn ? 'household' : 'guest'}
       guestName={guestName}
       guest={signedIn ? undefined : draft.guest}

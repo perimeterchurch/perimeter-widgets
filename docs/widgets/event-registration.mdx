@@ -96,10 +96,20 @@ widget so members can sign in for the household roster:
   grade-bounded sections show a **Grade** select, prefilled from the child's graduation
   year, and never ask a child whose age rules the grade out. Ineligible members read "too young",
   "too old" or "not this grade".
-  **Room placement** (2026-09-15): when an option group's rooms carry `Placement_*` bounds on
-  the Group record, the widget places the child from their birth date (and grade when a room
-  asks for it), shows the room as a line instead of radios, and the server re-derives it on every
-  quote and submit. The radios return only when no room fits, two fit, or the fit is full.
+  **Room placement from Event_Rooms** (2026-10-15): a section whose event has `Event_Rooms`
+  rows naming a group with `Placement_*` rules (`section.rooms`) places the child from their
+  birth date (and grade only where rooms overlap), shows "Room: SEC 1 year olds — from Max's
+  birth date" as a line, and never offers a room choice; the product's own room options are not
+  shown. A child nothing fits, or whose fits are full, is refused in the drawer and by the quote
+  (`NO_ROOM` / `ROOM_FULL`, with the event contact), and the picker reads "no room for this age"
+  when the roster already knows. Capacity is `Event_Rooms.Checkin_Capacity` (blank = unlimited);
+  two rooms that both fit go to the one with more seats left, then the lower `Balance_Priority`.
+  The server re-derives on every quote and submit and stamps the room on the participant.
+  **Room placement through option prices** (2026-09-15, events without ruled rooms): when an
+  option group's rooms carry `Placement_*` bounds on the Group record, the widget places the
+  child from their birth date (and grade when a room asks for it), shows the room as a line
+  instead of radios, and the server re-derives it on every quote and submit. The radios return
+  only when no room fits, two fit, or the fit is full.
   In a minors-only section the editor also shows a required **Date of birth** for the chosen child, prefilled from their record. The confirmed date is sent with the registration; the API requires one and writes a correction back to the child's contact, so a birth-date question on the custom form is redundant and can be removed.
   Someone already registered in a section's event is grayed out (blocked, not
   warned). Children show their age so parents can pick the right grade band.
@@ -137,8 +147,11 @@ widget so members can sign in for the household roster:
   option groups (required / mutually exclusive / quantities / sold out), promo
   codes, deposits. The total shown is the server's, and submit refuses with a
   refreshed total if anything changed in between.
-- **Overlap warning** — the same person in two sections whose events run at the
-  same time gets a warning, never a block (childcare-then-event is legitimate).
+- **One session per person at a time** (2026-10-15, was a warning) — a household member already
+  in the draft for a section whose event runs at the same time is disabled in the picker ("in
+  another session at this time"); the server refuses the plan with `TIME_CONFLICT` either way,
+  and a member already registered for a concurrent event comes back from the roster as
+  `time_conflict`. The hub's own event (extras) never conflicts.
 - **Submit** — `POST …/submit` with an `Idempotency-Key`; a retry after a network
   blip replays the same result. When the invoice total is above $0 the browser goes to
   `data-checkout-url?id=<Invoice_GUID>` (the native Invoice Details & Payment page; the

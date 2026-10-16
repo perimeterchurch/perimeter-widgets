@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { TriangleAlert } from 'lucide-react';
 import type { RegistrationQuote } from '@perimeter/api-hooks';
 import { Spinner } from '@perimeter/ui/spinner';
 import { formatMoney } from '../lib/format';
@@ -20,7 +19,8 @@ export interface ReviewBodyProps {
 
 /**
  * What the visitor has built so far, as the server's quote describes it:
- * each registrant with their line items, overlap warnings, problems, the
+ * each registrant with their line items, problems (a person in two sessions
+ * at once is one of them since 2026-10-15), the
  * deposit choice and the total. Mounted exactly once — inside the desktop
  * review column or inside the phone summary bar — because the deposit
  * checkbox carries a fixed id.
@@ -38,9 +38,6 @@ export function ReviewBody({
   const problems = quote?.problems ?? [];
   const generalProblems = problems.filter((p) => p.registrationIndex === null);
   const perRegistration = problems.filter((p) => p.registrationIndex !== null);
-  const overlaps = (quote?.registrations ?? []).filter(
-    (r) => r.overlapsWithRegistrationIndexes.length > 0,
-  );
 
   if (registrationCount === 0) {
     return <p className="font-sans text-sm text-muted-fg">Add at least one person to continue.</p>;
@@ -73,6 +70,11 @@ export function ReviewBody({
                       {showPrices && <span>{formatMoney(line.lineTotal)}</span>}
                     </li>
                   ))}
+                  {r.room && (
+                    <li className="flex justify-between gap-3" data-slot="review-room">
+                      <span>Room: {r.room.groupName}</span>
+                    </li>
+                  )}
                 </ul>
               </li>
             ))}
@@ -106,17 +108,6 @@ export function ReviewBody({
             )}
           </ul>
         </div>
-      )}
-
-      {overlaps.length > 0 && (
-        <p className="flex items-start gap-2 font-sans text-sm text-warning-fg" role="status">
-          <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-          <span>
-            {overlaps.map((o) => o.attendeeName).join(', ')} {overlaps.length === 1 ? 'is' : 'are'}{' '}
-            registered for two sessions that happen at the same time. You can still continue if that
-            is intended.
-          </span>
-        </p>
       )}
 
       {(generalProblems.length > 0 || perRegistration.length > 0) && (

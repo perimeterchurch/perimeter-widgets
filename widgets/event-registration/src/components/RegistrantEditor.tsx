@@ -16,8 +16,11 @@ import { GuestContactForm } from './PurchaserForm';
 import {
   isPlacementGroup,
   placementHint,
-  resolvePlacement,
   type PlacementOutcome,
+  resolvePlacement,
+  resolveRoom,
+  type RoomOutcome,
+  roomRefusalText,
 } from '../lib/placement';
 import { FIELD_TYPE, FormFieldInput, isFieldActive } from './FormFieldInput';
 import { RichText } from './RichText';
@@ -53,7 +56,8 @@ export interface RegistrantEditorProps {
   /** Household roster (signed in) or empty for a guest. */
   members: RosterMember[];
   /** Identities already in the draft for this section's event, so the picker can gray them out. */
-  takenIdentities: ReadonlySet<string>;
+  /** Identities a save here may not add: in the draft for this event (`same`) or for one running at the same time (`concurrent`). */
+  takenIdentities: ReadonlyMap<string, 'same' | 'concurrent'>;
   /** Guest viewers register themself; signed-in viewers pick from the roster or add a member. */
   mode: 'household' | 'guest';
   guestName: string;
@@ -254,6 +258,11 @@ export function RegistrantEditor({
     memberOf(key)?.eligibility.find((e) => e.sectionKey === section.key)?.requires ?? [];
 
   // ── Room placement (mirror of the server rule) ────────────────────────
+  // Event_Rooms placement (2026-10-15): when the section has rooms the server
+  // picks one from birth date and grade and refuses a child nothing fits; the
+  // option-price placement below only applies to events without rooms.
+  const rooms = section.rooms;
+  const roomsDriven = rooms.length > 0;
   const placementGroups = (product?.groups ?? []).filter(isPlacementGroup);
   const personFacts = (key: PersonKey): { dateOfBirth: string | null; grade: number | null } => {
     if (key === 'new') {
@@ -272,8 +281,14 @@ export function RegistrantEditor({
       placementGroups.map((g) => [g.productOptionGroupId, resolvePlacement(g, facts, eventStart)]),
     );
   };
+  const roomFor = (key: PersonKey): RoomOutcome | null =>
+    roomsDriven ? resolveRoom(rooms, personFacts(key), eventStart) : null;
   const placementNeedsGradeFor = (key: PersonKey): boolean => {
     const facts = personFacts(key);
+    if (roomsDriven) {
+      const o = resolveRoom(rooms, { dateOfBirth: facts.dateOfBirth, grade: null }, eventStart);
+      return o.kind === 'ask' && o.reason === 'needs_grade';
+    }
     return placementGroups.some((g) => {
       const o = resolvePlacement(g, { dateOfBirth: facts.dateOfBirth, grade: null }, eventStart);
       return o.kind === 'ask' && o.reason === 'needs_grade';
@@ -290,7 +305,8 @@ export function RegistrantEditor({
         .map(([id]) => id),
     );
   const asksBirthDateFor = (key: PersonKey): boolean =>
-    key.startsWith('c') && (minorsOnly || memberRequires(key).includes('birth_date'));
+    key.startsWith('c') &&
+    (minorsOnly || roomsDriven || memberRequires(key).includes('birth_date'));
   const asksGradeFor = (key: PersonKey): boolean =>
     key.startsWith('c') &&
     (asksGrade || memberRequires(key).includes('grade') || placementNeedsGradeFor(key));
@@ -399,14 +415,19 @@ export function RegistrantEditor({
       return errors;
     }
     const identity = attendeeIdentity(resolved);
-    if (
-      takenIdentities.has(identity) &&
-      !(existing && attendeeIdentity(existing.attendee) === identity)
-    ) {
+    const taken = takenIdentities.get(identity);
+    if (taken && !(existing && attendeeIdentity(existing.attendee) === identity)) {
       errors.set(
         `${view.key}:attendee`,
-        `${view.label || 'That person'} is already in this registration for this event.`,
+        taken === 'same'
+          ? `${view.label || 'That person'} is already in this registration for this event.`
+          : `${view.label || 'That person'} is already in another session at this time.`,
       );
+    }
+
+    const roomOutcome = roomFor(view.key);
+    if (roomOutcome?.kind === 'refused') {
+      errors.set(`${view.key}:attendee`, roomRefusalText(roomOutcome, view.firstName));
     }
 
     const decided = decidedGroupIdsFor(placementFor(view.key));
@@ -539,6 +560,7 @@ export function RegistrantEditor({
     (form?.fields ?? []).some((f) => f.fieldTypeId !== FIELD_TYPE.INSTRUCTIONS) ||
     standaloneGroups.length > 0 ||
     placementGroups.length > 0 ||
+    roomsDriven ||
     asksBirthDateFor(key) ||
     asksGradeFor(key);
   const openDrawer: PersonKey | null =
@@ -558,6 +580,8 @@ export function RegistrantEditor({
     const chips: string[] = [];
     const outcomes = placementFor(view.key);
     const decided = decidedGroupIdsFor(outcomes);
+    const roomOutcome = roomFor(view.key);
+    if (roomOutcome?.kind === 'resolved') chips.push(roomOutcome.room.groupName);
     for (const o of outcomes.values()) if (o.kind === 'resolved') chips.push(o.price.title);
     for (const g of product?.groups ?? []) {
       if (decided.has(g.productOptionGroupId)) continue;
@@ -652,8 +676,16 @@ export function RegistrantEditor({
     const setAnswer = (fieldId: number, value: string) =>
       updatePerson(key, { answers: new Map(state.answers).set(fieldId, value) });
 
+    const roomOutcome = roomFor(key);
+
     return (
       <div key={key} className="grid gap-4" data-person={key}>
+        {roomOutcome?.kind === 'resolved' && (
+          <p className="font-sans text-sm text-fg" data-placement="room">
+            <span className="font-medium">Room</span> {roomOutcome.room.groupName}
+            <span className="text-muted-fg"> — from {view.firstName}&apos;s birth date</span>
+          </p>
+        )}
         {err('attendee') && (
           <p role="alert" className="font-sans text-xs text-destructive">
             {err('attendee')}
@@ -998,8 +1030,8 @@ export function RegistrantEditor({
             {members.map((m) => {
               const eligibility = m.eligibility.find((e) => e.sectionKey === section.key);
               const eligible = eligibility?.eligible ?? false;
-              const taken = takenIdentities.has(`c${m.contactId}`);
-              const disabled = !eligible || taken;
+              const taken = takenIdentities.get(`c${m.contactId}`);
+              const disabled = !eligible || taken !== undefined;
               const id = `${idPrefix}-who-${m.contactId}`;
               const view = views.find((v) => v.key === `c${m.contactId}`);
               return (
@@ -1029,7 +1061,9 @@ export function RegistrantEditor({
                       )}
                     </span>
                     {taken ? (
-                      <span className="text-xs text-muted-fg">already added</span>
+                      <span className="text-xs text-muted-fg">
+                        {taken === 'same' ? 'already added' : 'in another session at this time'}
+                      </span>
                     ) : !eligible && eligibility?.reason ? (
                       <span className="text-xs text-muted-fg">
                         {eligibilityLabel(eligibility.reason)}
@@ -1136,6 +1170,10 @@ function eligibilityLabel(
       return 'not eligible';
     case 'section_closed':
       return 'closed';
+    case 'no_room':
+      return 'no room for this age';
+    case 'time_conflict':
+      return 'in another session at this time';
     default:
       return '';
   }

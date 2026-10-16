@@ -16,6 +16,9 @@ import {
 } from '../src/lib/format';
 import { bucketFor } from '../src/lib/breakpoint';
 import { groupSections } from '../src/lib/groups';
+import { resolveRoom, roomRefusalText } from '../src/lib/placement';
+import { eventsOverlap } from '../src/lib/overlap';
+import { DateTime } from 'luxon';
 import { familyNight } from './fixtures';
 
 const reg = (over: Partial<DraftRegistration> = {}): DraftRegistration => ({
@@ -244,5 +247,93 @@ describe('mobile layout helpers', () => {
     expect(groups).toHaveLength(1);
     expect(groups[0]?.label).toBeNull();
     expect(groups[0]?.sections).toHaveLength(3);
+  });
+});
+
+describe('Event_Rooms placement mirror', () => {
+  const START = DateTime.fromISO('2026-09-27T18:00:00', { zone: 'America/New_York' });
+  const room = (
+    groupId: number,
+    groupName: string,
+    min: number,
+    max: number,
+    over: Partial<{
+      remaining: number | null;
+      balancePriority: number | null;
+      minGrade: number | null;
+      maxGrade: number | null;
+    }> = {},
+  ) => ({
+    groupId,
+    groupName,
+    roomId: 100 + groupId,
+    roomName: `Room ${groupId}`,
+    placement: {
+      minAgeMonths: min,
+      maxAgeMonths: max,
+      minGrade: over.minGrade ?? null,
+      maxGrade: over.maxGrade ?? null,
+    },
+    remaining: over.remaining ?? null,
+    balancePriority: over.balancePriority ?? null,
+  });
+  const rooms = [
+    room(1, 'SEC 0-1', 0, 12),
+    room(2, 'SEC 1 year olds', 12, 24),
+    room(3, 'SEC 2 year olds', 24, 36),
+  ];
+
+  it('places by months, asks for a birth date, refuses when nothing fits or the fit is full', () => {
+    expect(resolveRoom(rooms, { dateOfBirth: '2025-03-01', grade: null }, START)).toMatchObject({
+      kind: 'resolved',
+      room: { groupName: 'SEC 1 year olds' },
+    });
+    expect(resolveRoom(rooms, { dateOfBirth: null, grade: null }, START)).toEqual({
+      kind: 'ask',
+      reason: 'needs_birth_date',
+    });
+    const none = resolveRoom(rooms, { dateOfBirth: '2017-05-16', grade: null }, START);
+    expect(none).toMatchObject({ kind: 'refused', reason: 'no_room' });
+    if (none.kind === 'refused')
+      expect(roomRefusalText(none, 'Max')).toBe("No room fits Max's age for this session.");
+    const full = resolveRoom(
+      [room(2, 'SEC 1 year olds', 12, 24, { remaining: 0 })],
+      { dateOfBirth: '2025-03-01', grade: null },
+      START,
+    );
+    expect(full).toMatchObject({ kind: 'refused', reason: 'room_full' });
+    if (full.kind === 'refused')
+      expect(roomRefusalText(full, 'Sofia')).toBe('The SEC 1 year olds room is full.');
+  });
+
+  it('breaks a tie by seats left, then Balance_Priority', () => {
+    const tie = [
+      room(1, 'Blue', 12, 24, { remaining: 2, balancePriority: 1 }),
+      room(2, 'Green', 12, 24, { remaining: 7, balancePriority: 2 }),
+    ];
+    expect(resolveRoom(tie, { dateOfBirth: '2025-03-01', grade: null }, START)).toMatchObject({
+      room: { groupName: 'Green' },
+    });
+    const even = [
+      room(1, 'Blue', 12, 24, { remaining: 5, balancePriority: 2 }),
+      room(2, 'Green', 12, 24, { remaining: 5, balancePriority: 1 }),
+    ];
+    expect(resolveRoom(even, { dateOfBirth: '2025-03-01', grade: null }, START)).toMatchObject({
+      room: { groupName: 'Green' },
+    });
+  });
+});
+
+describe('eventsOverlap', () => {
+  const ev = (eventId: number, start: string, end: string) => ({
+    eventId,
+    startDate: `2026-11-01T${start}:00`,
+    endDate: `2026-11-01T${end}:00`,
+  });
+  it('is true when the windows intersect and false when they only touch or are the same event', () => {
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '16:30', '18:00'))).toBe(true);
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '17:30', '19:00'))).toBe(true);
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(2, '18:00', '19:00'))).toBe(false);
+    expect(eventsOverlap(ev(1, '16:30', '18:00'), ev(1, '16:30', '18:00'))).toBe(false);
   });
 });

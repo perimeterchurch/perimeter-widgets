@@ -21,7 +21,9 @@ export function RichText({
    */
   inline?: boolean;
 }): React.JSX.Element | null {
-  const safe = useSafeHtml(html);
+  // Every link opens in a new tab: nothing in staff HTML may navigate a
+  // registering parent away from the page (the waiver PDF, 2026-10-15).
+  const safe = useSafeHtml(html, { linksInNewTab: true });
   if (!html || html.trim().length === 0) return null;
 
   if (inline) {

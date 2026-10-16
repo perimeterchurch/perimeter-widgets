@@ -1,5 +1,9 @@
 import type { DateTime } from 'luxon';
-import type { RegistrationOptionGroup, RegistrationOptionPrice } from '@perimeter/api-hooks';
+import type {
+  RegistrationOptionGroup,
+  RegistrationOptionPrice,
+  RegistrationSection,
+} from '@perimeter/api-hooks';
 
 /**
  * Client-side mirror of perimeter-api's room placement (placement.ts there):
@@ -83,6 +87,71 @@ export function resolvePlacement(
   const available =
     !price.hidden && !price.isPromo && (price.remaining === null || price.remaining > 0);
   return available ? { kind: 'resolved', price } : { kind: 'ask', reason: 'unavailable' };
+}
+
+// ── Event_Rooms placement (2026-10-15) ───────────────────────────────────
+
+export type SectionRoom = RegistrationSection['rooms'][number];
+
+export type RoomOutcome =
+  | { kind: 'resolved'; room: SectionRoom }
+  | { kind: 'ask'; reason: 'needs_birth_date' | 'needs_grade' }
+  | { kind: 'refused'; reason: 'no_room' | 'room_full'; rooms: SectionRoom[] };
+
+/**
+ * Mirror of the server's `resolveRoom`: the event's placement rooms decide,
+ * the parent is never asked to choose. Nothing fits or every fit is full is a
+ * refusal; two fit → most seats left, then lower Balance_Priority, then name.
+ */
+export function resolveRoom(
+  rooms: readonly SectionRoom[],
+  person: PlacementPerson,
+  eventStart: DateTime,
+): RoomOutcome {
+  const ageMonths = ageInMonthsOn(person.dateOfBirth, eventStart);
+  if (ageMonths === null && rooms.some((r) => hasAgeBound(r.placement)))
+    return { kind: 'ask', reason: 'needs_birth_date' };
+  const byAge = rooms.filter((r) => {
+    if (ageMonths === null) return true;
+    const p = r.placement;
+    if (p.minAgeMonths !== null && ageMonths < p.minAgeMonths) return false;
+    if (p.maxAgeMonths !== null && ageMonths >= p.maxAgeMonths) return false;
+    return true;
+  });
+  if (person.grade === null && byAge.some((r) => hasGradeBound(r.placement)))
+    return { kind: 'ask', reason: 'needs_grade' };
+  const byGrade = byAge.filter((r) => {
+    if (person.grade === null) return true;
+    const p = r.placement;
+    if (p.minGrade !== null && person.grade < p.minGrade) return false;
+    if (p.maxGrade !== null && person.grade > p.maxGrade) return false;
+    return true;
+  });
+  const gradeSpecific = byGrade.filter((r) => hasGradeBound(r.placement));
+  const fits = person.grade !== null && gradeSpecific.length > 0 ? gradeSpecific : byGrade;
+  if (fits.length === 0) return { kind: 'refused', reason: 'no_room', rooms: [] };
+  const open = fits.filter((r) => r.remaining === null || r.remaining > 0);
+  if (open.length === 0) return { kind: 'refused', reason: 'room_full', rooms: fits };
+  const ranked = [...open].sort((a, b) => {
+    const ra = a.remaining ?? Number.POSITIVE_INFINITY;
+    const rb = b.remaining ?? Number.POSITIVE_INFINITY;
+    if (ra !== rb) return rb - ra;
+    const pa = a.balancePriority ?? Number.POSITIVE_INFINITY;
+    const pb = b.balancePriority ?? Number.POSITIVE_INFINITY;
+    if (pa !== pb) return pa - pb;
+    return a.groupName.localeCompare(b.groupName);
+  });
+  return { kind: 'resolved', room: ranked[0]! };
+}
+
+/** What the drawer says when the rooms refuse; the server's quote repeats it with the event contact. */
+export function roomRefusalText(
+  outcome: Extract<RoomOutcome, { kind: 'refused' }>,
+  name: string,
+): string {
+  return outcome.reason === 'no_room'
+    ? `No room fits ${name}'s age for this session.`
+    : `The ${outcome.rooms.map((r) => r.groupName).join(' / ')} room is full.`;
 }
 
 export function placementHint(reason: PlacementAskReason, name: string): string | null {

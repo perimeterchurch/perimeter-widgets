@@ -12125,6 +12125,77 @@ paths:
                                     - fileUploadFieldIds
                                   additionalProperties: false
                                 - type: 'null'
+                            rooms:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  groupId:
+                                    type: integer
+                                    minimum: -9007199254740991
+                                    maximum: 9007199254740991
+                                  groupName:
+                                    type: string
+                                  roomId:
+                                    type: integer
+                                    minimum: -9007199254740991
+                                    maximum: 9007199254740991
+                                  roomName:
+                                    type: string
+                                  placement:
+                                    type: object
+                                    properties:
+                                      minAgeMonths:
+                                        anyOf:
+                                          - type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          - type: 'null'
+                                      maxAgeMonths:
+                                        anyOf:
+                                          - type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          - type: 'null'
+                                      minGrade:
+                                        anyOf:
+                                          - type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          - type: 'null'
+                                      maxGrade:
+                                        anyOf:
+                                          - type: integer
+                                            minimum: -9007199254740991
+                                            maximum: 9007199254740991
+                                          - type: 'null'
+                                    required:
+                                      - minAgeMonths
+                                      - maxAgeMonths
+                                      - minGrade
+                                      - maxGrade
+                                    additionalProperties: false
+                                  remaining:
+                                    anyOf:
+                                      - type: integer
+                                        minimum: -9007199254740991
+                                        maximum: 9007199254740991
+                                      - type: 'null'
+                                  balancePriority:
+                                    anyOf:
+                                      - type: integer
+                                        minimum: -9007199254740991
+                                        maximum: 9007199254740991
+                                      - type: 'null'
+                                required:
+                                  - groupId
+                                  - groupName
+                                  - roomId
+                                  - roomName
+                                  - placement
+                                  - remaining
+                                  - balancePriority
+                                additionalProperties: false
                             open:
                               type: boolean
                             closedReason:
@@ -12158,6 +12229,7 @@ paths:
                             - event
                             - product
                             - form
+                            - rooms
                             - open
                             - closedReason
                           additionalProperties: false
@@ -12576,6 +12648,8 @@ paths:
                                           - wrong_grade
                                           - already_registered
                                           - section_closed
+                                          - no_room
+                                          - time_conflict
                                       - type: 'null'
                                   requires:
                                     type: array
@@ -12789,6 +12863,29 @@ paths:
                                 type: integer
                                 minimum: -9007199254740991
                                 maximum: 9007199254740991
+                            room:
+                              anyOf:
+                                - type: object
+                                  properties:
+                                    groupId:
+                                      type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    groupName:
+                                      type: string
+                                    roomId:
+                                      type: integer
+                                      minimum: -9007199254740991
+                                      maximum: 9007199254740991
+                                    roomName:
+                                      type: string
+                                  required:
+                                    - groupId
+                                    - groupName
+                                    - roomId
+                                    - roomName
+                                  additionalProperties: false
+                                - type: 'null'
                             resolvedOptions:
                               type: array
                               items:
@@ -12826,6 +12923,7 @@ paths:
                             - attendingOnline
                             - addsToGroupIds
                             - overlapsWithRegistrationIndexes
+                            - room
                             - resolvedOptions
                           additionalProperties: false
                       extras:
@@ -12928,6 +13026,29 @@ paths:
                                   type: integer
                                   minimum: -9007199254740991
                                   maximum: 9007199254740991
+                              room:
+                                anyOf:
+                                  - type: object
+                                    properties:
+                                      groupId:
+                                        type: integer
+                                        minimum: -9007199254740991
+                                        maximum: 9007199254740991
+                                      groupName:
+                                        type: string
+                                      roomId:
+                                        type: integer
+                                        minimum: -9007199254740991
+                                        maximum: 9007199254740991
+                                      roomName:
+                                        type: string
+                                    required:
+                                      - groupId
+                                      - groupName
+                                      - roomId
+                                      - roomName
+                                    additionalProperties: false
+                                  - type: 'null'
                               resolvedOptions:
                                 type: array
                                 items:
@@ -12965,6 +13086,7 @@ paths:
                               - attendingOnline
                               - addsToGroupIds
                               - overlapsWithRegistrationIndexes
+                              - room
                               - resolvedOptions
                             additionalProperties: false
                           - type: 'null'
@@ -13011,6 +13133,9 @@ paths:
                                 - BIRTH_DATE_REQUIRED
                                 - GRADE_REQUIRED
                                 - CHOOSE_OPTION
+                                - NO_ROOM
+                                - ROOM_FULL
+                                - TIME_CONFLICT
                             message:
                               type: string
                             registrationIndex:
@@ -13575,6 +13700,29 @@ paths:
                                         type: integer
                                         minimum: -9007199254740991
                                         maximum: 9007199254740991
+                                    room:
+                                      anyOf:
+                                        - type: object
+                                          properties:
+                                            groupId:
+                                              type: integer
+                                              minimum: -9007199254740991
+                                              maximum: 9007199254740991
+                                            groupName:
+                                              type: string
+                                            roomId:
+                                              type: integer
+                                              minimum: -9007199254740991
+                                              maximum: 9007199254740991
+                                            roomName:
+                                              type: string
+                                          required:
+                                            - groupId
+                                            - groupName
+                                            - roomId
+                                            - roomName
+                                          additionalProperties: false
+                                        - type: 'null'
                                     resolvedOptions:
                                       type: array
                                       items:
@@ -13612,6 +13760,7 @@ paths:
                                     - attendingOnline
                                     - addsToGroupIds
                                     - overlapsWithRegistrationIndexes
+                                    - room
                                     - resolvedOptions
                                   additionalProperties: false
                               extras:
@@ -13714,6 +13863,29 @@ paths:
                                           type: integer
                                           minimum: -9007199254740991
                                           maximum: 9007199254740991
+                                      room:
+                                        anyOf:
+                                          - type: object
+                                            properties:
+                                              groupId:
+                                                type: integer
+                                                minimum: -9007199254740991
+                                                maximum: 9007199254740991
+                                              groupName:
+                                                type: string
+                                              roomId:
+                                                type: integer
+                                                minimum: -9007199254740991
+                                                maximum: 9007199254740991
+                                              roomName:
+                                                type: string
+                                            required:
+                                              - groupId
+                                              - groupName
+                                              - roomId
+                                              - roomName
+                                            additionalProperties: false
+                                          - type: 'null'
                                       resolvedOptions:
                                         type: array
                                         items:
@@ -13751,6 +13923,7 @@ paths:
                                       - attendingOnline
                                       - addsToGroupIds
                                       - overlapsWithRegistrationIndexes
+                                      - room
                                       - resolvedOptions
                                     additionalProperties: false
                                   - type: 'null'
@@ -13797,6 +13970,9 @@ paths:
                                         - BIRTH_DATE_REQUIRED
                                         - GRADE_REQUIRED
                                         - CHOOSE_OPTION
+                                        - NO_ROOM
+                                        - ROOM_FULL
+                                        - TIME_CONFLICT
                                     message:
                                       type: string
                                     registrationIndex:
@@ -13969,6 +14145,29 @@ paths:
                                         type: integer
                                         minimum: -9007199254740991
                                         maximum: 9007199254740991
+                                    room:
+                                      anyOf:
+                                        - type: object
+                                          properties:
+                                            groupId:
+                                              type: integer
+                                              minimum: -9007199254740991
+                                              maximum: 9007199254740991
+                                            groupName:
+                                              type: string
+                                            roomId:
+                                              type: integer
+                                              minimum: -9007199254740991
+                                              maximum: 9007199254740991
+                                            roomName:
+                                              type: string
+                                          required:
+                                            - groupId
+                                            - groupName
+                                            - roomId
+                                            - roomName
+                                          additionalProperties: false
+                                        - type: 'null'
                                     resolvedOptions:
                                       type: array
                                       items:
@@ -14006,6 +14205,7 @@ paths:
                                     - attendingOnline
                                     - addsToGroupIds
                                     - overlapsWithRegistrationIndexes
+                                    - room
                                     - resolvedOptions
                                   additionalProperties: false
                               extras:
@@ -14108,6 +14308,29 @@ paths:
                                           type: integer
                                           minimum: -9007199254740991
                                           maximum: 9007199254740991
+                                      room:
+                                        anyOf:
+                                          - type: object
+                                            properties:
+                                              groupId:
+                                                type: integer
+                                                minimum: -9007199254740991
+                                                maximum: 9007199254740991
+                                              groupName:
+                                                type: string
+                                              roomId:
+                                                type: integer
+                                                minimum: -9007199254740991
+                                                maximum: 9007199254740991
+                                              roomName:
+                                                type: string
+                                            required:
+                                              - groupId
+                                              - groupName
+                                              - roomId
+                                              - roomName
+                                            additionalProperties: false
+                                          - type: 'null'
                                       resolvedOptions:
                                         type: array
                                         items:
@@ -14145,6 +14368,7 @@ paths:
                                       - attendingOnline
                                       - addsToGroupIds
                                       - overlapsWithRegistrationIndexes
+                                      - room
                                       - resolvedOptions
                                     additionalProperties: false
                                   - type: 'null'
@@ -14191,6 +14415,9 @@ paths:
                                         - BIRTH_DATE_REQUIRED
                                         - GRADE_REQUIRED
                                         - CHOOSE_OPTION
+                                        - NO_ROOM
+                                        - ROOM_FULL
+                                        - TIME_CONFLICT
                                     message:
                                       type: string
                                     registrationIndex:

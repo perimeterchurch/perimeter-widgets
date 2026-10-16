@@ -820,3 +820,135 @@ describe('card price', () => {
     expect(screen.queryByText('no charge')).not.toBeInTheDocument();
   });
 });
+
+describe('Event_Rooms placement', () => {
+  const bigKids = {
+    groupId: 13634,
+    groupName: 'SEC K-11yrs',
+    roomId: 328,
+    roomName: 'Midtown Auditorium',
+    placement: { minAgeMonths: 36, maxAgeMonths: 144, minGrade: null, maxGrade: null },
+    remaining: null,
+    balancePriority: null,
+  };
+
+  it('shows the placed room as a line, never as a choice, and the picker says when no room fits', () => {
+    // Elementary Active (related:104) gets rooms; Max (born 2017-05-16) is 9.
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.key === 'related:104' ? { ...s, rooms: [bigKids] } : s,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    fireEvent.click(within(card).getByRole('button', { name: /^Add / }));
+    tick(card, /Max Cano/);
+    expect(within(card).getByText('SEC K-11yrs')).toBeInTheDocument();
+    expect(within(card).getByText(/from Max's birth date/)).toBeInTheDocument();
+    expect(within(card).queryByRole('radio')).not.toBeInTheDocument();
+
+    // The server's roster says no room takes William (as it would for a 12-year-old).
+    cleanup();
+    hooks.roster.data = envelope({
+      ...canoHousehold,
+      members: canoHousehold.members.map((m) =>
+        m.contactId === 698112
+          ? {
+              ...m,
+              eligibility: m.eligibility.map((e) =>
+                e.sectionKey === 'related:104'
+                  ? { ...e, eligible: false, reason: 'no_room' as const }
+                  : e,
+              ),
+            }
+          : m,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card2 = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    fireEvent.click(within(card2).getByRole('button', { name: /^Add / }));
+    expect(within(card2).getByText('no room for this age')).toBeInTheDocument();
+    expect(within(card2).getByRole('checkbox', { name: /William Cano/ })).toBeDisabled();
+  });
+});
+
+describe('one session per person at a time', () => {
+  it('will not let a child already in a concurrent section be ticked again, and names the reason', () => {
+    // Every fixture session runs 6-8 pm; Elementary Active and Student Night overlap.
+    render(<App config={config} auth={authStub(true)} />);
+    const elementary = screen.getByRole('region', { name: 'Elementary Active (Grades K-5)' });
+    fireEvent.click(within(elementary).getByRole('button', { name: /^Add / }));
+    tick(elementary, /William Cano/);
+    fireEvent.click(
+      within(elementary).getByRole('button', {
+        name: /Add .* to registration|Add to registration/,
+      }),
+    );
+    expect(
+      within(elementary).getByRole('button', { name: 'Remove William Cano' }),
+    ).toBeInTheDocument();
+
+    const students = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(students).getByRole('button', { name: 'Add a student' }));
+    const box = within(students).getByRole('checkbox', { name: /William Cano/ });
+    expect(box).toBeDisabled();
+    expect(within(students).getByText('in another session at this time')).toBeInTheDocument();
+    expect(within(students).queryByText('already added')).not.toBeInTheDocument();
+  });
+
+  it("shows the roster's time_conflict reason in the picker", () => {
+    hooks.roster.data = envelope({
+      ...canoHousehold,
+      members: canoHousehold.members.map((m) =>
+        m.contactId === 698112
+          ? {
+              ...m,
+              eligibility: m.eligibility.map((e) =>
+                e.sectionKey === 'related:103'
+                  ? { ...e, eligible: false, reason: 'time_conflict' as const }
+                  : e,
+              ),
+            }
+          : m,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const students = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(students).getByRole('button', { name: 'Add a student' }));
+    expect(within(students).getByRole('checkbox', { name: /William Cano/ })).toBeDisabled();
+    expect(within(students).getByText('in another session at this time')).toBeInTheDocument();
+  });
+});
+
+describe('links in staff HTML', () => {
+  it('opens the waiver link in a new tab, as field 53342 asks and DOMPurify would otherwise drop', () => {
+    const waiverField = {
+      ...familyNight.sections.find((s) => s.form)!.form!.fields[0]!,
+      formFieldId: 53342,
+      order: 9,
+      label: 'Waiver Statement',
+      alternateLabelHtml:
+        'Click here to view the waiver.&nbsp; (Link opens in a new tab.)<br><a href="https://perimetercdnstorage.blob.core.windows.net/widgets/Family%20Night%20Waiver%20and%20Release.pdf" target="_blank" rel="noopener"><b>Perimeter Church Waiver</b></a>',
+      fieldTypeId: 6,
+      values: [],
+      required: false,
+      dependsOnFieldId: null,
+      dependsOnValue: null,
+    };
+    hooks.event.data = envelope({
+      ...familyNight,
+      sections: familyNight.sections.map((s) =>
+        s.form ? { ...s, form: { ...s.form, fields: [...s.form.fields, waiverField] } } : s,
+      ),
+    });
+    render(<App config={config} auth={authStub(true)} />);
+    const card = screen.getByRole('region', { name: 'Student Night of Worship (Grades 6-12)' });
+    fireEvent.click(within(card).getByRole('button', { name: 'Add a student' }));
+    tick(card, /William Cano/);
+    const link = within(card).getByRole('link', { name: 'Perimeter Church Waiver' });
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link).toHaveAttribute('href', expect.stringContaining('Waiver%20and%20Release.pdf'));
+  });
+});
