@@ -70,6 +70,9 @@ function authStub(signedIn: boolean): AuthProvider {
 
 const config = {
   checkoutUrl: 'https://www.perimeter.org/event-checkout/',
+  paymentFlow: 'direct' as const,
+  paymentUrl: 'https://perimeter.onlinegiving.org/mp/payments/',
+  mpWidgetsUrl: 'https://mp.example.org/widgets',
   idParam: 'id',
   eventId: 900001,
   invoiceParam: 'id',

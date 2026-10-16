@@ -6,6 +6,7 @@ import type * as WidgetRuntime from '@perimeter/widget-runtime';
 import type { AuthProvider } from '@perimeter/auth';
 import { App } from '../src/app';
 import { canoHousehold, envelope, familyNight, pizzaExtras } from './fixtures';
+import { PENDING_PAYMENT_KEY } from '../src/lib/pending-payment';
 
 /**
  * Renders the widget against the Family Night fixture with every api-hook
@@ -67,6 +68,9 @@ function authStub(signedIn: boolean): AuthProvider {
 
 const config = {
   checkoutUrl: 'https://www.perimeter.org/event-checkout/',
+  paymentFlow: 'direct' as const,
+  paymentUrl: 'https://perimeter.onlinegiving.org/mp/payments/',
+  mpWidgetsUrl: 'https://mp.example.org/widgets',
   idParam: 'id',
   eventId: 900001,
   invoiceParam: 'id',
@@ -1060,5 +1064,366 @@ describe('$0 amounts', () => {
     expect(screen.queryByText('$0.00')).not.toBeInTheDocument();
     expect(within(review).queryByText('Total')).not.toBeInTheDocument();
     expect(within(review).getByRole('button', { name: 'Complete registration' })).toBeEnabled();
+  });
+});
+
+describe('payment (straight to Online Giving and back)', () => {
+  const PAGE = 'https://www.perimeter.org/family-registration/';
+  const GUID = 'e8b7bf55-a16b-4ee9-a826-277d5d6ade43';
+  const assign = vi.fn();
+  const fetchMock = vi.fn();
+
+  /** jsdom's location is read-only; the widget reads `href` and calls `assign`. */
+  function stubLocation(href: string): void {
+    vi.stubGlobal('location', { href, assign, origin: new URL(href).origin });
+  }
+
+  const paidQuote = {
+    eventId: 900001,
+    registrations: [
+      {
+        registrationIndex: 0,
+        sectionKey: 'related:101',
+        eventId: 900011,
+        contactId: 684077,
+        attendeeName: 'Jen Cano',
+        isMinor: false,
+        lines: [
+          {
+            kind: 'base',
+            productId: 9001,
+            productOptionPriceId: null,
+            title: 'Elementary + Early Years Focus',
+            quantity: 1,
+            unitPrice: 12,
+            lineTotal: 12,
+            itemNote: null,
+            depositRequested: false,
+          },
+        ],
+        subtotal: 12,
+        optionsSummary: null,
+        answerSummary: null,
+        attendingOnline: false,
+        addsToGroupIds: [],
+        overlapsWithRegistrationIndexes: [],
+        room: null,
+        resolvedOptions: [],
+      },
+    ],
+    extras: null,
+    invoiceTotal: 12,
+    depositRequested: false,
+    participationStatusId: 2,
+    invoiceStatusId: 1,
+    addressRequired: false,
+    problems: [],
+    submittable: true,
+    quoteHash: 'p'.repeat(64),
+  };
+
+  function submitPaid(depositRequested = false): void {
+    const quote = { ...paidQuote, depositRequested };
+    hooks.quote.mutate.mockImplementation(
+      (_plan: unknown, opts: { onSuccess: (r: { data: typeof quote }) => void }) =>
+        opts.onSuccess({ data: quote }),
+    );
+    hooks.submit.mutate.mockImplementation(
+      (_body: unknown, opts: { onSuccess: (r: { data: unknown }) => void }) =>
+        opts.onSuccess({
+          data: {
+            dryRun: false,
+            idempotencyKey: 'k',
+            replayed: false,
+            invoiceId: 1,
+            invoiceGuid: GUID,
+            invoiceTotal: 12,
+            invoiceStatusId: 1,
+            checkoutUrl: `https://www.perimeter.org/event-checkout/?id=${GUID}`,
+            participants: [],
+            quote,
+          },
+        }),
+    );
+  }
+
+  function jsonResponse(body: unknown, status = 200): Response {
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    assign.mockReset();
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+    localStorage.removeItem(PENDING_PAYMENT_KEY);
+    stubLocation(`${PAGE}?id=900001`);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+    localStorage.removeItem(PENDING_PAYMENT_KEY);
+  });
+
+  async function completeRegistration(): Promise<void> {
+    const card = screen.getByRole('region', { name: 'Elementary + Early Years Focus' });
+    fireEvent.click(within(card).getByRole('button', { name: "I'm Attending" }));
+    tick(card, /Jen Cano/);
+    fireEvent.click(within(card).getByRole('button', { name: 'Add to registration' }));
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Register and continue to payment' }),
+    );
+  }
+
+  it('mints a payment token and sends the browser to Online Giving, remembering the invoice', async () => {
+    submitPaid();
+    fetchMock.mockResolvedValue(jsonResponse({ token: 'signed.token' }));
+    render(<App config={{ ...config, eventId: undefined }} auth={authStub(true)} />);
+    await completeRegistration();
+    await waitFor(() =>
+      expect(assign).toHaveBeenCalledWith(
+        'https://perimeter.onlinegiving.org/mp/payments/?token=signed.token',
+      ),
+    );
+    const [url] = fetchMock.mock.calls[0] as [string];
+    const params = new URL(url).searchParams;
+    expect(
+      url.startsWith('https://mp.example.org/widgets/Api/CheckoutApi/BuildPaymentRequestToken'),
+    ).toBe(true);
+    expect(params.get('invoiceId')).toBe(GUID);
+    expect(params.get('returnUrl')).toBe(PAGE);
+    expect(params.get('amountToPay')).toBe('12.00');
+    expect(params.get('audienceUrl')).toBe('https://perimeter.onlinegiving.org/mp/payments/');
+    const saved: unknown = JSON.parse(localStorage.getItem(PENDING_PAYMENT_KEY) ?? 'null');
+    expect(saved).toMatchObject({
+      eventId: 900001,
+      invoiceGuid: GUID,
+      invoiceTotal: 12,
+      summary: { attendees: [{ name: 'Jen Cano', detail: 'Elementary + Early Years Focus' }] },
+    });
+  });
+
+  it('falls back to the native checkout page when MP refuses, when there is no MP script, and for a deposit', async () => {
+    const native = `https://www.perimeter.org/event-checkout/?id=${GUID}`;
+    submitPaid();
+    fetchMock.mockResolvedValue(new Response('', { status: 500 }));
+    const { unmount } = render(<App config={config} auth={authStub(true)} />);
+    await completeRegistration();
+    await waitFor(() => expect(assign).toHaveBeenCalledWith(native));
+    unmount();
+    // Leaving saved the invoice; a fresh page would otherwise offer to pay it.
+    localStorage.removeItem(PENDING_PAYMENT_KEY);
+
+    assign.mockReset();
+    fetchMock.mockReset();
+    render(<App config={{ ...config, mpWidgetsUrl: undefined }} auth={authStub(true)} />);
+    await completeRegistration();
+    await waitFor(() => expect(assign).toHaveBeenCalledWith(native));
+    expect(fetchMock).not.toHaveBeenCalled();
+    cleanup();
+    localStorage.removeItem(PENDING_PAYMENT_KEY);
+
+    assign.mockReset();
+    submitPaid(true);
+    render(<App config={config} auth={authStub(true)} />);
+    await completeRegistration();
+    await waitFor(() => expect(assign).toHaveBeenCalledWith(native));
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the native hand-off when paymentFlow is native', async () => {
+    submitPaid();
+    render(<App config={{ ...config, paymentFlow: 'native' }} auth={authStub(true)} />);
+    await completeRegistration();
+    await waitFor(() =>
+      expect(assign).toHaveBeenCalledWith(`https://www.perimeter.org/event-checkout/?id=${GUID}`),
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  function savedRecord(): void {
+    localStorage.setItem(
+      PENDING_PAYMENT_KEY,
+      JSON.stringify({
+        eventId: 900001,
+        invoiceGuid: GUID,
+        invoiceTotal: 12,
+        savedAt: Date.now(),
+        summary: {
+          attendees: [{ name: 'Jen Cano', detail: 'Elementary + Early Years Focus' }],
+          extras: { title: 'Pizza', detail: 'Cheese × 2' },
+        },
+      }),
+    );
+  }
+
+  it('confirms the payment on return, recovering the event from the saved record, and strips the token from the URL', async () => {
+    savedRecord();
+    stubLocation(`${PAGE}?token=resp.token`);
+    const replaceState = vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+    fetchMock
+      .mockResolvedValueOnce(
+        jsonResponse({ token: 'csrf', expiresAfterUtc: '2099-01-01T00:00:00Z' }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ success: true, invoiceId: GUID }));
+    render(<App config={{ ...config, eventId: undefined }} auth={authStub(true)} />);
+    // The event loads from the record (the URL has no ?id=) and shows above the confirmation.
+    expect(screen.getByRole('heading', { level: 1, name: 'Family Night' })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: "You're registered" })).toBeInTheDocument(),
+    );
+    const done = screen.getByRole('region', { name: "You're registered" });
+    expect(within(done).getByText('Payment complete · $12.00')).toBeInTheDocument();
+    expect(within(done).getByText('Jen Cano')).toBeInTheDocument();
+    expect(within(done).getByText('Pizza')).toBeInTheDocument();
+    expect(within(done).getByText('Cheese × 2')).toBeInTheDocument();
+    const [, init] = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect((init.body as FormData).get('text')).toBe('resp.token');
+    expect(replaceState).toHaveBeenCalledWith(null, '', PAGE);
+    expect(localStorage.getItem(PENDING_PAYMENT_KEY)).toBeNull();
+    // No cards and no "waiting for payment" notice behind the confirmation.
+    expect(
+      screen.queryByText('You have a registration waiting for payment.'),
+    ).not.toBeInTheDocument();
+    fireEvent.click(within(done).getByRole('button', { name: 'Add another family member' }));
+    expect(
+      screen.getByRole('region', { name: 'Elementary + Early Years Focus' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('You have a registration waiting for payment.'),
+    ).not.toBeInTheDocument();
+    replaceState.mockRestore();
+  });
+
+  it('says the payment was received when MP has not been notified yet', async () => {
+    savedRecord();
+    stubLocation(`${PAGE}?id=900001&token=resp.token`);
+    vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+    fetchMock
+      .mockResolvedValueOnce(
+        jsonResponse({ token: 'csrf', expiresAfterUtc: '2099-01-01T00:00:00Z' }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({ success: false, paymentReceived: true, paymentNotified: false }),
+      );
+    render(<App config={config} auth={authStub(true)} />);
+    await waitFor(() => expect(screen.getByText('Payment received · $12.00')).toBeInTheDocument());
+    expect(screen.getByText(/can take a few minutes/)).toBeInTheDocument();
+    expect(localStorage.getItem(PENDING_PAYMENT_KEY)).toBeNull();
+  });
+
+  it('offers to try again, the native page, or a fresh start when the payment failed', async () => {
+    savedRecord();
+    stubLocation(`${PAGE}?id=900001&token=resp.token`);
+    vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+    fetchMock
+      .mockResolvedValueOnce(
+        jsonResponse({ token: 'csrf', expiresAfterUtc: '2099-01-01T00:00:00Z' }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ success: false, Details: 'declined' }))
+      // "Try again" mints a new payment token.
+      .mockResolvedValueOnce(jsonResponse({ token: 'again.token' }));
+    render(<App config={config} auth={authStub(true)} />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Payment not completed' })).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Your payment did not go through.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Open the payment page' })).toHaveAttribute(
+      'href',
+      `https://www.perimeter.org/event-checkout/?id=${GUID}`,
+    );
+    // The record survives a failure so the retry knows the invoice and amount.
+    expect(localStorage.getItem(PENDING_PAYMENT_KEY)).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    await waitFor(() =>
+      expect(assign).toHaveBeenCalledWith(
+        'https://perimeter.onlinegiving.org/mp/payments/?token=again.token',
+      ),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
+    expect(localStorage.getItem(PENDING_PAYMENT_KEY)).toBeNull();
+    expect(
+      screen.getByRole('region', { name: 'Elementary + Early Years Focus' }),
+    ).toBeInTheDocument();
+  });
+
+  it('still confirms a payment when the return carries no event and nothing was saved', async () => {
+    stubLocation(`${PAGE}?token=resp.token`);
+    vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+    fetchMock
+      .mockResolvedValueOnce(
+        jsonResponse({ token: 'csrf', expiresAfterUtc: '2099-01-01T00:00:00Z' }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ success: true }));
+    render(<App config={{ ...config, eventId: undefined }} auth={authStub(true)} />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: "You're registered" })).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Payment complete')).toBeInTheDocument();
+    expect(screen.queryByText('No event selected', { exact: false })).not.toBeInTheDocument();
+  });
+
+  it('lets a visitor who backed out of Online Giving pay the saved invoice in place or start over', async () => {
+    savedRecord();
+    fetchMock.mockResolvedValue(jsonResponse({ token: 'resume.token' }));
+    render(<App config={config} auth={authStub(true)} />);
+    expect(screen.getByText('You have a registration waiting for payment.')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: 'Elementary + Early Years Focus' }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Pay now' }));
+    await waitFor(() =>
+      expect(assign).toHaveBeenCalledWith(
+        'https://perimeter.onlinegiving.org/mp/payments/?token=resume.token',
+      ),
+    );
+    const params = new URL(fetchMock.mock.calls[0]?.[0] as string).searchParams;
+    expect(params.get('invoiceId')).toBe(GUID);
+    expect(params.get('amountToPay')).toBe('12.00');
+    cleanup();
+
+    savedRecord();
+    render(<App config={config} auth={authStub(true)} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
+    expect(localStorage.getItem(PENDING_PAYMENT_KEY)).toBeNull();
+    expect(
+      screen.getByRole('region', { name: 'Elementary + Early Years Focus' }),
+    ).toBeInTheDocument();
+  });
+
+  it('ignores a saved record for a different event', () => {
+    localStorage.setItem(
+      PENDING_PAYMENT_KEY,
+      JSON.stringify({
+        eventId: 123,
+        invoiceGuid: GUID,
+        invoiceTotal: 5,
+        savedAt: Date.now(),
+        summary: { attendees: [], extras: null },
+      }),
+    );
+    render(<App config={config} auth={authStub(true)} />);
+    expect(
+      screen.queryByText('You have a registration waiting for payment.'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Elementary + Early Years Focus' }),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps offering the native page for a URL-only invoice, whose amount it does not know', () => {
+    stubLocation(`${PAGE}?id=900001&invoiceid=${GUID}`);
+    render(<App config={config} auth={authStub(true)} />);
+    expect(screen.getByRole('link', { name: 'Pay now' })).toHaveAttribute(
+      'href',
+      `https://www.perimeter.org/event-checkout/?id=${GUID}`,
+    );
   });
 });

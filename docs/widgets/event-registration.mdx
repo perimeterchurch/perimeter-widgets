@@ -10,8 +10,10 @@ registration section — the parent itself when it sells a registration, plus
 every `bp_Related_Events` row (childcare, a spouse section, concurrent
 sessions). A signed-in member picks household members into sections, answers
 each section's options and custom form, sees a running total, and submits once.
-perimeter-api writes exactly the rows the native widget writes and the browser
-is sent to the native **Invoice Details & Payment** page to pay.
+perimeter-api writes exactly the rows the native widget writes; when something is
+owed the widget sends the browser straight to Online Giving to pay and confirms
+the payment in place when it returns (2026-10-16), so the native **Invoice
+Details & Payment** page is out of the flow and kept only as a fallback.
 
 Built for events that use related-event (household) registration — Family
 Night, Vision Night + childcare, Bible study + childcare. The native Event
@@ -44,7 +46,10 @@ widget so members can sign in for the household roster:
 
 | Attribute                 | Required | Default                     | Description                                                                                          |
 | ------------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `data-checkout-url`       | No       | perimeter.org `/event-checkout/` | The native Invoice Details & Payment page. After a submit the browser goes to `…?id=<Invoice_GUID>`. |
+| `data-checkout-url`       | No       | perimeter.org `/event-checkout/` | The native Invoice Details & Payment page: the fallback when the widget cannot take the payment itself (`…?id=<Invoice_GUID>`). |
+| `data-payment-flow`       | No       | `direct`                    | `direct`: straight to Online Giving and back (below). `native`: hand off to `data-checkout-url` as before. |
+| `data-payment-url`        | No       | perimeter.onlinegiving.org `/mp/payments/` | Online Giving's MP payments page (the native `<mpp-checkout>`'s `paymentprocessortargeturl`). |
+| `data-mp-widgets-url`     | No       | detected                    | Root of the MP widgets app whose checkout API mints payment tokens; detected from the MPWidgets/UserLogin `<script>` on the page. |
 | `data-id-param`           | No       | `id`                        | Query-string key carrying the `Event_ID` (MP's `EventDetailWidgetIdParameterName`).                 |
 | `data-event-id`           | No       | —                           | Pin the event instead of reading the query string (studio preview, single-event pages).             |
 | `data-invoice-param`      | No       | `id`                        | Query-string key the checkout page reads (MP's `InvoiceDetailWidgetIdParameterName`).               |
@@ -154,10 +159,9 @@ widget so members can sign in for the household roster:
   and a member already registered for a concurrent event comes back from the roster as
   `time_conflict`. The hub's own event (extras) never conflicts.
 - **Submit** — `POST …/submit` with an `Idempotency-Key`; a retry after a network
-  blip replays the same result. When the invoice total is above $0 the browser goes to
-  `data-checkout-url?id=<Invoice_GUID>` (the native Invoice Details & Payment page; the
-  registration is *Awaiting Payment* until it pays, and MP releases unpaid seats after about an
-  hour). When it
+  blip replays the same result. When the invoice total is above $0 the widget takes the
+  payment itself (see **Payment**); the registration is *Awaiting Payment* until it pays, and
+  MP releases unpaid seats after about an hour. When it
   is $0 (2026-09-16) the widget stays put and shows "You're registered" with the people and
   sessions — the checkout page would only show a $0 invoice. It says nothing about a
   confirmation email (2026-10-02): each section's `Registrant_Message` template decides
@@ -166,9 +170,34 @@ widget so members can sign in for the household roster:
   buttons, since the family registered in one pass and the page is reached by direct link;
   a muted "Forgot someone? Add another family member" link brings the cards back.
   `data-return-url` is gone with the button.
-- **Coming back** — the checkout's "Make Changes" returns with
-  `?id=<eventId>&invoiceid=<guid>`; the widget offers to continue that checkout
-  or start over.
+- **Payment** (2026-10-16, Dana: a payment state in this widget instead of the native
+  Invoice Details & Payment page) — nobody's widget collects the card, MP's included: the
+  native page is a shell around MP's widgets Checkout API (`/Api/CheckoutApi/*`, read from
+  `widgets/dist/Checkout.js`), and the card form lives on Online Giving's hosted page. This
+  widget makes the same calls (`src/lib/mp-checkout.ts`), with the member's
+  `mpp-widgets_AuthToken` or none for a guest. After a paid submit it asks
+  `BuildPaymentRequestToken` for a signed token (invoice GUID, Online Giving's URL, this
+  page's bare URL as the return address, the full balance, `paymentOption=full`), saves a
+  record of the invoice and what was registered in localStorage (`src/lib/pending-payment.ts`,
+  24 h), and sends the browser to `data-payment-url?token=…`. Online Giving returns to the
+  bare page URL with `?token=<response>`: the widget recovers the event from the saved record
+  (the return URL has no `?id=`), posts the response to `ProcessPaymentResponse` (form field
+  `text`, `x-csrf-token` from `/Home/CSRFToken`) — this is what writes the `Payments` row and
+  sends MP's receipt — strips the token from the URL so a refresh cannot post it twice, and
+  shows "You're registered · Payment complete" with the saved people and sessions. MP's
+  "received but not yet notified" answer shows "Payment received" with a note that it can take
+  a few minutes; a refusal shows "Payment not completed" with Try again (a new token for the
+  same invoice), the native page, and Start over. A visitor who backs out of Online Giving
+  (browser back, empty draft) sees "You have a registration waiting for payment" with Pay now
+  in place. The native page stays as the fallback whenever the widget cannot do this: no MP
+  widgets `<script>` on the page (or `data-mp-widgets-url`), `data-payment-flow="native"`,
+  the API refusing the token, or an invoice that asks for a deposit (the amount choices live
+  on the native page). MP's CORS allowlist admits the page origin (www.perimeter.org), not
+  localhost, so local embeds always fall back. The API is MP-internal and undocumented; its
+  shapes were read from the bundle, not a spec.
+- **Coming back** — the native checkout's "Make Changes" returns with
+  `?id=<eventId>&invoiceid=<guid>`; the widget offers that invoice's payment page (it does not
+  know the amount owed, so not in place) or a start over.
 - **Not supported** — File Upload form fields (a required one closes the
   section), secondary households, and form fields that also write attributes or
   opportunity responses (answers are stored; the side effect is not).

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Button } from '@perimeter/ui/button';
+import { Spinner } from '@perimeter/ui/spinner';
 
 export function MessageState({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
@@ -10,15 +11,22 @@ export function MessageState({ children }: { children: React.ReactNode }): React
 }
 
 /**
- * The visitor came back from the native checkout with `?invoiceid=<guid>` in
- * the URL (its "Make Changes" / "Back to event" links carry it). Offer the
- * checkout again rather than a fresh form.
+ * An unpaid registration is waiting: the visitor backed out of Online Giving
+ * (the widget's own saved record, 2026-10-16) or came back from the native
+ * checkout with `?invoiceid=<guid>` in the URL (its "Make Changes" / "Back to
+ * event" links carry it). Offer to pay rather than a fresh form: in place
+ * when the widget knows the amount owed, else on the native checkout page.
  */
 export function PendingInvoiceNotice({
   checkoutHref,
+  onPayNow,
+  paying,
   onStartOver,
 }: {
   checkoutHref: string;
+  /** Send the browser to Online Giving for the saved invoice; null when only the native page can. */
+  onPayNow: (() => void) | null;
+  paying: boolean;
   onStartOver: () => void;
 }): React.JSX.Element {
   return (
@@ -27,13 +35,19 @@ export function PendingInvoiceNotice({
         You have a registration waiting for payment.
       </p>
       <p className="font-sans text-sm text-muted-fg">
-        Unpaid registrations are released after about an hour. Continue to checkout to keep your
-        spots, or start over to build a new registration.
+        Unpaid registrations are released after about an hour. Pay now to keep your spots, or start
+        over to build a new registration.
       </p>
       <div className="flex flex-wrap gap-3">
-        <Button size="lg" nativeButton={false} render={<a href={checkoutHref} />}>
-          Continue to checkout
-        </Button>
+        {onPayNow ? (
+          <Button type="button" size="lg" onClick={onPayNow} disabled={paying}>
+            {paying ? <Spinner /> : 'Pay now'}
+          </Button>
+        ) : (
+          <Button size="lg" nativeButton={false} render={<a href={checkoutHref} />}>
+            Pay now
+          </Button>
+        )}
         <Button type="button" variant="outline" size="lg" onClick={onStartOver}>
           Start over
         </Button>
