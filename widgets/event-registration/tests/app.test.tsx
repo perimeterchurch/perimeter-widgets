@@ -1182,17 +1182,25 @@ describe('payment (straight to Online Giving and back)', () => {
     );
   }
 
-  it('mints a payment token and sends the browser to Online Giving, remembering the invoice', async () => {
+  it('signs on to Online Giving, mints a payment token and sends the browser there, remembering the invoice', async () => {
     submitPaid();
-    fetchMock.mockResolvedValue(jsonResponse({ token: 'signed.token' }));
+    fetchMock
+      .mockResolvedValueOnce(new Response(null, { status: 200 }))
+      .mockResolvedValueOnce(jsonResponse({ token: 'signed.token' }));
     render(<App config={{ ...config, eventId: undefined }} auth={authStub(true)} />);
     await completeRegistration();
     await waitFor(() =>
       expect(assign).toHaveBeenCalledWith(
-        'https://perimeter.onlinegiving.org/mp/payments/?token=signed.token',
+        'https://perimeter.onlinegiving.org/mp/payments/?token=signed.token&mp_token=jwt%3Atoken',
       ),
     );
-    const [url] = fetchMock.mock.calls[0] as [string];
+    // The silent sign-on goes first, credentialed, to the payments page's origin.
+    const [ssoUrl, ssoInit] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(ssoUrl).toBe(
+      'https://perimeter.onlinegiving.org/donate/silent_sso?mp_token=jwt%3Atoken',
+    );
+    expect(ssoInit.credentials).toBe('include');
+    const [url] = fetchMock.mock.calls[1] as [string];
     const params = new URL(url).searchParams;
     expect(
       url.startsWith('https://mp.example.org/widgets/Api/CheckoutApi/BuildPaymentRequestToken'),
@@ -1208,6 +1216,27 @@ describe('payment (straight to Online Giving and back)', () => {
       invoiceTotal: 12,
       summary: { attendees: [{ name: 'Jen Cano', detail: 'Elementary + Early Years Focus' }] },
     });
+  });
+
+  it('skips the sign-on for a guest and puts no MP token on the payments URL', async () => {
+    // A guest who backed out of Online Giving pays the saved invoice: no MP token, so
+    // no silent sign-on and no mp_token on the URL.
+    hooks.event.data = envelope({
+      ...familyNight,
+      viewer: { ...familyNight.viewer, signedIn: false },
+    });
+    hooks.roster.data = undefined;
+    savedRecord();
+    fetchMock.mockResolvedValue(jsonResponse({ token: 'guest.token' }));
+    render(<App config={config} auth={authStub(false)} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Pay now' }));
+    await waitFor(() =>
+      expect(assign).toHaveBeenCalledWith(
+        'https://perimeter.onlinegiving.org/mp/payments/?token=guest.token',
+      ),
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect((fetchMock.mock.calls[0] as [string])[0]).toContain('BuildPaymentRequestToken');
   });
 
   it('falls back to the native checkout page when MP refuses, when there is no MP script, and for a deposit', async () => {
@@ -1333,7 +1362,8 @@ describe('payment (straight to Online Giving and back)', () => {
         jsonResponse({ token: 'csrf', expiresAfterUtc: '2099-01-01T00:00:00Z' }),
       )
       .mockResolvedValueOnce(jsonResponse({ success: false, Details: 'declined' }))
-      // "Try again" mints a new payment token.
+      // "Try again" signs on again, then mints a new payment token.
+      .mockResolvedValueOnce(new Response(null, { status: 200 }))
       .mockResolvedValueOnce(jsonResponse({ token: 'again.token' }));
     render(<App config={config} auth={authStub(true)} />);
     await waitFor(() =>
@@ -1349,7 +1379,7 @@ describe('payment (straight to Online Giving and back)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     await waitFor(() =>
       expect(assign).toHaveBeenCalledWith(
-        'https://perimeter.onlinegiving.org/mp/payments/?token=again.token',
+        'https://perimeter.onlinegiving.org/mp/payments/?token=again.token&mp_token=jwt%3Atoken',
       ),
     );
     fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
@@ -1377,7 +1407,9 @@ describe('payment (straight to Online Giving and back)', () => {
 
   it('lets a visitor who backed out of Online Giving pay the saved invoice in place or start over', async () => {
     savedRecord();
-    fetchMock.mockResolvedValue(jsonResponse({ token: 'resume.token' }));
+    fetchMock
+      .mockResolvedValueOnce(new Response(null, { status: 200 }))
+      .mockResolvedValueOnce(jsonResponse({ token: 'resume.token' }));
     render(<App config={config} auth={authStub(true)} />);
     expect(screen.getByText('You have a registration waiting for payment.')).toBeInTheDocument();
     expect(
@@ -1386,10 +1418,10 @@ describe('payment (straight to Online Giving and back)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Pay now' }));
     await waitFor(() =>
       expect(assign).toHaveBeenCalledWith(
-        'https://perimeter.onlinegiving.org/mp/payments/?token=resume.token',
+        'https://perimeter.onlinegiving.org/mp/payments/?token=resume.token&mp_token=jwt%3Atoken',
       ),
     );
-    const params = new URL(fetchMock.mock.calls[0]?.[0] as string).searchParams;
+    const params = new URL(fetchMock.mock.calls[1]?.[0] as string).searchParams;
     expect(params.get('invoiceId')).toBe(GUID);
     expect(params.get('amountToPay')).toBe('12.00');
     cleanup();

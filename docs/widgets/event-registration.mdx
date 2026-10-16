@@ -176,8 +176,11 @@ widget so members can sign in for the household roster:
   Online Giving's bot detection (403 on every onlinegiving.org host). The native checkout page
   loads Online Giving's `assets/mpsso.js`, which fires a credentialed `GET
   <og>/donate/silent_sso?mp_token=jwt:<mpp-widgets_AuthToken>` before the hand-off; this widget
-  does not, and that is the known difference. Do not turn `direct` on again until Online Giving
-  support confirms what their payments page requires. The mechanics: nobody's widget collects the card, MP's included: the
+  did not (0.2.10). Since 0.2.11 the direct flow performs that same silent sign-on itself, right
+  before leaving, and also appends `mp_token=jwt:<token>` to the payments URL (the parameter
+  mpsso.js adds to every onlinegiving.org link a signed-in member clicks); a guest gets neither.
+  Unverified against Online Giving as of 2026-10-16: `direct` stays opt-in until a coordinated
+  test on an allow-listed network passes. The mechanics: nobody's widget collects the card, MP's included: the
   native page is a shell around MP's widgets Checkout API (`/Api/CheckoutApi/*`, read from
   `widgets/dist/Checkout.js`), and the card form lives on Online Giving's hosted page. This
   widget makes the same calls (`src/lib/mp-checkout.ts`), with the member's
