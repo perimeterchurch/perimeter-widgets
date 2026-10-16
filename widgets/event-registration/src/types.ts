@@ -42,6 +42,26 @@ export const EventRegistrationConfigSchema = z.object({
     .describe(
       "Query-string key the checkout page reads the Invoice_GUID from. Matches MP's InvoiceDetailWidgetIdParameterName (default `id`).",
     ),
+  paymentFlow: z
+    .enum(['direct', 'native'])
+    .default('direct')
+    .describe(
+      "`direct` (default, 2026-10-16): after a paid submit the widget itself asks MP's checkout API for a payment token and sends the browser straight to Online Giving, then confirms the payment when Online Giving returns here. `native`: hand off to `checkoutUrl` as before. Deposits and any failure to reach MP's API use the native page either way.",
+    ),
+  paymentUrl: z
+    .string()
+    .url()
+    .default('https://perimeter.onlinegiving.org/mp/payments/')
+    .describe(
+      "Online Giving's MP payments page, the `paymentprocessortargeturl` of the native <mpp-checkout>. The browser goes to `<paymentUrl>?token=<payment request token>`.",
+    ),
+  mpWidgetsUrl: z
+    .string()
+    .url()
+    .optional()
+    .describe(
+      'Root of the MP widgets app (e.g. https://ministryplatform.perimeter.org/widgets), whose checkout API mints payment tokens. Auto-detected from the MPWidgets/UserLogin <script> on the page; set it only where that script is absent.',
+    ),
   defaultImageUrl: z.string().optional().describe('Fallback image when the event has none.'),
   showMap: z.coerce
     .boolean()
