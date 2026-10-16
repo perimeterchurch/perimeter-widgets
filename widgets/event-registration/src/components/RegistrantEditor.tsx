@@ -555,7 +555,7 @@ export function RegistrantEditor({
   const drawerMode = mode === 'household' && !existing;
   const [openKey, setOpenKey] = React.useState<PersonKey | null | undefined>(undefined);
   const isComplete = (view: PersonView): boolean => validatePerson(view).size === 0;
-  /** Whether the drawer would show anything beyond the Done button. */
+  /** Whether the drawer has anything to show at all. */
   const hasQuestions = (key: PersonKey): boolean =>
     (form?.fields ?? []).some((f) => f.fieldTypeId !== FIELD_TYPE.INSTRUCTIONS) ||
     standaloneGroups.length > 0 ||
@@ -601,17 +601,6 @@ export function RegistrantEditor({
       }
     }
     return chips;
-  };
-
-  /** "Done" re-checks the person; with nothing missing the drawer collapses. */
-  const closeDrawer = (view: PersonView): void => {
-    const personErrors = validatePerson(view);
-    setLocalErrors((prev) => {
-      const next = new Map([...prev].filter(([k]) => !k.startsWith(`${view.key}:`)));
-      personErrors.forEach((m, k) => next.set(k, m));
-      return next;
-    });
-    if (personErrors.size === 0) setOpenKey(null);
   };
 
   const toggleMember = (m: RosterMember, on: boolean): void => {
@@ -916,7 +905,12 @@ export function RegistrantEditor({
     );
   };
 
-  /** Under a ticked name: the open form, or a one-line summary with a way back in. */
+  /**
+   * Under a ticked name: the open form, or a one-line summary with a way back
+   * in. No "Done" under the form (Dana, 2026-10-16): the drawer stays open
+   * until the parent ticks someone else or adds everyone to the registration,
+   * which checks every answer anyway.
+   */
   const renderDrawer = (view: PersonView): React.JSX.Element => {
     const index = views.findIndex((v) => v.key === view.key);
     if (openDrawer === view.key) {
@@ -926,18 +920,6 @@ export function RegistrantEditor({
           data-drawer-state="open"
         >
           {renderPerson(view, index)}
-          <div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              aria-label={`Done with ${view.firstName}`}
-              onClick={() => closeDrawer(view)}
-            >
-              <Check aria-hidden className="mr-1.5 size-4" />
-              Done
-            </Button>
-          </div>
         </div>
       );
     }
