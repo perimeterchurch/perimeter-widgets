@@ -7,7 +7,12 @@ import {
   type DraftRegistration,
 } from '../src/lib/draft';
 import { buildCheckoutUrl, readPageContext, withoutQueryParams } from '../src/lib/page-url';
-import { MPCheckoutClient, paymentPageUrl, resolveMPAppRoot } from '../src/lib/mp-checkout';
+import {
+  MPCheckoutClient,
+  paymentPageUrl,
+  resolveMPAppRoot,
+  silentSignOn,
+} from '../src/lib/mp-checkout';
 import {
   PENDING_PAYMENT_KEY,
   PENDING_PAYMENT_TTL_MS,
@@ -451,6 +456,10 @@ describe('MP checkout client', () => {
       'https://perimeter.onlinegiving.org/mp/payments/?token=a%20b',
     );
     expect(paymentPageUrl('https://og.test/pay?x=1', 't')).toBe('https://og.test/pay?x=1&token=t');
+    // A signed-in member also carries the MP token, as Online Giving's link rewrite does.
+    expect(paymentPageUrl('https://og.test/pay', 't', 'mp.jwt')).toBe(
+      'https://og.test/pay?token=t&mp_token=jwt%3Amp.jwt',
+    );
     expect(resolveMPAppRoot('https://mp.example.org/widgets/')).toBe(
       'https://mp.example.org/widgets',
     );
@@ -491,5 +500,35 @@ describe('pending payment record', () => {
     clearPendingPayment();
     expect(readPendingPayment(Date.now(), null)).toBeNull();
     expect(() => savePendingPayment(record, Date.now(), null)).not.toThrow();
+  });
+});
+
+describe('Online Giving silent sign-on', () => {
+  it("sends the credentialed GET mpsso.js sends, against the payments page's origin", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
+    await silentSignOn('https://perimeter.onlinegiving.org/mp/payments/', 'mp.jwt', fetchImpl);
+    const [url, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://perimeter.onlinegiving.org/donate/silent_sso?mp_token=jwt%3Amp.jwt');
+    expect(init.method).toBe('GET');
+    expect(init.credentials).toBe('include');
+    expect(init.mode).toBe('no-cors');
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('never throws and gives up after the timeout', async () => {
+    const failing = vi.fn().mockRejectedValue(new Error('network'));
+    await expect(silentSignOn('https://og.test/pay', 't', failing)).resolves.toBeUndefined();
+    const hanging = vi.fn(
+      (_url: string, init: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init.signal?.addEventListener('abort', () => reject(new Error('aborted')));
+        }),
+    );
+    const started = Date.now();
+    await silentSignOn('https://og.test/pay', 't', hanging as unknown as typeof fetch, 30);
+    expect(Date.now() - started).toBeLessThan(2000);
+    expect(hanging).toHaveBeenCalledTimes(1);
+    await expect(silentSignOn('not a url', 't', failing)).resolves.toBeUndefined();
+    expect(failing).toHaveBeenCalledTimes(1);
   });
 });
