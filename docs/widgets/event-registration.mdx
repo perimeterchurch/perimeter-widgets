@@ -58,10 +58,11 @@ widget so members can sign in for the household roster:
 
 - **Sections** — `GET /api/registration/events/{id}` returns each related row in
   `Position` order (the hub itself is never a section; see **Extras**). Each is a tappable
-  card whose footer is a blue "I'm Attending" button, and the whole card is its hit area
-  (2026-09-22). A minors-only section with a grade range says "Add a student"; any other
-  minors-only section keeps its `Button_Text` (e.g. "Add a child" for childcare), since the
-  parent is adding a child, not attending.
+  card whose footer is a blue button, and the whole card is its hit area (2026-09-22). The
+  button reads the row's `Button_Text` whenever staff set one (2026-10-16: it overrides every
+  default, Dana). Unset, the widget says "I'm Attending" for a section open to adults, "Add a
+  student" for a minors-only section with a grade range, and "Add a child" for any other
+  minors-only section, since the parent is adding a child, not attending.
   The native widget's `Enable_Label` opt-in question is NOT rendered (2026-09-16,
   Dana: tapping the card is the opt-in); `Instructions` render as the card's
   one-line summary behind "View details". Closed sections say why (not open
