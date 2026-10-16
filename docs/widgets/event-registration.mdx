@@ -180,7 +180,11 @@ widget so members can sign in for the household roster:
   before leaving, and also appends `mp_token=jwt:<token>` to the payments URL (the parameter
   mpsso.js adds to every onlinegiving.org link a signed-in member clicks); a guest gets neither.
   Unverified against Online Giving as of 2026-10-16; `direct` stays the default because the page
-  is not public yet (Dana) and the first real payment is the test. The mechanics: nobody's widget collects the card, MP's included: the
+  is not public yet (Dana) and the first real payment is the test. The sign-on starts with the
+  submit so its round trip overlaps the write, the button reads "Taking you to payment…" once
+  the write is back, and the draft is not re-priced in that window (the post-submit roster
+  refetch re-prefills the contact, and re-pricing then reported the registration just made as
+  "already registered"; both seen on the first live run, 2026-10-16). The mechanics: nobody's widget collects the card, MP's included: the
   native page is a shell around MP's widgets Checkout API (`/Api/CheckoutApi/*`, read from
   `widgets/dist/Checkout.js`), and the card form lives on Online Giving's hosted page. This
   widget makes the same calls (`src/lib/mp-checkout.ts`), with the member's
