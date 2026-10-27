@@ -6,8 +6,11 @@ export default defineWidget({
   name: 'frontier-pledge',
   auth: 'none',
   // Host-page config arrives as data-* attributes (always strings):
-  //   data-heading, data-period, data-amount-label, data-account-url,
-  //   data-api-url. See src/types.ts for the schema and defaults.
+  //   data-pledge-campaign-id, data-heading, data-period, data-amount-label,
+  //   data-account-url, data-thank-you-heading, data-api-url, plus the hex
+  //   colors data-background-color, data-text-color, data-heading-color,
+  //   data-accent-color, data-period-color and data-button-text-color. See
+  //   src/types.ts for the schema and defaults.
   schema: FrontierPledgeConfigSchema,
   // Perimeter's design language has no corner radius, and the campaign design
   // this widget reproduces is square-cornered throughout. Zeroing the three
@@ -30,10 +33,18 @@ export default defineWidget({
   // Readable names for the studio's Configure panel. Presentational only — the
   // `data-*` attribute an embed writes still comes from the schema key.
   configLabels: {
+    pledgeCampaignId: 'Pledge campaign ID',
     heading: 'Headline',
     period: 'Pledge period',
     amountLabel: 'Amount field label',
     accountUrl: 'Link to check a pledge',
+    thankYouHeading: 'Thank-you heading',
+    backgroundColor: 'Background color',
+    textColor: 'Text color',
+    headingColor: 'Headline color',
+    accentColor: 'Accent color',
+    periodColor: 'Pledge period color',
+    buttonTextColor: 'Button text color',
     apiUrl: 'API base URL (advanced)',
   },
   App: ({ config }) => <App config={config} />,

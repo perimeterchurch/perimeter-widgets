@@ -6817,6 +6817,13 @@ paths:
                   exclusiveMinimum: 0
                 notes:
                   type: string
+                pledgeCampaignId:
+                  description:
+                    Pledge_Campaigns id to pledge to. Defaults to the Frontier campaign (960). Refused unless the campaign
+                    allows online pledges in MP, is not a mission trip, and has not ended.
+                  type: integer
+                  exclusiveMinimum: 0
+                  maximum: 9007199254740991
               required:
                 - firstName
                 - lastName
@@ -8107,9 +8114,11 @@ paths:
                       minLength: 7
                       maxLength: 25
                     HS_Graduation_Year:
-                      type: integer
-                      minimum: 1990
-                      maximum: 2100
+                      anyOf:
+                        - type: integer
+                          minimum: 1990
+                          maximum: 2100
+                        - type: 'null'
                     Current_School:
                       anyOf:
                         - type: string
@@ -8303,6 +8312,138 @@ paths:
                   type: boolean
               required:
                 - set
+                - expected
+              additionalProperties: false
+  /api/school/staff/{contactId}/photo:
+    put:
+      operationId: schoolUpdateStaffPhoto
+      summary:
+        "School sync: put a FACTS staff photo on the contact's current school Employee record as its default image
+        (Perimeter Sync's x-school-sync-key)"
+      tags:
+        - School Sync
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      dryRun:
+                        type: boolean
+                      alreadyCurrent:
+                        type: boolean
+                      replayed:
+                        type: boolean
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            table:
+                              type: string
+                            action:
+                              type: string
+                              enum:
+                                - create
+                                - update
+                            id:
+                              type: number
+                            fields:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - table
+                            - action
+                            - fields
+                          additionalProperties: false
+                      notes:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - dryRun
+                      - alreadyCurrent
+                      - steps
+                      - notes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a3
+      parameters:
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  minLength: 100
+                  maxLength: 4200000
+                  pattern: ^[A-Za-z0-9+/]+={0,2}$
+                fileName:
+                  type: string
+                  pattern: ^[\w .-]{1,100}\.(jpe?g|png)$
+                expected:
+                  type: object
+                  properties:
+                    fileId:
+                      anyOf:
+                        - type: integer
+                          exclusiveMinimum: 0
+                          maximum: 9007199254740991
+                        - type: 'null'
+                  required:
+                    - fileId
+                  additionalProperties: false
+                dryRun:
+                  type: boolean
+              required:
+                - image
+                - fileName
                 - expected
               additionalProperties: false
   /api/school/participation:
@@ -9088,6 +9229,619 @@ paths:
                 - personId
                 - contactId
                 - roles
+              additionalProperties: false
+  /api/journey/groups:
+    post:
+      operationId: journeyCreateGroup
+      summary: "Journey sync: a new discipleship group for a group new in The Journey (Perimeter Sync's x-school-sync-key)"
+      tags:
+        - Journey Sync
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      dryRun:
+                        type: boolean
+                      alreadyCurrent:
+                        type: boolean
+                      replayed:
+                        type: boolean
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            table:
+                              type: string
+                            action:
+                              type: string
+                              enum:
+                                - create
+                                - update
+                            id:
+                              type: number
+                            fields:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - table
+                            - action
+                            - fields
+                          additionalProperties: false
+                      notes:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - dryRun
+                      - alreadyCurrent
+                      - steps
+                      - notes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 75
+                ministryId:
+                  anyOf:
+                    - type: number
+                      const: 50
+                    - type: number
+                      const: 113
+                primaryContact:
+                  type: integer
+                  exclusiveMinimum: 0
+                  maximum: 9007199254740991
+                startDate:
+                  type: string
+                  pattern: ^\d{4}-\d{2}-\d{2}$
+                dryRun:
+                  type: boolean
+              required:
+                - name
+                - ministryId
+                - primaryContact
+                - startDate
+              additionalProperties: false
+  /api/journey/groups/{groupId}:
+    patch:
+      operationId: journeyRenameGroup
+      summary:
+        "Journey sync: rename a discipleship group for its current leaders, checked against the name reviewed
+        (Perimeter Sync's x-school-sync-key)"
+      tags:
+        - Journey Sync
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      dryRun:
+                        type: boolean
+                      alreadyCurrent:
+                        type: boolean
+                      replayed:
+                        type: boolean
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            table:
+                              type: string
+                            action:
+                              type: string
+                              enum:
+                                - create
+                                - update
+                            id:
+                              type: number
+                            fields:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - table
+                            - action
+                            - fields
+                          additionalProperties: false
+                      notes:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - dryRun
+                      - alreadyCurrent
+                      - steps
+                      - notes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a3
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                set:
+                  type: object
+                  properties:
+                    Group_Name:
+                      type: string
+                      minLength: 3
+                      maxLength: 75
+                  required:
+                    - Group_Name
+                  additionalProperties: false
+                expected:
+                  type: object
+                  properties:
+                    Group_Name:
+                      type: string
+                      maxLength: 75
+                  required:
+                    - Group_Name
+                  additionalProperties: false
+                dryRun:
+                  type: boolean
+              required:
+                - set
+                - expected
+              additionalProperties: false
+  /api/journey/groups/{groupId}/end:
+    post:
+      operationId: journeyEndGroup
+      summary:
+        "Journey sync: end a discipleship group no longer in The Journey, with its memberships (Perimeter Sync's
+        x-school-sync-key)"
+      tags:
+        - Journey Sync
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      dryRun:
+                        type: boolean
+                      alreadyCurrent:
+                        type: boolean
+                      replayed:
+                        type: boolean
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            table:
+                              type: string
+                            action:
+                              type: string
+                              enum:
+                                - create
+                                - update
+                            id:
+                              type: number
+                            fields:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - table
+                            - action
+                            - fields
+                          additionalProperties: false
+                      notes:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - dryRun
+                      - alreadyCurrent
+                      - steps
+                      - notes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a3
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endDate:
+                  type: string
+                  pattern: ^\d{4}-\d{2}-\d{2}$
+                dryRun:
+                  type: boolean
+              required:
+                - endDate
+              additionalProperties: false
+  /api/journey/members:
+    post:
+      operationId: journeyAddMember
+      summary: "Journey sync: add somebody to a discipleship group (Perimeter Sync's x-school-sync-key)"
+      tags:
+        - Journey Sync
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      dryRun:
+                        type: boolean
+                      alreadyCurrent:
+                        type: boolean
+                      replayed:
+                        type: boolean
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            table:
+                              type: string
+                            action:
+                              type: string
+                              enum:
+                                - create
+                                - update
+                            id:
+                              type: number
+                            fields:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - table
+                            - action
+                            - fields
+                          additionalProperties: false
+                      notes:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - dryRun
+                      - alreadyCurrent
+                      - steps
+                      - notes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                groupId:
+                  type: integer
+                  exclusiveMinimum: 0
+                  maximum: 9007199254740991
+                participantId:
+                  type: integer
+                  exclusiveMinimum: 0
+                  maximum: 9007199254740991
+                roleId:
+                  anyOf:
+                    - type: number
+                      const: 17
+                    - type: number
+                      const: 10
+                    - type: number
+                      const: 14
+                dryRun:
+                  type: boolean
+              required:
+                - groupId
+                - participantId
+                - roleId
+              additionalProperties: false
+  /api/journey/members/{groupParticipantId}:
+    patch:
+      operationId: journeyUpdateMember
+      summary: "Journey sync: make a member Leader, or end a membership (Perimeter Sync's x-school-sync-key)"
+      tags:
+        - Journey Sync
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    properties:
+                      dryRun:
+                        type: boolean
+                      alreadyCurrent:
+                        type: boolean
+                      replayed:
+                        type: boolean
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            table:
+                              type: string
+                            action:
+                              type: string
+                              enum:
+                                - create
+                                - update
+                            id:
+                              type: number
+                            fields:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - table
+                            - action
+                            - fields
+                          additionalProperties: false
+                      notes:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - dryRun
+                      - alreadyCurrent
+                      - steps
+                      - notes
+                    additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a3
+      parameters:
+        - name: groupParticipantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                set:
+                  type: object
+                  properties:
+                    Group_Role_ID:
+                      anyOf:
+                        - type: number
+                          const: 17
+                        - type: number
+                          const: 10
+                        - type: number
+                          const: 14
+                    End_Date:
+                      type: string
+                      pattern: ^\d{4}-\d{2}-\d{2}$
+                  additionalProperties: false
+                expected:
+                  type: object
+                  properties:
+                    Group_Role_ID:
+                      type: integer
+                      exclusiveMinimum: 0
+                      maximum: 9007199254740991
+                  additionalProperties: false
+                dryRun:
+                  type: boolean
+              required:
+                - set
+                - expected
               additionalProperties: false
   /api/mission-trips:
     get:
@@ -23460,8 +24214,9 @@ paths:
     post:
       operationId: searchRetrieval
       summary:
-        Permission-scoped semantic search (KB articles). Dependency outages return 200 with degraded=true and an
-        errorCode
+        Permission-scoped semantic search over KB articles (staff) or closed helpdesk tickets in the agent's workspaces
+        (helpdesk agents). One source type per request; results are a union on sourceType. Dependency outages return 200
+        with degraded=true and an errorCode
       tags:
         - Retrieval
       responses:
@@ -23493,75 +24248,177 @@ paths:
                           results:
                             type: array
                             items:
-                              type: object
-                              properties:
-                                sourceType:
-                                  type: string
-                                  enum:
-                                    - kb_article
-                                    - helpdesk_ticket
-                                sourceId:
-                                  type: integer
-                                  exclusiveMinimum: 0
-                                  maximum: 9007199254740991
-                                title:
-                                  type: string
-                                snippet:
-                                  type: string
-                                score:
-                                  type: number
-                                rank:
-                                  type: integer
-                                  minimum: 1
-                                  maximum: 9007199254740991
-                                url:
-                                  type: string
-                                freshness:
-                                  anyOf:
-                                    - type: object
+                              oneOf:
+                                - type: object
+                                  properties:
+                                    sourceType:
+                                      type: string
+                                      const: kb_article
+                                    sourceId:
+                                      type: integer
+                                      exclusiveMinimum: 0
+                                      maximum: 9007199254740991
+                                    title:
+                                      type: string
+                                    snippet:
+                                      type: string
+                                    score:
+                                      type: number
+                                    rank:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 9007199254740991
+                                    url:
+                                      type: string
+                                    freshness:
+                                      anyOf:
+                                        - type: object
+                                          properties:
+                                            verificationState:
+                                              type: string
+                                              enum:
+                                                - verified
+                                                - review_due
+                                                - unverified
+                                            lastVerifiedAt:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            lastVerifiedByContactId:
+                                              anyOf:
+                                                - type: integer
+                                                  exclusiveMinimum: 0
+                                                  maximum: 9007199254740991
+                                                - type: 'null'
+                                            reviewBy:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            lastModifiedAt:
+                                              type:
+                                                - string
+                                                - 'null'
+                                          required:
+                                            - verificationState
+                                            - lastVerifiedAt
+                                            - lastVerifiedByContactId
+                                            - reviewBy
+                                            - lastModifiedAt
+                                          additionalProperties: false
+                                        - type: 'null'
+                                    matchedSection:
+                                      type: object
                                       properties:
-                                        verificationState:
+                                        heading:
+                                          type: string
+                                          minLength: 1
+                                        path:
+                                          minItems: 1
+                                          type: array
+                                          items:
+                                            type: string
+                                        anchor:
+                                          anyOf:
+                                            - type: string
+                                              pattern: ^h-[a-z0-9]+(?:-[a-z0-9]+)*$
+                                            - type: 'null'
+                                        snippet:
+                                          type: string
+                                      required:
+                                        - heading
+                                        - path
+                                        - anchor
+                                        - snippet
+                                      additionalProperties: false
+                                  required:
+                                    - sourceType
+                                    - sourceId
+                                    - title
+                                    - snippet
+                                    - score
+                                    - rank
+                                    - url
+                                    - freshness
+                                  additionalProperties: false
+                                - type: object
+                                  properties:
+                                    sourceType:
+                                      type: string
+                                      const: helpdesk_ticket
+                                    sourceId:
+                                      type: integer
+                                      exclusiveMinimum: 0
+                                      maximum: 9007199254740991
+                                    title:
+                                      type: string
+                                    snippet:
+                                      type: string
+                                    score:
+                                      type: number
+                                    rank:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 9007199254740991
+                                    url:
+                                      type: string
+                                    freshness:
+                                      type: 'null'
+                                    matchedSection:
+                                      not: {}
+                                    resolution:
+                                      type:
+                                        - string
+                                        - 'null'
+                                    resolutionSource:
+                                      anyOf:
+                                        - type: string
+                                          enum:
+                                            - public_reply
+                                        - type: 'null'
+                                    ticket:
+                                      type: object
+                                      properties:
+                                        statusId:
+                                          type: integer
+                                          minimum: -9007199254740991
+                                          maximum: 9007199254740991
+                                        resolvedAt:
+                                          type:
+                                            - string
+                                            - 'null'
+                                        lastMessageAt:
+                                          type:
+                                            - string
+                                            - 'null'
+                                        workspaceId:
+                                          type: integer
+                                          minimum: -9007199254740991
+                                          maximum: 9007199254740991
+                                        matchedChunkKind:
                                           type: string
                                           enum:
-                                            - verified
-                                            - review_due
-                                            - unverified
-                                        lastVerifiedAt:
-                                          type:
-                                            - string
-                                            - 'null'
-                                        lastVerifiedByContactId:
-                                          anyOf:
-                                            - type: integer
-                                              exclusiveMinimum: 0
-                                              maximum: 9007199254740991
-                                            - type: 'null'
-                                        reviewBy:
-                                          type:
-                                            - string
-                                            - 'null'
-                                        lastModifiedAt:
-                                          type:
-                                            - string
-                                            - 'null'
+                                            - whole
+                                            - window
                                       required:
-                                        - verificationState
-                                        - lastVerifiedAt
-                                        - lastVerifiedByContactId
-                                        - reviewBy
-                                        - lastModifiedAt
+                                        - statusId
+                                        - resolvedAt
+                                        - lastMessageAt
+                                        - workspaceId
+                                        - matchedChunkKind
                                       additionalProperties: false
-                                    - type: 'null'
-                              required:
-                                - sourceType
-                                - sourceId
-                                - title
-                                - snippet
-                                - score
-                                - rank
-                                - url
-                                - freshness
-                              additionalProperties: false
+                                  required:
+                                    - sourceType
+                                    - sourceId
+                                    - title
+                                    - snippet
+                                    - score
+                                    - rank
+                                    - url
+                                    - freshness
+                                    - resolution
+                                    - resolutionSource
+                                    - ticket
+                                  additionalProperties: false
                         required:
                           - retrievalId
                           - retrievalVersion
@@ -23582,75 +24439,177 @@ paths:
                             maxItems: 0
                             type: array
                             items:
-                              type: object
-                              properties:
-                                sourceType:
-                                  type: string
-                                  enum:
-                                    - kb_article
-                                    - helpdesk_ticket
-                                sourceId:
-                                  type: integer
-                                  exclusiveMinimum: 0
-                                  maximum: 9007199254740991
-                                title:
-                                  type: string
-                                snippet:
-                                  type: string
-                                score:
-                                  type: number
-                                rank:
-                                  type: integer
-                                  minimum: 1
-                                  maximum: 9007199254740991
-                                url:
-                                  type: string
-                                freshness:
-                                  anyOf:
-                                    - type: object
+                              oneOf:
+                                - type: object
+                                  properties:
+                                    sourceType:
+                                      type: string
+                                      const: kb_article
+                                    sourceId:
+                                      type: integer
+                                      exclusiveMinimum: 0
+                                      maximum: 9007199254740991
+                                    title:
+                                      type: string
+                                    snippet:
+                                      type: string
+                                    score:
+                                      type: number
+                                    rank:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 9007199254740991
+                                    url:
+                                      type: string
+                                    freshness:
+                                      anyOf:
+                                        - type: object
+                                          properties:
+                                            verificationState:
+                                              type: string
+                                              enum:
+                                                - verified
+                                                - review_due
+                                                - unverified
+                                            lastVerifiedAt:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            lastVerifiedByContactId:
+                                              anyOf:
+                                                - type: integer
+                                                  exclusiveMinimum: 0
+                                                  maximum: 9007199254740991
+                                                - type: 'null'
+                                            reviewBy:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            lastModifiedAt:
+                                              type:
+                                                - string
+                                                - 'null'
+                                          required:
+                                            - verificationState
+                                            - lastVerifiedAt
+                                            - lastVerifiedByContactId
+                                            - reviewBy
+                                            - lastModifiedAt
+                                          additionalProperties: false
+                                        - type: 'null'
+                                    matchedSection:
+                                      type: object
                                       properties:
-                                        verificationState:
+                                        heading:
+                                          type: string
+                                          minLength: 1
+                                        path:
+                                          minItems: 1
+                                          type: array
+                                          items:
+                                            type: string
+                                        anchor:
+                                          anyOf:
+                                            - type: string
+                                              pattern: ^h-[a-z0-9]+(?:-[a-z0-9]+)*$
+                                            - type: 'null'
+                                        snippet:
+                                          type: string
+                                      required:
+                                        - heading
+                                        - path
+                                        - anchor
+                                        - snippet
+                                      additionalProperties: false
+                                  required:
+                                    - sourceType
+                                    - sourceId
+                                    - title
+                                    - snippet
+                                    - score
+                                    - rank
+                                    - url
+                                    - freshness
+                                  additionalProperties: false
+                                - type: object
+                                  properties:
+                                    sourceType:
+                                      type: string
+                                      const: helpdesk_ticket
+                                    sourceId:
+                                      type: integer
+                                      exclusiveMinimum: 0
+                                      maximum: 9007199254740991
+                                    title:
+                                      type: string
+                                    snippet:
+                                      type: string
+                                    score:
+                                      type: number
+                                    rank:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 9007199254740991
+                                    url:
+                                      type: string
+                                    freshness:
+                                      type: 'null'
+                                    matchedSection:
+                                      not: {}
+                                    resolution:
+                                      type:
+                                        - string
+                                        - 'null'
+                                    resolutionSource:
+                                      anyOf:
+                                        - type: string
+                                          enum:
+                                            - public_reply
+                                        - type: 'null'
+                                    ticket:
+                                      type: object
+                                      properties:
+                                        statusId:
+                                          type: integer
+                                          minimum: -9007199254740991
+                                          maximum: 9007199254740991
+                                        resolvedAt:
+                                          type:
+                                            - string
+                                            - 'null'
+                                        lastMessageAt:
+                                          type:
+                                            - string
+                                            - 'null'
+                                        workspaceId:
+                                          type: integer
+                                          minimum: -9007199254740991
+                                          maximum: 9007199254740991
+                                        matchedChunkKind:
                                           type: string
                                           enum:
-                                            - verified
-                                            - review_due
-                                            - unverified
-                                        lastVerifiedAt:
-                                          type:
-                                            - string
-                                            - 'null'
-                                        lastVerifiedByContactId:
-                                          anyOf:
-                                            - type: integer
-                                              exclusiveMinimum: 0
-                                              maximum: 9007199254740991
-                                            - type: 'null'
-                                        reviewBy:
-                                          type:
-                                            - string
-                                            - 'null'
-                                        lastModifiedAt:
-                                          type:
-                                            - string
-                                            - 'null'
+                                            - whole
+                                            - window
                                       required:
-                                        - verificationState
-                                        - lastVerifiedAt
-                                        - lastVerifiedByContactId
-                                        - reviewBy
-                                        - lastModifiedAt
+                                        - statusId
+                                        - resolvedAt
+                                        - lastMessageAt
+                                        - workspaceId
+                                        - matchedChunkKind
                                       additionalProperties: false
-                                    - type: 'null'
-                              required:
-                                - sourceType
-                                - sourceId
-                                - title
-                                - snippet
-                                - score
-                                - rank
-                                - url
-                                - freshness
-                              additionalProperties: false
+                                  required:
+                                    - sourceType
+                                    - sourceId
+                                    - title
+                                    - snippet
+                                    - score
+                                    - rank
+                                    - url
+                                    - freshness
+                                    - resolution
+                                    - resolutionSource
+                                    - ticket
+                                  additionalProperties: false
                           errorCode:
                             type: string
                             enum:
@@ -24053,3 +25012,95 @@ paths:
                     - eventType
                     - value
                   additionalProperties: false
+  /api/retrieval/warm:
+    post:
+      operationId: warmRetrieval
+      summary: Wake the KB search store before a search (no body). Neon problems return 200 with warmed=false and a reason
+      tags:
+        - Retrieval
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    oneOf:
+                      - type: object
+                        properties:
+                          warmed:
+                            type: boolean
+                            const: true
+                          ms:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                          sections:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                          whole:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                        required:
+                          - warmed
+                          - ms
+                          - sections
+                          - whole
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          warmed:
+                            type: boolean
+                            const: false
+                          reason:
+                            type: string
+                            enum:
+                              - off
+                              - recent
+                              - deadline
+                              - table_missing
+                              - error
+                          ms:
+                            type: integer
+                            minimum: 0
+                            maximum: 9007199254740991
+                        required:
+                          - warmed
+                          - reason
+                        additionalProperties: false
+                  meta:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      cached:
+                        type: boolean
+                      timestamp:
+                        type: string
+                        format: date-time
+                      pagination:
+                        type: object
+                        properties:
+                          top:
+                            type: integer
+                          skip:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      security: *a2

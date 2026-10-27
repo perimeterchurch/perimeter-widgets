@@ -36,16 +36,76 @@ The widget reads its config from `data-*` attributes on the placeholder div.
 
 | Attribute           | Required | Default                                  | Description                                                       |
 | ------------------- | -------- | ---------------------------------------- | ----------------------------------------------------------------- |
+| `data-pledge-campaign-id` | No | Frontier (`960`)                       | MP `Pledge_Campaign_ID` the pledge is recorded against.           |
 | `data-heading`      | No       | `My 3-Year Pledge`                       | Headline above the form.                                          |
 | `data-period`       | No       | `Jan 2026 - Dec 2028`                    | Pledge period, shown in brand amber under the headline.           |
 | `data-amount-label` | No       | `Total 3-Year Pledge Amount`             | Label on the amount field.                                        |
-| `data-account-url`  | No       | `https://www.perimeter.org/my-perimeter/`| Where the confirmation links a pledger to check their pledge.      |
+| `data-account-url`  | No       | `https://www.perimeter.org/my-perimeter/`| Where the confirmation links a pledger to check their pledge. Set it to an empty value to drop that sentence. |
+| `data-thank-you-heading` | No  | `Thank you for your pledge to the Frontier Campaign!` | Heading on the confirmation.                      |
 | `data-api-url`      | No       | `https://api.perimeter.org`              | Override the perimeter-api base URL (advanced / local dev).       |
 
-There is deliberately **no campaign attribute**. `POST /api/giving/pledges`
-pins the pledge to the Frontier campaign server-side, so nothing a host page
-writes can redirect a pledge to another campaign. The config covers the
-campaign's presentation only.
+### Colors
+
+Every color is optional and takes a hex value (`#1d4d3f` or `#fff`). Leave one
+off and the Perimeter brand color is used; a value that isn't a hex color is
+ignored the same way, so a typo never breaks the form. These exist so a host
+page with its own brand — a church plant's page, say — can re-skin the band.
+
+| Attribute                | Default            | Colors                                                       |
+| ------------------------ | ------------------ | ------------------------------------------------------------ |
+| `data-background-color`  | brand navy         | The band behind the form and the confirmation.               |
+| `data-text-color`        | white              | Headline, field labels, confirmation text.                   |
+| `data-heading-color`     | the text color     | The headline only.                                           |
+| `data-accent-color`      | brand amber        | The pledge period and the Make Pledge button.                |
+| `data-period-color`      | the accent color   | The pledge period only.                                      |
+| `data-button-text-color` | brand navy         | The Make Pledge button's label.                              |
+
+```html
+<div
+  data-perimeter-widget="frontier-pledge"
+  data-background-color="#1d4d3f"
+  data-text-color="#f4efe3"
+  data-accent-color="#e07a5f"
+  data-button-text-color="#ffffff"
+></div>
+```
+
+Check contrast when choosing them: validation messages stay a light red tuned
+for the dark navy band, so a light background color makes them hard to read.
+
+### Pledging to another campaign
+
+`data-pledge-campaign-id` points the form at a different MP campaign — a church
+plant's, for example. It is safe to expose because perimeter-api decides which
+campaigns accept pledges, not the page: `POST /api/giving/pledges` refuses
+(400) any campaign that
+
+- does not have **Allow Online Pledge** switched on in MP,
+- is a mission trip (a trip pledge is a trip registration), or
+- has passed its end date (unless **Pledge Beyond End Date** is on).
+
+So before a page can use a new campaign, someone has to switch on **Allow
+Online Pledge** on that campaign in MP. Until then the form shows its submit
+error. A campaign id that isn't a whole number stops the widget from loading,
+rather than quietly sending the pledge to Frontier.
+
+A church plant embed usually changes the copy and colors too:
+
+```html
+<div
+  data-perimeter-widget="frontier-pledge"
+  data-pledge-campaign-id="887"
+  data-heading="Plant Pledge"
+  data-period="Jan 2027 - Dec 2029"
+  data-thank-you-heading="Thank you for your pledge!"
+  data-account-url=""
+  data-background-color="#1d4d3f"
+></div>
+```
+
+The host page's domain must also be in perimeter-api's widget origin
+allowlist (`WIDGET_ORIGIN_ALLOWLIST` in `src/proxy.ts`), or every submit
+fails with a CORS error. perimeter.org pages are already allowed.
 
 ## Behavior
 
