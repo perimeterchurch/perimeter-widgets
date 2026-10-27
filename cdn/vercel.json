@@ -23,7 +23,7 @@
     },
     {
       "source": "/frontier-pledge/latest.js",
-      "destination": "/frontier-pledge/0.1.0/index.js"
+      "destination": "/frontier-pledge/0.2.0/index.js"
     },
     {
       "source": "/latest-sermon/latest.js",

@@ -1081,6 +1081,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/school/staff/{contactId}/photo': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** School sync: put a FACTS staff photo on the contact's current school Employee record as its default image (Perimeter Sync's x-school-sync-key) */
+    put: operations['schoolUpdateStaffPhoto'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/school/participation': {
     parameters: {
       query?: never;
@@ -1164,6 +1181,91 @@ export interface paths {
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  '/api/journey/groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Journey sync: a new discipleship group for a group new in The Journey (Perimeter Sync's x-school-sync-key) */
+    post: operations['journeyCreateGroup'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/journey/groups/{groupId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Journey sync: rename a discipleship group for its current leaders, checked against the name reviewed (Perimeter Sync's x-school-sync-key) */
+    patch: operations['journeyRenameGroup'];
+    trace?: never;
+  };
+  '/api/journey/groups/{groupId}/end': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Journey sync: end a discipleship group no longer in The Journey, with its memberships (Perimeter Sync's x-school-sync-key) */
+    post: operations['journeyEndGroup'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/journey/members': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Journey sync: add somebody to a discipleship group (Perimeter Sync's x-school-sync-key) */
+    post: operations['journeyAddMember'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/journey/members/{groupParticipantId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Journey sync: make a member Leader, or end a membership (Perimeter Sync's x-school-sync-key) */
+    patch: operations['journeyUpdateMember'];
     trace?: never;
   };
   '/api/mission-trips': {
@@ -2479,7 +2581,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Permission-scoped semantic search (KB articles). Dependency outages return 200 with degraded=true and an errorCode */
+    /** Permission-scoped semantic search over KB articles (staff) or closed helpdesk tickets in the agent's workspaces (helpdesk agents). One source type per request; results are a union on sourceType. Dependency outages return 200 with degraded=true and an errorCode */
     post: operations['searchRetrieval'];
     delete?: never;
     options?: never;
@@ -2498,6 +2600,23 @@ export interface paths {
     put?: never;
     /** Record an outcome event (result opened, vote, draft accepted, ...) on a retrieval issued to the caller */
     post: operations['recordRetrievalEvent'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/retrieval/warm': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Wake the KB search store before a search (no body). Neon problems return 200 with warmed=false and a reason */
+    post: operations['warmRetrieval'];
     delete?: never;
     options?: never;
     head?: never;
@@ -5761,6 +5880,8 @@ export interface operations {
           phone: string;
           pledge: number;
           notes?: string;
+          /** @description Pledge_Campaigns id to pledge to. Defaults to the Frontier campaign (960). Refused unless the campaign allows online pledges in MP, is not a mission trip, and has not ended. */
+          pledgeCampaignId?: number;
         };
       };
     };
@@ -6284,7 +6405,7 @@ export interface operations {
             /** Format: email */
             Email_Address?: string;
             Mobile_Phone?: string;
-            HS_Graduation_Year?: number;
+            HS_Graduation_Year?: number | null;
             Current_School?: string | null;
             Perimeter_School_ID?: number;
             Display_Name?: string;
@@ -6362,6 +6483,70 @@ export interface operations {
           };
           expected: {
             [key: string]: string | number | null;
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  schoolUpdateStaffPhoto: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        contactId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          image: string;
+          fileName: string;
+          expected: {
+            fileId: number | null;
           };
           dryRun?: boolean;
         };
@@ -6753,6 +6938,316 @@ export interface operations {
       400: components['responses']['BadRequest'];
       401: components['responses']['Unauthorized'];
       403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  journeyCreateGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          name: string;
+          ministryId: 50 | 113;
+          primaryContact: number;
+          startDate: string;
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  journeyRenameGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          set: {
+            Group_Name: string;
+          };
+          expected: {
+            Group_Name: string;
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  journeyEndGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          endDate: string;
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  journeyAddMember: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          groupId: number;
+          participantId: number;
+          roleId: 17 | 10 | 14;
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  journeyUpdateMember: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupParticipantId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          set: {
+            Group_Role_ID?: 17 | 10 | 14;
+            End_Date?: string;
+          };
+          expected: {
+            Group_Role_ID?: number;
+          };
+          dryRun?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data: {
+              dryRun: boolean;
+              alreadyCurrent: boolean;
+              replayed?: boolean;
+              steps: {
+                table: string;
+                /** @enum {string} */
+                action: 'create' | 'update';
+                id?: number;
+                fields: string[];
+              }[];
+              notes: string[];
+            };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
       500: components['responses']['InternalError'];
     };
   };
@@ -13013,48 +13508,108 @@ export interface operations {
                   retrievalVersion: string;
                   /** @constant */
                   degraded: false;
-                  results: {
-                    /** @enum {string} */
-                    sourceType: 'kb_article' | 'helpdesk_ticket';
-                    sourceId: number;
-                    title: string;
-                    snippet: string;
-                    score: number;
-                    rank: number;
-                    url: string;
-                    freshness: {
-                      /** @enum {string} */
-                      verificationState: 'verified' | 'review_due' | 'unverified';
-                      lastVerifiedAt: string | null;
-                      lastVerifiedByContactId: number | null;
-                      reviewBy: string | null;
-                      lastModifiedAt: string | null;
-                    } | null;
-                  }[];
+                  results: (
+                    | {
+                        /** @constant */
+                        sourceType: 'kb_article';
+                        sourceId: number;
+                        title: string;
+                        snippet: string;
+                        score: number;
+                        rank: number;
+                        url: string;
+                        freshness: {
+                          /** @enum {string} */
+                          verificationState: 'verified' | 'review_due' | 'unverified';
+                          lastVerifiedAt: string | null;
+                          lastVerifiedByContactId: number | null;
+                          reviewBy: string | null;
+                          lastModifiedAt: string | null;
+                        } | null;
+                        matchedSection?: {
+                          heading: string;
+                          path: string[];
+                          anchor: string | null;
+                          snippet: string;
+                        };
+                      }
+                    | {
+                        /** @constant */
+                        sourceType: 'helpdesk_ticket';
+                        sourceId: number;
+                        title: string;
+                        snippet: string;
+                        score: number;
+                        rank: number;
+                        url: string;
+                        freshness: null;
+                        matchedSection?: unknown;
+                        resolution: string | null;
+                        resolutionSource: 'public_reply' | null;
+                        ticket: {
+                          statusId: number;
+                          resolvedAt: string | null;
+                          lastMessageAt: string | null;
+                          workspaceId: number;
+                          /** @enum {string} */
+                          matchedChunkKind: 'whole' | 'window';
+                        };
+                      }
+                  )[];
                 }
               | {
                   retrievalId: string;
                   retrievalVersion: string;
                   /** @constant */
                   degraded: true;
-                  results: {
-                    /** @enum {string} */
-                    sourceType: 'kb_article' | 'helpdesk_ticket';
-                    sourceId: number;
-                    title: string;
-                    snippet: string;
-                    score: number;
-                    rank: number;
-                    url: string;
-                    freshness: {
-                      /** @enum {string} */
-                      verificationState: 'verified' | 'review_due' | 'unverified';
-                      lastVerifiedAt: string | null;
-                      lastVerifiedByContactId: number | null;
-                      reviewBy: string | null;
-                      lastModifiedAt: string | null;
-                    } | null;
-                  }[];
+                  results: (
+                    | {
+                        /** @constant */
+                        sourceType: 'kb_article';
+                        sourceId: number;
+                        title: string;
+                        snippet: string;
+                        score: number;
+                        rank: number;
+                        url: string;
+                        freshness: {
+                          /** @enum {string} */
+                          verificationState: 'verified' | 'review_due' | 'unverified';
+                          lastVerifiedAt: string | null;
+                          lastVerifiedByContactId: number | null;
+                          reviewBy: string | null;
+                          lastModifiedAt: string | null;
+                        } | null;
+                        matchedSection?: {
+                          heading: string;
+                          path: string[];
+                          anchor: string | null;
+                          snippet: string;
+                        };
+                      }
+                    | {
+                        /** @constant */
+                        sourceType: 'helpdesk_ticket';
+                        sourceId: number;
+                        title: string;
+                        snippet: string;
+                        score: number;
+                        rank: number;
+                        url: string;
+                        freshness: null;
+                        matchedSection?: unknown;
+                        resolution: string | null;
+                        resolutionSource: 'public_reply' | null;
+                        ticket: {
+                          statusId: number;
+                          resolvedAt: string | null;
+                          lastMessageAt: string | null;
+                          workspaceId: number;
+                          /** @enum {string} */
+                          matchedChunkKind: 'whole' | 'window';
+                        };
+                      }
+                  )[];
                   /** @enum {string} */
                   errorCode:
                     | 'RETRIEVAL_EMBED_UNAVAILABLE'
@@ -13185,6 +13740,58 @@ export interface operations {
             data: {
               eventId: string;
             };
+            meta?: {
+              count?: number;
+              cached?: boolean;
+              /** Format: date-time */
+              timestamp?: string;
+              pagination?: {
+                top?: number;
+                skip?: number;
+              };
+            };
+          };
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      500: components['responses']['InternalError'];
+    };
+  };
+  warmRetrieval: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** @constant */
+            success: true;
+            data:
+              | {
+                  /** @constant */
+                  warmed: true;
+                  ms: number;
+                  sections: number;
+                  whole: number;
+                }
+              | {
+                  /** @constant */
+                  warmed: false;
+                  /** @enum {string} */
+                  reason: 'off' | 'recent' | 'deadline' | 'table_missing' | 'error';
+                  ms?: number;
+                };
             meta?: {
               count?: number;
               cached?: boolean;

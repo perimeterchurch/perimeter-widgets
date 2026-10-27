@@ -6,8 +6,13 @@ import { transitions } from '@perimeter/ui/lib/motion-config';
 export interface PledgeConfirmationProps {
   open: boolean;
   onClose: () => void;
-  /** Where a pledger can log in to see the pledge that was just recorded. */
+  /**
+   * Where a pledger can log in to see the pledge that was just recorded. Blank
+   * drops the sentence — a host page whose pledgers have no My Perimeter
+   * account has nowhere to send them.
+   */
   accountUrl: string;
+  heading: string;
 }
 
 const checkDraw = {
@@ -28,6 +33,7 @@ export function PledgeConfirmation({
   open,
   onClose,
   accountUrl,
+  heading,
 }: PledgeConfirmationProps): React.JSX.Element {
   const closeRef = React.useRef<HTMLButtonElement>(null);
 
@@ -115,15 +121,17 @@ export function PledgeConfirmation({
           </motion.svg>
 
           <h3 className="font-serif text-2xl leading-tight font-normal text-balance @md:text-3xl">
-            Thank you for your pledge to the Frontier Campaign!
+            {heading}
           </h3>
-          <p className="max-w-md text-base">
-            To check your pledge, please log in to your{' '}
-            <a href={accountUrl} className="underline underline-offset-4 hover:text-primary">
-              My Perimeter
-            </a>{' '}
-            account.
-          </p>
+          {accountUrl.trim() && (
+            <p className="max-w-md text-base">
+              To check your pledge, please log in to your{' '}
+              <a href={accountUrl} className="underline underline-offset-4 hover:text-primary">
+                My Perimeter
+              </a>{' '}
+              account.
+            </p>
+          )}
           <p className="max-w-md text-base">
             A confirmation has been sent to the email you provided.
           </p>

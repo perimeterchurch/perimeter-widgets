@@ -5,6 +5,7 @@ import { PledgeForm } from './components/PledgeForm';
 import { PledgeConfirmation } from './components/PledgeConfirmation';
 import type { FrontierPledgeConfig, PledgeFormErrors, PledgeFormValues } from './types';
 import { buildPledgeNotes, emptyPledgeForm, parseAmount, validatePledgeForm } from './lib/pledge';
+import { bandColorStyle, cssColor } from './lib/colors';
 
 export interface AppProps {
   config: FrontierPledgeConfig;
@@ -40,6 +41,8 @@ export function App({ config }: AppProps): React.JSX.Element {
       pledge: amount,
       notes: buildPledgeNotes(values),
       ...(spouse ? { spouse } : {}),
+      // Omitted when unset so the API applies its own default (Frontier).
+      ...(config.pledgeCampaignId ? { pledgeCampaignId: config.pledgeCampaignId } : {}),
     });
   }
 
@@ -51,14 +54,25 @@ export function App({ config }: AppProps): React.JSX.Element {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="@container bg-surface-dark text-left text-surface-dark-fg">
+      <div
+        className="@container bg-surface-dark text-left text-surface-dark-fg"
+        style={bandColorStyle(config)}
+      >
         {/* `relative` is the positioning context the confirmation covers. */}
         <div className="relative flex flex-col items-center px-4 py-8 @xl:py-16">
           <header className="mb-6 text-center @xl:mb-10">
-            <h2 className="font-serif text-4xl leading-tight font-normal text-balance @md:text-5xl @xl:text-6xl">
+            <h2
+              className="font-serif text-4xl leading-tight font-normal text-balance @md:text-5xl @xl:text-6xl"
+              style={{ color: cssColor(config.headingColor) }}
+            >
               {config.heading}
             </h2>
-            <p className="mt-2 text-lg font-medium text-warning @md:text-xl">{config.period}</p>
+            <p
+              className="mt-2 text-lg font-medium text-warning @md:text-xl"
+              style={{ color: cssColor(config.periodColor) }}
+            >
+              {config.period}
+            </p>
           </header>
 
           <PledgeForm
@@ -77,6 +91,7 @@ export function App({ config }: AppProps): React.JSX.Element {
             open={submit.isSuccess}
             onClose={handleReset}
             accountUrl={config.accountUrl}
+            heading={config.thankYouHeading}
           />
         </div>
       </div>

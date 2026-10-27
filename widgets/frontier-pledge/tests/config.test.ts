@@ -11,6 +11,22 @@ describe('FrontierPledgeConfigSchema', () => {
     expect(config.apiUrl).toBeUndefined();
   });
 
+  it('leaves every color unset by default, so the brand palette applies', () => {
+    const config = FrontierPledgeConfigSchema.parse({});
+    expect(config.backgroundColor).toBeUndefined();
+    expect(config.textColor).toBeUndefined();
+    expect(config.headingColor).toBeUndefined();
+    expect(config.accentColor).toBeUndefined();
+    expect(config.periodColor).toBeUndefined();
+    expect(config.buttonTextColor).toBeUndefined();
+  });
+
+  it('does not reject a malformed color — a typo must not fail the mount', () => {
+    expect(() =>
+      FrontierPledgeConfigSchema.parse({ backgroundColor: 'not a color' }),
+    ).not.toThrow();
+  });
+
   it('passes host-page overrides through', () => {
     const config = FrontierPledgeConfigSchema.parse({
       heading: 'My 5-Year Pledge',
@@ -26,9 +42,25 @@ describe('FrontierPledgeConfigSchema', () => {
     expect(config.apiUrl).toBe('http://localhost:5500');
   });
 
-  it('has no campaign field — the campaign is pinned server-side', () => {
-    const keys = Object.keys(FrontierPledgeConfigSchema.shape);
-    expect(keys).not.toContain('campaignId');
-    expect(keys).not.toContain('pledgeCampaignId');
+  it('leaves the campaign unset by default, so the API pledges to Frontier', () => {
+    expect(FrontierPledgeConfigSchema.parse({}).pledgeCampaignId).toBeUndefined();
+  });
+
+  it('reads the campaign id from its data-* string', () => {
+    expect(FrontierPledgeConfigSchema.parse({ pledgeCampaignId: '887' }).pledgeCampaignId).toBe(
+      887,
+    );
+  });
+
+  it('fails the mount on a malformed campaign id rather than pledging to Frontier', () => {
+    for (const pledgeCampaignId of ['abc', '', '0', '-4', '9.5']) {
+      expect(() => FrontierPledgeConfigSchema.parse({ pledgeCampaignId })).toThrow();
+    }
+  });
+
+  it('defaults the thank-you heading to the Frontier copy', () => {
+    expect(FrontierPledgeConfigSchema.parse({}).thankYouHeading).toBe(
+      'Thank you for your pledge to the Frontier Campaign!',
+    );
   });
 });
