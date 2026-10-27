@@ -21,15 +21,15 @@ export type CreatePledgeResponse =
   operations['createPledge']['responses']['201']['content']['application/json']['data'];
 
 /**
- * Create a pledge against the Frontier campaign. Posts to
- * `POST /api/giving/pledges`, which matches the pledger to an existing MP
- * contact by name/email/phone (falling back to the generic donor) and writes
- * the Pledges row. Public — the pledge form is an embedded public widget, so
- * no bearer token is attached; production CORS restricts callers to
- * perimeter.org origins.
+ * Create a pledge. Posts to `POST /api/giving/pledges`, which matches the
+ * pledger to an existing MP contact by name/email/phone (falling back to the
+ * generic donor) and writes the Pledges row. Public — the pledge form is an
+ * embedded public widget, so no bearer token is attached; production CORS
+ * restricts callers to the widget origin allowlist.
  *
- * The campaign is fixed server-side; the widget only sends who is pledging and
- * how much.
+ * `pledgeCampaignId` is optional and the API defaults it to Frontier. The API
+ * refuses (400) any campaign that is not open to online pledges in MP, so a
+ * host page cannot pledge into an arbitrary campaign.
  */
 export function useCreatePledge(): UseMutationResult<
   CreatePledgeResponse,
