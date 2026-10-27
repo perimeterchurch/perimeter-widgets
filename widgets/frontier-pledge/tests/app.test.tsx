@@ -61,6 +61,33 @@ describe('frontier-pledge widget App', () => {
     expect(screen.getByText('Jan 2026 - Dec 2028')).toBeInTheDocument();
   });
 
+  it('applies configured colors to the band, headline and period', () => {
+    const { container } = render(
+      <App
+        config={config({
+          backgroundColor: '#1d4d3f',
+          accentColor: '#e07a5f',
+          headingColor: '#ffffff',
+          periodColor: '#f4efe3',
+        })}
+      />,
+    );
+    const band = container.firstElementChild as HTMLElement;
+    expect(band.style.getPropertyValue('--color-surface-dark')).toBe('#1d4d3f');
+    expect(band.style.getPropertyValue('--color-warning')).toBe('#e07a5f');
+    expect(screen.getByRole('heading', { name: 'My 3-Year Pledge' })).toHaveStyle({
+      color: '#ffffff',
+    });
+    expect(screen.getByText('Jan 2026 - Dec 2028')).toHaveStyle({ color: '#f4efe3' });
+  });
+
+  it('leaves the brand colors alone when none are configured', () => {
+    const { container } = render(<App config={config()} />);
+    const band = container.firstElementChild as HTMLElement;
+    expect(band.getAttribute('style')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'My 3-Year Pledge' })).not.toHaveAttribute('style');
+  });
+
   it('submits the trimmed pledge, with the spouse folded into the MP note', () => {
     render(<App config={config()} />);
     fillForm({ 'First Name': '  Samantha  ' });
@@ -80,6 +107,24 @@ describe('frontier-pledge widget App', () => {
       spouse: 'Drew',
     });
     expect(body.notes).toContain('Spouse: Drew');
+  });
+
+  it('sends the configured campaign id with the pledge', () => {
+    render(<App config={config({ pledgeCampaignId: '887' })} />);
+    fillForm();
+    fireEvent.click(screen.getByRole('button', { name: 'Make Pledge' }));
+
+    const body = mutation().mutate.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(body.pledgeCampaignId).toBe(887);
+  });
+
+  it('sends no campaign id when none is configured, leaving the API default', () => {
+    render(<App config={config()} />);
+    fillForm();
+    fireEvent.click(screen.getByRole('button', { name: 'Make Pledge' }));
+
+    const body = mutation().mutate.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(body).not.toHaveProperty('pledgeCampaignId');
   });
 
   it('omits spouse from the request when it is left blank', () => {
@@ -166,6 +211,21 @@ describe('frontier-pledge widget App', () => {
       'href',
       'https://example.org/account/',
     );
+  });
+
+  it('shows the configured thank-you heading and drops the account line when its link is blank', () => {
+    state.mutation = mutationResult({ isSuccess: true });
+    render(
+      <App
+        config={config({
+          thankYouHeading: 'Thank you for supporting Grace Church!',
+          accountUrl: '',
+        })}
+      />,
+    );
+
+    expect(screen.getByText('Thank you for supporting Grace Church!')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'My Perimeter' })).not.toBeInTheDocument();
   });
 
   it('makes the covered form inert so it cannot be tabbed into behind the confirmation', () => {
