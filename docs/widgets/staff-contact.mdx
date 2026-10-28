@@ -38,7 +38,7 @@ The widget reads its config from `data-*` attributes on the placeholder div.
 | Attribute                | Required | Default                         | Description                                                                 |
 | ------------------------ | -------- | ------------------------------- | --------------------------------------------------------------------------- |
 | `data-contact-guid`      | Yes      | —                               | MP Contact GUID of the staff member to email. Without it the widget shows a "contact form unavailable" notice. |
-| `data-recaptcha-site-key`| No       | Perimeter's public v2 site key  | Google reCAPTCHA v2 site key (public). Override only for a different key.    |
+| `data-recaptcha-site-key`| No       | The widget's own v3 site key    | Google reCAPTCHA v3 site key (public). The API only accepts the default key's tokens, so leave it unset. |
 | `data-api-url`           | No       | `https://api.perimeter.org`     | Override the perimeter-api base URL (advanced / local dev).                 |
 
 ## Behavior
@@ -68,8 +68,10 @@ before this widget works from a production origin — its path
 ## reCAPTCHA setup
 
 Uses a **reCAPTCHA v3 (score-based)** key — not the v2 checkbox. The public
-**site key** is the widget default (or `data-recaptcha-site-key`); the private
-**secret** lives in perimeter-api's `RECAPTCHA_SECRET` env var. The key's allowed
-domains must include every origin the widget is embedded on (e.g.
-`perimeter.org`, plus `localhost` for local testing). The server rejects
+**site key** is the widget default, the "Staff Contact Widget" key; the private
+**secret** lives in perimeter-api's `STAFF_CONTACT_RECAPTCHA_SECRET` env var. It
+is a separate key from the one prayer-wall and event-registration share (whose
+Google account can't be found), so its domain list can be changed. The key's
+allowed domains must include every origin the widget is embedded on — today
+`perimeter.org`, `perimeterschool.org`, and `localhost` for local testing. The server rejects
 assessments below a 0.5 score.
