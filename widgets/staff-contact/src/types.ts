@@ -1,12 +1,15 @@
 import { z } from 'zod';
 
 /**
- * Perimeter's public reCAPTCHA **v3** (score-based) site key for the
- * staff-contact form. (The earlier v2 checkbox key can't be used — v2 doesn't
- * work inside the widget's shadow DOM.) Overridable per embed via
- * `data-recaptcha-site-key`.
+ * The staff-contact form's own public reCAPTCHA **v3** (score-based) site key,
+ * "Staff Contact Widget" — allowed on perimeter.org, perimeterschool.org and
+ * localhost. It is separate from the key prayer-wall and event-registration
+ * share, and perimeter-api verifies it with `STAFF_CONTACT_RECAPTCHA_SECRET`.
+ * (The earlier v2 checkbox key can't be used — v2 doesn't work inside the
+ * widget's shadow DOM.) Overridable per embed via `data-recaptcha-site-key`,
+ * but the API only accepts tokens from this key.
  */
-const DEFAULT_RECAPTCHA_SITE_KEY = '6LfJFoYtAAAAAChdFF8MhIv7ma3l7xG2bJDQdzvk';
+const DEFAULT_RECAPTCHA_SITE_KEY = '6LcibwUuAAAAADZXZVYhPRTlYhujuWuFcm-JSaTS';
 
 /**
  * Host-page config for the staff-contact widget. Every value arrives as a
