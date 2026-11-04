@@ -19,7 +19,7 @@ export async function GET() {
   }
   try {
     const result = await auth.api.getAccessToken({
-      body: { providerId: 'ministryplatform', userId: session.user.id },
+      body: { useAccountCookie: true, userId: session.user.id },
       headers: hdrs,
     });
     if (!result?.accessToken) {
