@@ -13,3 +13,6 @@ coverage
 # `.next/dev/types` and `.next/types` depending on the last command.
 # CI runs `next build` before typecheck, so the file is always present.
 apps/*/next-env.d.ts
+
+# Vercel CLI settings and pulled env vars (vercel link / vercel pull)
+.vercel
