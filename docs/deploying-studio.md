@@ -47,7 +47,7 @@ Set these in the dashboard (Project → Settings). They differ from the old Vite
 | **Build Command** | `pnpm build` (i.e. the shell's `build` script) | Its `prebuild` hook runs `pnpm --filter @perimeter/studio build` → `embed-studio.mjs` (copies `studio/dist` → `studio-host/public`) → `next build`. |
 | **Output Directory** | *default* (leave blank) | Next manages `.next`; do not set the old `studio/dist`. |
 | **Node.js Version** | **22.x (≥ 22.18)** | Below 22.18 the studio's Vite build fails with `ERR_UNKNOWN_FILE_EXTENSION ".ts"` from `@perimeter/vite-plugin-widget`. If the available Node is older, add env `NODE_OPTIONS=--experimental-strip-types`. |
-| **Production Branch** | `main` | Auto-deploys on merge to `main`; preview deploys per PR. |
+| **Production Branch** | `main` | Production deploys run from GitHub Actions (`.github/workflows/vercel-deploy-studio.yml`) on each push to `main`; Vercel's own Git deploys are off (`studio-host/vercel.json`). **There are no preview deploys**: the token lives in the `vercel-production` GitHub environment, which only `main` may use, because any branch whose run could read it could steal it (Vercel Security Review, 2026-11-05). Test a branch locally, or `vercel deploy` it by hand from a team member's machine. |
 
 > Vercel has native **Turborepo** support: with Root Directory = `studio-host` it can resolve workspace deps via `turbo.json`. If the build can't find `studio/dist` or `@perimeter/*`, the **"include files outside root" toggle is off** — turn it on. If `next build` isn't detected, the **Root Directory isn't `studio-host`**.
 

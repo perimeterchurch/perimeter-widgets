@@ -1,149 +1,98 @@
-# Every deploy of the perimeter-widgets-studio Vercel project
-# (style.perimeter.org, root directory studio-host/), production and
-# preview, built here rather than by Vercel's Git integration. The widgets-cdn
-# project (cdn/) is separate and still deploys through Vercel's Git
-# integration.
-#
-# Vercel blocks a deploy whose commit author can't deploy on the Vercel team
-# (not a member, or a Viewer), so a branch or a release carrying such a
-# commit never went live. This workflow builds and deploys with a token from
-# a team member's account, so every deploy is that member's whoever wrote the
-# commits. studio-host/vercel.json turns Vercel's own Git deploys off for
-# this project only.
+# Production deploys of the perimeter-widgets-studio Vercel project
+# (style.perimeter.org, root directory studio-host/), built here rather than
+# by Vercel's Git integration. The widgets-cdn project (cdn/) is separate
+# and still deploys through Vercel's Git integration.
 #
 # The CLI runs from the repo root and applies the project's Root Directory
 # (studio-host) itself, the same way Vercel's own build did. Pushes that only
 # touch docs are skipped.
 #
-# - Push to main: production deploy.
-# - Push to any other branch: preview deploy, aliased to the branch's fixed
-#   address, <project>-git-<branch>-perimeter-church.vercel.app. That is the
-#   address Vercel itself gave branches, so the MP OAuth redirect URIs
-#   already registered for a branch keep working. When it would pass 63
-#   characters, the branch part is cut short and a 6-character hash added
-#   (Vercel's own hash can't be reproduced, so a long branch's address
-#   differs from what Vercel used to give it). The address is posted as a
-#   "Vercel preview (studio)" commit status, so it shows in the PR's checks.
+# Vercel blocks a deploy whose commit author can't deploy on the Vercel team
+# (not a member, or a Viewer), so a release carrying such a commit never went
+# live. This workflow builds and deploys with a token from a team member's
+# account, so every deploy is that member's whoever wrote the commits.
+# studio-host/vercel.json turns Vercel's own Git deploys off for
+# this project only.
 #
-# Secrets: VERCEL_TOKEN (a Vercel account token scoped to the Perimeter
-# Church team; tokens expire, and when it does this fails at "Pull Vercel
-# settings"), VERCEL_ORG_ID and VERCEL_PROJECT_ID. Dependabot runs get no
-# secrets, so they're skipped.
+# Only main deploys, and only main can read the token (Vercel Security
+# Review, 2026-11-05). A push runs the workflow file from the pushed branch,
+# so any branch whose run could read VERCEL_TOKEN could edit its copy of this
+# file to print it, and the token can do far more than deploy (it reads every
+# project's environment variables on the team). So:
+# - VERCEL_TOKEN is a secret of the `vercel-production` GitHub environment,
+#   whose deployment branch rule allows main alone. GitHub enforces that rule
+#   outside this file, so an edited copy on another branch gets no token.
+#   It must not also exist as a repository secret.
+# - There are no preview deploys. Preview a branch locally (`pnpm dev`), or
+#   deploy one by hand from a team member's machine (`vercel deploy`).
 #
-# Environment variables come from the Vercel project via `vercel pull`, for
-# previews including any scoped to the branch. Anything read at build time
-# (NEXT_PUBLIC_*, BETTER_AUTH_URL) must not be marked Sensitive in Vercel:
-# the CLI receives a placeholder for Sensitive values, and the build fails
-# or bakes in the placeholder.
+# Secrets: VERCEL_TOKEN (environment `vercel-production`; a Vercel account
+# token scoped to the Perimeter Church team; tokens expire, and when it does
+# this fails at "Pull Vercel settings"), VERCEL_ORG_ID and VERCEL_PROJECT_ID.
+# Dependabot runs get no secrets, so they're skipped.
+#
+# Environment variables come from the Vercel project via `vercel pull`.
+# Anything read at build time (NEXT_PUBLIC_*, BETTER_AUTH_URL) must not be
+# marked Sensitive in Vercel: the CLI receives a placeholder for Sensitive
+# values, and the build fails or bakes in the placeholder.
 
 name: vercel deploy (studio)
 
 on:
-    push:
-        branches: ['**']
-        paths-ignore:
-            - 'docs/**'
-            - '**/*.md'
-    workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
 
 permissions:
-    contents: read
-    # To post the preview address as a commit status. Nothing else.
-    statuses: write
+  contents: read
 
-# One deploy per branch at a time. A newer push to a preview branch replaces
-# the older run; production deploys queue instead.
+# Production deploys queue; none is cancelled.
 concurrency:
-    group: vercel-studio-${{ github.ref }}
-    cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: vercel-studio-production
+  cancel-in-progress: false
 
 env:
-    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-    VERCEL: pnpm dlx vercel@65.9.0
-    VERCEL_TEAM_SLUG: perimeter-church
-    BRANCH: ${{ github.ref_name }}
-    TARGET: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL: pnpm dlx vercel@65.9.0
 
 jobs:
-    deploy:
-        if: github.actor != 'dependabot[bot]'
-        runs-on: ubuntu-24.04
-        timeout-minutes: 20
-        steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-              with:
-                  persist-credentials: false
+  deploy:
+    # A manual run from another branch is refused here, and the
+    # environment's branch rule would withhold the token anyway.
+    if: github.ref == 'refs/heads/main' && github.actor != 'dependabot[bot]'
+    environment: vercel-production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-            # Reads the pnpm version from package.json's packageManager.
-            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      # Reads the pnpm version from package.json's packageManager.
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
-            # Node 22 matches the Vercel project's runtime setting (the studio's
-            # Vite build needs 22.18 or later, which setup-node's latest 22 is).
-            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-              with:
-                  node-version: '22'
-                  cache: pnpm
+      # Node 22 matches the Vercel project's runtime setting (the studio's
+      # Vite build needs 22.18 or later, which setup-node's latest 22 is).
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: pnpm
 
-            - name: Pull Vercel settings
-              run: |
-                  if [ "$TARGET" = production ]; then
-                      $VERCEL pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
-                  else
-                      $VERCEL pull --yes --environment=preview --git-branch="$BRANCH" --token="${{ secrets.VERCEL_TOKEN }}"
-                  fi
+      - name: Pull Vercel settings
+        run: $VERCEL pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
 
-            - name: Build
-              run: |
-                  prod=$([ "$TARGET" = production ] && echo --prod || true)
-                  $VERCEL build $prod --token="${{ secrets.VERCEL_TOKEN }}"
+      - name: Build
+        run: $VERCEL build --prod --token="${{ secrets.VERCEL_TOKEN }}"
 
-            - name: Deploy
-              id: deploy
-              run: |
-                  prod=$([ "$TARGET" = production ] && echo --prod || true)
-                  # Without a terminal the CLI prints just the deployment URL
-                  # on stdout (progress goes to stderr).
-                  out=$($VERCEL deploy --prebuilt $prod --token="${{ secrets.VERCEL_TOKEN }}")
-                  url=$(printf '%s\n' "$out" | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | head -1)
-                  case "$url" in https://*) ;; *) echo "No deployment URL in the CLI's output" >&2; exit 1 ;; esac
-                  echo "url=$url" >> "$GITHUB_OUTPUT"
-                  echo "Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
-
-            - name: Alias the branch address
-              id: alias
-              if: env.TARGET == 'preview'
-              env:
-                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-                  DEPLOY_URL: ${{ steps.deploy.outputs.url }}
-              run: |
-                  project=$(jq -r .projectName .vercel/project.json)
-                  slug=$(printf '%s' "$BRANCH" | tr 'A-Z' 'a-z' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')
-                  label="$project-git-$slug-$VERCEL_TEAM_SLUG"
-                  if [ ${#label} -gt 63 ]; then
-                      hash=$(printf '%s' "$BRANCH" | sha256sum | cut -c1-6)
-                      keep=$((63 - ${#project} - ${#VERCEL_TEAM_SLUG} - 13))
-                      slug=$(printf '%s' "${slug:0:$keep}" | sed -E 's/-+$//')
-                      label="$project-git-$slug-$hash-$VERCEL_TEAM_SLUG"
-                  fi
-                  # The REST API, not `vercel alias set`: the CLI command first
-                  # loads the token's user, which a team-scoped token can't.
-                  api() { curl -fsS -H "Authorization: Bearer $VERCEL_TOKEN" "$@"; }
-                  host=${DEPLOY_URL#https://}
-                  id=$(api "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" | jq -r .id)
-                  api -X POST -H 'Content-Type: application/json' \
-                      -d "{\"alias\":\"$label.vercel.app\"}" \
-                      "https://api.vercel.com/v2/deployments/$id/aliases?teamId=$VERCEL_ORG_ID" > /dev/null
-                  echo "url=https://$label.vercel.app" >> "$GITHUB_OUTPUT"
-                  echo "Branch address: https://$label.vercel.app" >> "$GITHUB_STEP_SUMMARY"
-
-            - name: Post the preview address
-              if: env.TARGET == 'preview'
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: |
-                  gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
-                      -f state=success \
-                      -f context='Vercel preview (studio)' \
-                      -f description="Deployed $BRANCH" \
-                      -f target_url="${{ steps.alias.outputs.url }}"
+      - name: Deploy
+        run: |
+          # Without a terminal the CLI prints just the deployment URL
+          # on stdout (progress goes to stderr).
+          out=$($VERCEL deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}")
+          url=$(printf '%s\n' "$out" | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | head -1)
+          case "$url" in https://*) ;; *) echo "No deployment URL in the CLI's output" >&2; exit 1 ;; esac
+          echo "Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
