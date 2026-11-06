@@ -21,7 +21,7 @@ function makeDefinition(
     schema,
     configLabels,
     App: () => null,
-  } as WidgetDefinition;
+  };
 }
 
 const definition = makeDefinition(

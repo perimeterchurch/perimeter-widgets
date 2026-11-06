@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     if (session) {
       email = session.user.email ?? '';
       const token = await auth.api.getAccessToken({
-        body: { providerId: 'ministryplatform', userId: session.user.id },
+        body: { useAccountCookie: true, userId: session.user.id },
         headers: hdrs,
       });
       idToken = token?.idToken;

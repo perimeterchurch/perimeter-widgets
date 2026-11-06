@@ -106,7 +106,9 @@ describe('mount config re-validation (studio configOverrides parity with prod da
     const w = defineWidget({
       name: 'm-bool',
       auth: 'none',
-      schema: z.object({ hidden: z.coerce.boolean() }),
+      // zod 4 rejects a missing key for a bare coerce.boolean(), so give it a
+      // default — `true`, so the 'false' override has to actually flip it.
+      schema: z.object({ hidden: z.coerce.boolean().default(true) }),
       App: ({ config }) => {
         received = config.hidden;
         return <p data-testid="lbl">{String(config.hidden)}</p>;
