@@ -110,7 +110,7 @@ export function mount<S extends z.ZodTypeAny>(
         <AuthGate widgetName={definition.name} mode={definition.auth}>
           <ApiClientContext.Provider value={apiClient}>
             <QueryProvider client={queryClient}>
-              <App config={mergedConfig} auth={auth} />
+              <App config={mergedConfig as z.infer<S>} auth={auth} />
             </QueryProvider>
           </ApiClientContext.Provider>
         </AuthGate>

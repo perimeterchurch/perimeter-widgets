@@ -45,5 +45,5 @@ function getOrCreate(): PerimeterWidgetsGlobal {
 
 export function ensureGlobal<S extends z.ZodTypeAny>(def: WidgetDefinition<S>, css: string): void {
   const g = getOrCreate();
-  g.widgets[def.name] = { definition: def as unknown as WidgetDefinition, css };
+  g.widgets[def.name] = { definition: def, css };
 }

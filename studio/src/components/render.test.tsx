@@ -202,7 +202,9 @@ describe('WidgetPreview config gate (studio configOverrides exercise the prod zo
     const def = defineWidget({
       name: 'gate-bool',
       auth: 'none',
-      schema: z.object({ hidden: z.coerce.boolean() }),
+      // zod 4 rejects a missing key for a bare coerce.boolean(), so give it a
+      // default — `true`, so the 'false' override has to actually flip it.
+      schema: z.object({ hidden: z.coerce.boolean().default(true) }),
       App: ({ config }) => {
         received = config.hidden;
         return <p data-testid="bool">{String(config.hidden)}</p>;

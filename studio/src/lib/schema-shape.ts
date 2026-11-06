@@ -1,30 +1,37 @@
 import { z } from 'zod';
 
 /**
- * Reach the underlying ZodObject through wrappers so refined schemas still get
- * per-field inputs. A `z.object({...}).refine(...)` (e.g. sermons) is a ZodEffects,
- * not a ZodObject — without unwrapping, callers fall back to a useless JSON box.
+ * Step through a `z.pipe` (what zod 4 builds for `.transform()` and
+ * `z.preprocess()`) to the side that carries the schema's shape: the input,
+ * unless the input is the bare transform function of a preprocess.
+ */
+function unwrapPipe(pipe: z.ZodPipe): z.ZodType {
+  return (pipe.in instanceof z.ZodTransform ? pipe.out : pipe.in) as z.ZodType;
+}
+
+/**
+ * Reach the underlying ZodObject through wrappers so transformed schemas still get
+ * per-field inputs. (In zod 4 a `.refine()` stays a ZodObject; a `.transform()` is
+ * a ZodPipe.) Without unwrapping, callers fall back to a useless JSON box.
  *
  * Shared by ConfigPanel (per-field inputs) and InfoPanel (schema reference table)
  * so the wrapper-walk lives in one place.
  */
-export function unwrapObject(schema: z.ZodTypeAny): z.ZodObject<z.ZodRawShape> | null {
-  let current: z.ZodTypeAny = schema;
+export function unwrapObject(schema: z.ZodType): z.ZodObject<z.ZodRawShape> | null {
+  let current: z.ZodType = schema;
   for (let i = 0; i < 10; i++) {
-    if (current instanceof z.ZodObject) return current as z.ZodObject<z.ZodRawShape>;
-    // zod's wrapper unwrap methods are typed loosely (effectively `any`); the runtime
-    // values are ZodTypeAny, so this walk is safe.
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-    if (current instanceof z.ZodEffects) {
-      current = current.innerType();
-    } else if (current instanceof z.ZodDefault) {
-      current = current.removeDefault();
-    } else if (current instanceof z.ZodOptional || current instanceof z.ZodNullable) {
-      current = current.unwrap();
+    if (current instanceof z.ZodObject) return current;
+    if (current instanceof z.ZodPipe) {
+      current = unwrapPipe(current);
+    } else if (
+      current instanceof z.ZodDefault ||
+      current instanceof z.ZodOptional ||
+      current instanceof z.ZodNullable
+    ) {
+      current = current.unwrap() as z.ZodType;
     } else {
       return null;
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment */
   }
   return null;
 }
@@ -70,8 +77,8 @@ function formatDefault(value: unknown): string {
  * is captured before unwrapping; optionality is recorded as we pass an Optional
  * /Nullable wrapper. The innermost type's class name becomes the label.
  */
-function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
-  let current: z.ZodTypeAny = field;
+function describeField(field: z.ZodType): Omit<SchemaField, 'key'> {
+  let current: z.ZodType = field;
   let defaultValue: string | null = null;
   let rawDefault: unknown;
   let optional = false;
@@ -83,20 +90,17 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
 
   for (let i = 0; i < 10; i++) {
     if (current instanceof z.ZodDefault) {
-      // defaultValue() is loosely typed (`any`); read it once, keep the real value
-      // for controls (landing in `unknown`, so callers must narrow) and format
+      // zod 4 stores the default as a value (a getter), not a factory. Keep the
+      // real value for controls (as `unknown`, so callers must narrow) and format
       // defensively for display.
-      rawDefault = current._def.defaultValue();
+      rawDefault = current.def.defaultValue;
       defaultValue = formatDefault(rawDefault);
-      /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
-      current = current.removeDefault();
+      current = current.unwrap() as z.ZodType;
     } else if (current instanceof z.ZodOptional || current instanceof z.ZodNullable) {
       optional = true;
-      /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
-      current = current.unwrap();
-    } else if (current instanceof z.ZodEffects) {
-      /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
-      current = current.innerType();
+      current = current.unwrap() as z.ZodType;
+    } else if (current instanceof z.ZodPipe) {
+      current = unwrapPipe(current);
     } else {
       break;
     }
@@ -117,27 +121,26 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
     type = `enum(${enumOptions.join(' | ')})`;
   } else {
     if (current instanceof z.ZodNumber) {
-      // z.coerce.number().min(0).max(20) stores constraints as checks.
-      for (const check of current._def.checks) {
-        if (check.kind === 'min') min = check.value;
-        else if (check.kind === 'max') max = check.value;
+      // z.coerce.number().min(0).max(20) stores constraints as checks. Read the
+      // explicit bounds only — NOT `minValue`/`maxValue`, which also fold in
+      // `.int()`'s ±MAX_SAFE_INTEGER range and would show it as a real limit.
+      for (const check of current.def.checks ?? []) {
+        const def = check._zod.def as { check: string; value?: unknown };
+        if (typeof def.value !== 'number') continue;
+        if (def.check === 'greater_than') min = def.value;
+        else if (def.check === 'less_than') max = def.value;
       }
     }
-    // ZodString → "string", ZodNumber → "number", ZodBoolean → "boolean", etc.
+    // "string", "number", "boolean", etc.
     //
-    // Read the name from zod's `_def.typeName` — a STRING zod stores on every
-    // schema ("ZodBoolean", "ZodNumber", …) — NOT from `constructor.name`. A
-    // production build minifies zod's class names, so `constructor.name` becomes a
-    // mangled letter and `type` never equals "boolean"/"number"; every field then
-    // falls through to a text input. This only reproduces in the minified bundle —
-    // the dev server and the Playwright harness both run unminified source, which
-    // is why it shipped. `_def.typeName` is a string literal, so it survives.
-    // Guarded by schema-shape.test.ts's minification-safety test.
-    // `_def` is loosely typed (`any`); narrow to just the field we read so the
-    // access is type-safe rather than disabled.
-    const def = current._def as { typeName?: string } | undefined;
-    const name = typeof def?.typeName === 'string' ? def.typeName : current.constructor.name;
-    type = name.replace(/^Zod/, '').toLowerCase();
+    // Read the name from zod's `def.type` — a STRING zod stores on every schema —
+    // NOT from `constructor.name`. A production build minifies zod's class names,
+    // so `constructor.name` becomes a mangled letter and `type` never equals
+    // "boolean"/"number"; every field then falls through to a text input. This
+    // only reproduces in the minified bundle — the dev server and the Playwright
+    // harness both run unminified source. `def.type` is a string literal, so it
+    // survives. Guarded by schema-shape.test.ts's minification-safety test.
+    type = current.def.type;
   }
 
   return { type, default: defaultValue, rawDefault, optional, enumOptions, min, max, description };
@@ -147,11 +150,11 @@ function describeField(field: z.ZodTypeAny): Omit<SchemaField, 'key'> {
  * Derive a flat field reference (key, type, default, optionality) for every key
  * of a widget's schema. Returns `[]` when the schema isn't an object-shaped one.
  */
-export function describeSchemaFields(schema: z.ZodTypeAny): SchemaField[] {
+export function describeSchemaFields(schema: z.ZodType): SchemaField[] {
   const object = unwrapObject(schema);
   if (!object) return [];
   return Object.entries(object.shape).map(([key, field]) => ({
     key,
-    ...describeField(field),
+    ...describeField(field as z.ZodType),
   }));
 }
