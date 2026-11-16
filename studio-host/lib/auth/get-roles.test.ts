@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
 
 // `get-roles` reads the MP token through Better Auth; stub that so these tests
 // exercise the upstream call, the cache, and the failure-mode split only.
@@ -23,7 +23,7 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
-let fetchMock: ReturnType<typeof vi.fn>;
+let fetchMock: Mock<typeof fetch>;
 
 beforeEach(() => {
   _clearCacheForTests();

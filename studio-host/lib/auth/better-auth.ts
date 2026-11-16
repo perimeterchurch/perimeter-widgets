@@ -10,6 +10,12 @@ import { AUTH_COOKIE_PREFIX } from './config';
 const mpBaseURL = process.env.MP_API_BASEURL || '';
 const mpOauthURL = `${mpBaseURL}/oauth`;
 
+// The redirect URI registered on MP's API client. Better Auth < 1.7 served the
+// generic-OAuth callback at /api/auth/oauth2/callback/:id; 1.7 moved it to the
+// core /api/auth/callback/:id. Pinning the old URI keeps MP's registration
+// valid; the legacy route in app/api/auth/oauth2/callback/[id] forwards it.
+export const MP_REDIRECT_PATH = '/api/auth/oauth2/callback/ministryplatform';
+
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
@@ -52,6 +58,7 @@ export const auth = betterAuth({
             'http://www.thinkministry.com/dataplatform/scopes/all',
           ],
           pkce: false,
+          redirectURI: `${process.env.BETTER_AUTH_URL || ''}${MP_REDIRECT_PATH}`,
           // Not async: the gate is synchronous (the OIDC `roles` claim carries
           // everything). Better Auth accepts a sync mapper and awaits it anyway.
           mapProfileToUser: (profile) => {

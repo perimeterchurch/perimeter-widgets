@@ -7,7 +7,8 @@ export default defineWidget({
   auth: 'none',
   // Host-page config arrives as data-* attributes (always strings). Use
   // z.coerce.number()/z.coerce.boolean() for any numeric/boolean fields so the
-  // studio and production parse them identically.
+  // studio and production parse them identically, and give every field a
+  // .default() or .optional() — zod 4 rejects a missing attribute otherwise.
   schema: z.object({
     title: z.string().default('__NAME__'),
   }),

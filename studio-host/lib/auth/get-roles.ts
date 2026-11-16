@@ -139,7 +139,7 @@ export async function getRoleIds(
   let accessToken: string | undefined;
   try {
     const token = await auth.api.getAccessToken({
-      body: { providerId: 'ministryplatform', userId: session.user.id },
+      body: { useAccountCookie: true, userId: session.user.id },
       headers,
     });
     accessToken = token?.accessToken;

@@ -1,10 +1,9 @@
 import { createAuthClient } from 'better-auth/react';
-import { genericOAuthClient } from 'better-auth/client/plugins';
 
-// Client for the studio shell. Same setup as KB. baseURL defaults to the
-// current origin, so it talks to this shell's /api/auth/*.
-export const authClient = createAuthClient({
-  plugins: [genericOAuthClient()],
-});
+// Client for the studio shell. baseURL defaults to the current origin, so it
+// talks to this shell's /api/auth/*. Since Better Auth 1.7 the genericOAuth
+// provider is a first-class social provider, so no client plugin is needed —
+// sign-in goes through `signIn.social({ provider: 'ministryplatform' })`.
+export const authClient = createAuthClient({});
 
 export const { signIn, signOut, useSession } = authClient;

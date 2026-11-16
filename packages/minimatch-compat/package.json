@@ -1,0 +1,20 @@
+{
+  "name": "@perimeter/minimatch-compat",
+  "version": "0.0.0",
+  "private": true,
+  "description": "minimatch 3/5-shaped default export backed by minimatch 11. Dev tooling only (eslint 9, @redocly/openapi-core 1.x); see index.cjs.",
+  "main": "index.cjs",
+  "exports": {
+    ".": {
+      "types": "./index.d.cts",
+      "default": "./index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "minimatch": "^11.0.1"
+  }
+}

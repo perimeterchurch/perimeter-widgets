@@ -41,6 +41,6 @@ export function parseDataAttrs<S extends z.ZodTypeAny>(
     rawConfig[key] = applyBoolShorthand(attr.value);
   }
 
-  const config = schema.parse(rawConfig) as z.infer<S>;
+  const config = schema.parse(rawConfig);
   return { config, themeOverrides };
 }

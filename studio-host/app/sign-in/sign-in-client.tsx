@@ -29,11 +29,11 @@ function SignInContent({ signedOut }: { signedOut: boolean }) {
 
   const signIn = () => {
     setStarting(true);
-    // Verified endpoint for this server's genericOAuth(MP) config (Phase 0):
-    // /api/auth/sign-in/oauth2 with providerId. errorCallbackURL routes a
-    // role-denied user to /access-denied instead of a raw error.
-    void authClient.signIn.oauth2({
-      providerId: 'ministryplatform',
+    // Better Auth 1.7 registers the genericOAuth(MP) provider as a social
+    // provider: /api/auth/sign-in/social with provider. errorCallbackURL routes
+    // a role-denied user to /access-denied instead of a raw error.
+    void authClient.signIn.social({
+      provider: 'ministryplatform',
       callbackURL,
       errorCallbackURL: '/access-denied',
     });

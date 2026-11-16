@@ -29,6 +29,8 @@ The shell uses the **same MP OAuth client as perimeter-api / KB** (client id `pe
 https://style.perimeter.org/api/auth/oauth2/callback/ministryplatform
 ```
 
+> **Better Auth 1.7 note:** 1.7 serves OAuth callbacks at `/api/auth/callback/:id`, not `/api/auth/oauth2/callback/:id`. The registered URI above is kept on purpose: `better-auth.ts` pins it as the `redirectURI` (`MP_REDIRECT_PATH`), and `app/api/auth/oauth2/callback/[id]/route.ts` hands it to Better Auth under the new path. Don't delete that route unless the MP client's redirect URI is changed to `/api/auth/callback/ministryplatform` at the same time.
+
 - This is **additive** — leave the existing entries (KB's, `http://localhost:5173/...`) in place. The `authorization_code` grant is already enabled on this client, so nothing else on the record changes. (See the plan §7; OAuth matches redirect URIs verbatim — exact scheme/host/path, no trailing slash.)
 - **Preview deploys:** Vercel preview URLs are per-deployment hashes and can't all be pre-registered. Either (a) assign the shell a **stable preview alias** (e.g. `studio-preview.perimeter.org`) and register its callback too, or (b) accept that **auth only works on localhost + production** and test preview builds without sign-in. Decide with the owner.
 

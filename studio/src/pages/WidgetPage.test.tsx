@@ -115,7 +115,9 @@ describe('WidgetPage (/widgets/:slug)', () => {
       { timeout: 10_000 },
     );
     expect(scope.queryByRole('tablist')).toBeNull();
-    // And it says so, rather than showing a version it does not have.
-    expect(scope.getByText('not released')).toBeTruthy();
+    // And it says so, rather than showing a version it does not have. The label
+    // waits for the CDN manifest to resolve, which can land after the preview
+    // mounts on a busy runner, so wait for it rather than asserting at once.
+    expect(await scope.findByText('not released', {}, { timeout: 10_000 })).toBeTruthy();
   });
 });
