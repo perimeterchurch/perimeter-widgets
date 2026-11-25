@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { genericOAuth } from 'better-auth/plugins';
 import { authorizeRoles } from './roles';
+import { emailVerifiedClaim, imageClaim } from './mp-claims';
 import { AUTH_COOKIE_PREFIX } from './config';
 
 // Ported from the Knowledge Base (knowledgebase-2.0/src/lib/auth/better-auth.ts):
@@ -82,6 +83,10 @@ export const auth = betterAuth({
             return {
               email,
               name: `${given} ${family}`.trim() || email,
+              // Set here, not left to Better Auth: its session-cookie check
+              // rejects MP's string email_verified (see mp-claims.ts).
+              emailVerified: emailVerifiedClaim(p.email_verified),
+              image: imageClaim(p.picture),
               firstName: given,
               lastName: family,
               roles: matched.join(','),
